@@ -236,31 +236,34 @@ class FilesRemover:
 
 class MfRemover:
     def start(mf_alias: str, queue: Queue):
-        engine = Dbase.create_engine()
-        conn = engine.connect()
+        with Dbase.create_engine().begin() as conn:
+            stmt = (
+                sqlalchemy.select(Thumbs.rel_thumb_path)
+                .where(Thumbs.mf_alias==mf_alias)
+            )
+            res = conn.execute(stmt).scalars().all()
 
-        stmt = sqlalchemy.select(Thumbs.rel_thumb_path).where(
-            Thumbs.mf_alias==mf_alias
-        )
-        res = conn.execute(stmt).scalars()
-
-        for rel_thumb_path in res:
-            abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-            try:
-                os.remove(abs_thumb_path)
-                os.rmdir(os.path.dirname(abs_thumb_path))
-            except Exception as e:
-                pass
-
-        stmt = sqlalchemy.delete(Thumbs.table).where(Thumbs.mf_alias == mf_alias)
-        conn.execute(stmt)
-
-        stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias == mf_alias)
-        conn.execute(stmt)
-
-        conn.commit()
-        conn.close()
-        engine.dispose()
+            for rel_thumb_path in res:
+                abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+                try:
+                    os.remove(abs_thumb_path)
+                except Exception as e:
+                    print(traceback.format_exc())
+                    continue
+                try:
+                    os.rmdir(os.path.dirname(abs_thumb_path))
+                except OSError:
+                    pass
+            stmt = (
+                sqlalchemy.delete(Thumbs.table)
+                .where(Thumbs.mf_alias == mf_alias)
+            )
+            conn.execute(stmt)
+            stmt = (
+                sqlalchemy.delete(Dirs.table)
+                .where(Dirs.mf_alias == mf_alias)
+            )
+            conn.execute(stmt)
 
 
 class _DirChangedHandler(FileSystemEventHandler):
