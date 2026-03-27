@@ -471,12 +471,12 @@ class _RemovedDirsWorker:
             one_slash = f"{dir_item.rel_path}/%"
             two_slash = f"{dir_item.rel_path}/%/%"
             stmt_thumbs_to_remove = (
-                sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
+                sqlalchemy.select(Thumbs.rel_thumb_path)
                 .where(Thumbs.rel_img_path.ilike(one_slash))
                 .where(Thumbs.rel_img_path.not_ilike(two_slash))
                 .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             )
-            return conn.execute(stmt_thumbs_to_remove).all()
+            return conn.execute(stmt_thumbs_to_remove).scalars().all()
         
         def _remove_thumb(rel_thumb_path: str):
             abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
@@ -490,8 +490,10 @@ class _RemovedDirsWorker:
                 pass
 
         def _remove_records(conn: sqlalchemy.Connection, thumbs_to_remove):
-            del_stmt = sqlalchemy.delete(Thumbs.table).where(
-                Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
+            del_stmt = (
+                sqlalchemy.delete(Thumbs.table)
+                .where(Thumbs.rel_thumb_path.in_(thumbs_to_remove))
+                .where(Thumbs.mf_alias==scaner_item.mf.mf_alias)
             )
             conn.execute(del_stmt)
 
@@ -499,7 +501,7 @@ class _RemovedDirsWorker:
             for dir_item in removed_dirs:
                 thumbs_to_remove = _get_thumbs(conn, dir_item)
                 if thumbs_to_remove:
-                    for _, rel_thumb_path in thumbs_to_remove:
+                    for rel_thumb_path in thumbs_to_remove:
                         _remove_thumb(rel_thumb_path)
                     _remove_records(conn, thumbs_to_remove)
 
