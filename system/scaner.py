@@ -472,11 +472,8 @@ class _DirsToScanWorker:
         finder_images = _ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
         db_images = _ImgLoader.get_db_images(scaner_item, dirs_to_scan)
         del_images, new_images = _ImgCompator.start(finder_images, db_images)
-
         # общий счет для отображения в GUI
         scaner_item.total_count = len(del_images) + len(new_images)
-
-        # удаляем миниатюры
         _ThumbsUpdater.del_thumbs(scaner_item, del_images)
         _ThumbsUpdater.add_thumbs(scaner_item, new_images)
         _DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
