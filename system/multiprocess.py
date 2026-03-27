@@ -301,7 +301,7 @@ class UpdateThumb:
                 return img_array
             return None
 
-        rel_img_path_to_array: dict[str, np.ndarray] = {}
+        update_thumb_items: list[UpdateThumbItem] = []
         engine = Dbase.create_engine()
         step = 10
         chunked_rel_img_paths = [
@@ -322,7 +322,9 @@ class UpdateThumb:
                 rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
                 thumb = _write_thumb(abs_img_path, abs_thumb_path)
                 if thumb is not None:
-                    rel_img_path_to_array[rel_img_path] = thumb
+                    update_thumb_items.append(
+                        UpdateThumbItem(rel_img_path, thumb)
+                    )
                     stats = os.stat(abs_img_path)
                     values_list.append({
                         ClmnNames.rel_item_path: rel_img_path,
@@ -343,5 +345,4 @@ class UpdateThumb:
                 stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
                 conn.execute(stmt)
 
-        item = UpdateThumbItem(rel_img_path_to_array)
-        queue.put(item)
+        queue.put(update_thumb_items)

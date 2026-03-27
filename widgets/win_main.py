@@ -293,11 +293,11 @@ class WinMain(UMainWindow):
         def poll_task():
             queue = self.update_thumb_task.process_queue
             if not queue.empty():
-                item: UpdateThumbItem = queue.get()
-                for rel_img_path, array in item.rel_img_path_to_array.items():
-                    wid = self.grid.path_to_wid.get(rel_img_path)
+                update_thumb_items: list[UpdateThumbItem] = queue.get()
+                for i in update_thumb_items:
+                    wid = self.grid.path_to_wid.get(i.rel_img_path)
                     if wid:
-                        wid.img = Utils.pixmap_from_array(array)
+                        wid.img = Utils.pixmap_from_array(i.array)
                         wid.setup()
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
