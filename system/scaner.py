@@ -581,10 +581,9 @@ class AllDirScaner:
             return
         removed_dirs = _DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
         dirs_to_scan = _DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
-
         # это нужно, когда удалена вся папка "имя папки"
         # то есть не когда "имя папки" пуста, но существует,
-        # а когда папка "имя папки" не существует
+        # а когда папка "имя папки" не существуетre
         if removed_dirs:
             _RemovedDirsWorker.remove_thumbs(removed_dirs, scaner_item)
             _RemovedDirsWorker.remove_dirs(removed_dirs, scaner_item)
