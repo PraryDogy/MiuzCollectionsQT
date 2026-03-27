@@ -198,7 +198,12 @@ class CopyTask:
         return path
         
     @staticmethod
-    def copy_file_with_progress(process_queue: Queue, copy_item: CopyTaskItem, src: Path, dest: Path):
+    def copy_file_with_progress(
+        process_queue: Queue,
+        copy_item: CopyTaskItem,
+        src: Path,
+        dest: Path
+    ):
         block = 4 * 1024 * 1024  # 4 MB
         with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
             while True:
