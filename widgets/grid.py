@@ -19,7 +19,7 @@ from system.utils import Utils
 from ._base_widgets import (NotifyWid, UMenu, USubMenu, USvgSqareWidget,
                             UVBoxLayout, VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
-                      PasteFiles, RemoveFiles, RevealInFinder, Save, SaveAs,
+                      PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, UpdateThumbAction, WinInfoAction)
 
 
@@ -396,7 +396,6 @@ class Grid(VScrollArea):
     paste_files = pyqtSignal()
     set_clipboard = pyqtSignal(tuple)
     setup_mf = pyqtSignal(SettingsItem)
-    go_to_widget = pyqtSignal(str)
     update_thumb = pyqtSignal(list)
     
     resize_ms = 10
@@ -415,7 +414,6 @@ class Grid(VScrollArea):
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
-        self.go_to_url: str = None
 
         self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
 

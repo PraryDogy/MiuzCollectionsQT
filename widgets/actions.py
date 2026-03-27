@@ -61,12 +61,6 @@ class Save(QAction):
         super().__init__(parent=parent, text=text)
 
 
-class SaveAs(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.save_as[Cfg.lng_index]} ({total})"
-        super().__init__(parent=parent, text=text)
-
-
 class RemoveFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
         if total > 1:
@@ -95,8 +89,5 @@ class PasteFiles(QAction):
 
 class UpdateThumbAction(QAction):
     def __init__(self, parent: QMenu, total: int):
-        if total > 1:
-            text = f"{Lng.update_thumbs[Cfg.lng_index]} ({total})"
-        else:
-            text = Lng.update_thumb[Cfg.lng_index]
+        text = Lng.update_thumb[Cfg.lng_index]
         super().__init__(text=text, parent=parent)

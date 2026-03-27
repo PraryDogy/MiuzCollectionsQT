@@ -178,9 +178,6 @@ class WinMain(UMainWindow):
         self.grid.setup_mf.connect(
             self.open_settings_win
         )
-        self.grid.go_to_widget.connect(
-            lambda rel_path: self.go_to_widget(rel_path)
-        )
         self.grid.path_bar_update.connect(
             lambda rel_path: self.path_bar_update(rel_path)
         )
@@ -244,15 +241,7 @@ class WinMain(UMainWindow):
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"
         self.bar_path.update(dir)
-    
-    def go_to_widget(self, rel_path: str):
-        dirname = os.path.dirname(rel_path)
-        Dynamic.current_dir = dirname
-        self.left_menu.tree_wid.expand_to_path(dirname)
-        self.left_menu.setCurrentIndex(1)
-        self.grid.go_to_url = rel_path
-        self.grid.reload_thumbnails()
-    
+        
     def open_filters_win(self):
 
         def on_closed():

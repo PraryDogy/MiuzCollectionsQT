@@ -274,7 +274,6 @@ class Lng:
     only_this_folder = ("Показать только в этой папке", "Show only this folder")
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрывать нумерацию", "Hide numbering")
-    go_to_folder = ("Перейти к папке", "Go to folder")
     expand_all = ("Развернуть всё", "Expand All")
     collapse_all = ("Свернуть всё", "Collapse All")
     forward = ("Вперед", "Forward")
@@ -371,12 +370,8 @@ class Lng:
         ""
     )
     update_thumb = (
-        "Обновить изображение",
-        "Update image"
-    )
-    update_thumbs = (
-        "Обновить изображения",
-        "Update images"
+        "Обновить данные",
+        "Update data"
     )
     advanced = (
         "Дополнительно",
