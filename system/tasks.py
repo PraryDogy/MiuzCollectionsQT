@@ -1,5 +1,6 @@
 import os
 import shutil
+import traceback
 from collections import defaultdict
 from datetime import datetime
 
@@ -239,15 +240,25 @@ class DbImagesLoader(URunnable):
 
         return stmt
 
-    def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
+    def combine_dates(
+            self,
+            date_start: datetime,
+            date_end: datetime
+        ):
         """
         Преобразует даты в timestamp для фильтрации:
         - date_start → 00:00:00
         - date_end → 23:59:59
         Возвращает кортеж (start_timestamp, end_timestamp).
         """
-        start = datetime.combine(date_start, datetime.min.time())
-        end = datetime.combine(date_end, datetime.max.time().replace(microsecond=0))
+        start = datetime.combine(
+            date_start,
+            datetime.min.time()
+        )
+        end = datetime.combine(
+            date_end,
+            datetime.max.time().replace(microsecond=0)
+        )
         return datetime.timestamp(start), datetime.timestamp(end)
 
 
@@ -273,9 +284,7 @@ class MfDataCleaner(URunnable):
         try:
             self._task()
         except Exception as e:
-            import traceback
             print(traceback.format_exc())
-            print("tasks, reset data task error:", e)
         finally:
             self.conn.close()
             self.sigs.finished_.emit()
