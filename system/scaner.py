@@ -468,12 +468,12 @@ class _RemovedDirsWorker:
         """
 
         def _get_thumbs(conn: sqlalchemy.Connection, dir_item: ScanerDirItem):
+            one_slash = f"{dir_item.rel_path}/%"
+            two_slash = f"{dir_item.rel_path}/%/%"
             stmt_thumbs_to_remove = (
                 sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path)
-                # как /путь к директории
-                .where(Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%"))
-                # но не как /путь к директории/субдиректория
-                .where(Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%"))
+                .where(Thumbs.rel_img_path.ilike(one_slash))
+                .where(Thumbs.rel_img_path.not_ilike(two_slash))
                 .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             )
             return conn.execute(stmt_thumbs_to_remove).all()
