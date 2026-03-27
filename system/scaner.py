@@ -409,12 +409,9 @@ class ThumbsUpdater:
                 rel_img_path=rel_img_path,
                 mf_alias=scaner_item.mf.mf_alias
             )
-            try:
-                ImgUtils.write_thumb(thumb_path, img)
+            if ImgUtils.write_thumb(thumb_path, img):
                 return True
-            except Exception as e:
-                print(traceback.format_exc())
-                return False
+            return False
 
         step = 10
         chunked_new_images = [
