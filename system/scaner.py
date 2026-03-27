@@ -489,17 +489,19 @@ class _RemovedDirsWorker:
             except OSError:
                 pass
 
+        def _remove_records(conn: sqlalchemy.Connection, thumbs_to_remove):
+            del_stmt = sqlalchemy.delete(Thumbs.table).where(
+                Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
+            )
+            conn.execute(del_stmt)
+
         with scaner_item.engine.begin() as conn:
             for dir_item in removed_dirs:
                 thumbs_to_remove = _get_thumbs(conn, dir_item)
-                if not thumbs_to_remove:
-                    continue
-                for _, rel_thumb_path in thumbs_to_remove:
-                    _remove_thumb(rel_thumb_path)
-                del_stmt = sqlalchemy.delete(Thumbs.table).where(
-                    Thumbs.id.in_([id_ for id_, _ in thumbs_to_remove])
-                )
-                conn.execute(del_stmt)
+                if thumbs_to_remove:
+                    for _, rel_thumb_path in thumbs_to_remove:
+                        _remove_thumb(rel_thumb_path)
+                    _remove_records(conn, thumbs_to_remove)
 
     def remove_dirs(removed_dirs: list[ScanerDirItem], scaner_item: ScanerItem):
         """
