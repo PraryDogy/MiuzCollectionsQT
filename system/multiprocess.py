@@ -300,6 +300,28 @@ class UpdateThumb:
             if ImgUtils.write_thumb(abs_thumb_path, img_array):
                 return img_array
             return None
+        
+        def _get_values(
+                abs_img_path: str,
+                rel_img_path: str,
+                rel_thumb_path: str
+            ):
+            try:
+                stats = os.stat(abs_img_path)
+            except Exception as e:
+                print(traceback.format_exc())
+                return None
+            return {
+                ClmnNames.rel_item_path: rel_img_path,
+                ClmnNames.rel_thumb_path: rel_thumb_path,
+                ClmnNames.size: int(stats.st_size),
+                ClmnNames.birth: 0,
+                ClmnNames.mod: int(stats.st_mtime),
+                ClmnNames.resol: "none",
+                ClmnNames.coll: "none",
+                ClmnNames.fav: 0,
+                ClmnNames.mf_alias: mf.mf_alias
+            }
 
         update_thumb_items: list[UpdateThumbItem] = []
         engine = Dbase.create_engine()
@@ -319,24 +341,21 @@ class UpdateThumb:
                     rel_img_path,
                     mf.mf_alias
                 )
-                rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+                rel_thumb_path = Utils.get_rel_thumb_path(
+                    abs_thumb_path
+                )
                 thumb = _write_thumb(abs_img_path, abs_thumb_path)
                 if thumb is not None:
-                    update_thumb_items.append(
-                        UpdateThumbItem(rel_img_path, thumb)
+                    result = _get_values(
+                        abs_img_path,
+                        rel_img_path,
+                        rel_thumb_path
                     )
-                    stats = os.stat(abs_img_path)
-                    values_list.append({
-                        ClmnNames.rel_item_path: rel_img_path,
-                        ClmnNames.rel_thumb_path: rel_thumb_path,
-                        ClmnNames.size: int(stats.st_size),
-                        ClmnNames.birth: 0,
-                        ClmnNames.mod: int(stats.st_mtime),
-                        ClmnNames.resol: "none",
-                        ClmnNames.coll: "none",
-                        ClmnNames.fav: 0,
-                        ClmnNames.mf_alias: mf.mf_alias
-                    })
+                    if result:
+                        values_list.append(result)
+                        item = UpdateThumbItem(rel_img_path, thumb)
+                        update_thumb_items.append(item)
+
             with engine.begin() as conn:
                 stmt = sqlalchemy.delete(Thumbs.table)
                 stmt = stmt.where(Thumbs.mf_alias == mf.mf_alias)
