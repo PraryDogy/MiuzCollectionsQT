@@ -359,11 +359,17 @@ class UpdateThumb:
             with engine.begin() as conn:
                 if chunk_rel_img_paths:
                     stmt = sqlalchemy.delete(Thumbs.table)
-                    stmt = stmt.where(Thumbs.mf_alias == mf.mf_alias)
-                    stmt = stmt.where(Thumbs.rel_img_path.in_(chunk_rel_img_paths))
+                    stmt = stmt.where(
+                        Thumbs.mf_alias == mf.mf_alias
+                    )
+                    stmt = stmt.where(
+                        Thumbs.rel_img_path.in_(chunk_rel_img_paths)
+                    )
                     conn.execute(stmt)
                 if values_list:
-                    stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
+                    stmt = sqlalchemy.insert(Thumbs.table).values(
+                        values_list
+                    )
                     conn.execute(stmt)
 
         queue.put(update_thumb_items)
