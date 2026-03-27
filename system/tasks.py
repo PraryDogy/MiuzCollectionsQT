@@ -206,18 +206,36 @@ class DbImagesLoader(URunnable):
             .offset(Dynamic.loaded_thumbs)
         )
         if Dynamic.sort_by_mod:
-            stmt = stmt.order_by(-Thumbs.mod)
+            stmt = (
+                stmt
+                .order_by(-Thumbs.mod)
+            )
         else:
-            stmt = stmt.order_by(-Thumbs.id)
-        stmt = stmt.where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
-        stmt = stmt.where(Thumbs.rel_img_path.ilike(f"{Dynamic.current_dir}/%"))
+            stmt = (
+                stmt
+                .order_by(-Thumbs.id)
+            )
+        one_slash = f"{Dynamic.current_dir}/%"
+        stmt = (
+            stmt
+            .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
+            .where(Thumbs.rel_img_path.ilike(one_slash))
+        )
         if Dynamic.filter_favs:
-            stmt = stmt.where(Thumbs.fav == 1)
+            stmt = (
+                stmt
+                .where(Thumbs.fav==1)
+            )
         if Dynamic.filter_only_folder:
-            stmt = stmt.where(Thumbs.rel_img_path.not_ilike(f"{Dynamic.current_dir}/%/%"))
+            two_slash = f"{Dynamic.current_dir}/%/%"
+            stmt = (
+                stmt
+                .where(Thumbs.rel_img_path.not_ilike(two_slash))
+            )
         if Dynamic.filters_enabled:
-            stmt = stmt.where(
-                sqlalchemy.or_(*[Thumbs.rel_img_path.ilike(f"%{f}%") for f in Dynamic.filters_enabled])
+            stmt = (
+                stmt
+                .where(sqlalchemy.or_(*[Thumbs.rel_img_path.ilike(f"%{f}%") for f in Dynamic.filters_enabled]))
             )
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
