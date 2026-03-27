@@ -153,9 +153,10 @@ class _DirsDbUpdater:
             return
         with scaner_item.engine.begin() as conn:
             rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
-            del_stmt = sqlalchemy.delete(Dirs.table).where(
-                Dirs.rel_dir_path.in_(rel_paths),
-                Dirs.mf_alias == scaner_item.mf.mf_alias
+            del_stmt = (
+                sqlalchemy.delete(Dirs.table)
+                .where(Dirs.rel_dir_path.in_(rel_paths))
+                .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
             )
             conn.execute(del_stmt)
             values_list = [
@@ -167,7 +168,9 @@ class _DirsDbUpdater:
                 for dir_item in dirs_to_scan
             ]
             if values_list:
-                conn.execute(sqlalchemy.insert(Dirs.table), values_list)
+                conn.execute(
+                    sqlalchemy.insert(Dirs.table), values_list
+                )
 
 
 class _ImgLoader:
@@ -214,13 +217,15 @@ class _ImgLoader:
         conn = scaner_item.engine.connect()
         db_images: list[ScanerImgItem] = []
         for dir_item in dirs_to_scan:
-            stmt = sqlalchemy.select(
-                Thumbs.rel_thumb_path,
-                Thumbs.rel_img_path,
-                Thumbs.size,
-                Thumbs.mod
+            stmt = (
+                sqlalchemy.select(
+                    Thumbs.rel_thumb_path,
+                    Thumbs.rel_img_path,
+                    Thumbs.size,
+                    Thumbs.mod
                 )
-            stmt = stmt.where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+                .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+            )
             if dir_item.rel_path == os.sep:
                 # если относительный путь является корневым каталогом /
                 # как путь /изображение.jpg
