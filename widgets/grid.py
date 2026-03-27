@@ -975,6 +975,15 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
+            self.menu_.addSeparator()
+
+            act = QAction(
+                f"{Lng.selected_objects[Cfg.lng_index]} ({len(rel_paths)})",
+                self.menu_
+            )
+            act.setDisabled(True)
+            self.menu_.addAction(act)
+
         if not clicked_wid:
             menu_empty()
         else:

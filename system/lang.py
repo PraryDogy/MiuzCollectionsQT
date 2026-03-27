@@ -377,3 +377,8 @@ class Lng:
         "Дополнительно",
         "Advanced"
     )
+
+    selected_objects = (
+        "Выделено объектов",
+        "Selected objects"
+    )
