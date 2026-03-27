@@ -194,7 +194,7 @@ class DbImagesLoader(URunnable):
 
         return thumbs_dict
 
-    def get_stmt(self):
+    def get_stmt(self) -> sqlalchemy.Select:
         stmt = (
             sqlalchemy.select(
                 Thumbs.rel_img_path,
@@ -202,41 +202,60 @@ class DbImagesLoader(URunnable):
                 Thumbs.mod,
                 Thumbs.fav
             )
-            .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
-            .where(Thumbs.rel_img_path.ilike(f"{Dynamic.current_dir}/%"))
-            .order_by(-Thumbs.mod if Dynamic.sort_by_mod else -Thumbs.id)
             .limit(Static.thumbs_load_limit)
             .offset(Dynamic.loaded_thumbs)
         )
-
+        if Dynamic.sort_by_mod:
+            stmt = (
+                stmt
+                .order_by(-Thumbs.mod)
+            )
+        else:
+            stmt = (
+                stmt
+                .order_by(-Thumbs.id)
+            )
+        one_slash = f"{Dynamic.current_dir}/%"
+        stmt = (
+            stmt
+            .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
+            .where(Thumbs.rel_img_path.ilike(one_slash))
+        )
         if Dynamic.filter_favs:
-            stmt = stmt.where(Thumbs.fav == 1)
-
+            stmt = (
+                stmt
+                .where(Thumbs.fav==1)
+            )
         if Dynamic.filter_only_folder:
             two_slash = f"{Dynamic.current_dir}/%/%"
             stmt = (
                 stmt
                 .where(Thumbs.rel_img_path.not_ilike(two_slash))
             )
-
         if Dynamic.filters_enabled:
             filters = [
                 Thumbs.rel_img_path.ilike(f"%{filter}%")
                 for filter in Dynamic.filters_enabled
             ]
-            stmt = stmt.where(sqlalchemy.or_(*filters))
-
+            stmt = (
+                stmt
+                .where(sqlalchemy.or_(*filters))
+            )
         if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
-            stmt = stmt.where(Thumbs.rel_img_path.ilike(f"%{text}%"))
-
+            stmt = (
+                stmt
+                .where(Thumbs.rel_img_path.ilike(f"%{text}%"))
+            )
         if any((Dynamic.date_start, Dynamic.date_end)):
             start, end = self.combine_dates(
                 Dynamic.date_start,
                 Dynamic.date_end
             )
-            stmt = stmt.where(Thumbs.mod > start, Thumbs.mod < end)
-
+            stmt = (
+                stmt
+                .where(Thumbs.mod > start).where(Thumbs.mod < end)
+            )
         return stmt
 
     def combine_dates(self, date_start: datetime, date_end: datetime) -> tuple[float, float]:
