@@ -227,21 +227,20 @@ class _ImgLoader:
                 .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
             )
             if dir_item.rel_path == os.sep:
-                # если относительный путь является корневым каталогом /
-                # как путь /изображение.jpg
-                stmt = stmt.where(Thumbs.rel_img_path.ilike("/%"))
-                # не как путь /директория/изображение.jpg
-                stmt = stmt.where(Thumbs.rel_img_path.not_ilike(f"/%/%"))
-            else:
-                # иначе относительный путь является каталогом /директория
-                # как путь /директория/изображение.jpg
-                stmt = stmt.where(
-                    Thumbs.rel_img_path.ilike(f"{dir_item.rel_path}/%")
+                one_slash = "/%"
+                two_slash = "/%/%"
+                stmt = (
+                    stmt
+                    .where(Thumbs.rel_img_path.ilike(one_slash))
+                    .where(Thumbs.rel_img_path.not_ilike(two_slash))
                 )
-                # иначе относительный путь является каталогом /директория
-                # не как путь /директория/субдиректория/изображение.jpg
-                stmt = stmt.where(
-                    Thumbs.rel_img_path.not_ilike(f"{dir_item.rel_path}/%/%")
+            else:
+                one_slash = f"{dir_item.rel_path}/%"
+                two_slash = f"{dir_item.rel_path}/%/%"
+                stmt = (
+                    stmt
+                    .where(Thumbs.rel_img_path.ilike(one_slash))
+                    .where(Thumbs.rel_img_path.not_ilike(two_slash))
                 )
             for rel_thumb_path, rel_path, size, mod in conn.execute(stmt):
                 abs_img_path = Utils.get_abs_any_path(
