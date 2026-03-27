@@ -103,13 +103,13 @@ class FavManager(URunnable):
     def task(self):
         """Обновляет поле 'fav' в БД и эмитит сигнал с результатом."""
         try:
-            q = (
+            stmt = (
                 sqlalchemy.update(Thumbs.table)
                 .where(Thumbs.rel_img_path == self.rel_path)
                 .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
                 .values(fav=self.value)
             )
-            self.conn.execute(q)
+            self.conn.execute(stmt)
             self.conn.commit()
             self.sigs.finished_.emit(self.value)
         except Exception as e:
@@ -195,12 +195,16 @@ class DbImagesLoader(URunnable):
         return thumbs_dict
 
     def get_stmt(self) -> sqlalchemy.Select:
-        stmt = sqlalchemy.select(
-            Thumbs.rel_img_path,
-            Thumbs.rel_thumb_path,
-            Thumbs.mod,
-            Thumbs.fav
-        ).limit(Static.thumbs_load_limit).offset(Dynamic.loaded_thumbs)
+        stmt = (
+            sqlalchemy.select(
+                Thumbs.rel_img_path,
+                Thumbs.rel_thumb_path,
+                Thumbs.mod,
+                Thumbs.fav
+            )
+            .limit(Static.thumbs_load_limit)
+            .offset(Dynamic.loaded_thumbs)
+        )
         if Dynamic.sort_by_mod:
             stmt = stmt.order_by(-Thumbs.mod)
         else:
