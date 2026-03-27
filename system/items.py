@@ -24,11 +24,6 @@ class ReadImgItem:
 
 
 @dataclass(slots=True)
-class OnStartItem:
-    mf_list: list["Mf"]
-
-
-@dataclass(slots=True)
 class ScanerItem:
     mf: Mf
     engine: sqlalchemy.Engine
@@ -39,7 +34,8 @@ class ScanerItem:
 
 @dataclass(slots=True)
 class SingleDirScanerItem:
-    data: dict[Mf, list[str]]
+    mf: Mf
+    dirs_to_scan: list[str]
 
 
 @dataclass(slots=True)

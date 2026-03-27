@@ -591,16 +591,16 @@ class AllDirScaner:
 class SingleDirScaner:
 
     @staticmethod
-    def start(scaner_item: SingleDirScanerItem, lng_index: int, queue: Queue):
-        for mf, dirs_to_scan in scaner_item.data.items():
-            print("single dir scaner started, mf:", mf.mf_alias)
+    def start(item_list: list[SingleDirScanerItem], lng_index: int, queue: Queue):
+        for item in item_list:
+            print("single dir scaner started, mf:", item.mf.mf_alias)
             SingleDirScaner.single_mf_scan(
-                mf=mf,
-                dirs_to_scan=dirs_to_scan,
+                mf=item.mf,
+                dirs_to_scan=item.dirs_to_scan,
                 lng_index=lng_index,
                 queue=queue
             )
-            print("single dir scaner finished, mf:", mf.mf_alias)
+            print("single dir scaner finished, mf:", item.mf.mf_alias)
 
     @staticmethod
     def single_mf_scan(mf: Mf, dirs_to_scan: list[str], lng_index: int, queue: Queue):

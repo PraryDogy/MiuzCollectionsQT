@@ -618,9 +618,13 @@ class WinMain(UMainWindow):
         if can_start:
             if self.scaner_data:
                 # print("штатно запускаю SINGLE сканер")
+                item_list = [
+                    SingleDirScanerItem(mf, dirs_to_scan)
+                    for mf, dirs_to_scan in self.scaner_data.items()
+                ]
                 self.scaner_task = ProcessWorker(
                     target=SingleDirScaner.start,
-                    args=(SingleDirScanerItem(self.scaner_data), Cfg.lng_index, )
+                    args=(item_list, Cfg.lng_index, )
                     )
             else:
                 # print("штатно запускаю ОБЩИЙ сканер")
