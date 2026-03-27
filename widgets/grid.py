@@ -496,12 +496,6 @@ class Grid(VScrollArea):
                 for i in prev_selection:
                     if i in self.path_to_wid:
                         self.wid_to_selected_widgets(self.path_to_wid[i])
-                if self.go_to_url and self.go_to_url in self.path_to_wid:
-                    wid = self.path_to_wid[self.go_to_url]
-                    wid.set_frame()
-                    self.selected_widgets.append(wid)
-                    self.go_to_url = None
-                    QTimer.singleShot(200, lambda: self.ensureWidgetVisible(wid))
                 QTimer.singleShot(100, self.setFocus)
 
         self.grid_wid.hide()
@@ -920,52 +914,6 @@ class Grid(VScrollArea):
                 )
                 self.menu_.addAction(act)
 
-                self.menu_.addSeparator()
-
-                expand_to_path = QAction(Lng.go_to_folder[Cfg.lng_index], self.menu_)
-                expand_to_path.triggered.connect(
-                    lambda: self.go_to_widget.emit(clicked.rel_path)
-                )
-                self.menu_.addAction(expand_to_path)
-
-                self.menu_.addSeparator()
-
-            # reveal / copy
-            act = RevealInFinder(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.reveal_in_finder.emit(rel_paths)
-            )
-            self.menu_.addAction(act)
-
-            act = CopyPath(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.copy_path.emit(rel_paths)
-            )
-            self.menu_.addAction(act)
-
-            act = CopyName(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.copy_name.emit(rel_paths)
-            )
-            self.menu_.addAction(act)
-
-            self.menu_.addSeparator()
-
-            # save / remove
-            act = Save(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.save_files.emit(
-                    (os.path.expanduser("~/Downloads"), rel_paths)
-                )
-            )
-            self.menu_.addAction(act)
-
-            act = RemoveFiles(self.menu_, len(self.selected_widgets))
-            act.triggered.connect(
-                lambda: self.remove_files.emit(rel_paths)
-            )
-            self.menu_.addAction(act)
-
             self.menu_.addSeparator()
 
             advanced_menu = USubMenu(
@@ -992,6 +940,42 @@ class Grid(VScrollArea):
                 lambda: self.update_thumb.emit(rel_paths)
             )
             advanced_menu.addAction(update_thumb)
+            
+            self.menu_.addSeparator()
+
+            act = RevealInFinder(self.menu_, len(rel_paths))
+            act.triggered.connect(
+                lambda: self.reveal_in_finder.emit(rel_paths)
+            )
+            self.menu_.addAction(act)
+
+            act = CopyPath(self.menu_, len(rel_paths))
+            act.triggered.connect(
+                lambda: self.copy_path.emit(rel_paths)
+            )
+            self.menu_.addAction(act)
+
+            act = CopyName(self.menu_, len(rel_paths))
+            act.triggered.connect(
+                lambda: self.copy_name.emit(rel_paths)
+            )
+            self.menu_.addAction(act)
+
+            self.menu_.addSeparator()
+
+            act = Save(self.menu_, len(rel_paths))
+            act.triggered.connect(
+                lambda: self.save_files.emit(
+                    (os.path.expanduser("~/Downloads"), rel_paths)
+                )
+            )
+            self.menu_.addAction(act)
+
+            act = RemoveFiles(self.menu_, len(self.selected_widgets))
+            act.triggered.connect(
+                lambda: self.remove_files.emit(rel_paths)
+            )
+            self.menu_.addAction(act)
 
         if not clicked_wid:
             menu_empty()
