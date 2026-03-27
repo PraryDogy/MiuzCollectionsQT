@@ -22,7 +22,7 @@ class WinInfoAction(QAction):
 class CopyPath(QAction):
     def __init__(self, parent: QMenu, total: int):
         if total > 1:
-            text = f"{Lng.copy_filepaths[Cfg.lng_index]} ({total})"
+            text = f"{Lng.copy_filepaths[Cfg.lng_index]}"
         else:
             text = f"{Lng.copy_filepath[Cfg.lng_index]}"
         super().__init__(parent=parent, text=text)
@@ -31,7 +31,7 @@ class CopyPath(QAction):
 class CopyName(QAction):
     def __init__(self, parent: QMenu, total: int):
         if total > 1:
-            text = f"{Lng.copy_names[Cfg.lng_index]} ({total})"
+            text = f"{Lng.copy_names[Cfg.lng_index]}"
         else:
             text = f"{Lng.copy_name[Cfg.lng_index]}"
         super().__init__(parent=parent, text=text)
@@ -55,7 +55,7 @@ class SetFav(QAction):
 class Save(QAction):
     def __init__(self, parent: QMenu, total: int):
         if total > 1:
-            text = f"{Lng.save_to_downloads[Cfg.lng_index]} ({total})"
+            text = f"{Lng.save_to_downloads[Cfg.lng_index]}"
         else:
             text = f"{Lng.save_to_downloads[Cfg.lng_index]}"
         super().__init__(parent=parent, text=text)
@@ -64,7 +64,7 @@ class Save(QAction):
 class RemoveFiles(QAction):
     def __init__(self, parent: QMenu, total: int):
         if total > 1:
-            text_ = f"{Lng.delete[Cfg.lng_index]} ({total})"
+            text_ = f"{Lng.delete[Cfg.lng_index]}"
         else:
             text_ = f"{Lng.delete[Cfg.lng_index]}"
         super().__init__(text_, parent)
