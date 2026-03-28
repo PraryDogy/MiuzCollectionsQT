@@ -35,7 +35,6 @@ class URunnable(QRunnable):
 
 class UThreadPool:
     pool: QThreadPool = None
-    tasks: list[URunnable] = []
 
     @classmethod
     def init(cls):
@@ -43,10 +42,6 @@ class UThreadPool:
 
     @classmethod
     def start(cls, runnable: URunnable):
-        """
-        Запускает URunnable, добавляет в список UThreadPool.tasks
-        """
-        # cls.tasks.append(runnable)
         cls.pool.start(runnable)
 
 
