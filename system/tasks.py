@@ -19,48 +19,15 @@ from .shared_utils import ImgUtils
 from .utils import Utils
 
 
-class TaskState:
-    __slots__ = ["_should_run", "_finished"]
-
-    def __init__(self, value=True, finished=False):
-        self._should_run = value
-        self._finished = finished
-
-    def should_run(self):
-        return self._should_run
-    
-    def set_should_run(self, value: bool):
-        self._should_run = value
-
-    def set_finished(self, value: bool):
-        self._finished = value
-
-    def finished(self):
-        return self._finished
-
-
 class URunnable(QRunnable):
     def __init__(self):
-        """
-        Внимание:   
-        Не переопределяйте метод self.run() как в QRunnable, переопределите
-        метод self.task()
-
-        self.task_state:
-        - для управления QRunnable.
-        - Можно остановить задачу self.task_state.set_should_run(False)
-        - По завершению задачи self.task_state.finished() вернет True
-        """
         super().__init__()
-        self.task_state = TaskState()
     
     def run(self):
         try:
             self.task()
-        finally:
-            self.task_state.set_finished(True)
-            # if self in UThreadPool.tasks:
-                # QTimer.singleShot(5000, lambda: UThreadPool.tasks.remove(self))
+        except Exception as e:
+            print(traceback.format_exc())
 
     def task(self):
         raise NotImplementedError("Переопредели метод task() в подклассе.")
