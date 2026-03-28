@@ -12,7 +12,7 @@ from PyQt5.QtGui import QImage
 
 from cfg import Cfg, Dynamic, Static
 
-from .database import Dbase, Dirs, Thumbs
+from .database import ClmnNames, Dbase, Dirs, Thumbs
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
@@ -67,7 +67,9 @@ class FavManager(URunnable):
                 sqlalchemy.update(Thumbs.table)
                 .where(Thumbs.rel_img_path==self.rel_path)
                 .where(Thumbs.mf_alias==Mf.current_mf.mf_alias)
-                .values(fav=self.value)
+                .values({
+                    ClmnNames.fav: self.value
+                })
             )
             conn.execute(stmt)
 
