@@ -48,7 +48,6 @@ class UThreadPool:
 class FavManager(URunnable):
     """
     Менеджер избранного для изображений.
-    
     Сигналы:
     - finished_(int): возвращает новое значение избранного после обновления.
     """
@@ -61,25 +60,18 @@ class FavManager(URunnable):
         self.sigs = FavManager.Sigs()
         self.rel_path = rel_path
         self.value = value
-        self.conn = Dbase.main_engine.connect()
 
     def task(self):
-        """Обновляет поле 'fav' в БД и эмитит сигнал с результатом."""
-        try:
+        with Dbase.main_engine.begin() as conn:
             stmt = (
                 sqlalchemy.update(Thumbs.table)
-                .where(Thumbs.rel_img_path == self.rel_path)
-                .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
+                .where(Thumbs.rel_img_path==self.rel_path)
+                .where(Thumbs.mf_alias==Mf.current_mf.mf_alias)
                 .values(fav=self.value)
             )
-            self.conn.execute(stmt)
-            self.conn.commit()
-            self.sigs.finished_.emit(self.value)
-        except Exception as e:
-            Utils.print_error()
-            self.conn.rollback()
-        finally:
-            self.conn.close()
+            conn.execute(stmt)
+
+        self.sigs.finished_.emit(self.value)
 
 
 class DbImagesLoader(URunnable):
