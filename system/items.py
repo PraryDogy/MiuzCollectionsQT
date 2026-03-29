@@ -4,6 +4,7 @@ from typing import Literal, Optional
 
 import numpy as np
 import sqlalchemy
+from PyQt5.QtGui import QImage
 from watchdog.events import FileSystemEvent
 
 from .main_folder import Mf
@@ -112,3 +113,13 @@ class ScanerImgItem:
 class UpdateThumbItem:
     rel_img_path: str
     array: np.ndarray
+
+
+@dataclass(slots=True)
+class DbImagesItem:
+    rel_img_path: str
+    rel_thumb_path: str
+    fav: int
+    qimage: QImage
+    day_month_year: str
+    month_year: str

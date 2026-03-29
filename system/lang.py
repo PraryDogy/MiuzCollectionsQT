@@ -29,7 +29,7 @@ class Lng:
             "9": "September"
         }
     ]
-    months_genitive_case = [
+    months_gen = [
         {
             "1": "января",
             "10": "октября",

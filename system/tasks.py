@@ -5,6 +5,7 @@ from datetime import datetime
 
 import numpy as np
 import sqlalchemy
+from .items import DbImagesItem
 from numpy import ndarray
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QImage
@@ -87,66 +88,51 @@ class DbImagesLoader(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal(dict)
 
-    class Item:
-        __slots__ = ["qimage", "rel_path", "fav", "f_mod", "mod"]
-        def __init__(self, qimage: QImage, rel_path: str, fav: int, f_mod: str, mod: str):
-            self.qimage = qimage
-            self.rel_path = rel_path
-            self.fav = fav
-            self.f_mod = f_mod
-            self.mod = mod
-
     def __init__(self):
         super().__init__()
         self.sigs = DbImagesLoader.Sigs()
-        self.conn = Dbase.main_engine.connect()
 
     def task(self):
-        try:
-            res = self._load_images()
-        except Exception as e:
-            print("DbImagesLoader error:", e)
-        finally:
-            self.sigs.finished_.emit(res)
-            self.conn.close()
-
-    def _load_images(self):
-        stmt = self.get_stmt()
-        res: list[tuple] = self.conn.execute(stmt).fetchall()
-        return self.create_dict(res)
+        with Dbase.main_engine.connect() as conn:
+            stmt = self.get_stmt()
+            res = conn.execute(stmt).fetchall()
+        if res:
+            image_items_dict = self.create_dict(res)
+            self.sigs.finished_.emit(image_items_dict)
+        else:
+            self.sigs.finished_.emit({})
 
     def create_dict(self, res: list[tuple]):
-        thumbs_dict = defaultdict(list[DbImagesLoader.Item])
-        if not res:
-            return {}
+        thumbs_dict = defaultdict(list[DbImagesItem])
 
-        for rel_path, rel_thumb_path, mod, fav in res:
-            if not rel_path.endswith(ImgUtils.ext_all):
-                continue
+        for rel_img_path, rel_thumb_path, mod, fav in res:
+            abs_thumb_path_ = Utils.get_abs_thumb_path(rel_thumb_path)
+            array_ = ImgUtils.read_thumb(abs_thumb_path_)
+            qimage = Utils.qimage_from_array(array_)
 
-            f_mod = datetime.fromtimestamp(mod).date()
-            thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-            thumb = ImgUtils.read_thumb(thumb_path)
-            if not isinstance(thumb, ndarray):
-                continue
-
-            qimage = Utils.qimage_from_array(thumb)
+            date_ = datetime.fromtimestamp(mod).date()
+            month_ = Lng.months[Cfg.lng_index][str(date_.month)]
+            month_gen_ = Lng.months_gen[Cfg.lng_index][str(date_.month)]
+            day_month_year = f"{date_.day} {month_gen_} {date_.year}"
 
             if Dynamic.date_start or Dynamic.date_end:
-                f_mod = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
+                month_year = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
             else:
-                f_mod = f"{Lng.months[Cfg.lng_index][str(f_mod.month)]} {f_mod.year}"
+                month_year = f"{month_} {date_.year}"
 
-            date_time = datetime.fromtimestamp(mod)
-            month = Lng.months_genitive_case[Cfg.lng_index][str(date_time.month)]
-            mod = f"{date_time.day} {month} {date_time.year}"
-
-            item = DbImagesLoader.Item(qimage, rel_path, fav, f_mod, mod)
+            item = DbImagesItem(
+                rel_img_path=rel_img_path,
+                rel_thumb_path=rel_thumb_path,
+                fav=fav,
+                qimage=qimage,
+                day_month_year=day_month_year,
+                month_year=month_year
+            )
 
             if Dynamic.sort_by_mod:
-                thumbs_dict[f_mod].append(item)
+                thumbs_dict[month_year].append(item)
             else:
-                thumbs_dict[0].append(item)
+                thumbs_dict["any_key"].append(item)
 
         return thumbs_dict
 
@@ -297,7 +283,6 @@ class DbDirsLoader(URunnable):
                 sqlalchemy.select(Dirs.rel_dir_path)
                 .where(Dirs.mf_alias == self.mf.mf_alias)
             )
-
             res = conn.execute(stmt).scalars().all()
             return self.fill_missing_paths(res)
         

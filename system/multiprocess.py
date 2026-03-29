@@ -105,7 +105,7 @@ class OneFileInfo:
         stats = os.stat(path)
         size = SharedUtils.get_f_size(stats.st_size)
         date_time = datetime.fromtimestamp(stats.st_mtime)
-        month = Lng.months_genitive_case[Cfg.lng_index][str(date_time.month)]
+        month = Lng.months_gen[Cfg.lng_index][str(date_time.month)]
         mod = f"{date_time.day} {month} {date_time.year}"
         item = OneFileInfoItem(type_, size, mod, "")
         return item

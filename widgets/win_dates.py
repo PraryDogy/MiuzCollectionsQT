@@ -48,7 +48,7 @@ class DatesTitle(QLabel):
     
     def get_named_date(self, date: datetime) -> str:
         month_number = str(date.month)
-        month = Lng.months_genitive_case[Cfg.lng_index][month_number]
+        month = Lng.months_gen[Cfg.lng_index][month_number]
         return f"{date.day} {month} {date.year}"
     
     def setText(self, a0):

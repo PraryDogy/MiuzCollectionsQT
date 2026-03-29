@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGridLayout, QLabel, QRubberBand, QWidget)
 
 from cfg import Cfg, Dynamic, Static
-from system.items import Buffer, SettingsItem
+from system.items import Buffer, DbImagesItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
@@ -122,7 +122,7 @@ class BelowTextWid(QLabel):
         else:
             root = root[0]
         first_row = self.short_text(root)
-        text = "\n".join((first_row, self.wid.mod))
+        text = "\n".join((first_row, self.wid.day_month_year))
         self.setText(text)
 
         self.setStyleSheet(self.STYLE)
@@ -193,15 +193,15 @@ class Thumbnail(QFrame):
         font-size: 11px;
     """
 
-    def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, f_mod: str, mod: str):
+    def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, month_year: str, day_month_year: str):
         super().__init__()
 
         # --- Исходные данные ---
         self.img = pixmap
         self.rel_path = rel_path
         self.fav_value = fav
-        self.f_mod = f_mod
-        self.mod = mod
+        self.month_year = month_year
+        self.day_month_year = day_month_year
         self.name = os.path.basename(rel_path)
         if fav:
             self.name = self.sym_star + self.name
@@ -224,7 +224,7 @@ class Thumbnail(QFrame):
         self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = f"{Lng.location[Cfg.lng_index]}: {Mf.current_mf.mf_alias}{rel_path}"
-        modified = f"{Lng.modified[Cfg.lng_index]}: {self.mod}"
+        modified = f"{Lng.modified[Cfg.lng_index]}: {self.day_month_year}"
         self.setToolTip("\n".join([location, modified, ]))
 
         self.setup()
@@ -470,11 +470,9 @@ class Grid(VScrollArea):
         self.grid_wid.deleteLater()
         self.rubberBand.deleteLater()
 
-    def load_initial_grid(self, db_images: dict[str, list[DbImagesLoader.Item]]):
+    def load_initial_grid(self, db_images: dict[str, list[DbImagesItem]]):
 
         def load_grid_delayed():
-            # QTimer.singleShot(2000, lambda: self.reload_thumbnails())
-            # value = self.verticalScrollBar().maximum()
             prev_selection = [i.rel_path for i in self.selected_widgets]
             self.remove_grid_container()
             self.load_grid_container()
@@ -504,21 +502,21 @@ class Grid(VScrollArea):
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
         wid.row, wid.col = self.glob_row, self.glob_col        
 
-    def add_thumbnails_to_grid(self, db_images: list[DbImagesLoader.Item]):
+    def add_thumbnails_to_grid(self, db_images: list[DbImagesItem]):
 
-        def create_thumb(image_item: DbImagesLoader.Item):
+        def create_thumb(image_item: DbImagesItem):
             thumbnail = Thumbnail(
                 pixmap=pixmap,
-                rel_path=image_item.rel_path,
+                rel_path=image_item.rel_img_path,
                 fav=image_item.fav,
-                f_mod=image_item.f_mod,
-                mod=image_item.mod
+                month_year=image_item.month_year,
+                day_month_year=image_item.day_month_year
             )
             thumbnail.set_no_frame()
             thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
 
             if pixmap is None:
-                print(image_item.rel_path)
+                print(image_item.rel_img_path)
 
             return thumbnail
 
@@ -528,7 +526,7 @@ class Grid(VScrollArea):
             self.add_thumb_data(thumbnail)
             self.grid_lay.addWidget(thumbnail, 0, 0)
 
-    def add_more_thumbnails(self, db_images: dict[str, list[DbImagesLoader.Item]]):
+    def add_more_thumbnails(self, db_images: dict[str, list[DbImagesItem]]):
         for _, db_images_list in db_images.items():
             self.add_thumbnails_to_grid(db_images_list)
         self.rearrange()
@@ -579,10 +577,10 @@ class Grid(VScrollArea):
         if not thumbnails:
             return
 
-        prev_f_mod = thumbnails[0].f_mod
+        prev_f_mod = thumbnails[0].month_year
         for thumb in thumbnails:
             # Проверка на смену модификации при сортировке по модификации
-            if Dynamic.sort_by_mod and thumb.f_mod != prev_f_mod:
+            if Dynamic.sort_by_mod and thumb.month_year != prev_f_mod:
                 _next_row()
 
             # Добавляем миниатюру в сетку и обновляем координаты
@@ -594,7 +592,7 @@ class Grid(VScrollArea):
             if self.glob_col >= self.max_col:
                 _next_row()
 
-            prev_f_mod = thumb.f_mod
+            prev_f_mod = thumb.month_year
 
         # Если последний ряд не завершен, начинаем новый ряд для следующих элементов
         if self.glob_col != 0:
@@ -1002,7 +1000,7 @@ class Grid(VScrollArea):
             return None
 
         def update_date_wid(wid: Thumbnail):
-            self.date_wid.setText(wid.f_mod)
+            self.date_wid.setText(wid.month_year)
             self.date_wid.adjustSize()
             self.date_wid.move(
                 (self.viewport().width() - self.date_wid.width()) // 2,
