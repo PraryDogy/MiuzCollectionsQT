@@ -107,6 +107,10 @@ class DbImagesLoader(URunnable):
 
         for rel_img_path, rel_thumb_path, mod, fav in res:
             abs_thumb_path_ = Utils.get_abs_thumb_path(rel_thumb_path)
+
+            if not os.path.exists(abs_thumb_path_):
+                continue
+
             array_ = ImgUtils.read_thumb(abs_thumb_path_)
             qimage = Utils.qimage_from_array(array_)
 
