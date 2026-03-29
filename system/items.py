@@ -123,3 +123,10 @@ class DbImagesItem:
     qimage: QImage
     day_month_year: str
     month_year: str
+
+
+@dataclass(slots=True)
+class HashDirSizeItem:
+    mf: Mf
+    size: int
+    total_images: int

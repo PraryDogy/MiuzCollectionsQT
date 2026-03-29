@@ -5,14 +5,13 @@ from datetime import datetime
 
 import numpy as np
 import sqlalchemy
-from .items import DbImagesItem
-from numpy import ndarray
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QImage
 
 from cfg import Cfg, Dynamic, Static
 
 from .database import ClmnNames, Dbase, Dirs, Thumbs
+from .items import DbImagesItem, HashDirSizeItem
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
@@ -307,7 +306,7 @@ class DbDirsLoader(URunnable):
 class HashDirSize(URunnable):
     
     class Sigs(QObject):
-        finished_ = pyqtSignal(dict)
+        finished_ = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -322,21 +321,26 @@ class HashDirSize(URunnable):
             print("HashDirSize error", e)
 
     def _task(self):
+        items: list[HashDirSizeItem] = []
         with Dbase.main_engine.begin() as conn:
-            main_folder_sizes = {}
-            for i in Mf.mf_list:
+            for mf in Mf.mf_list:
                 stmt = (
                     sqlalchemy.select(Thumbs.rel_thumb_path)
-                    .where(Thumbs.mf_alias == i.mf_alias)
+                    .where(Thumbs.mf_alias == mf.mf_alias)
                 )
-                res = conn.execute(stmt).scalars().all()
+                rel_thumb_paths = conn.execute(stmt).scalars().all()
                 size = sum([
-                    os.path.getsize(Utils.get_abs_thumb_path(i))
-                    for i in res
-                    if os.path.exists(Utils.get_abs_thumb_path(i))
+                    os.path.getsize(Utils.get_abs_thumb_path(x))
+                    for x in rel_thumb_paths
+                    if os.path.exists(Utils.get_abs_thumb_path(x))
                 ])
-                main_folder_sizes[i.mf_alias] = {"size": size, "total": len(res)}
-        return main_folder_sizes
+                item = HashDirSizeItem(
+                    mf=mf,
+                    size=size,
+                    total_images=len(rel_thumb_paths)
+                )
+                items.append(item)
+        return items
     
 
 class ImgArrayQImage(URunnable):

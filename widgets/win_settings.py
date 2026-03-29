@@ -15,7 +15,7 @@ from typing_extensions import Optional
 
 from cfg import Cfg, Static
 from system.filters import Filters
-from system.items import SettingsItem
+from system.items import HashDirSizeItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
@@ -238,7 +238,7 @@ class SizesWin(SingleActionWindow):
     ww = 500
     hh = 330
 
-    def __init__(self, sizes: dict[str, int], parent=None):
+    def __init__(self, size_items: list[HashDirSizeItem], parent=None):
         super().__init__(parent)
         self.setWindowTitle(Lng.data_size[Cfg.lng_index])
         self.resize(self.ww, self.hh)
@@ -253,11 +253,13 @@ class SizesWin(SingleActionWindow):
         info_layout.setContentsMargins(5, 5, 5, 5)
         info_layout.setSpacing(5)
 
-        total_size = SharedUtils.get_f_size(sum(i['size'] for i in sizes.values()))
+        total_size = SharedUtils.get_f_size(sum(
+            item.size for item in size_items
+        ))
         first_row = QLabel(f"{Lng.data_size[Cfg.lng_index]}: {total_size}")
         info_layout.addWidget(first_row)
 
-        total = sum(i["total"] for i in sizes.values())
+        total = sum(item.total_images for item in size_items)
         sec_row = QLabel(f"{Lng.images[Cfg.lng_index]}: {total}")
         info_layout.addWidget(sec_row)
 
@@ -268,7 +270,7 @@ class SizesWin(SingleActionWindow):
         self.table.setSortingEnabled(True)
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
-        self.table.setRowCount(len(sizes))
+        self.table.setRowCount(len(size_items))
         self.table.verticalHeader().hide()
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -283,15 +285,15 @@ class SizesWin(SingleActionWindow):
 
         layout.addWidget(self.table)
 
-        self.populate_table(sizes)
+        self.populate_table(size_items)
         self.setFocus()
 
-    def populate_table(self, sizes: dict[str, dict]):
+    def populate_table(self, size_items: list[HashDirSizeItem]):
         item_flags = Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
         v_center = Qt.AlignmentFlag.AlignVCenter
 
-        for row, (folder, data) in enumerate(sizes.items()):
-            folder_item = QTableWidgetItem(folder)
+        for row, item in enumerate(size_items):
+            folder_item = QTableWidgetItem(item.mf.mf_alias)
             folder_item.setFlags(
                 Qt.ItemFlag.ItemIsSelectable|Qt.ItemFlag.ItemIsEnabled
             )
@@ -299,13 +301,13 @@ class SizesWin(SingleActionWindow):
                 Qt.AlignmentFlag.AlignLeft | v_center
             )
 
-            size_item = QTableWidgetItem(SharedUtils.get_f_size(data["size"]))
+            size_item = QTableWidgetItem(SharedUtils.get_f_size(item.size))
             size_item.setFlags(item_flags)
             size_item.setTextAlignment(
                 Qt.AlignmentFlag.AlignLeft | v_center
             )
 
-            total_item = QTableWidgetItem(str(data["total"]))
+            total_item = QTableWidgetItem(str(item.total_images))
             total_item.setFlags(item_flags)
             total_item.setTextAlignment(
                 Qt.AlignmentFlag.AlignLeft | v_center
@@ -325,7 +327,7 @@ class NonRebootSettings(GroupWid):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(80)
-        self.data = {}
+        self.size_items = {}
 
         data_size_wid = GroupChild()
         data_size_wid.mouseReleaseEvent = self.show_sizes_win
@@ -354,13 +356,13 @@ class NonRebootSettings(GroupWid):
         self.get_sizes()
 
     def show_sizes_win(self, *args):
-        self.sizes_win = SizesWin(self.data)
+        self.sizes_win = SizesWin(self.size_items)
         self.sizes_win.center_to_parent(self.window())
         self.sizes_win.show()
 
     def get_sizes(self):
-        def on_finish(data: dict):
-            self.data = data
+        def on_finish(items: list[HashDirSizeItem]):
+            self.size_items = items
         self.hashdir_size = HashDirSize()
         self.hashdir_size.sigs.finished_.connect(on_finish)
         UThreadPool.start(self.hashdir_size)
