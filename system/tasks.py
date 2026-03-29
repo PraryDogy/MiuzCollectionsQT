@@ -225,8 +225,7 @@ class MfDataCleaner(URunnable):
             self._task()
         except Exception as e:
             print(traceback.format_exc())
-        finally:
-            self.sigs.finished_.emit()
+        self.sigs.finished_.emit()
 
     def _task(self):
         with Dbase.main_engine.begin() as conn:
@@ -237,27 +236,25 @@ class MfDataCleaner(URunnable):
             rel_thumb_paths = conn.execute(stmt).scalars().all()
 
             stmt = (
-                sqlalchemy.delete(Thumbs.table)
-                .where(Thumbs.mf_alias == self.mf_alias)
-            )
-            conn.execute(stmt)
-
-            stmt = (
                 sqlalchemy.delete(Dirs.table)
                 .where(Dirs.mf_alias == self.mf_alias)
             )
             conn.execute(stmt)
 
+            non_exist_thumbs = []
+
             for i in rel_thumb_paths:
                 abs_thumb_path = Utils.get_abs_thumb_path(i)
-                try:
-                    os.remove(abs_thumb_path)
-                except Exception as e:
-                    print(traceback.format_exc())
-                try:
-                    os.rmdir(os.path.dirname(abs_thumb_path))
-                except OSError:
-                    pass
+                if not os.path.exists(abs_thumb_path):
+                    non_exist_thumbs.append(i)
+            
+            stmt = (
+                sqlalchemy.delete(Thumbs.table)
+                .where(Thumbs.rel_thumb_path.in_(non_exist_thumbs))
+                .where(Thumbs.mf_alias==self.mf_alias)
+            )
+
+            conn.execute(stmt)
 
 
 class DbDirsLoader(URunnable):
