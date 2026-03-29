@@ -19,7 +19,7 @@ from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
 from system.scaner import AllDirScaner, SingleDirScaner
 from system.servers import Servers
 from system.shared_utils import ImgUtils
-from system.tasks import FavManager, MfDataCleaner, UThreadPool, Utils
+from system.tasks import FavManager, UThreadPool, Utils
 
 from ._base_widgets import NotifyWid, UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
@@ -688,19 +688,6 @@ class WinMain(UMainWindow):
             lambda: finished(rel_path, value)
         )
         UThreadPool.start(self.task)
-
-    def reset_data_cmd(self, mf: Mf):
-
-        def reset_data_finished():
-            self.grid.reload_thumbnails()
-            self.left_menu.tree_wid.init_ui()
-            self.restart_scaner_task()
-
-        self.grid.reload_thumbnails()
-        self.left_menu.tree_wid.init_ui()
-        self.reset_task = MfDataCleaner(mf.mf_alias)
-        self.reset_task.sigs.finished_.connect(reset_data_finished)
-        UThreadPool.start(self.reset_task)
 
     def copy_files_win(
             self,
