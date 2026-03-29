@@ -45,7 +45,7 @@ class UThreadPool:
         cls.pool.start(runnable)
 
 
-class FavManager(URunnable):
+class SetFav(URunnable):
     """
     Менеджер избранного для изображений.
     Сигналы:
@@ -57,7 +57,7 @@ class FavManager(URunnable):
 
     def __init__(self, rel_path: str, value: int):
         super().__init__()
-        self.sigs = FavManager.Sigs()
+        self.sigs = SetFav.Sigs()
         self.rel_path = rel_path
         self.value = value
 
@@ -93,13 +93,17 @@ class DbImagesLoader(URunnable):
         self.sigs = DbImagesLoader.Sigs()
 
     def task(self):
-        with Dbase.main_engine.connect() as conn:
-            stmt = self.get_stmt()
-            res = conn.execute(stmt).fetchall()
-        if res:
-            image_items_dict = self.create_dict(res)
-            self.sigs.finished_.emit(image_items_dict)
-        else:
+        try:
+            with Dbase.main_engine.connect() as conn:
+                stmt = self.get_stmt()
+                res = conn.execute(stmt).fetchall()
+            if res:
+                image_items_dict = self.create_dict(res)
+                self.sigs.finished_.emit(image_items_dict)
+            else:
+                self.sigs.finished_.emit({})
+        except Exception as e:
+            print(traceback.format_exc())
             self.sigs.finished_.emit({})
 
     def create_dict(self, res: list[tuple]):
@@ -274,9 +278,10 @@ class DbDirsLoader(URunnable):
     def task(self):
         try:
             res = self._task()
-            self.sigs.finished_.emit(res)
         except Exception as e:
             print(traceback.format_exc())
+            res = []
+        self.sigs.finished_.emit(res)
 
     def _task(self):
         with Dbase.main_engine.begin() as conn:
