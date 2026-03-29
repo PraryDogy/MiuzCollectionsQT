@@ -481,7 +481,9 @@ class Grid(VScrollArea):
             Thumbnail.calculate_size()
             if not db_images:
                 lbl = QLabel(Lng.no_photo[Cfg.lng_index])
-                self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+                self.grid_lay.addWidget(
+                    lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+            
                 self.grid_lay.setRowStretch(0, 1)
                 self.grid_lay.setColumnStretch(0, 1)
             else:
