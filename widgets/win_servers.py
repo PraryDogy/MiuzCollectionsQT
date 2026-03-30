@@ -204,18 +204,18 @@ class ServersWin(SingleActionWindow):
 
     def login_win(self, server_item: ServerItem = None):
 
-        def ok_pressed(server_item: ServerItem):
+        def ok_pressed(new_server_item: ServerItem):
 
             data = (
-                server_item.server,
-                server_item.login,
-                server_item.password
+                new_server_item.server,
+                new_server_item.login,
+                new_server_item.password
             )
 
             Servers.server_list.append((
-                server_item.server,
-                server_item.login,
-                server_item.password
+                new_server_item.server,
+                new_server_item.login,
+                new_server_item.password
             ))
             Servers.write_json_data()
 
