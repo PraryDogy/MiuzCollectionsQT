@@ -179,7 +179,7 @@ class ServersWin(SingleActionWindow):
 
     # Загрузка данных из JSON
     def init_data(self):
-        for server, login, pass_ in Servers.server_list:
+        for server, login, pass_ in Servers.items:
             server_item = ServerItem(
                 server=server,
                 login=login,
@@ -192,7 +192,7 @@ class ServersWin(SingleActionWindow):
             )
             self.v_list.addItem(list_item)
         
-        if Servers.server_list:
+        if Servers.items:
             self.v_list.setCurrentRow(0)
 
 
@@ -201,7 +201,7 @@ class ServersWin(SingleActionWindow):
         def ok_pressed(new_server_item: ServerItem):
             if server_item:
                 self.remove_cmd(server_item)
-            Servers.server_list.append([
+            Servers.items.append([
                 new_server_item.server,
                 new_server_item.login,
                 new_server_item.password
@@ -220,7 +220,7 @@ class ServersWin(SingleActionWindow):
         self.login_win.show()
 
     def remove_cmd(self, server_item: ServerItem):
-        Servers.server_list.remove([
+        Servers.items.remove([
             server_item.server,
             server_item.login,
             server_item.password

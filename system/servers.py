@@ -5,7 +5,7 @@ from cfg import Static
 
 
 class Servers:
-    server_list = []
+    items = []
 
     @classmethod
     def json_to_app(cls):
@@ -13,11 +13,11 @@ class Servers:
             with open(Static.external_servers, "r", encoding="utf-8") as f:
                 server_list: list = json.load(f)
             for i in server_list:
-                Servers.server_list.append(i)
+                Servers.items.append(i)
         except Exception as e:
             print("Servers json to app error", e)
     
     @classmethod
     def write_json_data(cls):
         with open(Static.external_servers, "w", encoding="utf-8") as file:
-            json.dump(cls.server_list, file, indent=4, ensure_ascii=False)
+            json.dump(cls.items, file, indent=4, ensure_ascii=False)

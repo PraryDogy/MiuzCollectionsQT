@@ -323,7 +323,7 @@ class HashDirSize(URunnable):
     def _task(self):
         items: list[HashDirSizeItem] = []
         with Dbase.main_engine.begin() as conn:
-            for mf in Mf.mf_list:
+            for mf in Mf.items:
                 stmt = (
                     sqlalchemy.select(Thumbs.rel_thumb_path)
                     .where(Thumbs.mf_alias == mf.mf_alias)

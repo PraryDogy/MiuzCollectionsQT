@@ -6,7 +6,7 @@ from cfg import Static
 
 class Mf:
     current_mf: "Mf" = None
-    mf_list: list["Mf"] = []
+    items: list["Mf"] = []
     __slots__ = ["mf_alias", "mf_paths", "mf_stop_list", "mf_current_path",]
 
     def __init__(self, **kw):
@@ -47,9 +47,9 @@ class Mf:
                     print("mf нет путей", mf["mf_alias"])
                     continue
                 else:
-                    cls.mf_list.append(Mf(**mf))
-            if len(cls.mf_list) != 0:
-                cls.current_mf = cls.mf_list[0]
+                    cls.items.append(Mf(**mf))
+            if len(cls.items) != 0:
+                cls.current_mf = cls.items[0]
                 return True
 
         except Exception as e:
@@ -61,5 +61,5 @@ class Mf:
     @classmethod
     def write_json_data(cls):
         with open(Static.external_mf, "w", encoding="utf-8") as file:
-            data = [i.get_data() for i in cls.mf_list]
+            data = [i.get_data() for i in cls.items]
             json.dump(data, file, ensure_ascii=False, indent=4)

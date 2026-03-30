@@ -4,17 +4,17 @@ from cfg import Static
 
 
 class Filters:
-    filter_list = []
+    items = []
 
     @classmethod
     def json_to_app(cls):
         try:
             with open(Static.external_filters, "r", encoding="utf-8") as f:
                 data: list[str] = json.load(f)
-            cls.filter_list = [
+            cls.items = [
                 i
                 for i in data
-                if i not in cls.filter_list
+                if i not in cls.items
             ]
         except Exception as e:
             print("Filters json to app error", e)
@@ -22,4 +22,4 @@ class Filters:
     @classmethod
     def write_json_data(cls):
         with open(Static.external_filters, "w", encoding="utf-8") as f:
-            json.dump(cls.filter_list, f, indent=4, ensure_ascii=False)
+            json.dump(cls.items, f, indent=4, ensure_ascii=False)

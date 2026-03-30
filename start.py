@@ -236,10 +236,10 @@ class App(QApplication):
     def start(self):
 
         def json_to_app():
-            Mf.mf_list.clear()
-            objects = (Cfg, Mf, Servers, Filters)
-            for i in objects:
+            for i in (Mf, Servers, Filters):
+                i.items.clear()
                 i.json_to_app()
+            Cfg.json_to_app()
 
         def setup_new_mf():
             new_mf_win = NewMfWin()
@@ -265,7 +265,7 @@ class App(QApplication):
         json_to_app()
         if not Cfg.check_files():
             lng_win()
-        elif not Mf.mf_list:
+        elif not Mf.items:
             lng_win()
         elif Static.app_ver > Cfg.app_ver:
             Dbase.set_short_hash_not_unique()

@@ -215,7 +215,7 @@ class MfList(VListWidget):
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
 
-        for i in Mf.mf_list:
+        for i in Mf.items:
             if i.mf_current_path:
                 true_name = os.path.basename(i.mf_current_path)
             else:
@@ -261,7 +261,7 @@ class MfList(VListWidget):
         for i in range(self.count()):
             item: MfListItem = self.item(i)
             new_order.append(item.mf)
-        Mf.mf_list = new_order
+        Mf.items = new_order
 
 
 class MenuLeft(QTabWidget):

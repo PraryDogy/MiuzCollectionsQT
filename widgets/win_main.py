@@ -559,7 +559,7 @@ class WinMain(UMainWindow):
             self.watchdog_task.terminate_join()
             
         mf_list: list[Mf] = []
-        for mf in Mf.mf_list:
+        for mf in Mf.items:
             if mf.get_available_path():
                 mf_list.append(mf)
         if mf_list:
@@ -630,7 +630,7 @@ class WinMain(UMainWindow):
                 # print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ProcessWorker(
                     target=AllDirScaner.start,
-                    args=(Mf.mf_list, Cfg.lng_index, )
+                    args=(Mf.items, Cfg.lng_index, )
                 )
                 self.scaner_data.clear()
             self.db_mtime = int(os.stat(Static.external_db).st_mtime)

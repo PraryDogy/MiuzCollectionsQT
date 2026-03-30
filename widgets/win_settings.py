@@ -626,7 +626,7 @@ class FiltersWid(GroupWid):
         
     def reset_btn_cmd(self, *args):
         def fin():
-            Filters.filter_list.clear()
+            Filters.items.clear()
             self.filters_edit.clear()
             self.filters_edit.insertPlainText()
             self.filters_win.deleteLater()
@@ -805,9 +805,9 @@ class MfSettings(QWidget):
         
         def poll_task():
             if not self.mf_remover.is_alive():
-                for i in Mf.mf_list:
+                for i in Mf.items:
                     if i.mf_alias == self.mf.mf_alias:
-                        Mf.mf_list.remove(i)
+                        Mf.items.remove(i)
                         break
                 Mf.write_json_data()
                 restart_app()
@@ -851,7 +851,7 @@ class MfSettings(QWidget):
             self.mf.mf_paths = paths
             self.mf.mf_stop_list = stop_list
 
-            for i in Mf.mf_list:
+            for i in Mf.items:
                 if i.mf_alias == self.mf.mf_alias:
                     i.mf_paths = paths
                     i.mf_stop_list = stop_list
@@ -961,7 +961,7 @@ class NewFolder(QWidget):
         # мы добавляем новую папку менно в Mf.list_ а не в clone
         # чтобы отменить изменения из других отделов
         # и применить изменения только по новой папке
-        Mf.mf_list.append(self.mf)
+        Mf.items.append(self.mf)
         Mf.write_json_data()
         restart_app()
 
@@ -1029,8 +1029,8 @@ class WinSettings(SingleActionWindow):
         self.setFixedSize(700, 560)
 
         self.cfg_clone = copy.deepcopy(Cfg)
-        self.mf_list_clone = copy.deepcopy(Mf.mf_list)
-        self.filters_clone = copy.deepcopy(Filters.filter_list)
+        self.mf_list_clone = copy.deepcopy(Mf.items)
+        self.filters_clone = copy.deepcopy(Filters.items)
         self.settings_item = settings_item
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -1069,7 +1069,7 @@ class WinSettings(SingleActionWindow):
         spacer = UListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
-        for i in Mf.mf_list:
+        for i in Mf.items:
             new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
             new_folder.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(new_folder)
@@ -1193,10 +1193,10 @@ class WinSettings(SingleActionWindow):
             win_warn.center_to_parent(self.window())
             win_warn.show()
         else:
-            Mf.mf_list = self.mf_list_clone
+            Mf.items = self.mf_list_clone
             Mf.write_json_data()
 
-            Filters.filter_list = self.filters_clone
+            Filters.items = self.filters_clone
             Filters.write_json_data()
 
             Cfg.lng_index = self.cfg_clone.lng_index
@@ -1230,7 +1230,7 @@ class NewMfWin(SingleActionWindow):
     def __init__(self):
         super().__init__()
         self.setFixedSize(500, 500)
-        self.mf_list_clone = copy.deepcopy(Mf.mf_list)
+        self.mf_list_clone = copy.deepcopy(Mf.items)
         self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
         # перехватываем нажатие кнопки "сохранить"
         self.new_mf.save_fin = self.new_save_fin
@@ -1244,7 +1244,7 @@ class NewMfWin(SingleActionWindow):
             mf_stop_list=stop_list,
             mf_current_path=""
         )
-        Mf.mf_list.append(mf)
+        Mf.items.append(mf)
         Cfg.remake_external_dir()
         Cfg.make_empty_external_files()
         Mf.write_json_data()
