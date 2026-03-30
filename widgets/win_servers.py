@@ -179,13 +179,7 @@ class ServersWin(SingleActionWindow):
 
     # Загрузка данных из JSON
     def init_data(self):
-        try:
-            with open(Static.external_servers, "r", encoding="utf-8") as f:
-                server_list = json.load(f)
-        except Exception as e:
-            print(traceback.format_exc())
-            return
-        for server, login, pass_ in server_list:
+        for server, login, pass_ in Servers.server_list:
             server_item = ServerItem(
                 server=server,
                 login=login,
@@ -198,7 +192,7 @@ class ServersWin(SingleActionWindow):
             )
             self.v_list.addItem(list_item)
         
-        if server_list:
+        if Servers.server_list:
             self.v_list.setCurrentRow(0)
 
 
