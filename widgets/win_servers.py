@@ -95,6 +95,7 @@ class LoginWin(SingleActionWindow):
         self.central_layout.addWidget(pass_label)
 
         self.pass_ = ULineEdit()
+        self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
         self.pass_.setPlaceholderText(f"{Lng.password[Cfg.lng_index]}")
         self.central_layout.addWidget(self.pass_)
 

@@ -105,7 +105,7 @@ class ULineEdit(QLineEdit):
     """
     hh = 30
     padding = (2, 28)
-    menu_width = 120
+    menu_width = 200
 
     def __init__(self):
         super().__init__()
