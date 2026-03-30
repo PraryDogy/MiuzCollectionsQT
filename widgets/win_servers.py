@@ -106,6 +106,7 @@ class LoginWin(SingleActionWindow):
 
         self.cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
+        self.cancel_btn.clicked.connect(self.deleteLater)
         self.btn_layout.addWidget(self.cancel_btn)
 
         self.btn_layout.addStretch()
