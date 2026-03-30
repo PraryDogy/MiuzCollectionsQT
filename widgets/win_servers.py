@@ -34,9 +34,16 @@ class ServerListItem(UListWidgetItem):
 class ServerList(VListWidget):
     edit_server = pyqtSignal(ServerItem)
     remove_server = pyqtSignal(ServerItem)
+    connect_server = pyqtSignal()
 
     def __init__(self, parent = None):
         super().__init__(parent)
+
+    def mouseDoubleClickEvent(self, e):
+        list_item: ServerListItem = self.itemAt(e.pos())
+        if list_item:
+            self.connect_server.emit()
+        return super().mouseDoubleClickEvent(e)
 
     def contextMenuEvent(self, a0):
         list_item: ServerListItem = self.itemAt(a0.pos())
@@ -151,6 +158,7 @@ class ServersWin(SingleActionWindow):
         self.v_list = ServerList()
         self.v_list.edit_server.connect(self.show_login_win)
         self.v_list.remove_server.connect(self.remove_cmd)
+        self.v_list.connect_server.connect(self.connect_cmd)
         self.central_layout.addWidget(self.v_list)
 
         # Кнопки
