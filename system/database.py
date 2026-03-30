@@ -139,7 +139,9 @@ class Dbase:
             if not values:
                 return
             for row in values:
-                row[ClmnNames.root] = os.path.dirname(row[ClmnNames.rel_item_path])
+                row[ClmnNames.root] = os.path.dirname(
+                    row[ClmnNames.rel_item_path]
+                )
             del_table = sqlalchemy.delete(Thumbs.table)
             conn.execute(del_table)
             stmt = sqlalchemy.insert(Thumbs.table).values(values)
