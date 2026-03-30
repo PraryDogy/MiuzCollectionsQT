@@ -148,7 +148,7 @@ class ServersWin(SingleActionWindow):
         self.central_layout.addWidget(favs)
 
         self.v_list = ServerList()
-        self.v_list.edit_server.connect(self.login_win)
+        self.v_list.edit_server.connect(self.show_login_win)
         self.v_list.setFixedHeight(110)
         self.central_layout.addWidget(self.v_list)
 
@@ -164,7 +164,7 @@ class ServersWin(SingleActionWindow):
 
         btn_add = SmallBtn(Lng.add[Cfg.lng_index])
         btn_add.setFixedWidth(90)
-        btn_add.clicked.connect(self.login_win)
+        btn_add.clicked.connect(self.show_login_win)
         btn_layout.addWidget(btn_add)
 
         btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
@@ -181,44 +181,58 @@ class ServersWin(SingleActionWindow):
         try:
             with open(Static.external_servers, "r", encoding="utf-8") as f:
                 server_list = json.load(f)
-            for server, login, pass_ in server_list:
-                server_item = ServerItem(
-                    server=server,
-                    login=login,
-                    password=pass_
-                )
-                list_item = ServerListItem(
-                    parent=self.v_list,
-                    text=server,
-                    server_item=server_item
-                )
-                self.v_list.addItem(list_item)
         except Exception as e:
             print(traceback.format_exc())
-
-    def login_win(self, server_item: ServerItem = None):
-
-        def ok_pressed(new_server_item: ServerItem):
-
-            data = (
-                new_server_item.server,
-                new_server_item.login,
-                new_server_item.password
+            return
+        for server, login, pass_ in server_list:
+            server_item = ServerItem(
+                server=server,
+                login=login,
+                password=pass_
             )
-
-            Servers.server_list.append((
-                new_server_item.server,
-                new_server_item.login,
-                new_server_item.password
-            ))
-            Servers.write_json_data()
-
-            item = ServerListItem(
+            list_item = ServerListItem(
                 parent=self.v_list,
-                text=server_item.server,
+                text=server,
                 server_item=server_item
             )
-            self.v_list.addItem(item)
+            self.v_list.addItem(list_item)
+
+
+    def show_login_win(self, server_item: ServerItem = None):
+
+        def ok_pressed(new_server_item: ServerItem):
+            if server_item:
+                Servers.server_list.remove([
+                    server_item.server,
+                    server_item.login,
+                    server_item.password
+                ])
+
+                for i in range(self.v_list.count()):
+                    item: ServerListItem = self.v_list.item(i)
+                    if item is None:
+                        continue
+                    if (
+                        item.server_item.server == server_item.server
+                        and
+                        item.server_item.login == server_item.login
+                        and
+                        item.server_item.password == server_item.password
+                    ):
+                        self.v_list.takeItem(i)
+
+            Servers.server_list.append([
+                new_server_item.server,
+                new_server_item.login,
+                new_server_item.password
+            ])
+            Servers.write_json_data()
+            list_item = ServerListItem(
+                parent=self.v_list,
+                text=new_server_item.server,
+                server_item=new_server_item
+            )
+            self.v_list.addItem(list_item)
 
         self.login_win = LoginWin(server_item)
         self.login_win.ok_pressed.connect(ok_pressed)
