@@ -203,25 +203,7 @@ class ServersWin(SingleActionWindow):
 
         def ok_pressed(new_server_item: ServerItem):
             if server_item:
-                Servers.server_list.remove([
-                    server_item.server,
-                    server_item.login,
-                    server_item.password
-                ])
-
-                for i in range(self.v_list.count()):
-                    item: ServerListItem = self.v_list.item(i)
-                    if item is None:
-                        continue
-                    if (
-                        item.server_item.server == server_item.server
-                        and
-                        item.server_item.login == server_item.login
-                        and
-                        item.server_item.password == server_item.password
-                    ):
-                        self.v_list.takeItem(i)
-
+                self.remove_cmd(server_item)
             Servers.server_list.append([
                 new_server_item.server,
                 new_server_item.login,
