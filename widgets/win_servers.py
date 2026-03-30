@@ -139,7 +139,7 @@ class ServersWin(SingleActionWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.connect_to_server[Cfg.lng_index])
-        self.setFixedWidth(400)
+        self.setFixedSize(350, 250)
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(10)
@@ -150,7 +150,6 @@ class ServersWin(SingleActionWindow):
         self.v_list = ServerList()
         self.v_list.edit_server.connect(self.show_login_win)
         self.v_list.remove_server.connect(self.remove_cmd)
-        self.v_list.setFixedHeight(110)
         self.central_layout.addWidget(self.v_list)
 
         # Кнопки
@@ -197,6 +196,9 @@ class ServersWin(SingleActionWindow):
                 server_item=server_item
             )
             self.v_list.addItem(list_item)
+        
+        if server_list:
+            self.v_list.setCurrentRow(0)
 
 
     def show_login_win(self, server_item: ServerItem = None):
