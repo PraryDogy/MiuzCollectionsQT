@@ -1,99 +1,69 @@
 import json
 import os
+import re
 import subprocess
 
-from PyQt5.QtCore import QModelIndex, QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QHeaderView,
-                             QListWidgetItem, QMenu, QPushButton, QTableView,
-                             QWidget)
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QListWidgetItem, QPushButton,
+                             QSpacerItem, QWidget)
 
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.servers import Servers
 from system.shared_utils import SharedUtils
 
-from ._base_widgets import SingleActionWindow, ULineEdit
+from ._base_widgets import (SingleActionWindow, SmallBtn, ULineEdit,
+                            UListWidgetItem, VListWidget)
 
 
-class ServersWidget(QTableView):
-    remove = pyqtSignal(object)
-
-    def __init__(self, data: list[list[str]]):
+class LoginWin(SingleActionWindow):
+    def __init__(self, title: str):
         super().__init__()
+        self.setFixedWidth(300)
+        self.setWindowTitle(title)
 
-        self.model_ = QStandardItemModel(0, 3, self)
-        self.model_.setHorizontalHeaderLabels([
-            Lng.server[Cfg.lng_index], Lng.login[Cfg.lng_index], Lng.password[Cfg.lng_index]
-        ])
-        self.setModel(self.model_)
+        login = QLabel(text=Lng.login[Cfg.lng_index])
+        self.central_layout.addWidget(login)
 
-        for row in data:
-            items = [QStandardItem(str(val)) for val in row]
-            for item in items:
-                item.setEditable(False)
-            self.model_.appendRow(items)
+        self.login = ULineEdit()
+        self.login.setPlaceholderText(f"{Lng.login[Cfg.lng_index]}")
+        self.central_layout.addWidget(self.login)
 
-        # Настройки таблицы
-        header = self.horizontalHeader()
+        self.central_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        # Сначала выставляем авто-ширину по содержимому
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        pass_ = QLabel(text=Lng.password[Cfg.lng_index])
+        self.central_layout.addWidget(pass_)
 
-        # Потом немного увеличиваем, чтобы не было сжатия
-        self.resizeColumnsToContents()
-        self.horizontalHeader().setStretchLastSection(True)
+        self.pass_ = ULineEdit()
+        self.pass_.setPlaceholderText(f"{Lng.password[Cfg.lng_index]}")
+        self.central_layout.addWidget(self.pass_)
 
-        # После этого включаем ручной ресайз
-        header.setSectionResizeMode(QHeaderView.Interactive)
+        self.central_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        self.verticalHeader().setVisible(False)
-        self.setSelectionBehavior(QTableView.SelectRows)
-        self.setSelectionMode(QTableView.SingleSelection)
-        self.setShowGrid(False)
-        self.setAlternatingRowColors(True)
-        self.verticalHeader().setDefaultSectionSize(25)
+        self.btn_layout = QHBoxLayout()
+        self.btn_layout.setSpacing(10)
+        self.central_layout.addLayout(self.btn_layout)
 
-        # Контекстное меню
-        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_context_menu)
+        self.btn_layout.addStretch()
 
-    def add_row(self, data: list[str]):
-        items = [QStandardItem(str(val)) for val in data]
-        for item in items:
-            item.setEditable(False)
-        self.model_.appendRow(items)
+        self.ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
+        self.ok_btn.setFixedWidth(90)
+        self.btn_layout.addWidget(self.ok_btn)
 
-    def get_row_text(self, index: QModelIndex):
-        return ", ".join(
-            self.model_.item(index.row(), c).text()
-            for c in range(self.model_.columnCount())
-        )
+        self.cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
+        self.cancel_btn.setFixedWidth(90)
+        self.btn_layout.addWidget(self.cancel_btn)
 
-    def show_context_menu(self, pos):
-        index = self.indexAt(pos)
-        row_text = self.get_row_text(index)
-        if not index.isValid():
-            return
+        self.btn_layout.addStretch()
 
-        menu = QMenu(self)
-        copy_action = menu.addAction(Lng.copy[Cfg.lng_index])
-        delete_action = menu.addAction(Lng.delete[Cfg.lng_index])
-        action = menu.exec_(self.viewport().mapToGlobal(pos))
+        self.adjustSize()
 
-        if action == copy_action:
-            QApplication.clipboard().setText(row_text)
-
-        elif action == delete_action:
-            self.remove.emit(row_text)
-            self.model_.removeRow(index.row())
-
-    def mouseReleaseEvent(self, e):
-        index = self.indexAt(e.pos())
-        if not index.isValid():
-            self.clearSelection()
-            self.setCurrentIndex(QModelIndex())
-        return super().mouseReleaseEvent(e)
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            self.deleteLater()
+        return super().keyPressEvent(a0)
 
 
 class ServersWin(SingleActionWindow):
@@ -110,15 +80,19 @@ class ServersWin(SingleActionWindow):
         self.central_layout.setSpacing(10)
 
         self.new_server = ULineEdit()
-        self.new_server.setPlaceholderText(
-            f"{Lng.server[Cfg.lng_index]}, {Lng.login[Cfg.lng_index]}, {Lng.password[Cfg.lng_index]}"
-        )
+        self.new_server.setPlaceholderText(f"{Lng.server[Cfg.lng_index]}")
         self.central_layout.addWidget(self.new_server)
 
-        # QListWidget
-        self.servers_widget = ServersWidget(self.data)
-        self.servers_widget.remove.connect(lambda text: self.remove_server(text))
-        self.central_layout.addWidget(self.servers_widget)
+        favs = QLabel(Lng.favorites[Cfg.lng_index])
+        self.central_layout.addWidget(favs)
+
+        self.v_list = VListWidget()
+        self.v_list.setFixedHeight(110)
+        self.central_layout.addWidget(self.v_list)
+
+        # for i in range(0, 3):
+        #     item = UListWidgetItem(self.v_list, text="server" + str(i))
+        #     self.v_list.addItem(item)
 
         # Кнопки
         btn_widget = QWidget()
@@ -127,17 +101,17 @@ class ServersWin(SingleActionWindow):
         btn_layout.setSpacing(5)
 
         # + и - слева
-        btn_add = QPushButton("+")
+        btn_add = SmallBtn("+")
         btn_add.setFixedWidth(50)
         btn_add.clicked.connect(self.add_server)
 
-        btn_remove = QPushButton("–")
+        btn_remove = SmallBtn("–")
         btn_remove.setFixedWidth(50)
         btn_remove.clicked.connect(lambda: self.remove_btn_cmd())
 
         # Connect справа
-        btn_connect = QPushButton(Lng.connect_short[Cfg.lng_index])
-        btn_connect.setFixedWidth(90)
+        btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
+        # btn_connect.setFixedWidth(90)
         btn_connect.clicked.connect(self.connect_cmd)
 
         btn_layout.addWidget(btn_add)
@@ -149,6 +123,10 @@ class ServersWin(SingleActionWindow):
 
         self.adjustSize()
         self.setFocus()
+
+        self.new_server.setText(
+            "smb://192.168.10.105/Shares"
+        )
 
     # Загрузка данных из JSON
     def init_data(self):
@@ -197,7 +175,27 @@ class ServersWin(SingleActionWindow):
         Servers.server_list = self.data
         Servers.write_json_data()
 
+    def show_login_window(self, text: str):
+        self.login_win = LoginWin(text)
+        self.login_win.center_to_parent(self.window())
+        self.login_win.show()
+
+    def is_good_server(self, text: str):
+        pattern = r"^smb://[\w.-]+/[\w.-]+$"
+        if re.match(pattern, text):
+            return True
+        return False
+
     def connect_cmd(self):
+        text = self.new_server.text()
+        if text and self.is_good_server(text):
+            self.show_login_window(text)
+        else:
+            item = self.v_list.currentItem()
+            t = item.text()
+            print(t, "выделеннаятстрока")
+
+        return
         delay = 0
         for server, login, password in self.data:
             if SharedUtils.is_mounted(server):
