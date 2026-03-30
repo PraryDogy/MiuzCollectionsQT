@@ -158,7 +158,7 @@ class ServersWin(SingleActionWindow):
         btn_layout = QHBoxLayout()
         btn_widget.setLayout(btn_layout)
         btn_layout.setContentsMargins(0, 0, 0, 0)
-        btn_layout.setSpacing(5)
+        btn_layout.setSpacing(10)
         self.central_layout.addWidget(btn_widget)
 
         btn_layout.addStretch()
@@ -170,7 +170,7 @@ class ServersWin(SingleActionWindow):
 
         btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
         btn_connect.setFixedWidth(90)
-        # btn_connect.clicked.connect(self.connect_cmd)
+        btn_connect.clicked.connect(self.connect_cmd)
         btn_layout.addWidget(btn_connect)
 
         self.adjustSize()
@@ -246,32 +246,16 @@ class ServersWin(SingleActionWindow):
             if current == target:
                 self.v_list.takeItem(i)
 
-    # def is_good_server(self, text: str):
-    #     pattern = r"^smb://[\w.-]+/[\w.-]+$"
-    #     if re.match(pattern, text):
-    #         return True
-    #     return False
-
-    # def connect_cmd(self):
-    #     text = self.new_server.text()
-    #     if text and self.is_good_server(text):
-    #         self.show_login_window(text)
-    #     else:
-    #         item = self.v_list.currentItem()
-    #         t = item.text()
-    #         print(t, "выделеннаятстрока")
-
-        return
-        delay = 0
-        for server, login, password in self.data:
-            if SharedUtils.is_mounted(server):
-                continue
-            smb = "smb://"
-            ip = server.split(smb)[-1]
-            cmd = f"{smb}{login}:{password}@{ip}"
-            QTimer.singleShot(delay, lambda c=cmd: subprocess.run(["open", c]))
-            delay += 200  # задержка 200 мс между подключениями
-        QTimer.singleShot(delay + 100, self.deleteLater)
+    def connect_cmd(self):
+        list_item: ServerListItem = self.v_list.currentItem()
+        if not list_item:
+            return
+        server_item = list_item.server_item
+        s, l, p = server_item.server, server_item.login, server_item.password
+        smb = "smb://"
+        ip = s.split(smb)[-1]
+        cmd = f"{smb}{l}:{p}@{ip}"
+        subprocess.run(["open", cmd])
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
