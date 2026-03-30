@@ -154,29 +154,23 @@ class ServersWin(SingleActionWindow):
 
         # Кнопки
         btn_widget = QWidget()
-        btn_layout = QHBoxLayout(btn_widget)
+        btn_layout = QHBoxLayout()
+        btn_widget.setLayout(btn_layout)
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(5)
-
-        # + и - слева
-        btn_add = SmallBtn("+")
-        btn_add.setFixedWidth(50)
-        btn_add.clicked.connect(self.login_win)
-
-        btn_remove = SmallBtn("–")
-        btn_remove.setFixedWidth(50)
-        # btn_remove.clicked.connect(lambda: self.remove_btn_cmd())
-
-        # Connect справа
-        btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
-        # btn_connect.clicked.connect(self.connect_cmd)
-
-        btn_layout.addWidget(btn_add)
-        btn_layout.addWidget(btn_remove)
-        btn_layout.addStretch()
-        btn_layout.addWidget(btn_connect)
-
         self.central_layout.addWidget(btn_widget)
+
+        btn_layout.addStretch()
+
+        btn_add = SmallBtn(Lng.add[Cfg.lng_index])
+        btn_add.setFixedWidth(90)
+        btn_add.clicked.connect(self.login_win)
+        btn_layout.addWidget(btn_add)
+
+        btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
+        btn_connect.setFixedWidth(90)
+        # btn_connect.clicked.connect(self.connect_cmd)
+        btn_layout.addWidget(btn_connect)
 
         self.adjustSize()
         self.setFocus()
