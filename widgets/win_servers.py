@@ -53,7 +53,7 @@ class ServerList(VListWidget):
 
         rem = QAction("Удалить", self.menu_)
         rem.triggered.connect(
-            lambda: self.edit_server.emit(list_item.server_item)
+            lambda: self.remove_server.emit(list_item.server_item)
         )
         self.menu_.addAction(rem)
 
@@ -149,6 +149,7 @@ class ServersWin(SingleActionWindow):
 
         self.v_list = ServerList()
         self.v_list.edit_server.connect(self.show_login_win)
+        self.v_list.remove_server.connect(self.remove_cmd)
         self.v_list.setFixedHeight(110)
         self.central_layout.addWidget(self.v_list)
 
@@ -239,21 +240,29 @@ class ServersWin(SingleActionWindow):
         self.login_win.center_to_parent(self.window())
         self.login_win.show()
 
-
-    # def remove_btn_cmd(self):
-    #     ind = self.servers_widget.currentIndex()
-    #     if ind.isValid():
-    #         text = self.servers_widget.get_row_text(ind)
-    #         self.servers_widget.model_.removeRow(ind.row())
-    #         self.remove_server(text)
-
-    # def remove_server(self, text: str):
-    #     self.data.remove(text.split(", "))
-    #     self.save_cmd()
-
-    # def save_cmd(self):
-        # Servers.server_list = self.data
-        # Servers.write_json_data()
+    def remove_cmd(self, server_item: ServerItem):
+        Servers.server_list.remove([
+            server_item.server,
+            server_item.login,
+            server_item.password
+        ])
+        Servers.write_json_data()
+        for i in range(self.v_list.count()):
+            item = self.v_list.item(i)
+            if not item:
+                continue
+            current = (
+                item.server_item.server,
+                item.server_item.login,
+                item.server_item.password
+            )
+            target = (
+                server_item.server,
+                server_item.login,
+                server_item.password
+            )
+            if current == target:
+                self.v_list.takeItem(i)
 
     # def is_good_server(self, text: str):
     #     pattern = r"^smb://[\w.-]+/[\w.-]+$"
@@ -285,7 +294,5 @@ class ServersWin(SingleActionWindow):
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
-        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-            self.connect_cmd()
         return super().keyPressEvent(a0)
     
