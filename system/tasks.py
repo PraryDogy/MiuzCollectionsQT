@@ -285,9 +285,9 @@ class DbDirsLoader(URunnable):
     def _task(self):
         with Dbase.main_engine.begin() as conn:
             stmt = (
-                sqlalchemy.select(Dirs.rel_dir_path)
-                .where(Dirs.mf_alias == self.mf.mf_alias)
-            )
+                sqlalchemy.select(Thumbs.root)
+                .where(Thumbs.mf_alias == self.mf.mf_alias)
+            ).distinct()
             res = conn.execute(stmt).scalars().all()
             return self.fill_missing_paths(res)
         
