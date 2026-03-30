@@ -2,6 +2,7 @@ import json
 import os
 import re
 import subprocess
+import traceback
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QListWidgetItem, QPushButton,
@@ -16,16 +17,35 @@ from ._base_widgets import (SingleActionWindow, SmallBtn, ULineEdit,
                             UListWidgetItem, VListWidget)
 
 
+class ServerItem(UListWidgetItem):
+    def __init__(self, parent: VListWidget, text: str, data: tuple):
+        super().__init__(parent=parent, text=text)
+        self.server, self.login, self.pass_ = data
+
+
+
 class LoginWin(SingleActionWindow):
     ok_pressed = pyqtSignal(tuple)
 
-    def __init__(self, title: str):
+    def __init__(
+            self,
+            server: str = None,
+            login: str = None,
+            pass_: str = None
+        ):
+
         super().__init__()
         self.setFixedWidth(300)
-        self.setWindowTitle(title)
 
-        login = QLabel(text=Lng.login[Cfg.lng_index])
-        self.central_layout.addWidget(login)
+        server_label = QLabel(text=Lng.server[Cfg.lng_index])
+        self.central_layout.addWidget(server_label)
+
+        self.server = ULineEdit()
+        self.server.setPlaceholderText(Lng.server[Cfg.lng_index])
+        self.central_layout.addWidget(self.server)
+
+        login_label = QLabel(text=Lng.login[Cfg.lng_index])
+        self.central_layout.addWidget(login_label)
 
         self.login = ULineEdit()
         self.login.setPlaceholderText(f"{Lng.login[Cfg.lng_index]}")
@@ -33,8 +53,8 @@ class LoginWin(SingleActionWindow):
 
         self.central_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        pass_ = QLabel(text=Lng.password[Cfg.lng_index])
-        self.central_layout.addWidget(pass_)
+        pass_label = QLabel(text=Lng.password[Cfg.lng_index])
+        self.central_layout.addWidget(pass_label)
 
         self.pass_ = ULineEdit()
         self.pass_.setPlaceholderText(f"{Lng.password[Cfg.lng_index]}")
@@ -59,12 +79,18 @@ class LoginWin(SingleActionWindow):
 
         self.btn_layout.addStretch()
 
+        if server:
+            self.server.setText(server)
+            self.login.setText(login)
+            self.pass_.setText(pass_)
+
+
         self.adjustSize()
 
     def ok_cmd(self):
-        if self.login.text() and self.pass_.text():
+        if self.server.text() and self.login.text() and self.pass_.text():
             self.ok_pressed.emit(
-                (self.login.text(), self.pass_.text())
+                (self.server.text(), self.login.text(), self.pass_.text())
             )
             self.deleteLater()
 
@@ -82,16 +108,8 @@ class ServersWin(SingleActionWindow):
         self.setWindowTitle(Lng.connect_to_server[Cfg.lng_index])
         self.setFixedWidth(400)
 
-        # Загрузка данных
-        self.data: list[list[str]] = []
-        self.init_data()
-
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(10)
-
-        self.new_server = ULineEdit()
-        self.new_server.setPlaceholderText(f"{Lng.server[Cfg.lng_index]}")
-        self.central_layout.addWidget(self.new_server)
 
         favs = QLabel(Lng.favorites[Cfg.lng_index])
         self.central_layout.addWidget(favs)
@@ -99,10 +117,6 @@ class ServersWin(SingleActionWindow):
         self.v_list = VListWidget()
         self.v_list.setFixedHeight(110)
         self.central_layout.addWidget(self.v_list)
-
-        # for i in range(0, 3):
-        #     item = UListWidgetItem(self.v_list, text="server" + str(i))
-        #     self.v_list.addItem(item)
 
         # Кнопки
         btn_widget = QWidget()
@@ -113,15 +127,15 @@ class ServersWin(SingleActionWindow):
         # + и - слева
         btn_add = SmallBtn("+")
         btn_add.setFixedWidth(50)
-        btn_add.clicked.connect(self.add_server)
+        btn_add.clicked.connect(self.show_login_window)
 
         btn_remove = SmallBtn("–")
         btn_remove.setFixedWidth(50)
-        btn_remove.clicked.connect(lambda: self.remove_btn_cmd())
+        # btn_remove.clicked.connect(lambda: self.remove_btn_cmd())
 
         # Connect справа
         btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
-        btn_connect.clicked.connect(self.connect_cmd)
+        # btn_connect.clicked.connect(self.connect_cmd)
 
         btn_layout.addWidget(btn_add)
         btn_layout.addWidget(btn_remove)
@@ -132,83 +146,71 @@ class ServersWin(SingleActionWindow):
 
         self.adjustSize()
         self.setFocus()
-
-        self.new_server.setText(
-            "smb://192.168.10.105/Shares"
-        )
+        self.init_data()
 
     # Загрузка данных из JSON
     def init_data(self):
-        if os.path.exists(Static.external_servers):
+        try:
             with open(Static.external_servers, "r", encoding="utf-8") as f:
-                self.data = json.load(f)
+                server_list = json.load(f)
+            for server, login, pass_ in server_list:
+                item = ServerItem(
+                    self.v_list,
+                    text=server,
+                    data=(server, login, pass_)
+                )
+                self.v_list.addItem(item)
+        except Exception as e:
+            print(traceback.format_exc())
 
-    def add_server(self):
-        text = self.new_server.text().strip()
-        if not text:
-            return
-
-        parts = [p.strip() for p in text.split(",")]
-        if len(parts) != 3:
-            return  # неправильный формат
-
-        server, login, password = parts
-
-        # Добавляем в QListWidget
-        item_text = f"{server}, {login}, {password}"
-        item = QListWidgetItem(item_text)
-        item.setSizeHint(QSize(0, 25))
-        self.servers_widget.add_row(parts)
-
-        # Добавляем в self.data
-        self.data.append(parts)
-
-        # Очищаем QLineEdit
-        self.new_server.clear()
-
-        # Сохраняем
-        self.save_cmd()
-
-    def remove_btn_cmd(self):
-        ind = self.servers_widget.currentIndex()
-        if ind.isValid():
-            text = self.servers_widget.get_row_text(ind)
-            self.servers_widget.model_.removeRow(ind.row())
-            self.remove_server(text)
-
-    def remove_server(self, text: str):
-        self.data.remove(text.split(", "))
-        self.save_cmd()
-
-    def save_cmd(self):
-        Servers.server_list = self.data
-        Servers.write_json_data()
-
-    def show_login_window(self, adress: str):
+    def show_login_window(self):
 
         def final(data: tuple):
-            login, pass_ = data
-            print(adress, login, pass_)
+            Servers.server_list.append(data)
+            Servers.write_json_data()
 
-        self.login_win = LoginWin(adress)
+            item = ServerItem(
+                parent=self.v_list,
+                text=data[0],
+                data=data
+            )
+            self.v_list.addItem(item)
+
+        self.login_win = LoginWin()
         self.login_win.ok_pressed.connect(final)
         self.login_win.center_to_parent(self.window())
         self.login_win.show()
 
-    def is_good_server(self, text: str):
-        pattern = r"^smb://[\w.-]+/[\w.-]+$"
-        if re.match(pattern, text):
-            return True
-        return False
 
-    def connect_cmd(self):
-        text = self.new_server.text()
-        if text and self.is_good_server(text):
-            self.show_login_window(text)
-        else:
-            item = self.v_list.currentItem()
-            t = item.text()
-            print(t, "выделеннаятстрока")
+    # def remove_btn_cmd(self):
+    #     ind = self.servers_widget.currentIndex()
+    #     if ind.isValid():
+    #         text = self.servers_widget.get_row_text(ind)
+    #         self.servers_widget.model_.removeRow(ind.row())
+    #         self.remove_server(text)
+
+    # def remove_server(self, text: str):
+    #     self.data.remove(text.split(", "))
+    #     self.save_cmd()
+
+    # def save_cmd(self):
+        # Servers.server_list = self.data
+        # Servers.write_json_data()
+
+    # def is_good_server(self, text: str):
+    #     pattern = r"^smb://[\w.-]+/[\w.-]+$"
+    #     if re.match(pattern, text):
+    #         return True
+    #     return False
+
+    # def connect_cmd(self):
+    #     text = self.new_server.text()
+    #     if text and self.is_good_server(text):
+    #         self.show_login_window(text)
+    #     else:
+    #         item = self.v_list.currentItem()
+    #         t = item.text()
+    #         print(t, "выделеннаятстрока")
 
         return
         delay = 0
