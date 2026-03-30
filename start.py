@@ -269,6 +269,7 @@ class App(QApplication):
             lng_win()
         elif Static.app_ver > Cfg.app_ver:
             Dbase.set_short_hash_not_unique()
+            Dbase.set_root()
             Cfg.app_ver = Static.app_ver
             Cfg.write_json_data()
             self.start()

@@ -325,7 +325,7 @@ class UpdateThumb:
                 ClmnNames.size: int(stats.st_size),
                 ClmnNames.birth: 0,
                 ClmnNames.mod: int(stats.st_mtime),
-                ClmnNames.resol: "none",
+                ClmnNames.root: os.path.dirname(rel_img_path),
                 ClmnNames.coll: "none",
                 ClmnNames.fav: 0,
                 ClmnNames.mf_alias: mf.mf_alias

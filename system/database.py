@@ -16,7 +16,7 @@ class ClmnNames:
     size: Literal["size"] = "size"
     birth: Literal["birth: упразднено, неверно отобр. на smb дисках"] = "birth"
     mod: Literal["mod"] = "mod"
-    resol: Literal["resol: упразднено"] = "resol"
+    root: Literal["наст. имя: resol, теперь это dirname"] = "resol"
     coll: Literal["coll: упразднено"] = "coll"
     fav: Literal["fav"] = "fav"
     mf_alias: Literal["наст. имя: brand"] = "brand"
@@ -30,7 +30,7 @@ _table_thumbs = sqlalchemy.Table(
     sqlalchemy.Column(ClmnNames.size, sqlalchemy.Integer),
     sqlalchemy.Column(ClmnNames.birth, sqlalchemy.Integer),
     sqlalchemy.Column(ClmnNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmnNames.resol, sqlalchemy.Text),
+    sqlalchemy.Column(ClmnNames.root, sqlalchemy.Text),
     sqlalchemy.Column(ClmnNames.coll, sqlalchemy.Text),
     sqlalchemy.Column(ClmnNames.fav, sqlalchemy.Integer),
     sqlalchemy.Column(ClmnNames.mf_alias, sqlalchemy.Text),
@@ -58,7 +58,7 @@ class Thumbs:
     size = _table_thumbs.c.size
     birth = _table_thumbs.c.birth
     mod = _table_thumbs.c.mod
-    resol = _table_thumbs.c.resol
+    root = _table_thumbs.c.resol
     coll = _table_thumbs.c.coll
     fav = _table_thumbs.c.fav
     mf_alias = _table_thumbs.c.brand
@@ -129,6 +129,23 @@ class Dbase:
         conn.close()
 
     @classmethod
+    def set_root(cls):
+        with Dbase.create_engine().begin() as conn:
+            stmt = sqlalchemy.select(Thumbs.table)
+            values = [
+                dict(i)
+                for i in conn.execute(stmt).mappings()
+            ]
+            if not values:
+                return
+            for row in values:
+                row[ClmnNames.root] = os.path.dirname(row[ClmnNames.rel_item_path])
+            del_table = sqlalchemy.delete(Thumbs.table)
+            conn.execute(del_table)
+            stmt = sqlalchemy.insert(Thumbs.table).values(values)
+            conn.execute(stmt)
+                    
+    @classmethod
     def set_short_hash_not_unique(cls):
         old_table = "thumbs"
         new_table = "thumbs_new"
@@ -143,7 +160,7 @@ class Dbase:
                 {ClmnNames.size} INTEGER,
                 {ClmnNames.birth} INTEGER,
                 {ClmnNames.mod} INTEGER,
-                {ClmnNames.resol} TEXT,
+                {ClmnNames.root} TEXT,
                 {ClmnNames.coll} TEXT,
                 {ClmnNames.fav} INTEGER,
                 {ClmnNames.mf_alias} TEXT

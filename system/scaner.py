@@ -406,7 +406,7 @@ class _ThumbsUpdater:
                         ClmnNames.size: img_item.size,
                         ClmnNames.birth: 0,
                         ClmnNames.mod: img_item.mod,
-                        ClmnNames.resol: "none",
+                        ClmnNames.root: os.path.dirname(rel_img_path),
                         ClmnNames.coll: "none",
                         ClmnNames.fav: 0,
                         ClmnNames.mf_alias: scaner_item.mf.mf_alias

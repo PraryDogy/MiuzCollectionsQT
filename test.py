@@ -1,8 +1,4 @@
-def test(callback: callable):
-    for i in range(0, 10):
-        callback("ewrwerw", i)
+import os
 
-
-test(
-    callback=lambda *args: print(999, *args)
-)
+test = "/img.jpg"
+print(os.path.dirname(test))
