@@ -5,9 +5,8 @@ import subprocess
 import traceback
 from dataclasses import dataclass
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import (QAction, QHBoxLayout, QLabel, QPushButton,
-                             QSpacerItem, QWidget)
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QAction, QHBoxLayout, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg, Static
 from system.lang import Lng
@@ -67,6 +66,12 @@ class ServerList(VListWidget):
         self.menu_.show_menu()
 
 
+class ServerLabel(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text=text)
+        self.setStyleSheet("padding-left: 1px;")
+
+
 class LoginWin(SingleActionWindow):
     ok_pressed = pyqtSignal(ServerItem)
 
@@ -74,15 +79,16 @@ class LoginWin(SingleActionWindow):
 
         super().__init__()
         self.setFixedWidth(300)
+        self.central_layout.setSpacing(5)
 
-        server_label = QLabel(text=Lng.server[Cfg.lng_index])
+        server_label = ServerLabel(text=Lng.server[Cfg.lng_index].capitalize())
         self.central_layout.addWidget(server_label)
 
         self.server = ULineEdit()
         self.server.setPlaceholderText(Lng.server[Cfg.lng_index])
         self.central_layout.addWidget(self.server)
 
-        login_label = QLabel(text=Lng.login[Cfg.lng_index])
+        login_label = ServerLabel(text=Lng.login[Cfg.lng_index].capitalize())
         self.central_layout.addWidget(login_label)
 
         self.login = ULineEdit()
@@ -91,7 +97,8 @@ class LoginWin(SingleActionWindow):
 
         self.central_layout.addSpacerItem(QSpacerItem(0, 10))
 
-        pass_label = QLabel(text=Lng.password[Cfg.lng_index])
+        pass_label = ServerLabel(text=Lng.password[Cfg.lng_index].capitalize())
+        pass_label.mouseReleaseEvent = self.show_hide_pass
         self.central_layout.addWidget(pass_label)
 
         self.pass_ = ULineEdit()
@@ -126,6 +133,12 @@ class LoginWin(SingleActionWindow):
 
         self.adjustSize()
 
+    def show_hide_pass(self, *args):
+        if self.pass_.echoMode() == ULineEdit.EchoMode.Password:
+            self.pass_.setEchoMode(ULineEdit.EchoMode.Normal)
+        else:
+            self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
+
     def ok_cmd(self):
         if self.server.text() and self.login.text() and self.pass_.text():
             server_item = ServerItem(
@@ -153,7 +166,7 @@ class ServersWin(SingleActionWindow):
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(10)
 
-        favs = QLabel(Lng.favorites[Cfg.lng_index])
+        favs = ServerLabel(Lng.favorites[Cfg.lng_index])
         self.central_layout.addWidget(favs)
 
         self.v_list = ServerList()
