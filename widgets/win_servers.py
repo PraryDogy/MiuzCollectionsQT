@@ -3,9 +3,10 @@ import os
 import re
 import subprocess
 import traceback
+from dataclasses import dataclass
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QListWidgetItem, QPushButton,
+from PyQt5.QtWidgets import (QAction, QHBoxLayout, QLabel, QPushButton,
                              QSpacerItem, QWidget)
 
 from cfg import Cfg, Static
@@ -14,25 +15,55 @@ from system.servers import Servers
 from system.shared_utils import SharedUtils
 
 from ._base_widgets import (SingleActionWindow, SmallBtn, ULineEdit,
-                            UListWidgetItem, VListWidget)
+                            UListWidgetItem, UMenu, VListWidget)
 
 
-class ServerItem(UListWidgetItem):
-    def __init__(self, parent: VListWidget, text: str, data: tuple):
+@dataclass(slots=True)
+class ServerItem:
+    server: str
+    login: str
+    password: str
+
+
+class ServerListItem(UListWidgetItem):
+    def __init__(self, parent: VListWidget, text: str, server_item: ServerItem):
         super().__init__(parent=parent, text=text)
-        self.server, self.login, self.pass_ = data
+        self.server_item = server_item
 
+
+class ServerList(VListWidget):
+    edit_server = pyqtSignal(ServerItem)
+    remove_server = pyqtSignal(ServerItem)
+
+    def __init__(self, parent = None):
+        super().__init__(parent)
+
+    def contextMenuEvent(self, a0):
+        list_item: ServerListItem = self.itemAt(a0.pos())
+        if not list_item:
+            return
+
+        self.menu_ = UMenu(a0)
+
+        edit = QAction("Редактировать", self.menu_)
+        edit.triggered.connect(
+            lambda: self.edit_server.emit(list_item.server_item)
+        )
+        self.menu_.addAction(edit)
+
+        rem = QAction("Удалить", self.menu_)
+        rem.triggered.connect(
+            lambda: self.edit_server.emit(list_item.server_item)
+        )
+        self.menu_.addAction(rem)
+
+        self.menu_.show_menu()
 
 
 class LoginWin(SingleActionWindow):
-    ok_pressed = pyqtSignal(tuple)
+    ok_pressed = pyqtSignal(ServerItem)
 
-    def __init__(
-            self,
-            server: str = None,
-            login: str = None,
-            pass_: str = None
-        ):
+    def __init__(self, server_item: ServerItem = None):
 
         super().__init__()
         self.setFixedWidth(300)
@@ -79,19 +110,21 @@ class LoginWin(SingleActionWindow):
 
         self.btn_layout.addStretch()
 
-        if server:
-            self.server.setText(server)
-            self.login.setText(login)
-            self.pass_.setText(pass_)
-
+        if server_item:
+            self.server.setText(server_item.server)
+            self.login.setText(server_item.login)
+            self.pass_.setText(server_item.password)
 
         self.adjustSize()
 
     def ok_cmd(self):
         if self.server.text() and self.login.text() and self.pass_.text():
-            self.ok_pressed.emit(
-                (self.server.text(), self.login.text(), self.pass_.text())
+            server_item = ServerItem(
+                server=self.server.text(),
+                login=self.login.text(),
+                password=self.pass_.text()
             )
+            self.ok_pressed.emit(server_item)
             self.deleteLater()
 
     def keyPressEvent(self, a0):
@@ -114,7 +147,8 @@ class ServersWin(SingleActionWindow):
         favs = QLabel(Lng.favorites[Cfg.lng_index])
         self.central_layout.addWidget(favs)
 
-        self.v_list = VListWidget()
+        self.v_list = ServerList()
+        self.v_list.edit_server.connect(self.login_win)
         self.v_list.setFixedHeight(110)
         self.central_layout.addWidget(self.v_list)
 
@@ -127,7 +161,7 @@ class ServersWin(SingleActionWindow):
         # + и - слева
         btn_add = SmallBtn("+")
         btn_add.setFixedWidth(50)
-        btn_add.clicked.connect(self.show_login_window)
+        btn_add.clicked.connect(self.login_win)
 
         btn_remove = SmallBtn("–")
         btn_remove.setFixedWidth(50)
@@ -154,30 +188,46 @@ class ServersWin(SingleActionWindow):
             with open(Static.external_servers, "r", encoding="utf-8") as f:
                 server_list = json.load(f)
             for server, login, pass_ in server_list:
-                item = ServerItem(
-                    self.v_list,
-                    text=server,
-                    data=(server, login, pass_)
+                server_item = ServerItem(
+                    server=server,
+                    login=login,
+                    password=pass_
                 )
-                self.v_list.addItem(item)
+                list_item = ServerListItem(
+                    parent=self.v_list,
+                    text=server,
+                    server_item=server_item
+                )
+                self.v_list.addItem(list_item)
         except Exception as e:
             print(traceback.format_exc())
 
-    def show_login_window(self):
+    def login_win(self, server_item: ServerItem = None):
 
-        def final(data: tuple):
-            Servers.server_list.append(data)
+        def ok_pressed(server_item: ServerItem):
+
+            data = (
+                server_item.server,
+                server_item.login,
+                server_item.password
+            )
+
+            Servers.server_list.append((
+                server_item.server,
+                server_item.login,
+                server_item.password
+            ))
             Servers.write_json_data()
 
-            item = ServerItem(
+            item = ServerListItem(
                 parent=self.v_list,
-                text=data[0],
-                data=data
+                text=server_item.server,
+                server_item=server_item
             )
             self.v_list.addItem(item)
 
-        self.login_win = LoginWin()
-        self.login_win.ok_pressed.connect(final)
+        self.login_win = LoginWin(server_item)
+        self.login_win.ok_pressed.connect(ok_pressed)
         self.login_win.center_to_parent(self.window())
         self.login_win.show()
 
