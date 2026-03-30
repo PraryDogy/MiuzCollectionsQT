@@ -17,6 +17,8 @@ from ._base_widgets import (SingleActionWindow, SmallBtn, ULineEdit,
 
 
 class LoginWin(SingleActionWindow):
+    ok_pressed = pyqtSignal(tuple)
+
     def __init__(self, title: str):
         super().__init__()
         self.setFixedWidth(300)
@@ -47,6 +49,7 @@ class LoginWin(SingleActionWindow):
         self.btn_layout.addStretch()
 
         self.ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
+        self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(90)
         self.btn_layout.addWidget(self.ok_btn)
 
@@ -58,11 +61,18 @@ class LoginWin(SingleActionWindow):
 
         self.adjustSize()
 
+    def ok_cmd(self):
+        if self.login.text() and self.pass_.text():
+            self.ok_pressed.emit(
+                (self.login.text(), self.pass_.text())
+            )
+            self.deleteLater()
+
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
-            self.deleteLater()
+            self.ok_cmd()
         return super().keyPressEvent(a0)
 
 
@@ -111,7 +121,6 @@ class ServersWin(SingleActionWindow):
 
         # Connect справа
         btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
-        # btn_connect.setFixedWidth(90)
         btn_connect.clicked.connect(self.connect_cmd)
 
         btn_layout.addWidget(btn_add)
@@ -175,8 +184,14 @@ class ServersWin(SingleActionWindow):
         Servers.server_list = self.data
         Servers.write_json_data()
 
-    def show_login_window(self, text: str):
-        self.login_win = LoginWin(text)
+    def show_login_window(self, adress: str):
+
+        def final(data: tuple):
+            login, pass_ = data
+            print(adress, login, pass_)
+
+        self.login_win = LoginWin(adress)
+        self.login_win.ok_pressed.connect(final)
         self.login_win.center_to_parent(self.window())
         self.login_win.show()
 
