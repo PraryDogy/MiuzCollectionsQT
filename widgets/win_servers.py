@@ -45,13 +45,13 @@ class ServerList(VListWidget):
 
         self.menu_ = UMenu(a0)
 
-        edit = QAction("Редактировать", self.menu_)
+        edit = QAction(Lng.edit[Cfg.lng_index], self.menu_)
         edit.triggered.connect(
             lambda: self.edit_server.emit(list_item.server_item)
         )
         self.menu_.addAction(edit)
 
-        rem = QAction("Удалить", self.menu_)
+        rem = QAction(Lng.delete[Cfg.lng_index], self.menu_)
         rem.triggered.connect(
             lambda: self.remove_server.emit(list_item.server_item)
         )

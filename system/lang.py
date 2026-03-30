@@ -384,3 +384,7 @@ class Lng:
         "Выделено объектов",
         "Selected objects"
     )
+    edit = (
+        "Редактировать",
+        "Edit"
+    )
