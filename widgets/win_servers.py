@@ -62,6 +62,12 @@ class ServerList(VListWidget):
 
         self.menu_ = UMenu(a0)
 
+        connect = QAction(Lng.connect[Cfg.lng_index], self.menu_)
+        connect.triggered.connect(self.connect_server.emit)
+        self.menu_.addAction(connect)
+
+        self.menu_.addSeparator()
+
         edit = QAction(Lng.edit[Cfg.lng_index], self.menu_)
         edit.triggered.connect(
             lambda: self.edit_server.emit(list_item.server_item)
