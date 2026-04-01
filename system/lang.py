@@ -389,7 +389,7 @@ class Lng:
         "Редактировать",
         "Edit"
     )
-    dont_show = (
-        "Не показывать",
-        "Don't show"
+    confirm_delete = (
+        "Вы уверены, что хотите удалить данные этого сервера?",
+        "Are you sure you want to delete this server's data?",
     )

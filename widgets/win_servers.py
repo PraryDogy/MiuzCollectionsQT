@@ -2,6 +2,7 @@ import subprocess
 from dataclasses import dataclass
 
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QAction, QHBoxLayout, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg
@@ -10,7 +11,8 @@ from system.servers import Servers
 
 from ._base_widgets import (SingleActionWindow, SmallBtn, ULineEdit,
                             UListWidgetItem, UMenu, VListWidget)
-from PyQt5.QtSvg import QSvgWidget
+from .win_warn import ConfirmWindow
+
 
 @dataclass(slots=True)
 class ServerItem:
@@ -49,6 +51,17 @@ class ServerList(VListWidget):
     def __init__(self, parent = None):
         super().__init__(parent)
 
+    def remove_cmd(self, server_item: ServerItem):
+        self.win_warn = ConfirmWindow(Lng.confirm_delete[Cfg.lng_index])
+        self.win_warn.ok_clicked.connect(
+            lambda: self.remove_server.emit(server_item)
+        )
+        self.win_warn.ok_clicked.connect(
+            self.win_warn.deleteLater()
+        )
+        self.win_warn.center_to_parent(self.window())
+        self.win_warn.show()
+
     def mouseDoubleClickEvent(self, e):
         list_item: ServerListItem = self.itemAt(e.pos())
         if list_item:
@@ -76,7 +89,7 @@ class ServerList(VListWidget):
 
         rem = QAction(Lng.delete[Cfg.lng_index], self.menu_)
         rem.triggered.connect(
-            lambda: self.remove_server.emit(list_item.server_item)
+            lambda: self.remove_cmd(list_item.server_item)
         )
         self.menu_.addAction(rem)
 
