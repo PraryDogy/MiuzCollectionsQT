@@ -57,7 +57,7 @@ class ServerList(VListWidget):
             lambda: self.remove_server.emit(server_item)
         )
         self.win_warn.ok_clicked.connect(
-            self.win_warn.deleteLater()
+            self.win_warn.deleteLater
         )
         self.win_warn.center_to_parent(self.window())
         self.win_warn.show()
