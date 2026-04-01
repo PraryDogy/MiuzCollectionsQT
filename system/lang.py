@@ -389,3 +389,7 @@ class Lng:
         "Редактировать",
         "Edit"
     )
+    dont_show = (
+        "Не показывать",
+        "Don't show"
+    )

@@ -1,21 +1,16 @@
-import json
-import os
-import re
 import subprocess
-import traceback
 from dataclasses import dataclass
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QAction, QHBoxLayout, QLabel, QSpacerItem, QWidget
 
-from cfg import Cfg, Static
+from cfg import Cfg
 from system.lang import Lng
 from system.servers import Servers
-from system.shared_utils import SharedUtils
 
 from ._base_widgets import (SingleActionWindow, SmallBtn, ULineEdit,
                             UListWidgetItem, UMenu, VListWidget)
-
+from PyQt5.QtSvg import QSvgWidget
 
 @dataclass(slots=True)
 class ServerItem:
@@ -29,6 +24,22 @@ class ServerListItem(UListWidgetItem):
         super().__init__(parent=parent, text=text)
         self.server_item = server_item
 
+
+class EyeSvg(QSvgWidget):
+    eye_on = "./images/eye_on.svg"
+    eye_off = "./images/eye_off.svg"
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(20, 20)
+        self.load(self.eye_off)
+
+    def enterEvent(self, a0):
+        self.setCursor(
+            Qt.CursorShape.ArrowCursor
+        )
+        return super().enterEvent(a0)
+    
 
 class ServerList(VListWidget):
     edit_server = pyqtSignal(ServerItem)
@@ -74,11 +85,12 @@ class ServerLabel(QLabel):
 
 class LoginWin(SingleActionWindow):
     ok_pressed = pyqtSignal(ServerItem)
+    ww = 300
 
     def __init__(self, server_item: ServerItem = None):
 
         super().__init__()
-        self.setFixedWidth(300)
+        self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(5)
 
         server_label = ServerLabel(text=Lng.server[Cfg.lng_index].capitalize())
@@ -98,7 +110,6 @@ class LoginWin(SingleActionWindow):
         self.central_layout.addSpacerItem(QSpacerItem(0, 10))
 
         pass_label = ServerLabel(text=Lng.password[Cfg.lng_index].capitalize())
-        pass_label.mouseReleaseEvent = self.show_hide_pass
         self.central_layout.addWidget(pass_label)
 
         self.pass_ = ULineEdit()
@@ -133,11 +144,23 @@ class LoginWin(SingleActionWindow):
 
         self.adjustSize()
 
+        self.eye_svg = EyeSvg()
+        self.eye_svg.setParent(self.pass_)
+        self.eye_svg.move(
+            self.ww - 50,
+            5
+        )
+        self.eye_svg.show()
+        self.eye_svg.mouseReleaseEvent = self.show_hide_pass
+
+
     def show_hide_pass(self, *args):
         if self.pass_.echoMode() == ULineEdit.EchoMode.Password:
             self.pass_.setEchoMode(ULineEdit.EchoMode.Normal)
+            self.eye_svg.load(self.eye_svg.eye_on)
         else:
             self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
+            self.eye_svg.load(self.eye_svg.eye_off)
 
     def ok_cmd(self):
         if self.server.text() and self.login.text() and self.pass_.text():
