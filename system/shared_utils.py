@@ -378,6 +378,35 @@ class ImgUtils:
         ...
 
     @classmethod
+    def read_img(cls, path: str):
+        _, ext = os.path.splitext(path)
+        ext = ext.lower()
+        read_any_dict: dict[str, callable] = {}
+
+        for i in cls.ext_psd:
+            read_any_dict[i] = cls._read_quicklook
+        for i in cls.ext_tiff:
+            read_any_dict[i] = cls._read_tiff
+        for i in cls.ext_raw:
+            read_any_dict[i] = cls._read_raw
+        for i in cls.ext_jpeg:
+            read_any_dict[i] = cls._read_jpg
+        for i in cls.ext_png:
+            read_any_dict[i] = cls._read_png
+        for i in cls.ext_video:
+            read_any_dict[i] = cls._read_movie
+        for i in cls.ext_icns:
+            read_any_dict[i] = cls._read_icns
+        for i in cls.ext_svg:
+            read_any_dict[i] = cls._read_svg
+        fn = read_any_dict.get(ext)
+        if fn:
+            cls._read_any = fn
+            return cls._read_any(path)
+        else:
+            return cls._get_broken_image()
+
+    @classmethod
     def get_psd_size(cls, path):
         with open(path, "rb") as f:
             header = f.read(26)
@@ -410,33 +439,15 @@ class ImgUtils:
             return cls._get_broken_image()
 
     @classmethod
-    def read_img(cls, path: str):
-        _, ext = os.path.splitext(path)
-        ext = ext.lower()
-        read_any_dict: dict[str, callable] = {}
-
-        for i in cls.ext_psd:
-            read_any_dict[i] = cls._read_quicklook
-        for i in cls.ext_tiff:
-            read_any_dict[i] = cls._read_tiff
-        for i in cls.ext_raw:
-            read_any_dict[i] = cls._read_raw
-        for i in cls.ext_jpeg:
-            read_any_dict[i] = cls._read_jpg
-        for i in cls.ext_png:
-            read_any_dict[i] = cls._read_png
-        for i in cls.ext_video:
-            read_any_dict[i] = cls._read_movie
-        for i in cls.ext_icns:
-            read_any_dict[i] = cls._read_icns
-        for i in cls.ext_svg:
-            read_any_dict[i] = cls._read_svg
-        fn = read_any_dict.get(ext)
-        if fn:
-            cls._read_any = fn
-            return cls._read_any(path)
-        else:
-            return cls._get_broken_image()
+    def read_icc(cls, path: str):
+        try:
+            with Image.open(path) as img:
+                icc_profile = img.info.get('icc_profile')
+                if icc_profile:
+                    return icc_profile  # уже байты
+        except Exception as e:
+            print("error profile read:", e)
+        return None
 
     @classmethod
     def get_img_res(cls, path: str):
