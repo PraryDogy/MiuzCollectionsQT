@@ -2,6 +2,7 @@ import os
 from typing import Literal
 
 import sqlalchemy
+from sqlalchemy.exc import IntegrityError, OperationalError
 
 from cfg import Static
 from system.utils import Utils
@@ -143,9 +144,17 @@ class Dbase:
                     row[ClmnNames.rel_item_path]
                 )
             del_table = sqlalchemy.delete(Thumbs.table)
-            conn.execute(del_table)
+            try:
+                conn.execute(del_table)
+            except (IntegrityError, OperationalError):
+                import traceback
+                print(traceback.format_exc())
             stmt = sqlalchemy.insert(Thumbs.table).values(values)
-            conn.execute(stmt)
+            try:
+                conn.execute(stmt)
+            except (IntegrityError, OperationalError):
+                import traceback
+                print(traceback.format_exc())
                     
     @classmethod
     def set_short_hash_not_unique(cls):
