@@ -144,17 +144,9 @@ class Dbase:
                     row[ClmnNames.rel_item_path]
                 )
             del_table = sqlalchemy.delete(Thumbs.table)
-            try:
-                conn.execute(del_table)
-            except (IntegrityError, OperationalError):
-                import traceback
-                print(traceback.format_exc())
-            stmt = sqlalchemy.insert(Thumbs.table).values(values)
-            try:
-                conn.execute(stmt)
-            except (IntegrityError, OperationalError):
-                import traceback
-                print(traceback.format_exc())
+            conn.execute(del_table)
+            stmt = sqlalchemy.insert(Thumbs.table)
+            conn.execute(stmt, values)
                     
     @classmethod
     def set_short_hash_not_unique(cls):
@@ -192,9 +184,15 @@ class Dbase:
 
         engine = cls.create_engine()
 
-        with engine.begin() as conn:
-            conn.execute(sqlalchemy.text(drop_new_sql))
-            conn.execute(sqlalchemy.text(create_table_sql))
-            conn.execute(sqlalchemy.text(copy_data_sql))
-            conn.execute(sqlalchemy.text(drop_old_sql))
-            conn.execute(sqlalchemy.text(rename_sql))
+        try:
+            with engine.begin() as conn:
+                conn.execute(sqlalchemy.text(drop_new_sql))
+                conn.execute(sqlalchemy.text(create_table_sql))
+                conn.execute(sqlalchemy.text(copy_data_sql))
+                conn.execute(sqlalchemy.text(drop_old_sql))
+                conn.execute(sqlalchemy.text(rename_sql))
+        except (IntegrityError, OperationalError):
+            import traceback
+            print(traceback.format_exc())
+            print("unique erorr error")
+            os._exit(1)
