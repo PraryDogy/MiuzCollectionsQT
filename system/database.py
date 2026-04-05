@@ -143,6 +143,7 @@ class Dbase:
                 row[ClmnNames.root] = os.path.dirname(
                     row[ClmnNames.rel_item_path]
                 )
+                row.pop(ClmnNames.id)
             del_table = sqlalchemy.delete(Thumbs.table)
             conn.execute(del_table)
             stmt = sqlalchemy.insert(Thumbs.table)
