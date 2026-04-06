@@ -316,16 +316,30 @@ class UpdateThumb:
             ):
             try:
                 stats = os.stat(abs_img_path)
+                size = int(stats.st_size)
+                mod = int(stats.st_mtime)
+                root = os.path.dirname(rel_img_path)
             except Exception as e:
                 print(traceback.format_exc())
                 return None
+            properties = (
+                abs_img_path,
+                rel_img_path,
+                rel_thumb_path,
+                size,
+                mod,
+                root
+            )
+            for i in properties:
+                if i is None:
+                    return None
             return {
                 Thumbs.rel_img_path.name: rel_img_path,
                 Thumbs.rel_thumb_path.name: rel_thumb_path,
-                Thumbs.size.name: int(stats.st_size),
+                Thumbs.size.name: size,
                 Thumbs.birth.name: 0,
-                Thumbs.mod.name: int(stats.st_mtime),
-                Thumbs.root.name: os.path.dirname(rel_img_path),
+                Thumbs.mod.name: mod,
+                Thumbs.root.name: root,
                 Thumbs.coll.name: "none",
                 Thumbs.fav.name: 0,
                 Thumbs.mf_alias.name: mf.mf_alias
