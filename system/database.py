@@ -148,7 +148,7 @@ class Dbase:
                     )
                     row.pop(ClmnNames.id)
                     ok_values.append(row)
-                except TypeError:
+                except Exception as e:
                     print(traceback.format_exc())
                     continue
             del_table = sqlalchemy.delete(Thumbs.table)
