@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import traceback
 from pathlib import Path
@@ -268,10 +269,8 @@ class App(QApplication):
         elif not Mf.items:
             lng_win()
         elif Static.app_ver > Cfg.app_ver:
-            Dbase.set_short_hash_not_unique()
-            Dbase.set_root()
+            shutil.rmtree(Static.external_files_dir)
             Cfg.app_ver = Static.app_ver
-            Cfg.write_json_data()
             self.start()
         else:
             objects = (Dbase, ThemeChanger, UThreadPool)
