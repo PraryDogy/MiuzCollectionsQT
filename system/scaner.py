@@ -400,13 +400,25 @@ class _ThumbsUpdater:
                         mf_alias=scaner_item.mf.mf_alias
                     )
                     rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+                    root = os.path.dirname(rel_img_path)
+                    properties = (
+                        rel_img_path,
+                        rel_thumb_path,
+                        img_item.size,
+                        img_item.mod,
+                        root,
+                        scaner_item.mf.mf_alias
+                    )
+                    for i in properties:
+                        if i is None:
+                            continue
                     values_list.append({
                         Thumbs.rel_img_path.name: rel_img_path,
                         Thumbs.rel_thumb_path.name: rel_thumb_path,
                         Thumbs.size.name: img_item.size,
                         Thumbs.birth.name: 0,
                         Thumbs.mod.name: img_item.mod,
-                        Thumbs.root.name: os.path.dirname(rel_img_path),
+                        Thumbs.root.name: root,
                         Thumbs.coll.name: "none",
                         Thumbs.fav.name: 0,
                         Thumbs.mf_alias.name: scaner_item.mf.mf_alias

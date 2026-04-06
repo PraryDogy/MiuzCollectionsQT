@@ -323,12 +323,12 @@ class UpdateThumb:
                 print(traceback.format_exc())
                 return None
             properties = (
-                abs_img_path,
                 rel_img_path,
                 rel_thumb_path,
                 size,
                 mod,
-                root
+                root,
+                mf.mf_alias
             )
             for i in properties:
                 if i is None:
