@@ -26,15 +26,6 @@ _table_thumbs = sqlalchemy.Table(
 )
 
 
-_table_dirs = sqlalchemy.Table(
-    "dirs", METADATA,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("short_src", sqlalchemy.Text),
-    sqlalchemy.Column("mod", sqlalchemy.Integer),
-    sqlalchemy.Column("brand", sqlalchemy.Text),
-)
-
-
 class Thumbs:
     """
     Класс-обёртка для колонок таблицы `thumbs` в базе данных.   
@@ -51,6 +42,15 @@ class Thumbs:
     coll = _table_thumbs.c.coll
     fav = _table_thumbs.c.fav
     mf_alias = _table_thumbs.c.brand
+
+
+_table_dirs = sqlalchemy.Table(
+    "dirs", METADATA,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("short_src", sqlalchemy.Text),
+    sqlalchemy.Column("mod", sqlalchemy.Integer),
+    sqlalchemy.Column("brand", sqlalchemy.Text),
+)
 
 
 class Dirs:
