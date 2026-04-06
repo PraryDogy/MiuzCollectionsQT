@@ -6,7 +6,7 @@ from time import sleep
 import sqlalchemy
 
 from cfg import Static
-from system.database import ClmnNames, Dbase, Dirs, Thumbs
+from system.database import Dbase, Dirs, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
@@ -174,9 +174,9 @@ class _DirsDbUpdater:
             conn.execute(del_stmt)
             values_list = [
                 {
-                    ClmnNames.rel_item_path: dir_item.rel_path,
-                    ClmnNames.mod: dir_item.mod,
-                    ClmnNames.mf_alias: scaner_item.mf.mf_alias
+                    Dirs.rel_dir_path.name: dir_item.rel_path,
+                    Dirs.mod.name: dir_item.mod,
+                    Dirs.mf_alias.name: scaner_item.mf.mf_alias
                 }
                 for dir_item in dirs_to_scan
             ]
@@ -401,15 +401,15 @@ class _ThumbsUpdater:
                     )
                     rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
                     values_list.append({
-                        ClmnNames.rel_item_path: rel_img_path,
-                        ClmnNames.rel_thumb_path: rel_thumb_path,
-                        ClmnNames.size: img_item.size,
-                        ClmnNames.birth: 0,
-                        ClmnNames.mod: img_item.mod,
-                        ClmnNames.root: os.path.dirname(rel_img_path),
-                        ClmnNames.coll: "none",
-                        ClmnNames.fav: 0,
-                        ClmnNames.mf_alias: scaner_item.mf.mf_alias
+                        Thumbs.rel_img_path.name: rel_img_path,
+                        Thumbs.rel_thumb_path.name: rel_thumb_path,
+                        Thumbs.size.name: img_item.size,
+                        Thumbs.birth.name: 0,
+                        Thumbs.mod.name: img_item.mod,
+                        Thumbs.root.name: os.path.dirname(rel_img_path),
+                        Thumbs.coll.name: "none",
+                        Thumbs.fav.name: 0,
+                        Thumbs.mf_alias.name: scaner_item.mf.mf_alias
                     })
                 stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
                 conn.execute(stmt)
