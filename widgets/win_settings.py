@@ -652,6 +652,7 @@ class FiltersWid(GroupWid):
 # ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ 
 
 class MfPaths(TextEditWidget):
+    new_mf_alias_name = pyqtSignal(str)
     def __init__(self, mf: Mf):
         super().__init__(
             title=Lng.images_folder_path[Cfg.lng_index],
@@ -675,6 +676,10 @@ class MfPaths(TextEditWidget):
                 (self.text_edit_wid.toPlainText(), *urls)
             ).strip()
             self.text_edit_wid.setPlainText(text)
+            if urls:
+                mf_alias = os.path.basename(urls[0])
+                if mf_alias:
+                    self.new_mf_alias_name.emit(mf_alias)
         return super().dropEvent(a0)
 
 
@@ -913,6 +918,9 @@ class NewFolder(QWidget):
         name_wid.layout_.addWidget(self.name_line_edit)
 
         self.mf_paths = MfPaths(self.mf)
+        self.mf_paths.new_mf_alias_name.connect(
+            lambda text: self.name_line_edit.setText(text)
+        )
         main_lay.addWidget(self.mf_paths)
 
         self.mf_stop_list = MfStopList(self.mf)
