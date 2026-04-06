@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 class Static:
-    app_ver = 4.65
+    app_ver = 4.66
     app_name = "Collections"
     thumbs_load_limit = 100
     
@@ -54,7 +54,7 @@ class Cfg:
     app_ver: str = Static.app_ver
     lng_index: int = 0
     dark_mode: int = 0
-    scaner_minutes: int = 5
+    scaner_minutes: int = 20
     new_scaner: int = True
     hide_digits: bool = True
     apps = [
