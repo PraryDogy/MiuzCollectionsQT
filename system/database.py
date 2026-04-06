@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import Literal
 
 import sqlalchemy
@@ -139,15 +140,22 @@ class Dbase:
             ]
             if not values:
                 return
+            ok_values = []
             for row in values:
-                row[ClmnNames.root] = os.path.dirname(
-                    row[ClmnNames.rel_item_path]
-                )
-                row.pop(ClmnNames.id)
+                try:
+                    row[ClmnNames.root] = os.path.dirname(
+                        row[ClmnNames.rel_item_path]
+                    )
+                    row.pop(ClmnNames.id)
+                    ok_values.append(row)
+                except TypeError:
+                    print(traceback.format_exc())
+                    continue
             del_table = sqlalchemy.delete(Thumbs.table)
             conn.execute(del_table)
             stmt = sqlalchemy.insert(Thumbs.table)
-            conn.execute(stmt, values)
+            if ok_values:
+                conn.execute(stmt, ok_values)
                     
     @classmethod
     def set_short_hash_not_unique(cls):
