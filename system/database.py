@@ -11,19 +11,6 @@ from system.utils import Utils
 METADATA = sqlalchemy.MetaData()
 
 
-class ClmnNames:
-    id: Literal["id"] = "id"
-    rel_item_path: Literal["наст. имя: short_src"] = "short_src"
-    rel_thumb_path: Literal["наст. имя: short_hash"] = "short_hash"
-    size: Literal["size"] = "size"
-    birth: Literal["birth: упразднено, неверно отобр. на smb дисках"] = "birth"
-    mod: Literal["mod"] = "mod"
-    root: Literal["наст. имя: resol, теперь это dirname"] = "resol"
-    coll: Literal["coll: упразднено"] = "coll"
-    fav: Literal["fav"] = "fav"
-    mf_alias: Literal["наст. имя: brand"] = "brand"
-
-
 _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),

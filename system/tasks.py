@@ -10,7 +10,7 @@ from PyQt5.QtGui import QImage
 
 from cfg import Cfg, Dynamic, Static
 
-from .database import ClmnNames, Dbase, Dirs, Thumbs
+from .database import Dbase, Dirs, Thumbs
 from .items import DbImagesItem, HashDirSizeItem
 from .lang import Lng
 from .main_folder import Mf
@@ -67,7 +67,7 @@ class SetFav(URunnable):
                 .where(Thumbs.rel_img_path==self.rel_path)
                 .where(Thumbs.mf_alias==Mf.current_mf.mf_alias)
                 .values({
-                    ClmnNames.fav: self.value
+                    Thumbs.fav.name: self.value
                 })
             )
             conn.execute(stmt)
