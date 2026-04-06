@@ -26,25 +26,25 @@ class ClmnNames:
 
 _table_thumbs = sqlalchemy.Table(
     "thumbs", METADATA,
-    sqlalchemy.Column(ClmnNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmnNames.rel_item_path, sqlalchemy.Text),
-    sqlalchemy.Column(ClmnNames.rel_thumb_path, sqlalchemy.Text),
-    sqlalchemy.Column(ClmnNames.size, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmnNames.birth, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmnNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmnNames.root, sqlalchemy.Text),
-    sqlalchemy.Column(ClmnNames.coll, sqlalchemy.Text),
-    sqlalchemy.Column(ClmnNames.fav, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmnNames.mf_alias, sqlalchemy.Text),
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("short_src", sqlalchemy.Text),
+    sqlalchemy.Column("short_hash", sqlalchemy.Text),
+    sqlalchemy.Column("size", sqlalchemy.Integer),
+    sqlalchemy.Column("birth", sqlalchemy.Integer),
+    sqlalchemy.Column("mod", sqlalchemy.Integer),
+    sqlalchemy.Column("resol", sqlalchemy.Text),
+    sqlalchemy.Column("coll", sqlalchemy.Text),
+    sqlalchemy.Column("fav", sqlalchemy.Integer),
+    sqlalchemy.Column("brand", sqlalchemy.Text),
 )
 
 
 _table_dirs = sqlalchemy.Table(
     "dirs", METADATA,
-    sqlalchemy.Column(ClmnNames.id, sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(ClmnNames.rel_item_path, sqlalchemy.Text),
-    sqlalchemy.Column(ClmnNames.mod, sqlalchemy.Integer),
-    sqlalchemy.Column(ClmnNames.mf_alias, sqlalchemy.Text),
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("short_src", sqlalchemy.Text),
+    sqlalchemy.Column("mod", sqlalchemy.Integer),
+    sqlalchemy.Column("brand", sqlalchemy.Text),
 )
 
 
@@ -129,73 +129,3 @@ class Dbase:
             Utils.print_error()
 
         conn.close()
-
-    @classmethod
-    def set_root(cls):
-        with Dbase.create_engine().begin() as conn:
-            stmt = sqlalchemy.select(Thumbs.table)
-            values = [
-                dict(i)
-                for i in conn.execute(stmt).mappings()
-            ]
-            if not values:
-                return
-            ok_values = []
-            for row in values:
-                try:
-                    row[ClmnNames.root] = os.path.dirname(
-                        row[ClmnNames.rel_item_path]
-                    )
-                    row.pop(ClmnNames.id)
-                    ok_values.append(row)
-                except Exception as e:
-                    print(traceback.format_exc())
-                    continue
-            del_table = sqlalchemy.delete(Thumbs.table)
-            conn.execute(del_table)
-            stmt = sqlalchemy.insert(Thumbs.table)
-            if ok_values:
-                conn.execute(stmt, ok_values)
-                    
-    @classmethod
-    def set_short_hash_not_unique(cls):
-        old_table = "thumbs"
-        new_table = "thumbs_new"
-
-        drop_new_sql = f"DROP TABLE IF EXISTS {new_table};"
-
-        create_table_sql = f"""
-            CREATE TABLE {new_table} (
-                {ClmnNames.id} INTEGER PRIMARY KEY,
-                {ClmnNames.rel_item_path} TEXT,
-                {ClmnNames.rel_thumb_path} TEXT,
-                {ClmnNames.size} INTEGER,
-                {ClmnNames.birth} INTEGER,
-                {ClmnNames.mod} INTEGER,
-                {ClmnNames.root} TEXT,
-                {ClmnNames.coll} TEXT,
-                {ClmnNames.fav} INTEGER,
-                {ClmnNames.mf_alias} TEXT
-            );
-        """
-        copy_data_sql = f"""
-            INSERT OR IGNORE INTO {new_table}
-            SELECT * FROM {old_table};
-        """
-
-        drop_old_sql = f"""
-            DROP TABLE {old_table};
-        """
-
-        rename_sql = f"""
-            ALTER TABLE {new_table} RENAME TO {old_table};
-        """
-
-        engine = cls.create_engine()
-
-        with engine.begin() as conn:
-            conn.execute(sqlalchemy.text(drop_new_sql))
-            conn.execute(sqlalchemy.text(create_table_sql))
-            conn.execute(sqlalchemy.text(copy_data_sql))
-            conn.execute(sqlalchemy.text(drop_old_sql))
-            conn.execute(sqlalchemy.text(rename_sql))

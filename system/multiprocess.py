@@ -12,7 +12,7 @@ from watchdog.observers.polling import PollingObserver as Observer
 
 from cfg import Cfg, Static
 
-from .database import ClmnNames, Dbase, Dirs, Thumbs
+from .database import Dbase, Dirs, Thumbs
 from .items import (CopyTaskItem, OneFileInfoItem, ReadImgItem,
                     UpdateThumbItem, WatchDogItem)
 from .lang import Lng
@@ -320,15 +320,15 @@ class UpdateThumb:
                 print(traceback.format_exc())
                 return None
             return {
-                ClmnNames.rel_item_path: rel_img_path,
-                ClmnNames.rel_thumb_path: rel_thumb_path,
-                ClmnNames.size: int(stats.st_size),
-                ClmnNames.birth: 0,
-                ClmnNames.mod: int(stats.st_mtime),
-                ClmnNames.root: os.path.dirname(rel_img_path),
-                ClmnNames.coll: "none",
-                ClmnNames.fav: 0,
-                ClmnNames.mf_alias: mf.mf_alias
+                Thumbs.rel_img_path.name: rel_img_path,
+                Thumbs.rel_thumb_path.name: rel_thumb_path,
+                Thumbs.size.name: int(stats.st_size),
+                Thumbs.birth.name: 0,
+                Thumbs.mod.name: int(stats.st_mtime),
+                Thumbs.root.name: os.path.dirname(rel_img_path),
+                Thumbs.coll.name: "none",
+                Thumbs.fav.name: 0,
+                Thumbs.mf_alias.name: mf.mf_alias
             }
 
         update_thumb_items: list[UpdateThumbItem] = []
