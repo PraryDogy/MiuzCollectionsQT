@@ -44,6 +44,9 @@ class StateWid:
     def set_was_changed(self, *args):
         self.was_changed = True
 
+    def reset_was_changed(self, *args):
+        self.was_changed = False
+
 
 class ULabel(QLabel):
     def __init__(self, *args, **kwargs):
@@ -1029,16 +1032,6 @@ class NewFolder(QWidget, StateWid):
         win.center_to_parent(self.window())
         win.show()
 
-    def not_empty(self):
-        texts = (
-            self.name_line_edit.text(),
-            self.mf_paths.text_edit_wid.toPlainText(),
-            self.mf_stop_list.text_edit_wid.toPlainText(),
-        )
-        if any (texts):
-            return True
-        return False
-
     def mouseReleaseEvent(self, a0):
         self.setFocus()
         return super().mouseReleaseEvent(a0)
@@ -1200,33 +1193,12 @@ class WinSettings(SingleActionWindow):
     def clear_right_side(self):
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
-
-        if isinstance(right_wid, NewFolder):
-            if right_wid.not_empty():
-                idx = self.left_menu.currentRow()
-                self.exit_win = ConfirmWindow(
-                    text="Отмемнить изменения?"
-                )
-                self.exit_win.ok_clicked.connect(right_wid.deleteLater)
-                self.exit_win.ok_clicked.connect(self.exit_win.deleteLater)
-                self.exit_win.ok_clicked.connect(
-                    lambda: self.init_right_side(idx)
-                )
-                self.exit_win.center_to_parent(self.window())
-                self.exit_win.show()
-                return False
-            else:
-                right_wid.deleteLater()
-                return True
-        else:
-            right_wid.deleteLater()
-            return True
+        right_wid.deleteLater()
 
     def left_menu_click(self, *args):
-        result = self.clear_right_side()
+        self.clear_right_side()
         idx = self.left_menu.currentRow()
-        if result:
-            self.init_right_side(idx)
+        self.init_right_side(idx)
 
     def ok_cmd(self):
 
