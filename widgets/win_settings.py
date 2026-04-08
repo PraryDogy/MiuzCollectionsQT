@@ -1191,6 +1191,10 @@ class WinSettings(SingleActionWindow):
         self.blink_ok_btn()
 
     def clear_right_side(self):
+        self.cfg_clone = copy.deepcopy(Cfg)
+        self.mf_list_clone = copy.deepcopy(Mf.items)
+        self.filters_clone = copy.deepcopy(Filters.items)
+
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
         right_wid.deleteLater()
