@@ -161,9 +161,9 @@ class RebootSettings(GroupWid):
     spin_max = 60
     spin_min = 0
 
-    def __init__(self, cfg_clone: Cfg):
+    def __init__(self, cfg_data: CfgData):
         super().__init__()
-        self.cfg_clone = cfg_clone
+        self.cfg_data = cfg_data
 
         lng_wid = GroupChild()
         self.layout_.addWidget(lng_wid)
@@ -202,7 +202,7 @@ class RebootSettings(GroupWid):
         self.spin.setFixedWidth(100)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[Cfg.lng_index]}")
-        self.spin.setValue(self.cfg_clone.scaner_minutes)
+        self.spin.setValue(self.cfg_data.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.layout_.addWidget(self.spin)
 
@@ -221,7 +221,7 @@ class RebootSettings(GroupWid):
         reset_data_wid.layout_.addWidget(self.reset_data_btn)
 
     def lang_action_cmd(self, value: int):
-        self.cfg_clone.lng_index = value
+        self.cfg_data.lng_index = value
         self.lng_btn.setText(Lng.russian[value])
         self.cfg_changed.emit()
 
@@ -248,7 +248,7 @@ class RebootSettings(GroupWid):
             self.spin.blockSignals(False)
             value = self.spin.maximum()
 
-        self.cfg_clone.scaner_minutes = value
+        self.cfg_data.scaner_minutes = value
         self.cfg_changed.emit()
 
 
@@ -573,7 +573,7 @@ class AboutWid(QGroupBox):
 class GeneralSettings(QWidget, StateWid):
     changed = pyqtSignal()
 
-    def __init__(self, cfg_clone: Cfg):
+    def __init__(self, cfg_data: CfgData):
         super().__init__()
 
         v_lay = UVBoxLayout()
@@ -582,7 +582,7 @@ class GeneralSettings(QWidget, StateWid):
         v_lay.setContentsMargins(0, 0, 0, 10)
         self.setLayout(v_lay)
 
-        reboot_settings = RebootSettings(cfg_clone)
+        reboot_settings = RebootSettings(cfg_data)
         reboot_settings.cfg_changed.connect(self.changed.emit)
         reboot_settings.cfg_changed.connect(self.set_was_changed)
         v_lay.addWidget(reboot_settings)
@@ -1060,7 +1060,10 @@ class WinSettings(SingleActionWindow):
         self.setWindowTitle(Lng.settings[Cfg.lng_index])
         self.setFixedSize(700, 560)
 
-        self.cfg_clone = copy.deepcopy(Cfg)
+        self.cfg_data = CfgData(
+            lng_index=Cfg.lng_index,
+            scaner_minutes=Cfg.scaner_minutes
+        )
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
         self.settings_item = settings_item
@@ -1165,7 +1168,7 @@ class WinSettings(SingleActionWindow):
     def init_right_side(self, idx: int):
         if idx == 0:
             self.btns_wid.show()
-            r_wid = GeneralSettings(self.cfg_clone)
+            r_wid = GeneralSettings(self.cfg_data)
         elif idx == 1:
             self.btns_wid.show()
             r_wid = FiltersWid(self.filters_clone)
@@ -1198,11 +1201,12 @@ class WinSettings(SingleActionWindow):
         self.blink_ok_btn()
 
     def clear_right_side(self):
-        self.cfg_clone = copy.deepcopy(Cfg)
+        self.cfg_data = CfgData(
+            lng_index=Cfg.lng_index,
+            scaner_minutes=Cfg.scaner_minutes
+        )
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
-
-        print(self.cfg_clone.scaner_minutes, Cfg.scaner_minutes)
 
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
@@ -1239,8 +1243,8 @@ class WinSettings(SingleActionWindow):
             Filters.items = self.filters_clone
             Filters.write_json_data()
 
-            Cfg.lng_index = self.cfg_clone.lng_index
-            Cfg.scaner_minutes = self.cfg_clone.scaner_minutes
+            Cfg.lng_index = self.cfg_data.lng_index
+            Cfg.scaner_minutes = self.cfg_data.scaner_minutes
             Cfg.write_json_data()
 
             restart_app()
