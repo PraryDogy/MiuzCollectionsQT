@@ -1195,6 +1195,8 @@ class WinSettings(SingleActionWindow):
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
 
+        print(self.cfg_clone.scaner_minutes, Cfg.scaner_minutes)
+
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
         right_wid.deleteLater()
