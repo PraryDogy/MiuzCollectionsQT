@@ -37,6 +37,14 @@ def restart_app():
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 
+class StateWid:
+    def __init__(self):
+        self.was_changed = False
+
+    def set_was_changed(self, *args):
+        self.was_changed = True
+
+
 class ULabel(QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -552,7 +560,7 @@ class AboutWid(QGroupBox):
         h_lay.addWidget(lbl)
 
 
-class GeneralSettings(QWidget):
+class GeneralSettings(QWidget, StateWid):
     changed = pyqtSignal()
 
     def __init__(self, cfg_clone: Cfg):
@@ -566,6 +574,7 @@ class GeneralSettings(QWidget):
 
         reboot_settings = RebootSettings(cfg_clone)
         reboot_settings.cfg_changed.connect(self.changed.emit)
+        reboot_settings.cfg_changed.connect(self.set_was_changed)
         v_lay.addWidget(reboot_settings)
 
         data_settings = NonRebootSettings()
@@ -580,6 +589,7 @@ class GeneralSettings(QWidget):
     def set_need_reset(self):
         self.need_reset_item.need_reset = True
         self.changed.emit()
+        self.set_was_changed()
 
 
 
@@ -587,7 +597,7 @@ class GeneralSettings(QWidget):
 
 
 
-class FiltersWid(GroupWid):
+class FiltersWid(GroupWid, StateWid):
     changed = pyqtSignal()
 
     def __init__(self, filters_clone: list[str]):
@@ -631,6 +641,7 @@ class FiltersWid(GroupWid):
             self.filters_edit.insertPlainText()
             self.filters_win.deleteLater()
             self.changed.emit
+            self.set_was_changed()
 
         self.filters_win = ConfirmWindow(Lng.reset_filters_long[Cfg.lng_index])
         self.filters_win.ok_clicked.connect(fin)
@@ -643,6 +654,7 @@ class FiltersWid(GroupWid):
         self.filters_clone.clear()   # очищаем текущий список
         self.filters_clone.extend(lines)  # добавляем новые элементы
         self.changed.emit()
+        self.set_was_changed()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -742,7 +754,7 @@ class MfSave(GroupWid):
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ 
 
 
-class MfSettings(QWidget):
+class MfSettings(QWidget, StateWid):
     changed = pyqtSignal()
 
     def __init__(self, mf: Mf, mf_list_clone: list[Mf]):
@@ -762,15 +774,9 @@ class MfSettings(QWidget):
         self.name_wid.layout_.addWidget(name_text)
 
         self.mf_paths = MfPaths(mf)
-        self.mf_paths.textChanged.connect(
-            lambda: self.mf_save.warning_svg.show()
-        )
         main_lay.addWidget(self.mf_paths)
 
         self.mf_stop_list = MfStopList(mf)
-        self.mf_stop_list.textChanged.connect(
-            lambda: self.mf_save.warning_svg.show()
-        )
         main_lay.addWidget(self.mf_stop_list)
 
         general_wid = GroupWid()
@@ -805,6 +811,13 @@ class MfSettings(QWidget):
         self.mf_save = MfSave()
         self.mf_save.clicked_.connect(self.save)
         main_lay.addWidget(self.mf_save)
+
+        QTimer.singleShot(100, self.text_changed)
+
+    def text_changed(self):
+        for i in (self.mf_paths, self.mf_stop_list):
+            i.textChanged.connect(self.mf_save.warning_svg.show)
+            self.set_was_changed()
 
     def remove_cmd(self, *args):
         
@@ -889,7 +902,7 @@ class MfSettings(QWidget):
 
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
-class NewFolder(QWidget):
+class NewFolder(QWidget, StateWid):
     svg_warning = "./images/warning.svg"
     changed = pyqtSignal()
 
@@ -953,6 +966,7 @@ class NewFolder(QWidget):
     def text_changed(self):
         for i in (self.name_line_edit, self.mf_paths, self.mf_stop_list):
             i.textChanged.connect(self.warning_svg.show)
+            self.set_was_changed()
         
     def preset_new_folder(self, url: str):
         if url:
