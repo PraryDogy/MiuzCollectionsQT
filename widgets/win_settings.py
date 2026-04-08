@@ -773,10 +773,6 @@ class MfSettings(QWidget):
         )
         main_lay.addWidget(self.mf_stop_list)
 
-        self.mf_save = MfSave()
-        self.mf_save.clicked_.connect(self.save)
-        main_lay.addWidget(self.mf_save)
-
         general_wid = GroupWid()
         main_lay.addWidget(general_wid)
 
@@ -805,6 +801,10 @@ class MfSettings(QWidget):
         remove_wid.layout_.addWidget(remove_btn)
 
         main_lay.addSpacerItem(QSpacerItem(0, 15))
+
+        self.mf_save = MfSave()
+        self.mf_save.clicked_.connect(self.save)
+        main_lay.addWidget(self.mf_save)
 
     def remove_cmd(self, *args):
         
