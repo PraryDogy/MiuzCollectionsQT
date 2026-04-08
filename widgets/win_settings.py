@@ -1147,6 +1147,7 @@ class WinSettings(SingleActionWindow):
             r_wid = FiltersWid(self.filters_clone)
         elif idx == 2:
             self.btns_wid.hide()
+            print(self.settings_item)
             r_wid = NewFolder(self.mf_list_clone)
             r_wid.preset_new_folder(self.settings_item.content)
         elif idx > 3:
@@ -1155,6 +1156,8 @@ class WinSettings(SingleActionWindow):
             for mf in self.mf_list_clone:
                 if mf.mf_alias == item.text():
                     r_wid = MfSettings(mf, self.mf_list_clone)
+                    self.settings_item.type_ = "general"
+                    self.settings_item.content = ""
                     break
         r_wid.changed.connect(self.blink_ok_btn)
         self.right_lay.insertWidget(0, r_wid)
