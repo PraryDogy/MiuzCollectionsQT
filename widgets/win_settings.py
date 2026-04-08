@@ -4,6 +4,7 @@ import re
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
@@ -35,6 +36,12 @@ def restart_app():
     ProcessWorker.stop_all()
     QApplication.quit()
     os.execl(sys.executable, sys.executable, *sys.argv)
+
+
+@dataclass(slots=True)
+class CfgData:
+    lng_index: int
+    scaner_minutes: int
 
 
 class StateWid:

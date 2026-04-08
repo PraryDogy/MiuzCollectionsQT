@@ -1,4 +1,11 @@
-import os
+class Test:
+    scaner = 0
 
-test = "/img.jpg"
-print(os.path.dirname(test))
+
+
+test = Test.scaner
+
+test = 1
+
+
+print(Test.scaner)
