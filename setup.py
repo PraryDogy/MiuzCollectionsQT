@@ -75,7 +75,8 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 
 DATA_FILES = [
     include_files("images"),
-    include_files("scripts")
+    include_files("scripts"),
+    include_files("_preload")
     ]
 
 
@@ -105,24 +106,6 @@ OPTIONS = {
             }
             }
 
-print("Нажми 1 чтобы создать приложение с кешем из ApplicationSupport")
-
-if input() == "1":
-    print("Создаю приложение с кешем ApplicationSupport")
-
-    src = Static.external_hashdir
-    root = os.path.basename(Static.external_hashdir)
-    app_sup = Static.external_files_dir
-    new_hashdir = shutil.make_archive(src, "zip", app_sup, root)
-
-    DATA_FILES.append(
-        ('_preload', [new_hashdir, Static.external_db])
-    )
-
-else:
-    print("Создаю приложение с пустым кешем")
-    new_hashdir = None
-    DATA_FILES.append(include_files("_preload"))
 
 sys.argv.append(PY2APP)
 
