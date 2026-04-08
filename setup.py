@@ -126,7 +126,3 @@ try:
 except Exception as e:
     print(e)
     remove_trash()
-
-
-if new_hashdir:
-    os.remove(new_hashdir)
