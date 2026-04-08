@@ -1207,6 +1207,8 @@ class WinSettings(SingleActionWindow):
         )
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
+        self.warn_svg.hide()
+        self.ok_btn.setText(Lng.ok[Cfg.lng_index])
 
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
