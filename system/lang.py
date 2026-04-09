@@ -393,3 +393,7 @@ class Lng:
         "Вы уверены, что хотите удалить данные этого сервера?",
         "Are you sure you want to delete this server's data?",
     )
+    show_in_folder = (
+        "Показать в папке",
+        "Show in folder"
+    )

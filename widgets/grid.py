@@ -20,7 +20,8 @@ from ._base_widgets import (NotifyWid, UMenu, USubMenu, USvgSqareWidget,
                             UVBoxLayout, VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
-                      ScanerRestart, SetFav, UpdateThumbAction, WinInfoAction)
+                      ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
+                      WinInfoAction)
 
 
 class FilenameWid(QLabel):
@@ -908,18 +909,18 @@ class Grid(VScrollArea):
                 )
                 self.menu_.addAction(fav)
 
+                show_in_app = ShowInFolder(self.menu_)
+                show_in_app.triggered.connect(
+                    lambda: self.show_in_app.emit(clicked.rel_path)
+                )
+                self.menu_.addAction(show_in_app)
+
                 # инфо
                 act = WinInfoAction(self.menu_)
                 act.triggered.connect(
                     lambda: self.open_info_win.emit(rel_paths)
                 )
                 self.menu_.addAction(act)
-
-                show_in_app = QAction("Показать в приложении", self.menu_)
-                show_in_app.triggered.connect(
-                    lambda: self.show_in_app.emit(clicked.rel_path)
-                )
-                self.menu_.addAction(show_in_app)
 
             self.menu_.addSeparator()
 

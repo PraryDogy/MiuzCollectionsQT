@@ -91,3 +91,11 @@ class UpdateThumbAction(QAction):
     def __init__(self, parent: QMenu, total: int):
         text = Lng.update_thumb[Cfg.lng_index]
         super().__init__(text=text, parent=parent)
+
+
+class ShowInFolder(QAction):
+    def __init__(self, parent: QMenu):
+        super().__init__(
+            text=Lng.show_in_folder[Cfg.lng_index],
+            parent=parent
+        )
