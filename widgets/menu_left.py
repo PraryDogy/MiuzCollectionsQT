@@ -103,6 +103,7 @@ class TreeWid(QTreeWidget):
             path = os.sep
         if path not in self.items:
             return
+        self.selected_path = path
         item = self.items.get(path)
         parent = item.parent()
         while parent:
