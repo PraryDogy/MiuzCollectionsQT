@@ -242,12 +242,27 @@ class WinMain(UMainWindow):
         return wrapper
     
     def show_in_app(self, rel_path: str):
+
+        def go_to_wid():
+            widget = self.grid.path_to_wid.get(rel_path)
+            if widget:
+                QTimer.singleShot(
+                    100, lambda: self.grid.ensureWidgetVisible(widget)
+                )
+
         current_dir = os.path.dirname(rel_path)
         current_dir = "" if current_dir == os.sep else current_dir
         Dynamic.current_dir = current_dir
-        self.grid.reload_thumbnails()
+
         self.left_menu.setCurrentIndex(1)
         self.left_menu.tree_wid.expand_to_path(current_dir)
+        self.grid.reload_thumbnails()
+        try:
+            self.grid.finished_.disconnect()
+        except TypeError:
+            print("сетка еще не подключила сигнал finished")
+            pass
+        self.grid.finished_.connect(go_to_wid)
     
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"

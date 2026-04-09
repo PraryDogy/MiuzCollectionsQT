@@ -398,6 +398,7 @@ class Grid(VScrollArea):
     setup_mf = pyqtSignal(SettingsItem)
     update_thumb = pyqtSignal(list)
     show_in_app = pyqtSignal(str)
+    finished_ = pyqtSignal()
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -492,6 +493,7 @@ class Grid(VScrollArea):
                     self.add_thumbnails_to_grid(db_images_list)
                 self.rearrange()
                 self.grid_wid.show()
+                self.finished_.emit()
                 for i in prev_selection:
                     if i in self.path_to_wid:
                         self.wid_to_selected_widgets(self.path_to_wid[i])
