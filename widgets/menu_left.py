@@ -354,6 +354,9 @@ class MenuLeft(QTabWidget):
 
         self.mf_list.setCurrentRow(0)
         QTimer.singleShot(10, lambda: _mf_open(Mf.current_mf))
+    
+    def show_in_app(self, rel_path: str):
+        self.tree_wid.expand_to_path(rel_path)
 
     def reload_tree(self):
         self.tree_wid.init_ui()

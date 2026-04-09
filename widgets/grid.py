@@ -397,6 +397,7 @@ class Grid(VScrollArea):
     set_clipboard = pyqtSignal(tuple)
     setup_mf = pyqtSignal(SettingsItem)
     update_thumb = pyqtSignal(list)
+    show_in_app = pyqtSignal(str)
     
     resize_ms = 10
     date_wid_ms = 3000
@@ -911,6 +912,12 @@ class Grid(VScrollArea):
                     lambda: self.open_info_win.emit(rel_paths)
                 )
                 self.menu_.addAction(act)
+
+                show_in_app = QAction("Показать в приложении", self.menu_)
+                show_in_app.triggered.connect(
+                    lambda: self.show_in_app.emit(clicked.rel_path)
+                )
+                self.menu_.addAction(show_in_app)
 
             self.menu_.addSeparator()
 

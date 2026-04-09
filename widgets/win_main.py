@@ -186,6 +186,9 @@ class WinMain(UMainWindow):
                 self.grid, Mf.current_mf, rel_img_paths
             )
         )
+        self.grid.show_in_app.connect(
+            self.show_in_app
+        )
         right_lay.addWidget(self.grid)
 
         sep_bottom = USep()
@@ -237,6 +240,14 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(parent, mf)
         return wrapper
+    
+    def show_in_app(self, rel_path: str):
+        current_dir = os.path.dirname(rel_path)
+        current_dir = "" if current_dir == os.sep else current_dir
+        Dynamic.current_dir = current_dir
+        self.grid.reload_thumbnails()
+        self.left_menu.setCurrentIndex(1)
+        self.left_menu.tree_wid.expand_to_path(current_dir)
     
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"
