@@ -10,7 +10,7 @@ from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskWorker
 
 from ._base_widgets import SingleActionWindow, SmallBtn
-from .progressbar_win import ProgressbarWin
+from .win_progressbar import WinProgressbar
 
 
 class ReplaceFilesWin(SingleActionWindow):
@@ -128,7 +128,7 @@ class ErrorWin(SingleActionWindow):
         return super().keyPressEvent(a0)
     
 
-class WinCopyFiles(ProgressbarWin):
+class WinCopyFiles(WinProgressbar):
     finished_ = pyqtSignal(list)
     ms = 500
 

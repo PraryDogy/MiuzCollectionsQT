@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QLabel, QProgressBar, QWidget
 from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
 
 
-class ProgressbarWin(SingleActionWindow):
+class WinProgressbar(SingleActionWindow):
     cancel = pyqtSignal()
 
     def __init__(self, title: str):
