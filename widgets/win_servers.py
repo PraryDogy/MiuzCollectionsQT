@@ -258,15 +258,16 @@ class ServersWin(SingleActionWindow):
 
     # Загрузка данных из JSON
     def init_data(self):
-        for server, login, pass_ in Servers.items:
+        for alias, server, login, pass_ in Servers.items:
             server_item = ServerItem(
+                alias=alias,
                 server=server,
                 login=login,
                 password=pass_
             )
             list_item = ServerListItem(
                 parent=self.v_list,
-                text=server,
+                text=f"{server} ({alias})",
                 server_item=server_item
             )
             self.v_list.addItem(list_item)
@@ -288,10 +289,11 @@ class ServersWin(SingleActionWindow):
             Servers.write_json_data()
             list_item = ServerListItem(
                 parent=self.v_list,
-                text=new_server_item.server,
+                text=f"{new_server_item.server} ({new_server_item.alias})",
                 server_item=new_server_item
             )
             self.v_list.addItem(list_item)
+            self.v_list.setCurrentItem(list_item)
 
         self.login_win = LoginWin(server_item)
         self.login_win.ok_pressed.connect(ok_pressed)
@@ -300,21 +302,24 @@ class ServersWin(SingleActionWindow):
 
     def remove_cmd(self, server_item: ServerItem):
         Servers.items.remove([
+            server_item.alias,
             server_item.server,
             server_item.login,
             server_item.password
         ])
         Servers.write_json_data()
         for i in range(self.v_list.count()):
-            item = self.v_list.item(i)
+            item: ServerListItem = self.v_list.item(i)
             if not item:
                 continue
             current = (
+                item.server_item.alias,
                 item.server_item.server,
                 item.server_item.login,
                 item.server_item.password
             )
             target = (
+                server_item.alias,
                 server_item.server,
                 server_item.login,
                 server_item.password
