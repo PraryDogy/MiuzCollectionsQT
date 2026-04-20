@@ -16,6 +16,7 @@ from .win_warn import ConfirmWindow
 
 @dataclass(slots=True)
 class ServerItem:
+    alias: str
     server: str
     login: str
     password: str
@@ -112,18 +113,25 @@ class LoginWin(SingleActionWindow):
         self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(5)
 
+        alias_label = ServerLabel(text=Lng.alias[Cfg.lng_index].capitalize())
+        self.central_layout.addWidget(alias_label)
+
+        self.alias = ULineEdit()
+        self.alias.setPlaceholderText(Lng.alias[Cfg.lng_index].capitalize())
+        self.central_layout.addWidget(self.alias)
+
         server_label = ServerLabel(text=Lng.server[Cfg.lng_index].capitalize())
         self.central_layout.addWidget(server_label)
 
         self.server = ULineEdit()
-        self.server.setPlaceholderText(Lng.server[Cfg.lng_index])
+        self.server.setPlaceholderText(Lng.server[Cfg.lng_index].capitalize())
         self.central_layout.addWidget(self.server)
 
         login_label = ServerLabel(text=Lng.login[Cfg.lng_index].capitalize())
         self.central_layout.addWidget(login_label)
 
         self.login = ULineEdit()
-        self.login.setPlaceholderText(f"{Lng.login[Cfg.lng_index]}")
+        self.login.setPlaceholderText(Lng.login[Cfg.lng_index].capitalize())
         self.central_layout.addWidget(self.login)
 
         self.central_layout.addSpacerItem(QSpacerItem(0, 10))
@@ -157,6 +165,7 @@ class LoginWin(SingleActionWindow):
         self.btn_layout.addStretch()
 
         if server_item:
+            self.alias.setText(server_item.alias)
             self.server.setText(server_item.server)
             self.login.setText(server_item.login)
             self.pass_.setText(server_item.password)
@@ -172,7 +181,6 @@ class LoginWin(SingleActionWindow):
         self.eye_svg.show()
         self.eye_svg.mouseReleaseEvent = self.show_hide_pass
 
-
     def show_hide_pass(self, *args):
         if self.pass_.echoMode() == ULineEdit.EchoMode.Password:
             self.pass_.setEchoMode(ULineEdit.EchoMode.Normal)
@@ -182,8 +190,15 @@ class LoginWin(SingleActionWindow):
             self.eye_svg.load(self.eye_svg.eye_off)
 
     def ok_cmd(self):
-        if self.server.text() and self.login.text() and self.pass_.text():
+        stmt = all((
+            self.alias.text(),
+            self.server.text(),
+            self.login.text(),
+            self.pass_.text()
+        ))
+        if stmt:
             server_item = ServerItem(
+                alias=self.alias.text(),
                 server=self.server.text(),
                 login=self.login.text(),
                 password=self.pass_.text()
