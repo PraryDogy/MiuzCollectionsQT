@@ -397,3 +397,7 @@ class Lng:
         "Показать в папке",
         "Show in folder"
     )
+    set_server_alias = (
+        "Задайте псевдоним",
+        "Set an alias"
+    )
