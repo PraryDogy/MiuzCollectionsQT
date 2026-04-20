@@ -282,6 +282,7 @@ class ServersWin(SingleActionWindow):
             if server_item:
                 self.remove_cmd(server_item)
             Servers.items.append([
+                new_server_item.alias,
                 new_server_item.server,
                 new_server_item.login,
                 new_server_item.password
