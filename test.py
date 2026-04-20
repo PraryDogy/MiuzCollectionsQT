@@ -1,15 +1,47 @@
-from dataclasses import dataclass
+import os
 
-class Test:
-    scaner = 0
+import cv2
+import numpy as np
+from skimage.metrics import structural_similarity as ssim
+
+from cfg import Static
+from system.shared_utils import ImgUtils
+from system.utils import Utils
 
 
-@dataclass(slots=True)
-class DataTest:
-    scaner: int
+import cv2
+import numpy as np
+
+import cv2
+import numpy as np
+
+def get_central_crop(img, size=210):
+    h, w = img.shape[:2]
+    actual_size = min(h, w, size)
+    start_x = (w - actual_size) // 2
+    start_y = (h - actual_size) // 2
+    crop = img[start_y:start_y+actual_size, start_x:start_x+actual_size]
+    return crop
+
+def compare_images_smart(template_array, scene_array):
+    gray_template = cv2.cvtColor(template_array, cv2.COLOR_BGR2GRAY)
+    gray_scene = cv2.cvtColor(scene_array, cv2.COLOR_BGR2GRAY)
+    res = cv2.matchTemplate(gray_scene, gray_template, cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    score = int(max_val * 100)
+    return {"score": score, "result_image": scene_array}
 
 
-data = DataTest(scaner=Test.scaner)
-data.scaner = 111
-
-print(Test.scaner)
+template = '/Users/Loshkarev/Desktop/test 3.jpg'
+template_array = cv2.imread(template)
+template_array = get_central_crop(template_array, 190)
+for i in os.scandir(Static.external_hashdir):
+    if not i.is_dir():
+        continue
+    for img in os.scandir(i.path):
+        scene_array = cv2.imread(img.path)
+        result = compare_images_smart(template_array, scene_array)
+        if result["score"] > 50:
+            cv2.imshow("111", result["result_image"])
+            cv2.waitKey(0)
+            print(result["score"])
