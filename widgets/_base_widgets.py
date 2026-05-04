@@ -225,7 +225,6 @@ class UMainWindow(QMainWindow, WindowMixin):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         central_widget = QWidget(self)
-        # central_widget.setContentsMargins(5, 5, 5, 5)
         self.setCentralWidget(central_widget)
         self.central_layout = UVBoxLayout(central_widget)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
