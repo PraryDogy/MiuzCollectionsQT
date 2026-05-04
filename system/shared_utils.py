@@ -12,7 +12,7 @@ import pillow_heif
 import rawpy
 import rawpy._rawpy
 import tifffile
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageCms
 
 
 class SharedUtils:
@@ -310,6 +310,11 @@ class ImgUtils:
         try:
             img = Image.open(path)
             img = ImageOps.exif_transpose(img) 
+            icc_profile = img.info.get("icc_profile")
+            if icc_profile:
+                src_profile = ImageCms.ImageCmsProfile(io.BytesIO(icc_profile))
+                dst_profile = ImageCms.createProfile("sRGB")
+                img = ImageCms.profileToProfile(img, src_profile, dst_profile)
             img = img.convert("RGB")
             array_img = np.array(img)
             img.close()
