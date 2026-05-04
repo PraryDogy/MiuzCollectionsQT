@@ -210,8 +210,10 @@ class _ImgLoader:
                         continue
                     size = int(stat.st_size)
                     mod = int(stat.st_mtime)
-                    if size == 0:
-                        continue
+                    # из-за этой строчки битые изображения не отображались
+                    # в коллекциях
+                    # if size == 0:
+                        # continue
                     img_item = ScanerImgItem(entry.path, size, mod)
                     finder_images.append(img_item)
         return finder_images
