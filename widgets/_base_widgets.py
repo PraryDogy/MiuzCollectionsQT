@@ -105,7 +105,6 @@ class ULineEdit(QLineEdit):
     """
     hh = 30
     padding = (2, 28)
-    menu_width = 200
 
     def __init__(self):
         super().__init__()
@@ -131,7 +130,6 @@ class ULineEdit(QLineEdit):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         self.menu_ = UMenu(event=a0)
-        self.menu_.setFixedWidth(self.menu_width)
 
         actions = [
             (Lng.cut[Cfg.lng_index], self.cut_selection),
@@ -185,7 +183,6 @@ class UTextEdit(QTextEdit):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         menu_ = UMenu(event=a0)
-        menu_.setFixedWidth(120)
 
         actions = [
             (Lng.cut[Cfg.lng_index], self.cut_selection),
@@ -228,9 +225,10 @@ class UMainWindow(QMainWindow, WindowMixin):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         central_widget = QWidget(self)
-        central_widget.setContentsMargins(0, 0, 0, 0)
+        # central_widget.setContentsMargins(5, 5, 5, 5)
         self.setCentralWidget(central_widget)
         self.central_layout = UVBoxLayout(central_widget)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.register_window()
 
     def set_always_on_top(self):

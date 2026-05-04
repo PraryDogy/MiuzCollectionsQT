@@ -70,6 +70,7 @@ class WinMain(UMainWindow):
 
     def __init__(self, argv: list[Literal["noscan", ""]]):
         super().__init__()
+        self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.resize(Static.ww, Static.hh)
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.app_name}")
