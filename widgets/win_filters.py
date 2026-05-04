@@ -4,11 +4,11 @@ from cfg import Dynamic, Cfg
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (SingleActionWindow, SmallBtn, UListSpacerItem,
+from ._base_widgets import (UMainWindow, SmallBtn, UListSpacerItem,
                             UListWidgetItem, VListWidget)
 
 
-class WinFilters(SingleActionWindow):
+class WinFilters(UMainWindow):
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     ww = 400
@@ -16,6 +16,8 @@ class WinFilters(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.filters[Cfg.lng_index])
         self.setFixedSize(self.ww, self.hh)
 

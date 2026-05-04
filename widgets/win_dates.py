@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QCalendarWidget, QGroupBox, QLabel, QSpinBox,
 from cfg import Cfg, Dynamic
 from system.lang import Lng
 
-from ._base_widgets import (HSep, SingleActionWindow, SmallBtn, UHBoxLayout,
+from ._base_widgets import (HSep, UMainWindow, SmallBtn, UHBoxLayout,
                             UVBoxLayout)
 
 
@@ -157,13 +157,15 @@ class MyCalendar(QGroupBox):
         """)
 
 
-class WinDates(SingleActionWindow):
+class WinDates(UMainWindow):
     dates_btn_solid = pyqtSignal()
     dates_btn_normal = pyqtSignal()
     reload_thumbnails = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.search_dates[Cfg.lng_index])
 
         self.central_layout.setSpacing(10)

@@ -9,7 +9,7 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import SingleActionWindow, UMenu
+from ._base_widgets import UMainWindow, UMenu
 from .win_servers import ServersWin
 from .win_settings import WinSettings
 
@@ -64,7 +64,7 @@ class SelectableLabel(QLabel):
         context_menu.show_menu()
 
 
-class AboutWin(SingleActionWindow):
+class AboutWin(UMainWindow):
     """
     Окно "О программе" с информацией о версии, авторе и контактами.
     
@@ -79,7 +79,8 @@ class AboutWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
-
+        self.set_always_on_top()
+        self.set_close_only()
         # --- Настройка окна ---
         self.setWindowTitle(Static.app_name)
         self.setFixedSize(self.ww, self.hh)

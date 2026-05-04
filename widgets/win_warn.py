@@ -5,16 +5,18 @@ from PyQt5.QtWidgets import QLabel
 from cfg import Cfg
 from system.lang import Lng
 
-from ._base_widgets import SingleActionWindow, SmallBtn, UHBoxLayout
+from ._base_widgets import SmallBtn, UHBoxLayout, UMainWindow
 
 
-class ConfirmWindow(SingleActionWindow):
+class ConfirmWindow(UMainWindow):
     ok_clicked = pyqtSignal()
     ww = 360
     svg_icon = "./images/warning.svg"
 
     def __init__(self, text: str):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
         self.setMaximumWidth(360)
         self.setMinimumWidth(300)

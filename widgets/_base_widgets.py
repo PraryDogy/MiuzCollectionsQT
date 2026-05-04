@@ -265,29 +265,6 @@ class UMainWindow(QMainWindow, WindowMixin):
         return super().deleteLater()
 
 
-class SingleActionWindow(UMainWindow):
-    """
-    Окно с пользовательскими флагами отображения:
-    - Модальность: блокирует другие окна приложения (ApplicationModal)
-    - Заголовок с кнопкой закрытия, остальные кнопки неактивны
-    - Внутренние отступы центрального layout'а: (10, 5, 10, 5)
-    """
-
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-
-        # --- Модальность окна ---
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-
-        # --- Флаги окна: только кнопка закрытия ---
-        flags = Qt.WindowType.Window | Qt.WindowType.CustomizeWindowHint
-        flags |= Qt.WindowType.WindowCloseButtonHint
-        self.setWindowFlags(flags)
-
-        # --- Отступы центрального layout'а ---
-        self.central_layout.setContentsMargins(10, 5, 10, 5)
-
-
 class AppModalWindow(UMainWindow):
     def __init__(self, parent: QWidget = None):
         """

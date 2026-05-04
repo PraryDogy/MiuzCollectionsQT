@@ -26,7 +26,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, SingleActionWindow, SmallBtn, UHBoxLayout,
+from ._base_widgets import (HSep, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
                             UTextEdit, UVBoxLayout, VListWidget, WinManager, UMainWindow)
 from .win_warn import ConfirmWindow, WarningWindow
@@ -252,12 +252,14 @@ class RebootSettings(GroupWid):
         self.cfg_changed.emit()
 
 
-class SizesWin(SingleActionWindow):
+class SizesWin(UMainWindow):
     ww = 500
     hh = 330
 
     def __init__(self, size_items: list[HashDirSizeItem], parent=None):
         super().__init__(parent)
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.data_size[Cfg.lng_index])
         self.resize(self.ww, self.hh)
 
@@ -1271,13 +1273,15 @@ class WinSettings(UMainWindow):
         return super().mouseReleaseEvent(a0)
 
 
-class NewMfWin(SingleActionWindow):
+class NewMfWin(UMainWindow):
     """
     Окно настроек при первой настройке приложения.
     """
     def __init__(self):
         super().__init__()
         self.setFixedSize(500, 500)
+        self.set_always_on_top()
+        self.set_close_only()
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
         # перехватываем нажатие кнопки "сохранить"

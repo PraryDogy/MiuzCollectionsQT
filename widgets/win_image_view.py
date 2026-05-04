@@ -19,7 +19,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import AppModalWindow, UMenu, USubMenu, USvgSqareWidget
+from ._base_widgets import UMenu, USubMenu, USvgSqareWidget, UMainWindow
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SetFav,
                       WinInfoAction)
 from .grid import Thumbnail
@@ -212,7 +212,7 @@ class NextImgBtn(SwitchImgBtn):
         super().__init__(os.path.join("./images", "next.svg"), parent)
 
 
-class WinImageView(AppModalWindow):
+class WinImageView(UMainWindow):
     switch_image_sig = pyqtSignal(str)
     no_connection = pyqtSignal()
     closed_ = pyqtSignal()

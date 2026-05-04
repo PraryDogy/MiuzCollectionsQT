@@ -2,14 +2,16 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel, QProgressBar, QWidget
 
-from ._base_widgets import SingleActionWindow, UHBoxLayout, UVBoxLayout
+from ._base_widgets import UMainWindow, UHBoxLayout, UVBoxLayout
 
 
-class WinProgressbar(SingleActionWindow):
+class WinProgressbar(UMainWindow):
     cancel = pyqtSignal()
 
     def __init__(self, title: str):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
         self.setWindowModality(Qt.WindowModality.WindowModal)
         self.setWindowTitle(title)

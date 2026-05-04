@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
 from cfg import Cfg
 from system.lang import Lng
 
-from ._base_widgets import SingleActionWindow, SmallBtn, UHBoxLayout
+from ._base_widgets import UMainWindow, SmallBtn, UHBoxLayout
 
 
 class TreeWid(QTreeWidget):
@@ -83,7 +83,7 @@ class TreeWid(QTreeWidget):
         self.scrollToItem(self.items[path], QTreeWidget.PositionAtCenter)
 
 
-class UploadWin(SingleActionWindow):
+class UploadWin(UMainWindow):
     ok_clicked = pyqtSignal()
     mrg = 2
     group_spacing = 7
@@ -94,6 +94,8 @@ class UploadWin(SingleActionWindow):
 
     def __init__(self, target_dir: str, target_files: list[str]):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
         self.setFixedSize(400, 400)
         self.central_layout.setSpacing(10)

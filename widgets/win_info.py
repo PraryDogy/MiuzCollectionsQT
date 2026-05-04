@@ -10,7 +10,7 @@ from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
 from system.utils import Utils
 
-from ._base_widgets import SingleActionWindow, UMenu
+from ._base_widgets import UMainWindow, UMenu
 
 
 class ULabel(QLabel):
@@ -61,11 +61,13 @@ class Selectable(ULabel):
         menu_.show_menu()
 
 
-class WinInfo(SingleActionWindow):
+class WinInfo(UMainWindow):
     finished_ = pyqtSignal()
 
     def __init__(self, paths: list[str]):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.info[Cfg.lng_index])
         self.path = paths[0]
 

@@ -9,11 +9,11 @@ from system.items import CopyTaskItem
 from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskWorker
 
-from ._base_widgets import SingleActionWindow, SmallBtn
+from ._base_widgets import UMainWindow, SmallBtn
 from .win_progressbar import WinProgressbar
 
 
-class ReplaceFilesWin(SingleActionWindow):
+class ReplaceFilesWin(UMainWindow):
     btn_w = 100
     icon_size = 50
     icon_path = "./images/warning.svg"
@@ -24,6 +24,8 @@ class ReplaceFilesWin(SingleActionWindow):
 
     def __init__(self):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.replace[Cfg.lng_index])
         self.setFixedSize(350, 90)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -84,12 +86,14 @@ class ReplaceFilesWin(SingleActionWindow):
         a0.ignore()
     
 
-class ErrorWin(SingleActionWindow):
+class ErrorWin(UMainWindow):
     icon_size = 50
     icon_path = "./images/warning.svg"
 
     def __init__(self):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.error[Cfg.lng_index])
         self.setFixedSize(350, 90)
 
