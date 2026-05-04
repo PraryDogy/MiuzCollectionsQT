@@ -143,8 +143,8 @@ class Lng:
     back = ("Назад", "Back")
     next_ = ("Далее", "Next")
     read_file_error = ("Ошибка чтения файла", "Error file read")
-    folders = ("Папки", "Folders")
-    folder = ("Папка", "Folder")
+    folders = ("Каталоги", "Catalogs")
+    folder = ("Каталог изображений", "Image catalog")
     open_default = ("Открыть по умолчанию", "Open by default")
     open_in = ("Открыть в приложении", "Open in application")
     alias_immutable = (
@@ -152,45 +152,44 @@ class Lng:
         "Name (cannot be changed after saving)"
     )
     save = ("Сохранить", "Save")
-    new_folder = ("Новая папка", "New folder")
+    new_folder = ("Новый каталог", "New catalog")
     enter_alias_warning = (
         "Поле \"Имя\" обязательно для заполнения.",
         "Alias field is required."
     )
-    select_folder_path = ("Укажите путь к папке с изображениями", "Select path to the images folder")
-    folder_path = ("Путь к папке с изображениями", "Images folder path")
+    select_folder_path = ("Укажите путь к каталогу", "Select path to the catalog")
+    folder_path = ("Путь к каталогу", "Catalog path")
     general = ("Основные", "General")
     restart = ("Перезапуск", "Restart")
     at_least_one_folder_required = (
-        "Нужна хотя бы одна папка с изображениями.",
-        "At least one images folder required."
+        "Нужен хотя бы один каталог с изображениями.",
+        "At least one image catalog is required."
     )
-    confirm_delete_folder = ("Вы уверены, что хотите удалить папку?", "Are you sure you want to delete the folder?")
     images = ("Изображения", "Images")
     menu = ("Меню", "Menu")
     dates = ("Календарь", "Calendar")
     favorites = ("Избранное", "Favorites")
     cancel = ("Отмена", "Cancel")
     no_connection = ("Нет подключения", "No connection")
-    no_connection_full = ("Нет подключения к папке с изображениями.", "No connection to images folder.")
+    no_connection_full = ("Нет подключения к каталогу.", "No connection to the catalog.")
     folder_access_error = (
-        "Не удалось получить доступ к папке с изображениями.\n"
+        "Не удалось получить доступ к каталогу с изображениями.\n"
         "Возможные причины:\n"
         "- Диск не подключён\n"
         "- Указанный путь недоступен\n\n"
-        "Решение: откройте настройки и добавьте новый путь к папке с изображениями.",
+        "Решение: откройте настройки и добавьте новый путь к каталогу.",
         
-        "Unable to access the images folder.\n"
+        "Unable to access the images catalog.\n"
         "Possible reasons:\n"
         "- Disk is not connected\n"
         "- The specified path is unavailable\n\n"
-        "Solution: open settings and add a new path to the images folder."
+        "Solution: open settings and add a new path to the catalog."
     )
     ok = ("Ок", "Ok")
     alias = ("Имя", "Name")
     images_folder_path = (
-        "Путь к папке с изображениями: перетащите сюда папку или укажите путь с новой строки.",
-        "Path to the images folder: drag a folder here or enter a path on a new line."
+        "Путь к каталогу с изображениями: перетащите сюда папку или укажите путь с новой строки.",
+        "Path to the images catalog: drag a folder here or enter a path on a new line."
     )
     ignore_list_descr = (
         "Игнор лист: перетащите сюда папку или укажите имя с новой строки.",
@@ -221,7 +220,7 @@ class Lng:
     adding = ("Добавляю", "Add")
     add = ("Добавить", "Add")
     deleting = ("Удаляю", "Deleting")
-    search_in = ("Поиск в папке", "Search in folder")
+    search_in = ("Поиск в каталоге", "Search in catalog")
     updating = ("Обновление", "Updating")
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
@@ -229,7 +228,6 @@ class Lng:
     alias_error = ("Имя должно быть уникальным", "Name must be unique")
     already_taken = ("Уже используется", "Is already taken")
     image = ("Изображение", "Image")
-    other_folders = ("Прочие папки", "Other folders")
     sort_by_mod = ("По дате изменения", "Date modification")
     sort_by_recent = ("По дате добавления", "Date added")
     sort_by_mod_short = ("Дата изм.", "Date mod.")
@@ -283,20 +281,16 @@ class Lng:
     data_size = ("Размер данных", "Data size")
     calculating = ("Вычисление", "Calculating")
     reset_mf = (
-        "Сбросить все данные папки.",
-        "Reset all folder data ."
+        "Исправить ошибки в каталоге.",
+        "Fix errors in the catalog."
     )
-    reset_mf_long = (
-        "Кэшированные изображения будут удалены и созданы заново.",
-        "Cached images will be deleted and recreated."
+    app_will_restarted = (
+        "Приложение будет перезапущено. Нажмите ок, чтобы продолжить.",
+        "The application will restart. Click OK to continue."
     )
     remove_folder = (
-        "Удалить папку из приложения.",
-        "Remove folder from app."
-    )
-    remove_folder_long = (
-        "Все данные папки будут удалены. Исходные изображения сохранятся.",
-        "All folder data will be deleted. Original images will remain intact."
+        "Удалить каталог изображений.",
+        "Delete the image catalog."
     )
     reset_filters = (
         "Сбросить фильтры.",
@@ -360,13 +354,9 @@ class Lng:
         "• up to 5-30 characters\n"
         "• Russian and English letters, digits, and spaces",
     )
-    folder_not_exists = (
-        "Добавьте существующий путь к папке.",
-        "Please provide an existing folder path.",
-    )
     folder_path_exists = (
-        "Папка с таким путем уже добавлена.\nИмя папки:",
-        "A folder with this path has already been added.\nFolder name:",
+        "Такой каталог уже существует.\nИмя каталога:",
+        "Catalog already exists.\nCatalog name:"
     )
     first_load_title = (
         "Начальная настройка",
@@ -394,8 +384,8 @@ class Lng:
         "Are you sure you want to delete this server's data?",
     )
     show_in_folder = (
-        "Показать в папке",
-        "Show in folder"
+        "Показать в исходной папке.",
+        "Show in source folder."
     )
     set_server_alias = (
         "Задайте псевдоним",

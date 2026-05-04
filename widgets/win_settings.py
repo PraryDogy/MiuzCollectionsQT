@@ -856,7 +856,7 @@ class MfSettings(QWidget, StateWid):
         if len(self.mf_list_clone) == 1:
             win = WarningWindow(Lng.at_least_one_folder_required[Cfg.lng_index])
         else:
-            win = ConfirmWindow(Lng.remove_folder_long[Cfg.lng_index])
+            win = ConfirmWindow(Lng.app_will_restarted[Cfg.lng_index])
             win.ok_clicked.connect(fin)
         win.center_to_parent(self.window())
         win.show()
@@ -868,7 +868,7 @@ class MfSettings(QWidget, StateWid):
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
-        win = ConfirmWindow(Lng.reset_mf_long[Cfg.lng_index])
+        win = ConfirmWindow(Lng.app_will_restarted[Cfg.lng_index])
         win.ok_clicked.connect(reset_data)
         win.center_to_parent(self.window())
         win.show()
