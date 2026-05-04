@@ -205,49 +205,40 @@ class WinManager:
     win_list: list[QMainWindow] = []
 
 
-class UMainWindow(QMainWindow):
-    """
-    Базовое главное окно приложения с центральным виджетом и вертикальным layout.
-
-    Атрибуты:
-        central_layout (QVBoxLayout): вертикальный layout центрального виджета.
-    """
-
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-
-        # --- Центральный виджет ---
-        central_widget = QWidget(self)
-        central_widget.setContentsMargins(0, 0, 0, 0)
-        self.setCentralWidget(central_widget)
-
-        # --- Компоновка ---
-        self.central_layout = UVBoxLayout(central_widget)
-
-        # --- Регистрация окна в менеджере ---
+class WindowMixin:
+    def register_window(self):
         WinManager.win_list.append(self)
 
-    def center_to_parent(self, parent: QMainWindow):
+    def unregister_window(self):
+        try:
+            WinManager.win_list.remove(self)
+        except ValueError:
+            pass
+
+    def center_to_parent(self, parent: QWidget):
         try:
             geo = self.geometry()
             geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
         except Exception as e:
-            print("base widgets, u main window, center error", e)
+            print("center error:", e)
+
+
+class UMainWindow(QMainWindow, WindowMixin):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+        central_widget = QWidget(self)
+        central_widget.setContentsMargins(0, 0, 0, 0)
+        self.setCentralWidget(central_widget)
+        self.central_layout = UVBoxLayout(central_widget)
+        self.register_window()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
-        try:
-            WinManager.win_list.remove(self)
-        except Exception as e:
-            Utils.print_error()
+        self.unregister_window()
         return super().closeEvent(a0)
     
     def deleteLater(self):
-        try:
-            WinManager.win_list.remove(self)
-        except ValueError as e:
-            # Utils.print_error()
-            print("remove win from list err", e)
+        self.unregister_window()
         return super().deleteLater()
 
 
