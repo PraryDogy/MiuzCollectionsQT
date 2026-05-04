@@ -108,8 +108,6 @@ class BelowTextWid(QLabel):
         color: #6199E4;
     """
 
-    sep = " ▸ "
-
     def __init__(self, wid: "Thumbnail"):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
