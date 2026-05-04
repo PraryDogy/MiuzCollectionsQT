@@ -1279,9 +1279,9 @@ class NewMfWin(UMainWindow):
     """
     def __init__(self):
         super().__init__()
-        self.setFixedSize(500, 500)
         self.set_always_on_top()
         self.set_close_only()
+        self.setFixedSize(500, 500)
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
         # перехватываем нажатие кнопки "сохранить"

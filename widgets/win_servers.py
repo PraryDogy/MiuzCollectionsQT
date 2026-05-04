@@ -110,6 +110,8 @@ class LoginWin(UMainWindow):
     def __init__(self, server_item: ServerItem = None):
 
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(5)
 
@@ -217,6 +219,8 @@ class LoginWin(UMainWindow):
 class ServersWin(UMainWindow):
     def __init__(self):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.connect_to_server[Cfg.lng_index])
         self.setFixedSize(350, 250)
 
