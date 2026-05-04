@@ -1,4 +1,3 @@
-import gc
 import os
 from typing import Literal
 
@@ -9,7 +8,7 @@ from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsPixmapItem, QGraphicsScene,
-                             QGraphicsView, QHBoxLayout, QLabel, QWidget)
+                             QGraphicsView, QHBoxLayout, QLabel, QWidget, QGraphicsOpacityEffect)
 
 from cfg import Cfg
 from system.lang import Lng
@@ -66,6 +65,11 @@ class ImgWid(QGraphicsView):
             self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
             self.is_zoomed = False
             self.setCursor(Qt.CursorShape.ArrowCursor)
+
+    def set_transparent(self, value: float):
+        effect = QGraphicsOpacityEffect(self)
+        effect.setOpacity(value)
+        self.pixmap_item.setGraphicsEffect(effect)
 
     # ---------------------- Drag через мышь ----------------------
     def mousePressEvent(self, event: QMouseEvent):
@@ -248,8 +252,8 @@ class WinImageView(UMainWindow):
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
-        self.image_label = ImgWid(QPixmap())
-        self.central_layout.addWidget(self.image_label)
+        self.img_wid = ImgWid(QPixmap())
+        self.central_layout.addWidget(self.img_wid)
         self.prev_image_btn = PrevImgBtn(self.centralWidget())
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
@@ -282,22 +286,22 @@ class WinImageView(UMainWindow):
     
     def zoom_cmd(self, flag: str):
         actions = {
-            "in": self.image_label.zoom_in,
-            "out": self.image_label.zoom_out,
-            "fit": self.image_label.zoom_fit,
+            "in": self.img_wid.zoom_in,
+            "out": self.img_wid.zoom_out,
+            "fit": self.img_wid.zoom_fit,
         }
         actions[flag]()
 
     def restart_img_wid(self, pixmap: QPixmap):
         self.text_label.hide()
-        self.image_label.hide()  # скрываем старый
+        self.img_wid.hide()  # скрываем старый
         new_wid = ImgWid(pixmap)
         new_wid.mouse_moved.connect(self.zoom_btns.show)
         self.central_layout.addWidget(new_wid)
 
-        self.image_label.deleteLater()
-        self.image_label = new_wid
-        self.image_label.show()
+        self.img_wid.deleteLater()
+        self.img_wid = new_wid
+        self.img_wid.show()
 
         btns = (self.zoom_btns, self.prev_image_btn, self.next_image_btn)
         for i in btns:
@@ -309,21 +313,12 @@ class WinImageView(UMainWindow):
         self.text_label.show()
 
     def load_thumb(self):
-        self.set_title()
-        try:
-            pixmap = self.wid.img
-        except Exception:
-            pixmap = None
-        if pixmap:
-            self.restart_img_wid(pixmap)
-        else:
-            t = f"{os.path.basename(self.rel_path)}\n{Lng.loading[Cfg.lng_index]}"
-            self.show_text_label(t)
-
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
             self.path = Utils.get_abs_any_path(Mf.current_mf.mf_current_path, self.rel_path)
+            self.set_title()
+            self.img_wid.set_transparent(0.7)
             self.load_image()
         else:
             print("img viewer > no smb")
@@ -375,7 +370,7 @@ class WinImageView(UMainWindow):
 
 
     def rotate(self, value: int):
-        pixmap = self.image_label.pixmap_item.pixmap()
+        pixmap = self.img_wid.pixmap_item.pixmap()
         transform = QTransform().rotate(value)
         pixmap = pixmap.transformed(transform)
         self.restart_img_wid(pixmap)
@@ -459,7 +454,7 @@ class WinImageView(UMainWindow):
             self.switch_image(1)
         else:
             self.switch_image(-1)
-        self.image_label.setCursor(Qt.CursorShape.ArrowCursor)
+        self.img_wid.setCursor(Qt.CursorShape.ArrowCursor)
 
     def change_fav(self, value: int):
         self.wid.set_fav(value)
@@ -481,13 +476,13 @@ class WinImageView(UMainWindow):
                 self.rotate(90)
 
             elif ev.key() == Qt.Key.Key_Equal:
-                self.image_label.zoom_in()
+                self.img_wid.zoom_in()
 
             elif ev.key() == Qt.Key.Key_Minus:
-                self.image_label.zoom_out()
+                self.img_wid.zoom_out()
 
             elif ev.key() == Qt.Key.Key_0:
-                self.image_label.zoom_fit()
+                self.img_wid.zoom_fit()
 
         else:
             if ev.key() == Qt.Key.Key_Left:
