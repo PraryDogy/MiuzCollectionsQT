@@ -202,9 +202,6 @@ class WinDates(UMainWindow):
         m = self.central_layout.contentsMargins()
         m.setBottom(15)
         self.central_layout.setContentsMargins(m)
-
-        self.adjustSize()
-
         if Dynamic.date_start:
             self.left_calendar.highlight_range(
                 Dynamic.date_start, Dynamic.date_end
@@ -215,6 +212,8 @@ class WinDates(UMainWindow):
                 Dynamic.date_start, Dynamic.date_end
             )
             self.right_calendar.title.set_named_date_text(Dynamic.date_end)
+
+        self.adjustSize()
 
     def clear_btn_cmd(self, *args):
         reload = True

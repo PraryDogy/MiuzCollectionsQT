@@ -516,10 +516,10 @@ class WinMain(UMainWindow):
 
     def open_dates_win(self):
         self.dates_win = WinDates()
-        self.dates_win.center_to_parent(self)
         self.dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
         self.dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
         self.dates_win.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.dates_win.center_to_parent(self)
         self.dates_win.show()
 
     def open_view_win(self):
