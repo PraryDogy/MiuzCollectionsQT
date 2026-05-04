@@ -227,11 +227,34 @@ class WindowMixin:
 class UMainWindow(QMainWindow, WindowMixin):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
+        self._always_on_top = False
+        self._close_only = False
         central_widget = QWidget(self)
         central_widget.setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(central_widget)
         self.central_layout = UVBoxLayout(central_widget)
         self.register_window()
+
+    def set_always_on_top(self, value=True):
+        self._always_on_top = value
+        self._apply_window_flags()
+
+    def set_close_only(self, value=True):
+        self._close_only = value
+        self._apply_window_flags()
+
+    def _apply_window_flags(self):
+        flags = Qt.WindowType.Window
+
+        if self._always_on_top:
+            flags |= Qt.WindowType.WindowStaysOnTopHint
+
+        if self._close_only:
+            flags |= Qt.WindowType.CustomizeWindowHint
+            flags |= Qt.WindowType.WindowCloseButtonHint
+
+        self.setWindowFlags(flags)
+        self.show()
 
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.unregister_window()

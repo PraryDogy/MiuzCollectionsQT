@@ -28,7 +28,7 @@ from system.utils import Utils
 
 from ._base_widgets import (HSep, SingleActionWindow, SmallBtn, UHBoxLayout,
                             ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, VListWidget, WinManager)
+                            UTextEdit, UVBoxLayout, VListWidget, WinManager, UMainWindow)
 from .win_warn import ConfirmWindow, WarningWindow
 
 
@@ -1047,7 +1047,7 @@ class NewFolder(QWidget, StateWid):
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
-class WinSettings(SingleActionWindow):
+class WinSettings(UMainWindow):
     closed = pyqtSignal()
     svg_folder = "./images/img_folder.svg"
     svg_filters = "./images/filters.svg"
@@ -1057,6 +1057,8 @@ class WinSettings(SingleActionWindow):
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
         self.setWindowTitle(Lng.settings[Cfg.lng_index])
         self.setFixedSize(700, 560)
 
