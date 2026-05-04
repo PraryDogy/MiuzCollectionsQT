@@ -9,7 +9,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsPixmapItem, QGraphicsScene,
                              QGraphicsView, QHBoxLayout, QLabel, QWidget, QGraphicsOpacityEffect)
-
+from multiprocessing import shared_memory
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
@@ -22,7 +22,7 @@ from ._base_widgets import UMenu, USubMenu, USvgSqareWidget, UMainWindow
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SetFav,
                       WinInfoAction)
 from .grid import Thumbnail
-
+import numpy as np
 
 class ImgWid(QGraphicsView):
     mouse_moved = pyqtSignal()
@@ -325,25 +325,27 @@ class WinImageView(UMainWindow):
 
     def load_image(self, ms = 300):
 
-        def fin(src: str, qimage: QImage):
+        def fin(src: str, qimage: QImage, shm: shared_memory.SharedMemory):
             qpixmap = QPixmap.fromImage(qimage)
             self.cached_images[src] = qpixmap
             self.restart_img_wid(qpixmap)
+            shm.close()
+            shm.unlink()
 
         def poll():
             self.read_img_timer.stop()
             queue = self.read_img_task.process_queue
             if not queue.empty():
-                item: ReadImgItem = queue.get()
-                if item.img_array is not None:
-                    if item.src == self.path:
-                        qimage_task = ImgArrayQImage(item.img_array)
-                        qimage_task.sigs.finished_.connect(
-                            lambda qimage: fin(item.src, qimage))
-                        UThreadPool.start(qimage_task)
-                else:
-                    t = f"{os.path.basename(self.path)}\n{Lng.read_file_error[Cfg.lng_index]}"
-                    self.show_text_label(t)
+                src, shm_name, shape, dtype = queue.get()
+                shm = shared_memory.SharedMemory(name=shm_name)
+                img_array = np.ndarray(shape, dtype=np.dtype(dtype), buffer=shm.buf)
+
+                if src == self.path:
+                    qimage_task = ImgArrayQImage(img_array)
+                    qimage_task.sigs.finished_.connect(
+                        lambda qimage: fin(src, qimage, shm)
+                    )
+                    UThreadPool.start(qimage_task)
             
             if not self.read_img_task.is_alive():
                 self.read_img_task.terminate_join()
