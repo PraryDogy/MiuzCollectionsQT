@@ -336,14 +336,14 @@ class WinImageView(UMainWindow):
             self.read_img_timer.stop()
             queue = self.read_img_task.process_queue
             if not queue.empty():
-                src, shm_name, shape, dtype = queue.get()
-                shm = shared_memory.SharedMemory(name=shm_name)
-                img_array = np.ndarray(shape, dtype=np.dtype(dtype), buffer=shm.buf)
+                item: ReadImgItem = queue.get()
+                shm = shared_memory.SharedMemory(name=item.shm_name)
+                img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=shm.buf)
 
-                if src == self.path:
+                if item.src == self.path:
                     qimage_task = ImgArrayQImage(img_array)
                     qimage_task.sigs.finished_.connect(
-                        lambda qimage: fin(src, qimage, shm)
+                        lambda qimage: fin(item.src, qimage, shm)
                     )
                     UThreadPool.start(qimage_task)
             

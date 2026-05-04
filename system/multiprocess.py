@@ -70,15 +70,6 @@ class ProcessWorker(BaseProcessWorker):
         super().__init__(target, (*args, self.process_queue))
 
 
-# class ReadImg:
-#     @staticmethod
-#     def start(src: str, desaturate: bool, queue: Queue):
-#         img_array = ImgUtils.read_img(src)
-#         if desaturate:
-#             img_array = ImgUtils.desaturate_image(img_array, 0.2)
-#         queue.put(ReadImgItem(src, img_array))
-
-
 class ReadImg:
     @staticmethod
     def start(src: str, desaturate: bool, queue: Queue):
@@ -87,14 +78,13 @@ class ReadImg:
         shm = shared_memory.SharedMemory(create=True, size=img_array.nbytes)
         buffer = np.ndarray(img_array.shape, dtype=img_array.dtype, buffer=shm.buf)
         buffer[:] = img_array
-
-        queue.put((
-            src,
-            shm.name,
-            img_array.shape,
-            str(img_array.dtype)
-        ))
-
+        item = ReadImgItem(
+            src=src,
+            shm_name=shm.name,
+            shape=img_array.shape,
+            dtype=img_array.dtype.str
+        )
+        queue.put(item)
         shm.close()
 
 

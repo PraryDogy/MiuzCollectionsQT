@@ -6,7 +6,7 @@ import numpy as np
 import sqlalchemy
 from PyQt5.QtGui import QImage
 from watchdog.events import FileSystemEvent
-
+import numpy as np
 from .main_folder import Mf
 
 
@@ -21,7 +21,9 @@ class OneFileInfoItem:
 @dataclass(slots=True)
 class ReadImgItem:
     src: str
-    img_array: np.ndarray
+    shm_name: str
+    shape: tuple[int, ...]
+    dtype: str
 
 
 @dataclass(slots=True)
