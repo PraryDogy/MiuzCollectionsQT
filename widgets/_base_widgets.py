@@ -238,6 +238,7 @@ class UMainWindow(QMainWindow, WindowMixin):
     def set_always_on_top(self, value=True):
         self._always_on_top = value
         self._apply_window_flags()
+        # self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
     def set_close_only(self, value=True):
         self._close_only = value
@@ -263,17 +264,6 @@ class UMainWindow(QMainWindow, WindowMixin):
     def deleteLater(self):
         self.unregister_window()
         return super().deleteLater()
-
-
-class AppModalWindow(UMainWindow):
-    def __init__(self, parent: QWidget = None):
-        """
-        Окно с пользовательскими флагами отображения:
-        - Модальность: блокирует другие окна приложения (ApplicationModal)
-        """
-
-        super().__init__(parent)
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
 
 class UListWidgetItem(QListWidgetItem):
