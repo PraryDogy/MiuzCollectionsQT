@@ -212,13 +212,21 @@ class WindowMixin:
         except ValueError:
             pass
 
-    def center_to_parent(self, parent: QWidget):
+    def center_to_parent(self: QWidget, parent: QWidget):
         try:
             geo = self.geometry()
             geo.moveCenter(parent.geometry().center())
             self.setGeometry(geo)
         except Exception as e:
             print("center error:", e)
+
+    def closeEvent(self, a0: QCloseEvent | None) -> None:
+        self.unregister_window()
+        return super().closeEvent(a0)
+    
+    def deleteLater(self):
+        self.unregister_window()
+        return super().deleteLater()
 
 
 class UMainWindow(QMainWindow, WindowMixin):
@@ -237,14 +245,6 @@ class UMainWindow(QMainWindow, WindowMixin):
         flags = Qt.WindowType.CustomizeWindowHint
         flags |= Qt.WindowType.WindowCloseButtonHint
         self.setWindowFlags(flags)
-
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
-        self.unregister_window()
-        return super().closeEvent(a0)
-    
-    def deleteLater(self):
-        self.unregister_window()
-        return super().deleteLater()
 
 
 class UListWidgetItem(QListWidgetItem):
