@@ -282,6 +282,7 @@ class WinImageView(UMainWindow):
             self.no_connection.emit()
         else:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
+        self.restart_img_wid(self.wid.img)
         self.load_thumb()
     
     def zoom_cmd(self, flag: str):
