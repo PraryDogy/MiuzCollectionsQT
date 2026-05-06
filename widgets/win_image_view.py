@@ -282,7 +282,6 @@ class WinImageView(UMainWindow):
             self.no_connection.emit()
         else:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
-        self.restart_img_wid(self.wid.img)
         self.load_thumb()
     
     def zoom_cmd(self, flag: str):
@@ -314,12 +313,13 @@ class WinImageView(UMainWindow):
         self.text_label.show()
 
     def load_thumb(self):
+        self.restart_img_wid(self.wid.img)
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
             self.path = Utils.get_abs_any_path(Mf.current_mf.mf_current_path, self.rel_path)
             self.set_title()
-            self.img_wid.set_transparent(0.7)
+            # self.img_wid.set_transparent(0.7)
             self.load_image()
         else:
             print("img viewer > no smb")
