@@ -16,7 +16,7 @@ from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.servers import Servers
 from system.tasks import UThreadPool
-from widgets._base_widgets import WinManager
+from widgets._base_widgets import UMainWindow
 from widgets.win_main import WinMain
 from widgets.win_settings import NewMfWin
 
@@ -284,7 +284,7 @@ class App(QApplication):
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            for i in WinManager.win_list:
+            for i in UMainWindow.win_list:
                 i.raise_()
                 i.show()
         return super().eventFilter(a0, a1)

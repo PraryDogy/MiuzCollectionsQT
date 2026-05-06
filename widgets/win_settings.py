@@ -26,9 +26,9 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, SmallBtn, UHBoxLayout,
-                            ULineEdit, UListSpacerItem, UListWidgetItem, UMenu,
-                            UTextEdit, UVBoxLayout, VListWidget, WinManager, UMainWindow)
+from ._base_widgets import (HSep, SmallBtn, UHBoxLayout, ULineEdit,
+                            UListSpacerItem, UListWidgetItem, UMainWindow,
+                            UMenu, UTextEdit, UVBoxLayout, VListWidget)
 from .win_warn import ConfirmWindow, WarningWindow
 
 
@@ -845,7 +845,7 @@ class MfSettings(QWidget, StateWid):
                 QTimer.singleShot(1000, poll_task)
 
         def fin():
-            for i in WinManager.win_list:
+            for i in UMainWindow.win_list:
                 i.hide()
             self.mf_remover.start()
             QTimer.singleShot(1000, poll_task)

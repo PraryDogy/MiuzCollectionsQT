@@ -504,7 +504,7 @@ class WinMain(UMainWindow):
         ]
         self.info_win = WinInfo(abs_paths)
         self.info_win.adjustSize()
-        self.info_win.center_to_parent(self)
+        self.info_win.center_to_parent(UMainWindow.win_list[-2])
         self.info_win.show()
         # self.info_win.finished_.connect(open_delayed)
 

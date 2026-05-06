@@ -198,17 +198,15 @@ class UTextEdit(QTextEdit):
         menu_.show_menu()
 
 
-class WinManager:
+class WindowMixin:
     win_list: list[QMainWindow] = []
 
-
-class WindowMixin:
     def register_window(self):
-        WinManager.win_list.append(self)
+        self.win_list.append(self)
 
     def unregister_window(self):
         try:
-            WinManager.win_list.remove(self)
+            self.win_list.remove(self)
         except ValueError:
             pass
 
