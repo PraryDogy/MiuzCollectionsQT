@@ -20,8 +20,8 @@ class ULabel(QLabel):
 
 
 class Selectable(SelectableLabel):
-    def __int__(self):
-        super().__init__()
+    def __init__(self, text: str):
+        super().__init__(text)
         self.setStyleSheet("font-size: 11px;")
 
 
