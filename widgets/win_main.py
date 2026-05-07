@@ -227,6 +227,9 @@ class WinMain(UMainWindow):
         self.grid.reload_thumbnails()
         if "noscan" not in argv:
             self.start_scaner_task()
+            path = Mf.current_mf.get_avaiable_mf_path()
+            if path is None:
+                self.open_win_smb()
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
@@ -288,20 +291,37 @@ class WinMain(UMainWindow):
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
 
-    def open_win_smb(self, parent: QWidget, mf: Mf):
-        try:
-            self.noti_wid.deleteLater()
-        except (AttributeError, RuntimeError) as e:
-            print(e)
+    def open_win_smb(self, *args):
 
-        alias = mf.mf_alias
-        self.noti_wid = NotifyWid(
-            parent,
-            f"{alias}: {Lng.no_connection_full[Cfg.lng_index].lower()}",
-            self.warning_svg,
-            ms=3000
-            )
-        self.noti_wid._show()
+        def fin(url: str):
+            if os.path.exists(url):
+                Mf.current_mf.mf_paths.clear()
+                Mf.current_mf.mf_paths = [url, ]
+                Mf.write_json_data()
+                self.restart_scaner_task()
+
+        def show():
+            self.win_smb.center_to_parent(self.win_list[-2])
+            self.win_smb.show()
+
+        from test_2 import WinSmb
+        self.win_smb = WinSmb()
+        self.win_smb.clicked.connect(fin)
+        QTimer.singleShot(100, show)
+ 
+        # try:
+        #     self.noti_wid.deleteLater()
+        # except (AttributeError, RuntimeError) as e:
+        #     print(e)
+
+        # alias = mf.mf_alias
+        # self.noti_wid = NotifyWid(
+        #     parent,
+        #     f"{alias}: {Lng.no_connection_full[Cfg.lng_index].lower()}",
+        #     self.warning_svg,
+        #     ms=3000
+        #     )
+        # self.noti_wid._show()
 
     @with_conn
     def start_update_thumb(self, parent: QWidget, mf: Mf, rel_img_paths: list[str]):

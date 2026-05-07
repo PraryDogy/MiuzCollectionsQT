@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QVBoxLayout, QWidget)
@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
-from system.utils import Utils
 from widgets._base_widgets import UMainWindow
 
 
@@ -142,6 +141,7 @@ class WinSmb(UMainWindow):
     def __init__(self):
         super().__init__()
         self.set_close_only()
+        self.set_always_on_top()
         self.url = ""
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
@@ -169,10 +169,17 @@ class WinSmb(UMainWindow):
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()
 
+        self.adjustSize()
+
     def ok_clicked(self):
         if self.path_widget.url:
             self.clicked.emit(self.path_widget.url)
             self.deleteLater()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
 
 # Mf.json_to_app()
 # app = QApplication(sys.argv)
@@ -180,8 +187,3 @@ class WinSmb(UMainWindow):
 # main_win.show()
 # app.exec()
 
-
-a = [1, 2, 3, 4, 5]
-b = a[:1]
-
-print(b)
