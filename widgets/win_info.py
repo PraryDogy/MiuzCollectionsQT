@@ -10,55 +10,19 @@ from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow, UMenu
+from ._base_widgets import UMainWindow, SelectableLabel
 
 
 class ULabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text=text)
-
         self.setStyleSheet("font-size: 11px;")
 
 
-
-class Selectable(ULabel):
-    sym_line_feed = "\u000a"
-    sym_paragraph_sep = "\u2029"
-
-    def __init__(self, text: str):
-        super().__init__(text)
-
-        fl = Qt.TextInteractionFlag.TextSelectableByMouse
-        self.setTextInteractionFlags(fl)
-        self.setCursor(Qt.CursorShape.IBeamCursor)
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-
-        text = self.selectedText()
-        text = text.replace(self.sym_paragraph_sep, "")
-        text = text.replace(self.sym_line_feed, "")
-
-        full_text = self.text().replace(self.sym_paragraph_sep, "")
-        full_text = full_text.replace(self.sym_line_feed, "")
-
-        is_path = any((os.path.isdir(full_text), os.path.isfile(full_text)))
-
-        menu_ = UMenu(event=ev)
-
-        label_text = Lng.copy[Cfg.lng_index]
-        sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(lambda: Utils.copy_text(text))
-        menu_.addAction(sel)
-
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[Cfg.lng_index])
-        reveal.triggered.connect(
-            lambda: Utils.reveal_files([full_text])
-        )
-        
-        if is_path:
-            menu_.addAction(reveal)
-
-        menu_.show_menu()
+class Selectable(SelectableLabel):
+    def __int__(self):
+        super().__init__()
+        self.setStyleSheet("font-size: 11px;")
 
 
 class WinInfo(UMainWindow):
