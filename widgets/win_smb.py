@@ -16,6 +16,7 @@ class WarnWidget(QWidget):
     warn = "images/warning.svg"
     def __init__(self, mf: Mf):
         super().__init__()
+        self.setFixedWidth(350)
         h_lay = QHBoxLayout(self)
         h_lay.setContentsMargins(2, 5, 2, 5)
         h_lay.setSpacing(10)

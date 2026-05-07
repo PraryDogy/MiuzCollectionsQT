@@ -602,7 +602,7 @@ class AllDirScaner:
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существуетre
         if removed_dirs:
-            AllDirScaner.log_removed_dirs(finder_dirs, removed_dirs)
+            AllDirScaner.log_removed_dirs(scaner_item, finder_dirs, removed_dirs)
             if len(finder_dirs) != len(removed_dirs):
                 _RemovedDirsWorker.remove_thumbs(removed_dirs, scaner_item)
                 _RemovedDirsWorker.remove_dirs(removed_dirs, scaner_item)
