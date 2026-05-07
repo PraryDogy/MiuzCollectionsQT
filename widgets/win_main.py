@@ -309,20 +309,6 @@ class WinMain(UMainWindow):
         self.win_smb.clicked.connect(fin)
         QTimer.singleShot(100, show)
  
-        # try:
-        #     self.noti_wid.deleteLater()
-        # except (AttributeError, RuntimeError) as e:
-        #     print(e)
-
-        # alias = mf.mf_alias
-        # self.noti_wid = NotifyWid(
-        #     parent,
-        #     f"{alias}: {Lng.no_connection_full[Cfg.lng_index].lower()}",
-        #     self.warning_svg,
-        #     ms=3000
-        #     )
-        # self.noti_wid._show()
-
     @with_conn
     def start_update_thumb(self, parent: QWidget, mf: Mf, rel_img_paths: list[str]):
 
