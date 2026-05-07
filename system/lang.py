@@ -116,8 +116,8 @@ class Lng:
     save_as = ("Сохранить как", "Save as")
     search = ("Поиск", "Search")
     search_dates = (
-        "Поиск фотографий по датам.",
-        "Searching for photos by dates."
+        "Поиск фотографий по датам",
+        "Searching for photos by dates"
     )
     settings = ("Настройки", "Settings")
     total = ("Всего", "Total")
@@ -138,7 +138,7 @@ class Lng:
     start_date = ("Дата начала", "Start date")
     end_date = ("Дата окончания", "End date")
     cut = ("Вырезать (⌘ + X)", "Cut (⌘ + X)")
-    drop_only_files = ("Можно загружать только файлы.", "Only files can be uploaded.")
+    drop_only_files = ("Можно загружать только файлы", "Only files can be uploaded")
     filters = ("Фильтры", "Filters")
     back = ("Назад", "Back")
     next_ = ("Далее", "Next")
@@ -154,16 +154,16 @@ class Lng:
     save = ("Сохранить", "Save")
     new_folder = ("Новый каталог", "New catalog")
     enter_alias_warning = (
-        "Поле \"Имя\" обязательно для заполнения.",
-        "Alias field is required."
+        "Поле \"Имя\" обязательно для заполнения",
+        "Alias field is required"
     )
     select_folder_path = ("Укажите путь к каталогу", "Select path to the catalog")
     folder_path = ("Путь к каталогу", "Catalog path")
     general = ("Основные", "General")
     restart = ("Перезапуск", "Restart")
     at_least_one_folder_required = (
-        "Нужен хотя бы один каталог с изображениями.",
-        "At least one image catalog is required."
+        "Нужен хотя бы один каталог с изображениями",
+        "At least one image catalog is required"
     )
     images = ("Изображения", "Images")
     menu = ("Меню", "Menu")
@@ -171,7 +171,7 @@ class Lng:
     favorites = ("Избранное", "Favorites")
     cancel = ("Отмена", "Cancel")
     no_connection = ("Нет подключения", "No connection")
-    no_connection_full = ("Нет подключения к каталогу.", "No connection to the catalog.")
+    no_connection_full = ("Нет подключения к каталогу", "No connection to the catalog")
     folder_access_error = (
         "Не удалось получить доступ к каталогу с изображениями.\n"
         "Возможные причины:\n"
@@ -188,12 +188,12 @@ class Lng:
     ok = ("Ок", "Ok")
     alias = ("Имя", "Name")
     images_folder_path = (
-        "Путь к каталогу с изображениями: перетащите сюда папку или укажите путь с новой строки.",
-        "Path to the images catalog: drag a folder here or enter a path on a new line."
+        "Путь к каталогу с изображениями: перетащите сюда папку или укажите путь с новой строки",
+        "Path to the images catalog: drag a folder here or enter a path on a new line"
     )
     ignore_list_descr = (
-        "Игнор лист: перетащите сюда папку или укажите имя с новой строки.",
-        "Ignore list: drag a folder here or enter a name on a new line."
+        "Игнор лист: перетащите сюда папку или укажите имя с новой строки",
+        "Ignore list: drag a folder here or enter a name on a new line"
     )
     ignore_list = ("Игнор лист", "Ignore list")
     minutes = ("минут", "minutes")
@@ -281,24 +281,24 @@ class Lng:
     data_size = ("Размер данных", "Data size")
     calculating = ("Вычисление", "Calculating")
     reset_mf = (
-        "Исправить ошибки в каталоге.",
-        "Fix errors in the catalog."
+        "Исправить ошибки в каталоге",
+        "Fix errors in the catalog"
     )
     app_will_restarted = (
         "Приложение будет перезапущено. Нажмите ок, чтобы продолжить.",
         "The application will restart. Click OK to continue."
     )
     remove_folder = (
-        "Удалить каталог изображений.",
-        "Delete the image catalog."
+        "Удалить каталог изображений",
+        "Delete the image catalog"
     )
     reset_filters = (
-        "Сбросить фильтры.",
-        "Reset filters."
+        "Сбросить фильтры",
+        "Reset filters"
     )
     reset_filters_long = (
-        "Фильтры будут сброшены к значениям по умолчанию.",
-        "All filters will be reset to their default values.",
+        "Фильтры будут сброшены к значениям по умолчанию",
+        "All filters will be reset to their default values",
     )
     erase_data_long = (
         "Все кэшированные изображения будут удалены, а настройки приложения "
@@ -335,14 +335,14 @@ class Lng:
     error = ("Ошибка", "Error")
     next_search = ("Поиск новых изображений через", "Search new images in")
     string_limit = (
-        "Имя — 5-30 символов.",
-        "Name — up to 5-30 characters.",
+        "Имя — 5-30 символов",
+        "Name — up to 5-30 characters",
     )
     valid_message = (
         "Имя может содержать только русские и английские буквы, "
-        "цифры и пробелы.",
+        "цифры и пробелы",
         "The name may contain only Russian and English letters, "
-        "digits and spaces.",
+        "digits and spaces",
     )
     folder_name = (
         "Имя:\n"
@@ -384,10 +384,22 @@ class Lng:
         "Are you sure you want to delete this server's data?",
     )
     show_in_folder = (
-        "Показать в исходной папке.",
-        "Show in source folder."
+        "Показать в исходной папке",
+        "Show in source folder"
     )
     set_server_alias = (
         "Задайте псевдоним",
         "Set an alias"
+    )
+    path_hint_texts = (
+        "Перетащите каталог сюда или нажмите для выбора",
+        "Drag and drop a catalog here or click to browse"
+    )
+    access_error_text = (
+        "Нет доступа к каталогу изображений",
+        "Unable to access the image directory"  # Более технически точно
+    )
+    network_error_text = (
+        "Сетевой диск не подключен или неправильно указан путь",
+        "Network drive not connected or the path is incorrect"
     )

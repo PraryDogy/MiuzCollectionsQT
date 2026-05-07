@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
 
 from cfg import Cfg
 from system.lang import Lng
+from system.main_folder import Mf
 from system.utils import Utils
 from widgets._base_widgets import UMainWindow
 
@@ -44,11 +45,7 @@ class PathWidget(QGroupBox):
         right_btn.setFixedSize(35, 35)
         h_lay.addWidget(right_btn)
 
-        lines = (
-            "Перетяните сюда каталог изображений",
-            "или нажмите, чтобы указать путь к каталогу."
-        )
-        left_label = QLabel("\n".join(lines))
+        left_label = QLabel(Lng.path_hint_texts[Cfg.lng_index])
         h_lay.addWidget(left_label)
 
         h_lay.addStretch()
@@ -123,7 +120,7 @@ class WarnWidget(QWidget):
     def __init__(self):
         super().__init__()
         h_lay = QHBoxLayout(self)
-        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setContentsMargins(2, 5, 2, 5)
         h_lay.setSpacing(10)
 
         warn_wid = QSvgWidget()
@@ -132,8 +129,8 @@ class WarnWidget(QWidget):
         h_lay.addWidget(warn_wid)
 
         lines = (
-            "Не могу получить доступ к каталогу изображений 'Тест'",
-            "Укажите правильный путь к каталогу"
+            f"{Lng.access_error_text[Cfg.lng_index]} \"{Mf.current_mf.mf_alias}\".",
+            Lng.network_error_text[Cfg.lng_index]
         )
         up_label = QLabel("\n".join(lines))
         h_lay.addWidget(up_label)
@@ -177,7 +174,7 @@ class WinSmb(UMainWindow):
             self.clicked.emit(self.path_widget.url)
             self.deleteLater()
 
-
+Mf.json_to_app()
 app = QApplication(sys.argv)
 main_win = WinSmb()
 main_win.show()
