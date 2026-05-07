@@ -400,6 +400,6 @@ class Lng:
         "Unable to access the image directory"  # Более технически точно
     )
     network_error_text = (
-        "Сетевой диск не подключен или неправильно указан путь",
-        "Network drive not connected or the path is incorrect"
+        "Сетевой диск не подключен или неправильно указан путь.",
+        "Network drive not connected or the path is incorrect."
     )

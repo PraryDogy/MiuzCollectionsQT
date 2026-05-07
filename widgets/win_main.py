@@ -35,6 +35,7 @@ from .win_image_view import WinImageView
 from .win_info import WinInfo
 from .win_servers import ServersWin
 from .win_settings import WinSettings
+from .win_smb import WinSmb
 from .win_upload import UploadWin
 from .win_warn import ConfirmWindow
 
@@ -229,7 +230,7 @@ class WinMain(UMainWindow):
             self.start_scaner_task()
             path = Mf.current_mf.get_avaiable_mf_path()
             if path is None:
-                self.open_win_smb()
+                QTimer.singleShot(100, self.open_win_smb)
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
@@ -298,16 +299,11 @@ class WinMain(UMainWindow):
                 Mf.current_mf.mf_paths.clear()
                 Mf.current_mf.mf_paths = [url, ]
                 Mf.write_json_data()
-                self.restart_scaner_task()
 
-        def show():
-            self.win_smb.center_to_parent(self.win_list[-2])
-            self.win_smb.show()
-
-        from test_2 import WinSmb
         self.win_smb = WinSmb()
         self.win_smb.clicked.connect(fin)
-        QTimer.singleShot(100, show)
+        self.win_smb.center_to_parent(self.win_list[-2])
+        self.win_smb.show()
  
     @with_conn
     def start_update_thumb(self, parent: QWidget, mf: Mf, rel_img_paths: list[str]):

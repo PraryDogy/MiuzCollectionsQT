@@ -1,10 +1,9 @@
 import os
-import sys
 
-from PyQt5.QtCore import pyqtSignal, Qt, QTimer
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QPushButton, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
+                             QPushButton, QVBoxLayout, QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
