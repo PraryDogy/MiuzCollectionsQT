@@ -1,10 +1,7 @@
-a = False
-b = True
+import os
 
-stmt = all((
-    a,
-    b
-))
-
-if stmt:
-    print(1)
+filepath = "/Users/Loshkarev/Desktop/test.txt"
+with open(filepath, "a") as file:
+    sep = f"\n\n=====\n\n"
+    text = "hello world"
+    file.write(sep + text)

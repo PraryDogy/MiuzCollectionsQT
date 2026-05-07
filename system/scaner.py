@@ -32,6 +32,12 @@ class Tools:
         if os.path.exists(scaner_item.mf.mf_current_path):
             return True
         return False
+    
+    def log(text: str):
+        filepath = os.path.join(Static.external_files_dir, "log.txt")
+        with open(filepath, "a") as f:
+            sep = f"\n\n=====\n\n"
+            f.write(sep + text)
 
 
 class _DirsLoader:
