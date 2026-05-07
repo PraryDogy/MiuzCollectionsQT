@@ -370,16 +370,18 @@ class PathWidget(QGroupBox):
     magnifier = "images/magnifier.svg"
     green_checkmark = "images/green_checkmark.svg"
     max_row = 45
+    ww = 70
+    icon_size = 35
+
     clicked = pyqtSignal(str)
     def __init__(self, mf: Mf):
         super().__init__()
-        self.url = None
         self.mf = mf
         self.setAcceptDrops(True)
-        self.setFixedHeight(90)
+        self.setFixedHeight(self.ww)
     
         self.main_lay = QVBoxLayout(self)
-        self.main_lay.setContentsMargins(2, 2, 2, 2)
+        self.main_lay.setContentsMargins(6, 2, 6, 2)
         self.main_lay.setSpacing(0)
 
         mf_path = mf.get_avaiable_mf_path()
@@ -388,6 +390,7 @@ class PathWidget(QGroupBox):
             self.url = mf_path
             self.main_wid = self.ok_path_widget()
         else:
+            self.url = None
             self.main_wid = self.no_path_widget()
         self.main_lay.addWidget(self.main_wid)
 
@@ -398,7 +401,11 @@ class PathWidget(QGroupBox):
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
-        h_lay.addStretch()
+        right_btn = QSvgWidget()
+        right_btn.load(self.magnifier)
+        right_btn.setFixedSize(self.icon_size, self.icon_size)
+        h_lay.addWidget(right_btn)
+
         
         lines = (
             f"{Lng.folder_path[Cfg.lng_index]}:",
@@ -406,12 +413,7 @@ class PathWidget(QGroupBox):
         )
         left_label = QLabel("\n".join(lines))
         left_label.setWordWrap(True)
-        h_lay.addWidget(left_label, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        right_btn = QSvgWidget()
-        right_btn.load(self.magnifier)
-        right_btn.setFixedSize(35, 35)
-        h_lay.addWidget(right_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        h_lay.addWidget(left_label)
 
         h_lay.addStretch()
 
@@ -423,8 +425,6 @@ class PathWidget(QGroupBox):
         h_lay = QHBoxLayout(wid)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
-
-        h_lay.addStretch()
 
         right_btn = QSvgWidget()
         right_btn.load(self.green_checkmark)

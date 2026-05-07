@@ -785,7 +785,6 @@ class MfSettings(QWidget, StateWid):
         name_text.setFixedHeight(GroupChild.hh)
         self.name_wid.layout_.addWidget(name_text)
 
-        # self.mf_paths = MfPaths(mf)
         self.mf_paths = PathWidget(mf)
         main_lay.addWidget(self.mf_paths)
 
