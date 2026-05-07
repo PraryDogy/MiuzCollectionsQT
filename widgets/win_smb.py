@@ -3,13 +3,20 @@ import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
-                             QPushButton, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
+                             QLabel, QPushButton, QVBoxLayout, QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
+from system.multiprocess import ProcessWorker
 from widgets._base_widgets import PathWidget, UMainWindow
+
+
+def restart_app():
+    ProcessWorker.stop_all()
+    QApplication.quit()
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 class WarnWidget(QWidget):
@@ -36,7 +43,6 @@ class WarnWidget(QWidget):
 
 
 class WinSmb(UMainWindow):
-    clicked = pyqtSignal(str)
 
     def __init__(self, mf: Mf):
         super().__init__()
@@ -51,6 +57,7 @@ class WinSmb(UMainWindow):
         self.central_layout.addWidget(warn_widget)
 
         self.path_widget = PathWidget(mf)
+        self.path_widget.textChanged.connect(self.path_wid_changed)
         self.central_layout.addWidget(self.path_widget)
 
         btns_wid = QWidget()
@@ -60,22 +67,27 @@ class WinSmb(UMainWindow):
         btns_lay.setSpacing(10)
 
         btns_lay.addStretch()
-        ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
-        ok_btn.clicked.connect(self.ok_clicked)
-        ok_btn.setFixedWidth(90)
-        btns_lay.addWidget(ok_btn)
+        self.ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn.clicked.connect(self.ok_clicked)
+        self.ok_btn.setFixedWidth(100)
+        btns_lay.addWidget(self.ok_btn)
         cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(90)
+        cancel_btn.setFixedWidth(100)
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()
 
         self.adjustSize()
+    
+    def path_wid_changed(self):
+        if self.path_widget.url and os.path.exists(self.path_widget.url):
+            self.ok_btn.setText(Lng.restart[Cfg.lng_index])
 
     def ok_clicked(self):
-        if self.path_widget.url:
-            self.clicked.emit(self.path_widget.url)
-            self.deleteLater()
+        if self.path_widget.url and os.path.exists(self.path_widget.url):
+            self.mf.mf_paths = [self.path_widget.url, ]
+            Mf.write_json_data()
+            restart_app()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:

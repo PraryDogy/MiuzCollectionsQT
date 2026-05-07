@@ -293,17 +293,7 @@ class WinMain(UMainWindow):
         self.filters_win.show()
 
     def open_win_smb(self, parent: QWidget, mf: Mf):
-
-        print(mf.mf_alias)
-
-        def fin(url: str):
-            if os.path.exists(url):
-                Mf.current_mf.mf_paths.clear()
-                Mf.current_mf.mf_paths = [url, ]
-                Mf.write_json_data()
-
         self.win_smb = WinSmb(mf)
-        self.win_smb.clicked.connect(fin)
         self.win_smb.center_to_parent(self.win_list[-2])
         self.win_smb.show()
  
