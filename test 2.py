@@ -174,8 +174,14 @@ class WinSmb(UMainWindow):
             self.clicked.emit(self.path_widget.url)
             self.deleteLater()
 
-Mf.json_to_app()
-app = QApplication(sys.argv)
-main_win = WinSmb()
-main_win.show()
-app.exec()
+# Mf.json_to_app()
+# app = QApplication(sys.argv)
+# main_win = WinSmb()
+# main_win.show()
+# app.exec()
+
+
+a = [1, 2, 3, 4, 5]
+b = a[:1]
+
+print(b)

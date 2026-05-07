@@ -47,7 +47,9 @@ class Mf:
                     print("mf нет путей", mf["mf_alias"])
                     continue
                 else:
-                    cls.items.append(Mf(**mf))
+                    mf = Mf(**mf)
+                    mf.mf_paths = mf.mf_paths[:1]
+                    cls.items.append(mf)
             if len(cls.items) != 0:
                 cls.current_mf = cls.items[0]
                 return True
