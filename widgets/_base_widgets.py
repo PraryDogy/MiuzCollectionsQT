@@ -1,9 +1,11 @@
-from PyQt5.QtCore import QSize, Qt, QTimer
+import os
+
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsDropShadowEffect, QHBoxLayout, QLabel,
-                             QLineEdit, QListWidget, QListWidgetItem,
+from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
+                             QGraphicsDropShadowEffect, QGroupBox, QHBoxLayout,
+                             QLabel, QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QPushButton, QScrollArea,
                              QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Optional
@@ -361,3 +363,104 @@ class HSep(QFrame):
         super().__init__()
         self.setStyleSheet("background: rgba(128, 128, 128, 0.2)")
         self.setFixedHeight(1)
+
+
+class PathWidget(QGroupBox):
+    magnifier = "images/magnifier.svg"
+    green_checkmark = "images/green_checkmark.svg"
+    max_row = 45
+    clicked = pyqtSignal(str)
+    def __init__(self):
+        super().__init__()
+        self.url = None
+        self.setAcceptDrops(True)
+        self.setFixedHeight(90)
+    
+        self.main_lay = QVBoxLayout(self)
+        self.main_lay.setContentsMargins(2, 20, 2, 20)
+        self.main_lay.setSpacing(0)
+
+        self.main_wid = self.no_path_widget()
+        self.main_lay.addWidget(self.main_wid)
+
+    def no_path_widget(self):
+        wid = QWidget()
+
+        h_lay = QHBoxLayout(wid)
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(10)
+
+        h_lay.addStretch()
+
+        right_btn = QSvgWidget()
+        right_btn.load(self.magnifier)
+        right_btn.setFixedSize(35, 35)
+        h_lay.addWidget(right_btn)
+
+        left_label = QLabel(Lng.path_hint_texts[Cfg.lng_index])
+        left_label.setWordWrap(True)
+        h_lay.addWidget(left_label)
+
+        h_lay.addStretch()
+
+        return wid
+    
+    def ok_path_widget(self):
+        wid = QWidget()
+
+        h_lay = QHBoxLayout(wid)
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(10)
+
+        h_lay.addStretch()
+
+        right_btn = QSvgWidget()
+        right_btn.load(self.green_checkmark)
+        right_btn.setFixedSize(35, 35)
+        h_lay.addWidget(right_btn)
+
+        if len(self.url) > self.max_row * 2:
+            url = self.url[:self.max_row*2] + "..."
+        url = self.lined_text(self.url)
+
+        left_label = QLabel(url)
+        h_lay.addWidget(left_label)
+
+        h_lay.addStretch()
+
+        return wid
+
+    def lined_text(self, text: str) -> str:
+        if len(text) > self.max_row:
+            return "\n".join(
+                text[i:i + self.max_row]
+                for i in range(0, len(text), self.max_row)
+            )
+        return text
+
+    def mouseReleaseEvent(self, a0):
+        dialog = QFileDialog()
+        url = dialog.getExistingDirectory()
+        if url:
+            self.url = url
+            self.clicked.emit(url)
+            self.main_wid.deleteLater()
+            self.main_wid = self.ok_path_widget()
+            self.main_lay.addWidget(self.main_wid)
+        return super().mouseReleaseEvent(a0)
+    
+    def dragEnterEvent(self, a0):
+        a0.accept()
+        return super().dragEnterEvent(a0)
+        
+    def dropEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
+            if url and os.path.isdir(url):
+                self.url = url
+                self.clicked.emit(url)
+                self.main_wid.deleteLater()
+                self.main_wid = self.ok_path_widget()
+                self.main_lay.addWidget(self.main_wid)
+
+        return super().dropEvent(a0)
