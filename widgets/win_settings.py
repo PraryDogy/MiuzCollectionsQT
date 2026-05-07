@@ -890,7 +890,7 @@ class MfSettings(QWidget, StateWid):
             Mf.write_json_data()
             restart_app()
 
-        paths = self.mf_paths.get_list()
+        paths = [self.mf_paths.url, ]
         stop_list = self.mf_stop_list.get_list()
 
         def show_warn(text: str):
@@ -942,10 +942,8 @@ class NewFolder(QWidget, StateWid):
         self.name_line_edit.setPlaceholderText(Lng.alias_immutable[Cfg.lng_index])
         name_wid.layout_.addWidget(self.name_line_edit)
 
-        self.mf_paths = MfPaths(self.mf)
-        self.mf_paths.new_mf_alias_name.connect(
-            lambda text: self.name_line_edit.setText(text)
-        )
+        self.mf_paths = PathWidget(self.mf)
+        self.mf_paths.no_path_widget()
         main_lay.addWidget(self.mf_paths)
 
         self.mf_stop_list = MfStopList(self.mf)
@@ -986,7 +984,9 @@ class NewFolder(QWidget, StateWid):
             basename = os.path.basename(url)
             self.name_line_edit.setText(basename)
             self.warning_svg.show()
-        self.mf_paths.text_edit_wid.setPlainText(url)
+            
+            self.mf_paths.url = url
+            self.mf_paths.ok_path_widget()
 
     def save_fin(self, folder_name: str, paths: list, stop_list: list):
         self.mf.mf_alias = folder_name

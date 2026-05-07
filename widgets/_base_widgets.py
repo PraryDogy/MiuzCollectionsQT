@@ -369,7 +369,6 @@ class HSep(QFrame):
 class PathWidget(QGroupBox):
     magnifier = "images/magnifier.svg"
     green_checkmark = "images/green_checkmark.svg"
-    max_row = 45
     ww = 70
     icon_size = 35
     textChanged = pyqtSignal(str)
@@ -383,20 +382,24 @@ class PathWidget(QGroupBox):
         self.main_lay.setContentsMargins(6, 2, 6, 2)
         self.main_lay.setSpacing(0)
 
+        self.main_wid = QWidget()
+
         mf_path = mf.get_avaiable_mf_path()
         if mf_path:
             mf.set_mf_current_path(mf_path)
             self.url = mf_path
-            self.main_wid = self.ok_path_widget()
+            self.ok_path_widget()
         else:
             self.url = None
-            self.main_wid = self.no_path_widget()
+            self.no_path_widget()
         self.main_lay.addWidget(self.main_wid)
 
     def no_path_widget(self):
-        wid = QWidget()
+        self.main_wid.deleteLater()
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
 
-        h_lay = QHBoxLayout(wid)
+        h_lay = QHBoxLayout(self.main_wid)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
@@ -415,13 +418,13 @@ class PathWidget(QGroupBox):
         h_lay.addWidget(left_label)
 
         h_lay.addStretch()
-
-        return wid
     
     def ok_path_widget(self):
-        wid = QWidget()
+        self.main_wid.deleteLater()
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
 
-        h_lay = QHBoxLayout(wid)
+        h_lay = QHBoxLayout(self.main_wid)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
@@ -430,15 +433,10 @@ class PathWidget(QGroupBox):
         right_btn.setFixedSize(35, 35)
         h_lay.addWidget(right_btn)
 
-        if len(self.url) > self.max_row * 2:
-            url = self.url[:self.max_row*2] + "..."
-        url = self.lined_text(self.url)
-
         lines = (
             f"{Lng.folder_path[Cfg.lng_index]}:",
-            url
+            self.url
         )
-
         left_label = QLabel('\n'.join(lines))
         fl = Qt.TextInteractionFlag.TextSelectableByMouse
         left_label.setTextInteractionFlags(fl)
@@ -446,16 +444,6 @@ class PathWidget(QGroupBox):
         h_lay.addWidget(left_label)
 
         h_lay.addStretch()
-
-        return wid
-
-    def lined_text(self, text: str) -> str:
-        if len(text) > self.max_row:
-            return "\n".join(
-                text[i:i + self.max_row]
-                for i in range(0, len(text), self.max_row)
-            )
-        return text
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
         if not a0.button() != 2:
@@ -465,9 +453,7 @@ class PathWidget(QGroupBox):
         if url:
             self.url = url
             self.textChanged.emit(url)
-            self.main_wid.deleteLater()
-            self.main_wid = self.ok_path_widget()
-            self.main_lay.addWidget(self.main_wid)
+            self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
     
     def dragEnterEvent(self, a0):
@@ -480,8 +466,6 @@ class PathWidget(QGroupBox):
             if url and os.path.isdir(url):
                 self.url = url
                 self.textChanged.emit(url)
-                self.main_wid.deleteLater()
-                self.main_wid = self.ok_path_widget()
-                self.main_lay.addWidget(self.main_wid)
+                self.ok_path_widget()
 
         return super().dropEvent(a0)
