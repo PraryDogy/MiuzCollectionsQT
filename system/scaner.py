@@ -37,8 +37,7 @@ class Tools:
     def log(text: str):
         filepath = os.path.join(Static.external_files_dir, "log.txt")
         with open(filepath, "a") as f:
-            sep = f"\n\n=====\n\n"
-            f.write(sep + text)
+            f.write(text)
 
 
 class _DirsLoader:
@@ -619,7 +618,9 @@ class AllDirScaner:
         finder_lines = [f"{i.abs_path}, {i.rel_path}" for i in finder_dirs]
         removed_lines = [f"{i.abs_path}, {i.rel_path}" for i in removed_dirs]
         now_line = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
+        sep = "\n\n==========="
         lines = [
+            sep,
             now_line,
             f"Mf: {scaner_item.mf.mf_alias}, {scaner_item.mf.mf_current_path}",
             "Удаление директорий:",
@@ -631,6 +632,7 @@ class AllDirScaner:
             "",
             "Список removed dirs (абсолютный путь, относительный путь)",
             *removed_lines,
+            sep
         ]
         Tools.log("\n".join(lines))
 
