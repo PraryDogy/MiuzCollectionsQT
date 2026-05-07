@@ -132,6 +132,14 @@ class Utils:
         icon = QIcon(pixmap)
         return icon.pixmap(QSize(new_w, new_h))
 
+    def short_text(self, text: str, row_limit: int = 100) -> str:
+        """
+        Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
+        """
+        if len(text) > row_limit:
+            return f"{text[:row_limit]}..."
+        return text
+
     @classmethod
     def print_error(cls):
         print()
