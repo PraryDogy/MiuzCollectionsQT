@@ -230,7 +230,7 @@ class WinMain(UMainWindow):
             self.start_scaner_task()
             path = Mf.current_mf.get_avaiable_mf_path()
             if path is None:
-                QTimer.singleShot(100, self.open_win_smb)
+                QTimer.singleShot(100, lambda: self.open_win_smb(self, Mf.current_mf))
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
@@ -292,7 +292,9 @@ class WinMain(UMainWindow):
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
 
-    def open_win_smb(self, *args):
+    def open_win_smb(self, parent: QWidget, mf: Mf):
+
+        print(mf.mf_alias)
 
         def fin(url: str):
             if os.path.exists(url):
@@ -300,7 +302,7 @@ class WinMain(UMainWindow):
                 Mf.current_mf.mf_paths = [url, ]
                 Mf.write_json_data()
 
-        self.win_smb = WinSmb()
+        self.win_smb = WinSmb(mf)
         self.win_smb.clicked.connect(fin)
         self.win_smb.center_to_parent(self.win_list[-2])
         self.win_smb.show()

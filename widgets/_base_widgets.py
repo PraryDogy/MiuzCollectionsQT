@@ -12,6 +12,7 @@ from typing_extensions import Optional
 
 from cfg import Cfg
 from system.lang import Lng
+from system.main_folder import Mf
 from system.utils import Utils
 
 
@@ -370,9 +371,10 @@ class PathWidget(QGroupBox):
     green_checkmark = "images/green_checkmark.svg"
     max_row = 45
     clicked = pyqtSignal(str)
-    def __init__(self):
+    def __init__(self, mf: Mf):
         super().__init__()
         self.url = None
+        self.mf = mf
         self.setAcceptDrops(True)
         self.setFixedHeight(90)
     
@@ -380,7 +382,13 @@ class PathWidget(QGroupBox):
         self.main_lay.setContentsMargins(2, 20, 2, 20)
         self.main_lay.setSpacing(0)
 
-        self.main_wid = self.no_path_widget()
+        mf_path = mf.get_avaiable_mf_path()
+        if mf_path:
+            mf.set_mf_current_path(mf_path)
+            self.url = mf_path
+            self.main_wid = self.ok_path_widget()
+        else:
+            self.main_wid = self.no_path_widget()
         self.main_lay.addWidget(self.main_wid)
 
     def no_path_widget(self):

@@ -14,7 +14,7 @@ from widgets._base_widgets import PathWidget, UMainWindow
 
 class WarnWidget(QWidget):
     warn = "images/warning.svg"
-    def __init__(self):
+    def __init__(self, mf: Mf):
         super().__init__()
         h_lay = QHBoxLayout(self)
         h_lay.setContentsMargins(2, 5, 2, 5)
@@ -26,7 +26,7 @@ class WarnWidget(QWidget):
         h_lay.addWidget(warn_wid)
 
         lines = (
-            f"{Lng.access_error_text[Cfg.lng_index]} \"{Mf.current_mf.mf_alias}\".",
+            f"{Lng.access_error_text[Cfg.lng_index]} \"{mf.mf_alias}\".",
             Lng.network_error_text[Cfg.lng_index]
         )
         up_label = QLabel("\n".join(lines))
@@ -37,19 +37,19 @@ class WarnWidget(QWidget):
 class WinSmb(UMainWindow):
     clicked = pyqtSignal(str)
 
-    def __init__(self):
+    def __init__(self, mf: Mf):
         super().__init__()
         self.set_close_only()
         self.set_always_on_top()
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
-        self.url = ""
+        self.mf = mf
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
 
-        warn_widget = WarnWidget()
+        warn_widget = WarnWidget(mf)
         self.central_layout.addWidget(warn_widget)
 
-        self.path_widget = PathWidget()
+        self.path_widget = PathWidget(mf)
         self.central_layout.addWidget(self.path_widget)
 
         btns_wid = QWidget()
