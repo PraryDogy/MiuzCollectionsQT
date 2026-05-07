@@ -379,7 +379,7 @@ class PathWidget(QGroupBox):
         self.setFixedHeight(90)
     
         self.main_lay = QVBoxLayout(self)
-        self.main_lay.setContentsMargins(2, 20, 2, 20)
+        self.main_lay.setContentsMargins(2, 2, 2, 2)
         self.main_lay.setSpacing(0)
 
         mf_path = mf.get_avaiable_mf_path()
@@ -399,15 +399,19 @@ class PathWidget(QGroupBox):
         h_lay.setSpacing(10)
 
         h_lay.addStretch()
+        
+        lines = (
+            f"{Lng.folder_path[Cfg.lng_index]}:",
+            Lng.path_hint_texts[Cfg.lng_index].lower()
+        )
+        left_label = QLabel("\n".join(lines))
+        left_label.setWordWrap(True)
+        h_lay.addWidget(left_label, alignment=Qt.AlignmentFlag.AlignLeft)
 
         right_btn = QSvgWidget()
         right_btn.load(self.magnifier)
         right_btn.setFixedSize(35, 35)
-        h_lay.addWidget(right_btn)
-
-        left_label = QLabel(Lng.path_hint_texts[Cfg.lng_index])
-        left_label.setWordWrap(True)
-        h_lay.addWidget(left_label)
+        h_lay.addWidget(right_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         h_lay.addStretch()
 
@@ -431,7 +435,12 @@ class PathWidget(QGroupBox):
             url = self.url[:self.max_row*2] + "..."
         url = self.lined_text(self.url)
 
-        left_label = QLabel(url)
+        lines = (
+            f"{Lng.folder_path[Cfg.lng_index]}:",
+            url
+        )
+
+        left_label = QLabel('\n'.join(lines))
         h_lay.addWidget(left_label)
 
         h_lay.addStretch()
