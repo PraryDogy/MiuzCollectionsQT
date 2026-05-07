@@ -440,6 +440,9 @@ class PathWidget(QGroupBox):
         )
 
         left_label = QLabel('\n'.join(lines))
+        fl = Qt.TextInteractionFlag.TextSelectableByMouse
+        left_label.setTextInteractionFlags(fl)
+        left_label.setCursor(Qt.CursorShape.IBeamCursor)
         h_lay.addWidget(left_label)
 
         h_lay.addStretch()
