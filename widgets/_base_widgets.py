@@ -227,7 +227,7 @@ class WindowMixin:
         return super().deleteLater()
 
 
-class UMainWindow(QMainWindow, WindowMixin):
+class UMainWindow(WindowMixin, QMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         central_widget = QWidget(self)
