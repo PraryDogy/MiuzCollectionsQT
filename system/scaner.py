@@ -1,5 +1,6 @@
 import os
 import traceback
+from datetime import datetime
 from multiprocessing import Queue
 from time import sleep
 
@@ -610,10 +611,17 @@ class AllDirScaner:
             _DirsToScanWorker.start(dirs_to_scan, scaner_item)
     
     @staticmethod
-    def log_removed_dirs(finder_dirs: list[ScanerDirItem], removed_dirs: list[ScanerDirItem]):
+    def log_removed_dirs(
+        scaner_item: ScanerItem,
+        finder_dirs: list[ScanerDirItem],
+        removed_dirs: list[ScanerDirItem]
+    ):
         finder_lines = [f"{i.abs_path}, {i.rel_path}" for i in finder_dirs]
         removed_lines = [f"{i.abs_path}, {i.rel_path}" for i in removed_dirs]
+        now_line = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
         lines = [
+            now_line,
+            f"Mf: {scaner_item.mf.mf_alias}, {scaner_item.mf.mf_current_path}",
             "Удаление директорий:",
             f"finder dirs: {len(finder_lines)}",
             f"removed dirs: {len(removed_lines)}",
