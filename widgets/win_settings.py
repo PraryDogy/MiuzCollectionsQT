@@ -26,7 +26,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, SmallBtn, UHBoxLayout, ULineEdit,
+from ._base_widgets import (HSep, PathWidget, SmallBtn, UHBoxLayout, ULineEdit,
                             UListSpacerItem, UListWidgetItem, UMainWindow,
                             UMenu, UTextEdit, UVBoxLayout, VListWidget)
 from .win_warn import ConfirmWindow, WarningWindow
@@ -785,7 +785,8 @@ class MfSettings(QWidget, StateWid):
         name_text.setFixedHeight(GroupChild.hh)
         self.name_wid.layout_.addWidget(name_text)
 
-        self.mf_paths = MfPaths(mf)
+        # self.mf_paths = MfPaths(mf)
+        self.mf_paths = PathWidget(mf)
         main_lay.addWidget(self.mf_paths)
 
         self.mf_stop_list = MfStopList(mf)
@@ -827,7 +828,8 @@ class MfSettings(QWidget, StateWid):
         QTimer.singleShot(100, self.text_changed)
 
     def text_changed(self):
-        for i in (self.mf_paths, self.mf_stop_list):
+        # self.mf_paths, 
+        for i in (self.mf_stop_list):
             i.textChanged.connect(self.mf_save.warning_svg.show)
             self.set_was_changed()
 
