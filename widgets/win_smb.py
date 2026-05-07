@@ -1,4 +1,5 @@
 import os
+import sys
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
