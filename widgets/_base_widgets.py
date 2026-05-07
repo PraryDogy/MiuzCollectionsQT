@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette
+from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette, QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
                              QGraphicsDropShadowEffect, QGroupBox, QHBoxLayout,
@@ -372,8 +372,7 @@ class PathWidget(QGroupBox):
     max_row = 45
     ww = 70
     icon_size = 35
-
-    clicked = pyqtSignal(str)
+    textChanged = pyqtSignal(str)
     def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
@@ -455,12 +454,14 @@ class PathWidget(QGroupBox):
             )
         return text
 
-    def mouseReleaseEvent(self, a0):
+    def mouseReleaseEvent(self, a0: QMouseEvent):
+        if not a0.button() != 2:
+            return
         dialog = QFileDialog()
         url = dialog.getExistingDirectory()
         if url:
             self.url = url
-            self.clicked.emit(url)
+            self.textChanged.emit(url)
             self.main_wid.deleteLater()
             self.main_wid = self.ok_path_widget()
             self.main_lay.addWidget(self.main_wid)
@@ -475,7 +476,7 @@ class PathWidget(QGroupBox):
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
                 self.url = url
-                self.clicked.emit(url)
+                self.textChanged.emit(url)
                 self.main_wid.deleteLater()
                 self.main_wid = self.ok_path_widget()
                 self.main_lay.addWidget(self.main_wid)

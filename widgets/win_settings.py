@@ -827,8 +827,7 @@ class MfSettings(QWidget, StateWid):
         QTimer.singleShot(100, self.text_changed)
 
     def text_changed(self):
-        # self.mf_paths, 
-        for i in (self.mf_stop_list, ):
+        for i in (self.mf_paths, self.mf_stop_list):
             i.textChanged.connect(self.mf_save.warning_svg.show)
             self.set_was_changed()
 
