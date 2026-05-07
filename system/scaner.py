@@ -602,10 +602,29 @@ class AllDirScaner:
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существуетre
         if removed_dirs:
-            _RemovedDirsWorker.remove_thumbs(removed_dirs, scaner_item)
-            _RemovedDirsWorker.remove_dirs(removed_dirs, scaner_item)
+            AllDirScaner.log_removed_dirs(finder_dirs, removed_dirs)
+            if len(finder_dirs) != len(removed_dirs):
+                _RemovedDirsWorker.remove_thumbs(removed_dirs, scaner_item)
+                _RemovedDirsWorker.remove_dirs(removed_dirs, scaner_item)
         if dirs_to_scan:
             _DirsToScanWorker.start(dirs_to_scan, scaner_item)
+    
+    @staticmethod
+    def log_removed_dirs(finder_dirs: list[ScanerDirItem], removed_dirs: list[ScanerDirItem]):
+        finder_lines = [f"{i.abs_path}, {i.rel_path}" for i in finder_dirs]
+        removed_lines = [f"{i.abs_path}, {i.rel_path}" for i in removed_dirs]
+        lines = [
+            "Удаление директорий:",
+            f"finder dirs: {len(finder_lines)}",
+            f"removed dirs: {len(removed_lines)}",
+            "",
+            "Список finder dirs (абсолютный путь, относительный путь)",
+            *finder_lines,
+            "",
+            "Список removed dirs (абсолютный путь, относительный путь)",
+            *removed_lines,
+        ]
+        Tools.log("\n".join(lines))
 
 
 class SingleDirScaner:
