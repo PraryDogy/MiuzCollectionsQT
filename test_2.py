@@ -142,6 +142,7 @@ class WinSmb(UMainWindow):
         super().__init__()
         self.set_close_only()
         self.set_always_on_top()
+        self.setWindowTitle(Lng.attention[Cfg.lng_index])
         self.url = ""
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
@@ -181,9 +182,9 @@ class WinSmb(UMainWindow):
             self.deleteLater()
         return super().keyPressEvent(a0)
 
-# Mf.json_to_app()
-# app = QApplication(sys.argv)
-# main_win = WinSmb()
-# main_win.show()
-# app.exec()
+Mf.json_to_app()
+app = QApplication(sys.argv)
+main_win = WinSmb()
+main_win.show()
+app.exec()
 
