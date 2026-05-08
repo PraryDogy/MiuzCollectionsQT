@@ -83,22 +83,22 @@ class ImgWid(ULabel):
 
 
 class WhiteTextWid(ULabel):
-    def __init__(self, name: str):
+    def __init__(self, data_item: DataItem):
         super().__init__()
-        self.name = name
+        self.data_item = data_item
         self.set_no_frame()
 
     def set_text(self) -> None:
         max_row = self.row_limits[Dynamic.thumb_size_index]
         lines: list[str] = []
-        if len(self.name) > max_row:
-            first_line = self.name[:max_row]
-            second_line = self.name[max_row:]
+        if len(self.data_item.filename) > max_row:
+            first_line = self.data_item.filename[:max_row]
+            second_line = self.data_item.filename[max_row:]
             if len(second_line) > max_row:
                 second_line = self.short_text(second_line)
             lines.extend([first_line, second_line])
         else:
-            lines.append(self.name)
+            lines.append(self.data_item.filename)
         self.setText("\n".join(lines))
 
     def set_frame(self):
@@ -124,21 +124,20 @@ class WhiteTextWid(ULabel):
     
     
 class BlueTextWid(ULabel):
-    def __init__(self, rel_path: str, day_month_year: str):
+    def __init__(self, data_item: DataItem):
         super().__init__()
-        self.rel_path = rel_path
-        self.day_month_year = day_month_year
+        self.data_item = data_item
         self.set_text()
         self.set_style()
 
     def set_text(self):
-        root = self.rel_path.strip(os.sep).split(os.sep)
+        root = self.data_item.rel_path.strip(os.sep).split(os.sep)
         if len(root) == 1:
             root = os.path.basename(Mf.current_mf.mf_alias)
         else:
             root = root[0]
         first_row = self.short_text(root)
-        text = "\n".join((first_row, self.day_month_year))
+        text = "\n".join((first_row, self.data_item.day_month_year))
         self.setText(text)
 
     def set_style(self):
@@ -176,10 +175,10 @@ class Thumb(QFrame):
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.white_text_wid = WhiteTextWid(self.data_item.filename)
+        self.white_text_wid = WhiteTextWid(self.data_item)
         self.v_layout.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.blue_text_wid = BlueTextWid(self.data_item.rel_path, self.data_item.day_month_year)
+        self.blue_text_wid = BlueTextWid(self.data_item)
         self.v_layout.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = (
@@ -237,7 +236,7 @@ class Thumb(QFrame):
                 f"{os.path.basename(self.data_item.rel_path)}"
             )
 
-        self.white_text_wid.name = self.data_item.filename
+        self.white_text_wid.data_item.filename = self.data_item.filename
         self.white_text_wid.set_text()
 
 
