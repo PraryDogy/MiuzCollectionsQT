@@ -221,6 +221,14 @@ class WindowMixin:
         except Exception as e:
             print("center error:", e)
 
+    def set_always_on_top(self: QWidget):
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+    def set_close_only(self: QWidget):
+        flags = Qt.WindowType.CustomizeWindowHint
+        flags |= Qt.WindowType.WindowCloseButtonHint
+        self.setWindowFlags(flags)
+
     def closeEvent(self, a0: QCloseEvent | None) -> None:
         self.unregister_window()
         return super().closeEvent(a0)
@@ -239,13 +247,13 @@ class UMainWindow(WindowMixin, QMainWindow):
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.register_window()
 
-    def set_always_on_top(self):
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-    def set_close_only(self):
-        flags = Qt.WindowType.CustomizeWindowHint
-        flags |= Qt.WindowType.WindowCloseButtonHint
-        self.setWindowFlags(flags)
+class UMainWidget(WindowMixin, QWidget):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+        self.central_layout = UVBoxLayout(self)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.register_window()
 
 
 class UListWidgetItem(QListWidgetItem):

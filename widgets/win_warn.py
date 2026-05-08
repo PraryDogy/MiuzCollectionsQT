@@ -5,10 +5,10 @@ from PyQt5.QtWidgets import QLabel
 from cfg import Cfg
 from system.lang import Lng
 
-from ._base_widgets import SmallBtn, UHBoxLayout, UMainWindow
+from ._base_widgets import SmallBtn, UHBoxLayout, UMainWidget
 
 
-class ConfirmWindow(UMainWindow):
+class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     ww = 360
     svg_icon = "./images/warning.svg"
@@ -19,9 +19,10 @@ class ConfirmWindow(UMainWindow):
         self.set_close_only()
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
         self.setMaximumWidth(360)
-        self.setMinimumWidth(300)
+        self.setMinimumWidth(280)
 
         text_layout = UHBoxLayout()
+        text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(15)
         self.central_layout.addLayout(text_layout)
 
@@ -36,6 +37,7 @@ class ConfirmWindow(UMainWindow):
         text_layout.addWidget(text_wid)
 
         btn_layout = UHBoxLayout()
+        btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.addLayout(btn_layout)
@@ -50,6 +52,9 @@ class ConfirmWindow(UMainWindow):
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn)
 
+        self.central_layout.setContentsMargins(5, 0, 5, 0)
+        self.central_layout.setSpacing(0)
+
         self.adjustSize()
 
     def keyPressEvent(self, a0):
@@ -63,6 +68,7 @@ class ConfirmWindow(UMainWindow):
 class WarningWindow(ConfirmWindow):
     def __init__(self, text):
         super().__init__(text)
-        self.cancel_btn.deleteLater()
+        self.cancel_btn.hide()
         self.ok_btn.disconnect()
         self.ok_btn.clicked.connect(self.deleteLater)
+        self.adjustSize()
