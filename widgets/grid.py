@@ -24,23 +24,12 @@ from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       WinInfoAction)
 
 
-class FilenameWid(QLabel):
-    """
-    QLabel для отображения текста с ограничением по длине и разбиением на строки.
-
-    Атрибуты:
-        name (str): основной текст.
-    """
-
+class WhiteTextWid(QLabel):
     def __init__(self, parent: QWidget, name: str):
         super().__init__(parent)
         self.name = name
 
     def set_text(self) -> None:
-        """
-        Устанавливает текст QLabel с учетом максимальной длины строки.
-        Делит длинный текст на две строки и сокращает, если необходимо.
-        """
         name: str = self.name
         ind = Dynamic.thumb_size_index
         max_row = Static.row_limits[ind]
@@ -60,12 +49,8 @@ class FilenameWid(QLabel):
         self.setText("\n".join(lines))
 
     def short_text(self, text: str, max_row: int) -> str:
-        """
-        Сокращает текст, оставляя начало и конец, вставляя "..." посередине.
-        """
         return f"{text[:max_row - 10]}...{text[-7:]}"
 
-    # --- Передача событий родительскому QLabel ---
     def mouseReleaseEvent(self, ev):
         super().mouseReleaseEvent(ev)
 
@@ -93,16 +78,7 @@ class ImgWid(QLabel):
         return super().mouseDoubleClickEvent(a0)
 
 
-class BelowTextWid(QLabel):
-    """
-    QLabel для отображения расширенной информации о миниатюре.
-
-    Особенности:
-        - Показывает сокращённое название коллекции и дату/модификацию.
-        - Текст центрирован.
-        - Цвет текста синий (#6199E4).
-    """
-
+class BlueTextWid(QLabel):
     STYLE = """
         font-size: 11px;
         color: #6199E4;
@@ -127,9 +103,6 @@ class BelowTextWid(QLabel):
         self.setStyleSheet(self.STYLE)
     
     def short_text(self, text: str) -> str:
-        """
-        Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
-        """
         max_row = Static.row_limits[Dynamic.thumb_size_index]
         if len(text) > max_row:
             return f"{text[:max_row]}..."
@@ -137,34 +110,14 @@ class BelowTextWid(QLabel):
 
 
 class Thumbnail(QFrame):
-    """
-    Виджет миниатюры изображения с текстовой информацией и визуальной рамкой.
-
-    Сигналы:
-        reload_thumbnails (pyqtSignal): испускается при изменении избранного в текущей коллекции.
-        select (pyqtSignal[str]): испускается при выборе миниатюры, передает путь к файлу.
-
-    Атрибуты класса (настраиваемые):
-        sym_star (str): символ для избранного.
-        img_frame_size, pixmap_size, thumb_w, thumb_h, corner (int): размеры элементов миниатюры.
-        IMG_FRAME_STYLE, TEXT_FRAME_STYLE, IMG_NO_FRAME_STYLE, TEXT_NO_FRAME_STYLE (str): стили для рамки и текста.
-    """
-
-    # --- Сигналы ---
     reload_thumbnails = pyqtSignal()
-
-    # --- Константы ---
     sym_star = "\U00002605"
-
-    # --- Параметры размеров (будут изменяться при calculate_size) ---
     img_frame_size = 0
     pixmap_size = 0
     thumb_w = 0
     thumb_h = 0
     corner = 0
 
-    # --- Стили (f-строки с тройными кавычками) ---
-    # bg_color будет ссылаться на Static.rgba_gray и Static.rgba_blue
     IMG_FRAME_STYLE = f"""
         border-radius: {{corner}}px;
         color: rgb(255,255,255);
@@ -215,11 +168,11 @@ class Thumbnail(QFrame):
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.text_wid = FilenameWid(self, self.name)
+        self.text_wid = WhiteTextWid(self, self.name)
         self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(self.text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.below_text = BelowTextWid(self)
+        self.below_text = BlueTextWid(self)
         self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = f"{Lng.location[Cfg.lng_index]}: {Mf.current_mf.mf_alias}{rel_path}"
@@ -604,7 +557,7 @@ class Grid(VScrollArea):
 
     def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumbnail:
         wid = QApplication.widgetAt(a0.globalPos())
-        if isinstance(wid, (ImgWid, FilenameWid)):
+        if isinstance(wid, (ImgWid, WhiteTextWid)):
             return wid.parent()
         else:
             return None
@@ -739,7 +692,7 @@ class Grid(VScrollArea):
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
 
             for wid in self.cell_to_wid.values():
-                widgets = wid.findChildren((FilenameWid, ImgWid))
+                widgets = wid.findChildren((WhiteTextWid, ImgWid))
                 intersects = any(
                     rect.intersects(QRect(child.mapTo(self, QPoint(0, 0)), child.size()))
                     for child in widgets
