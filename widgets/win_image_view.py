@@ -222,7 +222,6 @@ class NextImgBtn(SwitchImgBtn):
 class WinImageView(UMainWindow):
     select_thumb = pyqtSignal(str)
     no_connection = pyqtSignal()
-    closed_ = pyqtSignal()
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
@@ -242,8 +241,6 @@ class WinImageView(UMainWindow):
         self.url_to_pixmap: dict[str, QPixmap] = {}
         self.img_view_item = img_view_item
         self.current_data_item = img_view_item.start_data_item
-
-        # self.wid = path_to_wid.get(self.rel_path)
 
         self.setStyleSheet("background: black;")
         self.setMinimumSize(QSize(self.min_w, self.min_h))
@@ -416,10 +413,6 @@ class WinImageView(UMainWindow):
         else:
             self.switch_image(-1)
         self.img_wid.setCursor(Qt.CursorShape.ArrowCursor)
-
-    def change_fav(self, value: int):
-        self.wid.set_fav(value)
-        self.set_title()
 
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
