@@ -157,7 +157,10 @@ class Lng:
         "Поле \"Имя\" обязательно для заполнения",
         "Alias field is required"
     )
-    select_folder_path = ("Укажите путь к каталогу", "Select path to the catalog")
+    select_folder_path = (
+        "Укажите путь к каталогу с изображениями",
+        "Select path to the images catalog"
+    )
     folder_path = ("Путь к каталогу", "Catalog path")
     general = ("Основные", "General")
     restart = ("Перезапуск", "Restart")
@@ -335,8 +338,8 @@ class Lng:
     error = ("Ошибка", "Error")
     next_search = ("Поиск новых изображений через", "Search new images in")
     string_limit = (
-        "Имя — 5-30 символов",
-        "Name — up to 5-30 characters",
+        "Длина имени должна составлять от 5 до 30 символов",
+        "The name length should be from 5 to 30 characters",
     )
     valid_message = (
         "Имя может содержать только русские и английские буквы, "
@@ -353,10 +356,6 @@ class Lng:
         "• unique\n"
         "• up to 5-30 characters\n"
         "• Russian and English letters, digits, and spaces",
-    )
-    folder_path_exists = (
-        "Такой каталог уже существует.\nИмя каталога:",
-        "Catalog already exists.\nCatalog name:"
     )
     first_load_title = (
         "Начальная настройка",

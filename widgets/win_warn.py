@@ -52,7 +52,7 @@ class ConfirmWindow(UMainWidget):
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn)
 
-        self.central_layout.setContentsMargins(5, 0, 5, 0)
+        self.central_layout.setContentsMargins(10, 5, 10, 5)
         self.central_layout.setSpacing(0)
 
         self.adjustSize()
