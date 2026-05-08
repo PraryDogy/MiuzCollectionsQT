@@ -21,7 +21,7 @@ from system.utils import Utils
 from ._base_widgets import UMenu, USubMenu, USvgSqareWidget, UMainWindow
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SetFav,
                       WinInfoAction)
-from .grid import Thumbnail
+from .grid import Thumb
 import numpy as np
 
 class ImgWid(QGraphicsView):
@@ -233,7 +233,7 @@ class WinImageView(UMainWindow):
     xx, yy = 0, 0
     window_style = """background: black;"""
 
-    def __init__(self, rel_path: str, path_to_wid: dict[str, Thumbnail], is_selection: bool):
+    def __init__(self, rel_path: str, path_to_wid: dict[str, Thumb], is_selection: bool):
         super().__init__()
 
         self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}

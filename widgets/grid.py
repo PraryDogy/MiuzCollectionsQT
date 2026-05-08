@@ -150,15 +150,15 @@ class BlueTextWid(ULabel):
         )
 
 
-class Thumbnail(QFrame):
+class Thumb(QFrame):
     reload_thumbnails = pyqtSignal()
     sym_star = "\U00002605"
     # длина списка идентична cfg static pixmap sizes
     thumb_heights = [130, 150, 185, 270]
     thumb_widths = [145, 145, 180, 230]
     img_wid_size = 0
-    thumbnail_width = 0
-    thumbnail_height = 0
+    thumb_width = 0
+    thumb_height = 0
 
     def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, month_year: str, day_month_year: str):
         super().__init__()
@@ -200,14 +200,14 @@ class Thumbnail(QFrame):
         """Пересчет размеров миниатюр в зависимости от индекса размера."""
         ind = Dynamic.thumb_size_index
         cls.img_wid_size = Static.pixmap_sizes[ind]
-        cls.thumbnail_width = cls.thumb_widths[ind]
-        cls.thumbnail_height = cls.thumb_heights[ind]
+        cls.thumb_width = cls.thumb_widths[ind]
+        cls.thumb_height = cls.thumb_heights[ind]
 
     def setup(self):
         """Настройка миниатюры: текст, размеры, изображение."""
         self.white_text_wid.set_text()
         self.blue_text_wid.set_text()
-        self.setFixedSize(self.thumbnail_width, self.thumbnail_height)
+        self.setFixedSize(self.thumb_width, self.thumb_height)
 
         self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
         self.img_wid.setPixmap(
@@ -350,11 +350,11 @@ class Grid(VScrollArea):
         super().__init__()
 
         # --- Состояние и данные ---
-        self.wid_under_mouse: Thumbnail = None
+        self.wid_under_mouse: Thumb = None
         self.origin_pos = QPoint()
-        self.selected_widgets: list[Thumbnail] = []
-        self.cell_to_wid: dict[tuple, Thumbnail] = {}
-        self.path_to_wid: dict[str, Thumbnail] = {}
+        self.selected_widgets: list[Thumb] = []
+        self.cell_to_wid: dict[tuple, Thumb] = {}
+        self.path_to_wid: dict[str, Thumb] = {}
         self.max_col: int = 0
         self.glob_row, self.glob_col = 0, 0
         self.is_first_load = True
@@ -422,7 +422,7 @@ class Grid(VScrollArea):
             self.load_grid_container()
             self.reset_grid_properties()
             self.clear_selected_widgets()
-            Thumbnail.calculate_size()
+            Thumb.calculate_size()
             if not db_images:
                 lbl = QLabel(Lng.no_photo[Cfg.lng_index])
                 self.grid_lay.addWidget(
@@ -444,7 +444,7 @@ class Grid(VScrollArea):
         self.grid_wid.hide()
         QTimer.singleShot(50, load_grid_delayed)
                         
-    def add_thumb_data(self, wid: Thumbnail):
+    def add_thumb_data(self, wid: Thumb):
         self.path_to_wid[wid.rel_path] = wid
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
         wid.row, wid.col = self.glob_row, self.glob_col        
@@ -452,7 +452,7 @@ class Grid(VScrollArea):
     def add_thumbnails_to_grid(self, db_images: list[DbImagesItem]):
 
         def create_thumb(image_item: DbImagesItem):
-            thumbnail = Thumbnail(
+            thumbnail = Thumb(
                 pixmap=pixmap,
                 rel_path=image_item.rel_img_path,
                 fav=image_item.fav,
@@ -485,7 +485,7 @@ class Grid(VScrollArea):
             self.wid_to_selected_widgets(wid)
     
     def reset_grid_properties(self):
-        self.max_col = self.width() // Thumbnail.thumb_widths[Dynamic.thumb_size_index]
+        self.max_col = self.width() // Thumb.thumb_widths[Dynamic.thumb_size_index]
         self.glob_row, self.glob_col = 0, 0
         for i in (self.cell_to_wid, self.path_to_wid):
             i.clear()
@@ -496,7 +496,7 @@ class Grid(VScrollArea):
         - Меняет размеры виджетов Thumbnail в текущей сетке
         - Переупорядочивает сетку в соотетствии с новыми размерами
         """
-        Thumbnail.calculate_size()
+        Thumb.calculate_size()
         for _, wid in self.cell_to_wid.items():
             wid.setup()
             if wid in self.selected_widgets:
@@ -520,7 +520,7 @@ class Grid(VScrollArea):
             self.glob_row += 1
 
         self.reset_grid_properties()
-        thumbnails = self.grid_wid.findChildren(Thumbnail)
+        thumbnails = self.grid_wid.findChildren(Thumb)
         if not thumbnails:
             return
 
@@ -545,7 +545,7 @@ class Grid(VScrollArea):
         if self.glob_col != 0:
             _next_row()
 
-    def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumbnail:
+    def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
         wid = QApplication.widgetAt(a0.globalPos())
         if isinstance(wid, (ImgWid, WhiteTextWid)):
             return wid.parent()
@@ -561,12 +561,12 @@ class Grid(VScrollArea):
             i.set_no_frame()
         self.selected_widgets.clear()
 
-    def wid_to_selected_widgets(self, wid: Thumbnail):
+    def wid_to_selected_widgets(self, wid: Thumb):
         """
         - Добавляет переданный виджет в selected widgets
         - Задает стиль переданному виджету
         """
-        if isinstance(wid, Thumbnail):
+        if isinstance(wid, Thumb):
             self.selected_widgets.append(wid)
             wid.set_frame()
                 
@@ -805,7 +805,7 @@ class Grid(VScrollArea):
                 self.menu_.addAction(paste)
                 self.menu_.addSeparator()
 
-        def menu_widget(clicked: Thumbnail):
+        def menu_widget(clicked: Thumb):
             if not self.selected_widgets:
                 self.wid_to_selected_widgets(clicked)
             elif clicked not in self.selected_widgets:
@@ -945,14 +945,14 @@ class Grid(VScrollArea):
     def checkScrollValue(self, value: int):
         """Обрабатывает прокрутку: показывает кнопку вверх, дату и подгружает миниатюры."""
 
-        def thumbnail_under_point(point: QPoint) -> Thumbnail | None:
+        def thumbnail_under_point(point: QPoint) -> Thumb | None:
             mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
             wid = self.scroll_wid.childAt(mapped_pos)
-            if wid and isinstance(wid.parent(), Thumbnail):
+            if wid and isinstance(wid.parent(), Thumb):
                 return wid.parent()
             return None
 
-        def update_date_wid(wid: Thumbnail):
+        def update_date_wid(wid: Thumb):
             self.date_wid.setText(wid.month_year)
             self.date_wid.adjustSize()
             self.date_wid.move(
