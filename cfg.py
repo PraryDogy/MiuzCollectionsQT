@@ -30,7 +30,6 @@ class Static:
     thumb_heights = [130, 150, 185, 270]
     thumb_widths = [145, 145, 180, 230]
     pixmap_sizes = [50, 70, 100, 170]
-    row_limits = [20, 20, 25, 32]
     corner_values = [4, 8, 14, 16]
 
 

@@ -24,43 +24,6 @@ from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       WinInfoAction)
 
 
-class WhiteTextWid(QLabel):
-    def __init__(self, parent: QWidget, name: str):
-        super().__init__(parent)
-        self.name = name
-
-    def set_text(self) -> None:
-        name: str = self.name
-        ind = Dynamic.thumb_size_index
-        max_row = Static.row_limits[ind]
-        lines: list[str] = []
-
-        if len(name) > max_row:
-            first_line = name[:max_row]
-            second_line = name[max_row:]
-
-            if len(second_line) > max_row:
-                second_line = self.short_text(second_line, max_row)
-
-            lines.extend([first_line, second_line])
-        else:
-            lines.append(name)
-
-        self.setText("\n".join(lines))
-
-    def short_text(self, text: str, max_row: int) -> str:
-        return f"{text[:max_row - 10]}...{text[-7:]}"
-
-    def mouseReleaseEvent(self, ev):
-        super().mouseReleaseEvent(ev)
-
-    def contextMenuEvent(self, ev):
-        super().contextMenuEvent(ev)
-
-    def mouseDoubleClickEvent(self, ev):
-        super().mouseDoubleClickEvent(ev)
-    
-    
 class ImgWid(QLabel):
     def __init__(self):
         super().__init__()
@@ -76,9 +39,54 @@ class ImgWid(QLabel):
     
     def mouseDoubleClickEvent(self, a0):
         return super().mouseDoubleClickEvent(a0)
+    
+
+class TextMixin:
+    row_limits = [20, 20, 25, 32]
+    first_ind = 10
+    second_ind = 7
+
+    def short_text(self, text: str) -> str:
+        limit = self.row_limits[Dynamic.thumb_size_index]
+        if len(text) <= limit:
+            return text
+        edge = (limit - 3) // 2
+        return f"{text[:edge]}...{text[-edge:]}"
 
 
-class BlueTextWid(QLabel):
+class WhiteTextWid(TextMixin, QLabel):
+    def __init__(self, parent: QWidget, name: str):
+        super().__init__(parent)
+        self.name = name
+
+    def set_text(self) -> None:
+        max_row = self.row_limits[Dynamic.thumb_size_index]
+        lines: list[str] = []
+
+        if len(self.name) > max_row:
+            first_line = self.name[:max_row]
+            second_line = self.name[max_row:]
+
+            if len(second_line) > max_row:
+                second_line = self.short_text(second_line)
+
+            lines.extend([first_line, second_line])
+        else:
+            lines.append(self.name)
+
+        self.setText("\n".join(lines))
+
+    def mouseReleaseEvent(self, ev):
+        super().mouseReleaseEvent(ev)
+
+    def contextMenuEvent(self, ev):
+        super().contextMenuEvent(ev)
+
+    def mouseDoubleClickEvent(self, ev):
+        super().mouseDoubleClickEvent(ev)
+    
+    
+class BlueTextWid(TextMixin, QLabel):
     STYLE = """
         font-size: 11px;
         color: #6199E4;
@@ -101,12 +109,6 @@ class BlueTextWid(QLabel):
         self.setText(text)
 
         self.setStyleSheet(self.STYLE)
-    
-    def short_text(self, text: str) -> str:
-        max_row = Static.row_limits[Dynamic.thumb_size_index]
-        if len(text) > max_row:
-            return f"{text[:max_row]}..."
-        return text
 
 
 class Thumbnail(QFrame):
