@@ -11,7 +11,7 @@ from typing_extensions import Literal
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
 from system.items import (Buffer, SettingsItem, SingleDirScanerItem,
-                          UpdateThumbItem, WatchDogItem)
+                          UpdateThumbItem, WatchDogItem, ImgViewItem)
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
@@ -521,13 +521,19 @@ class WinMain(UMainWindow):
     def open_view_win(self):
 
         if len(self.grid.selected_widgets) == 1:
-            path_to_wid = self.grid.path_to_wid.copy()
+            data_items = [i.data_item for i in self.grid.path_to_wid.values()]
             is_selection = False
         else:
-            path_to_wid = {i.data_item.rel_path: i for i in self.grid.selected_widgets}
+            data_items = [i.data_item for i in self.grid.selected_widgets]
             is_selection = True
-        wid = self.grid.selected_widgets[-1]
-        self.view_win = WinImageView(wid.data_item.rel_path, path_to_wid, is_selection)
+        start_data_item = self.grid.selected_widgets[-1].data_item
+
+        item = ImgViewItem(
+            start_data_item=start_data_item,
+            data_items=data_items,
+            is_selection=is_selection
+        )
+        self.view_win = WinImageView(item)
         self.view_win.open_win_info.connect(
             lambda rel_paths: self.open_info_win(self.view_win, Mf.current_mf, rel_paths)
         )
@@ -546,7 +552,7 @@ class WinMain(UMainWindow):
         self.view_win.save_files.connect(
             lambda data: self.save_files(self.view_win, Mf.current_mf, data)
         )
-        self.view_win.switch_image_sig.connect(
+        self.view_win.select_thumb.connect(
             lambda path: self.grid.select_viewed_image(path)
         )
         self.view_win.no_connection.connect(

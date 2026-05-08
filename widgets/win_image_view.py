@@ -1,15 +1,18 @@
 import os
+from multiprocessing import shared_memory
 from typing import Literal
 
+import numpy as np
 from PyQt5.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
                           pyqtSignal)
 from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
                          QMouseEvent, QPixmap, QResizeEvent, QTransform)
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsPixmapItem, QGraphicsScene,
-                             QGraphicsView, QHBoxLayout, QLabel, QWidget, QGraphicsOpacityEffect)
-from multiprocessing import shared_memory
+                             QGraphicsOpacityEffect, QGraphicsPixmapItem,
+                             QGraphicsScene, QGraphicsView, QHBoxLayout,
+                             QLabel, QWidget)
+
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
@@ -17,12 +20,12 @@ from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
-
-from ._base_widgets import UMenu, USubMenu, USvgSqareWidget, UMainWindow
+from system.items import ImgViewItem
+from ._base_widgets import UMainWindow, UMenu, USubMenu, USvgSqareWidget
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SetFav,
                       WinInfoAction)
 from .grid import Thumb
-import numpy as np
+
 
 class ImgWid(QGraphicsView):
     mouse_moved = pyqtSignal()
@@ -217,7 +220,7 @@ class NextImgBtn(SwitchImgBtn):
 
 
 class WinImageView(UMainWindow):
-    switch_image_sig = pyqtSignal(str)
+    select_thumb = pyqtSignal(str)
     no_connection = pyqtSignal()
     closed_ = pyqtSignal()
     open_win_info = pyqtSignal(list)
@@ -231,20 +234,18 @@ class WinImageView(UMainWindow):
     min_w, min_h = 500, 400
     ww, hh = 0, 0
     xx, yy = 0, 0
-    window_style = """background: black;"""
 
-    def __init__(self, rel_path: str, path_to_wid: dict[str, Thumb], is_selection: bool):
+    def __init__(self, img_view_item: ImgViewItem):
         super().__init__()
 
         self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
-        self.cached_images: dict[str, QPixmap] = {}
-        self.is_selection = is_selection
-        self.path_to_wid = path_to_wid
-        self.rel_paths = list(path_to_wid.keys())
-        self.rel_path = rel_path
-        self.wid = path_to_wid.get(self.rel_path)
+        self.url_to_pixmap: dict[str, QPixmap] = {}
+        self.img_view_item = img_view_item
+        self.current_data_item = img_view_item.start_data_item
 
-        self.setStyleSheet(self.window_style)
+        # self.wid = path_to_wid.get(self.rel_path)
+
+        self.setStyleSheet("background: black;")
         self.setMinimumSize(QSize(self.min_w, self.min_h))
         self.installEventFilter(self)
 
@@ -313,22 +314,20 @@ class WinImageView(UMainWindow):
         self.text_label.show()
 
     def load_thumb(self):
-        self.restart_img_wid(self.wid.data_item.pixmap)
+        self.restart_img_wid(self.current_data_item.pixmap)
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
-            self.path = Utils.get_abs_any_path(Mf.current_mf.mf_current_path, self.rel_path)
             self.set_title()
-            # self.img_wid.set_transparent(0.7)
             self.load_image()
         else:
             print("img viewer > no smb")
 
     def load_image(self, ms = 300):
 
-        def fin(src: str, qimage: QImage, shm: shared_memory.SharedMemory):
+        def fin(qimage: QImage, shm: shared_memory.SharedMemory):
             qpixmap = QPixmap.fromImage(qimage)
-            self.cached_images[src] = qpixmap
+            self.url_to_pixmap[self.current_data_item.rel_path] = qpixmap
             self.restart_img_wid(qpixmap)
             shm.close()
             shm.unlink()
@@ -341,10 +340,10 @@ class WinImageView(UMainWindow):
                 shm = shared_memory.SharedMemory(name=item.shm_name)
                 img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=shm.buf)
 
-                if item.src == self.path:
+                if item.src == abs_path:
                     qimage_task = ImgArrayQImage(img_array)
                     qimage_task.sigs.finished_.connect(
-                        lambda qimage: fin(item.src, qimage, shm)
+                        lambda qimage: fin(qimage, shm)
                     )
                     UThreadPool.start(qimage_task)
             
@@ -357,12 +356,18 @@ class WinImageView(UMainWindow):
             self.read_img_task.terminate_join()
             self.read_img_timer.stop()
 
-        if self.path in self.cached_images:
-            self.restart_img_wid(self.cached_images[self.path])
+        if self.current_data_item.rel_path in self.url_to_pixmap:
+            self.restart_img_wid(self.url_to_pixmap[self.current_data_item.rel_path])
         else:
+
+            abs_path = Utils.get_abs_any_path(
+                mf_path=Mf.current_mf.mf_current_path,
+                rel_path=self.current_data_item.rel_path
+            )
+
             self.read_img_task = ProcessWorker(
                 target=ReadImg.start,
-                args=(self.path, False, )
+                args=(abs_path, False, )
             )
             self.read_img_timer = QTimer(self)
             self.read_img_timer.setSingleShot(True)
@@ -389,68 +394,21 @@ class WinImageView(UMainWindow):
             i.hide()
 
     def switch_image(self, offset):
-        # мы формируем актуальный список src из актуальной сетки изображений
-        self.rel_paths = list(self.path_to_wid.keys())
-
-        if self.rel_path in self.rel_paths:
-            current_index = self.rel_paths.index(self.rel_path)
-            new_index = current_index + offset
-        else:
-            new_index = 0
-
-        if new_index == len(self.rel_paths):
-            new_index = 0
-
-        elif new_index < 0:
-            new_index = len(self.rel_paths) - 1
-
-        # 
-        # сетка = Thumbnail.path_to_wid = сетка thumbnails
-        # 
-
-        # ищем новый src после или до предыдущего
-        # так как мы сохранили список src сетки, то новый src будет найден
-        # но не факт, что он уже есть в сетке
-        try:
-            rel_path = self.rel_paths[new_index]
-        except IndexError as e:
-            print(e)
-            return
-
-        # ищем виджет в актуальной сетке, которая могла обновиться в фоне
-        new_wid = self.path_to_wid.get(rel_path)
-
-        # если виджет не найден в сетке
-        # значит сетка обновилась в фоне с новыми виджетами
-        # формируем заново список src соответсвуя новой сетке
-        # берем первый src из этого списка
-        # и первый виджет из сетки
-        if not new_wid:
-            self.rel_path = self.rel_paths[0]
-            self.wid = self.path_to_wid.get(self.rel_path)
-
-        # если виджет найден, тоне факт, что список src актуален
-        # то есть сетка все равно могла быть перетасована
-        # формируем заново список src соответсвуя новой сетке
-        # так как мы ранее выяснили, что виджет есть в новой сетке
-        # то есть и src в списке src
-        # поэтому берем ранее найденный src и виджет
-        else:
-            self.rel_path = rel_path
-            self.wid = new_wid
-
+        current_index = self.img_view_item.data_items.index(self.current_data_item)
+        next_index = current_index + offset
+        if next_index < 0:
+            next_index = len(self.img_view_item.data_items) - 1
+        elif next_index >= len(self.img_view_item.data_items):
+            next_index = 0
+        self.current_data_item = self.img_view_item.data_items[next_index]
         self.load_thumb()
-
-        # если был выделен один виджет для просмотра, значит мы просматриваем
-        # все виджеты в сетке и, по мере пролистывания изображений,
-        # выделяем просматриваемый виджет
-        # но если было выбрано для просмотра х число виджетов, мы не 
-        # снимаем с них выделение
-        if not self.is_selection:
-            self.switch_image_sig.emit(self.rel_path)
+        if not self.img_view_item.is_selection:
+            self.select_thumb.emit(self.current_data_item.rel_path)
 
     def set_title(self):
-        self.setWindowTitle(os.path.basename(self.wid.data_item.rel_path))
+        self.setWindowTitle(
+            os.path.basename(self.current_data_item.rel_path)
+        )
 
     def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
         if flag == "+":
@@ -470,7 +428,7 @@ class WinImageView(UMainWindow):
 
         if ev.modifiers() & Qt.KeyboardModifier.ControlModifier:
             if ev.key() == Qt.Key.Key_I:
-                self.open_win_info.emit([self.rel_path])
+                self.open_win_info.emit([self.current_data_item.rel_path, ])
             
             elif ev.key() == Qt.Key.Key_Left:
                 self.rotate(-90)
@@ -507,7 +465,7 @@ class WinImageView(UMainWindow):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
         self.menu_ = UMenu(event=ev)
-        rel_paths = [self.rel_path]
+        rel_paths = [self.current_data_item.rel_path, ]
 
         # открыть в приложении
         open_menu = USubMenu(
@@ -531,10 +489,10 @@ class WinImageView(UMainWindow):
 
         self.menu_.addMenu(open_menu)
 
-        self.fav_action = SetFav(self.menu_, self.wid.data_item.fav)
+        self.fav_action = SetFav(self.menu_, self.current_data_item.fav)
         self.fav_action.triggered.connect(
             lambda: self.set_fav.emit(
-                (self.wid.data_item.rel_path, not self.wid.data_item.fav)
+                (self.current_data_item.rel_path, not self.current_data_item.fav)
             )
         )
         self.menu_.addAction(self.fav_action)
