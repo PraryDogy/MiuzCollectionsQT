@@ -25,6 +25,7 @@ from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
 
 
 class ULabel(QLabel):
+    # длина списка соответствует cfg > static.pixmap_sizes
     row_limits = [20, 20, 25, 32]
     corner_values = [4, 8, 14, 16]
     font_size = 11
