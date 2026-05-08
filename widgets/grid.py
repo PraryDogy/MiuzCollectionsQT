@@ -62,18 +62,14 @@ class WhiteTextWid(ThumbMixin, QLabel):
     def set_text(self) -> None:
         max_row = self.row_limits[Dynamic.thumb_size_index]
         lines: list[str] = []
-
         if len(self.name) > max_row:
             first_line = self.name[:max_row]
             second_line = self.name[max_row:]
-
             if len(second_line) > max_row:
                 second_line = self.short_text(second_line)
-
             lines.extend([first_line, second_line])
         else:
             lines.append(self.name)
-
         self.setText("\n".join(lines))
     
     
