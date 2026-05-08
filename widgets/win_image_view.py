@@ -459,7 +459,6 @@ class WinImageView(UMainWindow):
 
         self.menu_ = UMenu(event=ev)
         rel_paths = [self.current_data_item.rel_path, ]
-
         # открыть в приложении
         open_menu = USubMenu(
             f"{Lng.open_in[Cfg.lng_index]}",
