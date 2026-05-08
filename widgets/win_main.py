@@ -526,7 +526,7 @@ class WinMain(UMainWindow):
         else:
             data_items = [i.data_item for i in self.grid.selected_widgets]
             is_selection = True
-        start_data_item = self.grid.selected_widgets[-1].data_item
+        start_data_item = self.grid.selected_widgets[0].data_item
 
         item = ImgViewItem(
             start_data_item=start_data_item,
