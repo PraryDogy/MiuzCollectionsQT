@@ -24,10 +24,14 @@ from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       WinInfoAction)
 
 
-class ThumbMixin:
+class ULabel(QLabel):
     row_limits = [20, 20, 25, 32]
-    first_ind = 10
-    second_ind = 7
+    corner_values = [4, 8, 14, 16]
+    font_size = 11
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def short_text(self, text: str) -> str:
         limit = self.row_limits[Dynamic.thumb_size_index]
@@ -37,7 +41,7 @@ class ThumbMixin:
         return f"{text[:edge]}...{text[-edge:]}"
 
     def mouseReleaseEvent(self, ev):
-            super().mouseReleaseEvent(ev)
+        super().mouseReleaseEvent(ev)
 
     def contextMenuEvent(self, ev):
         super().contextMenuEvent(ev)
@@ -46,18 +50,42 @@ class ThumbMixin:
         super().mouseDoubleClickEvent(ev)
 
 
-class ImgWid(ThumbMixin, QLabel):
+class ImgWid(ULabel):
+    m = 4
+
     def __init__(self):
         super().__init__()
-        margin = 4
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setContentsMargins(margin, margin, margin, margin)
+        self.setContentsMargins(self.m, self.m, self.m, self.m)
+        self.set_no_frame()
+
+    def set_frame(self):
+        corner = self.corner_values[Dynamic.thumb_size_index]
+        self.setStyleSheet(
+            f"""
+                border-radius: {corner}px;
+                color: rgb(255,255,255);
+                background: rgba(125, 125, 125, 0.5);
+                border: 2px solid transparent;
+                padding-left: 2px;
+                padding-right: 2px;
+            """
+        )
+    
+    def set_no_frame(self):
+        self.setStyleSheet(
+            """
+                border: 2px solid transparent;
+                padding-left: 2px;
+                padding-right: 2px;
+            """
+        )
 
 
-class WhiteTextWid(ThumbMixin, QLabel):
-    def __init__(self, parent: QWidget, name: str):
-        super().__init__(parent)
+class WhiteTextWid(ULabel):
+    def __init__(self, name: str):
+        super().__init__()
         self.name = name
+        self.set_no_frame()
 
     def set_text(self) -> None:
         max_row = self.row_limits[Dynamic.thumb_size_index]
@@ -71,19 +99,35 @@ class WhiteTextWid(ThumbMixin, QLabel):
         else:
             lines.append(self.name)
         self.setText("\n".join(lines))
-    
-    
-class BlueTextWid(ThumbMixin, QLabel):
-    STYLE = """
-        font-size: 11px;
-        color: #6199E4;
-    """
 
+    def set_frame(self):
+        self.setStyleSheet(
+            f"""
+                border-radius: 7px;
+                color: rgb(255,255,255);
+                background: rgba(46, 89, 203, 1.0);
+                border: 2px solid transparent;
+                padding-left: 2px;
+                padding-right: 2px;
+                font-size: {self.font_size}px;
+            """
+        )
+
+    def set_no_frame(self):
+        self.setStyleSheet(
+        f"""
+            border: 2px solid transparent;
+            font-size: {self.font_size}px;
+        """
+        )
+    
+    
+class BlueTextWid(ULabel):
     def __init__(self, wid: "Thumbnail"):
         super().__init__()
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.wid = wid
         self.set_text()
+        self.set_style()
 
     def set_text(self):
         root = self.wid.rel_path.strip(os.sep).split(os.sep)
@@ -95,7 +139,13 @@ class BlueTextWid(ThumbMixin, QLabel):
         text = "\n".join((first_row, self.wid.day_month_year))
         self.setText(text)
 
-        self.setStyleSheet(self.STYLE)
+    def set_style(self):
+        self.setStyleSheet(
+            f"""
+                font-size: {self.font_size}px;
+                color: #6199E4;
+            """
+        )
 
 
 class Thumbnail(QFrame):
@@ -105,34 +155,6 @@ class Thumbnail(QFrame):
     pixmap_size = 0
     thumb_w = 0
     thumb_h = 0
-    corner = 0
-
-    IMG_FRAME_STYLE = f"""
-        border-radius: {{corner}}px;
-        color: rgb(255,255,255);
-        background: rgba(125, 125, 125, 0.5);
-        border: 2px solid transparent;
-        padding-left: 2px;
-        padding-right: 2px;
-    """
-    TEXT_FRAME_STYLE = f"""
-        border-radius: 7px;
-        color: rgb(255,255,255);
-        background: rgba(46, 89, 203, 1.0);
-        border: 2px solid transparent;
-        padding-left: 2px;
-        padding-right: 2px;
-        font-size: 11px;
-    """
-    IMG_NO_FRAME_STYLE = """
-        border: 2px solid transparent;
-        padding-left: 2px;
-        padding-right: 2px;
-    """
-    TEXT_NO_FRAME_STYLE = """
-        border: 2px solid transparent;
-        font-size: 11px;
-    """
 
     def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, month_year: str, day_month_year: str):
         super().__init__()
@@ -157,12 +179,11 @@ class Thumbnail(QFrame):
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.text_wid = WhiteTextWid(self, self.name)
-        self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.v_layout.addWidget(self.text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.white_text_wid = WhiteTextWid(self.name)
+        self.v_layout.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.below_text = BlueTextWid(self)
-        self.v_layout.addWidget(self.below_text, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.blue_text_wid = BlueTextWid(self)
+        self.v_layout.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = f"{Lng.location[Cfg.lng_index]}: {Mf.current_mf.mf_alias}{rel_path}"
         modified = f"{Lng.modified[Cfg.lng_index]}: {self.day_month_year}"
@@ -178,12 +199,11 @@ class Thumbnail(QFrame):
         cls.img_frame_size = Static.pixmap_sizes[ind]
         cls.thumb_w = Static.thumb_widths[ind]
         cls.thumb_h = Static.thumb_heights[ind]
-        cls.corner = Static.corner_values[ind]
 
     def setup(self):
         """Настройка миниатюры: текст, размеры, изображение."""
-        self.text_wid.set_text()
-        self.below_text.set_text()
+        self.white_text_wid.set_text()
+        self.blue_text_wid.set_text()
         self.setFixedSize(self.thumb_w, self.thumb_h)
 
         size_ = self.pixmap_size
@@ -193,14 +213,12 @@ class Thumbnail(QFrame):
         )
 
     def set_frame(self):
-        """Устанавливает рамку и фон для выделенной миниатюры."""
-        self.img_wid.setStyleSheet(self.IMG_FRAME_STYLE.format(corner=self.corner))
-        self.text_wid.setStyleSheet(self.TEXT_FRAME_STYLE)
+        self.img_wid.set_frame()
+        self.white_text_wid.set_frame()
 
     def set_no_frame(self):
-        """Снимает рамку и фон для миниатюры."""
-        self.img_wid.setStyleSheet(self.IMG_NO_FRAME_STYLE)
-        self.text_wid.setStyleSheet(self.TEXT_NO_FRAME_STYLE)
+        self.img_wid.set_no_frame()
+        self.white_text_wid.set_no_frame()
 
     def set_transparent_frame(self, value: float):
         effect = QGraphicsOpacityEffect(self)
@@ -216,8 +234,8 @@ class Thumbnail(QFrame):
             self.fav_value = 1
             self.name = f"{self.sym_star} {os.path.basename(self.rel_path)}"
 
-        self.text_wid.name = self.name
-        self.text_wid.set_text()
+        self.white_text_wid.name = self.name
+        self.white_text_wid.set_text()
 
 
 class UpBtn(QFrame):
