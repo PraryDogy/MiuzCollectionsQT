@@ -227,7 +227,6 @@ class Thumbnail(QFrame):
         self.setGraphicsEffect(effect)
 
     def set_fav(self, value: int):
-        """Добавляет или удаляет миниатюру из избранного и обновляет текст."""
         if value == 0:
             self.fav_value = 0
             self.name = os.path.basename(self.rel_path)
@@ -240,28 +239,10 @@ class Thumbnail(QFrame):
 
 
 class UpBtn(QFrame):
-    """
-    Кнопка для прокрутки вверх с круглой серой фоном и SVG-иконкой.
-
-    Сигналы:
-        scroll_to_top (pyqtSignal): испускается при нажатии кнопки.
-
-    Атрибуты класса:
-        icon (str): путь к SVG-иконке.
-        icon_size (int): размер кнопки и иконки.
-        bg_color (str): цвет фона кнопки.
-        radius (int): радиус скругления кнопки.
-        STYLE (str): стиль кнопки в формате f-строки.
-    """
-
     scroll_to_top = pyqtSignal()
-
-    # Настраиваемые параметры
     icon = "./images/up.svg"
     icon_size = 44
     radius = 22
-
-    # --- Стиль кнопки ---
     STYLE = f"""
         background: rgba(125, 125, 125, 0.5);
         border-radius: {radius}px;
