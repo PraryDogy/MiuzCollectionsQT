@@ -24,24 +24,7 @@ from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       WinInfoAction)
 
 
-class ImgWid(QLabel):
-    def __init__(self):
-        super().__init__()
-        margin = 4
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setContentsMargins(margin, margin, margin, margin)
-
-    def mouseReleaseEvent(self, ev):
-        return super().mouseReleaseEvent(ev)
-    
-    def contextMenuEvent(self, ev):
-        return super().contextMenuEvent(ev)
-    
-    def mouseDoubleClickEvent(self, a0):
-        return super().mouseDoubleClickEvent(a0)
-    
-
-class TextMixin:
+class ThumbMixin:
     row_limits = [20, 20, 25, 32]
     first_ind = 10
     second_ind = 7
@@ -53,8 +36,25 @@ class TextMixin:
         edge = (limit - 3) // 2
         return f"{text[:edge]}...{text[-edge:]}"
 
+    def mouseReleaseEvent(self, ev):
+            super().mouseReleaseEvent(ev)
 
-class WhiteTextWid(TextMixin, QLabel):
+    def contextMenuEvent(self, ev):
+        super().contextMenuEvent(ev)
+
+    def mouseDoubleClickEvent(self, ev):
+        super().mouseDoubleClickEvent(ev)
+
+
+class ImgWid(ThumbMixin, QLabel):
+    def __init__(self):
+        super().__init__()
+        margin = 4
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setContentsMargins(margin, margin, margin, margin)
+
+
+class WhiteTextWid(ThumbMixin, QLabel):
     def __init__(self, parent: QWidget, name: str):
         super().__init__(parent)
         self.name = name
@@ -75,18 +75,9 @@ class WhiteTextWid(TextMixin, QLabel):
             lines.append(self.name)
 
         self.setText("\n".join(lines))
-
-    def mouseReleaseEvent(self, ev):
-        super().mouseReleaseEvent(ev)
-
-    def contextMenuEvent(self, ev):
-        super().contextMenuEvent(ev)
-
-    def mouseDoubleClickEvent(self, ev):
-        super().mouseDoubleClickEvent(ev)
     
     
-class BlueTextWid(TextMixin, QLabel):
+class BlueTextWid(ThumbMixin, QLabel):
     STYLE = """
         font-size: 11px;
         color: #6199E4;
