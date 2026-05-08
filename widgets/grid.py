@@ -124,20 +124,21 @@ class WhiteTextWid(ULabel):
     
     
 class BlueTextWid(ULabel):
-    def __init__(self, wid: "Thumbnail"):
+    def __init__(self, rel_path: str, day_month_year: str):
         super().__init__()
-        self.wid = wid
+        self.rel_path = rel_path
+        self.day_month_year = day_month_year
         self.set_text()
         self.set_style()
 
     def set_text(self):
-        root = self.wid.rel_path.strip(os.sep).split(os.sep)
+        root = self.rel_path.strip(os.sep).split(os.sep)
         if len(root) == 1:
             root = os.path.basename(Mf.current_mf.mf_alias)
         else:
             root = root[0]
         first_row = self.short_text(root)
-        text = "\n".join((first_row, self.wid.day_month_year))
+        text = "\n".join((first_row, self.day_month_year))
         self.setText(text)
 
     def set_style(self):
@@ -166,9 +167,9 @@ class Thumbnail(QFrame):
         self.fav_value = fav
         self.month_year = month_year
         self.day_month_year = day_month_year
-        self.name = os.path.basename(rel_path)
+        self.filename = os.path.basename(rel_path)
         if fav:
-            self.name = self.sym_star + self.name
+            self.filename = self.sym_star + self.filename
 
         # --- Layout ---
         self.v_layout = UVBoxLayout()
@@ -180,10 +181,10 @@ class Thumbnail(QFrame):
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.white_text_wid = WhiteTextWid(self.name)
+        self.white_text_wid = WhiteTextWid(self.filename)
         self.v_layout.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.blue_text_wid = BlueTextWid(self)
+        self.blue_text_wid = BlueTextWid(self.rel_path, self.day_month_year)
         self.v_layout.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = f"{Lng.location[Cfg.lng_index]}: {Mf.current_mf.mf_alias}{rel_path}"
@@ -229,12 +230,12 @@ class Thumbnail(QFrame):
     def set_fav(self, value: int):
         if value == 0:
             self.fav_value = 0
-            self.name = os.path.basename(self.rel_path)
+            self.filename = os.path.basename(self.rel_path)
         else:
             self.fav_value = 1
-            self.name = f"{self.sym_star} {os.path.basename(self.rel_path)}"
+            self.filename = f"{self.sym_star} {os.path.basename(self.rel_path)}"
 
-        self.white_text_wid.name = self.name
+        self.white_text_wid.name = self.filename
         self.white_text_wid.set_text()
 
 
