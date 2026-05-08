@@ -23,14 +23,8 @@ class Static:
 
     internal_files_dir = "./_preload"
 
-    ww, hh = 1120, 760
     max_img_size = 210
-    spacing = 2
-    margins = 15
-    thumb_heights = [130, 150, 185, 270]
-    thumb_widths = [145, 145, 180, 230]
     pixmap_sizes = [50, 70, 100, 170]
-    corner_values = [4, 8, 14, 16]
 
 
 class Dynamic:

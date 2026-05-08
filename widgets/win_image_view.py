@@ -313,7 +313,7 @@ class WinImageView(UMainWindow):
         self.text_label.show()
 
     def load_thumb(self):
-        self.restart_img_wid(self.wid.img)
+        self.restart_img_wid(self.wid.main_pixmap)
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)

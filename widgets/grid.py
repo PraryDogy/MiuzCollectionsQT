@@ -153,16 +153,18 @@ class BlueTextWid(ULabel):
 class Thumbnail(QFrame):
     reload_thumbnails = pyqtSignal()
     sym_star = "\U00002605"
-    img_frame_size = 0
-    pixmap_size = 0
-    thumb_w = 0
-    thumb_h = 0
+    # длина списка идентична cfg static pixmap sizes
+    thumb_heights = [130, 150, 185, 270]
+    thumb_widths = [145, 145, 180, 230]
+    img_wid_size = 0
+    thumbnail_width = 0
+    thumbnail_height = 0
 
     def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, month_year: str, day_month_year: str):
         super().__init__()
 
         # --- Исходные данные ---
-        self.img = pixmap
+        self.main_pixmap = pixmap
         self.rel_path = rel_path
         self.fav_value = fav
         self.month_year = month_year
@@ -197,21 +199,19 @@ class Thumbnail(QFrame):
     def calculate_size(cls):
         """Пересчет размеров миниатюр в зависимости от индекса размера."""
         ind = Dynamic.thumb_size_index
-        cls.pixmap_size = Static.pixmap_sizes[ind]
-        cls.img_frame_size = Static.pixmap_sizes[ind]
-        cls.thumb_w = Static.thumb_widths[ind]
-        cls.thumb_h = Static.thumb_heights[ind]
+        cls.img_wid_size = Static.pixmap_sizes[ind]
+        cls.thumbnail_width = cls.thumb_widths[ind]
+        cls.thumbnail_height = cls.thumb_heights[ind]
 
     def setup(self):
         """Настройка миниатюры: текст, размеры, изображение."""
         self.white_text_wid.set_text()
         self.blue_text_wid.set_text()
-        self.setFixedSize(self.thumb_w, self.thumb_h)
+        self.setFixedSize(self.thumbnail_width, self.thumbnail_height)
 
-        size_ = self.pixmap_size
-        self.img_wid.setFixedSize(size_, size_)
+        self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
         self.img_wid.setPixmap(
-            Utils.qiconed_resize(self.img, self.pixmap_size)
+            Utils.qiconed_resize(self.main_pixmap, self.img_wid_size)
         )
 
     def set_frame(self):
@@ -485,7 +485,7 @@ class Grid(VScrollArea):
             self.wid_to_selected_widgets(wid)
     
     def reset_grid_properties(self):
-        self.max_col = self.width() // (Static.thumb_widths[Dynamic.thumb_size_index])
+        self.max_col = self.width() // Thumbnail.thumb_widths[Dynamic.thumb_size_index]
         self.glob_row, self.glob_col = 0, 0
         for i in (self.cell_to_wid, self.path_to_wid):
             i.clear()

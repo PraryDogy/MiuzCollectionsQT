@@ -67,12 +67,13 @@ class USep(QFrame):
 class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
+    ww, hh = 1120, 760
     warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[Literal["noscan", ""]]):
         super().__init__()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
-        self.resize(Static.ww, Static.hh)
+        self.resize(self.ww, self.hh)
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.app_name}")
 
@@ -307,7 +308,7 @@ class WinMain(UMainWindow):
                 for i in update_thumb_items:
                     wid = self.grid.path_to_wid.get(i.rel_img_path)
                     if wid:
-                        wid.img = Utils.pixmap_from_array(i.array)
+                        wid.main_pixmap = Utils.pixmap_from_array(i.array)
                         wid.setup()
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
@@ -556,7 +557,7 @@ class WinMain(UMainWindow):
         )
 
         if WinImageView.xx == 0:
-            self.view_win.resize(Static.ww, Static.hh)
+            self.view_win.resize(self.ww, self.hh)
             self.view_win.center_to_parent(self.window())
         else:
             self.view_win.resize(WinImageView.ww, WinImageView.hh)
