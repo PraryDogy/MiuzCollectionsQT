@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QLabel
+from PyQt5.QtGui import QKeyEvent
 
 from cfg import Cfg
 from system.lang import Lng
@@ -73,7 +74,7 @@ class WarningWindow(ConfirmWindow):
         self.ok_btn.clicked.connect(self.deleteLater)
         self.adjustSize()
 
-    def keyPressEvent(self, a0):
+    def keyPressEvent(self, a0: QKeyEvent):
         if a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.deleteLater()
         return super().keyPressEvent(a0)
