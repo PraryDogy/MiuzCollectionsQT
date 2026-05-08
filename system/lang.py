@@ -229,7 +229,10 @@ class Lng:
     file_name = ("Имя файла", "File name")
     show_about = ("Об авторе", "About")
     alias_error = ("Имя должно быть уникальным", "Name must be unique")
-    already_taken = ("Уже используется", "Is already taken")
+    already_taken = (
+        "Каталог с таким именем уже существует. Имя должно быть уникальным",
+        "A directory with this name already exists. The name must be unique"
+    )
     image = ("Изображение", "Image")
     sort_by_mod = ("По дате изменения", "Date modification")
     sort_by_recent = ("По дате добавления", "Date added")

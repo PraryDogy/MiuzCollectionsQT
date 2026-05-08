@@ -72,3 +72,8 @@ class WarningWindow(ConfirmWindow):
         self.ok_btn.disconnect()
         self.ok_btn.clicked.connect(self.deleteLater)
         self.adjustSize()
+
+    def keyPressEvent(self, a0):
+        if a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            self.deleteLater()
+        return super().keyPressEvent(a0)

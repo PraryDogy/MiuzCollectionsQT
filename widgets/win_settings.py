@@ -989,8 +989,7 @@ class NewFolder(QWidget, StateWid):
 
         elif any(i.mf_alias == folder_name for i in self.mf_list_clone):
             show_warn(
-                f'{Lng.alias[Cfg.lng_index]} "{folder_name}" '
-                f'{Lng.already_taken[Cfg.lng_index].lower()}'
+                f'{Lng.already_taken[Cfg.lng_index]}'
             )
             return
 
