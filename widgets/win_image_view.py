@@ -404,7 +404,7 @@ class WinImageView(UMainWindow):
 
     def set_title(self):
         self.setWindowTitle(
-            os.path.basename(self.current_data_item.rel_path)
+            self.current_data_item.filename
         )
 
     def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
