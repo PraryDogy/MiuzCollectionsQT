@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGridLayout, QLabel, QRubberBand, QWidget)
 
 from cfg import Cfg, Dynamic, Static
-from system.items import Buffer, DbImagesItem, SettingsItem
+from system.items import Buffer, DataItem, DbImagesItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
@@ -160,18 +160,11 @@ class Thumb(QFrame):
     thumb_width = 0
     thumb_height = 0
 
-    def __init__(self, pixmap: QPixmap, rel_path: str, fav: int, month_year: str, day_month_year: str):
+    def __init__(self, data_item: DataItem):
         super().__init__()
-
-        # --- Исходные данные ---
-        self.main_pixmap = pixmap
-        self.rel_path = rel_path
-        self.fav_value = fav
-        self.month_year = month_year
-        self.day_month_year = day_month_year
-        self.filename = os.path.basename(rel_path)
-        if fav:
-            self.filename = self.sym_star + self.filename
+        self.data_item = data_item
+        if self.data_item.fav:
+            self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
 
         # --- Layout ---
         self.v_layout = UVBoxLayout()
@@ -183,14 +176,20 @@ class Thumb(QFrame):
         self.img_wid = ImgWid()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.white_text_wid = WhiteTextWid(self.filename)
+        self.white_text_wid = WhiteTextWid(self.data_item.filename)
         self.v_layout.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.blue_text_wid = BlueTextWid(self.rel_path, self.day_month_year)
+        self.blue_text_wid = BlueTextWid(self.data_item.rel_path, self.data_item.day_month_year)
         self.v_layout.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        location = f"{Lng.location[Cfg.lng_index]}: {Mf.current_mf.mf_alias}{rel_path}"
-        modified = f"{Lng.modified[Cfg.lng_index]}: {self.day_month_year}"
+        location = (
+            f"{Lng.location[Cfg.lng_index]}: "
+            f"{Mf.current_mf.mf_alias}{self.data_item.rel_path}"
+        )
+        modified = (
+            f"{Lng.modified[Cfg.lng_index]}: "
+            f"{self.data_item.day_month_year}"
+        )
         self.setToolTip("\n".join([location, modified, ]))
 
         self.setup()
@@ -211,7 +210,7 @@ class Thumb(QFrame):
 
         self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
         self.img_wid.setPixmap(
-            Utils.qiconed_resize(self.main_pixmap, self.img_wid_size)
+            Utils.qiconed_resize(self.data_item.pixmap, self.img_wid_size)
         )
 
     def set_frame(self):
@@ -229,13 +228,16 @@ class Thumb(QFrame):
 
     def set_fav(self, value: int):
         if value == 0:
-            self.fav_value = 0
-            self.filename = os.path.basename(self.rel_path)
+            self.data_item.fav = 0
+            self.data_item.filename = os.path.basename(self.data_item.rel_path)
         else:
-            self.fav_value = 1
-            self.filename = f"{self.sym_star} {os.path.basename(self.rel_path)}"
+            self.data_item.fav = 1
+            self.data_item.filename = (
+                f"{self.sym_star} "
+                f"{os.path.basename(self.data_item.rel_path)}"
+            )
 
-        self.white_text_wid.name = self.filename
+        self.white_text_wid.name = self.data_item.filename
         self.white_text_wid.set_text()
 
 
@@ -417,7 +419,7 @@ class Grid(VScrollArea):
     def load_initial_grid(self, db_images: dict[str, list[DbImagesItem]]):
 
         def load_grid_delayed():
-            prev_selection = [i.rel_path for i in self.selected_widgets]
+            prev_selection = [i.data_item.rel_path for i in self.selected_widgets]
             self.remove_grid_container()
             self.load_grid_container()
             self.reset_grid_properties()
@@ -445,20 +447,22 @@ class Grid(VScrollArea):
         QTimer.singleShot(50, load_grid_delayed)
                         
     def add_thumb_data(self, wid: Thumb):
-        self.path_to_wid[wid.rel_path] = wid
+        self.path_to_wid[wid.data_item.rel_path] = wid
         self.cell_to_wid[self.glob_row, self.glob_col] = wid
         wid.row, wid.col = self.glob_row, self.glob_col        
 
     def add_thumbnails_to_grid(self, db_images: list[DbImagesItem]):
 
         def create_thumb(image_item: DbImagesItem):
-            thumbnail = Thumb(
+            data_item = DataItem(
                 pixmap=pixmap,
                 rel_path=image_item.rel_img_path,
                 fav=image_item.fav,
                 month_year=image_item.month_year,
-                day_month_year=image_item.day_month_year
+                day_month_year=image_item.day_month_year,
+                filename=os.path.basename(image_item.rel_img_path)
             )
+            thumbnail = Thumb(data_item)
             thumbnail.set_no_frame()
             thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
 
@@ -524,10 +528,10 @@ class Grid(VScrollArea):
         if not thumbnails:
             return
 
-        prev_f_mod = thumbnails[0].month_year
+        prev_f_mod = thumbnails[0].data_item.month_year
         for thumb in thumbnails:
             # Проверка на смену модификации при сортировке по модификации
-            if Dynamic.sort_by_mod and thumb.month_year != prev_f_mod:
+            if Dynamic.sort_by_mod and thumb.data_item.month_year != prev_f_mod:
                 _next_row()
 
             # Добавляем миниатюру в сетку и обновляем координаты
@@ -539,7 +543,7 @@ class Grid(VScrollArea):
             if self.glob_col >= self.max_col:
                 _next_row()
 
-            prev_f_mod = thumb.month_year
+            prev_f_mod = thumb.data_item.month_year
 
         # Если последний ряд не завершен, начинаем новый ряд для следующих элементов
         if self.glob_col != 0:
@@ -586,13 +590,13 @@ class Grid(VScrollArea):
 
         def remove_files():
             self.remove_files.emit(
-                [i.rel_path for i in self.selected_widgets]
+                [i.data_item.rel_path for i in self.selected_widgets]
             )
 
         def open_info():
             """Открывает окно информации для выбранных виджетов."""
             if self.selected_widgets:
-                rel_paths = [self.wid_under_mouse.rel_path, ]
+                rel_paths = [self.wid_under_mouse.data_item.rel_path, ]
                 self.open_info_win.emit(rel_paths)
 
         def select_all():
@@ -660,11 +664,11 @@ class Grid(VScrollArea):
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
             self.set_clipboard.emit(
-                ("copy", [i.rel_path for i in self.selected_widgets])
+                ("copy", [i.data_item.rel_path for i in self.selected_widgets])
             )
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_X:
             self.set_clipboard.emit(
-                ("cut", [i.rel_path for i in self.selected_widgets])
+                ("cut", [i.data_item.rel_path for i in self.selected_widgets])
             )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             if not event.isAutoRepeat():
@@ -812,7 +816,7 @@ class Grid(VScrollArea):
                 self.clear_selected_widgets()
                 self.wid_to_selected_widgets(clicked)
 
-            rel_paths = [w.rel_path for w in self.selected_widgets]
+            rel_paths = [w.data_item.rel_path for w in self.selected_widgets]
 
             # просмотр
             act = OpenInView(self.menu_)
@@ -844,15 +848,15 @@ class Grid(VScrollArea):
 
                 self.menu_.addMenu(open_menu)
 
-                fav = SetFav(self.menu_, clicked.fav_value)
+                fav = SetFav(self.menu_, clicked.data_item.fav)
                 fav.triggered.connect(
-                    lambda: self.set_fav.emit((clicked.rel_path, not clicked.fav_value))
+                    lambda: self.set_fav.emit((clicked.data_item.rel_path, not clicked.data_item.fav))
                 )
                 self.menu_.addAction(fav)
 
                 show_in_app = ShowInFolder(self.menu_)
                 show_in_app.triggered.connect(
-                    lambda: self.show_in_app.emit(clicked.rel_path)
+                    lambda: self.show_in_app.emit(clicked.data_item.rel_path)
                 )
                 self.menu_.addAction(show_in_app)
 
@@ -953,7 +957,7 @@ class Grid(VScrollArea):
             return None
 
         def update_date_wid(wid: Thumb):
-            self.date_wid.setText(wid.month_year)
+            self.date_wid.setText(wid.data_item.month_year)
             self.date_wid.adjustSize()
             self.date_wid.move(
                 (self.viewport().width() - self.date_wid.width()) // 2,
@@ -984,14 +988,14 @@ class Grid(VScrollArea):
         if self.wid_under_mouse:
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(self.wid_under_mouse)
-            self.path_bar_update.emit(self.wid_under_mouse.rel_path)
+            self.path_bar_update.emit(self.wid_under_mouse.data_item.rel_path)
             self.open_img_view.emit()
 
     def mousePressEvent(self, a0):
         self.origin_pos = a0.pos()
         self.wid_under_mouse = self.get_clicked_widget(a0)
         if self.wid_under_mouse:
-            self.path_bar_update.emit(self.wid_under_mouse.rel_path)
+            self.path_bar_update.emit(self.wid_under_mouse.data_item.rel_path)
         else:
             self.path_bar_update.emit(Dynamic.current_dir)
         return super().mousePressEvent(a0)
@@ -1027,7 +1031,7 @@ class Grid(VScrollArea):
             if avaiable_mf_path:
                 Mf.current_mf.set_mf_current_path(avaiable_mf_path)
                 paths = [
-                    Utils.get_abs_any_path(Mf.current_mf.mf_current_path, wid.rel_path)
+                    Utils.get_abs_any_path(Mf.current_mf.mf_current_path, wid.data_item.rel_path)
                     for wid in self.selected_widgets
                 ]
 

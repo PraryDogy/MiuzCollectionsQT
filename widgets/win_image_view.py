@@ -313,7 +313,7 @@ class WinImageView(UMainWindow):
         self.text_label.show()
 
     def load_thumb(self):
-        self.restart_img_wid(self.wid.main_pixmap)
+        self.restart_img_wid(self.wid.data_item.pixmap)
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
@@ -450,7 +450,7 @@ class WinImageView(UMainWindow):
             self.switch_image_sig.emit(self.rel_path)
 
     def set_title(self):
-        self.setWindowTitle(os.path.basename(self.wid.rel_path))
+        self.setWindowTitle(os.path.basename(self.wid.data_item.rel_path))
 
     def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
         if flag == "+":
@@ -531,10 +531,10 @@ class WinImageView(UMainWindow):
 
         self.menu_.addMenu(open_menu)
 
-        self.fav_action = SetFav(self.menu_, self.wid.fav_value)
+        self.fav_action = SetFav(self.menu_, self.wid.data_item.fav)
         self.fav_action.triggered.connect(
             lambda: self.set_fav.emit(
-                (self.wid.rel_path, not self.wid.fav_value)
+                (self.wid.data_item.rel_path, not self.wid.data_item.fav)
             )
         )
         self.menu_.addAction(self.fav_action)

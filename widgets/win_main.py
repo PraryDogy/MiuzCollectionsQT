@@ -308,7 +308,7 @@ class WinMain(UMainWindow):
                 for i in update_thumb_items:
                     wid = self.grid.path_to_wid.get(i.rel_img_path)
                     if wid:
-                        wid.main_pixmap = Utils.pixmap_from_array(i.array)
+                        wid.data_item.pixmap = Utils.pixmap_from_array(i.array)
                         wid.setup()
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
@@ -524,10 +524,10 @@ class WinMain(UMainWindow):
             path_to_wid = self.grid.path_to_wid.copy()
             is_selection = False
         else:
-            path_to_wid = {i.rel_path: i for i in self.grid.selected_widgets}
+            path_to_wid = {i.data_item.rel_path: i for i in self.grid.selected_widgets}
             is_selection = True
         wid = self.grid.selected_widgets[-1]
-        self.view_win = WinImageView(wid.rel_path, path_to_wid, is_selection)
+        self.view_win = WinImageView(wid.data_item.rel_path, path_to_wid, is_selection)
         self.view_win.open_win_info.connect(
             lambda rel_paths: self.open_info_win(self.view_win, Mf.current_mf, rel_paths)
         )

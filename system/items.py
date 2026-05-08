@@ -4,9 +4,9 @@ from typing import Literal, Optional
 
 import numpy as np
 import sqlalchemy
-from PyQt5.QtGui import QImage
+from PyQt5.QtGui import QImage, QPixmap
 from watchdog.events import FileSystemEvent
-import numpy as np
+
 from .main_folder import Mf
 
 
@@ -132,3 +132,13 @@ class HashDirSizeItem:
     mf: Mf
     size: int
     total_images: int
+
+
+@dataclass(slots=True)
+class DataItem:
+    pixmap: QPixmap
+    rel_path: str
+    fav: bool
+    month_year: str
+    day_month_year: str
+    filename: str
