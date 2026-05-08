@@ -858,8 +858,10 @@ class MfSettings(QWidget, StateWid):
             Mf.write_json_data()
             restart_app()
 
-        paths = [self.mf_paths.url, ]
         stop_list = self.mf_stop_list.get_list()
+        paths = []
+        if self.mf_paths.url:
+            paths.append(self.mf_paths.url)
 
         def show_warn(text: str):
             win_warn = WarningWindow(text)
