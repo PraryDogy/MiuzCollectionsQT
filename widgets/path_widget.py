@@ -20,6 +20,7 @@ class PathWidget(QGroupBox):
     hh = 70
     icon_size = 35
     mf_is_avaiable = pyqtSignal(str)
+
     def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
@@ -97,6 +98,7 @@ class PathWidget(QGroupBox):
                 self.mf_path = self.task.process_queue.get()
                 self.mf_is_avaiable.emit(self.mf_path)
                 self.ok_path_widget()
+                self.stop_task()
             else:
                 QTimer.singleShot(500, poll_task)
 
@@ -108,10 +110,11 @@ class PathWidget(QGroupBox):
         QTimer.singleShot(500, poll_task)
 
     def stop_task(self):
-        try:
-            self.task.terminate_join()
-        except Exception as e:
-            print("path widget stop task error", e)
+        if hasattr(self, "task"):
+            try:
+                self.task.terminate_join()
+            except Exception as e:
+                print("path widget stop task error", e)
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
         if not a0.button() != 2:
@@ -122,11 +125,8 @@ class PathWidget(QGroupBox):
             self.mf_path = url
             self.mf_is_avaiable.emit(self.mf_path)
             self.ok_path_widget()
+            self.stop_task()
         return super().mouseReleaseEvent(a0)
-    
-    def dragEnterEvent(self, a0):
-        a0.accept()
-        return super().dragEnterEvent(a0)
         
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
@@ -135,8 +135,13 @@ class PathWidget(QGroupBox):
                 self.mf_path = url
                 self.mf_is_avaiable.emit(self.mf_path)
                 self.ok_path_widget()
+                self.stop_task()
         return super().dropEvent(a0)
     
+    def dragEnterEvent(self, a0):
+        a0.accept()
+        return super().dragEnterEvent(a0)
+
     def deleteLater(self):
         self.stop_task()
         return super().deleteLater()
