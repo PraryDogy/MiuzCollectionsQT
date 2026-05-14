@@ -63,11 +63,11 @@ class WinSmb(UMainWindow):
         btns_lay.addStretch()
         self.ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.clicked.connect(self.deleteLater)
-        self.ok_btn.setFixedWidth(100)
+        self.ok_btn.setFixedWidth(90)
         btns_lay.addWidget(self.ok_btn)
         cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(100)
+        cancel_btn.setFixedWidth(90)
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()
 
