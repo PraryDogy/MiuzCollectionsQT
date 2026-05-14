@@ -39,6 +39,8 @@ class WinSmb(UMainWindow):
 
     def __init__(self, mf: Mf):
         super().__init__()
+        self.mf = mf
+
         self.set_close_only()
         self.set_always_on_top()
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
@@ -49,7 +51,7 @@ class WinSmb(UMainWindow):
         self.central_layout.addWidget(self.warn_widget)
 
         self.path_widget = PathWidget(mf)
-        self.path_widget.textChanged.connect(self.warn_widget.deleteLater)
+        self.path_widget.mf_is_avaiable.connect(self.mf_is_avaiable)
         self.central_layout.addWidget(self.path_widget)
 
         btns_wid = QWidget()
@@ -70,6 +72,12 @@ class WinSmb(UMainWindow):
         btns_lay.addStretch()
 
         self.adjustSize()
+
+    def mf_is_avaiable(self, path: str):
+        if path:
+            self.warn_widget.deleteLater()
+            self.mf.mf_paths = [path, ]
+            Mf.write_json_data()
 
     def keyPressEvent(self, a0):
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
