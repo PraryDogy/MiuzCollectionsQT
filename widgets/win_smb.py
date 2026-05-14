@@ -1,15 +1,15 @@
 import os
-import sys
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
 
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import ProcessWorker, SmbChecker
-from widgets._base_widgets import PathWidget, UMainWindow
+
+from ._base_widgets import UMainWindow
+from .path_widget import PathWidget
 
 
 class WarnWidget(QWidget):
@@ -42,7 +42,6 @@ class WinSmb(UMainWindow):
         self.set_close_only()
         self.set_always_on_top()
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
-        self.mf = mf
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
 
@@ -50,7 +49,7 @@ class WinSmb(UMainWindow):
         self.central_layout.addWidget(self.warn_widget)
 
         self.path_widget = PathWidget(mf)
-        # self.path_widget.textChanged.connect(self.path_wid_changed)
+        self.path_widget.textChanged.connect(self.warn_widget.deleteLater)
         self.central_layout.addWidget(self.path_widget)
 
         btns_wid = QWidget()
@@ -61,7 +60,7 @@ class WinSmb(UMainWindow):
 
         btns_lay.addStretch()
         self.ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
-        self.ok_btn.clicked.connect(self.ok_clicked)
+        self.ok_btn.clicked.connect(self.deleteLater)
         self.ok_btn.setFixedWidth(100)
         btns_lay.addWidget(self.ok_btn)
         cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
@@ -72,19 +71,7 @@ class WinSmb(UMainWindow):
 
         self.adjustSize()
 
-    def ok_clicked(self):
-        if self.path_widget.url and os.path.exists(self.path_widget.url):
-            self.mf.mf_paths = [self.path_widget.url, ]
-            Mf.write_json_data()
-            self.deleteLater()
-
     def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
+        if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.deleteLater()
         return super().keyPressEvent(a0)
-
-    def deleteLater(self):
-        return super().deleteLater()
-    
-    def closeEvent(self, a0):
-        return super().closeEvent(a0)

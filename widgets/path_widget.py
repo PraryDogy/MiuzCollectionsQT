@@ -19,7 +19,7 @@ class PathWidget(QGroupBox):
     green_checkmark = "images/green_checkmark.svg"
     hh = 70
     icon_size = 35
-    textChanged = pyqtSignal(str)
+    textChanged = pyqtSignal()
     def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
@@ -94,6 +94,7 @@ class PathWidget(QGroupBox):
 
         def poll_task():
             if not self.task.process_queue.empty():
+                self.textChanged.emit()
                 self.write_changes()
                 self.ok_path_widget()
             else:
@@ -122,7 +123,7 @@ class PathWidget(QGroupBox):
         dialog = QFileDialog()
         url = dialog.getExistingDirectory()
         if url:
-            self.textChanged.emit(url)
+            self.textChanged.emit()
             self.write_changes()
             self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
@@ -135,7 +136,7 @@ class PathWidget(QGroupBox):
         if a0.mimeData().hasUrls():
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
-                self.textChanged.emit(url)
+                self.textChanged.emit()
                 self.write_changes()
                 self.ok_path_widget()
         return super().dropEvent(a0)
