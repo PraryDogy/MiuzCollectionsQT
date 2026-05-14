@@ -855,15 +855,15 @@ class MfSettings(QWidget, StateWid):
             Mf.write_json_data()
             restart_app()
 
-        stop_list = self.mf_stop_list.get_list()
-        paths = []
-        if self.path_widget.mf.mf_paths:
-            paths.append(self.path_widget.mf.mf_paths)
-
         def show_warn(text: str):
             win_warn = WarningWindow(text)
             win_warn.center_to_parent(self.window())
             win_warn.show()
+
+        stop_list = self.mf_stop_list.get_list()
+        paths = []
+        if self.path_widget.mf_path:
+            paths.append(self.path_widget.mf_path)
 
         if not paths:
             show_warn(Lng.select_folder_path[Cfg.lng_index])
