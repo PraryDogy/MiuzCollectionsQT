@@ -754,11 +754,13 @@ class MfSettings(QWidget, StateWid):
         name_text.setFixedHeight(GroupChild.hh)
         self.name_wid.layout_.addWidget(name_text)
 
-        self.mf_paths = PathWidget(mf)
-        self.mf_paths.setFixedHeight(self.mf_paths.hh)
-        main_lay.addWidget(self.mf_paths)
+        self.path_widget = PathWidget(mf)
+        self.path_widget.setFixedHeight(self.path_widget.hh)
+        self.path_widget.mf_is_avaiable.connect(self.set_was_changed)
+        main_lay.addWidget(self.path_widget)
 
         self.mf_stop_list = MfStopList(mf)
+        self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
         general_wid = GroupWid()
@@ -793,13 +795,6 @@ class MfSettings(QWidget, StateWid):
         self.mf_save = MfSave()
         self.mf_save.clicked_.connect(self.save)
         main_lay.addWidget(self.mf_save)
-
-        QTimer.singleShot(100, self.text_changed)
-
-    def text_changed(self):
-        for i in (self.mf_paths, self.mf_stop_list):
-            i.textChanged.connect(self.mf_save.warning_svg.show)
-            self.set_was_changed()
 
     def remove_cmd(self, *args):
         
@@ -862,8 +857,8 @@ class MfSettings(QWidget, StateWid):
 
         stop_list = self.mf_stop_list.get_list()
         paths = []
-        if self.mf_paths.mf.mf_paths:
-            paths.append(self.mf_paths.mf.mf_paths)
+        if self.path_widget.mf.mf_paths:
+            paths.append(self.path_widget.mf.mf_paths)
 
         def show_warn(text: str):
             win_warn = WarningWindow(text)

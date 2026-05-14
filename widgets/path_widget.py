@@ -19,7 +19,7 @@ class PathWidget(QGroupBox):
     green_checkmark = "images/green_checkmark.svg"
     hh = 70
     icon_size = 35
-    textChanged = pyqtSignal()
+    mf_is_avaiable = pyqtSignal(str)
     def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
@@ -95,7 +95,7 @@ class PathWidget(QGroupBox):
         def poll_task():
             if not self.task.process_queue.empty():
                 self.mf_path = self.task.process_queue.get()
-                self.textChanged.emit()
+                self.mf_is_avaiable.emit(self.mf_path)
                 self.ok_path_widget()
             else:
                 QTimer.singleShot(500, poll_task)
@@ -120,7 +120,7 @@ class PathWidget(QGroupBox):
         url = dialog.getExistingDirectory()
         if url:
             self.mf_path = url
-            self.textChanged.emit()
+            self.mf_is_avaiable.emit(self.mf_path)
             self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
     
@@ -133,7 +133,7 @@ class PathWidget(QGroupBox):
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
                 self.mf_path = url
-                self.textChanged.emit()
+                self.mf_is_avaiable.emit(self.mf_path)
                 self.ok_path_widget()
         return super().dropEvent(a0)
     
