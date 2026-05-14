@@ -415,5 +415,4 @@ class SmbChecker:
             if avaiable_path:
                 queue.put(avaiable_path)
                 break
-            print("wait smb")
             sleep(1)
