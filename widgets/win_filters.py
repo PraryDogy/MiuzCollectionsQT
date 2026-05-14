@@ -1,11 +1,12 @@
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QListWidgetItem
 
-from cfg import Dynamic, Cfg
+from cfg import Cfg, Dynamic
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (UMainWindow, SmallBtn, UListSpacerItem,
-                            UListWidgetItem, VListWidget)
+from ._base_widgets import (SmallBtn, UListSpacerItem, UListWidgetItem,
+                            UMainWindow, VListWidget)
 
 
 class WinFilters(UMainWindow):
@@ -49,7 +50,9 @@ class WinFilters(UMainWindow):
         if Dynamic.filter_only_folder:
             folder_item.setCheckState(Qt.CheckState.Checked)
 
-        self.list_widget.addItem(UListSpacerItem(parent=self.list_widget))
+        self.list_widget.addItem(
+            UListSpacerItem(parent=self.list_widget)
+        )
 
         for i in Filters.items:
             item = UListWidgetItem(
@@ -78,6 +81,8 @@ class WinFilters(UMainWindow):
         )
 
     def item_cmd(self, item: UListWidgetItem):
+        if isinstance(item, UListSpacerItem):
+            return
         if item.text() == Lng.favorites[Cfg.lng_index]:
             if Dynamic.filter_favs:
                 Dynamic.filter_favs = False
@@ -114,6 +119,9 @@ class WinFilters(UMainWindow):
         Dynamic.filters_enabled.clear()
         self.reload_thumbnails.emit()
         self.deleteLater()
+
+    def mouseReleaseEvent(self, a0):
+        return super().mouseReleaseEvent(a0)
 
     def closeEvent(self, a0):
         self.closed_.emit()
