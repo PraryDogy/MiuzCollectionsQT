@@ -96,7 +96,7 @@ class PathWidget(QGroupBox):
             if not self.task.process_queue.empty():
                 self.write_changes()
                 self.ok_path_widget()
-                self.task.terminate_join()
+                self.stop_task()
             else:
                 QTimer.singleShot(500, poll_task)
 
@@ -110,6 +110,12 @@ class PathWidget(QGroupBox):
     def write_changes(self):
         self.mf.mf_paths = [self.mf.get_avaiable_mf_path(), ]
         Mf.write_json_data()
+
+    def stop_task(self):
+        try:
+            self.task.terminate_join()
+        except Exception as e:
+            print("path widget stop task error", e)
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
         if not a0.button() != 2:
@@ -136,9 +142,9 @@ class PathWidget(QGroupBox):
         return super().dropEvent(a0)
     
     def deleteLater(self):
-        self.task.terminate_join()
+        self.stop_task()
         return super().deleteLater()
     
     def closeEvent(self, a0):
-        self.task.terminate_join()
+        self.stop_task()
         return super().closeEvent(a0)
