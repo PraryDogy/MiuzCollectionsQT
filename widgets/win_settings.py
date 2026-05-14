@@ -26,9 +26,10 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, PathWidget, SmallBtn, UHBoxLayout, ULineEdit,
+from ._base_widgets import (HSep, SmallBtn, UHBoxLayout, ULineEdit,
                             UListSpacerItem, UListWidgetItem, UMainWindow,
                             UMenu, UTextEdit, UVBoxLayout, VListWidget)
+from .path_widget import PathWidget
 from .win_warn import ConfirmWindow, WarningWindow
 
 
@@ -861,8 +862,8 @@ class MfSettings(QWidget, StateWid):
 
         stop_list = self.mf_stop_list.get_list()
         paths = []
-        if self.mf_paths.url:
-            paths.append(self.mf_paths.url)
+        if self.mf_paths.mf.mf_paths:
+            paths.append(self.mf_paths.mf.mf_paths)
 
         def show_warn(text: str):
             win_warn = WarningWindow(text)
@@ -915,7 +916,6 @@ class NewFolder(QWidget, StateWid):
 
         self.mf_paths = PathWidget(self.mf)
         self.mf_paths.setFixedHeight(self.mf_paths.hh)
-        self.mf_paths.no_path_widget()
         main_lay.addWidget(self.mf_paths)
 
         self.mf_stop_list = MfStopList(self.mf)

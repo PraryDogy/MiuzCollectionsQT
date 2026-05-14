@@ -95,7 +95,6 @@ class PathWidget(QGroupBox):
         def poll_task():
             if not self.task.process_queue.empty():
                 self.textChanged.emit()
-                self.write_changes()
                 self.ok_path_widget()
             else:
                 QTimer.singleShot(500, poll_task)
@@ -106,10 +105,6 @@ class PathWidget(QGroupBox):
         )
         self.task.start()
         QTimer.singleShot(500, poll_task)
-
-    def write_changes(self):
-        self.mf.mf_paths = [self.mf.get_avaiable_mf_path(), ]
-        Mf.write_json_data()
 
     def stop_task(self):
         try:
@@ -124,7 +119,6 @@ class PathWidget(QGroupBox):
         url = dialog.getExistingDirectory()
         if url:
             self.textChanged.emit()
-            self.write_changes()
             self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
     
@@ -137,7 +131,6 @@ class PathWidget(QGroupBox):
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
                 self.textChanged.emit()
-                self.write_changes()
                 self.ok_path_widget()
         return super().dropEvent(a0)
     
