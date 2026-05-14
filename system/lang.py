@@ -386,8 +386,8 @@ class Lng:
         "Are you sure you want to delete this server's data?",
     )
     show_in_folder = (
-        "Показать в исходной папке",
-        "Show in source folder"
+        "Показать в коллекциях",
+        "Show in collections"
     )
     set_server_alias = (
         "Задайте псевдоним",
