@@ -107,7 +107,7 @@ class WinSmb(UMainWindow):
             self.mf.mf_paths = [self.path_widget.url, ]
             Mf.write_json_data()
             self.deleteLater()
-            restart_app()
+            # restart_app()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
