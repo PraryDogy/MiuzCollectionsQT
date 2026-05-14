@@ -612,6 +612,14 @@ class GeneralSettings(QWidget, StateWid):
 
 class FiltersWid(GroupWid, StateWid):
     changed = pyqtSignal()
+    exts = (
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".tiff",
+        ".psd",
+        ".psb",
+    )
 
     def __init__(self, filters_clone: list[str]):
         super().__init__()
@@ -624,20 +632,20 @@ class FiltersWid(GroupWid, StateWid):
         self.layout_.addSpacerItem(QSpacerItem(0, 5))
         self.layout_.addWidget(HSep())
 
-        # erase_filters_wid = GroupChild()
-        # erase_filters_wid.setFixedHeight(40)
-        # erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
-        # self.layout_.addWidget(erase_filters_wid)
+        erase_filters_wid = GroupChild()
+        erase_filters_wid.setFixedHeight(40)
+        erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
+        self.layout_.addWidget(erase_filters_wid)
 
-        # erase_filters_text = QLabel(Lng.reset_filters[Cfg.lng_index])
-        # erase_filters_wid.layout_.addWidget(erase_filters_text)
+        erase_filters_text = QLabel(Lng.reset_filters[Cfg.lng_index])
+        erase_filters_wid.layout_.addWidget(erase_filters_text)
 
-        # erase_filters_wid.layout_.addStretch()
+        erase_filters_wid.layout_.addStretch()
 
-        # self.reset_btn = SvgArrow()
-        # erase_filters_wid.layout_.addWidget(self.reset_btn)
+        self.reset_btn = SvgArrow()
+        erase_filters_wid.layout_.addWidget(self.reset_btn)
 
-        # self.layout_.addWidget(HSep())
+        self.layout_.addWidget(HSep())
         self.layout_.addSpacerItem(QSpacerItem(0, 10))
 
         self.filters_edit = UTextEdit()
@@ -648,13 +656,12 @@ class FiltersWid(GroupWid, StateWid):
         self.layout_.addWidget(self.filters_edit)
         
     def reset_btn_cmd(self, *args):
-        return
         def fin():
-            Filters.items.clear()
+            Filters.items = self.exts
             self.filters_edit.clear()
-            self.filters_edit.insertPlainText()
+            self.filters_edit.insertPlainText("\n".join(self.exts))
             self.filters_win.deleteLater()
-            self.changed.emit
+            self.changed.emit()
             self.set_was_changed()
 
         self.filters_win = ConfirmWindow(Lng.reset_filters_long[Cfg.lng_index])
