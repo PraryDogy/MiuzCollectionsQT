@@ -796,6 +796,10 @@ class MfSettings(QWidget, StateWid):
         self.mf_save.clicked_.connect(self.save)
         main_lay.addWidget(self.mf_save)
 
+    def set_was_changed(self):
+        self.mf_save.warning_svg.show()
+        super().set_was_changed()
+
     def remove_cmd(self, *args):
         
         def poll_task():
