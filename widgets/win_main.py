@@ -229,9 +229,6 @@ class WinMain(UMainWindow):
         self.grid.reload_thumbnails()
         if "noscan" not in argv:
             self.start_scaner_task()
-            path = Mf.current_mf.get_avaiable_mf_path()
-            if path is None:
-                QTimer.singleShot(100, lambda: self.open_win_smb(self, Mf.current_mf))
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
@@ -519,6 +516,9 @@ class WinMain(UMainWindow):
         self.dates_win.show()
 
     def open_view_win(self):
+        if not Mf.current_mf.get_avaiable_mf_path():
+            self.open_win_smb(self, Mf.current_mf)
+            return
 
         if len(self.grid.selected_widgets) == 1:
             data_items = [i.data_item for i in self.grid.path_to_wid.values()]

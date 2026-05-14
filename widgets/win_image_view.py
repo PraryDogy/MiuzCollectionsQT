@@ -14,13 +14,14 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QLabel, QWidget)
 
 from cfg import Cfg
+from system.items import ImgViewItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
-from system.items import ImgViewItem
+
 from ._base_widgets import UMainWindow, UMenu, USubMenu, USvgSqareWidget
 from .actions import (CopyName, CopyPath, RevealInFinder, Save, SetFav,
                       WinInfoAction)
