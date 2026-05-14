@@ -409,12 +409,10 @@ class UpdateThumb:
 class SmbChecker:
 
     def start(mf: Mf, queue: Queue):
-        mf_path = None
-        while not mf_path:
+        avaiable_path = mf.get_avaiable_mf_path()
+        while not avaiable_path:
             avaiable_path = mf.get_avaiable_mf_path()
             if avaiable_path:
-                mf.set_mf_current_path(avaiable_path)
-                mf_path = avaiable_path
                 queue.put(True)
                 break
             print("wait smb")
