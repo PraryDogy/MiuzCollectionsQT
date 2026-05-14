@@ -914,10 +914,12 @@ class NewFolder(QWidget, StateWid):
         name_wid.layout_.addWidget(self.name_line_edit)
 
         self.path_widget = PathWidget(self.mf)
+        self.path_widget.mf_is_avaiable.connect(self.set_was_changed)
         self.path_widget.setFixedHeight(self.path_widget.hh)
         main_lay.addWidget(self.path_widget)
 
         self.mf_stop_list = MfStopList(self.mf)
+        self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
         save_wid = GroupWid()
@@ -942,13 +944,10 @@ class NewFolder(QWidget, StateWid):
         save_btn = SvgArrow()
         save_wid_child.layout_.addWidget(save_btn)
 
-        QTimer.singleShot(100, self.text_changed)
+    def set_was_changed(self):
+        self.warning_svg.show()
+        super().set_was_changed()
 
-    def text_changed(self):
-        for i in (self.name_line_edit, self.path_widget, self.mf_stop_list):
-            i.textChanged.connect(self.warning_svg.show)
-            self.set_was_changed()
-        
     def preset_new_folder(self, url: str):
         if url:
             url = os.sep + url.strip(os.sep)
