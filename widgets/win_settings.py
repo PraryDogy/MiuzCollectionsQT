@@ -972,17 +972,17 @@ class NewFolder(QWidget, StateWid):
 
     def save_start(self, *args):
 
-        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
-        folder_name = self.name_line_edit.text()
-        stop_list = self.mf_stop_list.get_list()
-        paths = []
-        if self.path_widget.url:
-            paths.append(self.path_widget.url)
-
         def show_warn(text: str):
             win_warn = WarningWindow(text)
             win_warn.center_to_parent(self.window())
             win_warn.show()
+
+        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
+        folder_name = self.name_line_edit.text()
+        stop_list = self.mf_stop_list.get_list()
+        paths = []
+        if self.path_widget.mf_path:
+            paths.append(self.path_widget.mf_path)
 
         if not folder_name:
             show_warn(Lng.enter_alias_warning[Cfg.lng_index])
