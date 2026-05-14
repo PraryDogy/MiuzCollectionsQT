@@ -413,7 +413,7 @@ class SmbChecker:
         while not avaiable_path:
             avaiable_path = mf.get_avaiable_mf_path()
             if avaiable_path:
-                queue.put(True)
+                queue.put(avaiable_path)
                 break
             print("wait smb")
             sleep(1)

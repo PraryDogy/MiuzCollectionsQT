@@ -36,8 +36,8 @@ class PathWidget(QGroupBox):
         self.main_wid = QWidget()
         self.main_lay.addWidget(self.main_wid)
 
-        mf_path = mf.get_avaiable_mf_path()
-        if mf_path:
+        self.mf_path = mf.get_avaiable_mf_path()
+        if self.mf_path:
             self.ok_path_widget()
         else:
             self.start_checker()
@@ -83,7 +83,7 @@ class PathWidget(QGroupBox):
 
         lines = (
             f"{Lng.folder_path[Cfg.lng_index]}:",
-            self.mf.get_avaiable_mf_path()
+            self.mf_path
         )
         left_label = SelectableLabel('\n'.join(lines))
         h_lay.addWidget(left_label)
@@ -94,6 +94,7 @@ class PathWidget(QGroupBox):
 
         def poll_task():
             if not self.task.process_queue.empty():
+                self.mf_path = self.task.process_queue.get()
                 self.textChanged.emit()
                 self.ok_path_widget()
             else:
@@ -118,6 +119,7 @@ class PathWidget(QGroupBox):
         dialog = QFileDialog()
         url = dialog.getExistingDirectory()
         if url:
+            self.mf_path = url
             self.textChanged.emit()
             self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
@@ -130,6 +132,7 @@ class PathWidget(QGroupBox):
         if a0.mimeData().hasUrls():
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
+                self.mf_path = url
                 self.textChanged.emit()
                 self.ok_path_widget()
         return super().dropEvent(a0)

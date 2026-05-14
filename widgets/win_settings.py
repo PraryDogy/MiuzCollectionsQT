@@ -914,9 +914,9 @@ class NewFolder(QWidget, StateWid):
         self.name_line_edit.setPlaceholderText(Lng.alias_immutable[Cfg.lng_index])
         name_wid.layout_.addWidget(self.name_line_edit)
 
-        self.mf_paths = PathWidget(self.mf)
-        self.mf_paths.setFixedHeight(self.mf_paths.hh)
-        main_lay.addWidget(self.mf_paths)
+        self.path_widget = PathWidget(self.mf)
+        self.path_widget.setFixedHeight(self.path_widget.hh)
+        main_lay.addWidget(self.path_widget)
 
         self.mf_stop_list = MfStopList(self.mf)
         main_lay.addWidget(self.mf_stop_list)
@@ -946,7 +946,7 @@ class NewFolder(QWidget, StateWid):
         QTimer.singleShot(100, self.text_changed)
 
     def text_changed(self):
-        for i in (self.name_line_edit, self.mf_paths, self.mf_stop_list):
+        for i in (self.name_line_edit, self.path_widget, self.mf_stop_list):
             i.textChanged.connect(self.warning_svg.show)
             self.set_was_changed()
         
@@ -957,8 +957,8 @@ class NewFolder(QWidget, StateWid):
             self.name_line_edit.setText(basename)
             self.warning_svg.show()
             
-            self.mf_paths.url = url
-            self.mf_paths.ok_path_widget()
+            self.path_widget.url = url
+            self.path_widget.ok_path_widget()
 
     def save_fin(self, folder_name: str, paths: list, stop_list: list):
         self.mf.mf_alias = folder_name
@@ -977,8 +977,8 @@ class NewFolder(QWidget, StateWid):
         folder_name = self.name_line_edit.text()
         stop_list = self.mf_stop_list.get_list()
         paths = []
-        if self.mf_paths.url:
-            paths.append(self.mf_paths.url)
+        if self.path_widget.url:
+            paths.append(self.path_widget.url)
 
         def show_warn(text: str):
             win_warn = WarningWindow(text)
