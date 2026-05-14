@@ -1,15 +1,15 @@
 import os
 import sys
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QPushButton, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QLabel, QPushButton,
+                             QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import ProcessWorker
+from system.multiprocess import ProcessWorker, SmbChecker
 from widgets._base_widgets import PathWidget, UMainWindow
 
 
@@ -78,6 +78,25 @@ class WinSmb(UMainWindow):
         btns_lay.addStretch()
 
         self.adjustSize()
+        self.start_checker()
+
+    def start_checker(self):
+
+        def poll_task():
+            if not self.task.process_queue.empty():
+                self.path_widget.url = self.mf.get_avaiable_mf_path()
+                self.path_widget.ok_path_widget()
+                self.path_wid_changed()
+                self.task.terminate_join()
+            else:
+                QTimer.singleShot(500, poll_task)
+
+        self.task = ProcessWorker(
+            target=SmbChecker.start,
+            args=(self.mf, )
+        )
+        self.task.start()
+        QTimer.singleShot(500, poll_task)
     
     def path_wid_changed(self):
         if self.path_widget.url and os.path.exists(self.path_widget.url):
@@ -87,9 +106,18 @@ class WinSmb(UMainWindow):
         if self.path_widget.url and os.path.exists(self.path_widget.url):
             self.mf.mf_paths = [self.path_widget.url, ]
             Mf.write_json_data()
+            self.deleteLater()
             restart_app()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
+
+    def deleteLater(self):
+        self.task.terminate_join()
+        return super().deleteLater()
+    
+    def closeEvent(self, a0):
+        self.task.terminate_join()
+        return super().closeEvent(a0)
