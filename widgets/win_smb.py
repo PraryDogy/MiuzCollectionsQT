@@ -57,7 +57,7 @@ class WinSmb(UMainWindow):
         self.central_layout.addWidget(warn_widget)
 
         self.path_widget = PathWidget(mf)
-        self.path_widget.textChanged.connect(self.path_wid_changed)
+        # self.path_widget.textChanged.connect(self.path_wid_changed)
         self.central_layout.addWidget(self.path_widget)
 
         btns_wid = QWidget()
@@ -86,7 +86,7 @@ class WinSmb(UMainWindow):
             if not self.task.process_queue.empty():
                 self.path_widget.url = self.mf.get_avaiable_mf_path()
                 self.path_widget.ok_path_widget()
-                self.path_wid_changed()
+                # self.path_wid_changed()
                 self.task.terminate_join()
             else:
                 QTimer.singleShot(500, poll_task)
