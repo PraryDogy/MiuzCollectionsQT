@@ -71,32 +71,12 @@ class WinSmb(UMainWindow):
         btns_lay.addStretch()
 
         self.adjustSize()
-        self.start_checker()
-
-    def start_checker(self):
-
-        def poll_task():
-            if not self.task.process_queue.empty():
-                self.path_widget.url = self.mf.get_avaiable_mf_path()
-                self.path_widget.ok_path_widget()
-                self.warn_widget.deleteLater()
-                self.task.terminate_join()
-            else:
-                QTimer.singleShot(500, poll_task)
-
-        self.task = ProcessWorker(
-            target=SmbChecker.start,
-            args=(self.mf, )
-        )
-        self.task.start()
-        QTimer.singleShot(500, poll_task)
 
     def ok_clicked(self):
         if self.path_widget.url and os.path.exists(self.path_widget.url):
             self.mf.mf_paths = [self.path_widget.url, ]
             Mf.write_json_data()
             self.deleteLater()
-            # restart_app()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
@@ -104,9 +84,7 @@ class WinSmb(UMainWindow):
         return super().keyPressEvent(a0)
 
     def deleteLater(self):
-        self.task.terminate_join()
         return super().deleteLater()
     
     def closeEvent(self, a0):
-        self.task.terminate_join()
         return super().closeEvent(a0)
