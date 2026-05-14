@@ -237,7 +237,7 @@ class App(QApplication):
     def start(self):
 
         def json_to_app():
-            for i in (Mf, Servers, Filters):
+            for i in (Mf, Filters):
                 i.items.clear()
                 i.json_to_app()
             Cfg.json_to_app()

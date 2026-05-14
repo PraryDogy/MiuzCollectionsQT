@@ -1274,7 +1274,6 @@ class NewMfWin(UMainWindow):
         Mf.write_json_data()
         Cfg.write_json_data()
         Filters.write_json_data()
-        Servers.write_json_data()
         restart_app()
 
     def closeEvent(self, a0):

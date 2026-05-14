@@ -696,7 +696,6 @@ class WinMain(UMainWindow):
         except Exception as e:
             print("on exit main win terminate error", e)
         Cfg.write_json_data()
-        Servers.write_json_data()
         Filters.write_json_data()
         Mf.write_json_data()
         os._exit(0)
