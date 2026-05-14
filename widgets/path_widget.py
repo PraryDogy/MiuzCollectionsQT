@@ -96,7 +96,6 @@ class PathWidget(QGroupBox):
             if not self.task.process_queue.empty():
                 self.write_changes()
                 self.ok_path_widget()
-                self.stop_task()
             else:
                 QTimer.singleShot(500, poll_task)
 
