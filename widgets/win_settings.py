@@ -955,8 +955,9 @@ class NewFolder(QWidget, StateWid):
             self.name_line_edit.setText(basename)
             self.warning_svg.show()
             
-            self.path_widget.url = url
+            self.path_widget.mf_path = url
             self.path_widget.ok_path_widget()
+            self.path_widget.stop_task()
 
     def save_fin(self, folder_name: str, paths: list, stop_list: list):
         self.mf.mf_alias = folder_name
