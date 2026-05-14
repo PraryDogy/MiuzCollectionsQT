@@ -754,6 +754,7 @@ class MfSettings(QWidget, StateWid):
         self.name_wid.layout_.addWidget(name_text)
 
         self.mf_paths = PathWidget(mf)
+        self.mf_paths.setFixedHeight(self.mf_paths.hh)
         main_lay.addWidget(self.mf_paths)
 
         self.mf_stop_list = MfStopList(mf)
@@ -913,6 +914,7 @@ class NewFolder(QWidget, StateWid):
         name_wid.layout_.addWidget(self.name_line_edit)
 
         self.mf_paths = PathWidget(self.mf)
+        self.mf_paths.setFixedHeight(self.mf_paths.hh)
         self.mf_paths.no_path_widget()
         main_lay.addWidget(self.mf_paths)
 

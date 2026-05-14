@@ -3,20 +3,13 @@ import sys
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QLabel, QPushButton,
-                             QWidget)
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
 
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, SmbChecker
 from widgets._base_widgets import PathWidget, UMainWindow
-
-
-def restart_app():
-    ProcessWorker.stop_all()
-    QApplication.quit()
-    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 class WarnWidget(QWidget):
@@ -53,8 +46,8 @@ class WinSmb(UMainWindow):
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
 
-        warn_widget = WarnWidget(mf)
-        self.central_layout.addWidget(warn_widget)
+        self.warn_widget = WarnWidget(mf)
+        self.central_layout.addWidget(self.warn_widget)
 
         self.path_widget = PathWidget(mf)
         # self.path_widget.textChanged.connect(self.path_wid_changed)
@@ -86,7 +79,7 @@ class WinSmb(UMainWindow):
             if not self.task.process_queue.empty():
                 self.path_widget.url = self.mf.get_avaiable_mf_path()
                 self.path_widget.ok_path_widget()
-                # self.path_wid_changed()
+                self.warn_widget.deleteLater()
                 self.task.terminate_join()
             else:
                 QTimer.singleShot(500, poll_task)
@@ -97,10 +90,6 @@ class WinSmb(UMainWindow):
         )
         self.task.start()
         QTimer.singleShot(500, poll_task)
-    
-    def path_wid_changed(self):
-        if self.path_widget.url and os.path.exists(self.path_widget.url):
-            self.ok_btn.setText(Lng.restart[Cfg.lng_index])
 
     def ok_clicked(self):
         if self.path_widget.url and os.path.exists(self.path_widget.url):

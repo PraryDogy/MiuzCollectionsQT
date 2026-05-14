@@ -1,13 +1,14 @@
 import os
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QColor, QContextMenuEvent, QPalette, QMouseEvent
+from PyQt5.QtGui import (QCloseEvent, QColor, QContextMenuEvent, QMouseEvent,
+                         QPalette)
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
                              QGraphicsDropShadowEffect, QGroupBox, QHBoxLayout,
                              QLabel, QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QPushButton, QScrollArea,
-                             QTextEdit, QVBoxLayout, QWidget)
+                             QSizePolicy, QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
 from cfg import Cfg
@@ -416,14 +417,15 @@ class SelectableLabel(QLabel):
 class PathWidget(QGroupBox):
     magnifier = "images/magnifier.svg"
     green_checkmark = "images/green_checkmark.svg"
-    ww = 70
+    hh = 70
     icon_size = 35
     textChanged = pyqtSignal(str)
     def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
         self.setAcceptDrops(True)
-        self.setFixedHeight(self.ww)
+        # self.setFixedHeight(self.ww)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
     
         self.main_lay = QVBoxLayout(self)
         self.main_lay.setContentsMargins(6, 2, 6, 2)
