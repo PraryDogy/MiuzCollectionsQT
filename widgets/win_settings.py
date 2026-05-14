@@ -1008,7 +1008,7 @@ class NewFolder(QWidget, StateWid):
 
         win = ConfirmWindow(Lng.save_text_long[Cfg.lng_index])
         win.ok_clicked.connect(
-            self.save_fin(folder_name, paths, stop_list)
+            lambda: self.save_fin(folder_name, paths, stop_list)
         )
         win.center_to_parent(self.window())
         win.show()
