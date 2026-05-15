@@ -108,13 +108,13 @@ class TreeWid(QTreeWidget):
             if path == os.sep:
                 continue
             rel_path = Utils.get_rel_any_path(
-                mf_path=Mf.current_mf.get_avaiable_mf_path(),
+                mf_path=Mf.current_mf.mf_current_path,
                 abs_img_path=path
             )
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
             parent_rel_path = Utils.get_rel_any_path(
-                mf_path=Mf.current_mf.get_avaiable_mf_path(),
+                mf_path=Mf.current_mf.mf_current_path,
                 abs_img_path=parent
             )
             if Tools.is_hide_digits(Mf.current_mf, parent_rel_path):
@@ -268,7 +268,7 @@ class MfListItem(UListWidgetItem):
 
 class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
-    mf_reveal = pyqtSignal(Mf)
+    mf_reveal = pyqtSignal(tuple)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
     svg_folder = "./images/img_folder.svg"
@@ -308,7 +308,9 @@ class MfList(VListWidget):
             menu.addAction(mf_open)
             menu.addSeparator()
             mf_reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
-            mf_reveal.triggered.connect(lambda: self.mf_reveal.emit(item.mf))
+            mf_reveal.triggered.connect(
+                lambda: self.mf_reveal.emit((item.mf, [item.mf.mf_current_path]))
+            )
             menu.addAction(mf_reveal)
             menu.addSeparator()
             mf_edit = QAction(Lng.setup[Cfg.lng_index], menu)
@@ -380,9 +382,9 @@ class MenuLeft(QWidget):
 
         self.mf_list_widget = MfList(mf_list_parent)
         self.mf_list_widget.mf_open.connect(lambda mf: self.mf_open_cmd(mf))
-        self.mf_list_widget.mf_reveal.connect(lambda mf: self.mf_reveal_cmd(mf))
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
+        self.mf_list_widget.mf_reveal.connect(lambda data: self.reveal_cmd(*data))
         mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
 
         self.splitter.setSizes([
@@ -396,9 +398,8 @@ class MenuLeft(QWidget):
         self.reload_thumbnails.emit()
         self.tree_wid.init_ui()
 
-    def mf_reveal_cmd(self, mf: Mf):
-        data = (mf, [mf.mf_current_path, ])
-        self.reveal_in_finder.emit(data)
+    def reveal_cmd(self, mf: Mf, rel_paths: list[str]):
+        self.reveal_in_finder.emit((mf, rel_paths))
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(

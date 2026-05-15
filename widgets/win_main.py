@@ -148,7 +148,7 @@ class WinMain(UMainWindow):
             lambda p: self.remove_files(Mf.current_mf, p)
         )
         self.grid.open_img_view.connect(
-            lambda: self.open_view_win()
+            lambda: self.open_view_win(Mf.current_mf)
         )
         self.grid.save_files.connect(
             lambda data: self.save_files(Mf.current_mf, data)
@@ -512,7 +512,7 @@ class WinMain(UMainWindow):
         self.dates_win.show()
 
     @with_conn
-    def open_view_win(self):
+    def open_view_win(self, mf: Mf):
         if len(self.grid.selected_widgets) == 1:
             data_items = [i.data_item for i in self.grid.path_to_wid.values()]
             is_selection = False
