@@ -97,9 +97,6 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.no_connection.connect(
-            lambda mf: self.open_win_smb(self.grid, mf)
-        )
         self.left_menu.reload_thumbnails.connect(
             lambda: self.grid.reload_thumbnails()
         )
@@ -111,6 +108,9 @@ class WinMain(UMainWindow):
         )
         self.left_menu.mf_new.connect(
             lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.left_menu.reveal_in_finder.connect(
+            lambda data: self.reveal_in_finder(*data)
         )
         self.splitter.addWidget(self.left_menu)
 
@@ -145,49 +145,46 @@ class WinMain(UMainWindow):
             lambda: self.restart_scaner_task()
         )
         self.grid.remove_files.connect(
-            lambda rel_paths: self.remove_files(self, Mf.current_mf, rel_paths, ))
-        self.grid.no_connection.connect(
-            lambda: self.open_win_smb(self.grid, Mf.current_mf)
+            lambda p: self.remove_files(Mf.current_mf, p)
         )
         self.grid.open_img_view.connect(
-            lambda: self.open_view_win(self.grid, Mf.current_mf)
+            lambda: self.open_view_win()
         )
         self.grid.save_files.connect(
-            lambda data: self.save_files(self.grid, Mf.current_mf, data)
+            lambda data: self.save_files(Mf.current_mf, data)
         )
         self.grid.open_info_win.connect(
-            lambda rel_paths: self.open_info_win(self.grid, Mf.current_mf, rel_paths)
+            lambda p: self.open_info_win(Mf.current_mf, p)
         )
         self.grid.copy_path.connect(
-            lambda rel_paths: self.copy_path(self.grid, Mf.current_mf, rel_paths)
+            lambda p: self.copy_path(Mf.current_mf, p)
         )
         self.grid.copy_name.connect(
-            lambda rel_paths: self.copy_name(self.grid, Mf.current_mf, rel_paths)
+            lambda p: self.copy_name(Mf.current_mf, p)
         )
         self.grid.reveal_in_finder.connect(
-            lambda rel_paths: self.reveal_in_finder(self.grid, Mf.current_mf, rel_paths)
+            lambda p: self.reveal_in_finder(Mf.current_mf, p)
         )
         self.grid.set_fav.connect(
-            self.set_fav
+            lambda data: self.set_fav(data)
         )
         self.grid.open_in_app.connect(
-            lambda data: self.open_in_app(self.grid, Mf.current_mf, data))
+            lambda data: self.open_in_app(Mf.current_mf, data)
+        )
         self.grid.paste_files.connect(
-            lambda: self.paste_files(self.grid,  Mf.current_mf)
+            lambda: self.paste_files(Mf.current_mf)
         )
         self.grid.set_clipboard.connect(
-            lambda data: self.set_buffer(self.grid, Mf.current_mf, data)
+            lambda data: self.set_buffer(Mf.current_mf, data)
         )
         self.grid.setup_mf.connect(
-            self.open_settings_win
+            lambda item: self.open_settings_win(item)
         )
         self.grid.path_bar_update.connect(
             lambda rel_path: self.path_bar_update(rel_path)
         )
         self.grid.update_thumb.connect(
-            lambda rel_img_paths: self.start_update_thumb(
-                self.grid, Mf.current_mf, rel_img_paths
-            )
+            lambda p: self.start_update_thumb(Mf.current_mf, p)
         )
         self.grid.show_in_app.connect(
             self.show_in_app
@@ -211,7 +208,7 @@ class WinMain(UMainWindow):
 
         self.bar_bottom = BarBottom()
         self.bar_bottom.progress_bar.setText(Lng.loading[Cfg.lng_index])
-        self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
+        self.bar_bottom.resize_thumbnails.connect(self.grid.resize_thumbnails)
         right_lay.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
@@ -235,13 +232,13 @@ class WinMain(UMainWindow):
 
     @staticmethod
     def with_conn(fn):
-        def wrapper(self: "WinMain", parent: QWidget, mf: Mf, *args, **kwargs):
+        def wrapper(self: "WinMain", mf: Mf, *args):
             avaiable_mf_path = mf.get_avaiable_mf_path()
             if avaiable_mf_path:
                 mf.set_mf_current_path(avaiable_mf_path)
-                return fn(self, parent, mf, *args, **kwargs)
+                return fn(self, mf, *args)
             else:
-                self.open_win_smb(parent, mf)
+                self.open_win_smb(mf)
         return wrapper
     
     def show_in_app(self, rel_path: str):
@@ -290,13 +287,13 @@ class WinMain(UMainWindow):
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
 
-    def open_win_smb(self, parent: QWidget, mf: Mf):
+    def open_win_smb(self, mf: Mf):
         self.win_smb = WinSmb(mf)
         self.win_smb.center_to_parent(self.win_list[-2])
         self.win_smb.show()
  
     @with_conn
-    def start_update_thumb(self, parent: QWidget, mf: Mf, rel_img_paths: list[str]):
+    def start_update_thumb(self, mf: Mf, rel_img_paths: list[str]):
 
         def poll_task():
             queue = self.update_thumb_task.process_queue
@@ -320,7 +317,7 @@ class WinMain(UMainWindow):
         QTimer.singleShot(300, poll_task)
 
     @with_conn
-    def save_files(self, parent: QWidget, mf: Mf, data: tuple):
+    def save_files(self, mf: Mf, data: tuple):
         target_dir, rel_files_to_copy = data
         abs_files_to_copy = [
             Utils.get_abs_any_path(mf.mf_current_path, i)
@@ -339,7 +336,7 @@ class WinMain(UMainWindow):
         copy_files_win.finished_.connect(Utils.reveal_files)
 
     @with_conn
-    def set_buffer(self, parent: QWidget, mf: Mf, data: tuple):
+    def set_buffer(self, mf: Mf, data: tuple):
         buffer_type, rel_files_to_copy = data
         abs_files_to_copy = [
             Utils.get_abs_any_path(mf.mf_current_path, i)
@@ -356,7 +353,7 @@ class WinMain(UMainWindow):
         self.grid.buffer = self.buffer
 
     @with_conn
-    def paste_files(self, parent: QWidget, mf: Mf):
+    def paste_files(self, mf: Mf):
         target_dir = Utils.get_abs_any_path(
             mf_path=Mf.current_mf.mf_current_path,
             rel_path=Dynamic.current_dir
@@ -384,7 +381,7 @@ class WinMain(UMainWindow):
         copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
 
     @with_conn
-    def open_in_app(self, parent: QWidget, mf: Mf, data: tuple):
+    def open_in_app(self, mf: Mf, data: tuple):
         rel_paths, app_path = data
         for i in rel_paths:
             abs_path = Utils.get_abs_any_path(mf.mf_current_path, i)
@@ -394,7 +391,7 @@ class WinMain(UMainWindow):
                 subprocess.Popen(["open", abs_path])
 
     @with_conn
-    def reveal_in_finder(self, parent: QWidget, mf: Mf, rel_paths: list):
+    def reveal_in_finder(self, mf: Mf, rel_paths: list):
         abs_paths = [
             Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_paths
@@ -405,7 +402,7 @@ class WinMain(UMainWindow):
             Utils.reveal_files(abs_paths)
 
     @with_conn
-    def copy_name(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
+    def copy_name(self, mf: Mf, rel_paths: list[str]):
         names = [
             os.path.splitext(os.path.basename(i))[0]
             for i in rel_paths
@@ -413,7 +410,7 @@ class WinMain(UMainWindow):
         Utils.copy_text("\n".join(names))
 
     @with_conn
-    def copy_path(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
+    def copy_path(self, mf: Mf, rel_paths: list[str]):
         abs_paths = [
             Utils.get_abs_any_path(mf.mf_current_path, i)
             for i in rel_paths
@@ -421,7 +418,7 @@ class WinMain(UMainWindow):
         Utils.copy_text("\n".join(abs_paths))
 
     @with_conn
-    def remove_files(self, parent: QWidget, mf: Mf, rel_paths: list, ms = 300):
+    def remove_files(self, mf: Mf, rel_paths: list, ms = 300):
         
         def poll_file_remover():
             if not file_remover.process_queue.empty():
@@ -457,7 +454,7 @@ class WinMain(UMainWindow):
         self.remove_files_win.show()
     
     @with_conn
-    def upload_files(self, parent: QWidget, mf: Mf, abs_paths: list[str]):
+    def upload_files(self, mf: Mf, abs_paths: list[str]):
 
         def fin(target_dir: str):
             self.upload_win.deleteLater()
@@ -488,7 +485,7 @@ class WinMain(UMainWindow):
         self.upload_win.show()
 
     @with_conn
-    def open_info_win(self, parent: QWidget, mf: Mf, rel_paths: list[str]):
+    def open_info_win(self, mf: Mf, rel_paths: list[str]):
         
         abs_paths = [
             Utils.get_abs_any_path(mf.mf_current_path, i)
@@ -498,7 +495,6 @@ class WinMain(UMainWindow):
         self.info_win.adjustSize()
         self.info_win.center_to_parent(UMainWindow.win_list[-2])
         self.info_win.show()
-        # self.info_win.finished_.connect(open_delayed)
 
     def open_settings_win(self, settings_item: SettingsItem):
         self.bar_top.settings_btn.set_solid_style()
@@ -517,10 +513,6 @@ class WinMain(UMainWindow):
 
     @with_conn
     def open_view_win(self):
-        if not Mf.current_mf.get_avaiable_mf_path():
-            self.open_win_smb(self, Mf.current_mf)
-            return
-
         if len(self.grid.selected_widgets) == 1:
             data_items = [i.data_item for i in self.grid.path_to_wid.values()]
             is_selection = False
@@ -555,9 +547,6 @@ class WinMain(UMainWindow):
         )
         self.view_win.select_thumb.connect(
             lambda path: self.grid.select_viewed_image(path)
-        )
-        self.view_win.no_connection.connect(
-            lambda: self.open_win_smb(self.view_win, Mf.current_mf)
         )
         self.view_win.open_in_app.connect(
             lambda data: self.open_in_app(self.window(), Mf.current_mf, data)

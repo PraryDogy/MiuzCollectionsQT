@@ -376,7 +376,7 @@ class MfListItem(UListWidgetItem):
 
 class MfList(VListWidget):
     mf_edit = pyqtSignal(Mf)
-    reload_thumbnails = pyqtSignal()
+    mf_open = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
     mf_new = pyqtSignal()
     svg_folder = "./images/img_folder.svg"
@@ -397,18 +397,13 @@ class MfList(VListWidget):
             item.mf = i
             self.addItem(item)
 
-    def mf_open_cmd(self, mf: Mf):
-        Mf.current_mf = mf
-        Dynamic.current_dir = ""
-        self.reload_thumbnails.emit()
-
     def mouseReleaseEvent(self, e):
         item: MfListItem = self.itemAt(e.pos())
         if not item:
             self.clearSelection()
             return
         if e.button() == Qt.MouseButton.LeftButton:
-            self.mf_open_cmd(item.mf)
+            self.mf_open.emit(item.mf)
         return super().mouseReleaseEvent(e)
 
     def contextMenuEvent(self, a0):
@@ -416,7 +411,7 @@ class MfList(VListWidget):
         item: MfListItem = self.itemAt(a0.pos())
         if item:
             open = QAction(Lng.open[Cfg.lng_index], menu)
-            # open.triggered.connect(lambda: self.mf_open.emit(item.mf))
+            open.triggered.connect(lambda: self.mf_open.emit(item.mf))
             menu.addAction(open)
             menu.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
@@ -443,7 +438,7 @@ class MfList(VListWidget):
 
 class MenuLeft(QWidget):
     reload_thumbnails = pyqtSignal()
-    no_connection = pyqtSignal(Mf)
+    reveal_in_finder = pyqtSignal(tuple)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
     mf_list_ww = 130
@@ -469,11 +464,20 @@ class MenuLeft(QWidget):
         self.splitter.addWidget(mf_list_parent)
 
         self.mf_list_widget = MfList(mf_list_parent)
-        # self.mf_list_widget.mf_reveal.connect(self.revea)
-        self.mf_list_widget.reload_thumbnails.connect(self.reload_thumbnails.emit)
+        self.mf_list_widget.mf_open.connect(lambda mf: self.mf_open_cmd(mf))
+        self.mf_list_widget.mf_reveal.connect(lambda mf: self.mf_reveal_cmd(mf))
         mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
 
         self.splitter.setSizes([
             self.height() - self.mf_list_ww,
             self.mf_list_ww
         ])
+
+    def mf_open_cmd(self, mf: Mf):
+        Mf.current_mf = mf
+        Dynamic.current_dir = ""
+        self.reload_thumbnails.emit()
+
+    def mf_reveal_cmd(self, mf: Mf):
+        data = (mf, [mf.mf_current_path, ])
+        self.reveal_in_finder.emit(data)

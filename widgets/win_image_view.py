@@ -222,7 +222,6 @@ class NextImgBtn(SwitchImgBtn):
 
 class WinImageView(UMainWindow):
     select_thumb = pyqtSignal(str)
-    no_connection = pyqtSignal()
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
@@ -270,18 +269,9 @@ class WinImageView(UMainWindow):
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # self.hide_all_buttons()
-        QTimer.singleShot(100, self.first_load)
+        QTimer.singleShot(100, self.load_thumb)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
-
-
-    def first_load(self):
-        avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
-        if not avaiable_mf_path:
-            self.no_connection.emit()
-        else:
-            Mf.current_mf.set_mf_current_path(avaiable_mf_path)
-        self.load_thumb()
     
     def zoom_cmd(self, flag: str):
         actions = {

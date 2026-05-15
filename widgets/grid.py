@@ -329,7 +329,6 @@ class Grid(VScrollArea):
     save_files = pyqtSignal(tuple)
     path_bar_update = pyqtSignal(str)
     open_img_view = pyqtSignal()
-    no_connection = pyqtSignal()
     open_info_win = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
@@ -1033,9 +1032,6 @@ class Grid(VScrollArea):
                     Utils.get_abs_any_path(Mf.current_mf.mf_current_path, wid.data_item.rel_path)
                     for wid in self.selected_widgets
                 ]
-
-            # if not paths:
-                # return self.no_connection.emit()
 
             # создаём объект перетаскивания
             drag = QDrag(self)
