@@ -319,7 +319,7 @@ class MenuLeft(QWidget):
     reveal = pyqtSignal(tuple)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
-    mf_list_ww = 130
+    mf_list_hh = 130
 
     def __init__(self):
         super().__init__()
@@ -357,8 +357,8 @@ class MenuLeft(QWidget):
         mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
 
         self.splitter.setSizes([
-            self.height() - self.mf_list_ww,
-            self.mf_list_ww
+            self.height() - self.mf_list_hh,
+            self.mf_list_hh
         ])
 
     def reveal_cmd(self, mf: Mf, rel_paths: list[str]):
