@@ -311,9 +311,6 @@ class WinMain(UMainWindow):
             mf_path=mf.mf_current_path,
             abs_img_path=abs_path
         )
-        if rel_path == os.sep:
-            # это нужно чтобы из базы данных загрузить данные
-            rel_path = ""
         Dynamic.current_dir = rel_path
         self.grid.reload_thumbnails()
 

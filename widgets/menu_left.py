@@ -134,8 +134,6 @@ class TreeWid(QTreeWidget):
         self.expand_to_path(self.abs_selected_path)
 
     def expand_to_path(self, path: str):
-        if path == "":
-            path = os.sep
         if path not in self.items:
             return
         self.abs_selected_path = path
@@ -154,21 +152,6 @@ class TreeWid(QTreeWidget):
             return
         self.abs_selected_path = abs_path
         self.on_tree_clicked.emit(abs_path)
-        return
-
-
-        if item.rel_path == os.sep:
-            # Корневая директория представляется пустой строкой.
-            # Это нужно потому, что в запросах к БД формируется
-            # шаблон вида `path + '/%'` (ILIKE/LIKE).
-            # Если хранить корень как `'/'`,
-            # шаблон превратится в `'//%'` — поиск будет неверным.
-            # Пустая строка даёт корректный шаблон `'/%'`,
-            # то есть все записи из корня.
-            rel_path = ""
-        else:
-            rel_path = item.rel_path
-        self.on_tree_clicked.emit(rel_path)
 
     def generate_path_hierarchy(self, full_path):
         parts = []
@@ -207,7 +190,7 @@ class TreeWid(QTreeWidget):
         item: UTreeWidgetItem = self.itemAt(a0.pos())
         menu = UMenu(a0)
 
-        abs_path = ""
+        abs_path = os.sep
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
             self.abs_selected_path = abs_path
