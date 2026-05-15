@@ -90,6 +90,7 @@ class TreeWid(QTreeWidget):
 
     def build_tree(self, root_item: UTreeWidgetItem, paths: list[str]) -> None:
         self.items: dict[str, UTreeWidgetItem] = {os.sep: root_item}
+        hide_digits = Tools.need_hide_digits(Mf.current_mf)
 
         for path in sorted(paths):
             if path == os.sep:
@@ -97,8 +98,8 @@ class TreeWid(QTreeWidget):
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
 
-            # механика сокрытия цифер для первичных папок
-            if path.count(os.sep) == 1:
+            # Опция: скрывать числовые префиксы только у папок первого (верхнего) уровня
+            if hide_digits and path.count(os.sep) == 1:
                 name = self.strip_to_first_letter(path)
 
             parent_item = self.items.get(parent)
