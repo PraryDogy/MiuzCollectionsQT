@@ -161,8 +161,7 @@ class TreeWid(QTreeWidget):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
         if clicked_dir == self.abs_selected_path:
             return
-        else:
-            self.abs_selected_path = clicked_dir
+        self.abs_selected_path = clicked_dir
         if item.rel_path == os.sep:
             # Корневая директория представляется пустой строкой.
             # Это нужно потому, что в запросах к БД формируется
