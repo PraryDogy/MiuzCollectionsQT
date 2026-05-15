@@ -108,11 +108,6 @@ class TreeWid(QTreeWidget):
                 continue
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
-            # if Tools.is_hide_digits(Mf.current_mf, parent_rel_path):
-            #     old_name = name
-            #     name = self.strip_to_first_letter(name)
-            #     if not name:
-            #         name = old_name
 
             parent_item = self.items.get(parent)
             if parent_item is None:
@@ -212,23 +207,6 @@ class TreeWid(QTreeWidget):
         menu.addAction(collapse_all)
 
         menu.addSeparator()
-
-        # if item.rel_path:
-
-        #     if Tools.is_hide_digits(Mf.current_mf, item.rel_path):
-        #         text = Lng.show_digits[Cfg.lng_index]
-        #         cmd = show_digits_cmd
-        #     else:
-        #         text = Lng.hide_digits[Cfg.lng_index]
-        #         cmd = hide_digits_cmd
-        #     hide_ = QAction(text, menu)
-        #     hide_.triggered.connect(cmd)
-        #     menu.addAction(hide_)
-
-        #     if item.rel_path == os.sep:
-        #         reset_digits = QAction(Lng.show_digits_all[Cfg.lng_index], menu)
-        #         reset_digits.triggered.connect(reset_all_digits_cmd)
-        #         menu.addAction(reset_digits)
 
         menu.addSeparator()
 
