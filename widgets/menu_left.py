@@ -140,6 +140,8 @@ class TreeWid(QTreeWidget):
         self.sort_children(root_item)
 
         root_item.setExpanded(True)
+        if not self.selected_path:
+            self.selected_path = os.sep
         self.expand_to_path(self.selected_path)
 
     def expand_to_path(self, path: str):
@@ -406,6 +408,7 @@ class MenuLeft(QWidget):
         Mf.current_mf = mf
         Dynamic.current_dir = ""
         self.reload_thumbnails.emit()
+        self.tree_wid.selected_path = os.sep
         self.tree_wid.init_ui()
 
     def reveal_cmd(self, mf: Mf, rel_paths: list[str]):
