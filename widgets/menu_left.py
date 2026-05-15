@@ -467,7 +467,7 @@ class MenuLeft(QWidget):
         self.mf_list_widget.mf_open.connect(lambda mf: self.mf_open_cmd(mf))
         self.mf_list_widget.mf_reveal.connect(lambda mf: self.mf_reveal_cmd(mf))
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
-        self.mf_list_widget.mf_new
+        self.mf_list_widget.mf_new.connect(lambda: self.mf_new_cmd())
         mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
 
         self.splitter.setSizes([
@@ -491,5 +491,9 @@ class MenuLeft(QWidget):
         )
         self.mf_edit.emit(item)
 
-    def mf_new_cmd(self, mf: Mf):
-        ...
+    def mf_new_cmd(self):
+        item = SettingsItem(
+            type_="new_folder",
+            content=""
+        )
+        self.mf_new.emit(item)
