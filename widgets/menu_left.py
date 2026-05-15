@@ -54,7 +54,7 @@ class UTreeWidgetItem(QTreeWidgetItem):
 
 class TreeWid(QTreeWidget):
     tree_reveal = pyqtSignal(str)
-    tree_open = pyqtSignal(str)
+    reload_thumbnails = pyqtSignal(str)
 
     svg_folder = "./images/folder.svg"
     svg_size = 16
@@ -62,7 +62,7 @@ class TreeWid(QTreeWidget):
 
     def __init__(self):
         super().__init__()
-        self.selected_path: str = os.sep
+        self.abs_selected_path: str = os.sep
         self.items: dict[str, UTreeWidgetItem] = {}
 
         self.setHeaderHidden(True)
@@ -140,16 +140,14 @@ class TreeWid(QTreeWidget):
         self.sort_children(root_item)
 
         root_item.setExpanded(True)
-        # if not self.selected_path:
-            # self.selected_path = os.sep
-        self.expand_to_path(self.selected_path)
+        self.expand_to_path(self.abs_selected_path)
 
     def expand_to_path(self, path: str):
         if path == "":
             path = os.sep
         if path not in self.items:
             return
-        self.selected_path = path
+        self.abs_selected_path = path
         item = self.items.get(path)
         parent = item.parent()
         while parent:
@@ -161,18 +159,22 @@ class TreeWid(QTreeWidget):
 
     def on_item_click(self, item: UTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
-        if clicked_dir and clicked_dir != self.selected_path:
-            self.selected_path = clicked_dir
-            if clicked_dir == os.sep:
-                # Корневая директория представляется пустой строкой.
-                # Это нужно потому, что в запросах к БД формируется
-                # шаблон вида `path + '/%'` (ILIKE/LIKE).
-                # Если хранить корень как `'/'`,
-                # шаблон превратится в `'//%'` — поиск будет неверным.
-                # Пустая строка даёт корректный шаблон `'/%'`,
-                # то есть все записи из корня.
-                clicked_dir = ""
-            self.tree_open.emit(clicked_dir)
+        if clicked_dir == self.abs_selected_path:
+            return
+        else:
+            self.abs_selected_path = clicked_dir
+        if item.rel_path == os.sep:
+            # Корневая директория представляется пустой строкой.
+            # Это нужно потому, что в запросах к БД формируется
+            # шаблон вида `path + '/%'` (ILIKE/LIKE).
+            # Если хранить корень как `'/'`,
+            # шаблон превратится в `'//%'` — поиск будет неверным.
+            # Пустая строка даёт корректный шаблон `'/%'`,
+            # то есть все записи из корня.
+            rel_path = ""
+        else:
+            rel_path = item.rel_path
+        self.reload_thumbnails.emit(rel_path)
 
     def generate_path_hierarchy(self, full_path):
         parts = []
@@ -214,9 +216,9 @@ class TreeWid(QTreeWidget):
         abs_path = ""
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
-            self.selected_path = abs_path
+            self.abs_selected_path = abs_path
             view = QAction(Lng.open[Cfg.lng_index], menu)
-            view.triggered.connect(lambda: self.tree_open.emit(item.rel_path))
+            view.triggered.connect(lambda: self.reload_thumbnails.emit(item.rel_path))
             menu.addAction(view)
             menu.addSeparator()
 
@@ -379,7 +381,7 @@ class MenuLeft(QWidget):
         self.tree_wid.tree_reveal.connect(
             lambda abs_path: self.reveal_cmd(Mf.current_mf, [abs_path, ])
         )
-        self.tree_wid.tree_open.connect(
+        self.tree_wid.reload_thumbnails.connect(
             lambda rel_path: self.tree_open_cmd(rel_path)
         )
         self.tree_wid.init_ui()
@@ -409,7 +411,7 @@ class MenuLeft(QWidget):
         Mf.current_mf = mf
         Dynamic.current_dir = ""
         self.reload_thumbnails.emit()
-        self.tree_wid.selected_path = os.sep
+        self.tree_wid.abs_selected_path = os.sep
         self.tree_wid.init_ui()
 
     def reveal_cmd(self, mf: Mf, rel_paths: list[str]):

@@ -291,6 +291,10 @@ class WinMain(UMainWindow):
         self.win_smb = WinSmb(mf)
         self.win_smb.center_to_parent(self.win_list[-2])
         self.win_smb.show()
+
+    @with_conn
+    def tree_open(self, mf: Mf, rel_path: str):
+        ...
  
     @with_conn
     def start_update_thumb(self, mf: Mf, rel_img_paths: list[str]):
