@@ -55,6 +55,7 @@ class UTreeWidgetItem(QTreeWidgetItem):
 class TreeWid(QTreeWidget):
     tree_reveal = pyqtSignal(str)
     reload_thumbnails = pyqtSignal(str)
+    open_smb_win = pyqtSignal()
 
     svg_folder = "./images/folder.svg"
     svg_size = 16
