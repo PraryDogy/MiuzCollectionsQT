@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 class Static:
-    app_ver = 4.7
+    app_ver = 4.75
     app_name = "Collections"
     thumbs_load_limit = 100
     
