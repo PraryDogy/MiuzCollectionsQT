@@ -816,6 +816,9 @@ class MfSettings(QWidget, StateWid):
                     if i.mf_alias == self.mf.mf_alias:
                         Mf.items.remove(i)
                         break
+                if self.mf.mf_alias in Cfg.hide_digits_list:
+                    Cfg.hide_digits_list.pop(self.mf.mf_alias)
+                    Cfg.write_json_data()
                 Mf.write_json_data()
                 restart_app()
             else:
