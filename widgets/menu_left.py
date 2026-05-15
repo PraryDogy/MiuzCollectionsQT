@@ -109,6 +109,10 @@ class TreeWid(QTreeWidget):
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
 
+            # механика сокрытия цифер для первичных папок
+            if path.count(os.sep) == 1:
+                name = self.strip_to_first_letter(path)
+
             parent_item = self.items.get(parent)
             if parent_item is None:
                 continue
