@@ -1034,8 +1034,8 @@ class Grid(VScrollArea):
                     for wid in self.selected_widgets
                 ]
 
-            if not paths:
-                return self.no_connection.emit()
+            # if not paths:
+                # return self.no_connection.emit()
 
             # создаём объект перетаскивания
             drag = QDrag(self)
@@ -1048,7 +1048,11 @@ class Grid(VScrollArea):
 
             # назначаем urls
             mime_data.setUrls([QUrl.fromLocalFile(p) for p in paths])
-            drag.exec_(Qt.DropAction.CopyAction)
+
+            if not paths:
+                drag.exec_(Qt.DropAction.IgnoreAction)
+            else:
+                drag.exec_(Qt.DropAction.CopyAction)
 
         # --- Основная логика ---
         if self.wid_under_mouse is None and not self.rubberBand.isVisible():

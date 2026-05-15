@@ -146,9 +146,9 @@ class WinMain(UMainWindow):
         )
         self.grid.remove_files.connect(
             lambda rel_paths: self.remove_files(self, Mf.current_mf, rel_paths, ))
-        # self.grid.no_connection.connect(
-        #     lambda: self.open_win_smb(self.grid, Mf.current_mf)
-        # )
+        self.grid.no_connection.connect(
+            lambda: self.open_win_smb(self.grid, Mf.current_mf)
+        )
         self.grid.open_img_view.connect(
             lambda: self.open_view_win(self.grid, Mf.current_mf)
         )
