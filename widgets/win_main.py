@@ -146,11 +146,11 @@ class WinMain(UMainWindow):
         )
         self.grid.remove_files.connect(
             lambda rel_paths: self.remove_files(self, Mf.current_mf, rel_paths, ))
-        self.grid.no_connection.connect(
-            lambda: self.open_win_smb(self.grid, Mf.current_mf)
-        )
+        # self.grid.no_connection.connect(
+        #     lambda: self.open_win_smb(self.grid, Mf.current_mf)
+        # )
         self.grid.open_img_view.connect(
-            lambda: self.open_view_win()
+            lambda: self.open_view_win(self.grid, Mf.current_mf)
         )
         self.grid.save_files.connect(
             lambda data: self.save_files(self.grid, Mf.current_mf, data)
@@ -515,6 +515,7 @@ class WinMain(UMainWindow):
         self.dates_win.center_to_parent(self)
         self.dates_win.show()
 
+    @with_conn
     def open_view_win(self):
         if not Mf.current_mf.get_avaiable_mf_path():
             self.open_win_smb(self, Mf.current_mf)

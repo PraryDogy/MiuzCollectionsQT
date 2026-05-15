@@ -4,8 +4,7 @@ import subprocess
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QAction, QSplitter, QTabWidget, QTreeWidget,
-                             QTreeWidgetItem, QWidget)
+from PyQt5.QtWidgets import QAction, QTabWidget, QTreeWidget, QTreeWidgetItem
 
 from cfg import Cfg, Dynamic
 from system.items import SettingsItem
@@ -14,8 +13,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UHBoxLayout, UListWidgetItem, UMenu, UVBoxLayout,
-                            VListWidget)
+from ._base_widgets import UListWidgetItem, UMenu, USubMenu, VListWidget
 
 
 class Tools:
@@ -266,149 +264,40 @@ class MfListItem(UListWidgetItem):
         self.mf: Mf = None
 
 
-# class MenuLeft(QTabWidget):
-#     reload_thumbnails = pyqtSignal()
-#     no_connection = pyqtSignal(Mf)
-#     mf_edit = pyqtSignal(SettingsItem)
-#     mf_new = pyqtSignal(SettingsItem)
-
-#     def __init__(self):
-#         super().__init__()
-#         self.setAcceptDrops(True)
-#         self.init_ui()
-
-#     def init_ui(self):
-
-#         def with_conn(fn: callable):
-#             def wrapper(mf: Mf, *args, **kwargs):
-#                 fn(mf, *args, **kwargs)
-#                 avaiable_path = mf.get_avaiable_mf_path()
-#                 if not avaiable_path:
-#                     self.no_connection.emit(mf)
-#                 else:
-#                     mf.set_mf_current_path(avaiable_path)
-#             return wrapper
-
-#         @with_conn
-#         def _mf_reveal(mf: Mf):
-#             subprocess.Popen(["open", mf.mf_current_path])
-
-#         @with_conn
-#         def _tree_reveal(mf: Mf, rel_path: str):
-#             abs_path = Utils.get_abs_any_path(mf.mf_current_path, rel_path)
-#             subprocess.Popen(["open", abs_path])
-
-#         def _mf_open(mf: Mf):
-#             if Mf.current_mf == mf:
-#                 return
-#             Mf.current_mf = mf
-#             # Корневая директория представляется пустой строкой.
-#             # Это нужно потому, что в запросах к БД формируется шаблон вида `path + '/%'` (ILIKE/LIKE).
-#             # Если хранить корень как `'/'`, шаблон превратится в `'//%'` — поиск будет неверным.
-#             # Пустая строка даёт корректный шаблон `'/%'`, то есть все записи из корня.
-#             Dynamic.history.clear()
-#             Dynamic.current_dir = ""
-#             self.tree_wid.init_ui()
-#             self.reload_thumbnails.emit()
-
-#         def _tree_open(mf: Mf, rel_path: str):
-#             try:
-#                 curr_ind = max(
-#                     x
-#                     for x, i in enumerate(Dynamic.history)
-#                     if i == Dynamic.current_dir
-#                 )
-#             except ValueError:
-#                 curr_ind = -1
-#             Dynamic.history = Dynamic.history[:curr_ind + 1]
-#             Dynamic.history.append(rel_path)
-#             if len(Dynamic.history) > 100:
-#                 Dynamic.history = Dynamic.history[-100:]
-#             Dynamic.current_dir = rel_path
-#             self.reload_thumbnails.emit()
-
-#         def _mf_edit(mf: Mf):
-#             item = SettingsItem("edit_folder", mf.mf_alias)
-#             self.mf_edit.emit(item)
-
-#         def _mf_new():
-#             item = SettingsItem("new_folder", "")
-#             self.mf_new.emit(item)
-
-#         self.clear()
-#         self.mf_list = MfList(self)
-#         self.mf_list.mf_open.connect(lambda mf: _mf_open(mf))
-#         self.mf_list.mf_reveal.connect(lambda mf: _mf_reveal(mf))
-#         self.mf_list.mf_edit.connect(lambda mf: _mf_edit(mf))
-#         self.mf_list.mf_new.connect(lambda: _mf_new())
-
-#         self.tree_wid = TreeWid()
-#         self.tree_wid.init_ui()
-#         self.tree_wid.tree_reveal.connect(
-#             lambda rel_path: _tree_reveal(Mf.current_mf, rel_path)
-#         )
-#         self.tree_wid.tree_open.connect(
-#             lambda rel_path: _tree_open(Mf.current_mf, rel_path)
-#         )
-
-#         self.addTab(self.mf_list, Lng.catalogs[Cfg.lng_index])
-#         self.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])
-
-#         self.mf_list.setCurrentRow(0)
-#         QTimer.singleShot(10, lambda: _mf_open(Mf.current_mf))
-    
-#     def show_in_app(self, rel_path: str):
-#         self.tree_wid.expand_to_path(rel_path)
-
-#     def reload_tree(self):
-#         self.tree_wid.init_ui()
-
-#     def dragEnterEvent(self, a0):
-#         a0.accept()
-
-#     def dropEvent(self, a0):
-#         if a0.mimeData().hasUrls():
-#             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
-#             if os.path.isdir(url):
-#                 item = SettingsItem("new_folder", url)
-#                 self.mf_new.emit(item)
-
-
 class MfList(VListWidget):
     mf_edit = pyqtSignal(Mf)
-    reload_thumbnails = pyqtSignal()
+    mf_open = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
     mf_new = pyqtSignal()
     svg_folder = "./images/img_folder.svg"
     svg_size = 16
 
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QTabWidget):
         super().__init__(parent=parent)
         self.setCurrentRow(0)
-        # self.setDragEnabled(True)
-        # self.setAcceptDrops(True)
-        # self.setDefaultDropAction(Qt.DropAction.MoveAction)
-        # self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
 
         for i in Mf.items:
-            item = MfListItem(parent=self, text=i.mf_alias)
+            if i.mf_current_path:
+                true_name = os.path.basename(i.mf_current_path)
+            else:
+                true_name = os.path.basename(i.mf_paths[0])
+            text = i.mf_alias
+            item = MfListItem(parent=self, text=text)
             item.setIcon(QIcon(self.svg_folder))
             item.mf = i
             self.addItem(item)
 
-    def mf_open_cmd(self, mf: Mf):
-        Mf.current_mf = mf
-        Dynamic.current_dir = ""
-        self.reload_thumbnails.emit()
-
     def mouseReleaseEvent(self, e):
         item: MfListItem = self.itemAt(e.pos())
         if not item:
-            self.clearSelection()
             return
         if e.button() == Qt.MouseButton.LeftButton:
-            self.mf_open_cmd(item.mf)
+            self.mf_open.emit(item.mf)
         return super().mouseReleaseEvent(e)
 
     def contextMenuEvent(self, a0):
@@ -416,7 +305,7 @@ class MfList(VListWidget):
         item: MfListItem = self.itemAt(a0.pos())
         if item:
             open = QAction(Lng.open[Cfg.lng_index], menu)
-            # open.triggered.connect(lambda: self.mf_open.emit(item.mf))
+            open.triggered.connect(lambda: self.mf_open.emit(item.mf))
             menu.addAction(open)
             menu.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
@@ -441,39 +330,109 @@ class MfList(VListWidget):
         Mf.items = new_order
 
 
-class MenuLeft(QWidget):
+class MenuLeft(QTabWidget):
     reload_thumbnails = pyqtSignal()
     no_connection = pyqtSignal(Mf)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
-    mf_list_ww = 130
 
     def __init__(self):
         super().__init__()
-        v_lay = UHBoxLayout(self)
-        v_lay.setContentsMargins(0, 5, 0, 0)
-        self.splitter = QSplitter()
-        self.splitter.setHandleWidth(15)
-        self.splitter.setOrientation(Qt.Orientation.Vertical)
-        v_lay.addWidget(self.splitter)
+        self.setAcceptDrops(True)
+        self.init_ui()
 
-        tree_parent = QTabWidget()
-        tree_parent.tabBar().hide()
-        self.splitter.addWidget(tree_parent)
+    def init_ui(self):
+
+        def with_conn(fn: callable):
+            def wrapper(mf: Mf, *args, **kwargs):
+                fn(mf, *args, **kwargs)
+                avaiable_path = mf.get_avaiable_mf_path()
+                if not avaiable_path:
+                    self.no_connection.emit(mf)
+                else:
+                    mf.set_mf_current_path(avaiable_path)
+            return wrapper
+
+        @with_conn
+        def _mf_reveal(mf: Mf):
+            subprocess.Popen(["open", mf.mf_current_path])
+
+        @with_conn
+        def _tree_reveal(mf: Mf, rel_path: str):
+            abs_path = Utils.get_abs_any_path(mf.mf_current_path, rel_path)
+            subprocess.Popen(["open", abs_path])
+
+        def _mf_open(mf: Mf):
+            if Mf.current_mf == mf:
+                return
+            Mf.current_mf = mf
+            # Корневая директория представляется пустой строкой.
+            # Это нужно потому, что в запросах к БД формируется шаблон вида `path + '/%'` (ILIKE/LIKE).
+            # Если хранить корень как `'/'`, шаблон превратится в `'//%'` — поиск будет неверным.
+            # Пустая строка даёт корректный шаблон `'/%'`, то есть все записи из корня.
+            Dynamic.history.clear()
+            Dynamic.current_dir = ""
+            self.tree_wid.init_ui()
+            self.reload_thumbnails.emit()
+
+        def _tree_open(mf: Mf, rel_path: str):
+            try:
+                curr_ind = max(
+                    x
+                    for x, i in enumerate(Dynamic.history)
+                    if i == Dynamic.current_dir
+                )
+            except ValueError:
+                curr_ind = -1
+            Dynamic.history = Dynamic.history[:curr_ind + 1]
+            Dynamic.history.append(rel_path)
+            if len(Dynamic.history) > 100:
+                Dynamic.history = Dynamic.history[-100:]
+            Dynamic.current_dir = rel_path
+            self.reload_thumbnails.emit()
+
+        def _mf_edit(mf: Mf):
+            item = SettingsItem("edit_folder", mf.mf_alias)
+            self.mf_edit.emit(item)
+
+        def _mf_new():
+            item = SettingsItem("new_folder", "")
+            self.mf_new.emit(item)
+
+        self.clear()
+        self.mf_list = MfList(self)
+        self.mf_list.mf_open.connect(lambda mf: _mf_open(mf))
+        self.mf_list.mf_reveal.connect(lambda mf: _mf_reveal(mf))
+        self.mf_list.mf_edit.connect(lambda mf: _mf_edit(mf))
+        self.mf_list.mf_new.connect(lambda: _mf_new())
+
         self.tree_wid = TreeWid()
         self.tree_wid.init_ui()
-        tree_parent.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])
+        self.tree_wid.tree_reveal.connect(
+            lambda rel_path: _tree_reveal(Mf.current_mf, rel_path)
+        )
+        self.tree_wid.tree_open.connect(
+            lambda rel_path: _tree_open(Mf.current_mf, rel_path)
+        )
 
-        mf_list_parent = QTabWidget()
-        mf_list_parent.tabBar().hide()
-        self.splitter.addWidget(mf_list_parent)
+        self.addTab(self.mf_list, Lng.catalogs[Cfg.lng_index])
+        self.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])
 
-        self.mf_list_widget = MfList(mf_list_parent)
-        # self.mf_list_widget.mf_reveal.connect(self.revea)
-        self.mf_list_widget.reload_thumbnails.connect(self.reload_thumbnails.emit)
-        mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
+        self.mf_list.setCurrentRow(0)
+        QTimer.singleShot(10, lambda: _mf_open(Mf.current_mf))
+    
+    def show_in_app(self, rel_path: str):
+        self.tree_wid.expand_to_path(rel_path)
 
-        self.splitter.setSizes([
-            self.height() - self.mf_list_ww,
-            self.mf_list_ww
-        ])
+    def reload_tree(self):
+        self.tree_wid.init_ui()
+
+    def dragEnterEvent(self, a0):
+        a0.accept()
+
+    def dropEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
+            if os.path.isdir(url):
+                item = SettingsItem("new_folder", url)
+                self.mf_new.emit(item)
