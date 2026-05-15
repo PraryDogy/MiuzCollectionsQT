@@ -280,6 +280,7 @@ class Lng:
     only_this_folder = ("Показать только в этой папке", "Show only this folder")
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрывать нумерацию", "Hide numbering")
+    show_digits = ("Показывать нумерацию", "Show numbering")
     expand_all = ("Развернуть всё", "Expand All")
     collapse_all = ("Свернуть всё", "Collapse All")
     forward = ("Вперед", "Forward")

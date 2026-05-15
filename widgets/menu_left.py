@@ -18,22 +18,28 @@ from ._base_widgets import UListWidgetItem, UMenu, VListWidget
 
 class Tools:
 
-    def add_to_hide_digets(mf: Mf, rel_path: str):
-        rel_paths = Cfg.hide_digets_list.get(mf.mf_alias, None)
+    def hide_digits(mf: Mf, rel_path: str):
+        rel_paths = Cfg.hide_digits.get(mf.mf_alias, None)
         if rel_paths is None:
-            Cfg.hide_digets_list[mf.mf_alias] = []
+            Cfg.hide_digits[mf.mf_alias] = [rel_path, ]
         elif isinstance(rel_paths, list) and rel_path not in rel_paths:
             rel_paths.append(rel_path)
+        
+        Cfg.write_json_data()
 
-    def remove_hide_digets(mf: Mf, rel_path: str):
-        rel_paths = Cfg.hide_digets_list.get(mf.mf_alias, None)
+    def show_digits(mf: Mf, rel_path: str):
+        rel_paths = Cfg.hide_digits.get(mf.mf_alias, None)
         if isinstance(rel_paths, list) and rel_path in rel_paths:
             rel_paths.remove(rel_path)
+            if len(rel_paths) == 0:
+                Cfg.hide_digits.pop(mf.mf_alias)
+
+        Cfg.write_json_data()
 
     def is_hide_digits(mf: Mf, rel_path: str):
-        if mf.mf_alias not in Cfg.hide_digets_list:
+        if mf.mf_alias not in Cfg.hide_digits:
             return False
-        if rel_path not in Cfg.hide_digets_list[mf.mf_alias]:
+        if rel_path not in Cfg.hide_digits[mf.mf_alias]:
             return False
         return True
 
@@ -179,6 +185,10 @@ class TreeWid(QTreeWidget):
         abs_path = ""
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
+            rel_path = Utils.get_rel_any_path(
+                mf_path=Mf.current_mf.get_avaiable_mf_path(),
+                abs_img_path=abs_path
+            )
 
             view = QAction(Lng.open[Cfg.lng_index], menu)
             view.triggered.connect(lambda: self.tree_open.emit(abs_path))
@@ -199,11 +209,23 @@ class TreeWid(QTreeWidget):
 
         menu.addSeparator()
 
-        hide_digits = QAction(Lng.hide_digits[Cfg.lng_index], menu)
-        hide_digits.triggered.connect(hide_digits_cmd)
-        hide_digits.setCheckable(True)
-        hide_digits.setChecked(Cfg.hide_digits)
-        menu.addAction(hide_digits)
+        if rel_path:
+            if Tools.is_hide_digits(Mf.current_mf, rel_path):
+                text = Lng.hide_digits[Cfg.lng_index]
+                cmd = lambda: Tools.show_digits(Mf.current_mf, rel_path)
+            else:
+                text = "Скрывать нумерацию"
+                cmd = lambda: Tools.hide_digits(Mf.current_mf, rel_path)
+            hide_ = QAction(text, menu)
+            hide_.triggered.connect(cmd)
+            menu.addAction(hide_)
+
+
+        # hide_digits = QAction(Lng.hide_digits[Cfg.lng_index], menu)
+        # hide_digits.triggered.connect(hide_digits_cmd)
+        # hide_digits.setCheckable(True)
+        # hide_digits.setChecked(Cfg.hide_digits)
+        # menu.addAction(hide_digits)
         menu.addSeparator()
 
         reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
