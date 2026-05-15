@@ -62,7 +62,7 @@ class TreeWid(QTreeWidget):
 
     def __init__(self):
         super().__init__()
-        self.selected_path: str = None
+        self.selected_path: str = os.sep
         self.items: dict[str, UTreeWidgetItem] = {}
 
         self.setHeaderHidden(True)
@@ -140,8 +140,8 @@ class TreeWid(QTreeWidget):
         self.sort_children(root_item)
 
         root_item.setExpanded(True)
-        if not self.selected_path:
-            self.selected_path = os.sep
+        # if not self.selected_path:
+            # self.selected_path = os.sep
         self.expand_to_path(self.selected_path)
 
     def expand_to_path(self, path: str):
@@ -284,6 +284,7 @@ class MfList(VListWidget):
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
         self.init_ui()
+        self.setCurrentRow(0)
 
     def init_ui(self):
         for i in Mf.items:
