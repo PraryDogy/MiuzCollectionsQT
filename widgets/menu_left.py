@@ -378,19 +378,20 @@ class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
-    mf_new = pyqtSignal()
+    mf_new = pyqtSignal(str)
     svg_folder = "./images/img_folder.svg"
     svg_size = 16
 
     def __init__(self, parent: QWidget):
         super().__init__(parent=parent)
-        self.setCurrentRow(0)
-        # self.setDragEnabled(True)
-        # self.setAcceptDrops(True)
-        # self.setDefaultDropAction(Qt.DropAction.MoveAction)
-        # self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
         self.setIconSize(QSize(self.svg_size, self.svg_size))
+        self.init_ui()
 
+    def init_ui(self):
         for i in Mf.items:
             item = MfListItem(parent=self, text=i.mf_alias)
             item.setIcon(QIcon(self.svg_folder))
@@ -423,17 +424,39 @@ class MfList(VListWidget):
             menu.addAction(mf_edit)
         else:
             new_folder = QAction(Lng.new_folder[Cfg.lng_index], menu)
-            new_folder.triggered.connect(lambda: self.mf_new.emit())
+            new_folder.triggered.connect(lambda: self.mf_new.emit(""))
             menu.addAction(new_folder)
         menu.show_menu()
 
+    def dragEnterEvent(self, e):
+        if e.mimeData().hasUrls():
+            e.acceptProposedAction()
+        else:
+            super().dragEnterEvent(e)
+
+    def dragMoveEvent(self, e):
+        if e.mimeData().hasUrls():
+            e.acceptProposedAction()
+        else:
+            super().dragMoveEvent(e)
+
     def dropEvent(self, event):
-        super().dropEvent(event)
-        new_order = []
-        for i in range(self.count()):
-            item: MfListItem = self.item(i)
-            new_order.append(item.mf)
-        Mf.items = new_order
+        if event.mimeData().hasUrls():
+            urls = event.mimeData().urls()
+            url = urls[0].toLocalFile().rstrip(os.sep)
+            if os.path.isdir(url):
+                self.mf_new.emit(url)
+        else:
+            super().dropEvent(event)
+            new_order = []
+            for i in range(self.count()):
+                item = self.item(i)
+                if isinstance(item, MfListItem):
+                    new_order.append(item.mf)
+            print(len(new_order))
+            if new_order:
+                Mf.items = new_order
+                Mf.write_json_data()
 
 
 class MenuLeft(QWidget):
@@ -467,7 +490,7 @@ class MenuLeft(QWidget):
         self.mf_list_widget.mf_open.connect(lambda mf: self.mf_open_cmd(mf))
         self.mf_list_widget.mf_reveal.connect(lambda mf: self.mf_reveal_cmd(mf))
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
-        self.mf_list_widget.mf_new.connect(lambda: self.mf_new_cmd())
+        self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
 
         self.splitter.setSizes([
@@ -491,9 +514,9 @@ class MenuLeft(QWidget):
         )
         self.mf_edit.emit(item)
 
-    def mf_new_cmd(self):
+    def mf_new_cmd(self, path: str):
         item = SettingsItem(
             type_="new_folder",
-            content=""
+            content=path
         )
         self.mf_new.emit(item)

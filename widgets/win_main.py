@@ -797,7 +797,7 @@ class WinMain(UMainWindow):
         ]
 
         if paths:
-            self.upload_files(self.grid, Mf.current_mf, paths)
+            self.upload_files(Mf.current_mf, paths)
         return super().dropEvent(a0)
     
     def resizeEvent(self, a0):
