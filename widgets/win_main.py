@@ -109,7 +109,7 @@ class WinMain(UMainWindow):
         self.left_menu.mf_new.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
-        self.left_menu.reveal_in_finder.connect(
+        self.left_menu.reveal.connect(
             lambda data: self.reveal_in_finder(*data)
         )
 
@@ -119,7 +119,9 @@ class WinMain(UMainWindow):
         self.left_menu.on_tree_clicked.connect(
             lambda abs_path: self.on_tree_clicked(Mf.current_mf, abs_path)
         )
-
+        self.left_menu.on_mf_clicked.connect(
+            lambda mf: self.on_mf_clicked(mf)
+        )
 
 
 
@@ -314,7 +316,16 @@ class WinMain(UMainWindow):
         Dynamic.current_dir = rel_path
         self.grid.reload_thumbnails()
 
-        print(Dynamic.current_dir)
+    def on_mf_clicked(self, mf: Mf):
+        Mf.current_mf = mf
+        Dynamic.current_dir = os.sep
+        self.left_menu.tree_wid.abs_selected_path = os.sep
+        self.left_menu.tree_wid.init_ui()
+        self.grid.reload_thumbnails()
+
+        mf_path = mf.get_avaiable_mf_path()
+        if not mf_path:
+            self.open_win_smb(mf)
  
     @with_conn
     def start_update_thumb(self, mf: Mf, rel_img_paths: list[str]):

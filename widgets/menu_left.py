@@ -52,7 +52,7 @@ class UTreeWidgetItem(QTreeWidgetItem):
 
 
 class TreeWid(QTreeWidget):
-    tree_reveal = pyqtSignal(str)
+    reveal = pyqtSignal(str)
     on_tree_clicked = pyqtSignal(str)
 
     svg_folder = "./images/folder.svg"
@@ -211,7 +211,7 @@ class TreeWid(QTreeWidget):
         menu.addSeparator()
 
         reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
-        reveal.triggered.connect(lambda: self.tree_reveal.emit(abs_path))
+        reveal.triggered.connect(lambda: self.reveal.emit(abs_path))
         menu.addAction(reveal)
 
         menu.show_menu()
@@ -315,8 +315,9 @@ class MfList(VListWidget):
 
 class MenuLeft(QWidget):
     on_tree_clicked = pyqtSignal(str)
+    on_mf_clicked = pyqtSignal(Mf)
     reload_thumbnails = pyqtSignal()
-    reveal_in_finder = pyqtSignal(tuple)
+    reveal = pyqtSignal(tuple)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
     mf_list_ww = 130
@@ -334,7 +335,7 @@ class MenuLeft(QWidget):
         tree_parent.tabBar().hide()
         self.splitter.addWidget(tree_parent)
         self.tree_wid = TreeWid()
-        self.tree_wid.tree_reveal.connect(
+        self.tree_wid.reveal.connect(
             lambda abs_path: self.reveal_cmd(Mf.current_mf, [abs_path, ])
         )
         self.tree_wid.on_tree_clicked.connect(
@@ -348,7 +349,9 @@ class MenuLeft(QWidget):
         self.splitter.addWidget(mf_list_parent)
 
         self.mf_list_widget = MfList(mf_list_parent)
-        self.mf_list_widget.mf_open.connect(lambda mf: self.mf_open_cmd(mf))
+        self.mf_list_widget.mf_open.connect(
+            lambda mf: self.on_mf_clicked.emit(mf)
+        )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         self.mf_list_widget.mf_reveal.connect(lambda data: self.reveal_cmd(*data))
@@ -359,15 +362,8 @@ class MenuLeft(QWidget):
             self.mf_list_ww
         ])
 
-    def mf_open_cmd(self, mf: Mf):
-        Mf.current_mf = mf
-        Dynamic.current_dir = os.sep
-        self.tree_wid.abs_selected_path = os.sep
-        self.reload_thumbnails.emit()
-        self.tree_wid.init_ui()
-
     def reveal_cmd(self, mf: Mf, rel_paths: list[str]):
-        self.reveal_in_finder.emit((mf, rel_paths))
+        self.reveal.emit((mf, rel_paths))
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
