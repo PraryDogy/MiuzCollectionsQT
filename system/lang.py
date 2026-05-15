@@ -407,3 +407,7 @@ class Lng:
         "Сетевой диск не подключен или неправильно указан путь.",
         "Network drive not connected or the path is incorrect."
     )
+    hide_digits_full = (
+        "Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",
+        "Hides numeric prefixes for top-level folders only. Numbering of nested subfolders remains unchanged."
+    )

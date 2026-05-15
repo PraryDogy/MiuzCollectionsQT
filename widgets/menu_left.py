@@ -26,6 +26,7 @@ class UTreeWidgetItem(QTreeWidgetItem):
 class TreeWid(QTreeWidget):
     reveal = pyqtSignal(str)
     on_tree_clicked = pyqtSignal(str)
+    on_hide_digits_clicked = pyqtSignal()
 
     svg_folder = "./images/folder.svg"
     svg_size = 16
@@ -148,6 +149,7 @@ class TreeWid(QTreeWidget):
                 Cfg.hide_digits_mf_lst.append(Mf.current_mf.mf_alias)
                 Cfg.write_json_data()
                 self.init_ui()
+                self.on_hide_digits_clicked.emit()
 
         def show_digits_cmd():
             if Mf.current_mf.mf_alias in Cfg.hide_digits_mf_lst:
@@ -304,6 +306,7 @@ class MenuLeft(QWidget):
     reveal = pyqtSignal(tuple)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
+    on_hide_digits_clicked = pyqtSignal()
     mf_list_hh = 130
 
     def __init__(self):
@@ -324,6 +327,9 @@ class MenuLeft(QWidget):
         )
         self.tree_wid.on_tree_clicked.connect(
             lambda abs_path: self.on_tree_clicked.emit(abs_path)
+        )
+        self.tree_wid.on_hide_digits_clicked.connect(
+            lambda: self.on_hide_digits_clicked.emit()
         )
         self.tree_wid.init_ui()
         tree_parent.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])

@@ -10,8 +10,8 @@ from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
-from system.items import (Buffer, SettingsItem, SingleDirScanerItem,
-                          UpdateThumbItem, WatchDogItem, ImgViewItem)
+from system.items import (Buffer, ImgViewItem, SettingsItem,
+                          SingleDirScanerItem, UpdateThumbItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
@@ -37,7 +37,7 @@ from .win_servers import ServersWin
 from .win_settings import WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
-from .win_warn import ConfirmWindow
+from .win_warn import ConfirmWindow, WarningWindow
 
 
 class TestWid(QFrame):
@@ -111,6 +111,9 @@ class WinMain(UMainWindow):
         )
         self.left_menu.on_mf_clicked.connect(
             lambda mf: self.on_mf_clicked(mf)
+        )
+        self.left_menu.on_hide_digits_clicked.connect(
+            lambda: self.on_hide_digits_clicked()
         )
         self.splitter.addWidget(self.left_menu)
 
@@ -266,6 +269,11 @@ class WinMain(UMainWindow):
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"
         self.bar_path.update(dir)
+
+    def on_hide_digits_clicked(self):
+        self.win_warn = WarningWindow(Lng.hide_digits_full[Cfg.lng_index])
+        self.win_warn.center_to_parent(self)
+        self.win_warn.show()
         
     def open_filters_win(self):
 
