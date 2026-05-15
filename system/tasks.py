@@ -144,6 +144,9 @@ class DbImagesLoader(URunnable):
         return thumbs_dict
 
     def get_stmt(self):
+        rel_path = Dynamic.current_dir
+        if rel_path == os.sep:
+            rel_path = ""
         stmt = (
             sqlalchemy.select(
                 Thumbs.rel_img_path,
@@ -152,7 +155,7 @@ class DbImagesLoader(URunnable):
                 Thumbs.fav
             )
             .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
-            .where(Thumbs.rel_img_path.ilike(f"{Dynamic.current_dir}/%"))
+            .where(Thumbs.rel_img_path.ilike(f"{rel_path}/%"))
             .order_by(-Thumbs.mod if Dynamic.sort_by_mod else -Thumbs.id)
             .limit(Static.thumbs_load_limit)
             .offset(Dynamic.loaded_thumbs)
@@ -162,7 +165,7 @@ class DbImagesLoader(URunnable):
             stmt = stmt.where(Thumbs.fav == 1)
 
         if Dynamic.filter_only_folder:
-            two_slash = f"{Dynamic.current_dir}/%/%"
+            two_slash = f"{rel_path}/%/%"
             stmt = (
                 stmt
                 .where(Thumbs.rel_img_path.not_ilike(two_slash))

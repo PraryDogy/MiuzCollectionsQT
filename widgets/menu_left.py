@@ -47,15 +47,13 @@ class Tools:
 
 
 class UTreeWidgetItem(QTreeWidgetItem):
-    def __init__(self, rel_path: str, other):
+    def __init__(self, abs_path: str, other):
         super().__init__(other)
-        self.rel_path = rel_path
 
 
 class TreeWid(QTreeWidget):
     tree_reveal = pyqtSignal(str)
-    reload_thumbnails = pyqtSignal(str)
-    open_smb_win = pyqtSignal()
+    on_tree_clicked = pyqtSignal(str)
 
     svg_folder = "./images/folder.svg"
     svg_size = 16
@@ -108,27 +106,19 @@ class TreeWid(QTreeWidget):
         for path in sorted(paths):
             if path == os.sep:
                 continue
-            rel_path = Utils.get_rel_any_path(
-                mf_path=Mf.current_mf.mf_current_path,
-                abs_img_path=path
-            )
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
-            parent_rel_path = Utils.get_rel_any_path(
-                mf_path=Mf.current_mf.mf_current_path,
-                abs_img_path=parent
-            )
-            if Tools.is_hide_digits(Mf.current_mf, parent_rel_path):
-                old_name = name
-                name = self.strip_to_first_letter(name)
-                if not name:
-                    name = old_name
+            # if Tools.is_hide_digits(Mf.current_mf, parent_rel_path):
+            #     old_name = name
+            #     name = self.strip_to_first_letter(name)
+            #     if not name:
+            #         name = old_name
 
             parent_item = self.items.get(parent)
             if parent_item is None:
                 continue
 
-            child = UTreeWidgetItem(rel_path, [name])
+            child = UTreeWidgetItem(path, [name])
             child.setIcon(0, QIcon(self.svg_folder))
             child.setSizeHint(0, QSize(0, self.item_height))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
@@ -159,10 +149,14 @@ class TreeWid(QTreeWidget):
         self.scrollToItem(item, QTreeWidget.ScrollHint.PositionAtCenter)
 
     def on_item_click(self, item: UTreeWidgetItem, col: int):
-        clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
-        if clicked_dir == self.abs_selected_path:
+        abs_path = item.data(0, Qt.ItemDataRole.UserRole)
+        if abs_path == self.abs_selected_path:
             return
-        self.abs_selected_path = clicked_dir
+        self.abs_selected_path = abs_path
+        self.on_tree_clicked.emit(abs_path)
+        return
+
+
         if item.rel_path == os.sep:
             # Корневая директория представляется пустой строкой.
             # Это нужно потому, что в запросах к БД формируется
@@ -174,7 +168,7 @@ class TreeWid(QTreeWidget):
             rel_path = ""
         else:
             rel_path = item.rel_path
-        self.reload_thumbnails.emit(rel_path)
+        self.on_tree_clicked.emit(rel_path)
 
     def generate_path_hierarchy(self, full_path):
         parts = []
@@ -218,7 +212,7 @@ class TreeWid(QTreeWidget):
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
             self.abs_selected_path = abs_path
             view = QAction(Lng.open[Cfg.lng_index], menu)
-            view.triggered.connect(lambda: self.reload_thumbnails.emit(item.rel_path))
+            view.triggered.connect(lambda: self.on_tree_clicked.emit(self.abs_selected_path))
             menu.addAction(view)
             menu.addSeparator()
 
@@ -236,22 +230,22 @@ class TreeWid(QTreeWidget):
 
         menu.addSeparator()
 
-        if item.rel_path:
+        # if item.rel_path:
 
-            if Tools.is_hide_digits(Mf.current_mf, item.rel_path):
-                text = Lng.show_digits[Cfg.lng_index]
-                cmd = show_digits_cmd
-            else:
-                text = Lng.hide_digits[Cfg.lng_index]
-                cmd = hide_digits_cmd
-            hide_ = QAction(text, menu)
-            hide_.triggered.connect(cmd)
-            menu.addAction(hide_)
+        #     if Tools.is_hide_digits(Mf.current_mf, item.rel_path):
+        #         text = Lng.show_digits[Cfg.lng_index]
+        #         cmd = show_digits_cmd
+        #     else:
+        #         text = Lng.hide_digits[Cfg.lng_index]
+        #         cmd = hide_digits_cmd
+        #     hide_ = QAction(text, menu)
+        #     hide_.triggered.connect(cmd)
+        #     menu.addAction(hide_)
 
-            if item.rel_path == os.sep:
-                reset_digits = QAction(Lng.show_digits_all[Cfg.lng_index], menu)
-                reset_digits.triggered.connect(reset_all_digits_cmd)
-                menu.addAction(reset_digits)
+        #     if item.rel_path == os.sep:
+        #         reset_digits = QAction(Lng.show_digits_all[Cfg.lng_index], menu)
+        #         reset_digits.triggered.connect(reset_all_digits_cmd)
+        #         menu.addAction(reset_digits)
 
         menu.addSeparator()
 
@@ -359,6 +353,7 @@ class MfList(VListWidget):
 
 
 class MenuLeft(QWidget):
+    on_tree_clicked = pyqtSignal(str)
     reload_thumbnails = pyqtSignal()
     reveal_in_finder = pyqtSignal(tuple)
     mf_edit = pyqtSignal(SettingsItem)
@@ -381,8 +376,8 @@ class MenuLeft(QWidget):
         self.tree_wid.tree_reveal.connect(
             lambda abs_path: self.reveal_cmd(Mf.current_mf, [abs_path, ])
         )
-        self.tree_wid.reload_thumbnails.connect(
-            lambda rel_path: self.tree_open_cmd(rel_path)
+        self.tree_wid.on_tree_clicked.connect(
+            lambda abs_path: self.on_tree_clicked.emit(abs_path)
         )
         self.tree_wid.init_ui()
         tree_parent.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])
@@ -403,15 +398,11 @@ class MenuLeft(QWidget):
             self.mf_list_ww
         ])
 
-    def tree_open_cmd(self, rel_path: str):
-        Dynamic.current_dir = rel_path
-        self.reload_thumbnails.emit()
-
     def mf_open_cmd(self, mf: Mf):
         Mf.current_mf = mf
-        Dynamic.current_dir = ""
-        self.reload_thumbnails.emit()
+        Dynamic.current_dir = os.sep
         self.tree_wid.abs_selected_path = os.sep
+        self.reload_thumbnails.emit()
         self.tree_wid.init_ui()
 
     def reveal_cmd(self, mf: Mf, rel_paths: list[str]):

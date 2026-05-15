@@ -112,6 +112,20 @@ class WinMain(UMainWindow):
         self.left_menu.reveal_in_finder.connect(
             lambda data: self.reveal_in_finder(*data)
         )
+
+
+
+
+        self.left_menu.on_tree_clicked.connect(
+            lambda abs_path: self.on_tree_clicked(Mf.current_mf, abs_path)
+        )
+
+
+
+
+
+
+
         self.splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -251,7 +265,6 @@ class WinMain(UMainWindow):
                 )
 
         current_dir = os.path.dirname(rel_path)
-        current_dir = "" if current_dir == os.sep else current_dir
         Dynamic.current_dir = current_dir
 
         self.left_menu.setCurrentIndex(1)
@@ -293,8 +306,18 @@ class WinMain(UMainWindow):
         self.win_smb.show()
 
     @with_conn
-    def tree_open(self, mf: Mf, rel_path: str):
-        ...
+    def on_tree_clicked(self, mf: Mf, abs_path: str):
+        rel_path = Utils.get_rel_any_path(
+            mf_path=mf.mf_current_path,
+            abs_img_path=abs_path
+        )
+        if rel_path == os.sep:
+            # это нужно чтобы из базы данных загрузить данные
+            rel_path = ""
+        Dynamic.current_dir = rel_path
+        self.grid.reload_thumbnails()
+
+        print(Dynamic.current_dir)
  
     @with_conn
     def start_update_thumb(self, mf: Mf, rel_img_paths: list[str]):

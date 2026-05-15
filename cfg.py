@@ -35,7 +35,7 @@ class Dynamic:
     loaded_thumbs: int = 0
     search_widget_text: str = None
     thumb_size_index: int = 2
-    current_dir: str = ""
+    current_dir: str = os.sep
     sort_by_mod: bool = True
     filters_enabled: list[str] = []
     filter_favs: bool = False
