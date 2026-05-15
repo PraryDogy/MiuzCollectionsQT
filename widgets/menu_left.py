@@ -394,6 +394,7 @@ class MenuLeft(QWidget):
         Mf.current_mf = mf
         Dynamic.current_dir = ""
         self.reload_thumbnails.emit()
+        self.tree_wid.init_ui()
 
     def mf_reveal_cmd(self, mf: Mf):
         data = (mf, [mf.mf_current_path, ])
