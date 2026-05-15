@@ -20,28 +20,16 @@ from ._base_widgets import (UHBoxLayout, UListWidgetItem, UMenu, UVBoxLayout,
 
 class Tools:
 
-    def hide_digits(mf: Mf, rel_path: str):
-        rel_paths = Cfg.hide_digits_list.get(mf.mf_alias, None)
-        if rel_paths is None:
-            Cfg.hide_digits_list[mf.mf_alias] = [rel_path, ]
-        elif isinstance(rel_paths, list) and rel_path not in rel_paths:
-            rel_paths.append(rel_path)
+    def hide_digits(mf: Mf):
+        if mf not in Cfg.hide_digits_mf_lst:
+            Cfg.hide_digits_mf_lst.append(mf.mf_alias)
 
-    def show_digits(mf: Mf, rel_path: str):
-        rel_paths = Cfg.hide_digits_list.get(mf.mf_alias, None)
-        if isinstance(rel_paths, list) and rel_path in rel_paths:
-            rel_paths.remove(rel_path)
-            if len(rel_paths) == 0:
-                Cfg.hide_digits_list.pop(mf.mf_alias)
+    def show_digits(mf: Mf):
+        if mf in Cfg.hide_digits_mf_lst:
+            Cfg.hide_digits_mf_lst.remove(mf.mf_alias)
 
-    def reset_all_digits(mf: Mf):
-        if mf.mf_alias in Cfg.hide_digits_list:
-            Cfg.hide_digits_list.pop(mf.mf_alias)
-
-    def is_hide_digits(mf: Mf, rel_path: str):
-        if mf.mf_alias not in Cfg.hide_digits_list:
-            return False
-        if rel_path not in Cfg.hide_digits_list[mf.mf_alias]:
+    def need_hide_digits(mf: Mf):
+        if mf.mf_alias not in Cfg.hide_digits_mf_lst:
             return False
         return True
 
