@@ -243,7 +243,7 @@ class TreeWid(QTreeWidget):
             menu.addAction(hide_)
 
             if item.rel_path == os.sep:
-                reset_digits = QAction("Сбросить нумеарацию", menu)
+                reset_digits = QAction(Lng.show_digits_all[Cfg.lng_index], menu)
                 reset_digits.triggered.connect(reset_all_digits_cmd)
                 menu.addAction(reset_digits)
 

@@ -281,6 +281,7 @@ class Lng:
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрыть нумерацию", "Hide numbering")
     show_digits = ("Показать нумерацию", "Show numbering")
+    show_digits_all = ("Показать нумерацию везде", "Show numbering everywhere")
     expand_all = ("Развернуть всё", "Expand All")
     collapse_all = ("Свернуть всё", "Collapse All")
     forward = ("Вперед", "Forward")
