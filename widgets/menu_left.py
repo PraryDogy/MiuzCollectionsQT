@@ -157,7 +157,7 @@ class TreeWid(QTreeWidget):
         self.setCurrentItem(item)
         self.scrollToItem(item, QTreeWidget.ScrollHint.PositionAtCenter)
 
-    def on_item_click(self, item: QTreeWidgetItem, col: int):
+    def on_item_click(self, item: UTreeWidgetItem, col: int):
         clicked_dir = item.data(0, Qt.ItemDataRole.UserRole)
         if clicked_dir and clicked_dir != self.selected_path:
             self.selected_path = clicked_dir
@@ -214,7 +214,7 @@ class TreeWid(QTreeWidget):
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
             self.selected_path = abs_path
             view = QAction(Lng.open[Cfg.lng_index], menu)
-            view.triggered.connect(lambda: self.tree_open.emit(abs_path))
+            view.triggered.connect(lambda: self.tree_open.emit(item.rel_path))
             menu.addAction(view)
             menu.addSeparator()
 
@@ -373,6 +373,12 @@ class MenuLeft(QWidget):
         tree_parent.tabBar().hide()
         self.splitter.addWidget(tree_parent)
         self.tree_wid = TreeWid()
+        self.tree_wid.tree_reveal.connect(
+            lambda abs_path: self.reveal_cmd(Mf.current_mf, [abs_path, ])
+        )
+        self.tree_wid.tree_open.connect(
+            lambda rel_path: self.tree_open_cmd(rel_path)
+        )
         self.tree_wid.init_ui()
         tree_parent.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])
 
@@ -391,6 +397,10 @@ class MenuLeft(QWidget):
             self.height() - self.mf_list_ww,
             self.mf_list_ww
         ])
+
+    def tree_open_cmd(self, rel_path: str):
+        Dynamic.current_dir = rel_path
+        self.reload_thumbnails.emit()
 
     def mf_open_cmd(self, mf: Mf):
         Mf.current_mf = mf
