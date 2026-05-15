@@ -307,7 +307,6 @@ class MfList(VListWidget):
                 item = self.item(i)
                 if isinstance(item, MfListItem):
                     new_order.append(item.mf)
-            print(len(new_order))
             if new_order:
                 Mf.items = new_order
                 Mf.write_json_data()
