@@ -17,6 +17,8 @@ from system.utils import Utils
 from ._base_widgets import (UHBoxLayout, UListWidgetItem, UMenu, UVBoxLayout,
                             VListWidget)
 
+ITEM_HEIGHT = 25
+
 
 class UTreeWidgetItem(QTreeWidgetItem):
     def __init__(self, abs_path: str, other):
@@ -30,7 +32,6 @@ class TreeWid(QTreeWidget):
 
     svg_folder = "./images/folder.svg"
     svg_size = 16
-    item_height = 25
 
     def __init__(self):
         super().__init__()
@@ -69,7 +70,7 @@ class TreeWid(QTreeWidget):
         self.clear()
 
         root_item = UTreeWidgetItem(os.sep, [Mf.current_mf.mf_alias])
-        root_item.setSizeHint(0, QSize(0, self.item_height))
+        root_item.setSizeHint(0, QSize(0, ITEM_HEIGHT))
         root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
         root_item.setIcon(0, QIcon(self.svg_folder))
         self.addTopLevelItem(root_item)
@@ -98,7 +99,7 @@ class TreeWid(QTreeWidget):
 
             child = UTreeWidgetItem(path, [name])
             child.setIcon(0, QIcon(self.svg_folder))
-            child.setSizeHint(0, QSize(0, self.item_height))
+            child.setSizeHint(0, QSize(0, ITEM_HEIGHT))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
             child.setToolTip(1, os.path.basename(path))
             parent_item.addChild(child)
@@ -214,8 +215,8 @@ class TreeWid(QTreeWidget):
 
 
 class MfListItem(UListWidgetItem):
-    def __init__(self, parent, height = 30, text = None):
-        super().__init__(parent, height, text)
+    def __init__(self, parent, text = None):
+        super().__init__(parent, ITEM_HEIGHT, text)
         self.mf: Mf = None
 
 
