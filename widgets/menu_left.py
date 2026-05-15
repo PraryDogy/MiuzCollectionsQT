@@ -375,9 +375,9 @@ class MfListItem(UListWidgetItem):
 
 
 class MfList(VListWidget):
-    mf_edit = pyqtSignal(Mf)
     mf_open = pyqtSignal(Mf)
     mf_reveal = pyqtSignal(Mf)
+    mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal()
     svg_folder = "./images/img_folder.svg"
     svg_size = 16
@@ -410,17 +410,17 @@ class MfList(VListWidget):
         menu = UMenu(a0)
         item: MfListItem = self.itemAt(a0.pos())
         if item:
-            open = QAction(Lng.open[Cfg.lng_index], menu)
-            open.triggered.connect(lambda: self.mf_open.emit(item.mf))
-            menu.addAction(open)
+            mf_open = QAction(Lng.open[Cfg.lng_index], menu)
+            mf_open.triggered.connect(lambda: self.mf_open.emit(item.mf))
+            menu.addAction(mf_open)
             menu.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
-            reveal.triggered.connect(lambda: self.mf_reveal.emit(item.mf))
-            menu.addAction(reveal)
+            mf_reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
+            mf_reveal.triggered.connect(lambda: self.mf_reveal.emit(item.mf))
+            menu.addAction(mf_reveal)
             menu.addSeparator()
-            setup = QAction(Lng.setup[Cfg.lng_index], menu)
-            setup.triggered.connect(lambda: self.mf_edit.emit(item.mf))
-            menu.addAction(setup)
+            mf_edit = QAction(Lng.setup[Cfg.lng_index], menu)
+            mf_edit.triggered.connect(lambda: self.mf_edit.emit(item.mf))
+            menu.addAction(mf_edit)
         else:
             new_folder = QAction(Lng.new_folder[Cfg.lng_index], menu)
             new_folder.triggered.connect(lambda: self.mf_new.emit())
@@ -466,6 +466,8 @@ class MenuLeft(QWidget):
         self.mf_list_widget = MfList(mf_list_parent)
         self.mf_list_widget.mf_open.connect(lambda mf: self.mf_open_cmd(mf))
         self.mf_list_widget.mf_reveal.connect(lambda mf: self.mf_reveal_cmd(mf))
+        self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
+        self.mf_list_widget.mf_new
         mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
 
         self.splitter.setSizes([
@@ -481,3 +483,13 @@ class MenuLeft(QWidget):
     def mf_reveal_cmd(self, mf: Mf):
         data = (mf, [mf.mf_current_path, ])
         self.reveal_in_finder.emit(data)
+
+    def mf_edit_cmd(self, mf: Mf):
+        item = SettingsItem(
+            type_="edit_folder",
+            content=mf.mf_alias
+        )
+        self.mf_edit.emit(item)
+
+    def mf_new_cmd(self, mf: Mf):
+        ...
