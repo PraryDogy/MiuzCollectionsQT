@@ -18,22 +18,6 @@ from ._base_widgets import (UHBoxLayout, UListWidgetItem, UMenu, UVBoxLayout,
                             VListWidget)
 
 
-class Tools:
-
-    def hide_digits(mf: Mf):
-        if mf not in Cfg.hide_digits_mf_lst:
-            Cfg.hide_digits_mf_lst.append(mf.mf_alias)
-
-    def show_digits(mf: Mf):
-        if mf in Cfg.hide_digits_mf_lst:
-            Cfg.hide_digits_mf_lst.remove(mf.mf_alias)
-
-    def need_hide_digits(mf: Mf):
-        if mf.mf_alias not in Cfg.hide_digits_mf_lst:
-            return False
-        return True
-
-
 class UTreeWidgetItem(QTreeWidgetItem):
     def __init__(self, abs_path: str, other):
         super().__init__(other)
@@ -58,6 +42,11 @@ class TreeWid(QTreeWidget):
         self.setIndentation(15)
 
         self.itemClicked.connect(self.on_item_click)
+
+    def need_hide_digits(self):
+        if Mf.current_mf.mf_alias not in Cfg.hide_digits_mf_lst:
+            return False
+        return True
 
     # --- сортировка ---
     def strip_to_first_letter(self, s: str) -> str:
@@ -90,7 +79,7 @@ class TreeWid(QTreeWidget):
 
     def build_tree(self, root_item: UTreeWidgetItem, paths: list[str]) -> None:
         self.items: dict[str, UTreeWidgetItem] = {os.sep: root_item}
-        hide_digits = Tools.need_hide_digits(Mf.current_mf)
+        hide_digits = self.need_hide_digits()
 
         for path in sorted(paths):
             if path == os.sep:
@@ -155,19 +144,16 @@ class TreeWid(QTreeWidget):
     def contextMenuEvent(self, a0):
 
         def hide_digits_cmd():
-            Tools.hide_digits(Mf.current_mf, item.rel_path)
-            Cfg.write_json_data()
-            self.init_ui()
+            if Mf.current_mf.mf_alias not in Cfg.hide_digits_mf_lst:
+                Cfg.hide_digits_mf_lst.append(Mf.current_mf.mf_alias)
+                Cfg.write_json_data()
+                self.init_ui()
 
         def show_digits_cmd():
-            Tools.show_digits(Mf.current_mf, item.rel_path)
-            Cfg.write_json_data()
-            self.init_ui()
-
-        def reset_all_digits_cmd():
-            Tools.reset_all_digits(Mf.current_mf)
-            Cfg.write_json_data()
-            self.init_ui()
+            if Mf.current_mf.mf_alias in Cfg.hide_digits_mf_lst:
+                Cfg.hide_digits_mf_lst.remove(Mf.current_mf.mf_alias)
+                Cfg.write_json_data()
+                self.init_ui()
 
         def collapse_all_cmd():
             self.collapseAll()
@@ -187,19 +173,32 @@ class TreeWid(QTreeWidget):
             menu.addAction(view)
             menu.addSeparator()
 
-        update = QAction(Lng.update_grid[Cfg.lng_index])
-        update.triggered.connect(self.init_ui)
-        menu.addAction(update)
+        if self.abs_selected_path == os.sep:
+            update = QAction(Lng.update_grid[Cfg.lng_index])
+            update.triggered.connect(self.init_ui)
+            menu.addAction(update)
 
-        expand_all = QAction(Lng.expand_all[Cfg.lng_index], menu)
-        expand_all.triggered.connect(lambda: self.expandAll())
-        menu.addAction(expand_all)
+            menu.addSeparator()
 
-        collapse_all = QAction(Lng.collapse_all[Cfg.lng_index], menu)
-        collapse_all.triggered.connect(lambda: collapse_all_cmd())
-        menu.addAction(collapse_all)
+            expand_all = QAction(Lng.expand_all[Cfg.lng_index], menu)
+            expand_all.triggered.connect(lambda: self.expandAll())
+            menu.addAction(expand_all)
 
-        menu.addSeparator()
+            collapse_all = QAction(Lng.collapse_all[Cfg.lng_index], menu)
+            collapse_all.triggered.connect(lambda: collapse_all_cmd())
+            menu.addAction(collapse_all)
+
+            menu.addSeparator()
+
+            if self.need_hide_digits():
+                text = Lng.show_digits[Cfg.lng_index]
+                cmd = show_digits_cmd
+            else:
+                text = Lng.hide_digits[Cfg.lng_index]
+                cmd = hide_digits_cmd
+            digits = QAction(text, menu)
+            digits.triggered.connect(cmd)
+            menu.addAction(digits)
 
         menu.addSeparator()
 
@@ -259,12 +258,6 @@ class MfList(VListWidget):
             mf_open = QAction(Lng.open[Cfg.lng_index], menu)
             mf_open.triggered.connect(lambda: self.mf_open.emit(item.mf))
             menu.addAction(mf_open)
-            menu.addSeparator()
-            mf_reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
-            mf_reveal.triggered.connect(
-                lambda: self.mf_reveal.emit((item.mf, [item.mf.mf_current_path]))
-            )
-            menu.addAction(mf_reveal)
             menu.addSeparator()
             mf_edit = QAction(Lng.setup[Cfg.lng_index], menu)
             mf_edit.triggered.connect(lambda: self.mf_edit.emit(item.mf))
