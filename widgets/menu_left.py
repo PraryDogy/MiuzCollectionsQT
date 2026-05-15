@@ -402,8 +402,6 @@ class MenuLeft(QWidget):
         Dynamic.current_dir = rel_path
         self.reload_thumbnails.emit()
 
-        print(rel_path)
-
     def mf_open_cmd(self, mf: Mf):
         Mf.current_mf = mf
         Dynamic.current_dir = ""
