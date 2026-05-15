@@ -97,12 +97,6 @@ class WinMain(UMainWindow):
 
         # Левый виджет (MenuLeft)
         self.left_menu = MenuLeft()
-        self.left_menu.reload_thumbnails.connect(
-            lambda: self.grid.reload_thumbnails()
-        )
-        self.left_menu.reload_thumbnails.connect(
-            lambda: self.path_bar_update(Dynamic.current_dir)
-        )
         self.left_menu.mf_edit.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
@@ -112,22 +106,12 @@ class WinMain(UMainWindow):
         self.left_menu.reveal.connect(
             lambda data: self.reveal_in_finder(*data)
         )
-
-
-
-
         self.left_menu.on_tree_clicked.connect(
             lambda abs_path: self.on_tree_clicked(Mf.current_mf, abs_path)
         )
         self.left_menu.on_mf_clicked.connect(
             lambda mf: self.on_mf_clicked(mf)
         )
-
-
-
-
-
-
         self.splitter.addWidget(self.left_menu)
 
         # Правый виджет
@@ -315,6 +299,7 @@ class WinMain(UMainWindow):
         )
         Dynamic.current_dir = rel_path
         self.grid.reload_thumbnails()
+        self.path_bar_update(Dynamic.current_dir)
 
     def on_mf_clicked(self, mf: Mf):
         Mf.current_mf = mf
@@ -322,6 +307,7 @@ class WinMain(UMainWindow):
         self.left_menu.tree_wid.abs_selected_path = os.sep
         self.left_menu.tree_wid.init_ui()
         self.grid.reload_thumbnails()
+        self.path_bar_update(Dynamic.current_dir)
 
         mf_path = mf.get_avaiable_mf_path()
         if not mf_path:

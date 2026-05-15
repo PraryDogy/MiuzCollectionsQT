@@ -316,7 +316,6 @@ class MfList(VListWidget):
 class MenuLeft(QWidget):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
-    reload_thumbnails = pyqtSignal()
     reveal = pyqtSignal(tuple)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
