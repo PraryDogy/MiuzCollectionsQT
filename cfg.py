@@ -49,7 +49,7 @@ class Cfg:
     dark_mode = 0
     scaner_minutes = 20
     new_scaner = True
-    hide_digits: dict[list[str]] = {}
+    hide_digits_list: dict[list[str]] = {}
     apps = [
         "preview",
         "photos",

@@ -19,29 +19,35 @@ from ._base_widgets import UListWidgetItem, UMenu, VListWidget
 class Tools:
 
     def hide_digits(mf: Mf, rel_path: str):
-        rel_paths = Cfg.hide_digits.get(mf.mf_alias, None)
+        rel_paths = Cfg.hide_digits_list.get(mf.mf_alias, None)
         if rel_paths is None:
-            Cfg.hide_digits[mf.mf_alias] = [rel_path, ]
+            Cfg.hide_digits_list[mf.mf_alias] = [rel_path, ]
         elif isinstance(rel_paths, list) and rel_path not in rel_paths:
             rel_paths.append(rel_path)
         
         Cfg.write_json_data()
 
     def show_digits(mf: Mf, rel_path: str):
-        rel_paths = Cfg.hide_digits.get(mf.mf_alias, None)
+        rel_paths = Cfg.hide_digits_list.get(mf.mf_alias, None)
         if isinstance(rel_paths, list) and rel_path in rel_paths:
             rel_paths.remove(rel_path)
             if len(rel_paths) == 0:
-                Cfg.hide_digits.pop(mf.mf_alias)
+                Cfg.hide_digits_list.pop(mf.mf_alias)
 
         Cfg.write_json_data()
 
     def is_hide_digits(mf: Mf, rel_path: str):
-        if mf.mf_alias not in Cfg.hide_digits:
+        if mf.mf_alias not in Cfg.hide_digits_list:
             return False
-        if rel_path not in Cfg.hide_digits[mf.mf_alias]:
+        if rel_path not in Cfg.hide_digits_list[mf.mf_alias]:
             return False
         return True
+
+
+class UTreeWidgetItem(QTreeWidgetItem):
+    def __init__(self, rel_path: str, other):
+        super().__init__(other)
+        self.rel_path = rel_path
 
 
 class TreeWid(QTreeWidget):
@@ -55,7 +61,7 @@ class TreeWid(QTreeWidget):
     def __init__(self):
         super().__init__()
         self.selected_path: str = None
-        self.items: dict[str, QTreeWidgetItem] = {}
+        self.items: dict[str, UTreeWidgetItem] = {}
 
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
@@ -69,7 +75,7 @@ class TreeWid(QTreeWidget):
         """Удаляет начальные символы, которые не являются буквами, для сортировки."""
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
-    def sort_children(self, parent_item: QTreeWidgetItem):
+    def sort_children(self, parent_item: UTreeWidgetItem):
         """Сортировка детей рекурсивно по strip_to_first_letter."""
         children = [parent_item.child(i) for i in range(parent_item.childCount())]
         children.sort(key=lambda it: self.strip_to_first_letter(it.text(0)).lower())
@@ -83,7 +89,7 @@ class TreeWid(QTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = QTreeWidgetItem([Mf.current_mf.mf_alias])
+        root_item = UTreeWidgetItem(os.sep, [Mf.current_mf.mf_alias])
         root_item.setSizeHint(0, QSize(0, self.item_height))
         root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
         root_item.setIcon(0, QIcon(self.svg_folder))
@@ -93,15 +99,23 @@ class TreeWid(QTreeWidget):
         task.sigs.finished_.connect(lambda lst: self.build_tree(root_item, lst))
         UThreadPool.start(task)
 
-    def build_tree(self, root_item: QTreeWidgetItem, paths: list[str]) -> None:
-        self.items: dict[str, QTreeWidgetItem] = {os.sep: root_item}
+    def build_tree(self, root_item: UTreeWidgetItem, paths: list[str]) -> None:
+        self.items: dict[str, UTreeWidgetItem] = {os.sep: root_item}
 
         for path in sorted(paths):
             if path == os.sep:
                 continue
+            rel_path = Utils.get_rel_any_path(
+                mf_path=Mf.current_mf.get_avaiable_mf_path(),
+                abs_img_path=path
+            )
             parent = os.path.dirname(path) or os.sep
             name = os.path.basename(path)
-            if Cfg.hide_digits:
+            parent_rel_path = Utils.get_rel_any_path(
+                mf_path=Mf.current_mf.get_avaiable_mf_path(),
+                abs_img_path=parent
+            )
+            if Tools.is_hide_digits(Mf.current_mf, parent_rel_path):
                 old_name = name
                 name = self.strip_to_first_letter(name)
                 if not name:
@@ -111,7 +125,7 @@ class TreeWid(QTreeWidget):
             if parent_item is None:
                 continue
 
-            child = QTreeWidgetItem([name])
+            child = UTreeWidgetItem(rel_path, [name])
             child.setIcon(0, QIcon(self.svg_folder))
             child.setSizeHint(0, QSize(0, self.item_height))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
@@ -170,7 +184,11 @@ class TreeWid(QTreeWidget):
     def contextMenuEvent(self, a0):
 
         def hide_digits_cmd():
-            Cfg.hide_digits = not Cfg.hide_digits
+            Tools.hide_digits(Mf.current_mf, item.rel_path)
+            self.init_ui()
+
+        def show_digits_cmd():
+            Tools.show_digits(Mf.current_mf, item.rel_path)
             self.init_ui()
 
         def collapse_all_cmd():
@@ -179,17 +197,12 @@ class TreeWid(QTreeWidget):
             first_item.setExpanded(True)
             self.setCurrentItem(first_item)
 
-        item = self.itemAt(a0.pos())
+        item: UTreeWidgetItem = self.itemAt(a0.pos())
         menu = UMenu(a0)
 
         abs_path = ""
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
-            rel_path = Utils.get_rel_any_path(
-                mf_path=Mf.current_mf.get_avaiable_mf_path(),
-                abs_img_path=abs_path
-            )
-
             view = QAction(Lng.open[Cfg.lng_index], menu)
             view.triggered.connect(lambda: self.tree_open.emit(abs_path))
             menu.addAction(view)
@@ -209,13 +222,13 @@ class TreeWid(QTreeWidget):
 
         menu.addSeparator()
 
-        if rel_path:
-            if Tools.is_hide_digits(Mf.current_mf, rel_path):
-                text = Lng.hide_digits[Cfg.lng_index]
-                cmd = lambda: Tools.show_digits(Mf.current_mf, rel_path)
+        if item.rel_path:
+            if Tools.is_hide_digits(Mf.current_mf, item.rel_path):
+                text = Lng.show_digits[Cfg.lng_index]
+                cmd = show_digits_cmd
             else:
-                text = "Скрывать нумерацию"
-                cmd = lambda: Tools.hide_digits(Mf.current_mf, rel_path)
+                text = Lng.hide_digits[Cfg.lng_index]
+                cmd = hide_digits_cmd
             hide_ = QAction(text, menu)
             hide_.triggered.connect(cmd)
             menu.addAction(hide_)
