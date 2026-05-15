@@ -13,7 +13,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UListWidgetItem, UMenu, VListWidget
+from ._base_widgets import UListWidgetItem, UMenu, USubMenu, VListWidget
 
 
 class Tools:
@@ -24,8 +24,6 @@ class Tools:
             Cfg.hide_digits_list[mf.mf_alias] = [rel_path, ]
         elif isinstance(rel_paths, list) and rel_path not in rel_paths:
             rel_paths.append(rel_path)
-        
-        Cfg.write_json_data()
 
     def show_digits(mf: Mf, rel_path: str):
         rel_paths = Cfg.hide_digits_list.get(mf.mf_alias, None)
@@ -34,7 +32,9 @@ class Tools:
             if len(rel_paths) == 0:
                 Cfg.hide_digits_list.pop(mf.mf_alias)
 
-        Cfg.write_json_data()
+    def reset_all_digits(mf: Mf):
+        if mf.mf_alias in Cfg.hide_digits_list:
+            Cfg.hide_digits_list.pop(mf.mf_alias)
 
     def is_hide_digits(mf: Mf, rel_path: str):
         if mf.mf_alias not in Cfg.hide_digits_list:
@@ -140,8 +140,6 @@ class TreeWid(QTreeWidget):
         root_item.setExpanded(True)
         self.expand_to_path(self.selected_path)
 
-        print(self.selected_path)
-
     def expand_to_path(self, path: str):
         if path == "":
             path = os.sep
@@ -187,10 +185,17 @@ class TreeWid(QTreeWidget):
 
         def hide_digits_cmd():
             Tools.hide_digits(Mf.current_mf, item.rel_path)
+            Cfg.write_json_data()
             self.init_ui()
 
         def show_digits_cmd():
             Tools.show_digits(Mf.current_mf, item.rel_path)
+            Cfg.write_json_data()
+            self.init_ui()
+
+        def reset_all_digits_cmd():
+            Tools.reset_all_digits(Mf.current_mf)
+            Cfg.write_json_data()
             self.init_ui()
 
         def collapse_all_cmd():
@@ -226,6 +231,7 @@ class TreeWid(QTreeWidget):
         menu.addSeparator()
 
         if item.rel_path:
+
             if Tools.is_hide_digits(Mf.current_mf, item.rel_path):
                 text = Lng.show_digits[Cfg.lng_index]
                 cmd = show_digits_cmd
@@ -235,6 +241,11 @@ class TreeWid(QTreeWidget):
             hide_ = QAction(text, menu)
             hide_.triggered.connect(cmd)
             menu.addAction(hide_)
+
+            if item.rel_path == os.sep:
+                reset_digits = QAction("Сбросить нумеарацию", menu)
+                reset_digits.triggered.connect(reset_all_digits_cmd)
+                menu.addAction(reset_digits)
 
         menu.addSeparator()
 
