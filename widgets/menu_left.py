@@ -140,6 +140,8 @@ class TreeWid(QTreeWidget):
         root_item.setExpanded(True)
         self.expand_to_path(self.selected_path)
 
+        print(self.selected_path)
+
     def expand_to_path(self, path: str):
         if path == "":
             path = os.sep
@@ -203,6 +205,7 @@ class TreeWid(QTreeWidget):
         abs_path = ""
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
+            self.selected_path = abs_path
             view = QAction(Lng.open[Cfg.lng_index], menu)
             view.triggered.connect(lambda: self.tree_open.emit(abs_path))
             menu.addAction(view)
@@ -233,12 +236,6 @@ class TreeWid(QTreeWidget):
             hide_.triggered.connect(cmd)
             menu.addAction(hide_)
 
-
-        # hide_digits = QAction(Lng.hide_digits[Cfg.lng_index], menu)
-        # hide_digits.triggered.connect(hide_digits_cmd)
-        # hide_digits.setCheckable(True)
-        # hide_digits.setChecked(Cfg.hide_digits)
-        # menu.addAction(hide_digits)
         menu.addSeparator()
 
         reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
