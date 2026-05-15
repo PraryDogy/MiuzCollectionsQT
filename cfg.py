@@ -44,12 +44,13 @@ class Dynamic:
 
 
 class Cfg:
-    app_ver: str = Static.app_ver
-    lng_index: int = 0
-    dark_mode: int = 0
-    scaner_minutes: int = 20
-    new_scaner: int = True
-    hide_digits: bool = True
+    app_ver = Static.app_ver
+    lng_index = 0
+    dark_mode = 0
+    scaner_minutes = 20
+    new_scaner = True
+    hide_digits = True
+    no_digets = {}
     apps = [
         "preview",
         "photos",
