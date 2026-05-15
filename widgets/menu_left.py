@@ -13,7 +13,29 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UListWidgetItem, UMenu, UVBoxLayout, VListWidget
+from ._base_widgets import UListWidgetItem, UMenu, VListWidget
+
+
+class Tools:
+
+    def add_to_hide_digets(mf: Mf, rel_path: str):
+        rel_paths = Cfg.hide_digets_list.get(mf.mf_alias, None)
+        if rel_paths is None:
+            Cfg.hide_digets_list[mf.mf_alias] = []
+        elif isinstance(rel_paths, list) and rel_path not in rel_paths:
+            rel_paths.append(rel_path)
+
+    def remove_hide_digets(mf: Mf, rel_path: str):
+        rel_paths = Cfg.hide_digets_list.get(mf.mf_alias, None)
+        if isinstance(rel_paths, list) and rel_path in rel_paths:
+            rel_paths.remove(rel_path)
+
+    def is_hide_digits(mf: Mf, rel_path: str):
+        if mf.mf_alias not in Cfg.hide_digets_list:
+            return False
+        if rel_path not in Cfg.hide_digets_list[mf.mf_alias]:
+            return False
+        return True
 
 
 class TreeWid(QTreeWidget):

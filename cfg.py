@@ -50,7 +50,7 @@ class Cfg:
     scaner_minutes = 20
     new_scaner = True
     hide_digits = True
-    no_digets = {}
+    hide_digets_list: dict[list[str]] = {}
     apps = [
         "preview",
         "photos",
