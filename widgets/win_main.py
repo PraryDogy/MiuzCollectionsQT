@@ -25,7 +25,7 @@ from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
 from .bar_top import BarTop
-from .grid import Grid
+from .grid import Grid, GridStandart
 from .menu_left import MenuLeft
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
@@ -128,7 +128,7 @@ class WinMain(UMainWindow):
             lambda: self.open_dates_win()
         )
         self.bar_top.reload_thumbnails.connect(
-            lambda: self.reload_thumbnails()
+            lambda: self.load_st_grid()
             )
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
@@ -142,7 +142,7 @@ class WinMain(UMainWindow):
         self.right_layout.addWidget(sep_upper)
 
         self.grid = Grid()
-        self.reload_thumbnails()
+        self.load_st_grid()
 
         sep_bottom = USep()
         self.right_layout.addWidget(sep_bottom)
@@ -174,9 +174,8 @@ class WinMain(UMainWindow):
             self.width() - self.left_side_width
         ])
 
-        self.grid.setFocus()
+        self.load_st_grid()
 
-        self.reload_thumbnails()
         if "noscan" not in argv:
             self.start_scaner_task()
         else:
@@ -198,7 +197,7 @@ class WinMain(UMainWindow):
         current_dir = os.path.dirname(rel_path)
         Dynamic.current_dir = current_dir
         self.go_to_url = rel_path
-        self.reload_thumbnails()
+        self.load_st_grid()
     
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"
@@ -223,7 +222,7 @@ class WinMain(UMainWindow):
         self.filters_win = WinFilters()
         self.filters_win.closed_.connect(on_closed)
         self.filters_win.reload_thumbnails.connect(
-            self.reload_thumbnails
+            self.load_st_grid
         )
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -240,7 +239,7 @@ class WinMain(UMainWindow):
             abs_img_path=abs_path
         )
         Dynamic.current_dir = rel_path
-        self.reload_thumbnails()
+        self.load_st_grid()
         self.path_bar_update(Dynamic.current_dir)
 
     def on_mf_clicked(self, mf: Mf):
@@ -248,7 +247,7 @@ class WinMain(UMainWindow):
         Dynamic.current_dir = os.sep
         self.left_menu.tree_wid.abs_selected_path = os.sep
         self.left_menu.tree_wid.init_ui()
-        self.reload_thumbnails()
+        self.load_st_grid()
         self.path_bar_update(Dynamic.current_dir)
 
         mf_path = mf.get_avaiable_mf_path()
@@ -470,27 +469,28 @@ class WinMain(UMainWindow):
         self.dates_win = WinDates()
         self.dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
         self.dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
-        self.dates_win.reload_thumbnails.connect(lambda: self.reload_thumbnails())
+        self.dates_win.reload_thumbnails.connect(lambda: self.load_st_grid())
         self.dates_win.center_to_parent(self)
         self.dates_win.show()
 
-    def reload_thumbnails(self, layout_index: int = 2):
+    def load_st_grid(self, layout_index: int = 2):
 
         def finished():
             self.grid.setFocus()
             if self.go_to_url:
                 widget = self.grid.url_to_wid.get(self.go_to_url)
-                if widget:
-                    self.grid.select_by_url(self.go_to_url)
-                    QTimer.singleShot(
-                        100,
-                        lambda: self.grid.ensureWidgetVisible(widget)
-                    )
+                if not widget:
+                    return
+                self.grid.select_by_url(self.go_to_url)
+                QTimer.singleShot(
+                    100,
+                    lambda: self.grid.ensureWidgetVisible(widget)
+                )
                 self.go_to_url = str()
 
         Dynamic.loaded_thumbs = 0
         self.grid.deleteLater()
-        self.grid = Grid()
+        self.grid = GridStandart()
         self.grid.restart_scaner.connect(
             lambda: self.restart_scaner_task()
         )
@@ -543,7 +543,7 @@ class WinMain(UMainWindow):
             finished
         )
         self.grid.reload_thumbnails.connect(
-            self.reload_thumbnails
+            self.load_st_grid
         )
         self.right_layout.insertWidget(layout_index, self.grid)
 
@@ -641,7 +641,7 @@ class WinMain(UMainWindow):
             self.bar_bottom.progress_bar.start_timer_text()
             new_db_time = int(os.stat(Static.external_db).st_mtime)
             if self.db_mtime != new_db_time:
-                self.reload_thumbnails()
+                self.load_st_grid()
                 self.left_menu.tree_wid.init_ui()
         else:
             self.scaner_poll_timer.start(ms)
