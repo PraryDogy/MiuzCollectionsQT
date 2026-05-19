@@ -2,20 +2,23 @@ import sys
 
 import numpy as np
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QColor, QPen, QPixmap
+from PyQt5.QtGui import QColor, QFont, QPen, QPixmap
 from PyQt5.QtWidgets import (QApplication, QGraphicsPixmapItem,
-                             QGraphicsRectItem, QGraphicsScene, QGraphicsView,
-                             QMainWindow)
+                             QGraphicsRectItem, QGraphicsScene,
+                             QGraphicsTextItem, QGraphicsView, QHBoxLayout,
+                             QLabel, QPushButton, QVBoxLayout, QWidget)
 
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 from widgets._base_widgets import UMainWindow
 from widgets.win_image_view import WinImageView
-
+import os
 
 class CropView(QGraphicsView):
+    min_ww, min_hh = 300, 260
     def __init__(self):
         super().__init__()
+        self.setMinimumSize(self.min_ww, self.min_hh)
         self.setAcceptDrops(True)
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
@@ -26,9 +29,23 @@ class CropView(QGraphicsView):
         self.scene.addItem(self.crop_rect_item)
         self.dragging = False
 
-    def get_crop_numpy(self):
-        if self.image_np is None:
-            return None
+        lines = (
+            "Перетащите изображение сюда.",
+            "Выделите область изображения для поиска.",
+            "Если ничего не нашлось, попробуйте уменьшить область."
+        )
+
+        self.placeholder = QGraphicsTextItem("\n".join(lines))
+        self.placeholder.setDefaultTextColor(
+            QColor(150, 150, 150)
+        )
+        font = QFont()
+        font.setPointSize(14)
+        self.placeholder.setFont(font)
+        self.scene.addItem(self.placeholder)
+        self.update_placeholder_pos()
+
+    def get_crop_numpy(self) -> np.ndarray:
         rect = self.crop_rect_item.rect()
         x1 = int(rect.left())
         y1 = int(rect.top())
@@ -39,8 +56,19 @@ class CropView(QGraphicsView):
         x2 = max(0, min(w, x2))
         y1 = max(0, min(h, y1))
         y2 = max(0, min(h, y2))
-        cropped = self.image_np[y1:y2, x1:x2]
-        return cropped
+        return self.image_np[y1:y2, x1:x2]
+
+    def update_placeholder_pos(self):
+        view_rect = self.mapToScene(
+            self.viewport().rect()
+        ).boundingRect()
+
+        text_rect = self.placeholder.boundingRect()
+
+        self.placeholder.setPos(
+            view_rect.center().x() - text_rect.width() / 2,
+            view_rect.center().y() - text_rect.height() / 2
+        )
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -51,7 +79,14 @@ class CropView(QGraphicsView):
             event.acceptProposedAction()
 
     def dropEvent(self, event):
+        if not event.mimeData().hasUrls():
+            return
         path = event.mimeData().urls()[0].toLocalFile()
+        if not os.path.isfile(path):
+            return
+        if not path.endswith(ImgUtils.ext_all):
+            return
+        self.placeholder.hide()
         self.image_np = ImgUtils.read_img(path)
         qimage = Utils.qimage_from_array(self.image_np)
         pixmap = QPixmap.fromImage(qimage)
@@ -94,26 +129,45 @@ class CropView(QGraphicsView):
         super().resizeEvent(event)
         if self.pixmap_item:
             self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
+        else:
+            self.update_placeholder_pos()
 
 
-class MainWindow(UMainWindow):
+class CropWin(UMainWindow):
     def __init__(self):
         super().__init__()
-
         self.resize(500, 500)
-        self.view = CropView()
-        self.setCentralWidget(self.view)
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Return:
-            crop = self.view.get_crop_numpy()
-            print("Crop shape:", crop.shape)
+        above_bar = QWidget()
+        self.central_layout.addWidget(above_bar)
+        above_layout = QHBoxLayout(above_bar)
+        above_layout.setContentsMargins(0, 0, 0, 0)
 
+        self.ok_btn = QPushButton("Применить")
+        above_layout.addWidget(self.ok_btn)
+
+        self.crop_view = CropView()
+        self.central_layout.addWidget(self.crop_view)
+
+    def show_crop(self):
+        self.crop_array = self.crop_view.get_crop_numpy()
+        self.crop_qimage = Utils.qimage_from_array(self.crop_array)
+        self.crop_pixmap = QPixmap.fromImage(self.crop_qimage)
+        self.crop_pixmap = Utils.qiconed_resize(self.crop_pixmap, 500)
+        self.test = QLabel()
+        self.test.setPixmap(self.crop_pixmap)
+        self.test.show()
+
+    def keyPressEvent(self, a0):
+        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.show_crop()
+
+        return super().keyPressEvent(a0)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    window = MainWindow()
+    window = CropWin()
     window.show()
 
     sys.exit(app.exec_())

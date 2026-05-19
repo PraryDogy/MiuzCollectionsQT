@@ -21,6 +21,7 @@ class Utils:
     @classmethod
     def qimage_from_array(cls, image: np.ndarray) -> QImage | None:
         try:
+            image = np.ascontiguousarray(image)
             if image.ndim == 2:  # grayscale
                 height, width = image.shape
                 bytes_per_line = width
