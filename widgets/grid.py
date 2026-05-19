@@ -678,6 +678,8 @@ class Grid(VScrollArea):
 
                 self.menu_.addMenu(open_menu)
 
+                self.menu_.addSeparator()
+
                 fav = SetFav(self.menu_, clicked.data_item.fav)
                 fav.triggered.connect(
                     lambda: self.set_fav.emit((clicked.data_item.rel_path, not clicked.data_item.fav))
