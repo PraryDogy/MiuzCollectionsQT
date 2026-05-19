@@ -30,7 +30,7 @@ from .menu_left import MenuLeft
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_filters import WinFilters
-from .win_image_view import WinImageView
+from .win_image_view import WinImageView, WinImageViewSt
 from .win_info import WinInfo
 from .win_servers import ServersWin
 from .win_settings import WinSettings
@@ -566,7 +566,7 @@ class WinMain(UMainWindow):
             data_items=data_items,
             is_selection=is_selection
         )
-        self.view_win = WinImageView(item)
+        self.view_win = WinImageViewSt(item)
         self.view_win.open_win_info.connect(
             lambda rel_paths: self.open_info_win(self.view_win, Mf.current_mf, rel_paths)
         )
