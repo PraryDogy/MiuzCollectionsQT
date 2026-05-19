@@ -262,28 +262,11 @@ class WinImageView(UMainWindow):
     def set_new_pixmap(self, pixmap: QPixmap):
         self.img_wid.hide()
         new_wid = ImgWid(pixmap)
-        # new_wid.mouse_moved.connect(self.zoom_btns.show)
-        # new_wid.mouse_moved.connect(self.prev_image_btn.show)
-        # new_wid.mouse_moved.connect(self.next_image_btn.show)
         self.central_layout.addWidget(new_wid)
-
         self.img_wid.deleteLater()
         self.img_wid = new_wid
         self.img_wid.show()
-
         self.zoom_btns.raise_()
-
-# GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
-
-    # def hide_all_buttons(self):
-    #     btns = (self.zoom_btns, )
-    #     widget_under_cursor = QApplication.widgetAt(QCursor.pos())
-    #     if isinstance(widget_under_cursor, QSvgWidget):
-    #         return
-    #     for i in btns:
-    #         i.hide()
-
-# EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
 
     def keyPressEvent(self, ev: QKeyEvent | None) -> None:
 
