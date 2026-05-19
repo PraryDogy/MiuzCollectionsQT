@@ -542,7 +542,12 @@ class WinMain(UMainWindow):
         self.grid.show_in_app.connect(
             self.show_in_app
         )
-        self.grid.finished_.connect(finished)
+        self.grid.finished_.connect(
+            finished
+        )
+        self.grid.reload_thumbnails.connect(
+            self.reload_thumbnails
+        )
         self.right_layout.insertWidget(layout_index, self.grid)
 
     @with_conn

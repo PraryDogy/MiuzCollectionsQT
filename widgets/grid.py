@@ -271,6 +271,7 @@ class Grid(VScrollArea):
     """Сетка миниатюр с сигналами для действий с файлами и интерфейсом."""
 
     # --- Сигналы ---
+    reload_thumbnails = pyqtSignal()
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
@@ -615,7 +616,7 @@ class Grid(VScrollArea):
 
             update_grid = QAction(Lng.update_grid[Cfg.lng_index], self.menu_)
             update_grid.triggered.connect(
-                lambda: print("перезагрузка сетки")
+                lambda: self.reload_thumbnails.emit()
             )
             self.menu_.addAction(update_grid)
 
