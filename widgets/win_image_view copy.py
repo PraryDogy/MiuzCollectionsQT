@@ -234,8 +234,13 @@ class WinImageView(UMainWindow):
     ww, hh = 0, 0
     xx, yy = 0, 0
 
-    def __init__(self):
+    def __init__(self, img_view_item: ImgViewItem):
         super().__init__()
+
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
+        self.url_to_pixmap: dict[str, QPixmap] = {}
+        self.img_view_item = img_view_item
+        self.current_data_item = img_view_item.start_data_item
 
         self.setStyleSheet("background: black;")
         self.setMinimumSize(QSize(self.min_w, self.min_h))
@@ -247,7 +252,6 @@ class WinImageView(UMainWindow):
 
         self.img_wid = ImgWid(QPixmap())
         self.central_layout.addWidget(self.img_wid)
-
         self.prev_image_btn = PrevImgBtn(self.centralWidget())
         self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
@@ -260,6 +264,11 @@ class WinImageView(UMainWindow):
         self.zoom_btns.zoom_fit.connect(lambda: self.zoom_cmd("fit"))
         self.zoom_btns.zoom_close.connect(self.deleteLater)
 
+        self.text_label = QLabel(self)
+        self.text_label.setStyleSheet("background: black;")
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # self.hide_all_buttons()
         QTimer.singleShot(100, self.load_thumb)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
@@ -273,6 +282,7 @@ class WinImageView(UMainWindow):
         actions[flag]()
 
     def restart_img_wid(self, pixmap: QPixmap):
+        self.text_label.hide()
         self.img_wid.hide()  # скрываем старый
         new_wid = ImgWid(pixmap)
         new_wid.mouse_moved.connect(self.zoom_btns.show)
@@ -285,6 +295,11 @@ class WinImageView(UMainWindow):
         btns = (self.zoom_btns, self.prev_image_btn, self.next_image_btn)
         for i in btns:
             i.raise_()
+
+    def show_text_label(self, text: str):
+        self.text_label.setText(text)
+        self.text_label.raise_()  # поверх остальных
+        self.text_label.show()
 
     def load_thumb(self):
         self.restart_img_wid(self.current_data_item.pixmap)
@@ -528,6 +543,7 @@ class WinImageView(UMainWindow):
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
+        self.text_label.resize(self.size())
         self.setFocus()
 
         return super().resizeEvent(a0)
@@ -546,42 +562,25 @@ class WinImageView(UMainWindow):
         return super().leaveEvent(a0)
 
     def closeEvent(self, a0):
-        WinImageView.ww = self.size().width()
-        WinImageView.hh = self.size().height()
-        WinImageView.xx = self.x()
-        WinImageView.yy = self.y()
-        return super().closeEvent(a0)
-    
-    def deleteLater(self):
-        WinImageView.ww = self.size().width()
-        WinImageView.hh = self.size().height()
-        WinImageView.xx = self.x()
-        WinImageView.yy = self.y()
-        return super().deleteLater()
-
-
-class WinImageViewSt(WinImageView):
-    def __init__(self, img_view_item: ImgViewItem):
-        super().__init__(img_view_item)
-        self.image_apps = {
-            i: os.path.basename(i)
-            for i in SharedUtils.get_apps(Cfg.apps)
-        }
-        self.url_to_pixmap: dict[str, QPixmap] = {}
-        self.img_view_item = img_view_item
-        self.current_data_item = img_view_item.start_data_item
-
-    def terminate_task(self):
         try:
             self.read_img_task.terminate_join()
             self.read_img_timer.stop()
         except AttributeError as e:
             print("close img view error", e)
-
-    def closeEvent(self, a0):
-        self.terminate_task()
+        WinImageView.ww = self.size().width()
+        WinImageView.hh = self.size().height()
+        WinImageView.xx = self.x()
+        WinImageView.yy = self.y()
         return super().closeEvent(a0)
     
     def deleteLater(self):
-        self.terminate_task()
+        try:
+            self.read_img_task.terminate_join()
+            self.read_img_timer.stop()
+        except AttributeError as e:
+            print("close img view error", e)
+        WinImageView.ww = self.size().width()
+        WinImageView.hh = self.size().height()
+        WinImageView.xx = self.x()
+        WinImageView.yy = self.y()
         return super().deleteLater()
