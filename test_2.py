@@ -20,25 +20,14 @@ def load_image_to_numpy(path: str) -> np.ndarray:
 class CropView(QGraphicsView):
     def __init__(self):
         super().__init__()
-
         self.setAcceptDrops(True)
-
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
-
         self.pixmap_item = None
         self.image_np = None
-
         self.origin = QPointF()
         self.crop_rect_item = QGraphicsRectItem()
-
-        blue = QColor(70, 130, 240)
-        pen = QPen(blue)
-        pen.setWidth(2)
-
-        self.crop_rect_item.setPen(pen)
         self.scene.addItem(self.crop_rect_item)
-
         self.dragging = False
 
     def dragEnterEvent(self, event):
@@ -51,62 +40,42 @@ class CropView(QGraphicsView):
 
     def dropEvent(self, event):
         path = event.mimeData().urls()[0].toLocalFile()
-
         self.image_np = ImgUtils.read_img(path)
-
         qimage = Utils.qimage_from_array(self.image_np)
         pixmap = QPixmap.fromImage(qimage)
-
         self.scene.clear()
-
         self.pixmap_item = QGraphicsPixmapItem(pixmap)
         self.scene.addItem(self.pixmap_item)
-
         self.crop_rect_item = QGraphicsRectItem()
-
         blue = QColor(70, 130, 240)
         pen = QPen(blue)
         pen.setWidth(2)
-
         self.crop_rect_item.setPen(pen)
         self.scene.addItem(self.crop_rect_item)
-
         self.setSceneRect(QRectF(pixmap.rect()))
-
         self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
 
-    # ==========================================
-    # MOUSE
-    # ==========================================
     def mousePressEvent(self, event):
         if self.pixmap_item is None:
             return
-
         if event.button() == Qt.LeftButton:
             self.dragging = True
-
             self.origin = self.mapToScene(event.pos())
-
             self.crop_rect_item.setRect(
                 QRectF(self.origin, self.origin)
             )
-
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self.dragging:
             current_pos = self.mapToScene(event.pos())
-
             rect = QRectF(self.origin, current_pos).normalized()
-
             self.crop_rect_item.setRect(rect)
-
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.dragging = False
-
         super().mouseReleaseEvent(event)
 
     def get_crop_numpy(self):
