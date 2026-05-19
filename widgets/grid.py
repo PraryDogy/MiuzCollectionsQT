@@ -366,7 +366,7 @@ class Grid(VScrollArea):
             self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
 
         if not self.url_to_wid:
-            self.grid_wid.deleteLater()
+            self.grid_wid.hide()
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
             lbl = QLabel(Lng.no_photo[Cfg.lng_index])
             self.scroll_layout.addWidget(lbl)
