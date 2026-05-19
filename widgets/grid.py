@@ -414,35 +414,46 @@ class Grid(VScrollArea):
         self.grid_wid.deleteLater()
         self.rubberBand.deleteLater()
 
-    def load_initial_grid(self, db_images: dict[str, list[DbImagesItem]]):
+    def load_initial_grid(self, db_images: list[DbImagesItem]):
+        if not db_images:
+            lbl = QLabel(Lng.no_photo[Cfg.lng_index])
+            self.grid_lay.addWidget(
+                lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+            self.grid_lay.setRowStretch(0, 1)
+            self.grid_lay.setColumnStretch(0, 1)
+            return
 
-        def load_grid_delayed():
-            prev_selection = [i.data_item.rel_path for i in self.selected_widgets]
-            self.remove_grid_container()
-            self.load_grid_container()
-            self.reset_grid_properties()
-            self.clear_selected_widgets()
-            Thumb.calculate_size()
-            if not db_images:
-                lbl = QLabel(Lng.no_photo[Cfg.lng_index])
-                self.grid_lay.addWidget(
-                    lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-            
-                self.grid_lay.setRowStretch(0, 1)
-                self.grid_lay.setColumnStretch(0, 1)
-            else:
-                for _, db_images_list in db_images.items():
-                    self.add_thumbnails_to_grid(db_images_list)
-                self.rearrange()
-                self.grid_wid.show()
-                self.finished_.emit()
-                for i in prev_selection:
-                    if i in self.path_to_wid:
-                        self.wid_to_selected_widgets(self.path_to_wid[i])
-                QTimer.singleShot(100, self.setFocus)
+        prev_selection = [i.data_item.rel_path for i in self.selected_widgets]
+        self.remove_grid_container()
+        self.load_grid_container()
+        self.reset_grid_properties()
+        self.clear_selected_widgets()
+        Thumb.calculate_size()
+      
+        for image_item in db_images:
+            pixmap = QPixmap.fromImage(image_item.qimage)
+            data_item = DataItem(
+                pixmap=pixmap,
+                rel_path=image_item.rel_img_path,
+                fav=image_item.fav,
+                month_year=image_item.month_year,
+                day_month_year=image_item.day_month_year,
+                filename=os.path.basename(image_item.rel_img_path)
+            )
+            thumbnail = Thumb(data_item)
+            thumbnail.set_no_frame()
+            thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
 
-        self.grid_wid.hide()
-        QTimer.singleShot(50, load_grid_delayed)
+            self.add_thumb_data(thumbnail)
+            # self.grid_lay.addWidget(thumbnail, 0, 0)
+
+        self.rearrange()
+        self.grid_wid.show()
+        self.finished_.emit()
+        for i in prev_selection:
+            if i in self.path_to_wid:
+                self.wid_to_selected_widgets(self.path_to_wid[i])
+        QTimer.singleShot(100, self.setFocus)
                         
     def add_thumb_data(self, wid: Thumb):
         self.path_to_wid[wid.data_item.rel_path] = wid
@@ -450,6 +461,7 @@ class Grid(VScrollArea):
         wid.row, wid.col = self.glob_row, self.glob_col        
 
     def add_thumbnails_to_grid(self, db_images: list[DbImagesItem]):
+        return
 
         def create_thumb(image_item: DbImagesItem):
             data_item = DataItem(
@@ -527,7 +539,7 @@ class Grid(VScrollArea):
             return
 
         prev_f_mod = thumbnails[0].data_item.month_year
-        for thumb in thumbnails:
+        for thumb in self.path_to_wid.values():
             # Проверка на смену модификации при сортировке по модификации
             if Dynamic.sort_by_mod and thumb.data_item.month_year != prev_f_mod:
                 _next_row()

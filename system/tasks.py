@@ -85,7 +85,7 @@ class DbImagesLoader(URunnable):
     """
 
     class Sigs(QObject):
-        finished_ = pyqtSignal(dict)
+        finished_ = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -106,7 +106,8 @@ class DbImagesLoader(URunnable):
             self.sigs.finished_.emit({})
 
     def create_dict(self, res: list[tuple]):
-        thumbs_dict = defaultdict(list[DbImagesItem])
+        # thumbs_dict = defaultdict(list[DbImagesItem])
+        thumbs = []
 
         for rel_img_path, rel_thumb_path, mod, fav in res:
             abs_thumb_path_ = Utils.get_abs_thumb_path(rel_thumb_path)
@@ -121,11 +122,7 @@ class DbImagesLoader(URunnable):
             month_ = Lng.months[Cfg.lng_index][str(date_.month)]
             month_gen_ = Lng.months_gen[Cfg.lng_index][str(date_.month)]
             day_month_year = f"{date_.day} {month_gen_} {date_.year}"
-
-            if Dynamic.date_start or Dynamic.date_end:
-                month_year = f"{Dynamic.f_date_start} - {Dynamic.f_date_end}"
-            else:
-                month_year = f"{month_} {date_.year}"
+            month_year = f"{month_} {date_.year}"
 
             item = DbImagesItem(
                 rel_img_path=rel_img_path,
@@ -135,13 +132,8 @@ class DbImagesLoader(URunnable):
                 day_month_year=day_month_year,
                 month_year=month_year
             )
-
-            if Dynamic.sort_by_mod:
-                thumbs_dict[month_year].append(item)
-            else:
-                thumbs_dict["any_key"].append(item)
-
-        return thumbs_dict
+            thumbs.append(item)
+        return thumbs
 
     def get_stmt(self):
         rel_path = Dynamic.current_dir

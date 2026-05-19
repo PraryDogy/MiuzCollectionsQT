@@ -120,9 +120,9 @@ class WinMain(UMainWindow):
         # Правый виджет
         right_wid = QWidget()
         self.splitter.addWidget(right_wid)
-        right_lay = UVBoxLayout()
-        right_lay.setContentsMargins(0, 0, 0, 0)
-        right_wid.setLayout(right_lay)
+        self.right_layout = UVBoxLayout()
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+        right_wid.setLayout(self.right_layout)
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
@@ -130,7 +130,7 @@ class WinMain(UMainWindow):
             lambda: self.open_dates_win()
         )
         self.bar_top.reload_thumbnails.connect(
-            lambda: self.grid.reload_thumbnails()
+            lambda: self.reload_thumbnails()
             )
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
@@ -138,68 +138,20 @@ class WinMain(UMainWindow):
         self.bar_top.open_filters_win.connect(
             lambda: self.open_filters_win()
         )
-        right_lay.addWidget(self.bar_top)
+        self.right_layout.addWidget(self.bar_top)
 
         sep_upper = USep()
-        right_lay.addWidget(sep_upper)
+        self.right_layout.addWidget(sep_upper)
 
         self.grid = Grid()
-        self.grid.restart_scaner.connect(
-            lambda: self.restart_scaner_task()
-        )
-        self.grid.remove_files.connect(
-            lambda p: self.remove_files(Mf.current_mf, p)
-        )
-        self.grid.open_img_view.connect(
-            lambda: self.open_view_win(Mf.current_mf)
-        )
-        self.grid.save_files.connect(
-            lambda data: self.save_files(Mf.current_mf, data)
-        )
-        self.grid.open_info_win.connect(
-            lambda p: self.open_info_win(Mf.current_mf, p)
-        )
-        self.grid.copy_path.connect(
-            lambda p: self.copy_path(Mf.current_mf, p)
-        )
-        self.grid.copy_name.connect(
-            lambda p: self.copy_name(Mf.current_mf, p)
-        )
-        self.grid.reveal_in_finder.connect(
-            lambda p: self.reveal_in_finder(Mf.current_mf, p)
-        )
-        self.grid.set_fav.connect(
-            lambda data: self.set_fav(data)
-        )
-        self.grid.open_in_app.connect(
-            lambda data: self.open_in_app(Mf.current_mf, data)
-        )
-        self.grid.paste_files.connect(
-            lambda: self.paste_files(Mf.current_mf)
-        )
-        self.grid.set_clipboard.connect(
-            lambda data: self.set_buffer(Mf.current_mf, data)
-        )
-        self.grid.setup_mf.connect(
-            lambda item: self.open_settings_win(item)
-        )
-        self.grid.path_bar_update.connect(
-            lambda rel_path: self.path_bar_update(rel_path)
-        )
-        self.grid.update_thumb.connect(
-            lambda p: self.start_update_thumb(Mf.current_mf, p)
-        )
-        self.grid.show_in_app.connect(
-            self.show_in_app
-        )
-        right_lay.addWidget(self.grid)
+        self.reload_thumbnails()
 
         sep_bottom = USep()
-        right_lay.addWidget(sep_bottom)
+        self.right_layout.addWidget(sep_bottom)
 
         self.bar_path = PathBar()
         self.path_bar_update("")
-        right_lay.addWidget(self.bar_path)
+        self.right_layout.addWidget(self.bar_path)
         wid = self.splitter.widget(1)
         QTimer.singleShot(
             100,
@@ -207,12 +159,12 @@ class WinMain(UMainWindow):
         )
 
         sep_bottom = USep()
-        right_lay.addWidget(sep_bottom)
+        self.right_layout.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
         self.bar_bottom.progress_bar.setText(Lng.loading[Cfg.lng_index])
         self.bar_bottom.resize_thumbnails.connect(self.grid.resize_thumbnails)
-        right_lay.addWidget(self.bar_bottom)
+        self.right_layout.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
         h_lay_main.addWidget(self.splitter)
@@ -226,7 +178,7 @@ class WinMain(UMainWindow):
 
         self.grid.setFocus()
 
-        self.grid.reload_thumbnails()
+        self.reload_thumbnails()
         if "noscan" not in argv:
             self.start_scaner_task()
         else:
@@ -258,7 +210,7 @@ class WinMain(UMainWindow):
 
         self.left_menu.setCurrentIndex(1)
         self.left_menu.tree_wid.expand_to_path(current_dir)
-        self.grid.reload_thumbnails()
+        self.reload_thumbnails()
         try:
             self.grid.finished_.disconnect()
         except TypeError:
@@ -289,7 +241,7 @@ class WinMain(UMainWindow):
         self.filters_win = WinFilters()
         self.filters_win.closed_.connect(on_closed)
         self.filters_win.reload_thumbnails.connect(
-            self.grid.reload_thumbnails
+            self.reload_thumbnails
         )
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -306,7 +258,7 @@ class WinMain(UMainWindow):
             abs_img_path=abs_path
         )
         Dynamic.current_dir = rel_path
-        self.grid.reload_thumbnails()
+        self.reload_thumbnails()
         self.path_bar_update(Dynamic.current_dir)
 
     def on_mf_clicked(self, mf: Mf):
@@ -314,7 +266,7 @@ class WinMain(UMainWindow):
         Dynamic.current_dir = os.sep
         self.left_menu.tree_wid.abs_selected_path = os.sep
         self.left_menu.tree_wid.init_ui()
-        self.grid.reload_thumbnails()
+        self.reload_thumbnails()
         self.path_bar_update(Dynamic.current_dir)
 
         mf_path = mf.get_avaiable_mf_path()
@@ -536,9 +488,62 @@ class WinMain(UMainWindow):
         self.dates_win = WinDates()
         self.dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
         self.dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
-        self.dates_win.reload_thumbnails.connect(lambda: self.grid.reload_thumbnails())
+        self.dates_win.reload_thumbnails.connect(lambda: self.reload_thumbnails())
         self.dates_win.center_to_parent(self)
         self.dates_win.show()
+
+    def reload_thumbnails(self):
+        self.grid.deleteLater()
+        self.grid = Grid()
+        self.grid.restart_scaner.connect(
+            lambda: self.restart_scaner_task()
+        )
+        self.grid.remove_files.connect(
+            lambda p: self.remove_files(Mf.current_mf, p)
+        )
+        self.grid.open_img_view.connect(
+            lambda: self.open_view_win(Mf.current_mf)
+        )
+        self.grid.save_files.connect(
+            lambda data: self.save_files(Mf.current_mf, data)
+        )
+        self.grid.open_info_win.connect(
+            lambda p: self.open_info_win(Mf.current_mf, p)
+        )
+        self.grid.copy_path.connect(
+            lambda p: self.copy_path(Mf.current_mf, p)
+        )
+        self.grid.copy_name.connect(
+            lambda p: self.copy_name(Mf.current_mf, p)
+        )
+        self.grid.reveal_in_finder.connect(
+            lambda p: self.reveal_in_finder(Mf.current_mf, p)
+        )
+        self.grid.set_fav.connect(
+            lambda data: self.set_fav(data)
+        )
+        self.grid.open_in_app.connect(
+            lambda data: self.open_in_app(Mf.current_mf, data)
+        )
+        self.grid.paste_files.connect(
+            lambda: self.paste_files(Mf.current_mf)
+        )
+        self.grid.set_clipboard.connect(
+            lambda data: self.set_buffer(Mf.current_mf, data)
+        )
+        self.grid.setup_mf.connect(
+            lambda item: self.open_settings_win(item)
+        )
+        self.grid.path_bar_update.connect(
+            lambda rel_path: self.path_bar_update(rel_path)
+        )
+        self.grid.update_thumb.connect(
+            lambda p: self.start_update_thumb(Mf.current_mf, p)
+        )
+        self.grid.show_in_app.connect(
+            self.show_in_app
+        )
+        self.right_layout.insertWidget(2, self.grid)
 
     @with_conn
     def open_view_win(self, mf: Mf):
@@ -634,7 +639,7 @@ class WinMain(UMainWindow):
             self.bar_bottom.progress_bar.start_timer_text()
             new_db_time = int(os.stat(Static.external_db).st_mtime)
             if self.db_mtime != new_db_time:
-                self.grid.reload_thumbnails()
+                self.reload_thumbnails()
                 self.left_menu.tree_wid.init_ui()
         else:
             self.scaner_poll_timer.start(ms)
