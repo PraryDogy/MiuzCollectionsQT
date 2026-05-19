@@ -13,11 +13,6 @@ from widgets._base_widgets import UMainWindow
 from widgets.win_image_view import WinImageView
 
 
-def load_image_to_numpy(path: str) -> np.ndarray:
-    img = ImgUtils.read_img(path)
-    return img
-
-
 class CropView(QGraphicsView):
     def __init__(self):
         super().__init__()
@@ -78,6 +73,11 @@ class CropView(QGraphicsView):
         if event.button() == Qt.LeftButton:
             self.dragging = False
         super().mouseReleaseEvent(event)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.pixmap_item:
+            self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
 
     def get_crop_numpy(self):
         if self.image_np is None:
