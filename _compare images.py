@@ -2,18 +2,11 @@ import os
 
 import cv2
 import numpy as np
-from skimage.metrics import structural_similarity as ssim
 
 from cfg import Static
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 
-
-import cv2
-import numpy as np
-
-import cv2
-import numpy as np
 
 def get_central_crop(img, size=210):
     h, w = img.shape[:2]

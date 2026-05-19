@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QGraphicsPixmapItem,
 
 from system.shared_utils import ImgUtils
 from system.utils import Utils
+from widgets.win_image_view import WinImageView
 
 
 def load_image_to_numpy(path: str) -> np.ndarray:
