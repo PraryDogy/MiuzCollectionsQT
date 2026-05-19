@@ -17,11 +17,10 @@ from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
                                  UpdateThumb)
 from system.scaner import AllDirScaner, SingleDirScaner
-from system.servers import Servers
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import NotifyWid, UHBoxLayout, UMainWindow, UVBoxLayout
+from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -68,7 +67,6 @@ class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
     ww, hh = 1120, 760
-    warning_svg = "./images/warning.svg"
 
     def __init__(self, argv: list[Literal["noscan", ""]]):
         super().__init__()
