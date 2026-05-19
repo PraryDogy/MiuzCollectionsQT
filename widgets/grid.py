@@ -271,7 +271,7 @@ class Grid(VScrollArea):
     """Сетка миниатюр с сигналами для действий с файлами и интерфейсом."""
 
     # --- Сигналы ---
-    reload_thumbnails = pyqtSignal()
+    load_st_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
     save_files = pyqtSignal(tuple)
@@ -578,7 +578,7 @@ class Grid(VScrollArea):
 
             update_grid = QAction(Lng.update_grid[Cfg.lng_index], self.menu_)
             update_grid.triggered.connect(
-                lambda: self.reload_thumbnails.emit()
+                lambda: self.load_st_grid.emit()
             )
             self.menu_.addAction(update_grid)
 
@@ -891,5 +891,4 @@ class GridStandart(Grid):
 
         if paths:
             self.upload_files.emit(paths)
-            print("upload files", paths)
         return super().dropEvent(a0)

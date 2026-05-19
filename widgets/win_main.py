@@ -433,7 +433,7 @@ class WinMain(UMainWindow):
             )
 
             self.grid.buffer = self.buffer
-            self.paste_files(self.grid, Mf.current_mf)
+            self.paste_files(Mf.current_mf)
 
         target_dir = Utils.get_abs_any_path(mf.mf_current_path, Dynamic.current_dir)
         target_files = [
@@ -542,8 +542,11 @@ class WinMain(UMainWindow):
         self.grid.finished_.connect(
             finished
         )
-        self.grid.reload_thumbnails.connect(
+        self.grid.load_st_grid.connect(
             self.load_st_grid
+        )
+        self.grid.upload_files.connect(
+            lambda p: self.upload_files(Mf.current_mf, p)
         )
         self.right_layout.insertWidget(layout_index, self.grid)
 
