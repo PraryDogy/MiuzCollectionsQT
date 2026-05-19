@@ -199,7 +199,7 @@ class WinMain(UMainWindow):
     def show_in_app(self, rel_path: str):
 
         def go_to_wid():
-            widget = self.grid.path_to_wid.get(rel_path)
+            widget = self.grid.url_to_wid.get(rel_path)
             if widget:
                 QTimer.singleShot(
                     100, lambda: self.grid.ensureWidgetVisible(widget)
@@ -281,7 +281,7 @@ class WinMain(UMainWindow):
             if not queue.empty():
                 update_thumb_items: list[UpdateThumbItem] = queue.get()
                 for i in update_thumb_items:
-                    wid = self.grid.path_to_wid.get(i.rel_img_path)
+                    wid = self.grid.url_to_wid.get(i.rel_img_path)
                     if wid:
                         wid.data_item.pixmap = Utils.pixmap_from_array(i.array)
                         wid.setup()
@@ -493,6 +493,7 @@ class WinMain(UMainWindow):
         self.dates_win.show()
 
     def reload_thumbnails(self):
+        Dynamic.loaded_thumbs = 0
         self.grid.deleteLater()
         self.grid = Grid()
         self.grid.restart_scaner.connect(
@@ -543,12 +544,13 @@ class WinMain(UMainWindow):
         self.grid.show_in_app.connect(
             self.show_in_app
         )
+        self.grid.finished_.connect(self.grid.setFocus)
         self.right_layout.insertWidget(2, self.grid)
 
     @with_conn
     def open_view_win(self, mf: Mf):
         if len(self.grid.selected_widgets) == 1:
-            data_items = [i.data_item for i in self.grid.path_to_wid.values()]
+            data_items = [i.data_item for i in self.grid.url_to_wid.values()]
             is_selection = False
         else:
             data_items = [i.data_item for i in self.grid.selected_widgets]

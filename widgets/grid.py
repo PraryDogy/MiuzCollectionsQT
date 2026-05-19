@@ -150,7 +150,6 @@ class BlueTextWid(ULabel):
 
 
 class Thumb(QFrame):
-    reload_thumbnails = pyqtSignal()
     sym_star = "\U00002605"
     # длина списка идентична cfg static pixmap sizes
     thumb_heights = [130, 150, 185, 270]
@@ -161,6 +160,7 @@ class Thumb(QFrame):
 
     def __init__(self, data_item: DataItem):
         super().__init__()
+        self.row, self.col = 0, 0
         self.data_item = data_item
         if self.data_item.fav:
             self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
@@ -354,9 +354,7 @@ class Grid(VScrollArea):
         self.origin_pos = QPoint()
         self.selected_widgets: list[Thumb] = []
         self.cell_to_wid: dict[tuple, Thumb] = {}
-        self.path_to_wid: dict[str, Thumb] = {}
-        self.max_col: int = 0
-        self.glob_row, self.glob_col = 0, 0
+        self.url_to_wid: dict[str, Thumb] = {}
         self.is_first_load = True
 
         self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
@@ -385,49 +383,38 @@ class Grid(VScrollArea):
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
 
-        # --- Сборка ---
-        self.load_grid_container()
-        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
-
-    def reload_thumbnails(self):
-        Dynamic.loaded_thumbs = 0
-        self.load_db_images_task(self.load_initial_grid)
-
-    def load_more_thumbnails(self):
-        Dynamic.loaded_thumbs += Static.thumbs_load_limit
-        self.load_db_images_task(self.add_more_thumbnails)
-
-    def load_db_images_task(self, on_finish: callable):
-        self.task_ = DbImagesLoader()
-        self.task_.sigs.finished_.connect(on_finish)
-        UThreadPool.start(self.task_)
-        
-    def load_grid_container(self):
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout()
         self.grid_lay.setSpacing(1)
         self.grid_wid.setLayout(self.grid_lay)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
-        
-    def remove_grid_container(self):
-        self.grid_wid.deleteLater()
-        self.rubberBand.deleteLater()
 
-    def load_initial_grid(self, db_images: list[DbImagesItem]):
+        self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
+        self.load_db_images_task(self.create_thumbnails)
+
+    def load_more_thumbnails(self):
+
+        def add_more_thumbnails(db_images: list[DbImagesItem]):
+            self.create_thumbnails(db_images)
+            self.rearrange()
+
+        Dynamic.loaded_thumbs += Static.thumbs_load_limit
+        self.load_db_images_task(add_more_thumbnails)
+
+    def load_db_images_task(self, on_finish: callable):
+        self.task_ = DbImagesLoader()
+        self.task_.sigs.finished_.connect(on_finish)
+        UThreadPool.start(self.task_)
+
+    def create_thumbnails(self, db_images: list[DbImagesItem]):
         if not db_images:
             lbl = QLabel(Lng.no_photo[Cfg.lng_index])
-            self.grid_lay.addWidget(
-                lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+            self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
             self.grid_lay.setRowStretch(0, 1)
             self.grid_lay.setColumnStretch(0, 1)
             return
 
-        prev_selection = [i.data_item.rel_path for i in self.selected_widgets]
-        self.remove_grid_container()
-        self.load_grid_container()
-        self.reset_grid_properties()
-        self.clear_selected_widgets()
         Thumb.calculate_size()
       
         for image_item in db_images:
@@ -442,74 +429,18 @@ class Grid(VScrollArea):
             )
             thumbnail = Thumb(data_item)
             thumbnail.set_no_frame()
-            thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
-
-            self.add_thumb_data(thumbnail)
-            # self.grid_lay.addWidget(thumbnail, 0, 0)
+            self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
 
         self.rearrange()
-        self.grid_wid.show()
         self.finished_.emit()
-        for i in prev_selection:
-            if i in self.path_to_wid:
-                self.wid_to_selected_widgets(self.path_to_wid[i])
-        QTimer.singleShot(100, self.setFocus)
-                        
-    def add_thumb_data(self, wid: Thumb):
-        self.path_to_wid[wid.data_item.rel_path] = wid
-        self.cell_to_wid[self.glob_row, self.glob_col] = wid
-        wid.row, wid.col = self.glob_row, self.glob_col        
-
-    def add_thumbnails_to_grid(self, db_images: list[DbImagesItem]):
-        return
-
-        def create_thumb(image_item: DbImagesItem):
-            data_item = DataItem(
-                pixmap=pixmap,
-                rel_path=image_item.rel_img_path,
-                fav=image_item.fav,
-                month_year=image_item.month_year,
-                day_month_year=image_item.day_month_year,
-                filename=os.path.basename(image_item.rel_img_path)
-            )
-            thumbnail = Thumb(data_item)
-            thumbnail.set_no_frame()
-            thumbnail.reload_thumbnails.connect(self.reload_thumbnails)
-
-            if pixmap is None:
-                print(image_item.rel_img_path)
-
-            return thumbnail
-
-        for image_item in db_images:
-            pixmap = QPixmap.fromImage(image_item.qimage)
-            thumbnail = create_thumb(image_item)
-            self.add_thumb_data(thumbnail)
-            self.grid_lay.addWidget(thumbnail, 0, 0)
-
-    def add_more_thumbnails(self, db_images: dict[str, list[DbImagesItem]]):
-        for _, db_images_list in db_images.items():
-            self.add_thumbnails_to_grid(db_images_list)
-        self.rearrange()
 
     def select_viewed_image(self, path: str):
-        if path in self.path_to_wid:
-            wid = self.path_to_wid.get(path)
+        if path in self.url_to_wid:
+            wid = self.url_to_wid.get(path)
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(wid)
-    
-    def reset_grid_properties(self):
-        self.max_col = self.width() // Thumb.thumb_widths[Dynamic.thumb_size_index]
-        self.glob_row, self.glob_col = 0, 0
-        for i in (self.cell_to_wid, self.path_to_wid):
-            i.clear()
 
     def resize_thumbnails(self):
-        """
-        - Высчитывает новые размеры Thumbnail
-        - Меняет размеры виджетов Thumbnail в текущей сетке
-        - Переупорядочивает сетку в соотетствии с новыми размерами
-        """
         Thumb.calculate_size()
         for _, wid in self.cell_to_wid.items():
             wid.setup()
@@ -518,46 +449,15 @@ class Grid(VScrollArea):
         self.rearrange()
 
     def rearrange(self):
-        """
-        Переупорядочивает все миниатюры в сетке заново.
-
-        Логика:
-            - Сбрасывает свойства сетки (строки и столбцы)
-            - Находит все Thumbnail в контейнере
-            - Расставляет их по рядам и колонкам
-            - Если сортировка по модификации включена, начинает новый ряд при смене модификации
-        """
-
-        def _next_row():
-            """Сдвигает счетчики сетки на новый ряд."""
-            self.glob_col = 0
-            self.glob_row += 1
-
-        self.reset_grid_properties()
-        thumbnails = self.grid_wid.findChildren(Thumb)
-        if not thumbnails:
-            return
-
-        prev_f_mod = thumbnails[0].data_item.month_year
-        for thumb in self.path_to_wid.values():
-            # Проверка на смену модификации при сортировке по модификации
-            if Dynamic.sort_by_mod and thumb.data_item.month_year != prev_f_mod:
-                _next_row()
-
-            # Добавляем миниатюру в сетку и обновляем координаты
-            self.add_thumb_data(thumb)
-            self.grid_lay.addWidget(thumb, self.glob_row, self.glob_col)
-
-            # Переходим к следующей колонке, если достигнут максимум, переход к следующему ряду
-            self.glob_col += 1
-            if self.glob_col >= self.max_col:
-                _next_row()
-
-            prev_f_mod = thumb.data_item.month_year
-
-        # Если последний ряд не завершен, начинаем новый ряд для следующих элементов
-        if self.glob_col != 0:
-            _next_row()
+        self.grid_wid.hide()
+        max_col = self.width() // Thumb.thumb_widths[Dynamic.thumb_size_index]
+        self.cell_to_wid.clear()
+        for x, thumb in enumerate(self.url_to_wid.values()):
+            row, col = divmod(x, max_col)
+            self.cell_to_wid[row, col] = thumb
+            thumb.row, thumb.col = row, col
+            self.grid_lay.addWidget(thumb, row, col)
+        self.grid_wid.show()
 
     def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
         wid = QApplication.widgetAt(a0.globalPos())
@@ -585,8 +485,8 @@ class Grid(VScrollArea):
             wid.set_frame()
                 
     def set_thumb_fav(self, rel_path: str, value: int):
-        if rel_path in self.path_to_wid:
-            wid = self.path_to_wid.get(rel_path)
+        if rel_path in self.url_to_wid:
+            wid = self.url_to_wid.get(rel_path)
             wid.set_fav(value)
 
     def keyPressEvent(self, event: QKeyEvent | None) -> None:
@@ -793,7 +693,7 @@ class Grid(VScrollArea):
 
             update_grid = QAction(Lng.update_grid[Cfg.lng_index], self.menu_)
             update_grid.triggered.connect(
-                lambda: self.reload_thumbnails()
+                lambda: print("перезагрузка сетки")
             )
             self.menu_.addAction(update_grid)
 

@@ -97,10 +97,10 @@ class DbImagesLoader(URunnable):
                 stmt = self.get_stmt()
                 res = conn.execute(stmt).fetchall()
             if res:
-                image_items_dict = self.create_dict(res)
-                self.sigs.finished_.emit(image_items_dict)
+                image_items = self.create_dict(res)
+                self.sigs.finished_.emit(image_items)
             else:
-                self.sigs.finished_.emit({})
+                self.sigs.finished_.emit([])
         except Exception as e:
             print(traceback.format_exc())
             self.sigs.finished_.emit({})
