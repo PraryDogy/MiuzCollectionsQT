@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QGraphicsPixmapItem,
 
 from system.shared_utils import ImgUtils
 from system.utils import Utils
+from widgets._base_widgets import UMainWindow
 from widgets.win_image_view import WinImageView
 
 
@@ -81,51 +82,34 @@ class CropView(QGraphicsView):
     def get_crop_numpy(self):
         if self.image_np is None:
             return None
-
         rect = self.crop_rect_item.rect()
-
         x1 = int(rect.left())
         y1 = int(rect.top())
         x2 = int(rect.right())
         y2 = int(rect.bottom())
-
         h, w = self.image_np.shape[:2]
-
         x1 = max(0, min(w, x1))
         x2 = max(0, min(w, x2))
-
         y1 = max(0, min(h, y1))
         y2 = max(0, min(h, y2))
-
         cropped = self.image_np[y1:y2, x1:x2]
-
         return cropped
 
 
-# ==========================================
-# MAIN WINDOW
-# ==========================================
-class MainWindow(QMainWindow):
+class MainWindow(UMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Image Cropper")
-        self.resize(1200, 800)
-
+        self.resize(500, 500)
         self.view = CropView()
-
         self.setCentralWidget(self.view)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
             crop = self.view.get_crop_numpy()
-            if crop is not None:
-                print("Crop shape:", crop.shape)
+            print("Crop shape:", crop.shape)
 
 
-# ==========================================
-# RUN
-# ==========================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
