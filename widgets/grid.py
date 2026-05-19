@@ -856,3 +856,34 @@ class Grid(VScrollArea):
             start_drag()
 
         return super().mouseMoveEvent(a0)
+
+
+class GridStandart(Grid):
+    upload_files = pyqtSignal(list)
+
+    def __init__(self):
+        super().__init__()
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, a0):
+        a0.acceptProposedAction()
+        return super().dragEnterEvent(a0)
+    
+    def dropEvent(self, a0):
+
+        if not a0.mimeData().hasUrls() or a0.source() is not None:
+            return
+        
+        elif Dynamic.search_widget_text:
+            return
+
+        paths: list[str] = [
+            i.toLocalFile().rstrip(os.sep)
+            for i in a0.mimeData().urls()
+            if os.path.isfile(i.toLocalFile())
+        ]
+
+        if paths:
+            self.upload_files.emit(paths)
+            print("upload files", paths)
+        return super().dropEvent(a0)

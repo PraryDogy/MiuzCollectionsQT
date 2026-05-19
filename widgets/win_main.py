@@ -80,7 +80,6 @@ class WinMain(UMainWindow):
         self.setWindowIcon(QIcon("./images/icon.png"))
         self.setWindowIconText(f"{Static.app_name} {Static.app_ver}")
 
-        self.setAcceptDrops(True)
         self.setMenuBar(BarMacos())
 
         self.scaner_data: defaultdict[Mf, list[str]] = defaultdict(list)
@@ -805,39 +804,6 @@ class WinMain(UMainWindow):
                 if Dynamic.thumb_size_index > 0:
                     Dynamic.thumb_size_index -= 1
                     self.bar_bottom.slider._on_value_changed(Dynamic.thumb_size_index)
-
-
-    def dragEnterEvent(self, a0):
-        a0.acceptProposedAction()
-        return super().dragEnterEvent(a0)
-    
-    def dropEvent(self, a0):
-
-        if not a0.mimeData().hasUrls() or a0.source() is not None:
-            return
-        
-        elif Dynamic.search_widget_text:
-            try:
-                self.noti_wid.deleteLater()
-            except (AttributeError, RuntimeError) as e:
-                print(e)
-            self.noti_wid = NotifyWid(
-                self.grid,
-                Lng.drop_event_denied_msg[Cfg.lng_index],
-                self.warning_svg,
-                ms=3000
-                )
-            self.noti_wid._show()
-            return
-
-        paths: list[str] = [
-            i.toLocalFile().rstrip(os.sep)
-            for i in a0.mimeData().urls()
-        ]
-
-        if paths:
-            self.upload_files(Mf.current_mf, paths)
-        return super().dropEvent(a0)
     
     def resizeEvent(self, a0):
         wid = self.splitter.widget(1)
