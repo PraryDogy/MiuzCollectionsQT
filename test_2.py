@@ -2,7 +2,7 @@ import sys
 
 import numpy as np
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QImage, QPainter, QPen, QPixmap
+from PyQt5.QtGui import QColor, QPen, QPixmap
 from PyQt5.QtWidgets import (QApplication, QGraphicsPixmapItem,
                              QGraphicsRectItem, QGraphicsScene, QGraphicsView,
                              QMainWindow)
@@ -31,7 +31,8 @@ class CropView(QGraphicsView):
         self.origin = QPointF()
         self.crop_rect_item = QGraphicsRectItem()
 
-        pen = QPen(Qt.red)
+        blue = QColor(70, 130, 240)
+        pen = QPen(blue)
         pen.setWidth(2)
 
         self.crop_rect_item.setPen(pen)
@@ -39,9 +40,6 @@ class CropView(QGraphicsView):
 
         self.dragging = False
 
-    # ==========================================
-    # DROP
-    # ==========================================
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -64,7 +62,9 @@ class CropView(QGraphicsView):
         self.scene.addItem(self.pixmap_item)
 
         self.crop_rect_item = QGraphicsRectItem()
-        pen = QPen(Qt.red)
+
+        blue = QColor(70, 130, 240)
+        pen = QPen(blue)
         pen.setWidth(2)
 
         self.crop_rect_item.setPen(pen)
