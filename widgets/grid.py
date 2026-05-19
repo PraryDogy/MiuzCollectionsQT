@@ -430,14 +430,6 @@ class Grid(VScrollArea):
             wid.set_fav(value)
 
     def keyPressEvent(self, event: QKeyEvent | None) -> None:
-        """
-        Обрабатывает навигацию и горячие клавиши в сетке:
-            - Ctrl+I: открыть информацию по выбранным элементам
-            - Ctrl+A: выделить все элементы
-            - Space / Enter: открыть просмотр последнего выбранного элемента
-            - Стрелки: навигация по элементам сетки
-        """
-
         def remove_files():
             self.remove_files.emit(
                 [i.data_item.rel_path for i in self.selected_widgets]
