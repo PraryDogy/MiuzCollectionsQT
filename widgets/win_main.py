@@ -485,7 +485,7 @@ class WinMain(UMainWindow):
                 widget = self.grid.url_to_wid.get(self.go_to_url)
                 if widget:
                     self.grid.select_by_url(self.go_to_url)
-                    self.grid.ensureWidgetVisible(widget)
+                    QTimer.singleShot(100, lambda: self.grid.ensureWidgetVisible(widget))
                 self.go_to_url = str()
 
         Dynamic.loaded_thumbs = 0
