@@ -26,6 +26,22 @@ class CropView(QGraphicsView):
         self.scene.addItem(self.crop_rect_item)
         self.dragging = False
 
+    def get_crop_numpy(self):
+        if self.image_np is None:
+            return None
+        rect = self.crop_rect_item.rect()
+        x1 = int(rect.left())
+        y1 = int(rect.top())
+        x2 = int(rect.right())
+        y2 = int(rect.bottom())
+        h, w = self.image_np.shape[:2]
+        x1 = max(0, min(w, x1))
+        x2 = max(0, min(w, x2))
+        y1 = max(0, min(h, y1))
+        y2 = max(0, min(h, y2))
+        cropped = self.image_np[y1:y2, x1:x2]
+        return cropped
+
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -78,22 +94,6 @@ class CropView(QGraphicsView):
         super().resizeEvent(event)
         if self.pixmap_item:
             self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
-
-    def get_crop_numpy(self):
-        if self.image_np is None:
-            return None
-        rect = self.crop_rect_item.rect()
-        x1 = int(rect.left())
-        y1 = int(rect.top())
-        x2 = int(rect.right())
-        y2 = int(rect.bottom())
-        h, w = self.image_np.shape[:2]
-        x1 = max(0, min(w, x1))
-        x2 = max(0, min(w, x2))
-        y1 = max(0, min(h, y1))
-        y2 = max(0, min(h, y2))
-        cropped = self.image_np[y1:y2, x1:x2]
-        return cropped
 
 
 class MainWindow(UMainWindow):
