@@ -221,12 +221,10 @@ class NextImgBtn(SwitchImgBtn):
 
 
 class WinImageView(UMainWindow):
-    select_thumb = pyqtSignal(str)
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     copy_name = pyqtSignal(list)
     reveal_in_finder = pyqtSignal(list)
-    set_fav = pyqtSignal(tuple)
     save_files = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
     
@@ -334,6 +332,9 @@ class WinImageView(UMainWindow):
 
 
 class WinImageViewSt(WinImageView):
+    select_thumb = pyqtSignal(str)
+    set_fav = pyqtSignal(tuple)
+
     def __init__(self, img_view_item: ImgViewItem):
         super().__init__()
         self.image_apps = {
