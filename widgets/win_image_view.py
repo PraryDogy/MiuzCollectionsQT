@@ -239,28 +239,15 @@ class WinImageView(UMainWindow):
 
         self.setStyleSheet("background: black;")
         self.setMinimumSize(QSize(self.min_w, self.min_h))
-        self.installEventFilter(self)
-
-        self.mouse_move_timer = QTimer(self)
-        self.mouse_move_timer.setSingleShot(True)
-        self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
         self.img_wid = ImgWid(QPixmap())
         self.central_layout.addWidget(self.img_wid)
-
-        self.prev_image_btn = PrevImgBtn(self.centralWidget())
-        self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
-
-        self.next_image_btn = NextImgBtn(self.centralWidget())
-        self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
 
         self.zoom_btns = ZoomBtns(parent=self)
         self.zoom_btns.zoom_in.connect(lambda: self.zoom_cmd("in"))
         self.zoom_btns.zoom_out.connect(lambda: self.zoom_cmd("out"))
         self.zoom_btns.zoom_fit.connect(lambda: self.zoom_cmd("fit"))
         self.zoom_btns.zoom_close.connect(self.deleteLater)
-
-        QTimer.singleShot(100, self.load_thumb)
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
     
@@ -272,36 +259,148 @@ class WinImageView(UMainWindow):
         }
         actions[flag]()
 
-    def restart_img_wid(self, pixmap: QPixmap):
-        self.img_wid.hide()  # скрываем старый
+    def set_new_pixmap(self, pixmap: QPixmap):
+        self.img_wid.hide()
         new_wid = ImgWid(pixmap)
-        new_wid.mouse_moved.connect(self.zoom_btns.show)
+        # new_wid.mouse_moved.connect(self.zoom_btns.show)
+        # new_wid.mouse_moved.connect(self.prev_image_btn.show)
+        # new_wid.mouse_moved.connect(self.next_image_btn.show)
         self.central_layout.addWidget(new_wid)
 
         self.img_wid.deleteLater()
         self.img_wid = new_wid
         self.img_wid.show()
 
-        btns = (self.zoom_btns, self.prev_image_btn, self.next_image_btn)
-        for i in btns:
-            i.raise_()
+        self.zoom_btns.raise_()
 
+# GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
+
+    # def hide_all_buttons(self):
+    #     btns = (self.zoom_btns, )
+    #     widget_under_cursor = QApplication.widgetAt(QCursor.pos())
+    #     if isinstance(widget_under_cursor, QSvgWidget):
+    #         return
+    #     for i in btns:
+    #         i.hide()
+
+# EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
+
+    def keyPressEvent(self, ev: QKeyEvent | None) -> None:
+
+        if ev.modifiers() & Qt.KeyboardModifier.ControlModifier:
+            if ev.key() == Qt.Key.Key_I:
+                self.open_win_info.emit([self.current_data_item.rel_path, ])
+            
+            elif ev.key() == Qt.Key.Key_Equal:
+                self.img_wid.zoom_in()
+
+            elif ev.key() == Qt.Key.Key_Minus:
+                self.img_wid.zoom_out()
+
+            elif ev.key() == Qt.Key.Key_0:
+                self.img_wid.zoom_fit()
+
+        else:
+            if ev.key() == Qt.Key.Key_Space:
+                self.deleteLater()
+
+            elif ev.key() == Qt.Key.Key_Escape:
+                if self.isFullScreen():
+                    self.showNormal()
+                    self.raise_()
+                else:
+                    self.deleteLater()
+
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        horizontal_center = a0.size().width() // 2 - self.zoom_btns.width() // 2
+        bottom_window_side = a0.size().height() - self.zoom_btns.height()
+        self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
+        self.setFocus()
+        return super().resizeEvent(a0)
+
+    # def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
+    #     if a1.type() == 129:
+    #         self.mouse_move_timer.stop()
+    #         self.prev_image_btn.show()
+    #         self.next_image_btn.show()
+    #         self.zoom_btns.show()
+    #         self.mouse_move_timer.start(2000)
+    #     return super().eventFilter(a0, a1)
+
+    def leaveEvent(self, a0: QEvent | None) -> None:
+        self.zoom_btns.hide()
+        return super().leaveEvent(a0)
+    
+    def enterEvent(self, a0):
+        self.zoom_btns.show()
+        return super().enterEvent(a0)
+    
+    def closeEvent(self, a0):
+        WinImageView.ww = self.size().width()
+        WinImageView.hh = self.size().height()
+        WinImageView.xx = self.x()
+        WinImageView.yy = self.y()
+        return super().closeEvent(a0)
+    
+    def deleteLater(self):
+        WinImageView.ww = self.size().width()
+        WinImageView.hh = self.size().height()
+        WinImageView.xx = self.x()
+        WinImageView.yy = self.y()
+        return super().deleteLater()
+
+
+class WinImageViewSt(WinImageView):
+    def __init__(self, img_view_item: ImgViewItem):
+        super().__init__()
+        self.image_apps = {
+            i: os.path.basename(i)
+            for i in SharedUtils.get_apps(Cfg.apps)
+        }
+        self.url_to_pixmap: dict[str, QPixmap] = {}
+        self.img_view_item = img_view_item
+        self.current_data_item = img_view_item.start_data_item
+
+        self.prev_image_btn = PrevImgBtn(self.centralWidget())
+        self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
+
+        self.next_image_btn = NextImgBtn(self.centralWidget())
+        self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
+
+        self.btns = (
+            self.prev_image_btn,
+            self.next_image_btn
+        )
+
+        QTimer.singleShot(100, self.load_thumb)
+
+    def set_new_pixmap(self, pixmap):
+        super().set_new_pixmap(pixmap)
+        for i in self.btns:
+            i.raise_()
+    
     def load_thumb(self):
-        self.restart_img_wid(self.current_data_item.pixmap)
+        self.set_new_pixmap(self.current_data_item.pixmap)
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
-            self.set_title()
+            self.setWindowTitle(self.current_data_item.filename)
             self.load_image()
         else:
             print("img viewer > no smb")
+
+    def rotate(self, value: int):
+        pixmap = self.img_wid.pixmap_item.pixmap()
+        transform = QTransform().rotate(value)
+        pixmap = pixmap.transformed(transform)
+        self.set_new_pixmap(pixmap)
 
     def load_image(self, ms = 300):
 
         def fin(qimage: QImage, shm: shared_memory.SharedMemory):
             qpixmap = QPixmap.fromImage(qimage)
             self.url_to_pixmap[self.current_data_item.rel_path] = qpixmap
-            self.restart_img_wid(qpixmap)
+            self.set_new_pixmap(qpixmap)
             shm.close()
             shm.unlink()
 
@@ -330,14 +429,14 @@ class WinImageView(UMainWindow):
             self.read_img_timer.stop()
 
         if self.current_data_item.rel_path in self.url_to_pixmap:
-            self.restart_img_wid(self.url_to_pixmap[self.current_data_item.rel_path])
+            self.set_new_pixmap(
+                self.url_to_pixmap[self.current_data_item.rel_path]
+            )
         else:
-
             abs_path = Utils.get_abs_any_path(
                 mf_path=Mf.current_mf.mf_current_path,
                 rel_path=self.current_data_item.rel_path
             )
-
             self.read_img_task = ProcessWorker(
                 target=ReadImg.start,
                 args=(abs_path, False, )
@@ -349,22 +448,12 @@ class WinImageView(UMainWindow):
             self.read_img_task.start()
             self.read_img_timer.start(ms)
 
-
-    def rotate(self, value: int):
-        pixmap = self.img_wid.pixmap_item.pixmap()
-        transform = QTransform().rotate(value)
-        pixmap = pixmap.transformed(transform)
-        self.restart_img_wid(pixmap)
-
-# GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI GUI
-
-    def hide_all_buttons(self):
-        btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
-        widget_under_cursor = QApplication.widgetAt(QCursor.pos())
-        if isinstance(widget_under_cursor, QSvgWidget):
-            return
-        for i in btns:
-            i.hide()
+    def terminate_task(self):
+        try:
+            self.read_img_task.terminate_join()
+            self.read_img_timer.stop()
+        except AttributeError as e:
+            print("close img view error", e)
 
     def switch_image(self, offset):
         current_index = self.img_view_item.data_items.index(self.current_data_item)
@@ -378,11 +467,6 @@ class WinImageView(UMainWindow):
         if not self.img_view_item.is_selection:
             self.select_thumb.emit(self.current_data_item.rel_path)
 
-    def set_title(self):
-        self.setWindowTitle(
-            self.current_data_item.filename
-        )
-
     def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
         if flag == "+":
             self.switch_image(1)
@@ -390,49 +474,32 @@ class WinImageView(UMainWindow):
             self.switch_image(-1)
         self.img_wid.setCursor(Qt.CursorShape.ArrowCursor)
 
-
-# EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
-
-    def keyPressEvent(self, ev: QKeyEvent | None) -> None:
-
-        if ev.modifiers() & Qt.KeyboardModifier.ControlModifier:
-            if ev.key() == Qt.Key.Key_I:
-                self.open_win_info.emit([self.current_data_item.rel_path, ])
-            
-            elif ev.key() == Qt.Key.Key_Left:
-                self.rotate(-90)
-
-            elif ev.key() == Qt.Key.Key_Right:
-                self.rotate(90)
-
-            elif ev.key() == Qt.Key.Key_Equal:
-                self.img_wid.zoom_in()
-
-            elif ev.key() == Qt.Key.Key_Minus:
-                self.img_wid.zoom_out()
-
-            elif ev.key() == Qt.Key.Key_0:
-                self.img_wid.zoom_fit()
-
-        else:
-            if ev.key() == Qt.Key.Key_Left:
-                self.switch_image(-1)
-
-            elif ev.key() == Qt.Key.Key_Right:
-                self.switch_image(1)
-
-            elif ev.key() == Qt.Key.Key_Space:
-                self.deleteLater()
-
-            elif ev.key() == Qt.Key.Key_Escape:
-                if self.isFullScreen():
-                    self.showNormal()
-                    self.raise_()
-                else:
-                    self.deleteLater()
-
+    def closeEvent(self, a0):
+        self.terminate_task()
+        return super().closeEvent(a0)
+    
+    def deleteLater(self):
+        self.terminate_task()
+        return super().deleteLater()
+    
+    def enterEvent(self, a0):
+        for i in self.btns:
+            i.show()
+        return super().enterEvent(a0)
+    
+    def leaveEvent(self, a0):
+        for i in self.btns:
+            i.hide()
+        return super().leaveEvent(a0)
+    
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2
+        right_window_side = a0.size().width() - self.next_image_btn.width()
+        self.prev_image_btn.move(10, vertical_center)
+        self.next_image_btn.move(right_window_side - 10, vertical_center)
+        return super().resizeEvent(a0)
+    
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-
         self.menu_ = UMenu(event=ev)
         rel_paths = [self.current_data_item.rel_path, ]
         # открыть в приложении
@@ -518,70 +585,14 @@ class WinImageView(UMainWindow):
 
         self.menu_.show_menu()
 
-    def resizeEvent(self, a0: QResizeEvent | None) -> None:
-        vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2
-        right_window_side = a0.size().width() - self.next_image_btn.width()
-        self.prev_image_btn.move(10, vertical_center)
-        self.next_image_btn.move(right_window_side - 10, vertical_center)
-
-        horizontal_center = a0.size().width() // 2 - self.zoom_btns.width() // 2
-        bottom_window_side = a0.size().height() - self.zoom_btns.height()
-        self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
-
-        self.setFocus()
-
-        return super().resizeEvent(a0)
-
-    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
-        if a1.type() == 129:
-            self.mouse_move_timer.stop()
-            self.prev_image_btn.show()
-            self.next_image_btn.show()
-            self.zoom_btns.show()
-            self.mouse_move_timer.start(2000)
-        return super().eventFilter(a0, a1)
-
-    def leaveEvent(self, a0: QEvent | None) -> None:
-        self.hide_all_buttons()
-        return super().leaveEvent(a0)
-
-    def closeEvent(self, a0):
-        WinImageView.ww = self.size().width()
-        WinImageView.hh = self.size().height()
-        WinImageView.xx = self.x()
-        WinImageView.yy = self.y()
-        return super().closeEvent(a0)
-    
-    def deleteLater(self):
-        WinImageView.ww = self.size().width()
-        WinImageView.hh = self.size().height()
-        WinImageView.xx = self.x()
-        WinImageView.yy = self.y()
-        return super().deleteLater()
-
-
-class WinImageViewSt(WinImageView):
-    def __init__(self, img_view_item: ImgViewItem):
-        super().__init__(img_view_item)
-        self.image_apps = {
-            i: os.path.basename(i)
-            for i in SharedUtils.get_apps(Cfg.apps)
-        }
-        self.url_to_pixmap: dict[str, QPixmap] = {}
-        self.img_view_item = img_view_item
-        self.current_data_item = img_view_item.start_data_item
-
-    def terminate_task(self):
-        try:
-            self.read_img_task.terminate_join()
-            self.read_img_timer.stop()
-        except AttributeError as e:
-            print("close img view error", e)
-
-    def closeEvent(self, a0):
-        self.terminate_task()
-        return super().closeEvent(a0)
-    
-    def deleteLater(self):
-        self.terminate_task()
-        return super().deleteLater()
+    def keyPressEvent(self, ev):
+        if ev.modifiers() & Qt.KeyboardModifier.ControlModifier:
+            if ev.key() == Qt.Key.Key_Left:
+                self.rotate(-90)
+            elif ev.key() == Qt.Key.Key_Right:
+                self.rotate(90)
+        elif ev.key() == Qt.Key.Key_Left:
+            self.switch_image(-1)
+        elif ev.key() == Qt.Key.Key_Right:
+            self.switch_image(1)
+        return super().keyPressEvent(ev)

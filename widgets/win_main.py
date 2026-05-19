@@ -69,7 +69,6 @@ class WinMain(UMainWindow):
     ww, hh = 1120, 760
 
     def __init__(self, argv: list[Literal["noscan", ""]]):
-        return
         super().__init__()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.resize(self.ww, self.hh)

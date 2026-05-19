@@ -295,11 +295,11 @@ if "print" in sys.argv:
     System_.show_prints()
 
 if __name__ == "__main__":
-    if System_.set_plugin_path():
-        sys.excepthook = System_.catch_error_in_app
-        ...
-    else:
-        sys.excepthook = System_.catch_error_in_proj
-        ...
+    # if System_.set_plugin_path():
+    #     sys.excepthook = System_.catch_error_in_app
+    #     ...
+    # else:
+    #     sys.excepthook = System_.catch_error_in_proj
+    #     ...
     app = App(argv=sys.argv)
     app.exec()
