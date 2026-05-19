@@ -338,7 +338,6 @@ class Grid(VScrollArea):
 
         def add_more_thumbnails(db_images: list[DbImagesItem]):
             self.create_thumbnails(db_images)
-            self.rearrange()
 
         Dynamic.loaded_thumbs += Static.thumbs_load_limit
         self.load_db_images_task(add_more_thumbnails)
@@ -349,12 +348,6 @@ class Grid(VScrollArea):
         UThreadPool.start(self.task_)
 
     def create_thumbnails(self, db_images: list[DbImagesItem]):
-        if not db_images:
-            lbl = QLabel(Lng.no_photo[Cfg.lng_index])
-            self.grid_lay.addWidget(lbl, 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-            self.grid_lay.setRowStretch(0, 1)
-            self.grid_lay.setColumnStretch(0, 1)
-            return
 
         Thumb.calculate_size()
       
@@ -372,7 +365,13 @@ class Grid(VScrollArea):
             thumbnail.set_no_frame()
             self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
 
-        self.rearrange()
+        if not self.url_to_wid:
+            self.grid_wid.deleteLater()
+            self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            lbl = QLabel(Lng.no_photo[Cfg.lng_index])
+            self.scroll_layout.addWidget(lbl)
+        else:
+            self.rearrange()
         self.finished_.emit()
 
     def select_viewed_image(self, path: str):
