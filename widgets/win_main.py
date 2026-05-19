@@ -84,6 +84,7 @@ class WinMain(UMainWindow):
         self.setMenuBar(BarMacos())
 
         self.scaner_data: defaultdict[Mf, list[str]] = defaultdict(list)
+        self.go_to_url = str()
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -197,26 +198,10 @@ class WinMain(UMainWindow):
         return wrapper
     
     def show_in_app(self, rel_path: str):
-
-        def go_to_wid():
-            widget = self.grid.url_to_wid.get(rel_path)
-            if widget:
-                QTimer.singleShot(
-                    100, lambda: self.grid.ensureWidgetVisible(widget)
-                )
-
         current_dir = os.path.dirname(rel_path)
         Dynamic.current_dir = current_dir
-
-        self.left_menu.setCurrentIndex(1)
-        self.left_menu.tree_wid.expand_to_path(current_dir)
+        self.go_to_url = rel_path
         self.reload_thumbnails()
-        try:
-            self.grid.finished_.disconnect()
-        except TypeError:
-            print("сетка еще не подключила сигнал finished")
-            pass
-        self.grid.finished_.connect(go_to_wid)
     
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"
@@ -492,7 +477,17 @@ class WinMain(UMainWindow):
         self.dates_win.center_to_parent(self)
         self.dates_win.show()
 
-    def reload_thumbnails(self):
+    def reload_thumbnails(self, layout_index: int = 2):
+
+        def finished():
+            self.grid.setFocus()
+            if self.go_to_url:
+                widget = self.grid.url_to_wid.get(self.go_to_url)
+                if widget:
+                    self.grid.select_by_url(self.go_to_url)
+                    self.grid.ensureWidgetVisible(widget)
+                self.go_to_url = str()
+
         Dynamic.loaded_thumbs = 0
         self.grid.deleteLater()
         self.grid = Grid()
@@ -544,8 +539,8 @@ class WinMain(UMainWindow):
         self.grid.show_in_app.connect(
             self.show_in_app
         )
-        self.grid.finished_.connect(self.grid.setFocus)
-        self.right_layout.insertWidget(2, self.grid)
+        self.grid.finished_.connect(finished)
+        self.right_layout.insertWidget(layout_index, self.grid)
 
     @with_conn
     def open_view_win(self, mf: Mf):
@@ -582,7 +577,7 @@ class WinMain(UMainWindow):
             lambda data: self.save_files(self.view_win, Mf.current_mf, data)
         )
         self.view_win.select_thumb.connect(
-            lambda path: self.grid.select_viewed_image(path)
+            lambda path: self.grid.select_by_url(path)
         )
         self.view_win.open_in_app.connect(
             lambda data: self.open_in_app(self.window(), Mf.current_mf, data)

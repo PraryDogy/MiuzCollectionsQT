@@ -370,7 +370,7 @@ class Grid(VScrollArea):
             self.rearrange()
         self.finished_.emit()
 
-    def select_viewed_image(self, path: str):
+    def select_by_url(self, path: str):
         if path in self.url_to_wid:
             wid = self.url_to_wid.get(path)
             self.clear_selected_widgets()
