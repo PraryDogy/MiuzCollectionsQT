@@ -266,60 +266,7 @@ class UpBtn(QFrame):
             self.scroll_to_top.emit()
         super().mouseReleaseEvent(ev)
 
-
-class DateWid(QLabel):
-    """
-    QLabel с тенью для отображения даты.
-
-    Атрибуты класса:
-        SHADOW_BLUR (int): радиус размытия тени.
-        SHADOW_OFFSET (tuple[int, int]): смещение тени (x, y).
-        SHADOW_COLOR (QColor): цвет тени.
-        COLOR_DATA (dict): соответствие цвета текста палитры → фону.
-    """
-
-    SHADOW_BLUR = 20
-    SHADOW_OFFSET = (0, 2)
-    SHADOW_COLOR = QColor(0, 0, 0, 190)
-
-    TEXT_TO_BG_COLOR = {
-        "#000000": "#dcdcdc",
-        "#ffffff": "#505050",
-    }
-
-    def __init__(self, parent: QWidget, blue_color: bool = True):
-        super().__init__(parent)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(self.SHADOW_BLUR)
-        shadow.setOffset(*self.SHADOW_OFFSET)
-        shadow.setColor(self.SHADOW_COLOR)
-        self.setGraphicsEffect(shadow)
-        self.setText("Date wid text")
-
-    def apply_style(self):
-        palette = QApplication.palette()
-        text_color = QPalette.windowText(palette).color().name()
-        if text_color in self.TEXT_TO_BG_COLOR:
-            bg_color = self.TEXT_TO_BG_COLOR[text_color]
-        else:
-            raise Exception(
-                "DateWid.apply_style: цвет текста "
-                f"'{text_color}' не найден в COLOR_DATA"
-            )
-
-        self.setStyleSheet(f"""
-            QLabel {{
-                background: {bg_color};
-                font-weight: bold;
-                font-size: 18pt;
-                border-radius: 10px;
-                padding: 5px;
-            }}
-        """)
-        
-
+\
 class Grid(VScrollArea):
     """Сетка миниатюр с сигналами для действий с файлами и интерфейсом."""
 
@@ -343,7 +290,6 @@ class Grid(VScrollArea):
     finished_ = pyqtSignal()
     
     resize_ms = 10
-    date_wid_ms = 3000
     png_copy_files = "./images/copy_files.png"
 
     def __init__(self):
@@ -366,7 +312,6 @@ class Grid(VScrollArea):
 
         self.date_timer = QTimer(self)
         self.date_timer.setSingleShot(True)
-        self.date_timer.timeout.connect(lambda: self.date_wid.hide())
 
         # --- Вкладка прокрутки ---
         self.scroll_wid = QWidget()
@@ -374,10 +319,6 @@ class Grid(VScrollArea):
         self.scroll_layout = UVBoxLayout()
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
-
-        # --- Виджеты ---
-        self.date_wid = DateWid(parent=self.viewport())
-        self.date_wid.hide()
 
         self.up_btn = UpBtn(self.viewport())
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
@@ -674,13 +615,7 @@ class Grid(VScrollArea):
         self.up_btn.move(
             self.viewport().width() - self.up_btn.width() - 20,
             self.viewport().height() - self.up_btn.height() - 20
-        )        
-
-        self.date_wid.move(
-            (self.viewport().width() - self.date_wid.width()) // 2,
-            NotifyWid.yy
         )
-
         return super().resizeEvent(a0)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
@@ -857,40 +792,7 @@ class Grid(VScrollArea):
         self.menu_.show_menu()
 
     def checkScrollValue(self, value: int):
-        """Обрабатывает прокрутку: показывает кнопку вверх, дату и подгружает миниатюры."""
-
-        def thumbnail_under_point(point: QPoint) -> Thumb | None:
-            mapped_pos = self.scroll_wid.mapFrom(self.viewport(), point)
-            wid = self.scroll_wid.childAt(mapped_pos)
-            if wid and isinstance(wid.parent(), Thumb):
-                return wid.parent()
-            return None
-
-        def update_date_wid(wid: Thumb):
-            self.date_wid.setText(wid.data_item.month_year)
-            self.date_wid.adjustSize()
-            self.date_wid.move(
-                (self.viewport().width() - self.date_wid.width()) // 2,
-                NotifyWid.yy
-            )
-
-            if self.date_wid.isHidden() and Dynamic.sort_by_mod:
-                self.date_wid.apply_style()
-                self.date_wid.show()
-                self.date_timer.start(self.date_wid_ms)
-
-        # --- кнопка вверх ---
         self.up_btn.setVisible(value > 0)
-
-        # --- дата ---
-        if value > 0:
-            wid = thumbnail_under_point(QPoint(50, 50))
-            if wid:
-                update_date_wid(wid)
-        else:
-            self.date_wid.hide()
-
-        # --- конец списка ---
         if value == self.verticalScrollBar().maximum():
             self.load_more_thumbnails()
 
