@@ -345,9 +345,7 @@ class Grid(VScrollArea):
         UThreadPool.start(self.task_)
 
     def create_thumbnails(self, db_images: list[DbImagesItem]):
-
         Thumb.calculate_size()
-      
         for image_item in db_images:
             pixmap = QPixmap.fromImage(image_item.qimage)
             data_item = DataItem(
@@ -361,7 +359,6 @@ class Grid(VScrollArea):
             thumbnail = Thumb(data_item)
             thumbnail.set_no_frame()
             self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
-
         if not self.url_to_wid:
             self.grid_wid.hide()
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
