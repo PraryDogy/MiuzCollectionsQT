@@ -410,10 +410,6 @@ class Grid(VScrollArea):
         self.selected_widgets.clear()
 
     def wid_to_selected_widgets(self, wid: Thumb):
-        """
-        - Добавляет переданный виджет в selected widgets
-        - Задает стиль переданному виджету
-        """
         if isinstance(wid, Thumb):
             self.selected_widgets.append(wid)
             wid.set_frame()
