@@ -304,7 +304,10 @@ class Grid(VScrollArea):
         self.url_to_wid: dict[str, Thumb] = {}
         self.is_first_load = True
 
-        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
+        self.image_apps = {
+            i: os.path.basename(i)
+            for i in SharedUtils.get_apps(Cfg.apps)
+        }
 
         # --- Таймеры ---
         self.resize_timer = QTimer(self)
@@ -333,40 +336,6 @@ class Grid(VScrollArea):
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
-        self.load_db_images_task()
-
-    def load_more_thumbnails(self):
-        Dynamic.loaded_thumbs += Static.thumbs_load_limit
-        self.load_db_images_task()
-
-    def load_db_images_task(self):
-        self.task_ = DbImagesLoader()
-        self.task_.sigs.finished_.connect(self.create_thumbnails)
-        UThreadPool.start(self.task_)
-
-    def create_thumbnails(self, db_images: list[DbImagesItem]):
-        Thumb.calculate_size()
-        for image_item in db_images:
-            pixmap = QPixmap.fromImage(image_item.qimage)
-            data_item = DataItem(
-                pixmap=pixmap,
-                rel_path=image_item.rel_img_path,
-                fav=image_item.fav,
-                month_year=image_item.month_year,
-                day_month_year=image_item.day_month_year,
-                filename=os.path.basename(image_item.rel_img_path)
-            )
-            thumbnail = Thumb(data_item)
-            thumbnail.set_no_frame()
-            self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
-        if not self.url_to_wid:
-            self.grid_wid.hide()
-            self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            lbl = QLabel(Lng.no_photo[Cfg.lng_index])
-            self.scroll_layout.addWidget(lbl)
-        else:
-            self.rearrange()
-        self.finished_.emit()
 
     def select_by_url(self, path: str):
         if path in self.url_to_wid:
@@ -776,8 +745,6 @@ class Grid(VScrollArea):
 
     def checkScrollValue(self, value: int):
         self.up_btn.setVisible(value > 0)
-        if value == self.verticalScrollBar().maximum():
-            self.load_more_thumbnails()
 
     def mouseDoubleClickEvent(self, a0):
         if self.wid_under_mouse:
@@ -864,6 +831,45 @@ class GridStandart(Grid):
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
+        self.load_db_images_task()
+
+    def load_more_thumbnails(self):
+        Dynamic.loaded_thumbs += Static.thumbs_load_limit
+        self.load_db_images_task()
+
+    def load_db_images_task(self):
+        self.task_ = DbImagesLoader()
+        self.task_.sigs.finished_.connect(self.create_thumbnails)
+        UThreadPool.start(self.task_)
+
+    def create_thumbnails(self, db_images: list[DbImagesItem]):
+        Thumb.calculate_size()
+        for image_item in db_images:
+            pixmap = QPixmap.fromImage(image_item.qimage)
+            data_item = DataItem(
+                pixmap=pixmap,
+                rel_path=image_item.rel_img_path,
+                fav=image_item.fav,
+                month_year=image_item.month_year,
+                day_month_year=image_item.day_month_year,
+                filename=os.path.basename(image_item.rel_img_path)
+            )
+            thumbnail = Thumb(data_item)
+            thumbnail.set_no_frame()
+            self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
+        if not self.url_to_wid:
+            self.grid_wid.hide()
+            self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            lbl = QLabel(Lng.no_photo[Cfg.lng_index])
+            self.scroll_layout.addWidget(lbl)
+        else:
+            self.rearrange()
+        self.finished_.emit()
+
+    def checkScrollValue(self, value: int):
+        super().checkScrollValue(value)
+        if value == self.verticalScrollBar().maximum():
+            self.load_more_thumbnails()
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
