@@ -332,19 +332,15 @@ class Grid(VScrollArea):
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
-        self.load_db_images_task(self.create_thumbnails)
+        self.load_db_images_task()
 
     def load_more_thumbnails(self):
-
-        def add_more_thumbnails(db_images: list[DbImagesItem]):
-            self.create_thumbnails(db_images)
-
         Dynamic.loaded_thumbs += Static.thumbs_load_limit
-        self.load_db_images_task(add_more_thumbnails)
+        self.load_db_images_task()
 
-    def load_db_images_task(self, on_finish: callable):
+    def load_db_images_task(self):
         self.task_ = DbImagesLoader()
-        self.task_.sigs.finished_.connect(on_finish)
+        self.task_.sigs.finished_.connect(self.create_thumbnails)
         UThreadPool.start(self.task_)
 
     def create_thumbnails(self, db_images: list[DbImagesItem]):
