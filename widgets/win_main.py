@@ -200,6 +200,7 @@ class WinMain(UMainWindow):
         Dynamic.current_dir = current_dir
         self.go_to_url = rel_path
         self.load_st_grid()
+        self.left_menu.tree_wid.expand_to_path(current_dir)
     
     def path_bar_update(self, path: str):
         dir = f"/{Mf.current_mf.mf_alias}{path}"
