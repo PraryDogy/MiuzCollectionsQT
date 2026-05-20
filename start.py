@@ -234,6 +234,9 @@ class App(QApplication):
         self.argv = argv
         self.start()
 
+        # from PyQt5.QtCore import QTimer
+        # QTimer.singleShot(1000, lambda: print(3/0))
+
     def start(self):
 
         def setup_new_mf():
