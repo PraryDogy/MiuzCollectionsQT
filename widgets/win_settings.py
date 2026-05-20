@@ -1268,15 +1268,15 @@ class NewMfWin(UMainWindow):
     """
     def __init__(self):
         super().__init__()
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.set_always_on_top()
         self.set_close_only()
-        self.setFixedSize(500, 500)
+        self.setFixedWidth(450)
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
         # перехватываем нажатие кнопки "сохранить"
         self.new_mf.save_fin = self.new_save_fin
         self.central_layout.addWidget(self.new_mf)
-        self.central_layout.addSpacerItem(QSpacerItem(0, 15))
 
     def new_save_fin(self, folder_name, paths, stop_list):
         mf = Mf(
