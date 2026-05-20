@@ -236,12 +236,6 @@ class App(QApplication):
 
     def start(self):
 
-        def json_to_app():
-            for i in (Mf, Filters):
-                i.items.clear()
-                i.json_to_app()
-            Cfg.json_to_app()
-
         def setup_new_mf():
             new_mf_win = NewMfWin()
             new_mf_win.show()
@@ -263,15 +257,23 @@ class App(QApplication):
             lng_win.closed_.connect(first_load_win)
             lng_win.exec_()
 
-        json_to_app()
+        Cfg.json_to_app()
+
+        for i in (Mf, Filters):
+            i.items.clear()
+            i.json_to_app()
+
         if not Cfg.check_files():
             lng_win()
+
         elif not Mf.items:
             lng_win()
+
         elif Static.app_ver > Cfg.app_ver:
             shutil.rmtree(Static.external_files_dir)
             Cfg.app_ver = Static.app_ver
             self.start()
+
         else:
             objects = (Dbase, ThemeChanger, UThreadPool)
             for i in objects:
