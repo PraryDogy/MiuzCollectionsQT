@@ -299,9 +299,4 @@ if System_.set_plugin_path():
 
 if __name__ == "__main__":
     app = App(argv=sys.argv)
-
-    from widgets.win_settings import NewMfWin
-    test = NewMfWin()
-    test.show()
-
     app.exec()
