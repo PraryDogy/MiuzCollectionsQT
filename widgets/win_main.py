@@ -68,7 +68,7 @@ class WinMain(UMainWindow):
     left_side_width = 250
     ww, hh = 1120, 760
 
-    def __init__(self, argv: list[Literal["noscan", ""]]):
+    def __init__(self, argv: list):
         super().__init__()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.resize(self.ww, self.hh)
