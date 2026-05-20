@@ -161,7 +161,9 @@ class WinMain(UMainWindow):
 
         self.bar_bottom = BarBottom()
         self.bar_bottom.progress_bar.setText(Lng.loading[Cfg.lng_index])
-        self.bar_bottom.resize_thumbnails.connect(self.grid.resize_thumbnails)
+        self.bar_bottom.resize_thumbnails.connect(
+            self.grid.resize_thumbnails
+        )
         self.right_layout.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
@@ -220,7 +222,9 @@ class WinMain(UMainWindow):
 
         self.bar_top.filters_btn.set_solid_style()
         self.filters_win = WinFilters()
-        self.filters_win.closed_.connect(on_closed)
+        self.filters_win.closed_.connect(
+            on_closed
+        )
         self.filters_win.reload_thumbnails.connect(
             self.load_st_grid
         )
@@ -295,7 +299,9 @@ class WinMain(UMainWindow):
             target_dir=target_dir,
             action_type="copy"
         )
-        copy_files_win.finished_.connect(Utils.reveal_files)
+        copy_files_win.finished_.connect(
+            Utils.reveal_files
+        )
 
     @with_conn
     def set_buffer(self, mf: Mf, data: tuple):
@@ -340,7 +346,9 @@ class WinMain(UMainWindow):
         )
         del self.buffer
         del self.grid.buffer
-        copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
+        copy_files_win.finished_.connect(
+            lambda x: self.start_scaner_task()
+        )
 
     @with_conn
     def open_in_app(self, mf: Mf, data: tuple):
@@ -409,7 +417,9 @@ class WinMain(UMainWindow):
                 args=(abs_paths, )
             )
         self.remove_files_win.center_to_parent(self.window())
-        self.remove_files_win.ok_clicked.connect(start_file_remover)
+        self.remove_files_win.ok_clicked.connect(
+            start_file_remover
+        )
         self.remove_files_win.ok_clicked.connect(
             self.remove_files_win.deleteLater
         )
@@ -442,7 +452,9 @@ class WinMain(UMainWindow):
             if i.endswith(ImgUtils.ext_all)
         ]
         self.upload_win = UploadWin(target_dir, target_files)
-        self.upload_win.ok_clicked.connect(lambda: fin(target_dir))
+        self.upload_win.ok_clicked.connect(
+            lambda: fin(target_dir)
+        )
         self.upload_win.center_to_parent(self)
         self.upload_win.show()
 
@@ -461,15 +473,23 @@ class WinMain(UMainWindow):
     def open_settings_win(self, settings_item: SettingsItem):
         self.bar_top.settings_btn.set_solid_style()
         self.settings_win = WinSettings(settings_item)
-        self.settings_win.closed.connect(self.bar_top.settings_btn.set_normal_style)
+        self.settings_win.closed.connect(
+            self.bar_top.settings_btn.set_normal_style
+        )
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
 
     def open_dates_win(self):
         self.dates_win = WinDates()
-        self.dates_win.dates_btn_solid.connect(lambda: self.bar_top.dates_btn.set_solid_style())
-        self.dates_win.dates_btn_normal.connect(lambda: self.bar_top.dates_btn.set_normal_style())
-        self.dates_win.reload_thumbnails.connect(lambda: self.load_st_grid())
+        self.dates_win.dates_btn_solid.connect(
+            lambda: self.bar_top.dates_btn.set_solid_style()
+        )
+        self.dates_win.dates_btn_normal.connect(
+            lambda: self.bar_top.dates_btn.set_normal_style()
+        )
+        self.dates_win.reload_thumbnails.connect(
+            lambda: self.load_st_grid()
+        )
         self.dates_win.center_to_parent(self)
         self.dates_win.show()
 
@@ -567,28 +587,28 @@ class WinMain(UMainWindow):
         )
         self.view_win = WinImageView(item)
         self.view_win.open_win_info.connect(
-            lambda rel_paths: self.open_info_win(self.view_win, Mf.current_mf, rel_paths)
+            lambda rel_paths: self.open_info_win(Mf.current_mf, rel_paths)
         )
         self.view_win.copy_path.connect(
-            lambda rel_paths: self.copy_path(self.view_win, Mf.current_mf, rel_paths)
+            lambda rel_paths: self.copy_path(Mf.current_mf, rel_paths)
         )
         self.view_win.copy_name.connect(
-            lambda rel_paths: self.copy_name(self.view_win, Mf.current_mf, rel_paths)
+            lambda rel_paths: self.copy_name(Mf.current_mf, rel_paths)
         )
         self.view_win.reveal_in_finder.connect(
-            lambda rel_paths: self.reveal_in_finder(self.view_win, Mf.current_mf, rel_paths)
+            lambda rel_paths: self.reveal_in_finder(Mf.current_mf, rel_paths)
         )
         self.view_win.set_fav.connect(
             self.set_fav
         )
         self.view_win.save_files.connect(
-            lambda data: self.save_files(self.view_win, Mf.current_mf, data)
+            lambda data: self.save_files(Mf.current_mf, data)
         )
         self.view_win.select_thumb.connect(
             lambda path: self.grid.select_by_url(path)
         )
         self.view_win.open_in_app.connect(
-            lambda data: self.open_in_app(self.window(), Mf.current_mf, data)
+            lambda data: self.open_in_app(Mf.current_mf, data)
         )
 
         if WinImageView.xx == 0:
@@ -658,11 +678,15 @@ class WinMain(UMainWindow):
 
             self.scaner_check_timer = QTimer(self)
             self.scaner_check_timer.setSingleShot(True)
-            self.scaner_check_timer.timeout.connect(self.start_scaner_task)
+            self.scaner_check_timer.timeout.connect(
+                self.start_scaner_task
+            )
 
             self.scaner_poll_timer = QTimer(self)
             self.scaner_poll_timer.setSingleShot(True)
-            self.scaner_poll_timer.timeout.connect(self.poll_scaner_task)
+            self.scaner_poll_timer.timeout.connect(
+                self.poll_scaner_task
+            )
 
         can_start = False
         alive = self.scaner_task.is_alive() if self.scaner_task else False
