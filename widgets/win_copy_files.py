@@ -9,7 +9,7 @@ from system.items import CopyTaskItem
 from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskWorker
 
-from ._base_widgets import UMainWindow, SmallBtn
+from ._base_widgets import SmallBtn, UMainWindow
 from .win_progressbar import WinProgressbar
 
 
@@ -202,15 +202,23 @@ class WinCopyFiles(WinProgressbar):
                 self.dst_urls.extend(self.copy_item.dst_urls)
 
             self.progressbar.setValue(self.copy_item.current_size)
-            self.below_label.setText(
-                f'{self.windowTitle()} {self.copy_item.current_count} {Lng.from_[Cfg.lng_index]} {self.copy_item.total_count}'
+            below_text = (
+                {self.windowTitle()},
+                {self.copy_item.current_count},
+                {Lng.from_[Cfg.lng_index]},
+                {self.copy_item.total_count}
             )
+            self.below_label.setText(" ".join(below_text))
 
         if not self.copy_task.is_alive() or finished:
             self.progressbar.setValue(self.progressbar.maximum())
-            self.below_label.setText(
-                f'{self.windowTitle()} {self.copy_item.total_count} {Lng.from_[Cfg.lng_index]} {self.copy_item.total_count}'
-            )     
+            below_text = (
+                {self.windowTitle()},
+                {self.copy_item.total_count},
+                {Lng.from_[Cfg.lng_index]},
+                {self.copy_item.total_count}
+            )
+            self.below_label.setText(" ".join(below_text))     
             self.finished_.emit(self.dst_urls)
             self.stop_task()
             self.deleteLater()
