@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtWidgets import QSizePolicy
 
 from cfg import Cfg, Dynamic
 from system.filters import Filters
@@ -9,11 +9,24 @@ from ._base_widgets import (SmallBtn, UListSpacerItem, UListWidgetItem,
                             UMainWindow, VListWidget)
 
 
+class CheckableItem(UListWidgetItem):
+    hh = 25
+
+    def __init__(self, parent, text = None):
+        super().__init__(parent, self.hh, text)
+        self.setFlags(
+            self.flags() | Qt.ItemFlag.ItemIsUserCheckable
+        )
+        self.setCheckState(
+            Qt.CheckState.Unchecked
+        )
+
+
 class WinFilters(UMainWindow):
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    ww = 400
-    hh = 400
+    ww = 300
+    hh = 300
 
     def __init__(self):
         super().__init__()
@@ -26,26 +39,18 @@ class WinFilters(UMainWindow):
         self.list_widget.itemClicked.connect(self.item_cmd)
         self.central_layout.addWidget(self.list_widget)
 
-        favs_item = UListWidgetItem(
+        favs_item = CheckableItem(
             parent=self.list_widget,
             text=Lng.favorites[Cfg.lng_index]
         )
-        favs_item.setFlags(
-            favs_item.flags() | Qt.ItemFlag.ItemIsUserCheckable
-        )
-        favs_item.setCheckState(Qt.CheckState.Unchecked)
         self.list_widget.addItem(favs_item)
         if Dynamic.filter_favs:
             favs_item.setCheckState(Qt.CheckState.Checked)
 
-        folder_item = UListWidgetItem(
+        folder_item = CheckableItem(
             parent=self.list_widget,
             text=Lng.only_this_folder[Cfg.lng_index]
         )
-        folder_item.setFlags(
-            folder_item.flags() | Qt.ItemFlag.ItemIsUserCheckable
-        )
-        folder_item.setCheckState(Qt.CheckState.Unchecked)
         self.list_widget.addItem(folder_item)
         if Dynamic.filter_only_folder:
             folder_item.setCheckState(Qt.CheckState.Checked)
@@ -55,12 +60,10 @@ class WinFilters(UMainWindow):
         )
 
         for i in Filters.items:
-            item = UListWidgetItem(
+            item = CheckableItem(
                 parent=self.list_widget,
                 text=i
             )
-            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
-            item.setCheckState(Qt.CheckState.Unchecked)
             self.list_widget.addItem(item)
             if i in Dynamic.filters_enabled:
                 item.setCheckState(Qt.CheckState.Checked)
