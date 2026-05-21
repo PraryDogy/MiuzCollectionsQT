@@ -481,6 +481,13 @@ class WinMain(UMainWindow):
         self.settings_win.show()
 
     def open_dates_win(self):
+
+        # from .filters_calendar import FiltersCalendar
+        # self.test = FiltersCalendar()
+        # self.test.center_to_parent(self)
+        # self.test.show()
+        # return
+
         self.dates_win = WinDates()
         self.dates_win.dates_btn_solid.connect(
             lambda: self.bar_top.dates_btn.set_solid_style()
