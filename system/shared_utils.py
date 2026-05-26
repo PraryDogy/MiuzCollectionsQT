@@ -296,11 +296,19 @@ class ImgUtils:
 
     @classmethod
     def _read_jpg(cls, path: str):
+        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        return
         try:
             img = Image.open(path)
-            img = ImageOps.exif_transpose(img) 
+            try:
+                img = ImageOps.exif_transpose(img) 
+            except OSError:
+                pass
             icc_profile = img.info.get("icc_profile")
             if icc_profile:
+                print(123)
                 src_profile = ImageCms.ImageCmsProfile(io.BytesIO(icc_profile))
                 dst_profile = ImageCms.createProfile("sRGB")
                 img = ImageCms.profileToProfile(img, src_profile, dst_profile)
