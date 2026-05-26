@@ -145,7 +145,10 @@ class CopyTask:
 
         total_size = 0
         for src, dest in src_dst_urls:
-            total_size += os.path.getsize(src)
+            try:
+                total_size += os.path.getsize(src)
+            except FileNotFoundError:
+                continue
 
         copy_item.total_size = total_size // 1024
         copy_item.total_count = len(src_dst_urls)

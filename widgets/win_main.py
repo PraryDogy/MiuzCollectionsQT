@@ -319,7 +319,6 @@ class WinMain(UMainWindow):
         if self.buffer.type_ == "cut":
             for i in self.grid.selected_widgets:
                 i.set_transparent_frame(0.5)
-        self.grid.buffer = self.buffer
 
     @with_conn
     def paste_files(self, mf: Mf):
@@ -346,7 +345,6 @@ class WinMain(UMainWindow):
             action_type=self.buffer.type_
         )
         del self.buffer
-        del self.grid.buffer
         copy_files_win.finished_.connect(
             lambda x: self.start_scaner_task()
         )
@@ -443,7 +441,6 @@ class WinMain(UMainWindow):
                 files_to_copy=files_to_copy
             )
 
-            self.grid.buffer = self.buffer
             self.paste_files(Mf.current_mf)
 
         target_dir = Utils.get_abs_any_path(mf.mf_current_path, Dynamic.current_dir)
@@ -805,7 +802,7 @@ class WinMain(UMainWindow):
         
         if a0.key() == Qt.Key.Key_V:
             if hasattr(self, "buffer"):
-                self.paste_files(self.grid, Mf.current_mf)
+                self.paste_files(Mf.current_mf)
         
         elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
