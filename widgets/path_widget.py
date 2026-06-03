@@ -1,5 +1,6 @@
 import os
 
+import sqlalchemy
 from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtSvg import QSvgWidget
@@ -7,11 +8,14 @@ from PyQt5.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                              QSizePolicy, QVBoxLayout, QWidget)
 
 from cfg import Cfg
+from system.database import Dbase, Dirs
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, SmbChecker
+from system.utils import Utils
 
 from ._base_widgets import SelectableLabel
+from .win_warn import WarningWindow
 
 
 class PathWidget(QGroupBox):
@@ -19,7 +23,6 @@ class PathWidget(QGroupBox):
     green_checkmark = "images/green_checkmark.svg"
     hh = 70
     icon_size = 35
-    mf_is_avaiable = pyqtSignal(str)
 
     def __init__(self, mf: Mf):
         super().__init__()
@@ -37,8 +40,8 @@ class PathWidget(QGroupBox):
         self.main_wid = QWidget()
         self.main_lay.addWidget(self.main_wid)
 
-        self.mf_path = mf.get_avaiable_mf_path()
-        if self.mf_path:
+        self.mf_temp_path = mf.get_avaiable_mf_path()
+        if self.mf_temp_path:
             self.ok_path_widget()
         else:
             self.start_checker()
@@ -67,7 +70,23 @@ class PathWidget(QGroupBox):
         h_lay.addWidget(left_label)
 
         h_lay.addStretch()
-    
+
+    def check_mf_temp_path(self):
+        conn = Dbase.main_engine.connect()
+        stmt = (
+            sqlalchemy.select(Dirs.rel_dir_path)
+            .where(Dirs.mf_alias==self.mf.mf_alias)
+        )
+        result = conn.execute(stmt).scalars()
+        paths = []
+        for i in result:
+            abs_path = Utils.get_abs_any_path(self.mf_temp_path, i).rstrip(os.sep)
+            if os.path.exists(abs_path):
+                paths.append(abs_path)
+        if len(paths) == 1 and self.mf_temp_path == paths[0]:
+            return False
+        return True
+
     def ok_path_widget(self):
         self.main_wid.deleteLater()
         self.main_wid = QWidget()
@@ -84,21 +103,30 @@ class PathWidget(QGroupBox):
 
         lines = (
             f"{Lng.folder_path[Cfg.lng_index]}:",
-            self.mf_path
+            self.mf_temp_path
         )
         left_label = SelectableLabel('\n'.join(lines))
         h_lay.addWidget(left_label)
 
         h_lay.addStretch()
 
+    def open_win_warn(self):
+        self.warn_win = WarningWindow(Lng.bad_smb[Cfg.lng_index])
+        self.warn_win.center_to_parent(self.window())
+        self.warn_win.show()
+
     def start_checker(self):
 
         def poll_task():
             if not self.task.process_queue.empty():
-                self.mf_path = self.task.process_queue.get().rstrip(os.sep)
-                self.mf_is_avaiable.emit(self.mf_path)
-                self.ok_path_widget()
-                self.stop_task()
+                self.mf_temp_path = self.task.process_queue.get().rstrip(os.sep)
+                if self.check_mf_temp_path():
+                    self.ok_path_widget()
+                    self.stop_task()
+                else:
+                    self.mf_temp_path = None
+                    QTimer.singleShot(1, self.no_path_widget)
+                    self.open_win_warn()
             else:
                 QTimer.singleShot(500, poll_task)
 
@@ -122,20 +150,29 @@ class PathWidget(QGroupBox):
         dialog = QFileDialog()
         url = dialog.getExistingDirectory()
         if url:
-            self.mf_path = url.rstrip(os.sep)
-            self.mf_is_avaiable.emit(self.mf_path)
-            self.ok_path_widget()
-            self.stop_task()
+            self.mf_temp_path = url.rstrip(os.sep)
+            if self.check_mf_temp_path():
+                self.ok_path_widget()
+                self.stop_task()
+            else:
+                self.mf_temp_path = None
+                QTimer.singleShot(1, self.no_path_widget)
+                self.open_win_warn()
         return super().mouseReleaseEvent(a0)
         
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
-                self.mf_path = url.rstrip(os.sep)
-                self.mf_is_avaiable.emit(self.mf_path)
-                self.ok_path_widget()
-                self.stop_task()
+                self.mf_temp_path = url.rstrip(os.sep)
+
+                if self.check_mf_temp_path():
+                    self.ok_path_widget()
+                    self.stop_task()
+                else:
+                    self.mf_temp_path = None
+                    QTimer.singleShot(1, self.no_path_widget)
+                    self.open_win_warn()
         return super().dropEvent(a0)
     
     def dragEnterEvent(self, a0):

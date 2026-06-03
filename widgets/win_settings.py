@@ -764,7 +764,7 @@ class MfSettings(QWidget, StateWid):
 
         self.path_widget = PathWidget(mf)
         self.path_widget.setFixedHeight(self.path_widget.hh)
-        self.path_widget.mf_is_avaiable.connect(self.set_was_changed)
+        # self.path_widget.mf_is_avaiable.connect(self.set_was_changed)
         main_lay.addWidget(self.path_widget)
 
         self.mf_stop_list = MfStopList(mf)
@@ -877,8 +877,8 @@ class MfSettings(QWidget, StateWid):
 
         stop_list = self.mf_stop_list.get_list()
         paths = []
-        if self.path_widget.mf_path:
-            paths.append(self.path_widget.mf_path)
+        if self.path_widget.mf_temp_path:
+            paths.append(self.path_widget.mf_temp_path)
 
         if not paths:
             show_warn(Lng.select_folder_path[Cfg.lng_index])
@@ -972,7 +972,7 @@ class NewFolder(QWidget, StateWid):
             self.name_line_edit.setText(basename)
             self.warning_svg.show()
             
-            self.path_widget.mf_path = url
+            self.path_widget.mf_temp_path = url
             self.path_widget.ok_path_widget()
             self.path_widget.stop_task()
 
@@ -998,8 +998,8 @@ class NewFolder(QWidget, StateWid):
         folder_name = self.name_line_edit.text()
         stop_list = self.mf_stop_list.get_list()
         paths = []
-        if self.path_widget.mf_path:
-            paths.append(self.path_widget.mf_path)
+        if self.path_widget.mf_temp_path:
+            paths.append(self.path_widget.mf_temp_path)
 
         if not folder_name:
             show_warn(Lng.enter_alias_warning[Cfg.lng_index])

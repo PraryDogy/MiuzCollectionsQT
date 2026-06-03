@@ -1,19 +1,13 @@
-import os
-
-import sqlalchemy
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
 
 from cfg import Cfg
-from system.database import Dbase, Dirs, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
-from system.utils import Utils
 
 from ._base_widgets import UMainWindow
 from .path_widget import PathWidget
-from .win_warn import WarningWindow
 
 
 class WarnWidget(QWidget):
@@ -44,7 +38,7 @@ class WinSmb(UMainWindow):
     def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
-        self.temp_path = ""
+        self.mf_temp_path = ""
 
         self.set_close_only()
         self.set_always_on_top()
@@ -56,7 +50,6 @@ class WinSmb(UMainWindow):
         self.central_layout.addWidget(self.warn_widget)
 
         self.path_widget = PathWidget(mf)
-        self.path_widget.mf_is_avaiable.connect(self.mf_is_avaiable)
         self.central_layout.addWidget(self.path_widget)
 
         btns_wid = QWidget()
@@ -78,35 +71,10 @@ class WinSmb(UMainWindow):
 
         self.adjustSize()
 
-    def mf_is_avaiable(self, mf_path: str):
-        self.temp_path = mf_path
-        if self.temp_path:
-            conn = Dbase.main_engine.connect()
-            stmt = (
-                sqlalchemy.select(Dirs.rel_dir_path)
-                .where(Dirs.mf_alias==self.mf.mf_alias)
-            )
-            result = conn.execute(stmt).scalars()
-            paths = []
-            for i in result:
-                abs_path = Utils.get_abs_any_path(self.temp_path, i).rstrip(os.sep)
-                if os.path.exists(abs_path):
-                    paths.append(abs_path)
-            if len(paths) == 1 and self.temp_path == paths[0]:
-                self.temp_path = ""
-                QTimer.singleShot(1, self.path_widget.no_path_widget)
-                self.warn_win = WarningWindow(Lng.bad_smb[Cfg.lng_index])
-                self.warn_win.center_to_parent(self)
-                self.warn_win.show()
-
     def ok_clicked(self):
-        if self.temp_path:
-            self.mf.mf_paths = [self.temp_path, ]
+        if self.path_widget.mf_temp_path:
+            self.mf.mf_paths = [self.path_widget.mf_temp_path, ]
             Mf.write_json_data()
-            # try:
-            #     self.warn_win.deleteLater()
-            # except AttributeError:
-            #     ...
             self.deleteLater()
 
     def keyPressEvent(self, a0):
