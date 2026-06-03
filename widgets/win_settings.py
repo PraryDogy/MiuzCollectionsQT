@@ -925,8 +925,8 @@ class NewFolder(QWidget, StateWid):
         name_wid.layout_.addWidget(self.name_line_edit)
 
         self.path_widget = PathWidget(self.mf)
-        self.path_widget.mf_is_avaiable.connect(self.set_was_changed)
-        self.path_widget.mf_is_avaiable.connect(self.set_mf_alias)
+        self.path_widget.mf_path_avaiable.connect(self.set_was_changed)
+        self.path_widget.mf_path_avaiable.connect(self.set_mf_alias)
         self.path_widget.setFixedHeight(self.path_widget.hh)
         main_lay.addWidget(self.path_widget)
 
@@ -956,8 +956,8 @@ class NewFolder(QWidget, StateWid):
         save_btn = SvgArrow()
         save_wid_child.layout_.addWidget(save_btn)
 
-    def set_mf_alias(self, path: str):
-        name = os.path.basename(path)
+    def set_mf_alias(self):
+        name = os.path.basename(self.path_widget.mf_temp_path)
         if not self.name_line_edit.text():
             self.name_line_edit.setText(name)
 
