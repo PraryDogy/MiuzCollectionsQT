@@ -229,6 +229,7 @@ class WinImageView(UMainWindow):
     set_fav = pyqtSignal(tuple)
     save_files = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
+    image_not_exists = pyqtSignal()
     
     min_w, min_h = 500, 400
     ww, hh = 0, 0
@@ -303,12 +304,18 @@ class WinImageView(UMainWindow):
 
     def load_thumb(self):
         self.restart_img_wid(self.current_data_item.pixmap)
+
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
-            self.set_title()
-            self.load_image()
+            
+            if not os.path.exists(self.current_data_item.rel_path):
+                self.image_not_exists.emit()
+            else:
+                self.set_title()
+                self.load_image()
         else:
+            self.image_not_exists.emit()
             print("img viewer > no smb")
 
     def load_image(self, ms = 300):

@@ -615,7 +615,9 @@ class WinMain(UMainWindow):
         self.view_win.open_in_app.connect(
             lambda data: self.open_in_app(Mf.current_mf, data)
         )
-
+        self.view_win.image_not_exists.connect(
+            lambda: self.open_win_smb(Mf.current_mf)
+        )
         if WinImageView.xx == 0:
             self.view_win.resize(self.ww, self.hh)
             self.view_win.center_to_parent(self.window())
