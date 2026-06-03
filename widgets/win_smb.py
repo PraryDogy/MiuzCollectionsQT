@@ -13,7 +13,7 @@ from system.utils import Utils
 
 from ._base_widgets import UMainWindow
 from .path_widget import PathWidget
-from .win_warn import ConfirmWindow
+from .win_warn import WarningWindow
 
 
 class WarnWidget(QWidget):
@@ -93,21 +93,20 @@ class WinSmb(UMainWindow):
                 if os.path.exists(abs_path):
                     paths.append(abs_path)
             if len(paths) == 1 and self.temp_path == paths[0]:
+                self.temp_path = ""
                 QTimer.singleShot(100, self.path_widget.no_path_widget)
-                self.warn_win = ConfirmWindow(Lng.bad_smb[Cfg.lng_index])
+                self.warn_win = WarningWindow(Lng.bad_smb[Cfg.lng_index])
                 self.warn_win.center_to_parent(self)
-                self.warn_win.ok_clicked.connect(
-                    lambda: self.warn_win.deleteLater()
-                )
-                self.warn_win.ok_clicked.connect(
-                    lambda: self.path_widget.ok_path_widget()
-                )
                 self.warn_win.show()
 
     def ok_clicked(self):
         if self.temp_path:
             self.mf.mf_paths = [self.temp_path, ]
             Mf.write_json_data()
+            # try:
+            #     self.warn_win.deleteLater()
+            # except AttributeError:
+            #     ...
             self.deleteLater()
 
     def keyPressEvent(self, a0):

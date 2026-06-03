@@ -11,6 +11,7 @@ from ._base_widgets import SmallBtn, UHBoxLayout, UMainWidget
 
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
+    cancel_clicked = pyqtSignal()
     ww = 360
     svg_icon = "./images/warning.svg"
 
@@ -50,6 +51,7 @@ class ConfirmWindow(UMainWidget):
 
         self.cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
+        self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn)
 
