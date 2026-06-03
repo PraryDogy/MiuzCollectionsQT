@@ -296,9 +296,14 @@ class ImgUtils:
 
     @classmethod
     def _read_jpg(cls, path: str):
-        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
+        heics = (".heic", ".HEIC")
+        if path.endswith(heics):
+            img = Image.open(path)
+            img = img.convert("RGB")
+            return np.array(img)
+        else:
+            img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         return
         try:
             img = Image.open(path)
