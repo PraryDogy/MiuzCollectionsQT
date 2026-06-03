@@ -297,13 +297,17 @@ class ImgUtils:
     @classmethod
     def _read_jpg(cls, path: str):
         heics = (".heic", ".HEIC")
-        if path.endswith(heics):
-            img = Image.open(path)
-            img = img.convert("RGB")
-            return np.array(img)
-        else:
-            img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        try:
+            if path.endswith(heics):
+                img = Image.open(path)
+                img = img.convert("RGB")
+                return np.array(img)
+            else:
+                img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+                return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            print("read jpg error", e)
+            return cls._get_broken_image()
         return
         try:
             img = Image.open(path)
