@@ -94,7 +94,7 @@ class WinSmb(UMainWindow):
                     paths.append(abs_path)
             if len(paths) == 1 and self.temp_path == paths[0]:
                 self.temp_path = ""
-                QTimer.singleShot(100, self.path_widget.no_path_widget)
+                QTimer.singleShot(1, self.path_widget.no_path_widget)
                 self.warn_win = WarningWindow(Lng.bad_smb[Cfg.lng_index])
                 self.warn_win.center_to_parent(self)
                 self.warn_win.show()
