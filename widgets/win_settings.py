@@ -764,6 +764,7 @@ class MfSettings(QWidget, StateWid):
 
         self.path_widget = PathWidget(mf)
         self.path_widget.setFixedHeight(self.path_widget.hh)
+        self.path_widget.mf_path_avaiable.connect(self.set_was_changed)
         main_lay.addWidget(self.path_widget)
 
         self.mf_stop_list = MfStopList(mf)

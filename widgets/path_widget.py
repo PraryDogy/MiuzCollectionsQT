@@ -19,6 +19,7 @@ from .win_warn import WarningWindow
 
 
 class PathWidget(QGroupBox):
+    mf_path_avaiable = pyqtSignal()
     magnifier = "images/magnifier.svg"
     green_checkmark = "images/green_checkmark.svg"
     hh = 70
@@ -121,6 +122,7 @@ class PathWidget(QGroupBox):
             if not self.task.process_queue.empty():
                 self.mf_temp_path = self.task.process_queue.get().rstrip(os.sep)
                 if self.check_mf_temp_path():
+                    self.mf_path_avaiable.emit()
                     self.ok_path_widget()
                     self.stop_task()
                 else:
@@ -152,6 +154,7 @@ class PathWidget(QGroupBox):
         if url:
             self.mf_temp_path = url.rstrip(os.sep)
             if self.check_mf_temp_path():
+                self.mf_path_avaiable.emit()
                 self.ok_path_widget()
                 self.stop_task()
             else:
@@ -167,6 +170,7 @@ class PathWidget(QGroupBox):
                 self.mf_temp_path = url.rstrip(os.sep)
 
                 if self.check_mf_temp_path():
+                    self.mf_path_avaiable.emit()
                     self.ok_path_widget()
                     self.stop_task()
                 else:
