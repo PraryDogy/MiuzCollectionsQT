@@ -26,7 +26,8 @@ class UTreeWidgetItem(QTreeWidgetItem):
 
 
 class TreeWid(QTreeWidget):
-    reveal = pyqtSignal(str)
+    reveal = pyqtSignal(tuple)
+    copy_path = pyqtSignal(tuple)
     on_tree_clicked = pyqtSignal(str)
     on_hide_digits_clicked = pyqtSignal()
 
@@ -170,6 +171,7 @@ class TreeWid(QTreeWidget):
         abs_path = os.sep
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
+            rel_path = Utils.get_rel_any_path(Mf.current_mf.mf_current_path, abs_path)
             self.abs_selected_path = abs_path
             view = QAction(Lng.open[Cfg.lng_index], menu)
             view.triggered.connect(lambda: self.on_tree_clicked.emit(self.abs_selected_path))
@@ -205,8 +207,16 @@ class TreeWid(QTreeWidget):
 
         menu.addSeparator()
 
+        copy_path = QAction(Lng.copy_filepath[Cfg.lng_index], menu)
+        copy_path.triggered.connect(
+            lambda: self.copy_path.emit((Mf.current_mf, [rel_path, ]))
+        )
+        menu.addAction(copy_path)
+
         reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
-        reveal.triggered.connect(lambda: self.reveal.emit(abs_path))
+        reveal.triggered.connect(
+            lambda: self.reveal.emit((Mf.current_mf, [rel_path, ]))
+        )
         menu.addAction(reveal)
 
         menu.show_menu()
@@ -222,7 +232,6 @@ class MfListItem(UListWidgetItem):
 
 class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
-    mf_reveal = pyqtSignal(tuple)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
     svg_folder = "./images/img_folder.svg"
@@ -305,6 +314,7 @@ class MenuLeft(QWidget):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
     reveal = pyqtSignal(tuple)
+    copy_path = pyqtSignal(tuple)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
     on_hide_digits_clicked = pyqtSignal()
@@ -324,13 +334,16 @@ class MenuLeft(QWidget):
         self.splitter.addWidget(tree_parent)
         self.tree_wid = TreeWid()
         self.tree_wid.reveal.connect(
-            lambda abs_path: self.reveal_cmd(Mf.current_mf, [abs_path, ])
+            lambda data: self.reveal.emit(data)
         )
         self.tree_wid.on_tree_clicked.connect(
             lambda abs_path: self.on_tree_clicked.emit(abs_path)
         )
         self.tree_wid.on_hide_digits_clicked.connect(
             lambda: self.on_hide_digits_clicked.emit()
+        )
+        self.tree_wid.copy_path.connect(
+            lambda data: self.copy_path.emit(data)
         )
         self.tree_wid.init_ui()
         tree_parent.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])
@@ -345,16 +358,12 @@ class MenuLeft(QWidget):
         )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        self.mf_list_widget.mf_reveal.connect(lambda data: self.reveal_cmd(*data))
         mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
 
         self.splitter.setSizes([
             self.height() - self.mf_list_hh,
             self.mf_list_hh
         ])
-
-    def reveal_cmd(self, mf: Mf, rel_paths: list[str]):
-        self.reveal.emit((mf, rel_paths))
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(

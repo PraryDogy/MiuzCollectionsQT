@@ -113,6 +113,9 @@ class WinMain(UMainWindow):
         self.left_menu.on_hide_digits_clicked.connect(
             lambda: self.on_hide_digits_clicked()
         )
+        self.left_menu.copy_path.connect(
+            lambda data: self.copy_path(*data)
+        )
         self.splitter.addWidget(self.left_menu)
 
         # Правый виджет
