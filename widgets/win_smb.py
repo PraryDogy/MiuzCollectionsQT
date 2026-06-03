@@ -1,15 +1,19 @@
 import os
 
-from PyQt5.QtCore import Qt
+import sqlalchemy
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
 
 from cfg import Cfg
+from system.database import Dbase, Dirs, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
+from system.utils import Utils
 
 from ._base_widgets import UMainWindow
 from .path_widget import PathWidget
+from .win_warn import ConfirmWindow
 
 
 class WarnWidget(QWidget):
@@ -73,11 +77,43 @@ class WinSmb(UMainWindow):
 
         self.adjustSize()
 
-    def mf_is_avaiable(self, path: str):
-        if path:
-            self.warn_widget.deleteLater()
-            self.mf.mf_paths = [path, ]
-            Mf.write_json_data()
+    def mf_is_avaiable(self, mf_path: str):
+        if mf_path:
+            conn = Dbase.main_engine.connect()
+            stmt = (
+                sqlalchemy.select(Dirs.rel_dir_path)
+                .where(Dirs.mf_alias==self.mf.mf_alias)
+            )
+            result = conn.execute(stmt).scalars()
+            paths = []
+            for i in result:
+                abs_path = Utils.get_abs_any_path(mf_path, i).rstrip(os.sep)
+                if os.path.exists(abs_path):
+                    paths.append(abs_path)
+            if len(paths) == 1 and mf_path == paths[0]:
+                QTimer.singleShot(100, self.path_widget.no_path_widget)
+                self.warn_win = ConfirmWindow(Lng.bad_smb[Cfg.lng_index])
+                self.warn_win.center_to_parent(self)
+                self.warn_win.ok_clicked.connect(
+                    lambda: self.warn_win.deleteLater()
+                )
+                self.warn_win.ok_clicked.connect(
+                    lambda: self.apply_path(mf_path)
+                )
+                self.warn_win.ok_clicked.connect(
+                    lambda: self.path_widget.ok_path_widget()
+                )
+                self.warn_win.show()
+            else:
+                self.apply_path(mf_path)
+
+            # self.warn_widget.deleteLater()
+            # self.mf.mf_paths = [path, ]
+            # Mf.write_json_data()
+
+    def apply_path(self, path: str):
+        self.mf.mf_paths = [path, ]
+        Mf.write_json_data()
 
     def keyPressEvent(self, a0):
         if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):

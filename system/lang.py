@@ -411,3 +411,7 @@ class Lng:
         "Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",
         "Hides numeric prefixes for top-level folders only. Numbering of nested subfolders remains unchanged."
     )
+    bad_smb = (
+        "Путь к каталогу изображений указан неверно. Продолжение операции приведет к полной потере данных в этом каталоге. Вы действительно хотите продолжить?",
+        "The image directory path is incorrect. Continuing will result in total data loss in this directory. Are you sure you want to proceed?"
+    )

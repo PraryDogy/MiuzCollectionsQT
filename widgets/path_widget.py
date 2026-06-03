@@ -95,7 +95,7 @@ class PathWidget(QGroupBox):
 
         def poll_task():
             if not self.task.process_queue.empty():
-                self.mf_path = self.task.process_queue.get()
+                self.mf_path = self.task.process_queue.get().rstrip(os.sep)
                 self.mf_is_avaiable.emit(self.mf_path)
                 self.ok_path_widget()
                 self.stop_task()
@@ -122,7 +122,7 @@ class PathWidget(QGroupBox):
         dialog = QFileDialog()
         url = dialog.getExistingDirectory()
         if url:
-            self.mf_path = url
+            self.mf_path = url.rstrip(os.sep)
             self.mf_is_avaiable.emit(self.mf_path)
             self.ok_path_widget()
             self.stop_task()
@@ -132,7 +132,7 @@ class PathWidget(QGroupBox):
         if a0.mimeData().hasUrls():
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
-                self.mf_path = url
+                self.mf_path = url.rstrip(os.sep)
                 self.mf_is_avaiable.emit(self.mf_path)
                 self.ok_path_widget()
                 self.stop_task()
