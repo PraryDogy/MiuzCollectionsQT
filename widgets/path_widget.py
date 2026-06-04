@@ -73,20 +73,26 @@ class PathWidget(QGroupBox):
         h_lay.addStretch()
 
     def check_mf_temp_path(self):
-        conn = Dbase.main_engine.connect()
-        stmt = (
-            sqlalchemy.select(Dirs.rel_dir_path)
-            .where(Dirs.mf_alias==self.mf.mf_alias)
-        )
-        result = conn.execute(stmt).scalars()
-        paths = []
-        for i in result:
-            abs_path = Utils.get_abs_any_path(self.mf_temp_path, i).rstrip(os.sep)
+        with Dbase.main_engine.connect() as conn:
+            stmt = (
+                sqlalchemy.select(Dirs.rel_dir_path)
+                .where(Dirs.mf_alias==self.mf.mf_alias)
+            )
+            dir_records = conn.execute(stmt).scalars().all()
+        exist_paths = []
+        for i in dir_records:
+            abs_path = Utils.get_abs_any_path(
+                self.mf_temp_path,
+                i
+            ).rstrip(os.sep)
             if os.path.exists(abs_path):
-                paths.append(abs_path)
-        if len(paths) == 1 and self.mf_temp_path == paths[0]:
+                exist_paths.append(abs_path)
+        if len(dir_records) == 1:
+            return True
+        elif len(exist_paths) == 1 and self.mf_temp_path == exist_paths[0]:
             return False
-        return True
+        else:
+            return True
 
     def ok_path_widget(self):
         self.main_wid.deleteLater()

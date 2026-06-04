@@ -79,5 +79,6 @@ class WinSmb(UMainWindow):
     def deleteLater(self):
         if self.path_widget.mf_temp_path:
             self.mf.mf_paths = [self.path_widget.mf_temp_path, ]
+            self.mf.mf_current_path = self.path_widget.mf_temp_path
             Mf.write_json_data()
         return super().deleteLater()
