@@ -87,9 +87,9 @@ class PathWidget(QGroupBox):
             ).rstrip(os.sep)
             if os.path.exists(abs_path):
                 exist_paths.append(abs_path)
-        if len(dir_records) == 1:
-            return True
-        elif len(exist_paths) == 1 and self.mf_temp_path == exist_paths[0]:
+        # if len(dir_records) == 1:
+        #     return True
+        if len(exist_paths) == 1 and self.mf_temp_path == exist_paths[0]:
             return False
         else:
             return True
