@@ -78,18 +78,23 @@ class PathWidget(QGroupBox):
                 sqlalchemy.select(Dirs.rel_dir_path)
                 .where(Dirs.mf_alias==self.mf.mf_alias)
             )
-            dir_records = conn.execute(stmt).scalars().all()
-        exist_paths = []
-        for i in dir_records:
-            abs_path = Utils.get_abs_any_path(
-                self.mf_temp_path,
-                i
-            ).rstrip(os.sep)
+            db_paths = conn.execute(stmt).scalars().all()
+
+        db_exist_paths = []
+        for i in db_paths:
+            abs_path = Utils.get_abs_any_path(self.mf_temp_path,i).rstrip(os.sep)
             if os.path.exists(abs_path):
-                exist_paths.append(abs_path)
-        # if len(dir_records) == 1:
-        #     return True
-        if len(exist_paths) == 1 and self.mf_temp_path == exist_paths[0]:
+                db_exist_paths.append(abs_path)
+
+        finder_exist_paths = [self.mf_temp_path, ]
+        for i in os.scandir(self.mf_temp_path):
+            if i.is_dir():
+                finder_exist_paths.append(i.path)
+
+        # одноуровневый каталог, типа просто 1 папка с фотками
+        if len(db_paths) == 1 and len(finder_exist_paths) == 1:
+            return True
+        if len(db_exist_paths) == 1 and self.mf_temp_path == db_exist_paths[0]:
             return False
         else:
             return True
