@@ -266,6 +266,12 @@ class RebootSettings(GroupWid):
             )
             with zipfile.ZipFile(zip_path, "r") as z:
                 z.extractall(Static.external_files_dir)
+
+            Cfg.json_to_app()
+            Mf.json_to_app()
+            Filters.json_to_app()
+            Servers.json_to_app()
+
             os.remove(zip_path)
             restart_app()
 

@@ -36,6 +36,7 @@ class Mf:
 
     @classmethod
     def json_to_app(cls):
+        cls.items.clear()
         try:
             with open(Static.external_mf, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)

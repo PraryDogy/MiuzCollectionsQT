@@ -8,6 +8,7 @@ class Filters:
 
     @classmethod
     def json_to_app(cls):
+        cls.items.clear()
         try:
             with open(Static.external_filters, "r", encoding="utf-8") as f:
                 data: list[str] = json.load(f)

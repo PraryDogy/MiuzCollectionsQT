@@ -10,6 +10,7 @@ class Servers:
 
     @classmethod
     def json_to_app(cls):
+        cls.items.clear()
         try:
             with open(Static.external_servers, "r", encoding="utf-8") as f:
                 server_list: list[list] = json.load(f)
