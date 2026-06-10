@@ -262,7 +262,7 @@ class ServersWin(UMainWindow):
 
     # Загрузка данных из JSON
     def init_data(self):
-
+        Servers.items.clear()
         Servers.json_to_app()
 
         for alias, server, login, pass_ in Servers.items:
