@@ -26,6 +26,26 @@ class Static:
     max_img_size = 210
     pixmap_sizes = [50, 70, 100, 170]
 
+    apps = [
+        "preview",
+        "photos",
+        "photoshop",
+        "lightroom",
+        "affinity photo",
+        "pixelmator",
+        "gimp",
+        "capture one",
+        "dxo photolab",
+        "luminar neo",
+        "sketch",
+        "graphicconverter",
+        "imageoptim",
+        "snapheal",
+        "photoscape",
+        "preview",
+        "просмотр"
+    ]
+
 
 class Dynamic:
     date_start: datetime = None
@@ -48,27 +68,7 @@ class Cfg:
     lng_index = 0
     dark_mode = 0
     scaner_minutes = 20
-    new_scaner = True
     hide_digits_mf_lst = []
-    apps = [
-        "preview",
-        "photos",
-        "photoshop",
-        "lightroom",
-        "affinity photo",
-        "pixelmator",
-        "gimp",
-        "capture one",
-        "dxo photolab",
-        "luminar neo",
-        "sketch",
-        "graphicconverter",
-        "imageoptim",
-        "snapheal",
-        "photoscape",
-        "preview",
-        "просмотр"
-    ]
 
     @classmethod
     def get_data(cls):

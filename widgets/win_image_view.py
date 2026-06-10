@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsScene, QGraphicsView, QHBoxLayout,
                              QLabel, QWidget)
 
-from cfg import Cfg
+from cfg import Cfg, Static
 from system.items import ImgViewItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -238,7 +238,7 @@ class WinImageView(UMainWindow):
     def __init__(self, img_view_item: ImgViewItem):
         super().__init__()
 
-        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Cfg.apps)}
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Static.apps)}
         self.url_to_pixmap: dict[str, QPixmap] = {}
         self.img_view_item = img_view_item
         self.current_data_item = img_view_item.start_data_item

@@ -306,7 +306,7 @@ class Grid(VScrollArea):
 
         self.image_apps = {
             i: os.path.basename(i)
-            for i in SharedUtils.get_apps(Cfg.apps)
+            for i in SharedUtils.get_apps(Static.apps)
         }
 
         # --- Таймеры ---
