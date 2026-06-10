@@ -11,6 +11,7 @@ from system.multiprocess import CopyTask, CopyTaskWorker
 
 from ._base_widgets import SmallBtn, UMainWindow
 from .win_progressbar import WinProgressbar
+from system.main_folder import Mf
 
 
 class ReplaceFilesWin(UMainWindow):
@@ -138,8 +139,11 @@ class WinCopyFiles(WinProgressbar):
 
     def __init__(self, target_dir: str, files_to_copy: list[str], action_type: bool):
         super().__init__(Lng.copying[Cfg.lng_index])
+        dst_text = os.path.basename(target_dir)
+        if not dst_text:
+            dst_text = Mf.current_mf.mf_alias
         self.above_label.setText(
-            f"{Lng.copying[Cfg.lng_index]} {Lng.in_[Cfg.lng_index]} \"{os.path.basename(target_dir)}\""
+            f"{Lng.copying[Cfg.lng_index]} {Lng.in_[Cfg.lng_index]} \"{dst_text}\""
         )
 
         self.dst_urls: list[str] = []
