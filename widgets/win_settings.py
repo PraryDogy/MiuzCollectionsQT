@@ -237,11 +237,7 @@ class RebootSettings(GroupWid):
         self.export_wid.layout_.addWidget(self.export_data_btn)        
 
     def export_settings_dir(self, *args):
-        # self.window().setWindowModality(Qt.WindowModality.WindowModal)
-        # return
         url = QFileDialog.getExistingDirectory()
-        # QTimer.singleShot(100, dialog.setFocus)
-        # url = dialog.getExistingDirectory()
         if url:
             print(url.rstrip(os.sep))
 
