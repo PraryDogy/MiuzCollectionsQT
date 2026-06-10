@@ -268,6 +268,7 @@ class RebootSettings(GroupWid):
                 z.extractall(Static.external_files_dir)
             if Static.app_ver > Cfg.app_ver:
                 Cfg.app_ver = Static.app_ver
+                Cfg.json_to_app()
             os.remove(zip_path)
             restart_app()
 

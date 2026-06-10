@@ -272,10 +272,10 @@ class App(QApplication):
         elif not Mf.items:
             lng_win()
 
-        elif Static.app_ver > Cfg.app_ver:
-            shutil.rmtree(Static.external_files_dir)
-            Cfg.app_ver = Static.app_ver
-            self.start()
+        # elif Static.app_ver > Cfg.app_ver:
+        #     shutil.rmtree(Static.external_files_dir)
+        #     Cfg.app_ver = Static.app_ver
+        #     self.start()
 
         else:
             objects = (Dbase, ThemeChanger, UThreadPool)
