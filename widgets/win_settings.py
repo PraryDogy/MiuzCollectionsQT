@@ -9,9 +9,10 @@ from dataclasses import dataclass
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QGroupBox, QLabel,
-                             QLineEdit, QSpacerItem, QSpinBox, QSplitter,
-                             QTableWidget, QTableWidgetItem, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
+                             QGroupBox, QLabel, QLineEdit, QSpacerItem,
+                             QSpinBox, QSplitter, QTableWidget,
+                             QTableWidgetItem, QWidget)
 from typing_extensions import Optional
 
 from cfg import Cfg, Static
@@ -220,6 +221,29 @@ class RebootSettings(GroupWid):
 
         self.reset_data_btn = SvgArrow()
         reset_data_wid.layout_.addWidget(self.reset_data_btn)
+
+        self.layout_.addWidget(HSep())
+
+        self.export_wid = GroupChild()
+        self.export_wid.mouseReleaseEvent = self.export_settings_dir
+        self.layout_.addWidget(self.export_wid)
+
+        self.export_label = ULabel("Экспортировать настройки")
+        self.export_wid.layout_.addWidget(self.export_label)
+
+        self.export_wid.layout_.addStretch()
+
+        self.export_data_btn = SvgArrow()
+        self.export_wid.layout_.addWidget(self.export_data_btn)        
+
+    def export_settings_dir(self, *args):
+        # self.window().setWindowModality(Qt.WindowModality.WindowModal)
+        # return
+        url = QFileDialog.getExistingDirectory()
+        # QTimer.singleShot(100, dialog.setFocus)
+        # url = dialog.getExistingDirectory()
+        if url:
+            print(url.rstrip(os.sep))
 
     def lang_action_cmd(self, value: int):
         self.cfg_data.lng_index = value
