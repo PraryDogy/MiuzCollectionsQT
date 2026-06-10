@@ -273,6 +273,10 @@ class RebootSettings(GroupWid):
         downloads = os.path.expanduser("~/Downloads")
         url = QFileDialog.getExistingDirectory(directory=downloads)
         if url:
+            Cfg.json_to_app()
+            Mf.json_to_app()
+            Servers.json_to_app()
+            Filters.json_to_app()
             files = [
                 i.path
                 for i in os.scandir(Static.external_files_dir)
