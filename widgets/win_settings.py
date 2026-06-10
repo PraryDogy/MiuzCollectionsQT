@@ -7,7 +7,7 @@ import sys
 import zipfile
 from dataclasses import dataclass
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QTimer, QUrl, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
@@ -226,18 +226,50 @@ class RebootSettings(GroupWid):
         self.layout_.addWidget(HSep())
 
         self.export_wid = GroupChild()
-        self.export_wid.mouseReleaseEvent = self.export_settings_dir
+        self.export_wid.mouseReleaseEvent = self.export_settings
         self.layout_.addWidget(self.export_wid)
 
-        self.export_label = ULabel("Экспортировать настройки")
+        self.export_label = ULabel(Lng.export_settings[Cfg.lng_index])
         self.export_wid.layout_.addWidget(self.export_label)
 
         self.export_wid.layout_.addStretch()
 
         self.export_data_btn = SvgArrow()
-        self.export_wid.layout_.addWidget(self.export_data_btn)        
+        self.export_wid.layout_.addWidget(self.export_data_btn)   
 
-    def export_settings_dir(self, *args):
+        self.layout_.addWidget(HSep())
+
+        self.import_wid = GroupChild()
+        self.import_wid.mouseReleaseEvent = self.import_settings
+        self.layout_.addWidget(self.import_wid)
+
+        self.import_label = ULabel(Lng.import_setings[Cfg.lng_index])
+        self.import_wid.layout_.addWidget(self.import_label)
+
+        self.import_wid.layout_.addStretch()
+
+        self.import_data_btn = SvgArrow()
+        self.import_wid.layout_.addWidget(self.import_data_btn)
+    
+    def import_settings(self, *args):
+        downloads = os.path.expanduser("~/Downloads")
+        try:
+            url = QFileDialog.getOpenFileName(directory=downloads)[0]
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return
+        if url.endswith((".zip", ".ZIP")):
+            zip_path = shutil.copy(
+                src=url,
+                dst=Static.external_files_dir
+            )
+            with zipfile.ZipFile(zip_path, "r") as z:
+                z.extractall(Static.external_files_dir)
+            os.remove(zip_path)
+            restart_app()
+
+    def export_settings(self, *args):
         downloads = os.path.expanduser("~/Downloads")
         url = QFileDialog.getExistingDirectory(directory=downloads)
         if url:
@@ -252,7 +284,6 @@ class RebootSettings(GroupWid):
                 for file in files:
                     z.write(file, arcname=os.path.basename(file))
             Utils.reveal_files([path, ])
-            
 
     def lang_action_cmd(self, value: int):
         self.cfg_data.lng_index = value
