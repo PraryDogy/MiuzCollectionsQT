@@ -4,6 +4,7 @@ import re
 import shutil
 import subprocess
 import sys
+import zipfile
 from dataclasses import dataclass
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
@@ -237,9 +238,21 @@ class RebootSettings(GroupWid):
         self.export_wid.layout_.addWidget(self.export_data_btn)        
 
     def export_settings_dir(self, *args):
-        url = QFileDialog.getExistingDirectory()
+        downloads = os.path.expanduser("~/Downloads")
+        url = QFileDialog.getExistingDirectory(directory=downloads)
         if url:
-            print(url.rstrip(os.sep))
+            files = [
+                i.path
+                for i in os.scandir(Static.external_files_dir)
+                if i.name.endswith(".json")
+            ]
+            filename = f"{Static.app_name}Settings.zip"
+            path = os.path.join(downloads, filename)
+            with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+                for file in files:
+                    z.write(file, arcname=os.path.basename(file))
+            Utils.reveal_files([path, ])
+            
 
     def lang_action_cmd(self, value: int):
         self.cfg_data.lng_index = value
