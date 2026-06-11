@@ -82,18 +82,6 @@ class UGroupBox(QGroupBox):
         self.setLayout(self.layout_)
 
 
-class SvgWarning(QSvgWidget):
-    img = "./images/warning.svg"
-    size_ = 22
-    def __init__(self):
-        super().__init__()
-        self.setFixedSize(self.size_, self.size_)
-        self.load(self.img)
-        pol = self.sizePolicy()
-        pol.setRetainSizeWhenHidden(True)
-        self.setSizePolicy(pol)
-
-
 class RowArrowWidget(QWidget):
     hh = 35
     clicked = pyqtSignal()
