@@ -70,7 +70,7 @@ class UPushButton(SmallBtn):
         self.setFixedWidth(100)
 
 
-class GroupWid(QGroupBox):
+class UGroupBox(QGroupBox):
     def __init__(self):
         """
         QGroupBox + self.layout_ (vertical layout)
@@ -154,7 +154,7 @@ class RowArrowWidget(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class TextEditWidget(GroupWid):
+class TextEditWidget(UGroupBox):
     textChanged = pyqtSignal()
 
     def __init__(self, title: str, placeholder: str, text: Optional[str]):
@@ -193,7 +193,7 @@ class TextEditWidget(GroupWid):
 
 
 
-class RebootSettings(GroupWid):
+class RebootSettings(UGroupBox):
     cfg_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
@@ -409,7 +409,7 @@ class SizesWin(UMainWindow):
         return super().keyPressEvent(a0)
 
 
-class NonRebootSettings(GroupWid):
+class NonRebootSettings(UGroupBox):
     def __init__(self):
         super().__init__()
         self.size_items = {}
@@ -499,7 +499,7 @@ class ThemesBtn(QFrame):
             self.clicked.emit()
 
 
-class Themes(GroupWid):
+class Themes(UGroupBox):
     clicked = pyqtSignal()
     svg_theme_system = "./images/system_theme.svg"
     svg_theme_dark = "./images/dark_theme.svg"
@@ -658,7 +658,7 @@ class GeneralSettings(QWidget, StateWid):
 
 
 
-class FiltersWid(GroupWid, StateWid):
+class FiltersWid(UGroupBox, StateWid):
     changed = pyqtSignal()
     exts = (
         ".jpg",
@@ -749,7 +749,7 @@ class MfStopList(TextEditWidget):
         return super().dropEvent(a0)
 
 
-class MfSave(GroupWid):
+class MfSave(UGroupBox):
     clicked_ = pyqtSignal()
     def __init__(self):
         super().__init__()
@@ -775,7 +775,7 @@ class MfSettings(QWidget, StateWid):
         self.setLayout(main_lay)
 
         # Верхний ряд с названием
-        name_group = GroupWid()
+        name_group = UGroupBox()
         main_lay.addWidget(name_group)
 
         self.name_wid = RowArrowWidget(f"{Lng.alias[Cfg.lng_index]}: {mf.mf_alias}")
@@ -792,7 +792,7 @@ class MfSettings(QWidget, StateWid):
         self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
-        general_wid = GroupWid()
+        general_wid = UGroupBox()
         main_lay.addWidget(general_wid)
 
         reset_wid = RowArrowWidget(Lng.reset_mf[Cfg.lng_index])
@@ -918,7 +918,7 @@ class NewFolder(QWidget, StateWid):
         main_lay.setSpacing(15)
         self.setLayout(main_lay)
 
-        name_wid = GroupWid()
+        name_wid = UGroupBox()
         name_wid.layout_.setSpacing(5)
         main_lay.addWidget(name_wid)
 
@@ -939,7 +939,7 @@ class NewFolder(QWidget, StateWid):
         self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
-        save_group = GroupWid()
+        save_group = UGroupBox()
         main_lay.addWidget(save_group)
 
         self.save_wid = RowArrowWidget(Lng.save[Cfg.lng_index])
@@ -1035,6 +1035,7 @@ class WinSettings(UMainWindow):
     svg_filters = "./images/filters.svg"
     svg_settings = "./images/settings.svg"
     svg_new_folder = "./images/new_folder.svg"
+    svg_warn = "./images/warning.svg"
     svg_size = 16
 
     def __init__(self, settings_item: SettingsItem):
@@ -1108,9 +1109,15 @@ class WinSettings(UMainWindow):
         btns_lay.setSpacing(10)
         self.btns_wid.setLayout(btns_lay)
 
-        self.warn_svg = SvgWarning()
-        btns_lay.addWidget(self.warn_svg)
-        self.warn_svg.hide()
+
+        self.warn_wid = QSvgWidget()
+        self.warn_wid.load(self.svg_warn)
+        self.warn_wid.setFixedSize(22, 22)
+        pol = self.warn_wid.sizePolicy()
+        pol.setRetainSizeWhenHidden(True)
+        self.warn_wid.setSizePolicy(pol)
+        self.warn_wid.hide()
+        btns_lay.addWidget(self.warn_wid)
 
         self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.setFixedWidth(95)
@@ -1147,7 +1154,7 @@ class WinSettings(UMainWindow):
 
     def blink_ok_btn(self):
         self.ok_btn.setText(Lng.restart[Cfg.lng_index])
-        self.warn_svg.show()
+        self.warn_wid.show()
 
     def init_right_side(self, idx: int):
         if idx == 0:
@@ -1191,7 +1198,7 @@ class WinSettings(UMainWindow):
         )
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
-        self.warn_svg.hide()
+        self.warn_wid.hide()
         self.ok_btn.setText(Lng.ok[Cfg.lng_index])
 
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
@@ -1211,7 +1218,7 @@ class WinSettings(UMainWindow):
                     return folder.mf_alias
             return None
 
-        if self.warn_svg.isHidden():
+        if self.warn_wid.isHidden():
             self.deleteLater()
             return
 
