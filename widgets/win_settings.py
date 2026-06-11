@@ -77,36 +77,10 @@ class GroupWid(QGroupBox):
         """
         super().__init__()
         self.layout_ = UVBoxLayout()
-        self.layout_.setContentsMargins(6, 2, 6, 2)
-        self.layout_.setSpacing(2)
+        self.layout_.setContentsMargins(6, 0, 6, 0)
+        self.layout_.setSpacing(0)
         self.setLayout(self.layout_)
 
-
-class GroupChild(QWidget):
-    hh = 30
-    def __init__(self):
-        """
-        QWidget fixed height + horizontal layout
-        """
-        super().__init__()
-        self.setFixedHeight(self.hh)
-        self.layout_ = UHBoxLayout()
-        self.setLayout(self.layout_)
-
-
-class SvgArrow(QSvgWidget):
-    clicked = pyqtSignal()
-    img = "./images/next.svg"
-    size_ = 16
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-        self.load(self.img)
-        self.setFixedSize(self.size_, self.size_)
-
-    def mouseReleaseEvent(self, a0):
-        self.clicked.emit()
-        return super().mouseReleaseEvent(a0)
-    
 
 class SvgWarning(QSvgWidget):
     img = "./images/warning.svg"
@@ -118,6 +92,66 @@ class SvgWarning(QSvgWidget):
         pol = self.sizePolicy()
         pol.setRetainSizeWhenHidden(True)
         self.setSizePolicy(pol)
+
+
+class RowArrowWidget(QWidget):
+    hh = 35
+    clicked = pyqtSignal()
+    arrow_svg = "./images/next.svg"
+    warning_svg = "./images/warning.svg"
+    svg_size = 16
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setFixedHeight(self.hh)
+        self.main_layout = UVBoxLayout(self)
+
+        self.above_wid = QWidget()
+        self.above_layout = UHBoxLayout(self.above_wid)
+        self.above_layout.setSpacing(10)
+
+        self.sep = HSep()
+
+        self.text_widget = QLabel(text)
+
+        self.warning_wid = QSvgWidget()
+        self.warning_wid.setFixedSize(self.svg_size, self.svg_size)
+        self.warning_wid.load(self.warning_svg)
+        self.warning_wid.hide()
+
+        self.arrow_wid = QSvgWidget()
+        self.arrow_wid.setFixedSize(self.svg_size, self.svg_size)
+        self.arrow_wid.load(self.arrow_svg)
+
+        self.main_layout.addWidget(self.above_wid)
+        self.main_layout.addWidget(self.sep)
+
+        self.above_layout.addWidget(self.text_widget)
+        self.above_layout.addWidget(self.warning_wid)
+        self.above_layout.addStretch()
+        self.above_layout.addWidget(self.arrow_wid)
+
+    def replace_arrow_widget(self, widget: QWidget):
+        self.arrow_wid.hide()
+        self.above_layout.addWidget(widget)
+
+    def hide_sep(self):
+        self.sep.hide()
+        spacer = QSpacerItem(0, self.sep.height())
+        self.main_layout.addSpacerItem(spacer)
+
+    def hide_arrow(self):
+        self.arrow_wid.hide()
+
+    def show_warning(self):
+        self.warning_wid.show()
+
+    def hide_warning(self):
+        self.warning_wid.hide()
+
+    def mouseReleaseEvent(self, a0):
+        self.clicked.emit()
+        return super().mouseReleaseEvent(a0)
 
 
 class TextEditWidget(GroupWid):
@@ -168,35 +202,21 @@ class RebootSettings(GroupWid):
         super().__init__()
         self.cfg_data = cfg_data
 
-        lng_wid = GroupChild()
-        self.layout_.addWidget(lng_wid)
-
-        self.lng_text = ULabel(Lng.language_max[Cfg.lng_index])
-        lng_wid.layout_.addWidget(self.lng_text)
-
-        lng_wid.layout_.addStretch()
-
-        self.lng_menu = UMenu(None)
+        lng_menu = UMenu(None)
         for value in (0, 1):
-            action = QAction(Lng.russian[value], self.lng_menu)
+            action = QAction(Lng.russian[value], lng_menu)
             action.triggered.connect(lambda e, v=value: self.lang_action_cmd(v))
-            self.lng_menu.addAction(action)
+            lng_menu.addAction(action)
 
+        lng_wid = RowArrowWidget(Lng.language_max[Cfg.lng_index])
+        self.layout_.addWidget(lng_wid)
         self.lng_btn = UPushButton(text=Lng.russian[Cfg.lng_index])
         self.lng_btn.setFixedWidth(109)
-        self.lng_btn.setMenu(self.lng_menu)
-        lng_wid.layout_.addWidget(self.lng_btn)
+        self.lng_btn.setMenu(lng_menu)
+        lng_wid.replace_arrow_widget(self.lng_btn)
 
-        self.layout_.addWidget(HSep())
-
-        scaner_time_wid = GroupChild()
+        scaner_time_wid = RowArrowWidget(Lng.search_interval[Cfg.lng_index])
         self.layout_.addWidget(scaner_time_wid)
-
-        scaner_time_text = ULabel(Lng.search_interval[Cfg.lng_index], self)
-        scaner_time_wid.layout_.addWidget(scaner_time_text)
-
-        scaner_time_wid.layout_.addStretch()
-
         self.spin = QSpinBox(self)
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.spin.setMinimum(self.spin_min)
@@ -207,49 +227,20 @@ class RebootSettings(GroupWid):
         self.spin.setSuffix(f" {Lng.minutes[Cfg.lng_index]}")
         self.spin.setValue(self.cfg_data.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
-        scaner_time_wid.layout_.addWidget(self.spin)
+        scaner_time_wid.replace_arrow_widget(self.spin)
 
-        self.layout_.addWidget(HSep())
-
-        reset_data_wid = GroupChild()
-        reset_data_wid.mouseReleaseEvent = self.reset_btn_cmd
+        reset_data_wid = RowArrowWidget(Lng.erase_data[Cfg.lng_index])
+        reset_data_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(reset_data_wid)
 
-        reset_data_text = ULabel(Lng.erase_data[Cfg.lng_index])
-        reset_data_wid.layout_.addWidget(reset_data_text)
-
-        reset_data_wid.layout_.addStretch()
-
-        self.reset_data_btn = SvgArrow()
-        reset_data_wid.layout_.addWidget(self.reset_data_btn)
-
-        self.layout_.addWidget(HSep())
-
-        self.export_wid = GroupChild()
-        self.export_wid.mouseReleaseEvent = self.export_settings
+        self.export_wid = RowArrowWidget(Lng.export_settings[Cfg.lng_index])
+        self.export_wid.clicked.connect(self.export_settings)
         self.layout_.addWidget(self.export_wid)
 
-        self.export_label = ULabel(Lng.export_settings[Cfg.lng_index])
-        self.export_wid.layout_.addWidget(self.export_label)
-
-        self.export_wid.layout_.addStretch()
-
-        self.export_data_btn = SvgArrow()
-        self.export_wid.layout_.addWidget(self.export_data_btn)   
-
-        self.layout_.addWidget(HSep())
-
-        self.import_wid = GroupChild()
-        self.import_wid.mouseReleaseEvent = self.import_settings
+        self.import_wid = RowArrowWidget(Lng.import_setings[Cfg.lng_index])
+        self.import_wid.clicked.connect(self.import_settings)
+        self.import_wid.hide_sep()
         self.layout_.addWidget(self.import_wid)
-
-        self.import_label = ULabel(Lng.import_setings[Cfg.lng_index])
-        self.import_wid.layout_.addWidget(self.import_label)
-
-        self.import_wid.layout_.addStretch()
-
-        self.import_data_btn = SvgArrow()
-        self.import_wid.layout_.addWidget(self.import_data_btn)
     
     def import_settings(self, *args):
         downloads = os.path.expanduser("~/Downloads")
@@ -421,32 +412,16 @@ class SizesWin(UMainWindow):
 class NonRebootSettings(GroupWid):
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(80)
         self.size_items = {}
 
-        data_size_wid = GroupChild()
-        data_size_wid.mouseReleaseEvent = self.show_sizes_win
+        data_size_wid = RowArrowWidget(Lng.statistic[Cfg.lng_index])
+        data_size_wid.clicked.connect(self.show_sizes_win)
         self.layout_.addWidget(data_size_wid)
 
-        data_size_text = ULabel(text=Lng.statistic[Cfg.lng_index])
-        data_size_wid.layout_.addWidget(data_size_text)
-
-        data_size_wid.layout_.addStretch()
-
-        data_size_btn = SvgArrow()
-        data_size_wid.layout_.addWidget(data_size_btn)
-
-        self.layout_.addWidget(HSep())
-
-        show_files_wid = GroupChild()
-        show_files_wid.mouseReleaseEvent = self.show_files_cmd
+        show_files_wid = RowArrowWidget(Lng.show_system_files[Cfg.lng_index])
+        show_files_wid.clicked.connect(self.show_files_cmd)
+        show_files_wid.hide_sep()
         self.layout_.addWidget(show_files_wid)
-
-        show_files_text = ULabel(Lng.show_system_files[Cfg.lng_index])
-        show_files_wid.layout_.addWidget(show_files_text)
-
-        show_files_btn = SvgArrow(text=Lng.show[Cfg.lng_index])
-        show_files_wid.layout_.addWidget(show_files_btn)
 
         self.get_sizes()
 
@@ -534,19 +509,18 @@ class Themes(GroupWid):
         super().__init__()
         # self.setFixedHeight(120)
 
-        title_wid = GroupChild()
+        title_wid = RowArrowWidget(Lng.theme[Cfg.lng_index])
+        title_wid.hide_arrow()
         self.layout_.addWidget(title_wid)
 
-        title_text = ULabel("Тема")
-        title_wid.layout_.addWidget(title_text)
+        spacer = QSpacerItem(0, 15)
+        self.layout_.addSpacerItem(spacer)
 
-        self.layout_.addWidget(HSep())
-        self.layout_.addSpacerItem(QSpacerItem(0, 10))
-
-        themes_wid = GroupChild()
+        themes_wid = QWidget()
         themes_wid.setFixedHeight(80)
-        themes_wid.layout_.setSpacing(20)
-        themes_wid.layout_.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        themes_layout = UHBoxLayout(themes_wid)
+        themes_layout.setSpacing(20)
+        themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
 
         self.frames = []
@@ -565,7 +539,7 @@ class Themes(GroupWid):
         )
 
         for f in (self.system_theme, self.dark_theme, self.light_theme):
-            themes_wid.layout_.addWidget(f)
+            themes_layout.addWidget(f)
             self.frames.append(f)
             f.clicked.connect(self.on_frame_clicked)
 
@@ -706,20 +680,10 @@ class FiltersWid(GroupWid, StateWid):
         self.layout_.addSpacerItem(QSpacerItem(0, 5))
         self.layout_.addWidget(HSep())
 
-        erase_filters_wid = GroupChild()
-        erase_filters_wid.setFixedHeight(40)
-        erase_filters_wid.mouseReleaseEvent = self.reset_btn_cmd
+        erase_filters_wid = RowArrowWidget(Lng.reset_filters[Cfg.lng_index])
+        erase_filters_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(erase_filters_wid)
 
-        erase_filters_text = QLabel(Lng.reset_filters[Cfg.lng_index])
-        erase_filters_wid.layout_.addWidget(erase_filters_text)
-
-        erase_filters_wid.layout_.addStretch()
-
-        self.reset_btn = SvgArrow()
-        erase_filters_wid.layout_.addWidget(self.reset_btn)
-
-        self.layout_.addWidget(HSep())
         self.layout_.addSpacerItem(QSpacerItem(0, 10))
 
         self.filters_edit = UTextEdit()
@@ -788,31 +752,12 @@ class MfStopList(TextEditWidget):
 class MfSave(GroupWid):
     clicked_ = pyqtSignal()
     def __init__(self):
-        super().__init__()        
+        super().__init__()
 
-        save_wid_child = GroupChild()
-        self.layout_.addWidget(save_wid_child)
-
-        save_text = ULabel(Lng.save[Cfg.lng_index])
-        save_wid_child.layout_.addWidget(save_text)
-
-        save_wid_child.layout_.addSpacerItem(QSpacerItem(10, 0))
-
-        self.warning_svg = SvgWarning()
-        self.warning_svg.setFixedSize(14, 14)
-        save_wid_child.layout_.addWidget(self.warning_svg)
-        self.warning_svg.hide()
-
-        save_wid_child.layout_.addStretch()
-
-        save_btn = SvgArrow()
-        save_wid_child.layout_.addWidget(save_btn)
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
-        return super().mouseReleaseEvent(event)
-
+        self.save_wid = RowArrowWidget(Lng.save[Cfg.lng_index])
+        self.save_wid.clicked.connect(self.clicked.emit)
+        self.save_wid.hide_sep()
+        self.layout_.addWidget(self.save_wid)
 
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ 
 
@@ -830,11 +775,13 @@ class MfSettings(QWidget, StateWid):
         self.setLayout(main_lay)
 
         # Верхний ряд с названием
-        self.name_wid = GroupWid()
-        main_lay.addWidget(self.name_wid)
-        name_text = ULabel(f"{Lng.alias[Cfg.lng_index]}: {mf.mf_alias}")
-        name_text.setFixedHeight(GroupChild.hh)
-        self.name_wid.layout_.addWidget(name_text)
+        name_group = GroupWid()
+        main_lay.addWidget(name_group)
+
+        self.name_wid = RowArrowWidget(f"{Lng.alias[Cfg.lng_index]}: {mf.mf_alias}")
+        self.name_wid.hide_arrow()
+        self.name_wid.hide_sep()
+        name_group.layout_.addWidget(self.name_wid)
 
         self.path_widget = PathWidget(mf)
         self.path_widget.setFixedHeight(self.path_widget.hh)
@@ -848,38 +795,21 @@ class MfSettings(QWidget, StateWid):
         general_wid = GroupWid()
         main_lay.addWidget(general_wid)
 
-        reset_wid = GroupChild()
-        reset_wid.mouseReleaseEvent = self.set_reset_flag
+        reset_wid = RowArrowWidget(Lng.reset_mf[Cfg.lng_index])
+        reset_wid.clicked.connect(self.set_reset_flag)
         general_wid.layout_.addWidget(reset_wid)
 
-        reset_text = ULabel(text=Lng.reset_mf[Cfg.lng_index])
-        reset_wid.layout_.addWidget(reset_text)
-
-        reset_wid.layout_.addStretch()
-
-        reset_btn = SvgArrow()
-        reset_wid.layout_.addWidget(reset_btn)
-
-        general_wid.layout_.addWidget(HSep())
-
-        remove_wid = GroupChild()
-        remove_wid.mouseReleaseEvent = self.remove_cmd
+        remove_wid = RowArrowWidget(Lng.remove_folder[Cfg.lng_index])
+        remove_wid.clicked.connect(self.remove_cmd)
+        remove_wid.hide_sep()
         general_wid.layout_.addWidget(remove_wid)
-
-        remove_text = ULabel(text=Lng.remove_folder[Cfg.lng_index])
-        remove_wid.layout_.addWidget(remove_text)
-        remove_wid.layout_.addStretch()
-        remove_btn = SvgArrow()
-        remove_wid.layout_.addWidget(remove_btn)
-
-        main_lay.addSpacerItem(QSpacerItem(0, 15))
 
         self.mf_save = MfSave()
         self.mf_save.clicked_.connect(self.save)
         main_lay.addWidget(self.mf_save)
 
     def set_was_changed(self):
-        self.mf_save.warning_svg.show()
+        self.mf_save.save_wid.show_warning()
         super().set_was_changed()
 
     def remove_cmd(self, *args):
@@ -989,6 +919,7 @@ class NewFolder(QWidget, StateWid):
         self.setLayout(main_lay)
 
         name_wid = GroupWid()
+        name_wid.layout_.setSpacing(5)
         main_lay.addWidget(name_wid)
 
         self.name_text = QLabel(Lng.folder_name[Cfg.lng_index])
@@ -1008,27 +939,13 @@ class NewFolder(QWidget, StateWid):
         self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
-        save_wid = GroupWid()
-        save_wid.mouseReleaseEvent = self.save_start
-        main_lay.addWidget(save_wid)
-        
-        save_wid_child = GroupChild()
-        save_wid.layout_.addWidget(save_wid_child)
+        save_group = GroupWid()
+        main_lay.addWidget(save_group)
 
-        save_text = ULabel(Lng.save[Cfg.lng_index])
-        save_wid_child.layout_.addWidget(save_text)
-
-        save_wid_child.layout_.addSpacerItem(QSpacerItem(10, 0))
-
-        self.warning_svg = SvgWarning()
-        self.warning_svg.setFixedSize(14, 14)
-        save_wid_child.layout_.addWidget(self.warning_svg)
-        self.warning_svg.hide()
-
-        save_wid_child.layout_.addStretch()
-
-        save_btn = SvgArrow()
-        save_wid_child.layout_.addWidget(save_btn)
+        self.save_wid = RowArrowWidget(Lng.save[Cfg.lng_index])
+        self.save_wid.hide_sep()
+        self.save_wid.clicked.connect(self.save_start)
+        save_group.layout_.addWidget(self.save_wid)
 
     def set_mf_alias(self):
         name = os.path.basename(self.path_widget.mf_temp_path)
@@ -1036,7 +953,7 @@ class NewFolder(QWidget, StateWid):
             self.name_line_edit.setText(name)
 
     def set_was_changed(self):
-        self.warning_svg.show()
+        self.save_wid.show_warning()
         super().set_was_changed()
 
     def preset_new_folder(self, url: str):
@@ -1044,7 +961,7 @@ class NewFolder(QWidget, StateWid):
             url = os.sep + url.strip(os.sep)
             basename = os.path.basename(url)
             self.name_line_edit.setText(basename)
-            self.warning_svg.show()
+            self.save_wid.show_warning()
             
             self.path_widget.mf_temp_path = url
             self.path_widget.ok_path_widget()

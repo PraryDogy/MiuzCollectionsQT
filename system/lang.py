@@ -133,6 +133,7 @@ class Lng:
     attention = ("Внимание!", "Warning!")
     delete_forever = ("Удалить безвозвратно файлы", "Delete forever files")
     theme_auto = ("Авто", "Auto")
+    theme = ("Тема", "Theme")
     theme_dark = ("Темная", "Dark")
     theme_light = ("Светлая", "Light")
     start_date = ("Дата начала", "Start date")
