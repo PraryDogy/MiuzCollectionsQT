@@ -474,11 +474,9 @@ class ThemeBtn(QWidget):
 
 
 class Themes_(UGroupBox):
-    clicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
-        # self.setFixedHeight(120)
 
         title_wid = RowArrowWidget(Lng.theme[Cfg.lng_index])
         title_wid.hide_arrow()
@@ -488,70 +486,26 @@ class Themes_(UGroupBox):
         self.layout_.addSpacerItem(spacer)
 
         themes_wid = QWidget()
-        # themes_wid.setFixedHeight(80)
         themes_layout = UHBoxLayout(themes_wid)
         themes_layout.setSpacing(5)
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
-
-        themes = [
-            Themes.macintosh,
-            Themes.dark,
-            Themes.light
-        ]
         
-        for i in themes:
-            widget = ThemeBtn(i)
-            themes_layout.addWidget(widget)
-
+        for i in (Themes.macintosh, Themes.dark, Themes.light):
+            btn = ThemeBtn(i)
+            btn.clicked.connect(lambda theme, btn=btn: self.on_btn_clicked(theme, btn))
+            themes_layout.addWidget(btn)
             if i == Cfg.theme:
-                widget.select()
+                btn.select()
 
-
-    #     self.frames = []
-
-    #     self.system_theme = ThemesBtn(
-    #         self.svg_theme_system,
-    #         Lng.system_theme[Cfg.lng_index]
-    #     )
-    #     self.dark_theme = ThemesBtn(
-    #         self.svg_theme_dark,
-    #         Lng.dark_theme[Cfg.lng_index]
-    #     )
-    #     self.light_theme = ThemesBtn(
-    #         self.svg_theme_light,
-    #         Lng.light_theme[Cfg.lng_index]
-    #     )
-
-    #     for f in (self.system_theme, self.dark_theme, self.light_theme):
-    #         themes_layout.addWidget(f)
-    #         self.frames.append(f)
-    #         f.clicked.connect(self.on_frame_clicked)
-
-    #     if Cfg.theme == 0:
-    #         self.set_selected(self.system_theme)
-    #     elif Cfg.theme == 1:
-    #         self.set_selected(self.dark_theme)
-    #     elif Cfg.theme == 2:
-    #         self.set_selected(self.light_theme)
-
-    def on_frame_clicked(self):
-        sender: ThemesBtn = self.sender()
-    #     self.set_selected(sender)
-
-        if sender == self.system_theme:
-            Cfg.theme = 0
-    #     elif sender == self.dark_theme:
-    #         Cfg.theme = 1
-    #     elif sender == self.light_theme:
-    #         Cfg.theme = 2
-
-    #     ThemeChanger.init()
-    #     self.clicked.emit()
-
-    # def set_selected(self, selected_frame: ThemesBtn):
-    #     for f in self.frames:
-    #         f.selected(f is selected_frame)
+    def on_btn_clicked(self, theme: Literal["macintosh", "light", "dark"], btn: ThemeBtn):
+        theme_btns = self.findChildren(ThemeBtn)
+        if theme != Cfg.theme:
+            for i in theme_btns:
+                i.clear_selection()
+            btn.select()
+            Cfg.theme = theme
+            ThemeChanger.init()
 
 
 class SelectableLabel(ULabel):

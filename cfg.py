@@ -93,6 +93,8 @@ class Cfg:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
+            if Cfg.theme not in (Themes.macintosh, Themes.dark, Themes.light):
+                Cfg.theme = Themes.macintosh
         except Exception as e:
             print("Cfg json to app error",e)
     
