@@ -482,7 +482,7 @@ class Themes_(UGroupBox):
         title_wid.hide_arrow()
         self.layout_.addWidget(title_wid)
 
-        spacer = QSpacerItem(0, 15)
+        spacer = QSpacerItem(0, 5)
         self.layout_.addSpacerItem(spacer)
 
         themes_wid = QWidget()
