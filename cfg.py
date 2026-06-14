@@ -5,6 +5,12 @@ from datetime import datetime
 from pathlib import Path
 
 
+class Themes:
+    system = "system"
+    dark = "dark"
+    light = "light"
+
+
 class Static:
     app_ver = 4.82
     app_name = "Collections"
@@ -66,7 +72,7 @@ class Dynamic:
 class Cfg:
     app_ver = Static.app_ver
     lng_index = 0
-    dark_mode = 0
+    theme = Themes.system
     scaner_minutes = 20
     hide_digits_mf_lst = []
 

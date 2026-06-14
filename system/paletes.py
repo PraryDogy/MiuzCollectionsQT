@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import QApplication
 
-from cfg import Cfg
+from cfg import Cfg, Themes
 
 
 class UPallete:
@@ -48,12 +48,12 @@ class ThemeChanger:
     @classmethod
     def init(cls):
         app: QApplication = QApplication.instance()
-        if Cfg.dark_mode == 0:
+        if Cfg.theme == Themes.system:
             app.setPalette(QPalette())
             app.setStyle("macintosh")
-        elif Cfg.dark_mode == 1:
+        elif Cfg.theme == Themes.dark:
             app.setPalette(UPallete.dark())
             app.setStyle("Fusion")
-        elif Cfg.dark_mode == 2:
+        elif Cfg.theme == Themes.light:
             app.setPalette(UPallete.light())
             app.setStyle("Fusion")

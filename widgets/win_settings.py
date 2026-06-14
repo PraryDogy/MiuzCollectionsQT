@@ -14,9 +14,9 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
                              QGroupBox, QLabel, QLineEdit, QSpacerItem,
                              QSpinBox, QSplitter, QTableWidget,
                              QTableWidgetItem, QWidget)
-from typing_extensions import Optional, Literal
+from typing_extensions import Literal, Optional
 
-from cfg import Cfg, Static
+from cfg import Cfg, Static, Themes
 from system.filters import Filters
 from system.items import HashDirSizeItem, SettingsItem
 from system.lang import Lng
@@ -138,7 +138,8 @@ class RowArrowWidget(QWidget):
         self.warning_wid.hide()
 
     def mouseReleaseEvent(self, a0):
-        self.clicked.emit()
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
         return super().mouseReleaseEvent(a0)
 
 
@@ -432,89 +433,45 @@ class NonRebootSettings(UGroupBox):
             print(e)
 
 
-class ThemesBtn(QFrame):
+class ThemeBtn(QWidget):
     clicked = pyqtSignal()
 
-    def __init__(self, svg_path: str, label_text: str):
-        super().__init__()
-        v_lay = UVBoxLayout()
-        self.setLayout(v_lay)
-
-        self.svg_container = QFrame()
-        self.svg_container.setObjectName("svg_container")
-        self.svg_container.setStyleSheet(self.regular_style())
-        v_lay.addWidget(self.svg_container)
-
-        svg_lay = UVBoxLayout()
-        self.svg_container.setLayout(svg_lay)
-
-        self.svg_widget = QSvgWidget(svg_path)
-        self.svg_widget.setFixedSize(50, 50)
-        svg_lay.addWidget(self.svg_widget)
-
-        label = ULabel(label_text)
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        v_lay.addWidget(label)
-
-    def regular_style(self):
-        return """
-            #svg_container {
-                border: 2px solid transparent;
-                border-radius: 10px;
-            }
-        """
-
-    def border_style(self):
-        return """
-            #svg_container {
-                border: 2px solid #007aff;
-                border-radius: 10px;
-            }
-        """
-
-    def selected(self, enable=True):
-        if enable:
-            self.svg_container.setStyleSheet(
-                self.border_style()
-            )
-        else:
-            self.svg_container.setStyleSheet(
-                self.regular_style()
-            )
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit()
-
-
-class ThemeBtn(QWidget):
     def __init__(self, theme: Literal["system", "light", "dark"]):
         super().__init__()
         self.theme = theme
         self.svg = f"./images/{theme}_theme.svg"
         self.svg_selected = f"./images/{theme}_theme_selected.svg"
         text_mappings = {
-            "system": Lng.system_theme,
-            "light": Lng.light_theme,
-            "dark": Lng.dark_theme,
+            Themes.system: Lng.system_theme,
+            Themes.dark: Lng.dark_theme,
+            Themes.light: Lng.light_theme,
         }
 
         layout_ = UVBoxLayout(self)
-
+        
         self.svg_widget = QSvgWidget()
-        self.svg_widget.load(self.svg)
         self.svg_widget.setFixedSize(50, 50)
-        layout_.addWidget(self.svg_widget)
+        layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         label = QLabel(text_mappings[theme][Cfg.lng_index])
-        layout_.addWidget(label)
+        layout_.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.clear_selection()
+
+    def select(self):
+        self.svg_widget.load(self.svg_selected)
+
+    def clear_selection(self):
+        self.svg_widget.load(self.svg)
+
+    def mouseReleaseEvent(self, a0):
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        return super().mouseReleaseEvent(a0)
 
 
-class Themes(UGroupBox):
+class Themes_(UGroupBox):
     clicked = pyqtSignal()
-    svg_theme_system = "./images/system_theme.svg"
-    svg_theme_dark = "./images/dark_theme.svg"
-    svg_theme_light = "./images/light_theme.svg"
 
     def __init__(self):
         super().__init__()
@@ -530,9 +487,23 @@ class Themes(UGroupBox):
         themes_wid = QWidget()
         # themes_wid.setFixedHeight(80)
         themes_layout = UHBoxLayout(themes_wid)
-        # themes_layout.setSpacing(20)
-        # themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        themes_layout.setSpacing(40)
+        themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
+
+        themes = [
+            Themes.system,
+            Themes.dark,
+            Themes.light
+        ]
+        
+        for i in themes:
+            widget = ThemeBtn(i)
+            themes_layout.addWidget(widget)
+
+            if i == Cfg.theme:
+                widget.select()
+
 
     #     self.frames = []
 
@@ -554,23 +525,23 @@ class Themes(UGroupBox):
     #         self.frames.append(f)
     #         f.clicked.connect(self.on_frame_clicked)
 
-    #     if Cfg.dark_mode == 0:
+    #     if Cfg.theme == 0:
     #         self.set_selected(self.system_theme)
-    #     elif Cfg.dark_mode == 1:
+    #     elif Cfg.theme == 1:
     #         self.set_selected(self.dark_theme)
-    #     elif Cfg.dark_mode == 2:
+    #     elif Cfg.theme == 2:
     #         self.set_selected(self.light_theme)
 
-    # def on_frame_clicked(self):
-    #     sender: ThemesBtn = self.sender()
+    def on_frame_clicked(self):
+        sender: ThemesBtn = self.sender()
     #     self.set_selected(sender)
 
-    #     if sender == self.system_theme:
-    #         Cfg.dark_mode = 0
+        if sender == self.system_theme:
+            Cfg.theme = 0
     #     elif sender == self.dark_theme:
-    #         Cfg.dark_mode = 1
+    #         Cfg.theme = 1
     #     elif sender == self.light_theme:
-    #         Cfg.dark_mode = 2
+    #         Cfg.theme = 2
 
     #     ThemeChanger.init()
     #     self.clicked.emit()
@@ -652,7 +623,7 @@ class GeneralSettings(QWidget, StateWid):
         data_settings = NonRebootSettings()
         v_lay.addWidget(data_settings)
 
-        themes = Themes()
+        themes = Themes_()
         v_lay.addWidget(themes)
 
         about = AboutWid()
