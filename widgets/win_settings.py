@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
                              QGroupBox, QLabel, QLineEdit, QSpacerItem,
                              QSpinBox, QSplitter, QTableWidget,
                              QTableWidgetItem, QWidget)
-from typing_extensions import Optional
+from typing_extensions import Optional, Literal
 
 from cfg import Cfg, Static
 from system.filters import Filters
@@ -487,6 +487,29 @@ class ThemesBtn(QFrame):
             self.clicked.emit()
 
 
+class ThemeBtn(QWidget):
+    def __init__(self, theme: Literal["system", "light", "dark"]):
+        super().__init__()
+        self.theme = theme
+        self.svg = f"./images/{theme}_theme.svg"
+        self.svg_selected = f"./images/{theme}_theme_selected.svg"
+        text_mappings = {
+            "system": Lng.system_theme,
+            "light": Lng.light_theme,
+            "dark": Lng.dark_theme,
+        }
+
+        layout_ = UVBoxLayout(self)
+
+        self.svg_widget = QSvgWidget()
+        self.svg_widget.load(self.svg)
+        self.svg_widget.setFixedSize(50, 50)
+        layout_.addWidget(self.svg_widget)
+
+        label = QLabel(text_mappings[theme][Cfg.lng_index])
+        layout_.addWidget(label)
+
+
 class Themes(UGroupBox):
     clicked = pyqtSignal()
     svg_theme_system = "./images/system_theme.svg"
@@ -505,56 +528,56 @@ class Themes(UGroupBox):
         self.layout_.addSpacerItem(spacer)
 
         themes_wid = QWidget()
-        themes_wid.setFixedHeight(80)
+        # themes_wid.setFixedHeight(80)
         themes_layout = UHBoxLayout(themes_wid)
-        themes_layout.setSpacing(20)
-        themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # themes_layout.setSpacing(20)
+        # themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
 
-        self.frames = []
+    #     self.frames = []
 
-        self.system_theme = ThemesBtn(
-            self.svg_theme_system,
-            Lng.theme_auto[Cfg.lng_index]
-        )
-        self.dark_theme = ThemesBtn(
-            self.svg_theme_dark,
-            Lng.theme_dark[Cfg.lng_index]
-        )
-        self.light_theme = ThemesBtn(
-            self.svg_theme_light,
-            Lng.theme_light[Cfg.lng_index]
-        )
+    #     self.system_theme = ThemesBtn(
+    #         self.svg_theme_system,
+    #         Lng.system_theme[Cfg.lng_index]
+    #     )
+    #     self.dark_theme = ThemesBtn(
+    #         self.svg_theme_dark,
+    #         Lng.dark_theme[Cfg.lng_index]
+    #     )
+    #     self.light_theme = ThemesBtn(
+    #         self.svg_theme_light,
+    #         Lng.light_theme[Cfg.lng_index]
+    #     )
 
-        for f in (self.system_theme, self.dark_theme, self.light_theme):
-            themes_layout.addWidget(f)
-            self.frames.append(f)
-            f.clicked.connect(self.on_frame_clicked)
+    #     for f in (self.system_theme, self.dark_theme, self.light_theme):
+    #         themes_layout.addWidget(f)
+    #         self.frames.append(f)
+    #         f.clicked.connect(self.on_frame_clicked)
 
-        if Cfg.dark_mode == 0:
-            self.set_selected(self.system_theme)
-        elif Cfg.dark_mode == 1:
-            self.set_selected(self.dark_theme)
-        elif Cfg.dark_mode == 2:
-            self.set_selected(self.light_theme)
+    #     if Cfg.dark_mode == 0:
+    #         self.set_selected(self.system_theme)
+    #     elif Cfg.dark_mode == 1:
+    #         self.set_selected(self.dark_theme)
+    #     elif Cfg.dark_mode == 2:
+    #         self.set_selected(self.light_theme)
 
-    def on_frame_clicked(self):
-        sender: ThemesBtn = self.sender()
-        self.set_selected(sender)
+    # def on_frame_clicked(self):
+    #     sender: ThemesBtn = self.sender()
+    #     self.set_selected(sender)
 
-        if sender == self.system_theme:
-            Cfg.dark_mode = 0
-        elif sender == self.dark_theme:
-            Cfg.dark_mode = 1
-        elif sender == self.light_theme:
-            Cfg.dark_mode = 2
+    #     if sender == self.system_theme:
+    #         Cfg.dark_mode = 0
+    #     elif sender == self.dark_theme:
+    #         Cfg.dark_mode = 1
+    #     elif sender == self.light_theme:
+    #         Cfg.dark_mode = 2
 
-        ThemeChanger.init()
-        self.clicked.emit()
+    #     ThemeChanger.init()
+    #     self.clicked.emit()
 
-    def set_selected(self, selected_frame: ThemesBtn):
-        for f in self.frames:
-            f.selected(f is selected_frame)
+    # def set_selected(self, selected_frame: ThemesBtn):
+    #     for f in self.frames:
+    #         f.selected(f is selected_frame)
 
 
 class SelectableLabel(ULabel):
