@@ -48,7 +48,7 @@ class ThemeChanger:
     @classmethod
     def init(cls):
         app: QApplication = QApplication.instance()
-        if Cfg.theme == Themes.system:
+        if Cfg.theme == Themes.macintosh:
             app.setPalette(QPalette())
             app.setStyle("macintosh")
         elif Cfg.theme == Themes.dark:

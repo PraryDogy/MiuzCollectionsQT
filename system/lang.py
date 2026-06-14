@@ -132,7 +132,7 @@ class Lng:
     copy_names = ("Скопировать имя объектов", "Copy object names")
     attention = ("Внимание!", "Warning!")
     delete_forever = ("Удалить безвозвратно файлы", "Delete forever files")
-    system_theme = ("Macintosh", "Macintosh")
+    macintosh_theme = ("Macintosh", "Macintosh")
     theme = ("Тема", "Theme")
     dark_theme = ("Темная", "Dark")
     light_theme = ("Светлая", "Light")

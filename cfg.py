@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 class Themes:
-    system = "system"
+    macintosh = "macintosh"
     dark = "dark"
     light = "light"
 
@@ -72,7 +72,7 @@ class Dynamic:
 class Cfg:
     app_ver = Static.app_ver
     lng_index = 0
-    theme = Themes.system
+    theme = Themes.macintosh
     scaner_minutes = 20
     hide_digits_mf_lst = []
 

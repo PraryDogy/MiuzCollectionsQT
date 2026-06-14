@@ -434,18 +434,21 @@ class NonRebootSettings(UGroupBox):
 
 
 class ThemeBtn(QWidget):
-    clicked = pyqtSignal()
+    clicked = pyqtSignal(str)
+    ww = 70
 
-    def __init__(self, theme: Literal["system", "light", "dark"]):
+    def __init__(self, theme: Literal["macintosh", "light", "dark"]):
         super().__init__()
         self.theme = theme
         self.svg = f"./images/{theme}_theme.svg"
         self.svg_selected = f"./images/{theme}_theme_selected.svg"
         text_mappings = {
-            Themes.system: Lng.system_theme,
+            Themes.macintosh: Lng.macintosh_theme,
             Themes.dark: Lng.dark_theme,
             Themes.light: Lng.light_theme,
         }
+
+        self.setFixedWidth(self.ww)
 
         layout_ = UVBoxLayout(self)
         
@@ -466,7 +469,7 @@ class ThemeBtn(QWidget):
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit()
+            self.clicked.emit(self.theme)
         return super().mouseReleaseEvent(a0)
 
 
@@ -487,12 +490,12 @@ class Themes_(UGroupBox):
         themes_wid = QWidget()
         # themes_wid.setFixedHeight(80)
         themes_layout = UHBoxLayout(themes_wid)
-        themes_layout.setSpacing(40)
+        themes_layout.setSpacing(5)
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
 
         themes = [
-            Themes.system,
+            Themes.macintosh,
             Themes.dark,
             Themes.light
         ]
