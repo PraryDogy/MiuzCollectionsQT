@@ -181,6 +181,86 @@ class TextEditWidget(UGroupBox):
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ
 
 
+class GroupBoxBtn(QGroupBox):
+    clicked = pyqtSignal()
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setFixedSize(110, 50)
+        layout_ = UVBoxLayout(self)
+        # layout_.setSpacing(10)
+        # layout_.setContentsMargins(10, 10, 10, 10)
+
+        label = QLabel(text)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout_.addWidget(label)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        return super().mouseReleaseEvent(event)
+
+
+class ExportWin(UMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
+
+        h_layout = UHBoxLayout()
+        h_layout.setSpacing(10)
+        self.central_layout.addLayout(h_layout)
+
+        left_btn = GroupBoxBtn("Настройки")
+        h_layout.addWidget(left_btn)
+
+        right_btn = GroupBoxBtn("Полная копия")
+        right_btn.clicked.connect(
+            lambda: self.export_files(self.get_all_files())
+        )
+        h_layout.addWidget(right_btn)
+        
+        self.adjustSize()
+
+    def export_files(self, files: list[str]):
+        Cfg.json_to_app()
+        Mf.json_to_app()
+        Servers.json_to_app()
+        Filters.json_to_app()
+        
+        downloads = os.path.expanduser("~/Downloads")
+        filename = f"{Static.app_name}Settings.zip"
+        path = os.path.join(downloads, filename)
+        with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
+            for file in files:
+                rel_path = file.replace(Static.external_files_dir, "")
+                z.write(file, arcname=rel_path)
+        Utils.reveal_files([path, ])
+
+    def get_json_only(self):
+        return [
+            i.path
+            for i in os.scandir(Static.external_files_dir)
+            if i.name.endswith(".json")
+        ]
+
+    def get_all_files(self):
+        files = []
+        stack = [Static.external_files_dir, ]
+        while stack:
+            current_dir = stack.pop()
+            for i in os.scandir(current_dir):
+                if i.is_dir():
+                    stack.append(i)
+                else:
+                    files.append(i.path)
+        return files
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+
 
 class RebootSettings(UGroupBox):
     cfg_changed = pyqtSignal()
@@ -256,6 +336,10 @@ class RebootSettings(UGroupBox):
             restart_app()
 
     def export_settings(self, *args):
+        self.export_win = ExportWin()
+        self.export_win.center_to_parent(self.window())
+        self.export_win.show()
+        return
         downloads = os.path.expanduser("~/Downloads")
         url = QFileDialog.getExistingDirectory(directory=downloads)
         if url:
@@ -473,7 +557,7 @@ class ThemeBtn(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class Themes_(UGroupBox):
+class ThemesWidget(UGroupBox):
 
     def __init__(self):
         super().__init__()
@@ -580,7 +664,7 @@ class GeneralSettings(QWidget, StateWid):
         data_settings = NonRebootSettings()
         v_lay.addWidget(data_settings)
 
-        themes = Themes_()
+        themes = ThemesWidget()
         v_lay.addWidget(themes)
 
         about = AboutWid()

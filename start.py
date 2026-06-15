@@ -240,6 +240,7 @@ class App(QApplication):
     def start(self):
 
         def setup_new_mf():
+            Dbase.init()
             new_mf_win = NewMfWin()
             new_mf_win.show()
 
@@ -267,6 +268,7 @@ class App(QApplication):
             i.json_to_app()
 
         if not Cfg.check_files():
+            Cfg.make_empty_external_files()
             lng_win()
 
         elif not Mf.items:
