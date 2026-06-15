@@ -432,3 +432,15 @@ class Lng:
         "Только настройки",
         "Settings only"
     )
+    export_descr = (
+        "Выберите вариант экспорта:"
+        "\n- Только настройки — сохраняются настройки приложения, "
+        "\nфильтры, данные серверов, каталоги изображений."
+        "\n- Полный экспорт — дополнительно сохраняются"
+        "\nкэшированные изображения.",
+
+        "Choose an export option:"
+        "\n• Export settings — saves application settings, filter lists, "
+        "server data, and image directory lists."
+        "\n• Full export — also includes cached images."
+    )

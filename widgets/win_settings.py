@@ -203,25 +203,51 @@ class GroupBoxBtn(QGroupBox):
 
 
 class ExportWin(UMainWindow):
+    ww = 300
     def __init__(self):
         super().__init__()
+        self.setWindowTitle(Lng.settings[Cfg.lng_index])
         self.set_always_on_top()
         self.set_close_only()
+        self.setFixedWidth(self.ww)
 
-        h_layout = UHBoxLayout()
-        h_layout.setSpacing(10)
-        self.central_layout.addLayout(h_layout)
+        group = UGroupBox()
+        self.central_layout.addWidget(group)
 
-        left_btn = GroupBoxBtn(Lng.export_settings_only[Cfg.lng_index])
-        h_layout.addWidget(left_btn)
+        export_one = RowArrowWidget(Lng.export_settings_only[Cfg.lng_index])
+        export_one.clicked.connect(
+            lambda: self.export_files(self.get_json_only())
+        )
+        group.layout_.addWidget(export_one)
 
-        right_btn = GroupBoxBtn(Lng.export_full[Cfg.lng_index])
-        right_btn.clicked.connect(
+        export_two = RowArrowWidget(Lng.export_full[Cfg.lng_index])
+        export_two.clicked.connect(
             lambda: self.export_files(self.get_all_files())
         )
-        h_layout.addWidget(right_btn)
-        
+        group.layout_.addWidget(export_two)
+
         self.adjustSize()
+
+        # descr = QLabel(Lng.export_descr[Cfg.lng_index])
+        # self.central_layout.addWidget(descr)
+
+        # h_layout = UHBoxLayout()
+        # h_layout.setSpacing(10)
+        # self.central_layout.addLayout(h_layout)
+
+        # left_btn = GroupBoxBtn(Lng.export_settings_only[Cfg.lng_index])
+        # left_btn.clicked.connect(
+        #     lambda: self.export_files(self.get_json_only())
+        # )
+        # h_layout.addWidget(left_btn)
+
+        # right_btn = GroupBoxBtn(Lng.export_full[Cfg.lng_index])
+        # right_btn.clicked.connect(
+        #     lambda: self.export_files(self.get_all_files())
+        # )
+        # h_layout.addWidget(right_btn)
+        
+        # self.adjustSize()
 
     def export_files(self, files: list[str]):
         Cfg.json_to_app()
@@ -237,6 +263,7 @@ class ExportWin(UMainWindow):
                 rel_path = file.replace(Static.external_files_dir, "")
                 z.write(file, arcname=rel_path)
         Utils.reveal_files([path, ])
+        self.deleteLater()
 
     def get_json_only(self):
         return [
