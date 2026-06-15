@@ -142,11 +142,11 @@ class ExportWin(UMainWindow):
             Static.external_mf,
             Static.external_filters,
             Static.external_servers,
-            Static.external_db,
-            Static.external_hashdir
+            Static.external_db
         )
 
         v_list = VListWidget(self)
+        v_list.itemClicked.connect(self.item_cmd)
         self.central_layout.addWidget(v_list)
 
         for i in urls:
@@ -162,6 +162,9 @@ class ExportWin(UMainWindow):
         btn_layout.addStretch()
 
         btn_ok = SettingsButton(Lng.ok[Cfg.lng_index])
+        btn_ok.clicked.connect(
+            lambda: self.export_files(self.get_urls())
+        )
         btn_layout.addWidget(btn_ok)
 
         btn_cancel = SettingsButton(Lng.cancel[Cfg.lng_index])
@@ -170,22 +173,41 @@ class ExportWin(UMainWindow):
 
         btn_layout.addStretch()
 
-        # group = SettingsGroup()
-        # self.central_layout.addWidget(group)
-
-        # export_one = RowArrowWidget(Lng.export_settings_only[Cfg.lng_index])
-        # export_one.clicked.connect(
-        #     lambda: self.export_files(self.get_json_only())
-        # )
-        # group.layout_.addWidget(export_one)
-
-        # export_two = RowArrowWidget(Lng.export_full[Cfg.lng_index])
-        # export_two.clicked.connect(
-        #     lambda: self.export_files(self.get_all_files())
-        # )
-        # group.layout_.addWidget(export_two)
-
         self.adjustSize()
+
+    def item_cmd(self, item: VListWidgetItem):
+        if item.checkState() == Qt.CheckState.Unchecked:
+            item.setCheckState(Qt.CheckState.Checked)
+        else:
+            item.setCheckState(Qt.CheckState.Unchecked)
+
+    def get_urls(self):
+        list_widget = self.findChild(VListWidget)
+        items = [
+            list_widget.item(i)
+            for i in range(list_widget.count())
+        ]
+        urls = []
+
+        for i in items:
+            i: SettingsListItem
+            if i.checkState() == Qt.CheckState.Checked:
+                urls.append(i.url)
+
+        # если выбрана база данных то экспортируем 
+        # базу данных, кеш изображений, mf.json
+        if Static.external_db in urls:
+            if Static.external_mf not in urls:
+                urls.append(Static.external_mf)
+            stack = [Static.external_hashdir]
+            while stack:
+                current_dir = stack.pop()
+                for x in os.scandir(current_dir):
+                    if x.is_dir():
+                        stack.append(x)
+                    else:
+                        urls.append(x.path)
+        return urls
 
     def export_files(self, files: list[str]):
         Cfg.json_to_app()
@@ -202,25 +224,6 @@ class ExportWin(UMainWindow):
                 z.write(file, arcname=rel_path)
         Utils.reveal_files([path, ])
         self.deleteLater()
-
-    def get_json_only(self):
-        return [
-            i.path
-            for i in os.scandir(Static.external_files_dir)
-            if i.name.endswith(".json")
-        ]
-
-    def get_all_files(self):
-        files = []
-        stack = [Static.external_files_dir, ]
-        while stack:
-            current_dir = stack.pop()
-            for i in os.scandir(current_dir):
-                if i.is_dir():
-                    stack.append(i)
-                else:
-                    files.append(i.path)
-        return files
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
