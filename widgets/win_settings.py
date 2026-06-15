@@ -131,10 +131,9 @@ class ExportWin(UMainWindow):
     hh = 300
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.settings[Cfg.lng_index])
+        self.setWindowTitle(Lng.export_settings[Cfg.lng_index])
         self.set_always_on_top()
         self.set_close_only()
-        # self.setFixedSize(self.ww, self.hh)
         self.central_layout.setSpacing(5)
 
         urls = (
@@ -142,7 +141,8 @@ class ExportWin(UMainWindow):
             Static.external_mf,
             Static.external_filters,
             Static.external_servers,
-            Static.external_db
+            Static.external_db,
+            Static.external_hashdir
         )
 
         v_list = VListWidget(self)
@@ -196,9 +196,7 @@ class ExportWin(UMainWindow):
 
         # если выбрана база данных то экспортируем 
         # базу данных, кеш изображений, mf.json
-        if Static.external_db in urls:
-            if Static.external_mf not in urls:
-                urls.append(Static.external_mf)
+        if Static.external_hashdir in urls:
             stack = [Static.external_hashdir]
             while stack:
                 current_dir = stack.pop()
