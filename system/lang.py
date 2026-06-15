@@ -417,10 +417,18 @@ class Lng:
         "The image directory path is incorrect."
     )
     export_settings = (
-        "Экспортировать настройки",
+        "Экспорт настроек",
         "Export settings"
     )
-    import_setings = (
-        "Импортировать настройки",
+    import_settings = (
+        "Импорт настроек",
         "Import settings"
+    )
+    export_full = (
+        "Полная копия",
+        "Full copy"
+    )
+    export_settings_only = (
+        "Только настройки",
+        "Settings only"
     )

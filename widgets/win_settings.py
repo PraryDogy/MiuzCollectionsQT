@@ -192,6 +192,7 @@ class GroupBoxBtn(QGroupBox):
         # layout_.setContentsMargins(10, 10, 10, 10)
 
         label = QLabel(text)
+        label.setWordWrap(True)
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout_.addWidget(label)
 
@@ -211,10 +212,10 @@ class ExportWin(UMainWindow):
         h_layout.setSpacing(10)
         self.central_layout.addLayout(h_layout)
 
-        left_btn = GroupBoxBtn("Настройки")
+        left_btn = GroupBoxBtn(Lng.export_settings_only[Cfg.lng_index])
         h_layout.addWidget(left_btn)
 
-        right_btn = GroupBoxBtn("Полная копия")
+        right_btn = GroupBoxBtn(Lng.export_full[Cfg.lng_index])
         right_btn.clicked.connect(
             lambda: self.export_files(self.get_all_files())
         )
@@ -306,7 +307,7 @@ class RebootSettings(UGroupBox):
         self.export_wid.clicked.connect(self.export_settings)
         self.layout_.addWidget(self.export_wid)
 
-        self.import_wid = RowArrowWidget(Lng.import_setings[Cfg.lng_index])
+        self.import_wid = RowArrowWidget(Lng.import_settings[Cfg.lng_index])
         self.import_wid.clicked.connect(self.import_settings)
         self.import_wid.hide_sep()
         self.layout_.addWidget(self.import_wid)
