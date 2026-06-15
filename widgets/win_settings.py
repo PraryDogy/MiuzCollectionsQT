@@ -28,9 +28,10 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, SmallBtn, UHBoxLayout, ULineEdit,
-                            UListSpacerItem, UListWidgetItem, UMainWindow,
-                            UMenu, UTextEdit, UVBoxLayout, VListWidget)
+from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, UHBoxLayout,
+                            ULineEdit, UListSpacerItem, UListWidgetItem,
+                            UMainWindow, UMenu, UTextEdit, UVBoxLayout,
+                            VListWidget)
 from .path_widget import PathWidget
 from .win_warn import ConfirmWindow, WarningWindow
 
@@ -58,19 +59,19 @@ class StateWid:
         self.was_changed = False
 
 
-class ULabel(QLabel):
+class SettingsLabel(QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setMinimumWidth(30)
 
 
-class UPushButton(SmallBtn):
+class SettingsButton(SmallBtn):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setFixedWidth(100)
 
 
-class UGroupBox(QGroupBox):
+class SettingsGroup(QGroupBox):
     def __init__(self):
         """
         QGroupBox + self.layout_ (vertical layout)
@@ -82,68 +83,7 @@ class UGroupBox(QGroupBox):
         self.setLayout(self.layout_)
 
 
-class RowArrowWidget(QWidget):
-    hh = 35
-    clicked = pyqtSignal()
-    arrow_svg = "./images/next.svg"
-    warning_svg = "./images/warning.svg"
-    svg_size = 16
-
-    def __init__(self, text: str):
-        super().__init__()
-        self.setFixedHeight(self.hh)
-        self.main_layout = UVBoxLayout(self)
-
-        self.above_wid = QWidget()
-        self.above_layout = UHBoxLayout(self.above_wid)
-        self.above_layout.setSpacing(10)
-
-        self.sep = HSep()
-
-        self.text_widget = QLabel(text)
-
-        self.warning_wid = QSvgWidget()
-        self.warning_wid.setFixedSize(self.svg_size, self.svg_size)
-        self.warning_wid.load(self.warning_svg)
-        self.warning_wid.hide()
-
-        self.arrow_wid = QSvgWidget()
-        self.arrow_wid.setFixedSize(self.svg_size, self.svg_size)
-        self.arrow_wid.load(self.arrow_svg)
-
-        self.main_layout.addWidget(self.above_wid)
-        self.main_layout.addWidget(self.sep)
-
-        self.above_layout.addWidget(self.text_widget)
-        self.above_layout.addWidget(self.warning_wid)
-        self.above_layout.addStretch()
-        self.above_layout.addWidget(self.arrow_wid)
-
-    def replace_arrow_widget(self, widget: QWidget):
-        self.arrow_wid.hide()
-        self.above_layout.addWidget(widget)
-
-    def hide_sep(self):
-        self.sep.hide()
-        spacer = QSpacerItem(0, self.sep.height())
-        self.main_layout.addSpacerItem(spacer)
-
-    def hide_arrow(self):
-        self.arrow_wid.hide()
-
-    def show_warning(self):
-        self.warning_wid.show()
-
-    def hide_warning(self):
-        self.warning_wid.hide()
-
-    def mouseReleaseEvent(self, a0):
-        if a0.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit()
-        return super().mouseReleaseEvent(a0)
-
-
-class TextEditWidget(UGroupBox):
+class SettingsTextEdit(SettingsGroup):
     textChanged = pyqtSignal()
 
     def __init__(self, title: str, placeholder: str, text: Optional[str]):
@@ -151,7 +91,7 @@ class TextEditWidget(UGroupBox):
         self.setAcceptDrops(True)
         self.layout_.setSpacing(10)
 
-        self.title_wid = ULabel(title)
+        self.title_wid = SettingsLabel(title)
         self.title_wid.setWordWrap(True)
         self.layout_.addWidget(self.title_wid)
 
@@ -177,29 +117,7 @@ class TextEditWidget(UGroupBox):
         return super().dragEnterEvent(a0)
     
 
-
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ
-
-
-class GroupBoxBtn(QGroupBox):
-    clicked = pyqtSignal()
-
-    def __init__(self, text: str):
-        super().__init__()
-        self.setFixedSize(110, 50)
-        layout_ = UVBoxLayout(self)
-        # layout_.setSpacing(10)
-        # layout_.setContentsMargins(10, 10, 10, 10)
-
-        label = QLabel(text)
-        label.setWordWrap(True)
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout_.addWidget(label)
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit()
-        return super().mouseReleaseEvent(event)
 
 
 class ExportWin(UMainWindow):
@@ -211,7 +129,7 @@ class ExportWin(UMainWindow):
         self.set_close_only()
         self.setFixedWidth(self.ww)
 
-        group = UGroupBox()
+        group = SettingsGroup()
         self.central_layout.addWidget(group)
 
         export_one = RowArrowWidget(Lng.export_settings_only[Cfg.lng_index])
@@ -227,27 +145,6 @@ class ExportWin(UMainWindow):
         group.layout_.addWidget(export_two)
 
         self.adjustSize()
-
-        # descr = QLabel(Lng.export_descr[Cfg.lng_index])
-        # self.central_layout.addWidget(descr)
-
-        # h_layout = UHBoxLayout()
-        # h_layout.setSpacing(10)
-        # self.central_layout.addLayout(h_layout)
-
-        # left_btn = GroupBoxBtn(Lng.export_settings_only[Cfg.lng_index])
-        # left_btn.clicked.connect(
-        #     lambda: self.export_files(self.get_json_only())
-        # )
-        # h_layout.addWidget(left_btn)
-
-        # right_btn = GroupBoxBtn(Lng.export_full[Cfg.lng_index])
-        # right_btn.clicked.connect(
-        #     lambda: self.export_files(self.get_all_files())
-        # )
-        # h_layout.addWidget(right_btn)
-        
-        # self.adjustSize()
 
     def export_files(self, files: list[str]):
         Cfg.json_to_app()
@@ -290,7 +187,7 @@ class ExportWin(UMainWindow):
         return super().keyPressEvent(a0)
 
 
-class RebootSettings(UGroupBox):
+class RebootSettings(SettingsGroup):
     cfg_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
@@ -307,7 +204,7 @@ class RebootSettings(UGroupBox):
 
         lng_wid = RowArrowWidget(Lng.language_max[Cfg.lng_index])
         self.layout_.addWidget(lng_wid)
-        self.lng_btn = UPushButton(text=Lng.russian[Cfg.lng_index])
+        self.lng_btn = SettingsButton(text=Lng.russian[Cfg.lng_index])
         self.lng_btn.setFixedWidth(109)
         self.lng_btn.setMenu(lng_menu)
         lng_wid.replace_arrow_widget(self.lng_btn)
@@ -510,7 +407,7 @@ class SizesWin(UMainWindow):
         return super().keyPressEvent(a0)
 
 
-class NonRebootSettings(UGroupBox):
+class NonRebootSettings(SettingsGroup):
     def __init__(self):
         super().__init__()
         self.size_items = {}
@@ -585,7 +482,7 @@ class ThemeBtn(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class ThemesWidget(UGroupBox):
+class ThemesWidget(SettingsGroup):
 
     def __init__(self):
         super().__init__()
@@ -620,7 +517,7 @@ class ThemesWidget(UGroupBox):
             ThemeChanger.init()
 
 
-class SelectableLabel(ULabel):
+class SelectableLabel(SettingsLabel):
     txt = "\n".join([
         f"Version {Static.app_ver}",
         "Developed by Evlosh",
@@ -709,7 +606,7 @@ class GeneralSettings(QWidget, StateWid):
 
 
 
-class FiltersWid(UGroupBox, StateWid):
+class FiltersWid(SettingsGroup, StateWid):
     changed = pyqtSignal()
     exts = (
         ".jpg",
@@ -724,7 +621,7 @@ class FiltersWid(UGroupBox, StateWid):
         super().__init__()
         self.filters_clone = filters_clone
 
-        filters_text = ULabel(Lng.filters_descr[Cfg.lng_index])
+        filters_text = SettingsLabel(Lng.filters_descr[Cfg.lng_index])
         filters_text.setWordWrap(True)
         self.layout_.addWidget(filters_text)
 
@@ -773,7 +670,7 @@ class FiltersWid(UGroupBox, StateWid):
 
 # ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ 
 
-class MfStopList(TextEditWidget):
+class MfStopList(SettingsTextEdit):
     def __init__(self, mf: Mf):
         super().__init__(
             title=Lng.ignore_list_descr[Cfg.lng_index],
@@ -800,7 +697,7 @@ class MfStopList(TextEditWidget):
         return super().dropEvent(a0)
 
 
-class MfSave(UGroupBox):
+class MfSave(SettingsGroup):
     clicked_ = pyqtSignal()
     def __init__(self):
         super().__init__()
@@ -826,7 +723,7 @@ class MfSettings(QWidget, StateWid):
         self.setLayout(main_lay)
 
         # Верхний ряд с названием
-        name_group = UGroupBox()
+        name_group = SettingsGroup()
         main_lay.addWidget(name_group)
 
         self.name_wid = RowArrowWidget(f"{Lng.alias[Cfg.lng_index]}: {mf.mf_alias}")
@@ -843,7 +740,7 @@ class MfSettings(QWidget, StateWid):
         self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
-        general_wid = UGroupBox()
+        general_wid = SettingsGroup()
         main_lay.addWidget(general_wid)
 
         reset_wid = RowArrowWidget(Lng.reset_mf[Cfg.lng_index])
@@ -969,7 +866,7 @@ class NewFolder(QWidget, StateWid):
         main_lay.setSpacing(15)
         self.setLayout(main_lay)
 
-        name_wid = UGroupBox()
+        name_wid = SettingsGroup()
         name_wid.layout_.setSpacing(5)
         main_lay.addWidget(name_wid)
 
@@ -990,7 +887,7 @@ class NewFolder(QWidget, StateWid):
         self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
-        save_group = UGroupBox()
+        save_group = SettingsGroup()
         main_lay.addWidget(save_group)
 
         self.save_wid = RowArrowWidget(Lng.save[Cfg.lng_index])
@@ -1170,12 +1067,12 @@ class WinSettings(UMainWindow):
         self.warn_wid.hide()
         btns_lay.addWidget(self.warn_wid)
 
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = SettingsButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.setFixedWidth(95)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn = SettingsButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)

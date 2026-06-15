@@ -16,8 +16,8 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (NotifyWid, UMenu, USubMenu, USvgSqareWidget,
-                            UVBoxLayout, VScrollArea)
+from ._base_widgets import (UMenu, USubMenu, USvgSqareWidget, UVBoxLayout,
+                            VScrollArea)
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,

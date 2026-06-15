@@ -1,19 +1,16 @@
 import os
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import (QCloseEvent, QColor, QContextMenuEvent, QMouseEvent,
-                         QPalette)
+from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QPalette
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
-                             QGraphicsDropShadowEffect, QGroupBox, QHBoxLayout,
+from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QHBoxLayout,
                              QLabel, QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QPushButton, QScrollArea,
-                             QSizePolicy, QTextEdit, QVBoxLayout, QWidget)
+                             QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
 from cfg import Cfg
 from system.lang import Lng
-from system.main_folder import Mf
 from system.utils import Utils
 
 
@@ -303,71 +300,10 @@ class VListWidget(QListWidget):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 
-class NotifyWid(QFrame):
-    blue = "rgb(70, 130, 240)"
-    yy = 10
-
-    def __init__(self, parent: QWidget, text: str, svg_path: str, ms: int = 2000):
-        super().__init__(parent=parent)
-
-        self.ms = ms
-        self.setStyleSheet(
-            f"""
-                background: {self.blue};
-                border-radius: 10px;
-                font-size: 14px;
-                color: black;
-            """
-        )
-
-        # иконка
-        self.icon = QSvgWidget(svg_path, self)
-        self.icon.setFixedSize(20, 20)
-
-        # текст
-        self.label = QLabel(text, self)
-        self.label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
-
-        # лейаут
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(6, 6, 6, 6)
-        layout.setSpacing(6)
-        layout.addWidget(self.icon)
-        layout.addWidget(self.label)
-
-        # тень
-        shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(12)
-        shadow.setXOffset(0)
-        shadow.setYOffset(2)
-        shadow.setColor(QColor(0, 0, 0, 160))
-        self.setGraphicsEffect(shadow)
-
-        self.adjustSize()
-
-    def _show(self):
-        self.adjustSize()
-        pw, ph = self.parent().width(), self.parent().height()
-        x = (pw - self.width()) // 2
-        y = self.yy
-        self.move(x, y)
-        self.show()
-        QTimer.singleShot(self.ms, self._close)
-
-    def _close(self):
-        self.setGraphicsEffect(None)
-        self.hide()
-        self.deleteLater()
-
-
 class SmallBtn(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
-
-        # self.setFixedHeight(20)
-        self.setStyleSheet("""
-        font-size: 11pt;
-        """)
+        self.setStyleSheet("""font-size: 11pt;""")
 
 
 class HSep(QFrame):
@@ -414,3 +350,77 @@ class SelectableLabel(QLabel):
             menu_.addAction(reveal)
 
         menu_.show_menu()
+
+
+class CheckableListItem(UListWidgetItem):
+    hh = 25
+
+    def __init__(self, parent, text = None):
+        super().__init__(parent, self.hh, text)
+        self.setFlags(
+            self.flags() | Qt.ItemFlag.ItemIsUserCheckable
+        )
+        self.setCheckState(
+            Qt.CheckState.Unchecked
+        )
+
+
+class RowArrowWidget(QWidget):
+    hh = 35
+    clicked = pyqtSignal()
+    arrow_svg = "./images/next.svg"
+    warning_svg = "./images/warning.svg"
+    svg_size = 16
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setFixedHeight(self.hh)
+        self.main_layout = UVBoxLayout(self)
+
+        self.above_wid = QWidget()
+        self.above_layout = UHBoxLayout(self.above_wid)
+        self.above_layout.setSpacing(10)
+
+        self.sep = HSep()
+
+        self.text_widget = QLabel(text)
+
+        self.warning_wid = QSvgWidget()
+        self.warning_wid.setFixedSize(self.svg_size, self.svg_size)
+        self.warning_wid.load(self.warning_svg)
+        self.warning_wid.hide()
+
+        self.arrow_wid = QSvgWidget()
+        self.arrow_wid.setFixedSize(self.svg_size, self.svg_size)
+        self.arrow_wid.load(self.arrow_svg)
+
+        self.main_layout.addWidget(self.above_wid)
+        self.main_layout.addWidget(self.sep)
+
+        self.above_layout.addWidget(self.text_widget)
+        self.above_layout.addWidget(self.warning_wid)
+        self.above_layout.addStretch()
+        self.above_layout.addWidget(self.arrow_wid)
+
+    def replace_arrow_widget(self, widget: QWidget):
+        self.arrow_wid.hide()
+        self.above_layout.addWidget(widget)
+
+    def hide_sep(self):
+        self.sep.hide()
+        spacer = QSpacerItem(0, self.sep.height())
+        self.main_layout.addSpacerItem(spacer)
+
+    def hide_arrow(self):
+        self.arrow_wid.hide()
+
+    def show_warning(self):
+        self.warning_wid.show()
+
+    def hide_warning(self):
+        self.warning_wid.hide()
+
+    def mouseReleaseEvent(self, a0):
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        return super().mouseReleaseEvent(a0)

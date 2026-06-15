@@ -5,21 +5,8 @@ from cfg import Cfg, Dynamic
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (SmallBtn, UListSpacerItem, UListWidgetItem,
-                            UMainWindow, VListWidget)
-
-
-class CheckableItem(UListWidgetItem):
-    hh = 25
-
-    def __init__(self, parent, text = None):
-        super().__init__(parent, self.hh, text)
-        self.setFlags(
-            self.flags() | Qt.ItemFlag.ItemIsUserCheckable
-        )
-        self.setCheckState(
-            Qt.CheckState.Unchecked
-        )
+from ._base_widgets import (CheckableListItem, SmallBtn, UListSpacerItem,
+                            UListWidgetItem, UMainWindow, VListWidget)
 
 
 class WinFilters(UMainWindow):
@@ -39,7 +26,7 @@ class WinFilters(UMainWindow):
         self.list_widget.itemClicked.connect(self.item_cmd)
         self.central_layout.addWidget(self.list_widget)
 
-        favs_item = CheckableItem(
+        favs_item = CheckableListItem(
             parent=self.list_widget,
             text=Lng.favorites[Cfg.lng_index]
         )
@@ -47,7 +34,7 @@ class WinFilters(UMainWindow):
         if Dynamic.filter_favs:
             favs_item.setCheckState(Qt.CheckState.Checked)
 
-        folder_item = CheckableItem(
+        folder_item = CheckableListItem(
             parent=self.list_widget,
             text=Lng.only_this_folder[Cfg.lng_index]
         )
@@ -60,7 +47,7 @@ class WinFilters(UMainWindow):
         )
 
         for i in Filters.items:
-            item = CheckableItem(
+            item = CheckableListItem(
                 parent=self.list_widget,
                 text=i
             )
