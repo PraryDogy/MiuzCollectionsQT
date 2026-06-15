@@ -10,7 +10,7 @@ from system.lang import Lng
 from system.servers import Servers
 
 from ._base_widgets import (SmallBtn, ULineEdit, UMainWindow,
-                            UListWidgetItem, UMenu, VListWidget)
+                            VListWidgetItem, UMenu, VListWidget)
 from .win_warn import ConfirmWindow
 
 
@@ -22,7 +22,7 @@ class ServerItem:
     password: str
 
 
-class ServerListItem(UListWidgetItem):
+class ServerListItem(VListWidgetItem):
     def __init__(self, parent: VListWidget, text: str, server_item: ServerItem):
         super().__init__(parent=parent, text=text)
         self.server_item = server_item

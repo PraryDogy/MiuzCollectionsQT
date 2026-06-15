@@ -29,7 +29,7 @@ from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, UHBoxLayout,
-                            ULineEdit, UListSpacerItem, UListWidgetItem,
+                            ULineEdit, VListSpacerItem, VListWidgetItem,
                             UMainWindow, UMenu, UTextEdit, UVBoxLayout,
                             VListWidget)
 from .path_widget import PathWidget
@@ -1013,32 +1013,32 @@ class WinSettings(UMainWindow):
         self.left_menu.setIconSize(QSize(self.svg_size, self.svg_size))
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = UListWidgetItem(
+        main_settings_item = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.general[Cfg.lng_index]
         )
         main_settings_item.setIcon(QIcon(self.svg_settings))
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = UListWidgetItem(
+        filter_settings = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.filters[Cfg.lng_index]
         )
         filter_settings.setIcon(QIcon(self.svg_filters))
         self.left_menu.addItem(filter_settings)
 
-        new_folder = UListWidgetItem(
+        new_folder = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.new_folder[Cfg.lng_index]
         )
         new_folder.setIcon(QIcon(self.svg_new_folder))
         self.left_menu.addItem(new_folder)
         
-        spacer = UListSpacerItem(self.left_menu)
+        spacer = VListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
         for i in Mf.items:
-            new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
+            new_folder = VListWidgetItem(self.left_menu, text=i.mf_alias)
             new_folder.setIcon(QIcon(self.svg_folder))
             self.left_menu.addItem(new_folder)
 
@@ -1117,7 +1117,7 @@ class WinSettings(UMainWindow):
             r_wid.preset_new_folder(self.settings_item.content)
         elif idx > 3:
             self.btns_wid.hide()
-            item: UListWidgetItem = self.left_menu.item(idx)
+            item: VListWidgetItem = self.left_menu.item(idx)
             for mf in self.mf_list_clone:
                 if mf.mf_alias == item.text():
                     r_wid = MfSettings(mf, self.mf_list_clone)
@@ -1129,7 +1129,7 @@ class WinSettings(UMainWindow):
 
     def add_mf(self, mf: Mf):
         self.mf_list_clone.append(mf)
-        item = UListWidgetItem(self.left_menu, text=mf.mf_alias)
+        item = VListWidgetItem(self.left_menu, text=mf.mf_alias)
         item.setIcon(QIcon(self.svg_folder))
         item.mf = mf
         self.left_menu.addItem(item)

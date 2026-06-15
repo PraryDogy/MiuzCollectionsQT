@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UHBoxLayout, UListWidgetItem, UMenu, UVBoxLayout,
+from ._base_widgets import (UHBoxLayout, VListWidgetItem, UMenu, UVBoxLayout,
                             VListWidget)
 
 ITEM_HEIGHT = 25
@@ -224,7 +224,7 @@ class TreeWid(QTreeWidget):
         return super().contextMenuEvent(a0)
 
 
-class MfListItem(UListWidgetItem):
+class MfListItem(VListWidgetItem):
     def __init__(self, parent, text = None):
         super().__init__(parent, ITEM_HEIGHT, text)
         self.mf: Mf = None

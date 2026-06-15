@@ -32,11 +32,7 @@ class UVBoxLayout(QVBoxLayout):
         self.setSpacing(0)
 
 
-class UMenuBase(QMenu):
-    """
-    Базовый QMenu с кастомной окраской разделителей, подстроенной под цвет текста приложения.
-    """
-
+class UMenuStyle(QMenu):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -52,13 +48,15 @@ class UMenuBase(QMenu):
         sep_color = color_data.get(text_color, "#8a8a8a")  # дефолт
 
         # --- стили ---
-        self.setStyleSheet(f"""
-            QMenu::separator {{
-                height: 1px;
-                background: {sep_color};
-                margin: 4px 10px;
-            }}
-        """)
+        self.setStyleSheet(
+            f"""
+                QMenu::separator {{
+                    height: 1px;
+                    background: {sep_color};
+                    margin: 4px 10px;
+                }}
+            """
+        )
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.RightButton:
@@ -67,14 +65,7 @@ class UMenuBase(QMenu):
             super().mouseReleaseEvent(a0)
 
 
-class UMenu(UMenuBase):
-    """
-    Контекстное меню для главного окна.
-    
-    Аргументы:
-        event (QContextMenuEvent): Событие контекстного меню.
-    """
-
+class UMenu(UMenuStyle):
     def __init__(self, event: Optional[QContextMenuEvent]):
         super().__init__()
         self.event_ = event
@@ -86,11 +77,7 @@ class UMenu(UMenuBase):
             self.exec_()
 
 
-class USubMenu(UMenuBase):
-    """
-    Подменю с тем же стилем, что и UMenu.
-    """
-
+class USubMenu(UMenuStyle):
     def __init__(self, title: str, parent: QMenu):
         super().__init__(title, parent)
 
@@ -254,23 +241,6 @@ class UMainWidget(WindowMixin, QWidget):
         self.register_window()
 
 
-class UListWidgetItem(QListWidgetItem):
-    def __init__(self, parent: QListWidget, height: int = 30, text: str | None = None):
-        super().__init__(parent)
-        self.setSizeHint(QSize(parent.width(), height))
-        if text:
-            self.setText(text)
-
-
-class UListSpacerItem(QListWidgetItem):
-    def __init__(self, parent: QListWidget, height: int = 15):
-        super().__init__()
-        self.setSizeHint(QSize(parent.width(), height))
-        self.setFlags(
-            Qt.ItemFlag.NoItemFlags
-        )
-
-
 class VScrollArea(QScrollArea):
     """QScrollArea с вертикальной прокруткой, без горизонтальной и без границ."""
 
@@ -287,6 +257,31 @@ class VScrollArea(QScrollArea):
 
         # --- Убираем границы ---
         self.setStyleSheet("QScrollArea { border: none; }")
+
+
+class VListWidgetItem(QListWidgetItem):
+    def __init__(self, parent: QListWidget, height: int = 30, text: str | None = None):
+        super().__init__(parent)
+        self.setSizeHint(QSize(parent.width(), height))
+        if text:
+            self.setText(text)
+
+    def set_checkable(self):
+        self.setFlags(
+            self.flags() | Qt.ItemFlag.ItemIsUserCheckable
+        )
+        self.setCheckState(
+            Qt.CheckState.Unchecked
+        )
+
+
+class VListSpacerItem(QListWidgetItem):
+    def __init__(self, parent: QListWidget, height: int = 15):
+        super().__init__()
+        self.setSizeHint(QSize(parent.width(), height))
+        self.setFlags(
+            Qt.ItemFlag.NoItemFlags
+        )
 
 
 class VListWidget(QListWidget):
@@ -350,19 +345,6 @@ class SelectableLabel(QLabel):
             menu_.addAction(reveal)
 
         menu_.show_menu()
-
-
-class CheckableListItem(UListWidgetItem):
-    hh = 25
-
-    def __init__(self, parent, text = None):
-        super().__init__(parent, self.hh, text)
-        self.setFlags(
-            self.flags() | Qt.ItemFlag.ItemIsUserCheckable
-        )
-        self.setCheckState(
-            Qt.CheckState.Unchecked
-        )
 
 
 class RowArrowWidget(QWidget):

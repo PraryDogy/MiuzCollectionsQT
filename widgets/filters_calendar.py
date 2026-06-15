@@ -11,12 +11,12 @@ from cfg import Cfg, Dynamic
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (HSep, SmallBtn, UHBoxLayout, UListSpacerItem,
-                            UListWidgetItem, UMainWindow, UVBoxLayout,
+from ._base_widgets import (HSep, SmallBtn, UHBoxLayout, VListSpacerItem,
+                            VListWidgetItem, UMainWindow, UVBoxLayout,
                             VListWidget)
 
 
-class CheckableItem(UListWidgetItem):
+class CheckableItem(VListWidgetItem):
     hh = 25
 
     def __init__(self, parent, text = None):
@@ -61,7 +61,7 @@ class WinFilters(QWidget):
             folder_item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.addItem(
-            UListSpacerItem(parent=self.list_widget)
+            VListSpacerItem(parent=self.list_widget)
         )
 
         for i in Filters.items:
@@ -88,8 +88,8 @@ class WinFilters(QWidget):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-    def item_cmd(self, item: UListWidgetItem):
-        if isinstance(item, UListSpacerItem):
+    def item_cmd(self, item: VListWidgetItem):
+        if isinstance(item, VListSpacerItem):
             return
         if item.text() == Lng.favorites[Cfg.lng_index]:
             if Dynamic.filter_favs:

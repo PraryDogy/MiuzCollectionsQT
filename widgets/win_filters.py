@@ -5,8 +5,8 @@ from cfg import Cfg, Dynamic
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (CheckableListItem, SmallBtn, UListSpacerItem,
-                            UListWidgetItem, UMainWindow, VListWidget)
+from ._base_widgets import (SmallBtn, UMainWindow, VListSpacerItem,
+                            VListWidget, VListWidgetItem)
 
 
 class WinFilters(UMainWindow):
@@ -26,31 +26,34 @@ class WinFilters(UMainWindow):
         self.list_widget.itemClicked.connect(self.item_cmd)
         self.central_layout.addWidget(self.list_widget)
 
-        favs_item = CheckableListItem(
+        favs_item = VListWidgetItem(
             parent=self.list_widget,
             text=Lng.favorites[Cfg.lng_index]
         )
+        favs_item.set_checkable()
         self.list_widget.addItem(favs_item)
         if Dynamic.filter_favs:
             favs_item.setCheckState(Qt.CheckState.Checked)
 
-        folder_item = CheckableListItem(
+        folder_item = VListWidgetItem(
             parent=self.list_widget,
             text=Lng.only_this_folder[Cfg.lng_index]
         )
+        folder_item.set_checkable()
         self.list_widget.addItem(folder_item)
         if Dynamic.filter_only_folder:
             folder_item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.addItem(
-            UListSpacerItem(parent=self.list_widget)
+            VListSpacerItem(parent=self.list_widget)
         )
 
         for i in Filters.items:
-            item = CheckableListItem(
+            item = VListWidgetItem(
                 parent=self.list_widget,
                 text=i
             )
+            item.set_checkable()
             self.list_widget.addItem(item)
             if i in Dynamic.filters_enabled:
                 item.setCheckState(Qt.CheckState.Checked)
@@ -70,8 +73,8 @@ class WinFilters(UMainWindow):
             alignment=Qt.AlignmentFlag.AlignCenter
         )
 
-    def item_cmd(self, item: UListWidgetItem):
-        if isinstance(item, UListSpacerItem):
+    def item_cmd(self, item: VListWidgetItem):
+        if isinstance(item, VListSpacerItem):
             return
         if item.text() == Lng.favorites[Cfg.lng_index]:
             if Dynamic.filter_favs:
