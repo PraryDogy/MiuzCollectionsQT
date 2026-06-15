@@ -7,13 +7,13 @@ import sys
 import zipfile
 from dataclasses import dataclass
 
-from PyQt5.QtCore import QSize, Qt, QTimer, QUrl, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QContextMenuEvent, QIcon
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
-                             QGroupBox, QLabel, QLineEdit, QSpacerItem,
-                             QSpinBox, QSplitter, QTableWidget,
-                             QTableWidgetItem, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QGroupBox,
+                             QLabel, QLineEdit, QSpacerItem, QSpinBox,
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QWidget)
 from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes
@@ -29,9 +29,9 @@ from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, UHBoxLayout,
-                            ULineEdit, VListSpacerItem, VListWidgetItem,
-                            UMainWindow, UMenu, UTextEdit, UVBoxLayout,
-                            VListWidget)
+                            ULineEdit, UMainWindow, UMenu, UTextEdit,
+                            UVBoxLayout, VListSpacerItem, VListWidget,
+                            VListWidgetItem)
 from .path_widget import PathWidget
 from .win_warn import ConfirmWindow, WarningWindow
 
@@ -117,32 +117,73 @@ class SettingsTextEdit(SettingsGroup):
         return super().dragEnterEvent(a0)
     
 
+class SettingsListItem(VListWidgetItem):
+    def __init__(self, url: str, parent, height = 30, text = None):
+        super().__init__(parent, height, text)
+        self.url = url
+    
+
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ
 
 
 class ExportWin(UMainWindow):
-    ww = 300
+    ww = 250
+    hh = 300
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.settings[Cfg.lng_index])
         self.set_always_on_top()
         self.set_close_only()
-        self.setFixedWidth(self.ww)
+        # self.setFixedSize(self.ww, self.hh)
+        self.central_layout.setSpacing(5)
 
-        group = SettingsGroup()
-        self.central_layout.addWidget(group)
-
-        export_one = RowArrowWidget(Lng.export_settings_only[Cfg.lng_index])
-        export_one.clicked.connect(
-            lambda: self.export_files(self.get_json_only())
+        urls = (
+            Static.external_cfg,
+            Static.external_mf,
+            Static.external_filters,
+            Static.external_servers,
+            Static.external_db,
+            Static.external_hashdir
         )
-        group.layout_.addWidget(export_one)
 
-        export_two = RowArrowWidget(Lng.export_full[Cfg.lng_index])
-        export_two.clicked.connect(
-            lambda: self.export_files(self.get_all_files())
-        )
-        group.layout_.addWidget(export_two)
+        v_list = VListWidget(self)
+        self.central_layout.addWidget(v_list)
+
+        for i in urls:
+            text = os.path.basename(i)
+            item = SettingsListItem(i, v_list, text=text)
+            item.set_checkable()
+            v_list.addItem(item)
+
+        btn_layout = UHBoxLayout()
+        btn_layout.setSpacing(10)
+        self.central_layout.addLayout(btn_layout)
+
+        btn_layout.addStretch()
+
+        btn_ok = SettingsButton(Lng.ok[Cfg.lng_index])
+        btn_layout.addWidget(btn_ok)
+
+        btn_cancel = SettingsButton(Lng.cancel[Cfg.lng_index])
+        btn_cancel.clicked.connect(self.deleteLater)
+        btn_layout.addWidget(btn_cancel)
+
+        btn_layout.addStretch()
+
+        # group = SettingsGroup()
+        # self.central_layout.addWidget(group)
+
+        # export_one = RowArrowWidget(Lng.export_settings_only[Cfg.lng_index])
+        # export_one.clicked.connect(
+        #     lambda: self.export_files(self.get_json_only())
+        # )
+        # group.layout_.addWidget(export_one)
+
+        # export_two = RowArrowWidget(Lng.export_full[Cfg.lng_index])
+        # export_two.clicked.connect(
+        #     lambda: self.export_files(self.get_all_files())
+        # )
+        # group.layout_.addWidget(export_two)
 
         self.adjustSize()
 
@@ -264,25 +305,6 @@ class RebootSettings(SettingsGroup):
         self.export_win = ExportWin()
         self.export_win.center_to_parent(self.window())
         self.export_win.show()
-        return
-        downloads = os.path.expanduser("~/Downloads")
-        url = QFileDialog.getExistingDirectory(directory=downloads)
-        if url:
-            Cfg.json_to_app()
-            Mf.json_to_app()
-            Servers.json_to_app()
-            Filters.json_to_app()
-            files = [
-                i.path
-                for i in os.scandir(Static.external_files_dir)
-                if i.name.endswith(".json")
-            ]
-            filename = f"{Static.app_name}Settings.zip"
-            path = os.path.join(downloads, filename)
-            with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-                for file in files:
-                    z.write(file, arcname=os.path.basename(file))
-            Utils.reveal_files([path, ])
 
     def lang_action_cmd(self, value: int):
         self.cfg_data.lng_index = value
