@@ -208,7 +208,14 @@ class WinMain(UMainWindow):
         return wrapper
     
     def open_img_search(self):
+
+        def finished(*args):
+            self.load_st_grid()
+            Dynamic.thumb_path_set.clear()
+            self.win_img_search.deleteLater()
+
         self.win_img_search = WinImgSearch()
+        self.win_img_search.finished_.connect(finished)
         self.win_img_search.center_to_parent(self)
         self.win_img_search.show()
     

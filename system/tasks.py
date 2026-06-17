@@ -182,6 +182,11 @@ class DbImagesLoader(URunnable):
             )
             stmt = stmt.where(Thumbs.mod > start, Thumbs.mod < end)
 
+# ТУТ ТУ Т УТУТТУТУТУТу
+        if Dynamic.thumb_path_set:
+            # lst = list(Dynamic.thumb_names_list)
+            stmt = stmt.where(Thumbs.rel_thumb_path.in_(Dynamic.thumb_path_set))
+
         return stmt
 
     def combine_dates(
@@ -373,7 +378,7 @@ class ImageSearcher(URunnable):
         self.hash_dir = hash_dir if hash_dir else Static.external_hashdir
         self.max_side = max_side
         self.sift = cv2.SIFT_create()
-        self.thumb_names_list: set[str] = set()
+        self.thumb_path_set: set[str] = set()
         
         # Предварительная подготовка эталона при создании объекта
         self.processed_src = self._prepare_source(src_img)
@@ -447,8 +452,9 @@ class ImageSearcher(URunnable):
                         
                         # Условие соответствия OR
                         if sift_score > min_sift or color_score > min_color:
-                            self.thumb_names_list.add(x.name)
+                            rel_path = Utils.get_rel_thumb_path(x.path)
+                            self.thumb_path_set.add(rel_path)
 
     def task(self):
         self.start(min_sift=70, min_color=60)
-        self.sigs.finished_.emit(self.thumb_names_list)
+        self.sigs.finished_.emit(self.thumb_path_set)

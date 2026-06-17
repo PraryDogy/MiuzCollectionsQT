@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QPushButton
 
 from system.shared_utils import ImgUtils
@@ -12,6 +12,9 @@ from ._base_widgets import UMainWindow
 
 
 class WinImgSearch(UMainWindow):
+    finished_ = pyqtSignal(set)
+
+
     def __init__(self):
         super().__init__()
         self.set_always_on_top()
@@ -39,7 +42,8 @@ class WinImgSearch(UMainWindow):
         for i in thumb_names_list:
             print(i)
 
-        Dynamic.thumb_names_list = thumb_names_list
+        Dynamic.thumb_path_set = thumb_names_list
+        self.finished_.emit(thumb_names_list)
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
@@ -56,6 +60,14 @@ class WinImgSearch(UMainWindow):
                 self.img_label.setPixmap(QPixmap.fromImage(qimage))
         return super().dropEvent(a0)
     
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+    
 # чтение изображения в фоне
 # решить где ресайз
 # отправлять в таск только путь?
+# как прервать задачу закрытием
+# когда очищать список динамик
+# при закрытии очищать и при отображении сетки очищать
