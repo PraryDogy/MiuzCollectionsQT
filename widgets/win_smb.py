@@ -32,7 +32,7 @@ class SuperWarnWindow(UMainWindow):
         self.set_always_on_top()
         self.set_close_only()
         above_layout = QHBoxLayout()
-        above_layout.setSpacing(15)
+        above_layout.setSpacing(5)
         above_layout.setContentsMargins(0, 0, 15, 0)
         self.central_layout.setSpacing(10)
         self.central_layout.addLayout(above_layout)
