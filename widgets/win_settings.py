@@ -34,6 +34,7 @@ from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, UHBoxLayout,
                             VListWidgetItem)
 from .path_widget import PathWidget
 from .win_warn import ConfirmWindow, WarningWindow
+from .win_smb import SuperWarnWindow
 
 
 def restart_app():
@@ -726,9 +727,12 @@ class MfSave(SettingsGroup):
         super().__init__()
 
         self.save_wid = RowArrowWidget(Lng.save[Cfg.lng_index])
-        self.save_wid.clicked.connect(self.clicked.emit)
         self.save_wid.hide_sep()
         self.layout_.addWidget(self.save_wid)
+
+    def mouseReleaseEvent(self, event):
+        self.clicked_.emit()
+        return super().mouseReleaseEvent(event)
 
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ 
 
@@ -858,11 +862,16 @@ class MfSettings(QWidget, StateWid):
         if not paths:
             show_warn(Lng.select_folder_path[Cfg.lng_index])
             return
+        
+        super_win = SuperWarnWindow()
+        super_win.ok_clicked.connect(fin)
+        super_win.center_to_parent(self.window())
+        super_win.show()
 
-        win = ConfirmWindow(Lng.save_text_long[Cfg.lng_index])
-        win.ok_clicked.connect(fin)
-        win.center_to_parent(self.window())
-        win.show()
+        # win = ConfirmWindow(Lng.save_text_long[Cfg.lng_index])
+        # win.ok_clicked.connect(fin)
+        # win.center_to_parent(self.window())
+        # win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
