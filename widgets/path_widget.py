@@ -73,6 +73,8 @@ class PathWidget(QGroupBox):
         h_lay.addStretch()
 
     def check_mf_temp_path(self):
+        return os.path.exists(self.mf_temp_path)
+        # self.mf_temp_path
         with Dbase.main_engine.connect() as conn:
             stmt = (
                 sqlalchemy.select(Dirs.rel_dir_path)

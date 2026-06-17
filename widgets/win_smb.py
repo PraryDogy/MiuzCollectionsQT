@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
 
@@ -8,6 +8,58 @@ from system.main_folder import Mf
 
 from ._base_widgets import UMainWindow
 from .path_widget import PathWidget
+from .win_warn import ConfirmWindow
+
+
+class SuperWarnWindow(UMainWindow):
+    ok_clicked = pyqtSignal()
+    svg = "./images/super_warning.svg"
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(Lng.attention[Cfg.lng_index])
+        self.set_always_on_top()
+        self.set_close_only()
+        above_layout = QHBoxLayout()
+        above_layout.setSpacing(15)
+        above_layout.setContentsMargins(0, 0, 15, 0)
+        self.central_layout.addLayout(above_layout)
+
+        svg_widget = QSvgWidget()
+        svg_widget.load(self.svg)
+        svg_widget.setFixedSize(50, 50)
+        above_layout.addWidget(svg_widget)
+
+        lines = (
+            "Вы уверены, что правильно указали путь?",
+            "Неправильный путь приведет к удалению ",
+            "всего каталога."
+        )
+        question = QLabel("\n".join(lines))
+        above_layout.addWidget(question)
+
+        self.adjustSize()
+
+        btns_lay = QHBoxLayout()
+        btns_lay.setContentsMargins(0, 0, 0, 0)
+        btns_lay.setSpacing(10)
+        self.central_layout.addLayout(btns_lay)
+
+        btns_lay.addStretch()
+        self.ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn.clicked.connect(self.ok_clicked.emit)
+        self.ok_btn.setFixedWidth(90)
+        btns_lay.addWidget(self.ok_btn)
+        cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn.clicked.connect(self.deleteLater)
+        cancel_btn.setFixedWidth(90)
+        btns_lay.addWidget(cancel_btn)
+        btns_lay.addStretch()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
 
 
 class WarnWidget(QWidget):
@@ -60,7 +112,7 @@ class WinSmb(UMainWindow):
 
         btns_lay.addStretch()
         self.ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
-        self.ok_btn.clicked.connect(self.deleteLater)
+        self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(90)
         btns_lay.addWidget(self.ok_btn)
         cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
@@ -71,14 +123,27 @@ class WinSmb(UMainWindow):
 
         self.adjustSize()
 
+    def ok_cmd(self):
+
+        def ok_clicked():
+            if self.path_widget.mf_temp_path:
+                self.mf.mf_paths = [self.path_widget.mf_temp_path, ]
+                self.mf.mf_current_path = self.path_widget.mf_temp_path
+                Mf.write_json_data()
+
+            self.super_win.deleteLater()
+            self.deleteLater()
+
+        if self.path_widget.mf_temp_path:
+            self.super_win = SuperWarnWindow()
+            self.super_win.ok_clicked.connect(ok_clicked)
+            self.super_win.center_to_parent(self)
+            self.super_win.show()
+
     def keyPressEvent(self, a0):
-        if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+        if a0.key() in (Qt.Key.Key_Escape, ):
             self.deleteLater()
         return super().keyPressEvent(a0)
 
     def deleteLater(self):
-        if self.path_widget.mf_temp_path:
-            self.mf.mf_paths = [self.path_widget.mf_temp_path, ]
-            self.mf.mf_current_path = self.path_widget.mf_temp_path
-            Mf.write_json_data()
         return super().deleteLater()

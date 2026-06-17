@@ -187,6 +187,12 @@ class WinMain(UMainWindow):
             print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
 
+
+        # from .win_smb import SuperWarnWindow
+        # self.super_window = SuperWarnWindow()
+        # self.super_window.center_to_parent(self)
+        # QTimer.singleShot(100, self.super_window.show)
+
     @staticmethod
     def with_conn(fn):
         def wrapper(self: "WinMain", mf: Mf, *args):
