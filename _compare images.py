@@ -1,56 +1,75 @@
-import os
-
 import cv2
-import numpy as np
-
+import os
 from cfg import Static
-from system.shared_utils import ImgUtils
-from system.utils import Utils
 
+def get_color_histogram(image):
+    """Вычисляет нормализованную гистограмму в пространстве HSV."""
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    # Считаем по двум каналам: Hue (цвет) и Saturation (насыщенность)
+    hist = cv2.calcHist([hsv], [0, 1], None, [50, 60], [0, 180, 0, 256])
+    cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+    return hist
 
-def get_central_crop(img, size=210):
-    h, w = img.shape[:2]
-    actual_size = min(h, w, size)
-    start_x = (w - actual_size) // 2
-    start_y = (h - actual_size) // 2
-    crop = img[start_y:start_y+actual_size, start_x:start_x+actual_size]
-    return crop
+def compare_images_features(sift, des_src, thumbnail):
+    """Проверка по ключевым точкам (SIFT)."""
+    gray_thumbnail = cv2.cvtColor(thumbnail, cv2.COLOR_BGR2GRAY)
+    kp_thumb, des_thumb = sift.detectAndCompute(gray_thumbnail, None)
 
-def compare_images_smart(template_array, scene_array):
+    if des_src is None or des_thumb is None or len(des_thumb) < 10:
+        return 0
 
-    # 1. Получаем размеры
-    h_t, w_t = template_array.shape[:2]
-    h_s, w_s = scene_array.shape[:2]
+    index_params = dict(algorithm=1, trees=5)
+    search_params = dict(checks=50)
+    flann = cv2.FlannBasedMatcher(index_params, search_params)
+    
+    matches = flann.knnMatch(des_thumb, des_src, k=2)
 
-    # 2. Если сцена меньше шаблона, уменьшаем шаблон
-    # (matchTemplate требует, чтобы шаблон был <= сцены)
-    if h_s < h_t or w_s < w_t:
-        # Вычисляем коэффициент масштабирования, чтобы вписаться в меньшую сторону сцены
-        scale = min(w_s / w_t, h_s / h_t)
-        new_w = int(w_t * scale)
-        new_h = int(h_t * scale)
-        # Уменьшаем шаблон
-        template_array = cv2.resize(template_array, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    good_matches = []
+    for m, n in matches:
+        if m.distance < 0.7 * n.distance:
+            good_matches.append(m)
 
-    gray_template = cv2.cvtColor(template_array, cv2.COLOR_BGR2GRAY)
-    gray_scene = cv2.cvtColor(scene_array, cv2.COLOR_BGR2GRAY)
-    res = cv2.matchTemplate(gray_scene, gray_template, cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-    score = int(max_val * 100)
-    return {"score": score, "result_image": scene_array}
+    score = min(int((len(good_matches) / len(kp_thumb)) * 100), 100) 
+    return score
 
+# --- Подготовка эталона ---
+src_img_path = '/Users/evlosh/Desktop/R1-01777-0006 А4.jpg'
+src_img = cv2.imread(src_img_path)
 
-template = '/Users/Loshkarev/Desktop/template 4.jpg'
-template_array = cv2.imread(template)
-template_array = ImgUtils.resize(template_array, Static.max_img_size)
-template_array = get_central_crop(template_array, 190)
+h_src, w_src = src_img.shape[:2]
+max_side = 500
+if max(h_src, w_src) > max_side:
+    scale = max_side / max(h_src, w_src)
+    src_img = cv2.resize(src_img, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+
+# Извлекаем признаки из исходника один раз ДО цикла
+src_hist = get_color_histogram(src_img)
+
+sift = cv2.SIFT_create()
+gray_src = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
+kp_src, des_src = sift.detectAndCompute(gray_src, None)
+
+# --- Цикл сканирования директорий ---
 for i in os.scandir(Static.external_hashdir):
-    if not i.is_dir():
-        continue
-    for img in os.scandir(i.path):
-        scene_array = cv2.imread(img.path)
-        result = compare_images_smart(template_array, scene_array)
-        if result["score"] > 60:
-            cv2.imshow("111", result["result_image"])
-            cv2.waitKey(0)
-            print(result["score"])
+    if i.is_dir():
+        for x in os.scandir(i.path):
+            if x.name.endswith(".jpg"):
+                thumbnail = cv2.imread(x.path)
+                if thumbnail is None:
+                    continue
+                
+                # 1. Проверка по цвету
+                thumb_hist = get_color_histogram(thumbnail)
+                hist_similarity = cv2.compareHist(src_hist, thumb_hist, cv2.HISTCMP_CORREL)
+                color_score = int(hist_similarity * 100)
+                
+                # 2. Проверка по точкам
+                sift_score = compare_images_features(sift, des_src, thumbnail)
+                
+                # Условие: картинка подходит, если совпали И цвета, И геометрия
+                if sift_score > 70 or color_score > 60:
+                    print(f"🔥 Найдено! {x.name} | Цвет: {color_score}% | Точки: {sift_score}%")
+                    cv2.imshow("1", thumbnail)
+                    cv2.waitKey(0)
+
+cv2.destroyAllWindows()
