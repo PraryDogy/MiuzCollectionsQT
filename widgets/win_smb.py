@@ -1,14 +1,24 @@
+import os
+import sys
+
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QLabel, QPushButton,
+                             QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
+from system.multiprocess import ProcessWorker
 
 from ._base_widgets import UMainWindow
 from .path_widget import PathWidget
-from .win_warn import ConfirmWindow
+
+
+def restart_app():
+    ProcessWorker.stop_all()
+    QApplication.quit()
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 class SuperWarnWindow(UMainWindow):
@@ -134,8 +144,9 @@ class WinSmb(UMainWindow):
                 self.mf.mf_paths = [self.path_widget.mf_temp_path, ]
                 self.mf.mf_current_path = self.path_widget.mf_temp_path
                 Mf.write_json_data()
-                self.super_win.deleteLater()
-                self.deleteLater()
+                # self.super_win.deleteLater()
+                # self.deleteLater()
+                restart_app()
 
         if self.path_widget.mf_temp_path:
             self.super_win = SuperWarnWindow()
