@@ -18,6 +18,7 @@ class SuperWarnWindow(UMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
+        self.setFixedWidth(360)
         self.set_always_on_top()
         self.set_close_only()
         above_layout = QHBoxLayout()
@@ -32,10 +33,10 @@ class SuperWarnWindow(UMainWindow):
 
         lines = (
             "Вы уверены, что правильно указали путь?",
-            "Неправильный путь приведет к удалению ",
-            "всего каталога."
+            "Неправильный путь приведет к удалению всего каталога."
         )
         question = QLabel("\n".join(lines))
+        question.setWordWrap(True)
         above_layout.addWidget(question)
 
         self.adjustSize()
@@ -130,9 +131,8 @@ class WinSmb(UMainWindow):
                 self.mf.mf_paths = [self.path_widget.mf_temp_path, ]
                 self.mf.mf_current_path = self.path_widget.mf_temp_path
                 Mf.write_json_data()
-
-            self.super_win.deleteLater()
-            self.deleteLater()
+                self.super_win.deleteLater()
+                self.deleteLater()
 
         if self.path_widget.mf_temp_path:
             self.super_win = SuperWarnWindow()
