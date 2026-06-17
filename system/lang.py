@@ -444,3 +444,9 @@ class Lng:
         "server data, and image directory lists."
         "\n• Full export — also includes cached images."
     )
+    confirm_mf_path = (
+        "Вы уверены, что правильно указали путь?"
+        "\nНеправильный путь приведет к удалению всего каталога.",
+        "Are you sure you specified the path correctly?"
+        "\nAn incorrect path will result in the deletion of the entire directory.",
+    )

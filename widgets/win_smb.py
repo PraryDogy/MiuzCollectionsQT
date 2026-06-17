@@ -14,32 +14,32 @@ from .win_warn import ConfirmWindow
 class SuperWarnWindow(UMainWindow):
     ok_clicked = pyqtSignal()
     svg = "./images/super_warning.svg"
+    svg_size = 60
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
-        self.setFixedWidth(360)
         self.set_always_on_top()
         self.set_close_only()
         above_layout = QHBoxLayout()
         above_layout.setSpacing(15)
         above_layout.setContentsMargins(0, 0, 15, 0)
+        self.central_layout.setSpacing(10)
         self.central_layout.addLayout(above_layout)
 
         svg_widget = QSvgWidget()
         svg_widget.load(self.svg)
-        svg_widget.setFixedSize(50, 50)
+        svg_widget.setFixedSize(self.svg_size, self.svg_size)
         above_layout.addWidget(svg_widget)
 
-        lines = (
-            "Вы уверены, что правильно указали путь?",
-            "Неправильный путь приведет к удалению всего каталога."
-        )
-        question = QLabel("\n".join(lines))
+        question = QLabel(Lng.confirm_mf_path[Cfg.lng_index])
+        if Cfg.lng_index == 0:
+            ww = 270
+        else:
+            ww = 260
+        question.setFixedWidth(ww)
         question.setWordWrap(True)
         above_layout.addWidget(question)
-
-        self.adjustSize()
 
         btns_lay = QHBoxLayout()
         btns_lay.setContentsMargins(0, 0, 0, 0)
@@ -56,6 +56,9 @@ class SuperWarnWindow(UMainWindow):
         cancel_btn.setFixedWidth(90)
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()
+
+        self.adjustSize()
+
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
