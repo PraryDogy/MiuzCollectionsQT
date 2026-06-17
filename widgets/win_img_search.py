@@ -14,7 +14,7 @@ class WinImgSearch(UMainWindow):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.acceptDrops(True)
+        self.setAcceptDrops(True)
         self.setFixedSize(500, 500)
 
         self.img_label = QLabel()

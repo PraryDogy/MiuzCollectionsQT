@@ -226,6 +226,7 @@ class BarTop(QWidget):
     reload_thumbnails = pyqtSignal()
     history_press = pyqtSignal()
     level_up = pyqtSignal()
+    open_img_search = pyqtSignal()
     text_height = 53
     text_spacing = 15
 
@@ -265,6 +266,7 @@ class BarTop(QWidget):
         # --- Виджет поиска ---
         self.search_wid = WidSearch()
         self.search_wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
+        self.search_wid.open_img_search.connect(lambda: self.open_img_search.emit())
         self.h_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
     def mouseReleaseEvent(self, a0):

@@ -37,7 +37,7 @@ from .win_settings import WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
 from .win_warn import ConfirmWindow, WarningWindow
-
+from .win_img_search import WinImgSearch
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
@@ -139,6 +139,9 @@ class WinMain(UMainWindow):
         self.bar_top.open_filters_win.connect(
             lambda: self.open_filters_win()
         )
+        self.bar_top.open_img_search.connect(
+            lambda: self.open_img_search()
+        )
         self.right_layout.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -203,6 +206,11 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(mf)
         return wrapper
+    
+    def open_img_search(self):
+        self.win_img_search = WinImgSearch()
+        self.win_img_search.center_to_parent(self)
+        self.win_img_search.show()
     
     def show_in_app(self, rel_path: str):
         current_dir = os.path.dirname(rel_path)

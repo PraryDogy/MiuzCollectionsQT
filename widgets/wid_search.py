@@ -35,6 +35,7 @@ class ClearBtn(QSvgWidget):
 
 class WidSearch(ULineEdit):
     reload_thumbnails = pyqtSignal()
+    open_img_search = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -74,3 +75,8 @@ class WidSearch(ULineEdit):
         if a0.key() == Qt.Key.Key_Escape:
             self.clearFocus()
         return super().keyPressEvent(a0)
+    
+    
+    def mouseDoubleClickEvent(self, a0):
+        self.open_img_search.emit()
+        return super().mouseDoubleClickEvent(a0)
