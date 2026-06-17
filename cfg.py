@@ -67,6 +67,7 @@ class Dynamic:
     filter_favs: bool = False
     filter_only_folder: bool = False
     history: list[str] = []
+    thumb_names_list: list[str] = []
 
 
 class Cfg:
