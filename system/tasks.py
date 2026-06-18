@@ -387,6 +387,12 @@ class ImageSearcher(URunnable):
         gray_src = cv2.cvtColor(self.processed_src, cv2.COLOR_BGR2GRAY)
         _, self.des_src = self.sift.detectAndCompute(gray_src, None)
 
+        self.current_count = 0
+        self.stop_flag = False
+
+    def stop_task(self):
+        self.stop_flag = True
+
     def _get_color_histogram(self, image):
         """Вычисляет нормализованную гистограмму в пространстве HSV."""
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -437,8 +443,14 @@ class ImageSearcher(URunnable):
         for i in os.scandir(self.hash_dir):
             if i.is_dir():
                 for x in os.scandir(i.path):
+                    
+                    if self.stop_flag:
+                        print("image search canceled")
+                        return
+
                     if x.name.endswith(".jpg"):
                         thumbnail = cv2.imread(x.path)
+                        self.current_count += 1
                         if thumbnail is None:
                             continue
                         
@@ -449,12 +461,18 @@ class ImageSearcher(URunnable):
                         
                         # 2. Проверка по точкам
                         sift_score = self._compare_sift(thumbnail)
+
+                        name = "925a1924ed9676297908706adc063791"
+                        if name in x.name:
+                            print("вот оно", "точки", sift_score, "цвет", color_score)
                         
                         # Условие соответствия OR
                         if sift_score > min_sift or color_score > min_color:
                             rel_path = Utils.get_rel_thumb_path(x.path)
                             self.thumb_path_set.add(rel_path)
 
+                            print("другие фотки", "точки", sift_score, "цвет", color_score)
+
     def task(self):
-        self.start(min_sift=70, min_color=60)
+        self.start(min_sift=60, min_color=80)
         self.sigs.finished_.emit(self.thumb_path_set)

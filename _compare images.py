@@ -10,7 +10,8 @@ class ImageSearcher:
         :param hash_dir: Путь к базовой директории с подпапками (по умолчанию из Static)
         :param max_side: Максимальный размер стороны для масштабирования исходника
         """
-        self.hash_dir = hash_dir if hash_dir else Static.external_hashdir
+        # self.hash_dir = hash_dir if hash_dir else Static.external_hashdir
+        self.hash_dir = "/Users/Loshkarev/Desktop/hashdir"
         self.max_side = max_side
         self.sift = cv2.SIFT_create()
         
@@ -93,6 +94,6 @@ class ImageSearcher:
         cv2.destroyAllWindows()
 
 
-img_array = cv2.imread("/Users/evlosh/Desktop/R1-01777-0006 А4.jpg")
+img_array = cv2.imread("/Users/Loshkarev/Desktop/R01-WED-00112-MIX-или-R01-WED-00084-MIX-2.jpg")
 image_sercher = ImageSearcher(img_array)
 image_sercher.start()
