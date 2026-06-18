@@ -12,7 +12,7 @@ class Themes:
 
 
 class Static:
-    app_ver = 4.82
+    app_ver = 5.00
     app_name = "Collections"
     thumbs_load_limit = 100
     
