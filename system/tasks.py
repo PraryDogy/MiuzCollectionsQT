@@ -364,7 +364,8 @@ class ImgArrayQImage(URunnable):
 class ImageSearcher(URunnable):
 
     class Sigs(QObject):
-        finished_ = pyqtSignal(set)
+        finished_ = pyqtSignal()
+        found_image = pyqtSignal(str)
 
     def __init__(self, src_img, hash_dir=None, max_side=500):
         """
@@ -469,11 +470,11 @@ class ImageSearcher(URunnable):
                         # Условие соответствия OR
                         if sift_score > min_sift or color_score > min_color:
                             rel_path = Utils.get_rel_thumb_path(x.path)
-                            self.thumb_path_set.add(rel_path)
-
-                            print("другие фотки", "точки", sift_score, "цвет", color_score)
+                            self.sigs.found_image.emit(rel_path)
+                            # self.thumb_path_set.add(rel_path)
+                            # print("другие фотки", "точки", sift_score, "цвет", color_score)
 
     def task(self):
         self.start(min_sift=60, min_color=80)
         if not self.stop_flag:
-            self.sigs.finished_.emit(self.thumb_path_set)
+            self.sigs.finished_.emit()

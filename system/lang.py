@@ -466,3 +466,7 @@ class Lng:
         "Перетяните сюда изображение",
         "Drop image here"
     )
+    close = (
+        "Закрыть",
+        "Close"
+    )

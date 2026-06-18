@@ -36,7 +36,7 @@ class ProgressWin(UMainWindow):
         self.text_label.setFixedSize(200, 30)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
+        self.cancel_btn = QPushButton(Lng.stop[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -56,8 +56,9 @@ class ProgressWin(UMainWindow):
 
 
 class WinImgSearch(UMainWindow):
-    finished_ = pyqtSignal()
-    img_size = 450
+    found_image = pyqtSignal()
+    ww = 250
+    hh = 200
 
     def __init__(self):
         super().__init__()
@@ -65,7 +66,7 @@ class WinImgSearch(UMainWindow):
         self.set_close_only()
         self.setAcceptDrops(True)
         self.setWindowTitle(Lng.image_search[Cfg.lng_index])
-        self.central_layout.setContentsMargins(15, 10, 15, 10)
+        self.central_layout.setContentsMargins(15, 10, 15, 5)
         self.central_layout.setSpacing(10)
 
         group = QGroupBox()
@@ -75,7 +76,7 @@ class WinImgSearch(UMainWindow):
 
         self.img_label = QLabel(Lng.image_search_drop[Cfg.lng_index])
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.img_label.setFixedSize(self.img_size, self.img_size)
+        self.img_label.setFixedSize(self.ww, self.hh)
         group_layout.addWidget(self.img_label)
 
         self.central_layout.addStretch()
@@ -90,7 +91,7 @@ class WinImgSearch(UMainWindow):
         self.start_btn.setFixedWidth(90)
         btn_layout.addWidget(self.start_btn)
 
-        cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn = QPushButton(Lng.close[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         cancel_btn.setFixedWidth(90)
         btn_layout.addWidget(cancel_btn)
@@ -103,9 +104,12 @@ class WinImgSearch(UMainWindow):
 
         if not hasattr(self, "img_array") or self.img_array is None:
             return
+        
+        Dynamic.thumb_path_set.clear()
 
         self.image_searcher = ImageSearcher(self.img_array, max_side=450)
         self.image_searcher.sigs.finished_.connect(self.task_finished)
+        self.image_searcher.sigs.found_image.connect(self.found_image_cmd)
         UThreadPool.start(self.image_searcher)
 
         self.get_total_count()
@@ -119,9 +123,14 @@ class WinImgSearch(UMainWindow):
         self.progress_win.show()
 
     def cancel_clicked(self):
-        self.progress_win.deleteLater()
         self.progress_timer.stop()
         self.image_searcher.stop_task()
+        self.progress_win.deleteLater() 
+
+    def task_finished(self):
+        self.progress_timer.stop()
+        self.progress_win.deleteLater()
+        self.deleteLater()
 
     def poll_progress_win(self):
 
@@ -143,13 +152,9 @@ class WinImgSearch(UMainWindow):
             stmt = sqlalchemy.select(func.count()).select_from(Thumbs.table)
             self.total_count = conn.execute(stmt).scalar()
 
-    def task_finished(self, thumb_names_list: set[str]):
-        Dynamic.thumb_path_set.clear()
-        Dynamic.thumb_path_set.update(thumb_names_list)
-        self.finished_.emit()
-        self.progress_timer.stop()
-        self.progress_win.deleteLater()
-        self.deleteLater()
+    def found_image_cmd(self, rel_path: str):
+        Dynamic.thumb_path_set.add(rel_path)
+        self.found_image.emit()
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
@@ -162,8 +167,8 @@ class WinImgSearch(UMainWindow):
                 self.img_array = ImgUtils.read_img(first_url)
                 qimage = Utils.qimage_from_array(self.img_array)
                 qimage = qimage.scaled(
-                    self.img_size,
-                    self.img_size,
+                    self.ww,
+                    self.hh,
                     aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
                     transformMode=Qt.TransformationMode.SmoothTransformation
                 )
