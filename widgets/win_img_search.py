@@ -48,7 +48,7 @@ class ProgressWin(UMainWindow):
         if total_count == 0:
             text = Lng.preparing[Cfg.lng_index]
         else:
-            text = f"Поиск {current_count} из {total_count}"
+            text = f"{Lng.search[Cfg.lng_index]} {current_count} {Lng.from_[Cfg.lng_index]} {total_count}"
         self.text_label.setText(text)
 
     def closeEvent(self, a0):
@@ -128,6 +128,11 @@ class WinImgSearch(UMainWindow):
         self.progress_win.deleteLater() 
 
     def task_finished(self):
+
+        if not Dynamic.thumb_path_set:
+            Dynamic.thumb_path_set.add("999999999999")
+            self.found_image.emit()
+
         self.progress_timer.stop()
         self.progress_win.deleteLater()
         self.deleteLater()
