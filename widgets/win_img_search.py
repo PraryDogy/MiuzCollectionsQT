@@ -62,13 +62,19 @@ class WinImgSearch(UMainWindow):
         self.set_close_only()
         self.setAcceptDrops(True)
         self.setWindowTitle(Lng.image_search[Cfg.lng_index])
-        self.central_layout.setContentsMargins(0, 0, 0, 0)
+        self.central_layout.setContentsMargins(0, 5, 0, 0)
         self.central_layout.setSpacing(5)
 
         self.img_label = QLabel(Lng.image_search_drop[Cfg.lng_index])
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setFixedSize(self.img_size, self.img_size)
         self.central_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.img_label.setStyleSheet(
+            """
+                border: 3px dashed rgba(128, 128, 128, 0.5);
+                border-radius: 5px;
+            """
+        )
 
         self.central_layout.addStretch()
 
@@ -139,20 +145,29 @@ class WinImgSearch(UMainWindow):
         if a0.mimeData().hasUrls():
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if first_url.endswith(ImgUtils.ext_all):
+                self.img_label.setStyleSheet(
+                    """
+                        border: none;
+                    """
+                )
                 import cv2
                 self.img_array = ImgUtils.read_img(first_url)
-                # self.img_array = ImgUtils.resize(self.img_array, 450)
                 qimage = Utils.qimage_from_array(self.img_array)
-                qimage = qimage.scaled(self.img_size, self.img_size, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
+                qimage = qimage.scaled(
+                    self.img_size,
+                    self.img_size,
+                    aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                    transformMode=Qt.TransformationMode.SmoothTransformation
+                )
                 self.img_label.setPixmap(QPixmap.fromImage(qimage))
-
                 self.img_array = cv2.cvtColor(self.img_array, cv2.COLOR_RGB2BGR)
 
         return super().dropEvent(a0)
     
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            self.image_searcher.stop_task()
+            if hasattr(self, "image_searcher"):
+                self.image_searcher.stop_task()
             self.deleteLater()
         return super().keyPressEvent(a0)
     
