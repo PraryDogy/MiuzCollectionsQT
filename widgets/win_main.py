@@ -215,12 +215,16 @@ class WinMain(UMainWindow):
             Dynamic.thumb_path_set.clear()
             self.win_img_search.deleteLater()
 
+        def search_started():
+            self.bar_top.search_wid.setText(Lng.image_search[Cfg.lng_index])
+
         def found_image():
             self.load_st_grid()
 
         self.win_img_search = WinImgSearch()
         # self.win_img_search.finished_.connect(finished)
         self.win_img_search.found_image.connect(found_image)
+        self.win_img_search.search_started.connect(search_started)
         self.win_img_search.center_to_parent(self)
         self.win_img_search.show()
     

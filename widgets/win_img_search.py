@@ -57,6 +57,7 @@ class ProgressWin(UMainWindow):
 
 class WinImgSearch(UMainWindow):
     found_image = pyqtSignal()
+    search_started = pyqtSignal()
     ww = 250
     hh = 200
 
@@ -115,6 +116,8 @@ class WinImgSearch(UMainWindow):
         self.get_total_count()
         self.open_progress_win()
         self.poll_progress_win()
+
+        self.search_started.emit()
 
     def open_progress_win(self):
         self.progress_win = ProgressWin()

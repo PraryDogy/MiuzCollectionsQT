@@ -173,7 +173,7 @@ class DbImagesLoader(URunnable):
             ]
             stmt = stmt.where(sqlalchemy.or_(*filters))
 
-        if Dynamic.search_widget_text:
+        if Dynamic.search_widget_text and Dynamic.search_widget_text != Lng.image_search[Cfg.lng_index]:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             stmt = stmt.where(Thumbs.rel_img_path.ilike(f"%{text}%"))
 

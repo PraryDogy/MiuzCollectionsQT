@@ -67,6 +67,7 @@ class WidSearch(ULineEdit):
         self.clear()
         Dynamic.search_widget_text = None
         Dynamic.loaded_thumbs = 0
+        Dynamic.thumb_path_set.clear()
         self.reload_thumbnails.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
