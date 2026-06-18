@@ -22,20 +22,20 @@ class ProgressWin(UMainWindow):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
+        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.text_label = QLabel()
-        self.central_layout.addWidget(self.text_label)
+        self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.central_layout.addStretch()
 
         self.cancel_btn = QPushButton("cancel")
-        self.cancel_btn.clicked.connect(self.cancel_cmd)
-        self.central_layout.addWidget(self.cancel_btn)
+        self.cancel_btn.setFixedWidth(90)
+        self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
+        self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.adjustSize()
         self.set_text(0, 0)
-
-    def cancel_cmd(self):
-        self.cancel_clicked.emit()
-        self.deleteLater()
 
     def set_text(self, current_count, total_count):
         if total_count == 0:
@@ -44,12 +44,11 @@ class ProgressWin(UMainWindow):
         self.text_label.setText(text)
 
     def closeEvent(self, a0):
-        self.cancel_clicked.emit()
-        return super().closeEvent(a0)
+        a0.ignore()
 
 
 class WinImgSearch(UMainWindow):
-    finished_ = pyqtSignal(set)
+    finished_ = pyqtSignal()
     img_size = 450
 
     def __init__(self):
@@ -80,7 +79,7 @@ class WinImgSearch(UMainWindow):
             return
 
         self.image_searcher = ImageSearcher(self.img_array, max_side=450)
-        self.image_searcher.sigs.finished_.connect(self.finished)
+        self.image_searcher.sigs.finished_.connect(self.task_finished)
         UThreadPool.start(self.image_searcher)
 
         self.get_total_count()
@@ -90,8 +89,13 @@ class WinImgSearch(UMainWindow):
     def open_progress_win(self):
         self.progress_win = ProgressWin()
         self.progress_win.center_to_parent(self)
-        self.progress_win.cancel_clicked.connect(self.image_searcher.stop_task)
+        self.progress_win.cancel_clicked.connect(self.cancel_clicked)
         self.progress_win.show()
+
+    def cancel_clicked(self):
+        self.progress_win.deleteLater()
+        self.progress_timer.stop()
+        self.image_searcher.stop_task()
 
     def poll_progress_win(self):
 
@@ -113,15 +117,13 @@ class WinImgSearch(UMainWindow):
             stmt = sqlalchemy.select(func.count()).select_from(Thumbs.table)
             self.total_count = conn.execute(stmt).scalar()
 
-    def finished(self, thumb_names_list: set[str]):
-
-        # if not thumb_names_list:
-            # return
-
-        Dynamic.thumb_path_set = thumb_names_list
-        self.finished_.emit(thumb_names_list)
+    def task_finished(self, thumb_names_list: set[str]):
+        Dynamic.thumb_path_set.clear()
+        Dynamic.thumb_path_set.update(thumb_names_list)
+        self.finished_.emit()
         self.progress_timer.stop()
         self.progress_win.deleteLater()
+        self.deleteLater()
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()

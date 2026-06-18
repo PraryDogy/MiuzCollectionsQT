@@ -475,4 +475,5 @@ class ImageSearcher(URunnable):
 
     def task(self):
         self.start(min_sift=60, min_color=80)
-        self.sigs.finished_.emit(self.thumb_path_set)
+        if not self.stop_flag:
+            self.sigs.finished_.emit(self.thumb_path_set)
