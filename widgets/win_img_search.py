@@ -22,20 +22,23 @@ class ProgressWin(UMainWindow):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
+        self.setFixedHeight(70)
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.central_layout.setSpacing(5)
+        self.central_layout.setContentsMargins(0, 0, 0, 0)
 
         self.text_label = QLabel()
+        self.text_label.setFixedSize(200, 30)
+        # self.text_label.setStyleSheet("background: red;")
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        self.central_layout.addStretch()
 
         self.cancel_btn = QPushButton("cancel")
         self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.adjustSize()
         self.set_text(0, 0)
+        self.adjustSize()
 
     def set_text(self, current_count, total_count):
         if total_count == 0:
