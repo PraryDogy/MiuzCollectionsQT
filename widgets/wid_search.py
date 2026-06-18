@@ -36,10 +36,11 @@ class ClearBtn(QSvgWidget):
 class WidSearch(ULineEdit):
     reload_thumbnails = pyqtSignal()
     open_img_search = pyqtSignal()
+    ww = 162
 
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(150)
+        self.setFixedWidth(self.ww)
 
         self.textChanged.connect(self.create_search)
         self.setPlaceholderText(Lng.search[Cfg.lng_index])
@@ -56,6 +57,7 @@ class WidSearch(ULineEdit):
         if len(new_text) > 0:
             Dynamic.search_widget_text = new_text
             self.clear_btn.enable()
+            self.setCursorPosition(0)
         else:
             Dynamic.search_widget_text = None
             self.clear_btn.disable()
