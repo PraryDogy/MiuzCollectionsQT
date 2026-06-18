@@ -6,8 +6,9 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QLabel, QPushButton
 from sqlalchemy import func
 
-from cfg import Dynamic
+from cfg import Cfg, Dynamic
 from system.database import Dbase, Thumbs
+from system.lang import Lng
 from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
@@ -23,13 +24,14 @@ class ProgressWin(UMainWindow):
         self.set_always_on_top()
         self.set_close_only()
         self.setFixedHeight(70)
+        self.setWindowTitle(Lng.progress[Cfg.lng_index])
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(0, 0, 0, 0)
 
         self.text_label = QLabel()
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.text_label.setFixedSize(200, 30)
-        # self.text_label.setStyleSheet("background: red;")
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.cancel_btn = QPushButton("cancel")
@@ -59,17 +61,18 @@ class WinImgSearch(UMainWindow):
         self.set_always_on_top()
         self.set_close_only()
         self.setAcceptDrops(True)
+        self.setWindowTitle(Lng.image_search[Cfg.lng_index])
         self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.central_layout.setSpacing(5)
 
-        self.img_label = QLabel("Перетяните сюда изображение")
+        self.img_label = QLabel(Lng.image_search_drop[Cfg.lng_index])
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setFixedSize(self.img_size, self.img_size)
         self.central_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.central_layout.addStretch()
 
-        self.start_btn = QPushButton("start")
+        self.start_btn = QPushButton(Lng.start[Cfg.lng_index])
         self.start_btn.clicked.connect(self.start_image_searcher)
         self.start_btn.setFixedWidth(90)
         self.central_layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignCenter)

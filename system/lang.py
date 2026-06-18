@@ -450,3 +450,19 @@ class Lng:
         "Are you sure you specified the path correctly?"
         "\nAn incorrect path will result in the deletion of the entire directory.",
     )
+    progress = (
+        "Прогресс",
+        "Progress"
+    )
+    image_search = (
+        "Поиск изображений",
+        "Image search"
+    )
+    start = (
+        "Старт",
+        "Start"
+    )
+    image_search_drop = (
+        "Перетяните сюда изображение",
+        "Drop image here"
+    )
