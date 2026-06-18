@@ -210,13 +210,15 @@ class WinMain(UMainWindow):
     def open_img_search(self):
 
         def found_image():
+            
+            if Dynamic.search_widget_text != Lng.image_search[Cfg.lng_index]:
+                self.bar_top.search_wid.setText(Lng.image_search[Cfg.lng_index])
+                self.bar_top.search_wid.setCursorPosition(0)
+
             if Dynamic.current_dir != os.sep:
                 Dynamic.current_dir = os.sep
                 self.left_menu.tree_wid.expand_to_path(os.sep)
             self.load_st_grid()
-
-        self.bar_top.search_wid.setText(Lng.image_search[Cfg.lng_index])
-        self.bar_top.search_wid.setCursorPosition(0)
             
         self.win_img_search = WinImgSearch()
         self.win_img_search.found_image.connect(found_image)
@@ -506,13 +508,6 @@ class WinMain(UMainWindow):
         self.settings_win.show()
 
     def open_dates_win(self):
-
-        # from .filters_calendar import FiltersCalendar
-        # self.test = FiltersCalendar()
-        # self.test.center_to_parent(self)
-        # self.test.show()
-        # return
-
         self.dates_win = WinDates()
         self.dates_win.dates_btn_solid.connect(
             lambda: self.bar_top.dates_btn.set_solid_style()
