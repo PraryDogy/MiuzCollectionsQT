@@ -1,9 +1,11 @@
 import os
 
+import cv2
 import sqlalchemy
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QLabel, QPushButton
+from PyQt5.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
+                             QVBoxLayout)
 from sqlalchemy import func
 
 from cfg import Cfg, Dynamic
@@ -34,7 +36,7 @@ class ProgressWin(UMainWindow):
         self.text_label.setFixedSize(200, 30)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.cancel_btn = QPushButton("cancel")
+        self.cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -44,8 +46,9 @@ class ProgressWin(UMainWindow):
 
     def set_text(self, current_count, total_count):
         if total_count == 0:
-            total_count = "..."
-        text = f"Поиск {current_count} из {total_count}"
+            text = Lng.preparing[Cfg.lng_index]
+        else:
+            text = f"Поиск {current_count} из {total_count}"
         self.text_label.setText(text)
 
     def closeEvent(self, a0):
@@ -62,26 +65,37 @@ class WinImgSearch(UMainWindow):
         self.set_close_only()
         self.setAcceptDrops(True)
         self.setWindowTitle(Lng.image_search[Cfg.lng_index])
-        self.central_layout.setContentsMargins(0, 5, 0, 0)
-        self.central_layout.setSpacing(5)
+        self.central_layout.setContentsMargins(15, 10, 15, 10)
+        self.central_layout.setSpacing(10)
+
+        group = QGroupBox()
+        self.central_layout.addWidget(group)
+        group_layout = QVBoxLayout(group)
+        group_layout.setContentsMargins(5, 5, 5, 5)
 
         self.img_label = QLabel(Lng.image_search_drop[Cfg.lng_index])
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setFixedSize(self.img_size, self.img_size)
-        self.central_layout.addWidget(self.img_label, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.img_label.setStyleSheet(
-            """
-                border: 3px dashed rgba(128, 128, 128, 0.5);
-                border-radius: 5px;
-            """
-        )
+        group_layout.addWidget(self.img_label)
 
         self.central_layout.addStretch()
+
+        btn_layout = QHBoxLayout()
+        self.central_layout.addLayout(btn_layout)
+
+        btn_layout.addStretch()
 
         self.start_btn = QPushButton(Lng.start[Cfg.lng_index])
         self.start_btn.clicked.connect(self.start_image_searcher)
         self.start_btn.setFixedWidth(90)
-        self.central_layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btn_layout.addWidget(self.start_btn)
+
+        cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn.clicked.connect(self.deleteLater)
+        cancel_btn.setFixedWidth(90)
+        btn_layout.addWidget(cancel_btn)
+
+        btn_layout.addStretch()
 
         self.adjustSize()
 
@@ -145,12 +159,6 @@ class WinImgSearch(UMainWindow):
         if a0.mimeData().hasUrls():
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if first_url.endswith(ImgUtils.ext_all):
-                self.img_label.setStyleSheet(
-                    """
-                        border: none;
-                    """
-                )
-                import cv2
                 self.img_array = ImgUtils.read_img(first_url)
                 qimage = Utils.qimage_from_array(self.img_array)
                 qimage = qimage.scaled(
@@ -166,10 +174,18 @@ class WinImgSearch(UMainWindow):
     
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            if hasattr(self, "image_searcher"):
-                self.image_searcher.stop_task()
             self.deleteLater()
         return super().keyPressEvent(a0)
+    
+    def deleteLater(self):
+        if hasattr(self, "image_searcher"):
+            self.image_searcher.stop_task()
+        return super().deleteLater()
+    
+    def closeEvent(self, a0):
+        if hasattr(self, "image_searcher"):
+            self.image_searcher.stop_task()
+        return super().closeEvent(a0)
     
 # чтение изображения в фоне
 # решить где ресайз
