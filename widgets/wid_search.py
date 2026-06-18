@@ -57,7 +57,6 @@ class WidSearch(ULineEdit):
         if len(new_text) > 0:
             Dynamic.search_widget_text = new_text
             self.clear_btn.enable()
-            self.setCursorPosition(0)
         else:
             Dynamic.search_widget_text = None
             self.clear_btn.disable()
