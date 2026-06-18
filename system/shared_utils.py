@@ -9,8 +9,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pillow_heif
-import rawpy
-import rawpy._rawpy
+# import rawpy
+# import rawpy._rawpy
 import tifffile
 from PIL import Image, ImageOps, ImageCms
 
@@ -331,6 +331,7 @@ class ImgUtils:
 
     @classmethod
     def _read_raw(cls, path: str):
+        return cls._get_broken_image()
         try:
             # https://github.com/letmaik/rawpy
             # Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:

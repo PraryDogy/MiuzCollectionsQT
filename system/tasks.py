@@ -4,8 +4,10 @@ from collections import defaultdict
 from datetime import datetime
 
 import cv2
+import imagehash
 import numpy as np
 import sqlalchemy
+from PIL import Image
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QImage
 
@@ -378,53 +380,24 @@ class ImageSearcher(URunnable):
         self.sigs = ImageSearcher.Sigs()
         self.hash_dir = hash_dir if hash_dir else Static.external_hashdir
         self.max_side = max_side
-        self.sift = cv2.SIFT_create()
-        self.thumb_path_set: set[str] = set()
+        # self.sift = cv2.SIFT_create()
+        # self.thumb_path_set: set[str] = set()
         
         # Предварительная подготовка эталона при создании объекта
-        self.processed_src = self._prepare_source(src_img)
-        self.src_hist = self._get_color_histogram(self.processed_src)
+        resized_img = self._prepare_source(src_img)
+        src_pil = Image.fromarray(cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB))
+        self.src_hash = imagehash.phash(src_pil)
+
+        # self.src_hist = self._get_color_histogram(self.processed_src)
         
-        gray_src = cv2.cvtColor(self.processed_src, cv2.COLOR_BGR2GRAY)
-        _, self.des_src = self.sift.detectAndCompute(gray_src, None)
+        # gray_src = cv2.cvtColor(self.processed_src, cv2.COLOR_BGR2GRAY)
+        # _, self.des_src = self.sift.detectAndCompute(gray_src, None)
 
         self.current_count = 0
         self.stop_flag = False
 
     def stop_task(self):
         self.stop_flag = True
-
-    def _get_color_histogram(self, image):
-        """Вычисляет нормализованную гистограмму в пространстве HSV."""
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        hist = cv2.calcHist([hsv], [0, 1], None, [50, 60], [0, 180, 0, 256])
-        cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-        return hist
-
-    def _compare_sift(self, thumbnail):
-        """Проверка миниатюры по ключевым точкам (SIFT)."""
-        gray_thumbnail = cv2.cvtColor(thumbnail, cv2.COLOR_BGR2GRAY)
-        kp_thumb, des_thumb = self.sift.detectAndCompute(gray_thumbnail, None)
-
-        if self.des_src is None or des_thumb is None or len(des_thumb) < 10:
-            return 0
-
-        index_params = dict(algorithm=1, trees=5)
-        search_params = dict(checks=50)
-        flann = cv2.FlannBasedMatcher(index_params, search_params)
-        
-        matches = flann.knnMatch(des_thumb, self.des_src, k=2)
-
-        good_matches = []
-        for m, n in matches:
-            if m.distance < 0.7 * n.distance:
-                good_matches.append(m)
-
-        if not kp_thumb:
-            return 0
-            
-        score = min(int((len(good_matches) / len(kp_thumb)) * 100), 100) 
-        return score
 
     def _prepare_source(self, src_img):
         """Масштабирует исходное изображение, если оно больше лимита."""
@@ -433,13 +406,22 @@ class ImageSearcher(URunnable):
             scale = self.max_side / max(h_src, w_src)
             return cv2.resize(src_img, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
         return src_img.copy()
+    
+    def compare_hash(self, thumb_image: np.ndarray):
+        # Переводим OpenCV-картинки в формат PIL
+        thumb_pil = Image.fromarray(cv2.cvtColor(thumb_image, cv2.COLOR_BGR2RGB))
+        hash_thumb = imagehash.phash(thumb_pil)
 
-    def start(self, min_sift=70, min_color=60):
-        """
-        Запускает процесс сканирования директории и сравнения файлов.
-        :param min_sift: Порог совпадения по точкам SIFT
-        :param min_color: Порог совпадения по цвету
-        """
+        # Находим расстояние Хэмминга (разницу между ними)
+        # 0 - идеальное совпадение. Чем выше число, тем меньше похожи.
+        distance = self.src_hash - hash_thumb
+
+        # Переводим в схожесть от 0.0 до 1.0 (для хэша 8х8 длина равна 64 битам)
+        similarity = 1.0 - (distance / 64.0)
+
+        return similarity
+
+    def start(self):
         # Сканирование директорий
         for i in os.scandir(self.hash_dir):
             if i.is_dir():
@@ -452,29 +434,12 @@ class ImageSearcher(URunnable):
                     if x.name.endswith(".jpg"):
                         thumbnail = cv2.imread(x.path)
                         self.current_count += 1
-                        if thumbnail is None:
-                            continue
-                        
-                        # 1. Проверка по цвету
-                        thumb_hist = self._get_color_histogram(thumbnail)
-                        hist_similarity = cv2.compareHist(self.src_hist, thumb_hist, cv2.HISTCMP_CORREL)
-                        color_score = int(hist_similarity * 100)
-                        
-                        # 2. Проверка по точкам
-                        sift_score = self._compare_sift(thumbnail)
-
-                        name = "925a1924ed9676297908706adc063791"
-                        if name in x.name:
-                            print("вот оно", "точки", sift_score, "цвет", color_score)
-                        
-                        # Условие соответствия OR
-                        if sift_score > min_sift or color_score > min_color:
+                        result = self.compare_hash(thumbnail)
+                        if result > 0.9:
                             rel_path = Utils.get_rel_thumb_path(x.path)
                             self.sigs.found_image.emit(rel_path)
-                            # self.thumb_path_set.add(rel_path)
-                            # print("другие фотки", "точки", sift_score, "цвет", color_score)
 
     def task(self):
-        self.start(min_sift=60, min_color=80)
+        self.start()
         if not self.stop_flag:
             self.sigs.finished_.emit()
