@@ -2,7 +2,8 @@ import os
 import traceback
 from collections import defaultdict
 from datetime import datetime
-
+import torch
+import clip
 import cv2
 # import imagehash
 import numpy as np
@@ -372,33 +373,36 @@ class ImageSearcher(URunnable):
     def __init__(self, src_img: np.ndarray):
         super().__init__()
         self.sigs = ImageSearcher.Sigs()
-        self.src_img = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
+        self.src_img = src_img
         self.current_count = 0
         self.stop_flag = False
+
+
+        self.model, self.preprocess = clip.load(
+            "ViT-B/32",
+            device="cpu",
+            download_root="./models"
+        )
+        self.model.eval()
+
+        self.src_emb = self.embed(src_img)
 
     def stop_task(self):
         self.stop_flag = True
 
+    def embed(self, img):
+        img = Image.fromarray(img[:, :, ::-1])  # BGR → RGB
+        img = self.preprocess(img).unsqueeze(0)
 
-    def resize_max(self, img, size=205):
-        h, w = img.shape[:2]
-        scale = size / max(h, w)
-        return cv2.resize(img, (int(w*scale), int(h*scale)))
+        with torch.no_grad():
+            emb = self.model.encode_image(img)
+
+        return emb / emb.norm(dim=-1, keepdim=True)
 
     def compare(self, img2):
-        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-        img1 = self.src_img
-        max_side = 190
-
-        src_image = img1
-        template = self.resize_max(img2, max_side)
-        r1 = cv2.matchTemplate(src_image, template, cv2.TM_CCOEFF_NORMED).max()
-
-        src_image = img2
-        template = self.resize_max(img1, max_side)
-        r2 = cv2.matchTemplate(src_image, template, cv2.TM_CCOEFF_NORMED).max()
-
-        return max(r1, r2)
+        emb2 = self.embed(img2)
+        sim = (self.src_emb @ emb2.T).item()
+        return sim
 
     def start(self):
         for i in os.scandir(Static.external_hashdir):
@@ -410,11 +414,9 @@ class ImageSearcher(URunnable):
                     if x.name.endswith(".jpg"):
                             self.current_count += 1
                             img = cv2.imread(x.path)
-                            try:
-                                result = self.compare(img)
-                            except cv2.error:
-                                continue
-                            if result > 0.8:
+                            result = self.compare(img)
+                            # print(result)
+                            if result > 0.9:
                                 rel_path = Utils.get_rel_thumb_path(x.path)
                                 self.sigs.found_image.emit(rel_path)
 
