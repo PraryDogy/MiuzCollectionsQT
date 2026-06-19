@@ -387,11 +387,8 @@ class ImageSearcher(URunnable):
                         print("image search canceled")
                         return
                     if x.name.endswith(".jpg"):
-                        thumbnail = cv2.imread(x.path)
-                        self.current_count += 1
-                        similarity = self.compare_hash(thumbnail)
-                        if similarity > 0.5:
-                            score = self.compare_orb(thumbnail)
+                            # тут должен быть метод cv2.template
+                            score = ...
                             if score > 0.5:
                                 rel_path = Utils.get_rel_thumb_path(x.path)
                                 self.sigs.found_image.emit(rel_path)
