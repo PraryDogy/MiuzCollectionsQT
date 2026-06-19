@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 
 import cv2
-import imagehash
+# import imagehash
 import numpy as np
 import sqlalchemy
 from PIL import Image
@@ -369,75 +369,32 @@ class ImageSearcher(URunnable):
         finished_ = pyqtSignal()
         found_image = pyqtSignal(str)
 
-    def __init__(self, src_img, hash_dir=None, max_side=500):
-        """
-        Инициализация класса поиска.
-        :param src_img: Исходное изображение (numpy array)
-        :param hash_dir: Путь к базовой директории с подпапками (по умолчанию из Static)
-        :param max_side: Максимальный размер стороны для масштабирования исходника
-        """
+    def __init__(self, src_img: np.ndarray):
         super().__init__()
         self.sigs = ImageSearcher.Sigs()
-        self.hash_dir = hash_dir if hash_dir else Static.external_hashdir
-        self.max_side = max_side
-        # self.sift = cv2.SIFT_create()
-        # self.thumb_path_set: set[str] = set()
-        
-        # Предварительная подготовка эталона при создании объекта
-        resized_img = self._prepare_source(src_img)
-        src_pil = Image.fromarray(cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB))
-        self.src_hash = imagehash.phash(src_pil)
-
-        # self.src_hist = self._get_color_histogram(self.processed_src)
-        
-        # gray_src = cv2.cvtColor(self.processed_src, cv2.COLOR_BGR2GRAY)
-        # _, self.des_src = self.sift.detectAndCompute(gray_src, None)
-
+        self.src_img = src_img
         self.current_count = 0
         self.stop_flag = False
 
     def stop_task(self):
         self.stop_flag = True
 
-    def _prepare_source(self, src_img):
-        """Масштабирует исходное изображение, если оно больше лимита."""
-        h_src, w_src = src_img.shape[:2]
-        if max(h_src, w_src) > self.max_side:
-            scale = self.max_side / max(h_src, w_src)
-            return cv2.resize(src_img, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-        return src_img.copy()
-    
-    def compare_hash(self, thumb_image: np.ndarray):
-        # Переводим OpenCV-картинки в формат PIL
-        thumb_pil = Image.fromarray(cv2.cvtColor(thumb_image, cv2.COLOR_BGR2RGB))
-        hash_thumb = imagehash.phash(thumb_pil)
-
-        # Находим расстояние Хэмминга (разницу между ними)
-        # 0 - идеальное совпадение. Чем выше число, тем меньше похожи.
-        distance = self.src_hash - hash_thumb
-
-        # Переводим в схожесть от 0.0 до 1.0 (для хэша 8х8 длина равна 64 битам)
-        similarity = 1.0 - (distance / 64.0)
-
-        return similarity
-
     def start(self):
-        # Сканирование директорий
-        for i in os.scandir(self.hash_dir):
+        for i in os.scandir(Static.external_hashdir):
             if i.is_dir():
                 for x in os.scandir(i.path):
-                    
                     if self.stop_flag:
                         print("image search canceled")
                         return
-
                     if x.name.endswith(".jpg"):
                         thumbnail = cv2.imread(x.path)
                         self.current_count += 1
-                        result = self.compare_hash(thumbnail)
-                        if result > 0.9:
-                            rel_path = Utils.get_rel_thumb_path(x.path)
-                            self.sigs.found_image.emit(rel_path)
+                        similarity = self.compare_hash(thumbnail)
+                        if similarity > 0.5:
+                            score = self.compare_orb(thumbnail)
+                            if score > 0.5:
+                                rel_path = Utils.get_rel_thumb_path(x.path)
+                                self.sigs.found_image.emit(rel_path)
 
     def task(self):
         self.start()
