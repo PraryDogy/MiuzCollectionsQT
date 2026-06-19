@@ -372,12 +372,33 @@ class ImageSearcher(URunnable):
     def __init__(self, src_img: np.ndarray):
         super().__init__()
         self.sigs = ImageSearcher.Sigs()
-        self.src_img = src_img
+        self.src_img = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
         self.current_count = 0
         self.stop_flag = False
 
     def stop_task(self):
         self.stop_flag = True
+
+
+    def resize_max(self, img, size=205):
+        h, w = img.shape[:2]
+        scale = size / max(h, w)
+        return cv2.resize(img, (int(w*scale), int(h*scale)))
+
+    def compare(self, img2):
+        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+        img1 = self.src_img
+        max_side = 190
+
+        src_image = img1
+        template = self.resize_max(img2, max_side)
+        r1 = cv2.matchTemplate(src_image, template, cv2.TM_CCOEFF_NORMED).max()
+
+        src_image = img2
+        template = self.resize_max(img1, max_side)
+        r2 = cv2.matchTemplate(src_image, template, cv2.TM_CCOEFF_NORMED).max()
+
+        return max(r1, r2)
 
     def start(self):
         for i in os.scandir(Static.external_hashdir):
@@ -387,9 +408,13 @@ class ImageSearcher(URunnable):
                         print("image search canceled")
                         return
                     if x.name.endswith(".jpg"):
-                            # тут должен быть метод cv2.template
-                            score = ...
-                            if score > 0.5:
+                            self.current_count += 1
+                            img = cv2.imread(x.path)
+                            try:
+                                result = self.compare(img)
+                            except cv2.error:
+                                continue
+                            if result > 0.8:
                                 rel_path = Utils.get_rel_thumb_path(x.path)
                                 self.sigs.found_image.emit(rel_path)
 

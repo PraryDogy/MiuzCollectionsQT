@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout)
 from sqlalchemy import func
 
-from cfg import Cfg, Dynamic
+from cfg import Cfg, Dynamic, Static
 from system.database import Dbase, Thumbs
 from system.lang import Lng
 from system.shared_utils import ImgUtils
@@ -107,7 +107,7 @@ class WinImgSearch(UMainWindow):
         
         Dynamic.thumb_path_set.clear()
 
-        self.image_searcher = ImageSearcher(self.img_array, max_side=450)
+        self.image_searcher = ImageSearcher(self.img_array)
         self.image_searcher.sigs.finished_.connect(self.task_finished)
         self.image_searcher.sigs.found_image.connect(self.found_image_cmd)
         UThreadPool.start(self.image_searcher)
@@ -170,14 +170,16 @@ class WinImgSearch(UMainWindow):
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if first_url.endswith(ImgUtils.ext_all):
                 self.img_array = ImgUtils.read_img(first_url)
+                
                 qimage = Utils.qimage_from_array(self.img_array)
                 qimage = qimage.scaled(
-                    self.ww,
-                    self.hh,
-                    aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-                    transformMode=Qt.TransformationMode.SmoothTransformation
+                    self.img_label.width(),
+                    self.img_label.height(),
+                    aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio
                 )
                 self.img_label.setPixmap(QPixmap.fromImage(qimage))
+
+                self.img_array = ImgUtils.fit_to_thumb(self.img_array, Static.max_img_size)
                 self.img_array = cv2.cvtColor(self.img_array, cv2.COLOR_RGB2BGR)
 
         return super().dropEvent(a0)
