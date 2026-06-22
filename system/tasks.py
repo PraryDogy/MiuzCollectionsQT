@@ -402,6 +402,8 @@ class ImageSearcher(URunnable):
                 elif i.name.endswith(".jpg"):
                     self.current_count += 1
                     img = cv2.imread(i.path)
+                    if ImgUtils.is_grayscale(img):
+                        continue
                     result = self.compare(img)
                     if result > 0.8:
                         rel_path = Utils.get_rel_thumb_path(i.path)

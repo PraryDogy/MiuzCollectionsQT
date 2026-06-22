@@ -470,3 +470,7 @@ class Lng:
         "Закрыть",
         "Close"
     )
+    only_color = (
+        "Поддерживаются только цветные изображения",
+        "Only color images are supported"
+    )

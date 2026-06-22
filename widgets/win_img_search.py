@@ -77,6 +77,7 @@ class WinImgSearch(UMainWindow):
         self.img_label = QLabel(Lng.image_search_drop[Cfg.lng_index])
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setFixedSize(self.ww, self.hh)
+        self.img_label.setWordWrap(True)
         group_layout.addWidget(self.img_label)
 
         self.central_layout.addStretch()
@@ -170,6 +171,14 @@ class WinImgSearch(UMainWindow):
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if first_url.endswith(ImgUtils.ext_all):
                 self.img_array = ImgUtils.read_img(first_url)
+                if ImgUtils.is_grayscale(self.img_array):
+                    old_text = self.img_label.text()
+                    self.img_label.setText(Lng.only_color[Cfg.lng_index])
+                    QTimer.singleShot(
+                        1500,
+                        lambda: self.img_label.setText(old_text)
+                    )
+                    return
                 
                 qimage = Utils.qimage_from_array(self.img_array)
                 qimage = qimage.scaled(
