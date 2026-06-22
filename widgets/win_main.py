@@ -209,19 +209,19 @@ class WinMain(UMainWindow):
     
     def open_img_search(self):
 
-        def found_image():
-            
-            if Dynamic.search_widget_text != Lng.image_search[Cfg.lng_index]:
-                self.bar_top.search_wid.setText(Lng.image_search[Cfg.lng_index])
-                self.bar_top.search_wid.setCursorPosition(0)
-
-            if Dynamic.current_dir != os.sep:
-                Dynamic.current_dir = os.sep
-                self.left_menu.tree_wid.expand_to_path(os.sep)
-            self.load_st_grid()
+        def search_started():
+            Dynamic.current_dir = os.sep
+            Dynamic.filter_favs = False
+            Dynamic.filter_only_folder = False
+            Dynamic.filters_enabled.clear()
+            Dynamic.search_widget_text = None
+            Dynamic.date_start = None
+            Dynamic.date_end = None
+            self.left_menu.tree_wid.expand_to_path(os.sep)
             
         self.win_img_search = WinImgSearch()
-        self.win_img_search.found_image.connect(found_image)
+        self.win_img_search.found_image.connect(self.load_st_grid)
+        self.win_img_search.search_started.connect(search_started)
         self.win_img_search.center_to_parent(self)
         self.win_img_search.show()
     

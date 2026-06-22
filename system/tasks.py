@@ -172,7 +172,7 @@ class DbImagesLoader(URunnable):
             ]
             stmt = stmt.where(sqlalchemy.or_(*filters))
 
-        if Dynamic.search_widget_text and Dynamic.search_widget_text != Lng.image_search[Cfg.lng_index]:
+        if Dynamic.search_widget_text:
             text = Dynamic.search_widget_text.strip().replace("\n", "")
             stmt = stmt.where(Thumbs.rel_img_path.ilike(f"%{text}%"))
 
@@ -183,9 +183,7 @@ class DbImagesLoader(URunnable):
             )
             stmt = stmt.where(Thumbs.mod > start, Thumbs.mod < end)
 
-# ТУТ ТУ Т УТУТТУТУТУТу
         if Dynamic.thumb_path_set:
-            # lst = list(Dynamic.thumb_names_list)
             stmt = stmt.where(Thumbs.rel_thumb_path.in_(Dynamic.thumb_path_set))
 
         return stmt

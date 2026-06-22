@@ -222,8 +222,6 @@ class WinDates(UMainWindow):
         Dynamic.loaded_thumbs = 0
         Dynamic.date_start = None
         Dynamic.date_end = None
-        Dynamic.f_date_start = None
-        Dynamic.f_date_end = None
         if reload:
             self.reload_thumbnails.emit()
             self.dates_btn_normal.emit()
@@ -242,8 +240,6 @@ class WinDates(UMainWindow):
             )            
 
         if all((Dynamic.date_start, Dynamic.date_end)):
-            Dynamic.f_date_start = self.named_date(Dynamic.date_start)
-            Dynamic.f_date_end = self.named_date(Dynamic.date_end)
             self.reload_thumbnails.emit()
             self.dates_btn_solid.emit()
 
