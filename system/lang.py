@@ -463,8 +463,8 @@ class Lng:
         "Start"
     )
     image_search_drop = (
-        "Перетяните сюда изображение",
-        "Drop image here"
+        "Перетяните сюда цветное изображение",
+        "Drop color image here"
     )
     close = (
         "Закрыть",
