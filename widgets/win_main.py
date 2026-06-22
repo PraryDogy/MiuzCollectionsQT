@@ -140,7 +140,10 @@ class WinMain(UMainWindow):
             lambda: self.open_filters_win()
         )
         self.bar_top.open_img_search.connect(
-            lambda: self.open_img_search()
+            lambda: self.img_search_start()
+        )
+        self.bar_top.exit_img_search.connect(
+            lambda: self.img_search_exit()
         )
         self.right_layout.addWidget(self.bar_top)
 
@@ -207,7 +210,7 @@ class WinMain(UMainWindow):
                 self.open_win_smb(mf)
         return wrapper
     
-    def open_img_search(self):
+    def img_search_start(self):
 
         def search_started():
             Dynamic.current_dir = os.sep
@@ -218,12 +221,21 @@ class WinMain(UMainWindow):
             Dynamic.date_start = None
             Dynamic.date_end = None
             self.left_menu.tree_wid.expand_to_path(os.sep)
+            self.bar_top.filters_btn.set_normal_style()
+            self.bar_top.dates_btn.set_normal_style()
+            self.bar_top.show_img_search()
+            self.bar_top.search_wid.clear()
             
         self.win_img_search = WinImgSearch()
         self.win_img_search.found_image.connect(self.load_st_grid)
         self.win_img_search.search_started.connect(search_started)
         self.win_img_search.center_to_parent(self)
         self.win_img_search.show()
+
+    def img_search_exit(self):
+        Dynamic.thumb_path_set.clear()
+        self.bar_top.hide_img_search()
+        self.load_st_grid()
     
     def show_in_app(self, rel_path: str):
         current_dir = os.path.dirname(rel_path)

@@ -287,22 +287,6 @@ class ExitImgSearchBtn(BarTopBtn):
 
 
 class BarTop(QWidget):
-    """
-    Верхняя панель с кнопками управления и поиском.
-
-    Сигналы:
-        open_dates_win: открывает окно выбора даты.
-        open_settings_win: открывает окно настроек.
-        reload_thumbnails: обновляет миниатюры при изменении фильтров или сортировки.
-
-    Атрибуты:
-        sort_btn: кнопка сортировки.
-        filters_btn: кнопка фильтров.
-        dates_btn: кнопка открытия окна выбора даты.
-        settings_btn: кнопка настроек.
-        search_wid: виджет поиска.
-    """
-
     open_dates_win = pyqtSignal()
     open_settings_win = pyqtSignal(SettingsItem)
     open_filters_win = pyqtSignal()
@@ -310,6 +294,7 @@ class BarTop(QWidget):
     history_press = pyqtSignal()
     level_up = pyqtSignal()
     open_img_search = pyqtSignal()
+    exit_img_search = pyqtSignal()
     text_height = 53
     text_spacing = 15
 
@@ -344,9 +329,9 @@ class BarTop(QWidget):
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        self.test_btn = TestBtn()
-        self.test_btn.clicked_.connect(self.toggle_img_search)
-        self.h_layout.addWidget(self.test_btn)
+        # self.test_btn = TestBtn()
+        # self.test_btn.clicked_.connect(self.toggle_img_search)
+        # self.h_layout.addWidget(self.test_btn)
 
         self.h_layout.addStretch()
 
@@ -358,16 +343,17 @@ class BarTop(QWidget):
 
         self.exit_search_btn = ExitImgSearchBtn()
         self.exit_search_btn.setFixedWidth(self.search_wid.ww)
+        self.exit_search_btn.clicked_.connect(self.exit_img_search.emit)
         self.h_layout.addWidget(self.exit_search_btn)
         self.exit_search_btn.hide()
 
-    def toggle_img_search(self):
-        if self.exit_search_btn.isHidden():
-            self.search_wid.hide()
-            self.exit_search_btn.show()
-        else:
-            self.search_wid.show()
-            self.exit_search_btn.hide()
+    def show_img_search(self):
+        self.search_wid.hide()
+        self.exit_search_btn.show()        
+
+    def hide_img_search(self):
+        self.search_wid.show()
+        self.exit_search_btn.hide()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
