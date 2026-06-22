@@ -6,7 +6,7 @@ from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QHBoxLayout,
                              QLabel, QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QPushButton, QScrollArea,
-                             QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
+                             QSpacerItem, QTextEdit, QVBoxLayout, QWidget, QSlider)
 from typing_extensions import Optional
 
 from cfg import Cfg
@@ -406,3 +406,50 @@ class RowArrowWidget(QWidget):
         if a0.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         return super().mouseReleaseEvent(a0)
+    
+
+class USlider(QSlider):
+    clicked = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        style = """
+            QSlider::groove:horizontal {
+                border-radius: 1px;
+                height: 3px;
+                margin: 0px;
+                background-color: rgba(111, 111, 111, 0.5);
+            }
+            QSlider::handle:horizontal {
+                background-color: rgba(199, 199, 199, 1);
+                height: 10px;
+                width: 10px;
+                border-radius: 5px;
+                margin: -4px 0;
+                padding: -4px 0px;
+            }
+        """
+        self.setStyleSheet(style)
+        self.valueChanged.connect(self._on_value_changed)
+
+    def mousePressEvent(self, ev):
+        if ev.button() != Qt.MouseButton.LeftButton:
+            ev.ignore()
+            return
+
+        ratio = ev.x() / self.width()
+        value = self.minimum() + round(ratio * (self.maximum() - self.minimum()))
+        self.setValue(value)
+        ev.accept()
+        return super().mousePressEvent(ev)
+
+    def wheelEvent(self, e) -> None:
+        if e:
+            e.ignore()
+
+    def _on_value_changed(self, value: int):
+        self.blockSignals(True)
+        self.setValue(value)
+        self.blockSignals(False)
+        self.clicked.emit()
