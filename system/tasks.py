@@ -405,7 +405,7 @@ class ImageSearcher(URunnable):
                     if ImgUtils.is_grayscale(img):
                         continue
                     result = self.compare(img)
-                    if result > 0.8:
+                    if result > 0.5:
                         rel_path = Utils.get_rel_thumb_path(i.path)
                         self.sigs.found_image.emit(rel_path)
 
