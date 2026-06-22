@@ -263,7 +263,7 @@ class WinMain(UMainWindow):
 
         def on_closed():
             if not any((
-                Dynamic.filters_enabled,
+                Dynamic.filter_only_folder,
                 Dynamic.filter_favs,
                 *Dynamic.filters_enabled,
             )):
