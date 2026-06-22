@@ -269,21 +269,30 @@ class SettingsBtn(BarTopBtn):
         self.svg_btn.load(self.ICON_PATH)
 
 
-class TestBtn(BarTopBtn):
-    ICON_PATH = "./images/settings.svg"
+class ExitImgSearchBtn(UFrame):
+    clicked_ = pyqtSignal()
+    ICON_PATH = "./images/clear.svg"
+    svg_size = 15
+    hh = 30
     def __init__(self):
         super().__init__()
-        self.lbl.setText("тест")
-        self.svg_btn.load(self.ICON_PATH)
+        h_layout = UHBoxLayout(self)
+        h_layout.setSpacing(10)
 
+        h_layout.addStretch()
 
-class ExitImgSearchBtn(BarTopBtn):
-    ICON_PATH = "./images/settings.svg"
-    def __init__(self):
-        super().__init__()
-        self.lbl.setText("ВЫйти из поиска")
-        self.svg_btn.load(self.ICON_PATH)
+        text_label = QLabel("Закрыть поиск")
+        h_layout.addWidget(text_label)
 
+        svg_widget = ClearBtn(self)
+        h_layout.addWidget(svg_widget)
+
+        self.solid_style()
+        self.setFixedHeight(self.hh)
+
+    def mouseReleaseEvent(self, a0):
+        self.clicked_.emit()
+        return super().mouseReleaseEvent(a0)
 
 
 class BarTop(QWidget):
@@ -329,11 +338,7 @@ class BarTop(QWidget):
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        # self.test_btn = TestBtn()
-        # self.test_btn.clicked_.connect(self.toggle_img_search)
-        # self.h_layout.addWidget(self.test_btn)
-
-        self.h_layout.addStretch()
+        self.h_layout.addStretch(0)
 
         # --- Виджет поиска ---
         self.search_wid = WidSearch()
@@ -342,9 +347,9 @@ class BarTop(QWidget):
         self.h_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.exit_search_btn = ExitImgSearchBtn()
-        self.exit_search_btn.setFixedWidth(self.search_wid.ww)
+        # self.exit_search_btn.setFixedWidth(self.search_wid.ww)
         self.exit_search_btn.clicked_.connect(self.exit_img_search.emit)
-        self.h_layout.addWidget(self.exit_search_btn)
+        self.h_layout.addWidget(self.exit_search_btn, alignment=Qt.AlignmentFlag.AlignRight)
         self.exit_search_btn.hide()
 
     def show_img_search(self):
