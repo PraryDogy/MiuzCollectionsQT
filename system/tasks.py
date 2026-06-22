@@ -1,9 +1,7 @@
 import os
 import traceback
-from collections import defaultdict
 from datetime import datetime
-import torch
-import clip
+
 import cv2
 # import imagehash
 import numpy as np
@@ -377,48 +375,29 @@ class ImageSearcher(URunnable):
         self.current_count = 0
         self.stop_flag = False
 
-
-        self.model, self.preprocess = clip.load(
-            "ViT-B/32",
-            device="cpu",
-            download_root="./models"
-        )
-        self.model.eval()
-
-        self.src_emb = self.embed(src_img)
-
     def stop_task(self):
         self.stop_flag = True
 
-    def embed(self, img):
-        img = Image.fromarray(img[:, :, ::-1])  # BGR → RGB
-        img = self.preprocess(img).unsqueeze(0)
-
-        with torch.no_grad():
-            emb = self.model.encode_image(img)
-
-        return emb / emb.norm(dim=-1, keepdim=True)
-
     def compare(self, img2):
-        emb2 = self.embed(img2)
-        sim = (self.src_emb @ emb2.T).item()
-        return sim
+        return 0
 
     def start(self):
-        for i in os.scandir(Static.external_hashdir):
-            if i.is_dir():
-                for x in os.scandir(i.path):
-                    if self.stop_flag:
-                        print("image search canceled")
-                        return
-                    if x.name.endswith(".jpg"):
-                            self.current_count += 1
-                            img = cv2.imread(x.path)
-                            result = self.compare(img)
-                            # print(result)
-                            if result > 0.9:
-                                rel_path = Utils.get_rel_thumb_path(x.path)
-                                self.sigs.found_image.emit(rel_path)
+        stack = [Static.external_hashdir, ]
+        while stack:
+            current_dir = stack.pop()
+            for i in os.scandir(current_dir):
+                if self.stop_flag:
+                    print("image search canceled")
+                    return
+                if i.is_dir():
+                    stack.append(i.path)
+                elif i.name.endswith(".jpg"):
+                    self.current_count += 1
+                    img = cv2.imread(i.path)
+                    result = self.compare(img)
+                    if result > 9000:
+                        rel_path = Utils.get_rel_thumb_path(i.path)
+                        self.sigs.found_image.emit(rel_path)
 
     def task(self):
         self.start()
