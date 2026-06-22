@@ -148,8 +148,6 @@ class WinImgSearch(UMainWindow):
 
         if not hasattr(self, "img_array") or self.img_array is None:
             return
-        
-        Dynamic.thumb_path_set.clear()
 
         self.image_searcher = ImageSearcher(self.img_array, self.slider_widget.current_value)
         self.image_searcher.sigs.finished_.connect(self.image_searcher_finished)

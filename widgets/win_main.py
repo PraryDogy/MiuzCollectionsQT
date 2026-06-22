@@ -209,23 +209,30 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(mf)
         return wrapper
-    
+
+    def set_no_filters(self):
+        Dynamic.filters_enabled.clear()
+        Dynamic.filter_favs = False
+        Dynamic.filter_only_folder = False
+        self.bar_top.filters_btn.set_normal_style()
+
+        Dynamic.date_start = None
+        Dynamic.date_end = None
+        self.bar_top.dates_btn.set_normal_style()
+
+        Dynamic.search_widget_text = None
+        Dynamic.thumb_path_set.clear()
+        self.bar_top.search_wid.clear()
+        self.bar_top.show_base_search()
+
     def img_search_start(self):
 
         def search_started():
             Dynamic.current_dir = os.sep
-            Dynamic.filter_favs = False
-            Dynamic.filter_only_folder = False
-            Dynamic.filters_enabled.clear()
-            Dynamic.search_widget_text = None
-            Dynamic.date_start = None
-            Dynamic.date_end = None
             self.left_menu.tree_wid.expand_to_path(os.sep)
-            self.bar_top.filters_btn.set_normal_style()
-            self.bar_top.dates_btn.set_normal_style()
+            self.set_no_filters()
             self.bar_top.show_img_search()
-            self.bar_top.search_wid.clear()
-            
+
         self.win_img_search = WinImgSearch()
         self.win_img_search.found_image.connect(self.load_st_grid)
         self.win_img_search.search_started.connect(search_started)
@@ -233,8 +240,7 @@ class WinMain(UMainWindow):
         self.win_img_search.show()
 
     def img_search_exit(self):
-        Dynamic.thumb_path_set.clear()
-        self.bar_top.hide_img_search()
+        self.set_no_filters()
         self.load_st_grid()
     
     def show_in_app(self, rel_path: str):
@@ -286,22 +292,18 @@ class WinMain(UMainWindow):
             abs_img_path=abs_path
         )
         Dynamic.current_dir = rel_path
-        Dynamic.search_widget_text = ""
-        Dynamic.thumb_path_set.clear()
-        self.bar_top.search_wid.clear()
+        self.set_no_filters()
         self.load_st_grid()
         self.path_bar_update(Dynamic.current_dir)
 
     def on_mf_clicked(self, mf: Mf):
+        self.set_no_filters()
         Mf.current_mf = mf
         Dynamic.current_dir = os.sep
-        Dynamic.search_widget_text = ""
-        Dynamic.thumb_path_set.clear()
-        self.bar_top.search_wid.clear()
+        self.path_bar_update(Dynamic.current_dir)
         self.left_menu.tree_wid.abs_selected_path = os.sep
         self.left_menu.tree_wid.init_ui()
         self.load_st_grid()
-        self.path_bar_update(Dynamic.current_dir)
 
         mf_path = mf.get_avaiable_mf_path()
         if not mf_path:

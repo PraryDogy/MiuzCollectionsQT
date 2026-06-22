@@ -363,7 +363,7 @@ class BarTop(QWidget):
         self.search_wid.hide()
         self.exit_search_btn.show()        
 
-    def hide_img_search(self):
+    def show_base_search(self):
         self.search_wid.show()
         self.exit_search_btn.hide()
 
