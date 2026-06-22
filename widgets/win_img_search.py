@@ -159,7 +159,12 @@ class WinImgSearch(UMainWindow):
 
     def found_image_cmd(self, rel_path: str):
         Dynamic.thumb_path_set.add(rel_path)
-        QTimer.singleShot(500, self.found_image.emit)
+        if hasattr(self, "found_image_timer"):
+            self.found_image_timer.stop()
+        self.found_image_timer = QTimer(self)
+        self.found_image_timer.setSingleShot(True)
+        self.found_image_timer.timeout.connect(self.found_image.emit)
+        self.found_image_timer.start(500)
 
     def read_img(self, url: str, ms=300):
 
@@ -189,10 +194,9 @@ class WinImgSearch(UMainWindow):
                     self.img_label.setPixmap(QPixmap.fromImage(qimage))
 
             if not self.read_img_task.is_alive():
-                ...
-                # self.read_img_task.terminate_join()
-                # shm.close()
-                # shm.unlink()
+                self.read_img_task.terminate_join()
+                shm.close()
+                shm.unlink()
             else:
                 self.read_img_timer.start(ms)
 
