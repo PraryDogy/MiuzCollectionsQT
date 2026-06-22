@@ -62,7 +62,6 @@ class ProgressWin(UMainWindow):
 
 
 class SliderWidget(QWidget):
-    # slider_clicked = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -79,7 +78,6 @@ class SliderWidget(QWidget):
         self.slider.setMinimum(0)
         self.slider.setMaximum(100)
         self.slider.setValue(base_value)
-        self.slider.setFixedWidth(80)
 
         self.h_layout.addWidget(self.slider)
 
