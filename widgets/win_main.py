@@ -274,12 +274,18 @@ class WinMain(UMainWindow):
             abs_img_path=abs_path
         )
         Dynamic.current_dir = rel_path
+        Dynamic.search_widget_text = ""
+        Dynamic.thumb_path_set.clear()
+        self.bar_top.search_wid.clear()
         self.load_st_grid()
         self.path_bar_update(Dynamic.current_dir)
 
     def on_mf_clicked(self, mf: Mf):
         Mf.current_mf = mf
         Dynamic.current_dir = os.sep
+        Dynamic.search_widget_text = ""
+        Dynamic.thumb_path_set.clear()
+        self.bar_top.search_wid.clear()
         self.left_menu.tree_wid.abs_selected_path = os.sep
         self.left_menu.tree_wid.init_ui()
         self.load_st_grid()
