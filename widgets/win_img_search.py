@@ -134,11 +134,10 @@ class WinImgSearch(UMainWindow):
 
     def task_finished(self):
         if not Dynamic.thumb_path_set:
-            Dynamic.thumb_path_set.add("999999999999")
-            self.found_image.emit()
+            self.found_image_cmd("999999999999")
+        self.progress_win.deleteLater()
 
     def poll_progress_win(self):
-
         def timeout():
             try:
                 self.progress_win.set_text(
@@ -147,7 +146,6 @@ class WinImgSearch(UMainWindow):
                 )
             except RuntimeError:
                 ...
-
         self.progress_timer = QTimer(self)
         self.progress_timer.timeout.connect(timeout)
         self.progress_timer.start(500)
@@ -173,8 +171,8 @@ class WinImgSearch(UMainWindow):
             queue = self.read_img_task.process_queue
             if not queue.empty():
                 item: ReadImgItem = queue.get()
-                shm = shared_memory.SharedMemory(name=item.shm_name)
-                self.img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=shm.buf)
+                self.shm = shared_memory.SharedMemory(name=item.shm_name)
+                self.img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=self.shm.buf)
 
                 if ImgUtils.is_grayscale(self.img_array):
                     del self.img_array
@@ -195,8 +193,8 @@ class WinImgSearch(UMainWindow):
 
             if not self.read_img_task.is_alive():
                 self.read_img_task.terminate_join()
-                shm.close()
-                shm.unlink()
+                # self.shm.close()
+                # self.shm.unlink()
             else:
                 self.read_img_timer.start(ms)
 
