@@ -133,14 +133,9 @@ class WinImgSearch(UMainWindow):
         self.progress_win.deleteLater() 
 
     def task_finished(self):
-
         if not Dynamic.thumb_path_set:
             Dynamic.thumb_path_set.add("999999999999")
             self.found_image.emit()
-
-        self.progress_timer.stop()
-        self.progress_win.deleteLater()
-        self.deleteLater()
 
     def poll_progress_win(self):
 
@@ -164,16 +159,9 @@ class WinImgSearch(UMainWindow):
 
     def found_image_cmd(self, rel_path: str):
         Dynamic.thumb_path_set.add(rel_path)
-        self.found_image.emit()
+        QTimer.singleShot(500, self.found_image.emit)
 
     def read_img(self, url: str, ms=300):
-
-        def fin(qimage: QImage, shm: shared_memory.SharedMemory):
-            qpixmap = QPixmap.fromImage(qimage)
-            self.url_to_pixmap[self.current_data_item.rel_path] = qpixmap
-            self.restart_img_wid(qpixmap)
-            shm.close()
-            shm.unlink()
 
         def poll():
             self.read_img_timer.stop()
@@ -186,7 +174,6 @@ class WinImgSearch(UMainWindow):
                 if ImgUtils.is_grayscale(self.img_array):
                     del self.img_array
                     self.img_label.clear()
-                    old_text = self.img_label.text()
                     self.img_label.setText(Lng.only_color[Cfg.lng_index])
                     QTimer.singleShot(
                         1500,
@@ -201,9 +188,11 @@ class WinImgSearch(UMainWindow):
                     )
                     self.img_label.setPixmap(QPixmap.fromImage(qimage))
 
-
             if not self.read_img_task.is_alive():
-                self.read_img_task.terminate_join()
+                ...
+                # self.read_img_task.terminate_join()
+                # shm.close()
+                # shm.unlink()
             else:
                 self.read_img_timer.start(ms)
 

@@ -401,7 +401,7 @@ class ImageSearcher(URunnable):
                     stack.append(i.path)
                 elif i.name.endswith(".jpg"):
                     self.current_count += 1
-                    img = cv2.imread(i.path)
+                    img = ImgUtils.read_img(i.path)
                     if ImgUtils.is_grayscale(img):
                         continue
                     result = self.compare(img)
