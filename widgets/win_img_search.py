@@ -1,16 +1,20 @@
 import os
+from multiprocessing import shared_memory
 
 import cv2
+import numpy as np
 import sqlalchemy
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout)
 from sqlalchemy import func
 
 from cfg import Cfg, Dynamic, Static
 from system.database import Dbase, Thumbs
+from system.items import ReadImgItem
 from system.lang import Lng
+from system.multiprocess import ProcessWorker, ReadImg
 from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
@@ -162,6 +166,58 @@ class WinImgSearch(UMainWindow):
         Dynamic.thumb_path_set.add(rel_path)
         self.found_image.emit()
 
+    def read_img(self, url: str, ms=300):
+
+        def fin(qimage: QImage, shm: shared_memory.SharedMemory):
+            qpixmap = QPixmap.fromImage(qimage)
+            self.url_to_pixmap[self.current_data_item.rel_path] = qpixmap
+            self.restart_img_wid(qpixmap)
+            shm.close()
+            shm.unlink()
+
+        def poll():
+            self.read_img_timer.stop()
+            queue = self.read_img_task.process_queue
+            if not queue.empty():
+                item: ReadImgItem = queue.get()
+                shm = shared_memory.SharedMemory(name=item.shm_name)
+                self.img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=shm.buf)
+
+                if ImgUtils.is_grayscale(self.img_array):
+                    del self.img_array
+                    self.img_label.clear()
+                    old_text = self.img_label.text()
+                    self.img_label.setText(Lng.only_color[Cfg.lng_index])
+                    QTimer.singleShot(
+                        1500,
+                        lambda: self.img_label.setText(Lng.image_search_drop[Cfg.lng_index])
+                    )
+                else:
+                    qimage = Utils.qimage_from_array(self.img_array)
+                    qimage = qimage.scaled(
+                        self.img_label.width(),
+                        self.img_label.height(),
+                        aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio
+                    )
+                    self.img_label.setPixmap(QPixmap.fromImage(qimage))
+
+
+            if not self.read_img_task.is_alive():
+                self.read_img_task.terminate_join()
+            else:
+                self.read_img_timer.start(ms)
+
+        self.read_img_task = ProcessWorker(
+            target=ReadImg.start,
+            args=(url, Static.max_img_size * 2, )
+        )
+        self.read_img_timer = QTimer(self)
+        self.read_img_timer.setSingleShot(True)
+        self.read_img_timer.timeout.connect(poll)
+
+        self.read_img_task.start()
+        self.read_img_timer.start(ms)
+
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
         return super().dragEnterEvent(a0)
@@ -170,26 +226,9 @@ class WinImgSearch(UMainWindow):
         if a0.mimeData().hasUrls():
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if first_url.endswith(ImgUtils.ext_all):
-                self.img_array = ImgUtils.read_img(first_url)
-                if ImgUtils.is_grayscale(self.img_array):
-                    old_text = self.img_label.text()
-                    self.img_label.setText(Lng.only_color[Cfg.lng_index])
-                    QTimer.singleShot(
-                        1500,
-                        lambda: self.img_label.setText(old_text)
-                    )
-                    return
-                
-                qimage = Utils.qimage_from_array(self.img_array)
-                qimage = qimage.scaled(
-                    self.img_label.width(),
-                    self.img_label.height(),
-                    aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio
-                )
-                self.img_label.setPixmap(QPixmap.fromImage(qimage))
-
-                self.img_array = ImgUtils.fit_to_thumb(self.img_array, Static.max_img_size)
-                self.img_array = cv2.cvtColor(self.img_array, cv2.COLOR_RGB2BGR)
+                self.img_label.clear()
+                self.img_label.setText(Lng.loading[Cfg.lng_index])
+                self.read_img(first_url)
 
         return super().dropEvent(a0)
     

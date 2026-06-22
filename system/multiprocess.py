@@ -72,9 +72,10 @@ class ProcessWorker(BaseProcessWorker):
 
 class ReadImg:
     @staticmethod
-    def start(src: str, desaturate: bool, queue: Queue):
+    def start(src: str, size: int, queue: Queue):
         img_array = ImgUtils.read_img(src)
-
+        if size > 0:
+            img_array = ImgUtils.resize(img_array, size)
         shm = shared_memory.SharedMemory(create=True, size=img_array.nbytes)
         buffer = np.ndarray(img_array.shape, dtype=img_array.dtype, buffer=shm.buf)
         buffer[:] = img_array

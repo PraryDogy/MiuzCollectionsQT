@@ -366,7 +366,7 @@ class WinImageView(UMainWindow):
 
             self.read_img_task = ProcessWorker(
                 target=ReadImg.start,
-                args=(abs_path, False, )
+                args=(abs_path, 0, )
             )
             self.read_img_timer = QTimer(self)
             self.read_img_timer.setSingleShot(True)
