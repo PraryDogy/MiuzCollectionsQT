@@ -368,10 +368,11 @@ class ImageSearcher(URunnable):
         finished_ = pyqtSignal()
         found_image = pyqtSignal(str)
 
-    def __init__(self, src_img: np.ndarray):
+    def __init__(self, src_img: np.ndarray, similarity_value: int):
         super().__init__()
         self.sigs = ImageSearcher.Sigs()
         self.src_img = src_img
+        self.similarity_value = similarity_value / 100
         self.current_count = 0
         self.stop_flag = False
 
@@ -405,7 +406,7 @@ class ImageSearcher(URunnable):
                     if ImgUtils.is_grayscale(img):
                         continue
                     result = self.compare(img)
-                    if result > 0.5:
+                    if result > self.similarity_value:
                         rel_path = Utils.get_rel_thumb_path(i.path)
                         self.sigs.found_image.emit(rel_path)
 

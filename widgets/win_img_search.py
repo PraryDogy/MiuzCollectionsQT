@@ -7,7 +7,7 @@ import sqlalchemy
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
-                             QVBoxLayout)
+                             QVBoxLayout, QWidget)
 from sqlalchemy import func
 
 from cfg import Cfg, Dynamic, Static
@@ -19,7 +19,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow
+from ._base_widgets import UMainWindow, USlider
 
 
 class ProgressWin(UMainWindow):
@@ -61,6 +61,38 @@ class ProgressWin(UMainWindow):
         a0.ignore()
 
 
+class SliderWidget(QWidget):
+    # slider_clicked = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        base_value = 50
+        self.current_value = base_value
+
+        self.h_layout = QHBoxLayout(self)
+        self.h_layout.setContentsMargins(0, 0, 0, 0)
+        self.h_layout.setSpacing(10)
+
+        self.slider = USlider()
+
+        self.slider.setOrientation(Qt.Orientation.Horizontal)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(100)
+        self.slider.setValue(base_value)
+        self.slider.setFixedWidth(80)
+
+        self.h_layout.addWidget(self.slider)
+
+        self.value_label = QLabel(f"{base_value}%")
+        self.h_layout.addWidget(self.value_label)
+
+        self.slider.clicked.connect(self.slider_clicked_cmd)
+
+    def slider_clicked_cmd(self, value: int):
+        self.value_label.setText(f"{value}%")
+        self.current_value = value
+
+
 class WinImgSearch(UMainWindow):
     found_image = pyqtSignal()
     ww = 250
@@ -88,6 +120,9 @@ class WinImgSearch(UMainWindow):
 
         self.central_layout.addStretch()
 
+        self.slider_widget = SliderWidget()
+        self.central_layout.addWidget(self.slider_widget)
+
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
 
@@ -114,7 +149,7 @@ class WinImgSearch(UMainWindow):
         
         Dynamic.thumb_path_set.clear()
 
-        self.image_searcher = ImageSearcher(self.img_array)
+        self.image_searcher = ImageSearcher(self.img_array, self.slider_widget.current_value)
         self.image_searcher.sigs.finished_.connect(self.image_searcher_finished)
         self.image_searcher.sigs.found_image.connect(self.found_image_cmd)
         UThreadPool.start(self.image_searcher)

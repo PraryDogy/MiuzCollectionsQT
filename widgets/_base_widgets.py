@@ -409,7 +409,7 @@ class RowArrowWidget(QWidget):
     
 
 class USlider(QSlider):
-    clicked = pyqtSignal()
+    clicked = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -452,4 +452,4 @@ class USlider(QSlider):
         self.blockSignals(True)
         self.setValue(value)
         self.blockSignals(False)
-        self.clicked.emit()
+        self.clicked.emit(value)
