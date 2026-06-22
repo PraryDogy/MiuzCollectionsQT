@@ -474,3 +474,7 @@ class Lng:
         "Поддерживаются только цветные изображения",
         "Only color images are supported"
     )
+    accuracy = (
+        "Точность",
+        "Accuracy"
+    )

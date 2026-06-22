@@ -118,6 +118,9 @@ class WinImgSearch(UMainWindow):
 
         self.central_layout.addStretch()
 
+        self.accuracy_label = QLabel(Lng.accuracy[Cfg.lng_index] + ":")
+        self.central_layout.addWidget(self.accuracy_label)
+
         self.slider_widget = SliderWidget()
         self.central_layout.addWidget(self.slider_widget)
 
