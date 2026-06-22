@@ -277,6 +277,7 @@ class ExitImgSearchBtn(UFrame):
     def __init__(self):
         super().__init__()
         h_layout = UHBoxLayout(self)
+        h_layout.setContentsMargins(2, 0, 2, 0)
         h_layout.setSpacing(10)
 
         h_layout.addStretch()
@@ -340,16 +341,22 @@ class BarTop(QWidget):
 
         self.h_layout.addStretch(0)
 
+        right_widget = QWidget()
+        right_widget.setFixedWidth(WidSearch.ww)
+        self.h_layout.addWidget(right_widget)
+        right_layout = UHBoxLayout(right_widget)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(0)
+
         # --- Виджет поиска ---
         self.search_wid = WidSearch()
         self.search_wid.reload_thumbnails.connect(lambda: self.reload_thumbnails.emit())
         self.search_wid.open_img_search.connect(lambda: self.open_img_search.emit())
-        self.h_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
+        right_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.exit_search_btn = ExitImgSearchBtn()
-        # self.exit_search_btn.setFixedWidth(self.search_wid.ww)
         self.exit_search_btn.clicked_.connect(self.exit_img_search.emit)
-        self.h_layout.addWidget(self.exit_search_btn, alignment=Qt.AlignmentFlag.AlignRight)
+        right_layout.addWidget(self.exit_search_btn, alignment=Qt.AlignmentFlag.AlignRight)
         self.exit_search_btn.hide()
 
     def show_img_search(self):
