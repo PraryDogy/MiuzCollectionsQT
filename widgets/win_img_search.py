@@ -49,11 +49,13 @@ class ProgressWin(UMainWindow):
         self.adjustSize()
 
     def set_text(self, current_count, total_count):
+        if current_count > total_count:
+            current_count = total_count
         if total_count == 0:
             text = Lng.preparing[Cfg.lng_index]
         else:
             text = f"{Lng.search[Cfg.lng_index]} {current_count} {Lng.from_[Cfg.lng_index]} {total_count}"
-        self.text_label.setText(text)
+            self.text_label.setText(text)
 
     def closeEvent(self, a0):
         a0.ignore()
@@ -113,7 +115,7 @@ class WinImgSearch(UMainWindow):
         Dynamic.thumb_path_set.clear()
 
         self.image_searcher = ImageSearcher(self.img_array)
-        self.image_searcher.sigs.finished_.connect(self.task_finished)
+        self.image_searcher.sigs.finished_.connect(self.image_searcher_finished)
         self.image_searcher.sigs.found_image.connect(self.found_image_cmd)
         UThreadPool.start(self.image_searcher)
 
@@ -124,15 +126,15 @@ class WinImgSearch(UMainWindow):
     def open_progress_win(self):
         self.progress_win = ProgressWin()
         self.progress_win.center_to_parent(self)
-        self.progress_win.cancel_clicked.connect(self.cancel_clicked)
+        self.progress_win.cancel_clicked.connect(self.cancel_progress_win)
         self.progress_win.show()
 
-    def cancel_clicked(self):
+    def cancel_progress_win(self):
         self.progress_timer.stop()
         self.image_searcher.stop_task()
         self.progress_win.deleteLater() 
 
-    def task_finished(self):
+    def image_searcher_finished(self):
         if not Dynamic.thumb_path_set:
             self.found_image_cmd("999999999999")
         self.progress_win.deleteLater()
