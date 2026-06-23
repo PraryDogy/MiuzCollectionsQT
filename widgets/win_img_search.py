@@ -180,7 +180,7 @@ class WinImgSearch(UMainWindow):
     def image_searcher_finished(self):
         if not Dynamic.thumb_path_set:
             self.found_image_cmd("999999999999")
-        self.progress_win.deleteLater()
+        QTimer.singleShot(1000, self.progress_win.deleteLater)
 
     def poll_progress_win(self):
         def timeout():
