@@ -478,3 +478,7 @@ class Lng:
         "Точность",
         "Accuracy"
     )
+    close_search = (
+        "Закрыть поиск",
+        "Close search"
+    )

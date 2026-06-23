@@ -278,7 +278,7 @@ class ExitImgSearchBtn(UFrame):
 
         h_layout.addStretch()
 
-        text_label = QLabel("Закрыть поиск")
+        text_label = QLabel(Lng.close_search[Cfg.lng_index])
         h_layout.addWidget(text_label)
 
         svg_widget = ClearBtn(self)
