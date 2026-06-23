@@ -293,10 +293,3 @@ class WinImgSearch(UMainWindow):
         if hasattr(self, "image_searcher"):
             self.image_searcher.stop_task()
         return super().closeEvent(a0)
-    
-# чтение изображения в фоне
-# решить где ресайз
-# отправлять в таск только путь?
-# как прервать задачу закрытием
-# когда очищать список динамик
-# при закрытии очищать и при отображении сетки очищать
