@@ -281,8 +281,13 @@ class ExitImgSearchBtn(UFrame):
         text_label = QLabel(Lng.close_search[Cfg.lng_index])
         h_layout.addWidget(text_label)
 
+        icon_container = QWidget()
+        icon_container.setFixedSize(14, 18)
+        h_layout.addWidget(icon_container)
+
         svg_widget = ClearBtn(self)
-        h_layout.addWidget(svg_widget)
+        svg_widget.setParent(icon_container)
+        svg_widget.move(0, 2)
 
         self.solid_style()
         self.setFixedHeight(self.hh)
