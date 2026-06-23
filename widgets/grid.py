@@ -549,12 +549,13 @@ class Grid(VScrollArea):
             self.clear_selected_widgets()
             return
 
+
         modifiers = a0.modifiers()
         if modifiers == Qt.KeyboardModifier.ShiftModifier and self.selected_widgets:
             handle_shift_click()
         elif modifiers == Qt.KeyboardModifier.ControlModifier:
             handle_control_click()
-        else:
+        elif not hasattr(self, "double_click"):
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(self.wid_under_mouse)
 
@@ -747,10 +748,13 @@ class Grid(VScrollArea):
         self.up_btn.setVisible(value > 0)
 
     def mouseDoubleClickEvent(self, a0):
+
+        def fin(wid: Thumb):
+            self.wid_to_selected_widgets(wid)
+
         if self.wid_under_mouse:
-            self.clear_selected_widgets()
-            self.wid_to_selected_widgets(self.wid_under_mouse)
             self.open_img_view.emit()
+            QTimer.singleShot(150, lambda w=self.wid_under_mouse: fin(w))
 
     def mousePressEvent(self, a0):
         self.origin_pos = a0.pos()
