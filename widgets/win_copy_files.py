@@ -7,11 +7,10 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 from cfg import Cfg
 from system.items import CopyTaskItem
 from system.lang import Lng
+from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskWorker
 
-from ._base_widgets import SmallBtn, UMainWindow
-from .win_progressbar import WinProgressbar
-from system.main_folder import Mf
+from ._base_widgets import SmallBtn, UMainWindow, WinProgressbar
 
 
 class ReplaceFilesWin(UMainWindow):
