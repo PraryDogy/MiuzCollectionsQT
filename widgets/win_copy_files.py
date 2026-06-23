@@ -138,6 +138,9 @@ class WinCopyFiles(WinProgressbar):
 
     def __init__(self, target_dir: str, files_to_copy: list[str], action_type: bool):
         super().__init__(Lng.copying[Cfg.lng_index])
+        self.cancel.connect(self.stop_task)
+        self.cancel.connect(self.deleteLater)
+
         dst_text = os.path.basename(target_dir)
         if not dst_text:
             dst_text = Mf.current_mf.mf_alias
@@ -146,8 +149,6 @@ class WinCopyFiles(WinProgressbar):
         )
 
         self.dst_urls: list[str] = []
-        self.cancel.connect(self.stop_task)
-        self.cancel.connect(self.deleteLater)
         action_type = True if action_type == "cut" else False
 
         self.copy_task_item = CopyTaskItem(
