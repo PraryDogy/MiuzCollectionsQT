@@ -23,7 +23,7 @@ from ._base_widgets import UMainWindow, USlider
 
 
 class ProgressWin(UMainWindow):
-    cancel_clicked = pyqtSignal()
+    cancel_image_search = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -42,7 +42,7 @@ class ProgressWin(UMainWindow):
 
         self.cancel_btn = QPushButton(Lng.stop[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
-        self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
+        self.cancel_btn.clicked.connect(self.cancel_image_search.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.set_text(0, 0)
@@ -78,7 +78,7 @@ class SliderWidget(QWidget):
         self.slider = USlider()
 
         self.slider.setOrientation(Qt.Orientation.Horizontal)
-        self.slider.setMinimum(0)
+        self.slider.setMinimum(30)
         self.slider.setMaximum(100)
         self.slider.setValue(base_value)
 
@@ -145,13 +145,18 @@ class WinImgSearch(UMainWindow):
         self.adjustSize()
 
     def start_image_searcher(self):
-
         if not hasattr(self, "img_array") or self.img_array is None:
             return
-
-        self.image_searcher = ImageSearcher(self.img_array, self.slider_widget.current_value)
-        self.image_searcher.sigs.finished_.connect(self.image_searcher_finished)
-        self.image_searcher.sigs.found_image.connect(self.found_image_cmd)
+        self.image_searcher = ImageSearcher(
+            src_img=self.img_array,
+            similarity_value=self.slider_widget.current_value
+        )
+        self.image_searcher.sigs.finished_.connect(
+            self.image_searcher_finished
+        )
+        self.image_searcher.sigs.found_image.connect(
+            self.found_image_cmd
+        )
         UThreadPool.start(self.image_searcher)
 
         self.get_total_count()
@@ -162,11 +167,13 @@ class WinImgSearch(UMainWindow):
     def open_progress_win(self):
         self.progress_win = ProgressWin()
         self.progress_win.center_to_parent(self)
-        self.progress_win.cancel_clicked.connect(self.cancel_progress_win)
+        self.progress_win.cancel_image_search.connect(
+            self.cancel_image_search
+        )
         self.progress_win.show()
 
-    def cancel_progress_win(self):
-        self.progress_timer.stop()
+    def cancel_image_search(self):
+        self.progress_win_timer.stop()
         self.image_searcher.stop_task()
         self.progress_win.deleteLater() 
 
@@ -184,9 +191,9 @@ class WinImgSearch(UMainWindow):
                 )
             except RuntimeError:
                 ...
-        self.progress_timer = QTimer(self)
-        self.progress_timer.timeout.connect(timeout)
-        self.progress_timer.start(500)
+        self.progress_win_timer = QTimer(self)
+        self.progress_win_timer.timeout.connect(timeout)
+        self.progress_win_timer.start(500)
 
     def get_total_count(self):
         with Dbase.main_engine.connect() as conn:
@@ -206,29 +213,37 @@ class WinImgSearch(UMainWindow):
 
         def poll():
             self.read_img_timer.stop()
-            queue = self.read_img_task.process_queue
-            if not queue.empty():
-                item: ReadImgItem = queue.get()
-                self.shm = shared_memory.SharedMemory(name=item.shm_name)
-                self.img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=self.shm.buf)
+            if not self.read_img_task.process_queue.empty():
+                item: ReadImgItem = self.read_img_task.process_queue.get()
+                shm = shared_memory.SharedMemory(
+                    name=item.shm_name
+                )
+                self.img_array = np.ndarray(
+                    item.shape,
+                    dtype=np.dtype(item.dtype),
+                    buffer=shm.buf
+                )
 
                 if ImgUtils.is_grayscale(self.img_array):
                     del self.img_array
                     self.img_label.clear()
                     self.img_label.setText(Lng.only_color[Cfg.lng_index])
+                    base_text = Lng.image_search_drop[Cfg.lng_index]
                     QTimer.singleShot(
                         1500,
-                        lambda: self.img_label.setText(Lng.image_search_drop[Cfg.lng_index])
+                        lambda: self.img_label.setText(base_text)
                     )
                 else:
                     qimage = Utils.qimage_from_array(self.img_array)
-                    qimage = qimage.scaled(
+                    min_size = min(
                         self.img_label.width(),
-                        self.img_label.height(),
-                        aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio
+                        self.img_label.height()
                     )
-                    self.img_label.setPixmap(QPixmap.fromImage(qimage))
-
+                    resized_qpixmap = Utils.qiconed_resize(
+                        QPixmap.fromImage(qimage),
+                        min_size
+                    )
+                    self.img_label.setPixmap(resized_qpixmap)
             if not self.read_img_task.is_alive():
                 self.read_img_task.terminate_join()
                 # self.shm.close()
