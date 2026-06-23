@@ -246,8 +246,8 @@ class WinImgSearch(UMainWindow):
                     self.img_label.setPixmap(resized_qpixmap)
             if not self.read_img_task.is_alive():
                 self.read_img_task.terminate_join()
-                # self.shm.close()
-                # self.shm.unlink()
+                # shm.close()
+                # shm.unlink()
             else:
                 self.read_img_timer.start(ms)
 
