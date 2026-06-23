@@ -77,7 +77,6 @@ class WidSearch(ULineEdit):
             self.clearFocus()
         return super().keyPressEvent(a0)
     
-    
     def mouseDoubleClickEvent(self, a0):
         self.open_img_search.emit()
         return super().mouseDoubleClickEvent(a0)
