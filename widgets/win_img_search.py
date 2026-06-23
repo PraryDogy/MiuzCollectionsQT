@@ -215,13 +215,13 @@ class WinImgSearch(UMainWindow):
             self.read_img_timer.stop()
             if not self.read_img_task.process_queue.empty():
                 item: ReadImgItem = self.read_img_task.process_queue.get()
-                shm = shared_memory.SharedMemory(
+                self.shm = shared_memory.SharedMemory(
                     name=item.shm_name
                 )
                 self.img_array = np.ndarray(
                     item.shape,
                     dtype=np.dtype(item.dtype),
-                    buffer=shm.buf
+                    buffer=self.shm.buf
                 )
 
                 if ImgUtils.is_grayscale(self.img_array):
