@@ -284,6 +284,9 @@ class WinImgSearch(UMainWindow):
     def deleteLater(self):
         if hasattr(self, "image_searcher"):
             self.image_searcher.stop_task()
+        if hasattr(self, "read_img_task"):
+            self.read_img_task.terminate_join()
+        
         return super().deleteLater()
     
     def closeEvent(self, a0):
