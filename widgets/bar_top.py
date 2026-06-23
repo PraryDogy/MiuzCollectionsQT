@@ -50,10 +50,7 @@ class WidSearch(ULineEdit):
         self.clear_btn = ClearBtn(parent=self)
         self.clear_btn.clicked_.connect(self.clear_search)
         self.clear_btn.disable()
-        self.clear_btn.move(
-            self.width() - ClearBtn.svg_size - 8,
-            (ClearBtn.svg_size * 2) // 4
-        )
+        self.clear_btn.move(self.ww - 20, 8)
 
     def create_search(self, new_text):
         if len(new_text) > 0:
@@ -278,7 +275,7 @@ class ExitImgSearchBtn(UFrame):
         super().__init__()
         h_layout = UHBoxLayout(self)
         h_layout.setContentsMargins(2, 0, 2, 0)
-        h_layout.setSpacing(10)
+        h_layout.setSpacing(5)
 
         h_layout.addStretch()
 

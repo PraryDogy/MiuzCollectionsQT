@@ -9,8 +9,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pillow_heif
-# import rawpy
-# import rawpy._rawpy
+import rawpy
 import tifffile
 from PIL import Image, ImageOps, ImageCms
 
@@ -303,35 +302,14 @@ class ImgUtils:
                 img = img.convert("RGB")
                 return np.array(img)
             else:
-                img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+                img = cv2.imread(path, cv2.IMREAD_COLOR)
                 return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        except Exception as e:
-            print("read jpg error", e)
-            return cls._get_broken_image()
-        return
-        try:
-            img = Image.open(path)
-            try:
-                img = ImageOps.exif_transpose(img) 
-            except OSError:
-                pass
-            icc_profile = img.info.get("icc_profile")
-            if icc_profile:
-                print(123)
-                src_profile = ImageCms.ImageCmsProfile(io.BytesIO(icc_profile))
-                dst_profile = ImageCms.createProfile("sRGB")
-                img = ImageCms.profileToProfile(img, src_profile, dst_profile)
-            img = img.convert("RGB")
-            array_img = np.array(img)
-            img.close()
-            return array_img
         except Exception as e:
             print("read jpg error", e)
             return cls._get_broken_image()
 
     @classmethod
     def _read_raw(cls, path: str):
-        return cls._get_broken_image()
         try:
             # https://github.com/letmaik/rawpy
             # Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:
@@ -365,7 +343,7 @@ class ImgUtils:
             array_img = np.array(img)
             img.close()
             return array_img
-        except (Exception, rawpy._rawpy.LibRawDataError) as e:
+        except Exception as e:
             print("read raw error", e)
             return cls._get_broken_image()
 
