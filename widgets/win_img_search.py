@@ -14,6 +14,7 @@ from cfg import Cfg, Dynamic, Static
 from system.database import Dbase, Thumbs
 from system.items import ReadImgItem
 from system.lang import Lng
+from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg
 from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
@@ -35,7 +36,7 @@ class ProgressWin(UMainWindow):
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.text_label = QLabel()
+        self.text_label = QLabel(Lng.preparing[Cfg.lng_index])
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.text_label.setFixedSize(200, 30)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -54,7 +55,10 @@ class ProgressWin(UMainWindow):
         if total_count == 0:
             text = Lng.preparing[Cfg.lng_index]
         else:
-            text = f"{Lng.search[Cfg.lng_index]} {current_count} {Lng.from_[Cfg.lng_index]} {total_count}"
+            text = (
+                f"{Lng.search[Cfg.lng_index]} {current_count} " 
+                f"{Lng.from_[Cfg.lng_index]} {total_count}"
+            )
             self.text_label.setText(text)
 
     def closeEvent(self, a0):
@@ -114,7 +118,15 @@ class WinImgSearch(UMainWindow):
         group_layout = QVBoxLayout(group)
         group_layout.setContentsMargins(5, 5, 5, 5)
 
-        self.img_label = QLabel(Lng.image_search_drop[Cfg.lng_index])
+        lines_base_text = (
+
+            f"{Lng.search[Cfg.lng_index]} {Lng.in_[Cfg.lng_index]} "
+            f"\"{Mf.current_mf.mf_alias}\".",
+
+            f"{Lng.image_search_drop[Cfg.lng_index]}."
+        )
+        self.base_text = "\n".join(lines_base_text)
+        self.img_label = QLabel(self.base_text)
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setFixedSize(self.ww, self.hh)
         self.img_label.setWordWrap(True)
@@ -228,10 +240,9 @@ class WinImgSearch(UMainWindow):
                     del self.img_array
                     self.img_label.clear()
                     self.img_label.setText(Lng.only_color[Cfg.lng_index])
-                    base_text = Lng.image_search_drop[Cfg.lng_index]
                     QTimer.singleShot(
                         1500,
-                        lambda: self.img_label.setText(base_text)
+                        lambda: self.img_label.setText(self.base_text)
                     )
                 else:
                     qimage = Utils.qimage_from_array(self.img_array)
