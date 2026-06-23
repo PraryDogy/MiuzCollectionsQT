@@ -750,7 +750,6 @@ class Grid(VScrollArea):
         if self.wid_under_mouse:
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(self.wid_under_mouse)
-            self.path_bar_update.emit(self.wid_under_mouse.data_item.rel_path)
             self.open_img_view.emit()
 
     def mousePressEvent(self, a0):
