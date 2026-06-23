@@ -12,8 +12,8 @@ class WinProgressbar(UMainWindow):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
-        self.setWindowModality(Qt.WindowModality.WindowModal)
+        # self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
+        # self.setWindowModality(Qt.WindowModality.WindowModal)
         self.setWindowTitle(title)
         self.setFixedSize(400, 70)
 
@@ -57,3 +57,7 @@ class WinProgressbar(UMainWindow):
     def cancel_cmd(self, *args):
         self.cancel.emit()
         self.deleteLater()
+
+    def closeEvent(self, a0):
+        self.cancel.emit()
+        return super().closeEvent(a0)

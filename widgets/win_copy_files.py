@@ -147,6 +147,7 @@ class WinCopyFiles(WinProgressbar):
         )
 
         self.dst_urls: list[str] = []
+        self.cancel.connect(self.stop_task)
         self.cancel.connect(self.deleteLater)
         action_type = True if action_type == "cut" else False
 
