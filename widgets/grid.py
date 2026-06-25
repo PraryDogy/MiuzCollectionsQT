@@ -458,7 +458,8 @@ class Grid(VScrollArea):
         }
 
         if event.modifiers() == CTRL and event.key() == Qt.Key.Key_Backspace:
-            remove_files()
+            if self.selected_widgets:
+                remove_files()
         if event.modifiers() == CTRL and event.key() == Qt.Key.Key_I:
             open_info()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_A:
