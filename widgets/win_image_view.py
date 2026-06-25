@@ -493,19 +493,6 @@ class WinImageView(UMainWindow):
 
         self.menu_.addSeparator()
 
-        rotate_menu = USubMenu(Lng.rotate[Cfg.lng_index], self.menu_)
-        self.menu_.addMenu(rotate_menu)
-
-        rotate_cw = QAction(Lng.clockwise[Cfg.lng_index] + " (⌘ + →)", rotate_menu)
-        rotate_cw.triggered.connect(lambda: self.rotate(90))
-        rotate_menu.addAction(rotate_cw)
-
-        rotate_ccw = QAction(Lng.counter_clockwise[Cfg.lng_index] + " (⌘ + ←)", rotate_menu)
-        rotate_ccw.triggered.connect(lambda: self.rotate(-90))
-        rotate_menu.addAction(rotate_ccw)
-
-        self.menu_.addSeparator()
-
         info = WinInfoAction(self.menu_)
         info.triggered.connect(
             lambda: self.open_win_info.emit(rel_paths)
@@ -526,11 +513,15 @@ class WinImageView(UMainWindow):
         )
         self.menu_.addAction(copy_path)
 
-        copy_name = CopyName(self.menu_, 1)
-        copy_name.triggered.connect(
-            lambda: self.copy_name.emit(rel_paths)
-        )
-        self.menu_.addAction(copy_name)
+        self.menu_.addSeparator()
+
+        rotate_cw = QAction(Lng.clockwise[Cfg.lng_index], self.menu_)
+        rotate_cw.triggered.connect(lambda: self.rotate(90))
+        self.menu_.addAction(rotate_cw)
+
+        rotate_ccw = QAction(Lng.counter_clockwise[Cfg.lng_index], self.menu_)
+        rotate_ccw.triggered.connect(lambda: self.rotate(-90))
+        self.menu_.addAction(rotate_ccw)
 
         self.menu_.addSeparator()
 

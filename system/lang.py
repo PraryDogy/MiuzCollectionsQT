@@ -335,8 +335,8 @@ class Lng:
     )
     swipe_text = ("\u2039 Проведите мышкой \u203A", "\u2039 Drag with mouse \u203A")
     rotate = ("Повернуть", "Rotate")
-    clockwise = ("Повернуть по ч.с.", "Rotate cw")
-    counter_clockwise = ("Повернуть против ч.с.", "Rotate ccw")
+    clockwise = ("Повернуть по ч.с. (⌘ + →)", "Rotate cw (⌘ + →)")
+    counter_clockwise = ("Повернуть против ч.с. (⌘ + ←)", "Rotate ccw (⌘ + ←)")
 
     replace = ("Замена", "Replace")
     replace_one = ("Заменить", "Replace")
