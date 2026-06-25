@@ -230,18 +230,23 @@ class CopyTask:
                 if percent > copy_item.current_percent:
                     copy_item.current_percent = percent
                     process_queue.put(copy_item)
-                    print("put", percent)
-            print("end while")
-        print("end open")
 
-        try:
+            fdst.flush()            # Скидывает данные из буфера Python в буфер ОС [1]
+            os.fsync(fdst.fileno()) # Принудительно заставляет ОС записать всё на физический диск прямо сейчас [1]
+            print("end")
+
+        #             print("put", percent)
+        #     print("end while")
+        # print("end open")
+
+        # try:
             # process_queue.put(copy_item)
-            print("copy file finished")
+            # print("copy file finished")
             # shutil.copystat(src, dest, follow_symlinks=True)
-        except OSError as e:
+        # except OSError as e:
             # import traceback
             # print(traceback.format_exc())
-            print("copy task - copy stat error", e)
+            # print("copy task - copy stat error", e)
 
 
 class FilesRemover:
