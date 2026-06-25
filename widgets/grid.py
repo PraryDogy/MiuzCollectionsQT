@@ -468,10 +468,6 @@ class Grid(VScrollArea):
             self.set_clipboard.emit(
                 ("copy", [i.data_item.rel_path for i in self.selected_widgets])
             )
-        elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_X:
-            self.set_clipboard.emit(
-                ("cut", [i.data_item.rel_path for i in self.selected_widgets])
-            )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             if not event.isAutoRepeat():
                 open_last_selected()
@@ -668,36 +664,23 @@ class Grid(VScrollArea):
 
             self.menu_.addSeparator()
 
-            advanced_menu = USubMenu(
-                Lng.advanced[Cfg.lng_index],
-                self.menu_
-            )
-            self.menu_.addMenu(advanced_menu)
-
-            act = CutFiles(self.menu_, len(rel_paths))
+            act = RevealInFinder(self.menu_, len(rel_paths))
             act.triggered.connect(
-                lambda: self.set_clipboard.emit(("cut", rel_paths))
+                lambda: self.reveal_in_finder.emit(rel_paths)
             )
-            advanced_menu.addAction(act)
+            self.menu_.addAction(act)
 
-            act = CopyFiles(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.set_clipboard.emit(("copy", rel_paths))
-            )
-            advanced_menu.addAction(act)
-
-            advanced_menu.addSeparator()
             update_thumb = UpdateThumbAction(self.menu_, len(rel_paths))
             update_thumb.triggered.connect(
                 lambda: self.update_thumb.emit(rel_paths)
             )
-            advanced_menu.addAction(update_thumb)
+            self.menu_.addAction(update_thumb)
             
             self.menu_.addSeparator()
 
-            act = RevealInFinder(self.menu_, len(rel_paths))
+            act = CopyFiles(self.menu_, len(rel_paths))
             act.triggered.connect(
-                lambda: self.reveal_in_finder.emit(rel_paths)
+                lambda: self.set_clipboard.emit(("copy", rel_paths))
             )
             self.menu_.addAction(act)
 
@@ -707,11 +690,11 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            act = CopyName(self.menu_, len(rel_paths))
-            act.triggered.connect(
-                lambda: self.copy_name.emit(rel_paths)
-            )
-            self.menu_.addAction(act)
+            # act = CopyName(self.menu_, len(rel_paths))
+            # act.triggered.connect(
+            #     lambda: self.copy_name.emit(rel_paths)
+            # )
+            # self.menu_.addAction(act)
 
             self.menu_.addSeparator()
 

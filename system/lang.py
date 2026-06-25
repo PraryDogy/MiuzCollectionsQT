@@ -215,7 +215,7 @@ class Lng:
     from_ = ("из", "from")
     in_ = ("в", "in")
     date_format = ("день.месяц.год", "day.month.year")
-    copy = ("Копировать (⌘ + C)", "Copy (⌘ + C)")
+    copy = ("Копировать файл (⌘ + C)", "Copy file (⌘ + C)")
     copy_all = ("Копировать все", "Copy all")
     add_to_favorites = ("Добавить в избранное", "Add to favorites")
     remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
@@ -368,8 +368,8 @@ class Lng:
         ""
     )
     update_thumb = (
-        "Обновить данные",
-        "Update data"
+        "Обновить изображение",
+        "Update image"
     )
     advanced = (
         "Дополнительно",
