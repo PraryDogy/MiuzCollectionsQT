@@ -475,7 +475,7 @@ class _ThumbsUpdater:
     def get_gui_text(scaner_item: ScanerItem):
         return (
             f"{scaner_item.mf.mf_alias}: "
-            f"{Lng.updating[scaner_item.lng_index].lower()} "
+            f"{Lng.indexing[scaner_item.lng_index].lower()} "
             f"({scaner_item.total_count})"
         )
 

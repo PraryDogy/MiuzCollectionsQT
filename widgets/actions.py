@@ -5,8 +5,12 @@ from system.lang import Lng
 
 
 class OpenInView(QAction):
-    def __init__(self, parent_: QMenu):
-        super().__init__(parent=parent_, text=Lng.open[Cfg.lng_index])
+    def __init__(self, rel_paths: list[str], parent_: QMenu):
+        if len(rel_paths) > 1:
+            end_text =  f" ({len(rel_paths)})"
+        else:
+            end_text = ""
+        super().__init__(parent=parent_, text=f"{Lng.open[Cfg.lng_index]}{end_text}")
 
 
 class ScanerRestart(QAction):

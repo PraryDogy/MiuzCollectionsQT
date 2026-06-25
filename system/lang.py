@@ -225,7 +225,7 @@ class Lng:
     add = ("Добавить", "Add")
     deleting = ("Удаляю", "Deleting")
     search_in = ("Поиск в каталоге", "Search in catalog")
-    updating = ("Обновление", "Updating")
+    indexing = ("Индексация", "Indexing")
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
     show_about = ("Об авторе", "About")

@@ -615,7 +615,7 @@ class Grid(VScrollArea):
             rel_paths = [w.data_item.rel_path for w in self.selected_widgets]
 
             # просмотр
-            act = OpenInView(self.menu_)
+            act = OpenInView(rel_paths, self.menu_)
             act.triggered.connect(
                 lambda: self.open_img_view.emit()
             )
@@ -730,12 +730,12 @@ class Grid(VScrollArea):
 
             self.menu_.addSeparator()
 
-            act = QAction(
-                f"{Lng.selected_objects[Cfg.lng_index]} ({len(rel_paths)})",
-                self.menu_
-            )
-            act.setDisabled(True)
-            self.menu_.addAction(act)
+            # act = QAction(
+            #     f"{Lng.selected_objects[Cfg.lng_index]} ({len(rel_paths)})",
+            #     self.menu_
+            # )
+            # act.setDisabled(True)
+            # self.menu_.addAction(act)
 
         if not clicked_wid:
             menu_empty()
