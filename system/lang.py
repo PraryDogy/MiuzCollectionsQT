@@ -131,7 +131,8 @@ class Lng:
     copy_name = ("Скопировать имя", "Copy filename")
     copy_names = ("Скопировать имя объектов", "Copy object names")
     attention = ("Внимание!", "Warning!")
-    delete_forever = ("Удалить безвозвратно файлы", "Delete forever files")
+    remove_file_question = ("Удалить безвозвратно файл", "Delete forever file")
+    remove_files_question = ("Удалить безвозвратно файлы", "Delete forever files")
     macintosh_theme = ("Macintosh", "Macintosh")
     theme = ("Тема", "Theme")
     dark_theme = ("Темная", "Dark")
@@ -215,12 +216,14 @@ class Lng:
     from_ = ("из", "from")
     in_ = ("в", "in")
     date_format = ("день.месяц.год", "day.month.year")
-    copy = ("Копировать файл (⌘ + C)", "Copy file (⌘ + C)")
+    copy_file = ("Копировать файл (⌘ + C)", "Copy file (⌘ + C)")
+    copy_files = ("Копировать файлы (⌘ + C)", "Copy files (⌘ + C)")
+    copy = ("Cкопировать (⌘ + C)", "Copy (⌘ + C)")
     copy_all = ("Копировать все", "Copy all")
     add_to_favorites = ("Добавить в избранное", "Add to favorites")
     remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
-    copy_filepath = ("Скопировать путь", "Copy filepath")
-    copy_filepaths = ("Скопировать путь до объектов", "Copy file paths to objects")
+    copy_filepath = ("Скопировать путь к файлу", "Copy filepath")
+    copy_filepaths = ("Скопировать путь к файлам", "Copy file paths to files")
     adding = ("Добавляю", "Add")
     add = ("Добавить", "Add")
     deleting = ("Удаляю", "Deleting")
@@ -370,6 +373,10 @@ class Lng:
     update_thumb = (
         "Обновить изображение",
         "Update image"
+    )
+    update_thumbs = (
+        "Обновить изображения",
+        "Update images"
     )
     advanced = (
         "Дополнительно",

@@ -670,7 +670,7 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            update_thumb = UpdateThumbAction(self.menu_, len(rel_paths))
+            update_thumb = UpdateThumbAction(self.menu_, rel_paths)
             update_thumb.triggered.connect(
                 lambda: self.update_thumb.emit(rel_paths)
             )
@@ -678,7 +678,7 @@ class Grid(VScrollArea):
             
             self.menu_.addSeparator()
 
-            act = CopyFiles(self.menu_, len(rel_paths))
+            act = CopyFiles(self.menu_, rel_paths)
             act.triggered.connect(
                 lambda: self.set_clipboard.emit(("copy", rel_paths))
             )

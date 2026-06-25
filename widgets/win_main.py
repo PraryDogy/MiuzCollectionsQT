@@ -493,9 +493,11 @@ class WinMain(UMainWindow):
             for i in rel_paths
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
-        self.remove_files_win = ConfirmWindow(
-            f"{Lng.delete_forever[Cfg.lng_index]} ({len(abs_paths)})?"
-        )
+        if len(abs_paths) == 1:
+            text = f"{Lng.remove_file_question[Cfg.lng_index]}?"
+        else:
+            text = f"{Lng.remove_files_question[Cfg.lng_index]}?"
+        self.remove_files_win = ConfirmWindow(text)
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
                 args=(abs_paths, )
