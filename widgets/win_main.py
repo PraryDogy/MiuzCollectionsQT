@@ -243,10 +243,6 @@ class WinMain(UMainWindow):
         Dynamic.current_dir = os.sep
         self.left_menu.tree_wid.expand_to_path(os.sep)
 
-        # Dynamic.search_widget_text = None
-        # self.bar_top.search_wid.clear()
-        # self.bar_top.show_base_search()
-
         self.load_st_grid()
 
     def img_search_start(self):
@@ -268,6 +264,21 @@ class WinMain(UMainWindow):
         self.load_st_grid()
     
     def show_in_app(self, rel_path: str):
+
+        Dynamic.filters_enabled.clear()
+        Dynamic.filter_favs = False
+        Dynamic.filter_only_folder = False
+        self.bar_top.filters_btn.set_normal_style()
+
+        Dynamic.date_start = None
+        Dynamic.date_end = None
+        self.bar_top.dates_btn.set_normal_style()
+
+        Dynamic.thumb_path_set.clear()
+        Dynamic.search_widget_text = None
+        self.bar_top.search_wid.clear()
+        self.bar_top.show_base_search()
+
         current_dir = os.path.dirname(rel_path)
         Dynamic.current_dir = current_dir
         self.go_to_url = rel_path
