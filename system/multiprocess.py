@@ -189,8 +189,6 @@ class CopyTask:
         copy_item.msg = "finished"
         process_queue.put(copy_item)
 
-        print("finished")
-
     @staticmethod
     def get_another_dir_urls(copy_item: CopyTaskItem):
         src_dst_urls: list[tuple[Path, Path]] = []
