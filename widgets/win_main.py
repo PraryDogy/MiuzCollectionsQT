@@ -145,6 +145,9 @@ class WinMain(UMainWindow):
         self.bar_top.exit_img_search.connect(
             lambda: self.img_search_exit()
         )
+        self.bar_top.open_base_search.connect(
+            lambda: self.base_search_start()
+        )
         self.right_layout.addWidget(self.bar_top)
 
         sep_upper = USep()
@@ -224,6 +227,27 @@ class WinMain(UMainWindow):
         Dynamic.thumb_path_set.clear()
         self.bar_top.search_wid.clear()
         self.bar_top.show_base_search()
+
+    def base_search_start(self):
+        Dynamic.filters_enabled.clear()
+        Dynamic.filter_favs = False
+        Dynamic.filter_only_folder = False
+        self.bar_top.filters_btn.set_normal_style()
+
+        Dynamic.date_start = None
+        Dynamic.date_end = None
+        self.bar_top.dates_btn.set_normal_style()
+
+        Dynamic.thumb_path_set.clear()
+
+        Dynamic.current_dir = os.sep
+        self.left_menu.tree_wid.expand_to_path(os.sep)
+
+        # Dynamic.search_widget_text = None
+        # self.bar_top.search_wid.clear()
+        # self.bar_top.show_base_search()
+
+        self.load_st_grid()
 
     def img_search_start(self):
 
