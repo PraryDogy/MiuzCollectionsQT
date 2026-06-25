@@ -46,10 +46,11 @@ class CopyTaskItem:
     dst_dir: str
     src_urls: list[str]
     is_cut: bool
-    current_size: int
-    total_size: int
-    current_count: int
-    total_count: int
+    current_percent: int
+    copied_bytes: int
+    total_bytes: int
+    current_file_count: int
+    total_file_count: int
     dst_urls: list[str]
     msg: Literal[
         "none",

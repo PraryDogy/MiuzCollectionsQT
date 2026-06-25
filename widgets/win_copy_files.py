@@ -134,7 +134,7 @@ class ErrorWin(UMainWindow):
 
 class WinCopyFiles(WinProgressbar):
     finished_ = pyqtSignal(list)
-    ms = 500
+    ms = 100
 
     def __init__(self, target_dir: str, files_to_copy: list[str], action_type: bool):
         super().__init__(Lng.copying[Cfg.lng_index])
@@ -155,10 +155,11 @@ class WinCopyFiles(WinProgressbar):
             dst_dir=target_dir,
             src_urls=files_to_copy,
             is_cut=action_type,
-            current_size=0,
-            total_size=0,
-            current_count=0,
-            total_count=0,
+            current_percent=0,
+            copied_bytes=0,
+            total_bytes=0,
+            current_file_count=0,
+            total_file_count=0,
             dst_urls=[],
             msg="none"
         )
@@ -172,6 +173,8 @@ class WinCopyFiles(WinProgressbar):
 
         self.copy_task.start()
         self.copy_timer.start(self.ms)
+
+        self.progressbar.setMaximum(100)
 
     def poll_task(self):
         self.copy_timer.stop()
@@ -199,19 +202,16 @@ class WinCopyFiles(WinProgressbar):
             
             elif self.copy_item.msg == "finished":
                 finished = True
-            
-            if self.progressbar.maximum() == 100:
-                self.progressbar.setMaximum(self.copy_item.total_size)
 
             if len(self.dst_urls) == 0 and self.copy_item.dst_urls:
                 self.dst_urls.extend(self.copy_item.dst_urls)
 
-            self.progressbar.setValue(self.copy_item.current_size)
+            self.progressbar.setValue(self.copy_item.current_percent)
             below_text = (
                 self.windowTitle(),
-                str(self.copy_item.current_count),
+                str(self.copy_item.current_file_count),
                 Lng.from_[Cfg.lng_index],
-                str(self.copy_item.total_count)
+                str(self.copy_item.total_file_count)
             )
             self.below_label.setText(" ".join(below_text))
 
@@ -219,9 +219,9 @@ class WinCopyFiles(WinProgressbar):
             self.progressbar.setValue(self.progressbar.maximum())
             below_text = (
                 self.windowTitle(),
-                str(self.copy_item.total_count),
+                str(self.copy_item.total_file_count),
                 Lng.from_[Cfg.lng_index],
-                str(self.copy_item.total_count)
+                str(self.copy_item.total_file_count)
             )
             self.below_label.setText(" ".join(below_text))     
             self.finished_.emit(self.dst_urls)

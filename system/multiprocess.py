@@ -151,8 +151,8 @@ class CopyTask:
             except FileNotFoundError:
                 continue
 
-        copy_item.total_size = total_size // 1024
-        copy_item.total_count = len(src_dst_urls)
+        copy_item.total_bytes = total_size
+        copy_item.total_file_count = len(src_dst_urls)
         replace_all = False
 
         for count, (src, dest) in enumerate(src_dst_urls, start=1):
@@ -173,7 +173,7 @@ class CopyTask:
                             replace_all = True
                             break
 
-            copy_item.current_count = count
+            copy_item.current_file_count = count
             copy_item.msg = ""
             try:
                 CopyTask.copy_file_with_progress(process_queue, copy_item, src, dest)
@@ -224,10 +224,20 @@ class CopyTask:
                 if not buf:
                     break
                 fdst.write(buf)
-                copy_item.current_size += len(buf) // 1024
-                process_queue.put(copy_item)
+
+                copy_item.copied_bytes += len(buf)
+                percent = (copy_item.copied_bytes * 100) // copy_item.total_bytes
+                if percent > copy_item.current_percent:
+                    copy_item.current_percent = percent
+                    process_queue.put(copy_item)
+                    print("put", percent)
+            print("end while")
+        print("end open")
+
         try:
-            shutil.copystat(src, dest, follow_symlinks=True)
+            # process_queue.put(copy_item)
+            print("copy file finished")
+            # shutil.copystat(src, dest, follow_symlinks=True)
         except OSError as e:
             # import traceback
             # print(traceback.format_exc())
