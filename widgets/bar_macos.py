@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent, QPixmap
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QLabel, QMenu, QMenuBar, QSpacerItem,
                              QWidget)
@@ -76,6 +76,7 @@ class AboutWin(UMainWindow):
     ww, hh = 280, 240
     svg_ww, svg_hh = 150, 130
     svg_icon = "./images/icon.svg"
+    png_icon = "./images/icon.png"
 
     def __init__(self):
         super().__init__()
@@ -86,10 +87,10 @@ class AboutWin(UMainWindow):
         self.setFixedSize(self.ww, self.hh)
 
         # --- Иконка приложения ---
-        icon = QSvgWidget()
-        icon.load(self.svg_icon)
-        icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        icon.setFixedSize(self.svg_ww, self.svg_hh)
+        icon = QLabel()
+        pixmap = QPixmap(self.png_icon)
+        pixmap = Utils.qiconed_resize(pixmap, self.svg_ww)
+        icon.setPixmap(pixmap)
         self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # --- Разделитель ---

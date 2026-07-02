@@ -583,14 +583,10 @@ class AboutWid(QGroupBox):
         h_lay = UHBoxLayout()
         self.setLayout(h_lay)
 
-        # icon = QSvgWidget(self.svg_icon)
-        # icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        # icon.setFixedSize(85, 85)
         icon = QLabel()
         pixmap = QPixmap(self.png_icon)
         pixmap = Utils.qiconed_resize(pixmap, 85)
         icon.setPixmap(pixmap)
-        # icon.setFixedSize(85, 85)
         h_lay.addWidget(icon)
 
         h_lay.addSpacerItem(QSpacerItem(0, 20))
