@@ -594,6 +594,8 @@ class AboutWid(QGroupBox):
         lbl = SelectableLabel(self)
         h_lay.addWidget(lbl)
 
+        h_lay.addStretch()
+
 
 class GeneralSettings(QWidget, StateWid):
     changed = pyqtSignal()
