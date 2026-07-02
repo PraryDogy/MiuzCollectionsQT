@@ -8,7 +8,7 @@ import zipfile
 from dataclasses import dataclass
 
 from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QIcon
+from PyQt5.QtGui import QContextMenuEvent, QIcon, QPixmap
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QGroupBox,
                              QLabel, QLineEdit, QSpacerItem, QSpinBox,
@@ -33,8 +33,8 @@ from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, UHBoxLayout,
                             UVBoxLayout, VListSpacerItem, VListWidget,
                             VListWidgetItem)
 from .path_widget import PathWidget
-from .win_warn import ConfirmWindow, WarningWindow
 from .win_smb import SuperWarnWindow
+from .win_warn import ConfirmWindow, WarningWindow
 
 
 def restart_app():
@@ -576,15 +576,21 @@ class SelectableLabel(SettingsLabel):
 
 class AboutWid(QGroupBox):
     svg_icon = "./images/icon.svg"
+    png_icon = "./images/icon.png"
 
     def __init__(self):
         super().__init__()
         h_lay = UHBoxLayout()
         self.setLayout(h_lay)
 
-        icon = QSvgWidget(self.svg_icon)
-        icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        icon.setFixedSize(85, 85)
+        # icon = QSvgWidget(self.svg_icon)
+        # icon.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+        # icon.setFixedSize(85, 85)
+        icon = QLabel()
+        pixmap = QPixmap(self.png_icon)
+        pixmap = Utils.qiconed_resize(pixmap, 85)
+        icon.setPixmap(pixmap)
+        # icon.setFixedSize(85, 85)
         h_lay.addWidget(icon)
 
         h_lay.addSpacerItem(QSpacerItem(0, 20))
