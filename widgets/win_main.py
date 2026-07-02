@@ -67,6 +67,7 @@ class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
     ww, hh = 1120, 760
+    icon_png = "./images/icon.png"
 
     def __init__(self, argv: list):
         super().__init__()
@@ -75,7 +76,10 @@ class WinMain(UMainWindow):
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.app_name}")
 
-        self.setWindowIcon(QIcon("./images/icon.png"))
+        # icon = QIcon(self.icon_png)
+        # self.setWindowIcon(icon)
+
+        self.setWindowIcon(QIcon("./images/icon.icns"))
         self.setWindowIconText(f"{Static.app_name} {Static.app_ver}")
 
         self.setMenuBar(BarMacos())
