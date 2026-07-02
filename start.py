@@ -5,6 +5,7 @@ import traceback
 from pathlib import Path
 
 from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
@@ -288,6 +289,9 @@ class App(QApplication):
             self.win_main.show()
             self.installEventFilter(self)
             self.aboutToQuit.connect(lambda: self.win_main.on_exit())
+
+            icon = QIcon("./images/icon.png")
+            self.setWindowIcon(icon)
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:

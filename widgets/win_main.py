@@ -3,7 +3,7 @@ import subprocess
 from collections import defaultdict
 
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QCloseEvent, QIcon, QKeyEvent
+from PyQt5.QtGui import QCloseEvent, QIcon, QKeyEvent, QPixmap
 from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal
@@ -31,13 +31,14 @@ from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_filters import WinFilters
 from .win_image_view import WinImageView
+from .win_img_search import WinImgSearch
 from .win_info import WinInfo
 from .win_servers import ServersWin
 from .win_settings import WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
 from .win_warn import ConfirmWindow, WarningWindow
-from .win_img_search import WinImgSearch
+
 
 class TestWid(QFrame):
     def __init__(self, parent=None):
@@ -67,7 +68,6 @@ class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
     ww, hh = 1120, 760
-    icon_png = "./images/icon.png"
 
     def __init__(self, argv: list):
         super().__init__()
@@ -76,10 +76,6 @@ class WinMain(UMainWindow):
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.app_name}")
 
-        # icon = QIcon(self.icon_png)
-        # self.setWindowIcon(icon)
-
-        self.setWindowIcon(QIcon("./images/icon.icns"))
         self.setWindowIconText(f"{Static.app_name} {Static.app_ver}")
 
         self.setMenuBar(BarMacos())
