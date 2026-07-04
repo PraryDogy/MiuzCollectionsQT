@@ -575,8 +575,7 @@ class SelectableLabel(SettingsLabel):
 
 
 class AboutWid(QGroupBox):
-    svg_icon = "./images/icon.svg"
-    png_icon = "./images/icon.png"
+    png_icon = "./images/icon_2.png"
 
     def __init__(self):
         super().__init__()

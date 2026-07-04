@@ -75,8 +75,7 @@ class AboutWin(UMainWindow):
     """
     ww, hh = 280, 240
     svg_ww, svg_hh = 150, 130
-    svg_icon = "./images/icon.svg"
-    png_icon = "./images/icon.png"
+    png_icon = "./images/icon_2.png"
 
     def __init__(self):
         super().__init__()
