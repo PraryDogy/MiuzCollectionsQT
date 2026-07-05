@@ -45,7 +45,7 @@ class UPallete:
     @classmethod
     def macinthosh(cls):
         p = QPalette()
-        # return p
+        return p
         
         # 1. Основной фон окон и текст на нем
         p.setColor(QPalette.Window, QColor("#393D44"))         # Темно-серый фон окна

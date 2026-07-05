@@ -37,25 +37,15 @@ class UMenuStyle(QMenu):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # --- палитра ---
-        # palette = QApplication.palette()
-        # text_color = palette.color(QPalette.ColorRole.WindowText).name().lower()
-
-        # --- соответствие цвета текста и разделителя ---
-        color_data = {
-            Themes.dark: "#8a8a8a",
-            Themes.light: "#5a5a5a",
-            Themes.macintosh: "#5a5a5a",
-        }
-        sep_color = color_data.get(Cfg.theme)
-
-        # --- стили ---
         self.setStyleSheet(
             f"""
+                QMenu {{ 
+                    border-radius: 0px;
+                }}
                 QMenu::separator {{
                     height: 1px;
-                    background: {sep_color};
-                    margin: 4px 10px;
+                    padding-left: 5px;
+                    padding-right: 5px;
                 }}
             """
         )
