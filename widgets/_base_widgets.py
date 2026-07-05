@@ -13,7 +13,7 @@ from typing_extensions import Optional
 from cfg import Cfg
 from system.lang import Lng
 from system.utils import Utils
-
+from cfg import Cfg, Themes
 
 class UHBoxLayout(QHBoxLayout):
     """QHBoxLayout с нулевыми отступами и нулевым расстоянием между виджетами."""
@@ -38,15 +38,16 @@ class UMenuStyle(QMenu):
         super().__init__(*args, **kwargs)
 
         # --- палитра ---
-        palette = QApplication.palette()
-        text_color = palette.color(QPalette.ColorRole.WindowText).name().lower()
+        # palette = QApplication.palette()
+        # text_color = palette.color(QPalette.ColorRole.WindowText).name().lower()
 
         # --- соответствие цвета текста и разделителя ---
         color_data = {
-            "#000000": "#8a8a8a",
-            "#ffffff": "#5a5a5a",
+            Themes.dark: "#8a8a8a",
+            Themes.light: "#5a5a5a",
+            Themes.macintosh: "#5a5a5a",
         }
-        sep_color = color_data.get(text_color, "#8a8a8a")  # дефолт
+        sep_color = color_data.get(Cfg.theme)
 
         # --- стили ---
         self.setStyleSheet(

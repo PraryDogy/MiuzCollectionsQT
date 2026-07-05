@@ -80,8 +80,8 @@ class ThemeChanger:
     def init(cls):
         app: QApplication = QApplication.instance()
         if Cfg.theme == Themes.macintosh:
-            app.setStyle("macintosh")
             app.setPalette(UPallete.macinthosh())
+            app.setStyle("macintosh")
         elif Cfg.theme == Themes.dark:
             app.setPalette(UPallete.dark())
             app.setStyle("macintosh")
