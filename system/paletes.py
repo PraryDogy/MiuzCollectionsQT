@@ -42,6 +42,44 @@ class UPallete:
         p.setColor(QPalette.HighlightedText, QColor("#000000"))
         return p
 
+    @classmethod
+    def macinthosh(cls):
+        p = QPalette()
+        return p
+        
+        # 1. Основной фон окон и текст на нем
+        p.setColor(QPalette.Window, QColor("#433F45"))         # Темно-серый фон окна
+        p.setColor(QPalette.WindowText, QColor("#FFFFFF"))     # Белый текст на окне
+        
+        # 2. Поля ввода (QLineEdit) и списки (QListWidget)
+        p.setColor(QPalette.Base, QColor("#2E2B30"))           # Фон для полей и списков (чуть темнее окон)
+        p.setColor(QPalette.Text, QColor("#FFFFFF"))           # Белый текст внутри полей и списков
+        
+        # 3. Кнопки и текст на них
+        p.setColor(QPalette.Button, QColor("#534F55"))         # Фон кнопок
+        p.setColor(QPalette.ButtonText, QColor("#FFFFFF"))     # Белый шрифт кнопок
+        
+        # 4. Выделение текста и элементов списка
+        p.setColor(QPalette.Highlight, QColor("#007AFF"))      # Цвет выделения (акцентный синий)
+        p.setColor(QPalette.HighlightedText, QColor("#FFFFFF")) # Цвет текста при выделении
+        
+        # 5. Вспомогательный текст (подсказки / placeholder)
+        p.setColor(QPalette.PlaceholderText, QColor("#8E8E93")) # Серый цвет для подсказок ввода
+
+        # 1. Когда окно АКТИВНО (в фокусе)
+        # Синий фон выделения и белый текст
+        p.setColor(QPalette.Active, QPalette.Highlight, QColor("#007AFF"))       
+        p.setColor(QPalette.Active, QPalette.HighlightedText, QColor("#FFFFFF")) 
+        
+        # 2. Когда окно НЕАКТИВНО (потеряло фокус)
+        # Приглушенный серый фон выделения и белый текст (чтобы выделение не пропадало)
+        p.setColor(QPalette.Inactive, QPalette.Highlight, QColor("#55555A"))     
+        p.setColor(QPalette.Inactive, QPalette.HighlightedText, QColor("#FFFFFF"))
+        
+        return p
+
+
+
 
 class ThemeChanger:
 
@@ -49,8 +87,8 @@ class ThemeChanger:
     def init(cls):
         app: QApplication = QApplication.instance()
         if Cfg.theme == Themes.macintosh:
-            app.setPalette(QPalette())
             app.setStyle("macintosh")
+            app.setPalette(UPallete.macinthosh())
         elif Cfg.theme == Themes.dark:
             app.setPalette(UPallete.dark())
             app.setStyle("Fusion")

@@ -1,17 +1,31 @@
-import cv2
-import numpy as np
+from PyQt5.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
+from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtCore import Qt
 
+app = QApplication([])
 
-def is_grayscale(img: np.ndarray, saturation_threshold=3):
-    if len(img.shape) < 3 or img.shape[2] == 1:
-        return True
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    _, s, _ = cv2.split(hsv)
-    mean_saturation = np.mean(s)
-    return mean_saturation < saturation_threshold
+# Проверяем, что используется родной стиль macOS
+app.setStyle('Macintosh') 
 
-src = "/Users/evlosh/Desktop/R1-01777-0006 А4 3.jpg"
-img = cv2.imread(src)
-result = is_grayscale_hsv(img)
+# Создаем и настраиваем палитру
+palette = QPalette()
+# Меняем цвет фона окон на темно-серый
+palette.setColor(QPalette.Window, QColor("#f84949"))
+# Меняем цвет текста на белый
+palette.setColor(QPalette.WindowText, Qt.white)
+# Меняем цвет кнопок (в macOS повлияет на фокус и границы)
+palette.setColor(QPalette.Button, QColor("#CCF320")) 
+palette.setColor(QPalette.ButtonText, Qt.white)
 
-print(result)
+# Применяем палитру ко всему приложению
+app.setPalette(palette)
+
+# Пример интерфейса
+window = QWidget()
+layout = QVBoxLayout()
+btn = QPushButton("Системная кнопка")
+layout.addWidget(btn)
+window.setLayout(layout)
+window.show()
+
+app.exec_()
