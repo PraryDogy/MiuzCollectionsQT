@@ -84,7 +84,7 @@ class ThemeChanger:
             app.setPalette(UPallete.macinthosh())
         elif Cfg.theme == Themes.dark:
             app.setPalette(UPallete.dark())
-            app.setStyle("Fusion")
+            app.setStyle("macintosh")
         elif Cfg.theme == Themes.light:
             app.setPalette(UPallete.light())
-            app.setStyle("Fusion")
+            app.setStyle("macintosh")
