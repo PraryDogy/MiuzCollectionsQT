@@ -137,95 +137,6 @@ class CustomSvg(QSvgWidget):
         return super().mouseReleaseEvent(a0)
 
 
-# class _ZoomButton(CustomSvg):
-#     def __init__(self, value: int):
-#         super().__init__()
-#         self.value = value
-
-
-# class ZoomWidget(QFrame):
-#     zoom_close = pyqtSignal()
-#     zoom_in = pyqtSignal()
-#     zoom_out = pyqtSignal()
-#     zoom_fit = pyqtSignal()
-
-#     def __init__(self, parent: QWidget = None) -> None:
-#         super().__init__(parent)
-#         self.setFixedHeight(CustomSvg.svg_size)
-#         self.setStyleSheet(
-#             """
-#             ZoomWidget {
-#                 background: rgba(128, 128, 128, 0.5);
-#                 border-radius: 15px;
-#             }
-#             """
-#         )
-
-#         h_layout = QHBoxLayout(self)
-#         h_layout.setSpacing(20)
-#         h_layout.setContentsMargins(10, 0, 10, 0)
-
-#         zoom_out = _ZoomButton(value=-1)
-#         zoom_out.load(os.path.join(Static.internal_images, "zoom_out.svg"))
-#         zoom_out.clicked.connect(self.zoom_out.emit)
-#         h_layout.addWidget(zoom_out)
-
-#         zoom_in = _ZoomButton(value=1)
-#         zoom_in.load(os.path.join(Static.internal_images, "zoom_in.svg"))
-#         zoom_in.clicked.connect(self.zoom_in.emit)
-#         h_layout.addWidget(zoom_in)
-
-#         zoom_fit = _ZoomButton(value=0)
-#         zoom_fit.load(os.path.join(Static.internal_images, "zoom_fit.svg"))
-#         zoom_fit.clicked.connect(self.zoom_fit.emit)
-#         h_layout.addWidget(zoom_fit)
-
-#         zoom_close = _ZoomButton(value=9999)
-#         zoom_close.load(os.path.join(Static.internal_images, "zoom_close.svg"))
-#         zoom_close.clicked.connect(self.zoom_close.emit)
-#         h_layout.addWidget(zoom_close)
-
-#         self.start_pos = None
-#         self.is_move = False
-#         self.adjustSize()
-
-#     def mousePressEvent(self, e):
-#         return
-#         self.start_pos = e.pos()
-#         self.is_move = False
-#         super().mousePressEvent(e)
-
-#     def mouseMoveEvent(self, e):
-#         return
-#         if not self.start_pos:
-#             return
-
-#         dx = e.x() - self.start_pos.x()
-#         if abs(dx) > 30:  # горизонтальное движение
-#             self.is_move = True
-#             self.setCursor(Qt.CursorShape.SizeHorCursor)
-#             if dx > 0:
-#                 self.zoom_in.emit()
-#             else:
-#                 self.zoom_out.emit()
-#             self.start_pos = e.pos()
-#         super().mouseMoveEvent(e)
-
-#     def mouseReleaseEvent(self, e):
-#         return
-#         self.setCursor(Qt.CursorShape.ArrowCursor)
-#         if self.is_move:
-#             self.is_move = False
-#             return  # не считаем клик, если двигали мышь
-#         pos = e.globalPos()
-#         wid = QApplication.widgetAt(pos)
-#         if isinstance(wid, UserSvg):
-#             func = self.mappings.get(wid.value)
-#             if func:
-#                 func()
-#         super().mouseReleaseEvent(e)
-
-
 class ZoomWidget(CustomSvg):
     zoom_close = pyqtSignal()
     zoom_in = pyqtSignal()
@@ -261,7 +172,6 @@ class ZoomWidget(CustomSvg):
 
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
-
         self.setCursor(Qt.CursorShape.ArrowCursor)
         if self.is_move:
             self.is_move = False
