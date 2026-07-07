@@ -38,7 +38,7 @@ class UMenuStyle(QMenu):
         super().__init__(*args, **kwargs)
         self.setStyleSheet(
             """
-            QMenu {
+            UMenuStyle {
                 border-radius: 0px;
             }
             """
@@ -202,21 +202,19 @@ class UMainWidget(WindowMixin, QWidget):
 
 
 class VScrollArea(QScrollArea):
-    """QScrollArea с вертикальной прокруткой, без горизонтальной и без границ."""
-
     def __init__(self):
         super().__init__()
-
-        # --- Настройка области прокрутки ---
         self.setWidgetResizable(True)
         self.setAcceptDrops(True)
-
-        # --- Вертикальная прокрутка только ---
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
-        # --- Убираем границы ---
-        self.setStyleSheet("QScrollArea { border: none; }")
+        self.setStyleSheet(
+            """
+            VScrollArea { 
+                border: none; 
+            }
+            """
+        )
 
 
 class VListWidgetItem(QListWidgetItem):
@@ -258,13 +256,21 @@ class VListWidget(QListWidget):
 class SmallBtn(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
-        self.setStyleSheet("""font-size: 11pt;""")
+        self.setStyleSheet(
+            """
+            font-size: 11pt;
+            """
+        )
 
 
 class HSep(QFrame):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("background: rgba(128, 128, 128, 0.2)")
+        self.setStyleSheet(
+            """
+                background: palette(mid)
+            """
+        )
         self.setFixedHeight(1)
 
 

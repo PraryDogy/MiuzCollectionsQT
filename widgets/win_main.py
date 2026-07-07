@@ -20,7 +20,7 @@ from system.scaner import AllDirScaner, SingleDirScaner
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import UHBoxLayout, UMainWindow, UVBoxLayout
+from ._base_widgets import HSep, UHBoxLayout, UMainWindow, UVBoxLayout
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -55,13 +55,6 @@ class TestWid(QFrame):
 
     def reload(self):
         ...
-
-
-class USep(QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setStyleSheet("background: rgba(0, 0, 0, 0.2)")
-        self.setFixedHeight(1)
 
 
 class WinMain(UMainWindow):
@@ -150,13 +143,13 @@ class WinMain(UMainWindow):
         )
         self.right_layout.addWidget(self.bar_top)
 
-        sep_upper = USep()
+        sep_upper = HSep()
         self.right_layout.addWidget(sep_upper)
 
         self.grid = Grid()
         self.load_st_grid()
 
-        sep_bottom = USep()
+        sep_bottom = HSep()
         self.right_layout.addWidget(sep_bottom)
 
         self.bar_path = PathBar()
@@ -168,7 +161,7 @@ class WinMain(UMainWindow):
             lambda: self.bar_path.setMaximumWidth(wid.width())
         )
 
-        sep_bottom = USep()
+        sep_bottom = HSep()
         self.right_layout.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
