@@ -648,7 +648,8 @@ class WinMain(UMainWindow):
         self.grid.upload_files.connect(
             lambda p: self.upload_files(Mf.current_mf, p)
         )
-        self.right_layout.insertWidget(layout_index, self.grid)
+        # -1 для pyqt6
+        self.right_layout.insertWidget(layout_index-1, self.grid)
 
     @with_conn
     def open_view_win(self, mf: Mf):
