@@ -123,13 +123,13 @@ class CustomSvg(QSvgWidget):
         )
 
     def load(self, file_path: str):
-            super().load(file_path)
-            renderer = self.renderer()
-            if renderer and renderer.isValid():
-                orig_size = renderer.defaultSize()
-                aspect_ratio = orig_size.width() / orig_size.height()
-                calculated_width = int(self.svg_size * aspect_ratio)
-                self.setFixedSize(calculated_width, self.svg_size)
+        super().load(file_path)
+        renderer = self.renderer()
+        if renderer and renderer.isValid():
+            orig_size = renderer.defaultSize()
+            aspect_ratio = orig_size.width() / orig_size.height()
+            calculated_width = int(self.svg_size * aspect_ratio)
+            self.setFixedSize(calculated_width, self.svg_size)
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
         if a0.button() == Qt.MouseButton.LeftButton:
