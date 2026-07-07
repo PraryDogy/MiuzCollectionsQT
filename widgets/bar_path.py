@@ -42,100 +42,20 @@ class PathItem(QWidget):
         item_layout.addWidget(self.text_wid)
 
     def add_arrow(self):
-        """
-        Добавляет к тексту виджета ">"
-        """
         t = self.text_wid.text() + " " + PathItem.arrow_right
         self.text_wid.setText(t)
 
     def del_arrow(self):
-        """
-        Удаляет ">"
-        """
         t = self.text_wid.text().replace(PathItem.arrow_right, "")
         self.text_wid.setText(t)
 
     def expand(self):
-        """
-        Показывает виджет в полную длину
-        """
         self.text_wid.setFixedWidth(self.text_wid.sizeHint().width())
  
-    def solid_style(self):
-        """
-        Выделяет виджет синим цветом
-        """
-        self.text_wid.setStyleSheet(
-            f"""
-                background: {Static.rgba_blue};
-                border-radius: 2px;
-            """
-        )
-
-    def default_style(self):
-        """
-        Сбрасывает стиль
-        """
-        self.text_wid.setStyleSheet("")
 
     def collapse(self):
-        """
-        Схлопывает виджет до указанной минимальной длины, если
-        виджет находится не под курсором мыши
-        """
         if not self.text_wid.underMouse():
             self.text_wid.setMinimumWidth(self.min_wid)
-
-    def enterEvent(self, a0):
-        """
-        Раскрывает виджет на всю его длину при наведении мыши
-        """
-        self.expand()
-
-    def leaveEvent(self, a0):
-        """
-        Отложено схолпывает виджет до указанной минимальной длины
-        """
-        QTimer.singleShot(500, self.collapse)
-
-    # def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-    #     urls = [self.main_win_item.main_dir]
-    #     menu_ = UMenu(parent=self)
-
-    #     if self.item_dir in JsonData.favs:
-    #         cmd_ = lambda: self.fav_cmd(offset=-1, src=self.item_dir)
-    #         fav_action = ItemActions.FavRemove(menu_)
-    #         fav_action.triggered.connect(cmd_)
-    #         menu_.addAction(fav_action)
-    #     else:
-    #         cmd_ = lambda: self.fav_cmd(offset=1, src=self.item_dir)
-    #         fav_action = ItemActions.FavAdd(menu_)
-    #         fav_action.triggered.connect(cmd_)
-    #         menu_.addAction(fav_action)
-
-    #     info = ItemActions.Info(menu_)
-    #     info.triggered.connect(self.open_info_win)
-    #     menu_.addAction(info)
-
-    #     menu_.addSeparator()
-
-    #     show_in_finder_action = ItemActions.RevealInFinder(menu_, urls)
-    #     menu_.addAction(show_in_finder_action)
-
-    #     copy_path = ItemActions.CopyPath(menu_, urls)
-    #     menu_.addAction(copy_path)
-
-    #     self.solid_style()
-    #     menu_.show_under_cursor()
-    #     self.default_style()
-
-    # def mouseReleaseEvent(self, a0):
-    #     if a0.button() == Qt.MouseButton.LeftButton:
-    #         if os.path.isdir(self.item_dir) and self.item_dir != self.main_win_item.main_dir:
-    #             self.main_win_item.main_dir = self.item_dir
-    #             self.new_history_item.emit(self.item_dir)
-    #             self.load_st_grid.emit()
-    #     return super().mouseReleaseEvent(a0)
 
 
 class PathBar(QWidget):
@@ -200,9 +120,6 @@ class PathBar(QWidget):
         
         if len(root) != 1:
             last_item.del_arrow()
-            last_item.expand()
-            last_item.enterEvent = lambda *args, **kwargs: None
-            last_item.leaveEvent = lambda *args, **kwargs: None
 
     def shorten_filename(self, filename: str, max_len: int = 40) -> str:
         name, ext = os.path.splitext(filename)

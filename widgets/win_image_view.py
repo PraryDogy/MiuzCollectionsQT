@@ -31,7 +31,6 @@ class ImgWid(QGraphicsView):
         super().__init__()
 
         self.setMouseTracking(True)
-        self.setStyleSheet("background: black")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 

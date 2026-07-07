@@ -90,7 +90,7 @@ class UFrame(QFrame):
 
     def normal_style(self):
         self.setStyleSheet("""
-            QFrame#uFrame {
+            uFrame {
                 background: transparent;
                 padding-left: 2px;
                 padding-right: 2px;
@@ -99,8 +99,8 @@ class UFrame(QFrame):
 
     def solid_style(self):
         self.setStyleSheet("""
-            QFrame#uFrame {
-                background: rgba(125, 125, 125, 0.5);
+            uFrame {
+                background: rgba(128, 128, 128, 0.5);
                 border-radius: 7px;
                 padding-left: 2px;
                 padding-right: 2px;
@@ -142,7 +142,11 @@ class BarTopBtn(QWidget):
 
         # --- Подпись ---
         self.lbl = QLabel()
-        self.lbl.setStyleSheet(f"font-size: 10px;")
+        self.lbl.setStyleSheet(
+            """
+                font-size: 10px;
+            """
+        )
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def set_solid_style(self):

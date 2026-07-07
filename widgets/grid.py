@@ -65,7 +65,7 @@ class ImgWid(ULabel):
             f"""
                 border-radius: {corner}px;
                 color: rgb(255,255,255);
-                background: rgba(125, 125, 125, 0.5);
+                background: rgba(128, 128, 128, 0.5);
                 border: 2px solid transparent;
                 padding-left: 2px;
                 padding-right: 2px;
@@ -106,7 +106,7 @@ class WhiteTextWid(ULabel):
             f"""
                 border-radius: 7px;
                 color: rgb(255,255,255);
-                background: rgba(46, 89, 203, 1.0);
+                background: palette(highlight);
                 border: 2px solid transparent;
                 padding-left: 2px;
                 padding-right: 2px;

@@ -268,7 +268,7 @@ class HSep(QFrame):
         super().__init__()
         self.setStyleSheet(
             """
-                background: palette(mid)
+                background: rgba(128, 128, 128, 0.2);
             """
         )
         self.setFixedHeight(1)
@@ -379,24 +379,24 @@ class USlider(QSlider):
 
     def __init__(self):
         super().__init__()
-
-        style = """
-            QSlider::groove:horizontal {
-                border-radius: 1px;
-                height: 3px;
-                margin: 0px;
-                background-color: rgba(111, 111, 111, 0.5);
-            }
-            QSlider::handle:horizontal {
-                background-color: rgba(199, 199, 199, 1);
-                height: 10px;
-                width: 10px;
-                border-radius: 5px;
-                margin: -4px 0;
-                padding: -4px 0px;
-            }
-        """
-        self.setStyleSheet(style)
+        self.setStyleSheet(
+            """
+                QSlider::groove:horizontal {
+                    border-radius: 1px;
+                    height: 3px;
+                    margin: 0px;
+                    background-color: rgba(111, 111, 111, 0.5);
+                }
+                QSlider::handle:horizontal {
+                    background-color: rgba(199, 199, 199, 1);
+                    height: 10px;
+                    width: 10px;
+                    border-radius: 5px;
+                    margin: -4px 0;
+                    padding: -4px 0px;
+                }
+            """
+        )
         self.valueChanged.connect(self._on_value_changed)
 
     def mousePressEvent(self, ev):
