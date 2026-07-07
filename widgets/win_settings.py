@@ -1084,7 +1084,6 @@ class WinSettings(UMainWindow):
         self.right_lay.addStretch()
 
         self.btns_wid = QWidget()
-        # self.btns_wid.setFixedHeight(50)
         self.right_lay.addWidget(self.btns_wid)
         btns_lay = UHBoxLayout()
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
