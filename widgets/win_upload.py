@@ -2,7 +2,7 @@ import os
 
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QIcon
-from PyQt6.QtSvg import QSvgWidget
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
                              QWidget)
 

@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtGui import QMouseEvent
-from PyQt6.QtSvg import QSvgWidget
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                              QSizePolicy, QVBoxLayout, QWidget)
 

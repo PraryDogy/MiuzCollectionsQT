@@ -2,7 +2,7 @@ import os
 import sys
 
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtSvg import QSvgWidget
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QPushButton,
                              QWidget)
 

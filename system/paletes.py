@@ -9,43 +9,46 @@ class UPallete:
     @classmethod
     def light(cls):
         p = QPalette()
-        p.setColor(QPalette.Window, QColor("#ffffff"))
-        p.setColor(QPalette.WindowText, QColor("#000000"))
-        p.setColor(QPalette.Base, QColor("#f5f5f5"))
-        p.setColor(QPalette.AlternateBase, QColor("#ffffff"))
-        p.setColor(QPalette.ToolTipBase, QColor("#ffffff"))   # фон тултипа светлый
-        p.setColor(QPalette.ToolTipText, QColor("#000000"))   # текст тултипа тёмный
-        p.setColor(QPalette.Text, QColor("#000000"))
-        p.setColor(QPalette.Button, QColor("#f0f0f0"))
-        p.setColor(QPalette.ButtonText, QColor("#000000"))
-        p.setColor(QPalette.BrightText, QColor("#ff0000"))
-        p.setColor(QPalette.Link, QColor("#0059d1"))
-        p.setColor(QPalette.Highlight, QColor("#0059d1"))
-        p.setColor(QPalette.HighlightedText, QColor("#ffffff"))
+        color = QPalette.ColorRole
+        p.setColor(color.Window, QColor("#ffffff"))
+        p.setColor(color.WindowText, QColor("#000000"))
+        p.setColor(color.Base, QColor("#f5f5f5"))
+        p.setColor(color.AlternateBase, QColor("#ffffff"))
+        p.setColor(color.ToolTipBase, QColor("#ffffff"))   
+        p.setColor(color.ToolTipText, QColor("#000000"))   
+        p.setColor(color.Text, QColor("#000000"))
+        p.setColor(color.Button, QColor("#f0f0f0"))
+        p.setColor(color.ButtonText, QColor("#000000"))
+        p.setColor(color.BrightText, QColor("#ff0000"))
+        p.setColor(color.Link, QColor("#0059d1"))
+        p.setColor(color.Highlight, QColor("#0059d1"))
+        p.setColor(color.HighlightedText, QColor("#ffffff"))
         return p
 
     @classmethod
     def dark(cls):
         p = QPalette()
-        p.setColor(QPalette.Window, QColor("#1e1e1e"))
-        p.setColor(QPalette.WindowText, QColor("#ffffff"))
-        p.setColor(QPalette.Base, QColor("#191919"))
-        p.setColor(QPalette.AlternateBase, QColor("#2a2a2a"))
-        p.setColor(QPalette.ToolTipBase, QColor("#2a2a2a"))   # фон тултипа тёмный
-        p.setColor(QPalette.ToolTipText, QColor("#ffffff"))   # текст тултипа светлый
-        p.setColor(QPalette.Text, QColor("#ffffff"))
-        p.setColor(QPalette.Button, QColor("#2d2d2d"))
-        p.setColor(QPalette.ButtonText, QColor("#ffffff"))
-        p.setColor(QPalette.BrightText, QColor("#ff453a"))
-        p.setColor(QPalette.Link, QColor("#0059d1"))
-        p.setColor(QPalette.Highlight, QColor("#0059d1"))
-        p.setColor(QPalette.HighlightedText, QColor("#000000"))
+        color = QPalette.ColorRole
+        p.setColor(color.Window, QColor("#1e1e1e"))
+        p.setColor(color.WindowText, QColor("#ffffff"))
+        p.setColor(color.Base, QColor("#191919"))
+        p.setColor(color.AlternateBase, QColor("#2a2a2a"))
+        p.setColor(color.ToolTipBase, QColor("#2a2a2a"))   
+        p.setColor(color.ToolTipText, QColor("#ffffff"))   
+        p.setColor(color.Text, QColor("#ffffff"))
+        p.setColor(color.Button, QColor("#2d2d2d"))
+        p.setColor(color.ButtonText, QColor("#ffffff"))
+        p.setColor(color.BrightText, QColor("#ff453a"))
+        p.setColor(color.Link, QColor("#0059d1"))
+        p.setColor(color.Highlight, QColor("#0059d1"))
+        p.setColor(color.HighlightedText, QColor("#000000"))
         return p
 
     @classmethod
     def macinthosh(cls):
         p = QPalette()
-        # p.setColor(QPalette.Highlight, QColor("#0059d1"))
+        color = p.ColorRole
+        p.setColor(color.Highlight, QColor("#0059d1"))
         return p
 
 

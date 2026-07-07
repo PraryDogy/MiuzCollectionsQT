@@ -3,9 +3,9 @@ import subprocess
 from collections import defaultdict
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QCloseEvent, QIcon, QKeyEvent, QPixmap
-from PyQt6.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
-                             QPushButton, QSplitter, QVBoxLayout, QWidget)
+from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
+from PyQt6.QtWidgets import (QFileDialog, QFrame, QLabel, QPushButton,
+                             QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
@@ -815,10 +815,16 @@ class WinMain(UMainWindow):
         self.start_scaner_task()
         
     def center_screen(self):
-        screen = QDesktopWidget().screenGeometry()
+        # Получаем геометрию первичного (главного) экрана
+        screen = QGuiApplication.primaryScreen().geometry()
+        # Получаем геометрию текущего окна
         size = self.geometry()
+        
+        # Вычисляем координаты центра
         x = (screen.width() - size.width()) // 2
         y = (screen.height() - size.height()) // 2
+        
+        # Перемещаем окно
         self.move(x, y)
 
     def on_exit(self):

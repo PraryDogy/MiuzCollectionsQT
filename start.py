@@ -229,8 +229,6 @@ class LanguageSelect(QDialog):
 
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
-        self.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
-        self.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
         super().__init__(argv)
         self.argv = argv
         self.start()

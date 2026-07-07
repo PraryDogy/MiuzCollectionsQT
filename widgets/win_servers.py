@@ -2,15 +2,16 @@ import subprocess
 from dataclasses import dataclass
 
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtSvg import QSvgWidget
-from PyQt6.QtWidgets import QAction, QHBoxLayout, QLabel, QSpacerItem, QWidget
+from PyQt6.QtGui import QAction
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (SmallBtn, ULineEdit, UMainWindow,
-                            VListWidgetItem, UMenu, VListWidget)
+from ._base_widgets import (SmallBtn, ULineEdit, UMainWindow, UMenu,
+                            VListWidget, VListWidgetItem)
 from .win_warn import ConfirmWindow
 
 
