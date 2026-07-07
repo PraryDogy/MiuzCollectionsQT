@@ -1,6 +1,5 @@
 import os
 from multiprocessing import shared_memory
-from typing import Literal
 
 import numpy as np
 from PyQt5.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
@@ -8,10 +7,9 @@ from PyQt5.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
 from PyQt5.QtGui import (QContextMenuEvent, QCursor, QImage, QKeyEvent,
                          QMouseEvent, QPixmap, QResizeEvent, QTransform)
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
-                             QGraphicsOpacityEffect, QGraphicsPixmapItem,
-                             QGraphicsScene, QGraphicsView, QHBoxLayout,
-                             QLabel, QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsOpacityEffect,
+                             QGraphicsPixmapItem, QGraphicsScene,
+                             QGraphicsView, QLabel)
 
 from cfg import Cfg, Static
 from system.items import ImgViewItem
@@ -22,10 +20,8 @@ from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow, UMenu, USubMenu, USvgSqareWidget
-from .actions import (CopyName, CopyPath, RevealInFinder, Save, SetFav,
-                      WinInfoAction)
-from .grid import Thumb
+from ._base_widgets import UMainWindow, UMenu, USubMenu
+from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
 class ImgWid(QGraphicsView):
