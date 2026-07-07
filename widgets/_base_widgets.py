@@ -109,29 +109,9 @@ class ULineEdit(QLineEdit):
         self.menu_.show_menu()
 
 
-class USvgSqareWidget(QSvgWidget):
-    def __init__(self, src: str, size: int):
-        """
-        Квадратный Svg виджет
-        """
-        super().__init__()
-        # self.setStyleSheet(
-        #     """
-        #         background-color: transparent;
-        #     """
-        # )
-        self.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        self.setFixedSize(size, size)
-        if src:
-            self.load(src)
-
-
 class UTextEdit(QTextEdit):
-    """QTextEdit с кастомным контекстным меню для копирования/вставки"""
-
     def __init__(self):
         super().__init__()
-        # background-color: palette(base);
 
     def copy_selection(self):
         cur = self.textCursor()
