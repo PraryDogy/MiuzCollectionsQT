@@ -439,10 +439,11 @@ class _ThumbsUpdater:
             Создает и записывает в `hashdir` миниатюру.
             """
             scaner_item.total_count -= 1
-            Tools.send_text(
-                scaner_item.queue,
-                _ThumbsUpdater.get_gui_text(scaner_item)
-            )
+            if scaner_item.total_count > 0:
+                Tools.send_text(
+                    scaner_item.queue,
+                    _ThumbsUpdater.get_gui_text(scaner_item)
+                )
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
             rel_img_path = Utils.get_rel_any_path(
