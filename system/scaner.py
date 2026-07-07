@@ -473,7 +473,7 @@ class _ThumbsUpdater:
                 _upsert_records(good_chunk)
     
     def get_gui_text(scaner_item: ScanerItem):
-        sleep(0.5)
+        # sleep(0.5)
         return (
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.indexing[scaner_item.lng_index].lower()} "
