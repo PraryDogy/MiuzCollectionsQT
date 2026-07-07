@@ -2,8 +2,9 @@ import os
 
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QDrag, QKeyEvent,
-                         QMouseEvent, QPalette, QPixmap, QResizeEvent)
+from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
+                         QKeyEvent, QMouseEvent, QPalette, QPixmap,
+                         QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QWidget)
@@ -348,7 +349,8 @@ class Grid(VScrollArea):
         self.grid_wid.show()
 
     def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
-        wid = QApplication.widgetAt(a0.globalPos())
+        global_pos = QCursor.pos() 
+        wid = QApplication.widgetAt(global_pos)
         if isinstance(wid, (ImgWid, WhiteTextWid)):
             return wid.parent()
         else:
@@ -675,12 +677,6 @@ class Grid(VScrollArea):
             )
             self.menu_.addAction(act)
 
-            # act = CopyName(self.menu_, len(rel_paths))
-            # act.triggered.connect(
-            #     lambda: self.copy_name.emit(rel_paths)
-            # )
-            # self.menu_.addAction(act)
-
             self.menu_.addSeparator()
 
             act = Save(self.menu_, len(rel_paths))
@@ -698,13 +694,6 @@ class Grid(VScrollArea):
             self.menu_.addAction(act)
 
             self.menu_.addSeparator()
-
-            # act = QAction(
-            #     f"{Lng.selected_objects[Cfg.lng_index]} ({len(rel_paths)})",
-            #     self.menu_
-            # )
-            # act.setDisabled(True)
-            # self.menu_.addAction(act)
 
         if not clicked_wid:
             menu_empty()

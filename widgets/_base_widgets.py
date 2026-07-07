@@ -57,9 +57,9 @@ class UMenu(UMenuStyle):
 
     def show_menu(self):
         if self.event_:
-            self.exec_(self.event_.globalPos())
+            self.exec(self.event_.globalPos())
         else:
-            self.exec_()
+            self.exec()
 
 
 class USubMenu(UMenuStyle):
@@ -403,7 +403,7 @@ class USlider(QSlider):
             ev.ignore()
             return
 
-        ratio = ev.x() / self.width()
+        ratio = ev.pos().x() / self.width()
         value = self.minimum() + round(ratio * (self.maximum() - self.minimum()))
         self.setValue(value)
         ev.accept()
