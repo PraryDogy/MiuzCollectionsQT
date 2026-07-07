@@ -311,7 +311,7 @@ class BarTop(QWidget):
     open_img_search = pyqtSignal()
     exit_img_search = pyqtSignal()
     open_base_search = pyqtSignal()
-    text_height = 53
+    text_height = 60
     text_spacing = 15
 
     def __init__(self):

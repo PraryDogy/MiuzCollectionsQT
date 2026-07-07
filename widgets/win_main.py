@@ -5,7 +5,7 @@ from collections import defaultdict
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QLabel, QPushButton,
-                             QSplitter, QVBoxLayout, QWidget)
+                             QSplitter, QVBoxLayout, QWidget, QSpacerItem)
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
@@ -142,6 +142,8 @@ class WinMain(UMainWindow):
             lambda: self.base_search_start()
         )
         self.right_layout.addWidget(self.bar_top)
+
+        # self.right_layout.addSpacerItem(QSpacerItem(0, 5))
 
         sep_upper = HSep()
         self.right_layout.addWidget(sep_upper)
@@ -571,7 +573,7 @@ class WinMain(UMainWindow):
         self.dates_win.center_to_parent(self)
         self.dates_win.show()
 
-    def load_st_grid(self, layout_index: int = 2):
+    def load_st_grid(self, layout_index: int = 3):
 
         def finished():
             self.grid.setFocus()
