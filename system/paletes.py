@@ -19,8 +19,8 @@ class UPallete:
         p.setColor(QPalette.Button, QColor("#f0f0f0"))
         p.setColor(QPalette.ButtonText, QColor("#000000"))
         p.setColor(QPalette.BrightText, QColor("#ff0000"))
-        p.setColor(QPalette.Link, QColor("#007aff"))
-        p.setColor(QPalette.Highlight, QColor("#007aff"))
+        p.setColor(QPalette.Link, QColor("#0059d1"))
+        p.setColor(QPalette.Highlight, QColor("#0059d1"))
         p.setColor(QPalette.HighlightedText, QColor("#ffffff"))
         return p
 
@@ -37,14 +37,15 @@ class UPallete:
         p.setColor(QPalette.Button, QColor("#2d2d2d"))
         p.setColor(QPalette.ButtonText, QColor("#ffffff"))
         p.setColor(QPalette.BrightText, QColor("#ff453a"))
-        p.setColor(QPalette.Link, QColor("#0a84ff"))
-        p.setColor(QPalette.Highlight, QColor("#0a84ff"))
+        p.setColor(QPalette.Link, QColor("#0059d1"))
+        p.setColor(QPalette.Highlight, QColor("#0059d1"))
         p.setColor(QPalette.HighlightedText, QColor("#000000"))
         return p
 
     @classmethod
     def macinthosh(cls):
         p = QPalette()
+        p.setColor(QPalette.Highlight, QColor("#0059d1"))
         return p
         
         # 1. Основной фон окон и текст на нем
@@ -70,8 +71,6 @@ class UPallete:
         p.setColor(QPalette.Inactive, QPalette.HighlightedText, QColor("#FFFFFF"))
         
         return p
-
-
 
 
 class ThemeChanger:
