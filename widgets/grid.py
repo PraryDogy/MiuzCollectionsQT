@@ -771,9 +771,9 @@ class Grid(VScrollArea):
             mime_data.setUrls([QUrl.fromLocalFile(p) for p in paths])
 
             if not paths:
-                drag.exec_(Qt.DropAction.IgnoreAction)
+                drag.exec(Qt.DropAction.IgnoreAction)
             else:
-                drag.exec_(Qt.DropAction.CopyAction)
+                drag.exec(Qt.DropAction.CopyAction)
 
         # --- Основная логика ---
         if self.wid_under_mouse is None and not self.rubberBand.isVisible():
