@@ -275,7 +275,7 @@ class MfRemover:
                 abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
                 try:
                     os.remove(abs_thumb_path)
-                except Exception as e:
+                except (Exception, FileNotFoundError) as e:
                     print(traceback.format_exc())
                     continue
                 try:

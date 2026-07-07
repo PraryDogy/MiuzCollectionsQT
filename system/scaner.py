@@ -339,7 +339,7 @@ class _ThumbsUpdater:
                 conn.execute(stmt)
 
         def _remove_thumb(img_item: ScanerImgItem):
-            scaner_item.total_count -= 1
+            scaner_item.current_count += 1
             Tools.send_text(
                 scaner_item.queue,
                 _ThumbsUpdater.get_gui_text(scaner_item)
@@ -438,12 +438,11 @@ class _ThumbsUpdater:
             """
             Создает и записывает в `hashdir` миниатюру.
             """
-            scaner_item.total_count -= 1
-            if scaner_item.total_count > 0:
-                Tools.send_text(
-                    scaner_item.queue,
-                    _ThumbsUpdater.get_gui_text(scaner_item)
-                )
+            scaner_item.current_count += 1
+            Tools.send_text(
+                scaner_item.queue,
+                _ThumbsUpdater.get_gui_text(scaner_item)
+            )
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
             rel_img_path = Utils.get_rel_any_path(
@@ -474,10 +473,11 @@ class _ThumbsUpdater:
                 _upsert_records(good_chunk)
     
     def get_gui_text(scaner_item: ScanerItem):
+        sleep(0.5)
         return (
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.indexing[scaner_item.lng_index].lower()} "
-            f"({scaner_item.total_count})"
+            f"{scaner_item.current_count} {Lng.from_[scaner_item.lng_index]} {scaner_item.total_count}"
         )
 
 
@@ -570,7 +570,14 @@ class AllDirScaner:
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = ScanerItem(mf, engine, queue, lng_index, 0)
+            scaner_item = ScanerItem(
+                mf=mf,
+                engine=engine, 
+                queue=queue,
+                lng_index=lng_index,
+                total_count=0,
+                current_count=0
+            )
             avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
             if avaiable_mf_path:
                 scaner_item.mf.set_mf_current_path(avaiable_mf_path)

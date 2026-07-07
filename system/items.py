@@ -33,6 +33,7 @@ class ScanerItem:
     queue: Queue
     lng_index: int
     total_count: int
+    current_count: int
 
 
 @dataclass(slots=True)
