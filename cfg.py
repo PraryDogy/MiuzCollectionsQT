@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 class Themes:
-    macintosh = "macintosh"
+    macos = "macos"
     dark = "dark"
     light = "light"
 
@@ -72,7 +72,7 @@ class Dynamic:
 class Cfg:
     app_ver = Static.app_ver
     lng_index = 0
-    theme = Themes.macintosh
+    theme = Themes.macos
     scaner_minutes = 20
     hide_digits_mf_lst = []
 
@@ -93,8 +93,8 @@ class Cfg:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
-            if Cfg.theme not in (Themes.macintosh, Themes.dark, Themes.light):
-                Cfg.theme = Themes.macintosh
+            if Cfg.theme not in (Themes.macos, Themes.dark, Themes.light):
+                Cfg.theme = Themes.macos
         except Exception as e:
             print("Cfg json to app error",e)
     

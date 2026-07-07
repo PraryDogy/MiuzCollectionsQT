@@ -25,11 +25,11 @@ class Utils:
             if image.ndim == 2:  # grayscale
                 height, width = image.shape
                 bytes_per_line = width
-                qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+                qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format.Format_Grayscale8)
             elif image.ndim == 3 and image.shape[2] in (3, 4):
                 height, width, channels = image.shape
                 bytes_per_line = channels * width
-                fmt = QImage.Format_RGB888 if channels == 3 else QImage.Format_RGBA8888
+                fmt = QImage.Format.Format_RGB888 if channels == 3 else QImage.Format.Format_RGBA8888
                 qimage = QImage(image.data, width, height, bytes_per_line, fmt)
             else:
                 print(f"qimage_from_array: channels trouble {image.shape}")

@@ -318,7 +318,7 @@ class Grid(VScrollArea):
         self.grid_lay = QGridLayout()
         self.grid_lay.setSpacing(1)
         self.grid_wid.setLayout(self.grid_lay)
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self.viewport())
+        self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 

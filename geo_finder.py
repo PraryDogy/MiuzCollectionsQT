@@ -189,7 +189,7 @@ class ColorHighlighter(QRunnable):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         h, w, ch = img_rgb.shape
         bytes_per_line = ch * w
-        return QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format_RGB888)
+        return QImage(img_rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
 
 
 class ImageOpener(QRunnable):
