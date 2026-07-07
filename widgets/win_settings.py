@@ -1084,13 +1084,12 @@ class WinSettings(UMainWindow):
         self.right_lay.addStretch()
 
         self.btns_wid = QWidget()
-        self.btns_wid.setFixedHeight(26)
+        # self.btns_wid.setFixedHeight(50)
         self.right_lay.addWidget(self.btns_wid)
         btns_lay = UHBoxLayout()
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btns_lay.setSpacing(10)
         self.btns_wid.setLayout(btns_lay)
-
 
         self.warn_wid = QSvgWidget()
         self.warn_wid.load(self.svg_warn)
@@ -1110,6 +1109,8 @@ class WinSettings(UMainWindow):
         cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
+
+        self.btns_wid.adjustSize()
 
         self.central_layout.addSpacerItem(QSpacerItem(0, 5))
 
