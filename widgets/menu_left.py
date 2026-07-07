@@ -207,7 +207,7 @@ class TreeWid(QTreeWidget):
 
         menu.addSeparator()
 
-        copy_path = QAction(Lng.copy_filepath[Cfg.lng_index], menu)
+        copy_path = QAction(Lng.copy_dirpath[Cfg.lng_index], menu)
         copy_path.triggered.connect(
             lambda: self.copy_path.emit((Mf.current_mf, [rel_path, ]))
         )

@@ -223,6 +223,7 @@ class Lng:
     add_to_favorites = ("Добавить в избранное", "Add to favorites")
     remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
     copy_filepath = ("Скопировать путь к файлу", "Copy filepath")
+    copy_dirpath = ("Скопировать путь", "Copy path")
     copy_filepaths = ("Скопировать путь к файлам", "Copy file paths to files")
     adding = ("Добавляю", "Add")
     add = ("Добавить", "Add")
