@@ -427,8 +427,6 @@ class WinProgressbar(UMainWindow):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        # self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
-        # self.setWindowModality(Qt.WindowModality.WindowModal)
         self.setWindowTitle(title)
         self.setFixedSize(400, 70)
 
