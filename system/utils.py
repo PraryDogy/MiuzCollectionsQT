@@ -6,9 +6,9 @@ import traceback
 
 import cv2
 import numpy as np
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QIcon, QImage, QPixmap
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtGui import QIcon, QImage, QPixmap
+from PyQt6.QtWidgets import QApplication
 
 from cfg import Static
 

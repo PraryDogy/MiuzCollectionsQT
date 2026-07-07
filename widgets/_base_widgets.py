@@ -1,19 +1,18 @@
 import os
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QPalette
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFrame, QHBoxLayout,
-                             QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSlider, QSpacerItem, QTextEdit,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QCloseEvent, QContextMenuEvent
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
+                             QListWidget, QListWidgetItem, QMainWindow, QMenu,
+                             QProgressBar, QPushButton, QScrollArea, QSlider,
+                             QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
-from cfg import Cfg
+from cfg import Cfg, Themes
 from system.lang import Lng
 from system.utils import Utils
-from cfg import Cfg, Themes
+
 
 class UHBoxLayout(QHBoxLayout):
     """QHBoxLayout с нулевыми отступами и нулевым расстоянием между виджетами."""

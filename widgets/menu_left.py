@@ -2,9 +2,9 @@ import os
 import re
 import subprocess
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QAction, QSplitter, QTabWidget, QTreeWidget,
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import (QSplitter, QTabWidget, QTreeWidget,
                              QTreeWidgetItem, QWidget)
 
 from cfg import Cfg, Dynamic
@@ -14,8 +14,8 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UHBoxLayout, VListWidgetItem, UMenu, UVBoxLayout,
-                            VListWidget)
+from ._base_widgets import (UHBoxLayout, UMenu, UVBoxLayout, VListWidget,
+                            VListWidgetItem)
 
 ITEM_HEIGHT = 25
 

@@ -1,10 +1,10 @@
 import os
 
 import sqlalchemy
-from PyQt5.QtCore import QTimer, pyqtSignal
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
+from PyQt6.QtCore import QTimer, pyqtSignal
+from PyQt6.QtGui import QMouseEvent
+from PyQt6.QtSvg import QSvgWidget
+from PyQt6.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                              QSizePolicy, QVBoxLayout, QWidget)
 
 from cfg import Cfg

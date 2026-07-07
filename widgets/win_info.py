@@ -1,16 +1,15 @@
 import os
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
-from PyQt5.QtWidgets import QAction, QGridLayout, QLabel, QSpacerItem, QWidget
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtWidgets import QGridLayout, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg
 from system.items import OneFileInfoItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
-from system.utils import Utils
 
-from ._base_widgets import UMainWindow, SelectableLabel
+from ._base_widgets import SelectableLabel, UMainWindow
 
 
 class ULabel(QLabel):

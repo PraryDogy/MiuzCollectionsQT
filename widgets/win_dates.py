@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from typing import Literal
 
-from PyQt5.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
-from PyQt5.QtWidgets import (QCalendarWidget, QGroupBox, QLabel, QSpinBox,
+from PyQt6.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
+from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QLabel, QSpinBox,
                              QToolButton, QWidget)
 
 from cfg import Cfg, Dynamic

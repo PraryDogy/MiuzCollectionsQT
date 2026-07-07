@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtGui import QKeyEvent
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtSvg import QSvgWidget
+from PyQt6.QtWidgets import QLabel
+from PyQt6.QtGui import QKeyEvent
 
 from cfg import Cfg
 from system.lang import Lng

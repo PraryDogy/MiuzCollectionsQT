@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 import numpy as np
 import sqlalchemy
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt6.QtGui import QImage, QPixmap
 from watchdog.events import FileSystemEvent
 
 from .main_folder import Mf

@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QAction, QMenu
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QMenu
 
 from cfg import Cfg
 from system.lang import Lng

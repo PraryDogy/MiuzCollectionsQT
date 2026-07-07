@@ -1,9 +1,9 @@
 import subprocess
 from dataclasses import dataclass
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QAction, QHBoxLayout, QLabel, QSpacerItem, QWidget
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtSvg import QSvgWidget
+from PyQt6.QtWidgets import QAction, QHBoxLayout, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg
 from system.lang import Lng

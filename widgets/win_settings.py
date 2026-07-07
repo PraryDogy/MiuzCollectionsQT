@@ -7,13 +7,12 @@ import sys
 import zipfile
 from dataclasses import dataclass
 
-from PyQt5.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QIcon, QPixmap
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QGroupBox,
-                             QLabel, QLineEdit, QSpacerItem, QSpinBox,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QWidget)
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QLabel,
+                             QLineEdit, QSpacerItem, QSpinBox, QSplitter,
+                             QTableWidget, QTableWidgetItem, QWidget)
 from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes

@@ -8,10 +8,10 @@ import sys
 import cv2
 import numpy as np
 from PIL import Image
-from PyQt5.QtCore import (QObject, QRunnable, QSize, Qt, QThreadPool, QTimer,
+from PyQt6.QtCore import (QObject, QRunnable, QSize, Qt, QThreadPool, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import QColor, QDropEvent, QIcon, QImage, QPixmap
-from PyQt5.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
+from PyQt6.QtGui import QColor, QDropEvent, QIcon, QImage, QPixmap
+from PyQt6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QLabel, QListWidget, QListWidgetItem, QPushButton,
                              QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
                              QWidget)

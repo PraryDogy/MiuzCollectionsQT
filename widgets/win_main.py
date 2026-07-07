@@ -2,9 +2,9 @@ import os
 import subprocess
 from collections import defaultdict
 
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QCloseEvent, QIcon, QKeyEvent, QPixmap
-from PyQt5.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QCloseEvent, QIcon, QKeyEvent, QPixmap
+from PyQt6.QtWidgets import (QDesktopWidget, QFileDialog, QFrame, QLabel,
                              QPushButton, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal
 

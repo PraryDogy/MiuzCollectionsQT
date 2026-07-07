@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QMouseEvent, QWheelEvent
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import QGraphicsOpacityEffect, QLabel, QSlider, QWidget
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QMouseEvent, QWheelEvent
+from PyQt6.QtSvg import QSvgWidget
+from PyQt6.QtWidgets import QGraphicsOpacityEffect, QLabel, QSlider, QWidget
 
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng

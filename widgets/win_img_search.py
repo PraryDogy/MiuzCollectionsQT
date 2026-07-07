@@ -4,9 +4,9 @@ from multiprocessing import shared_memory
 import cv2
 import numpy as np
 import sqlalchemy
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout, QWidget)
 from sqlalchemy import func
 

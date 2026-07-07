@@ -4,9 +4,9 @@ import sys
 import traceback
 from pathlib import Path
 
-from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSignal
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
+from PyQt6.QtCore import QEvent, QObject, Qt, pyqtSignal
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
 
@@ -70,7 +70,7 @@ class System_:
         #lib folder appears when we pack this project to .app with py2app
         if os.path.exists("lib"): 
             ver = f"{sys.version_info.major}.{sys.version_info.minor}"
-            plugin_path = f"lib/python{ver}/PyQt5/Qt5/plugins"
+            plugin_path = f"lib/python{ver}/PyQt6/Qt5/plugins"
             os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
             return True
         else:
@@ -235,7 +235,7 @@ class App(QApplication):
         self.argv = argv
         self.start()
 
-        # from PyQt5.QtCore import QTimer
+        # from PyQt6.QtCore import QTimer
         # QTimer.singleShot(1000, lambda: print(3/0))
 
     def start(self):
@@ -291,7 +291,7 @@ class App(QApplication):
             self.aboutToQuit.connect(lambda: self.win_main.on_exit())
 
             icon = QIcon("./images/icon.png")
-            # self.setWindowIcon(icon)
+            self.setWindowIcon(icon)
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
