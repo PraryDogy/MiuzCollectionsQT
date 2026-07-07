@@ -45,31 +45,7 @@ class UPallete:
     @classmethod
     def macinthosh(cls):
         p = QPalette()
-        p.setColor(QPalette.Highlight, QColor("#0059d1"))
-        return p
-        
-        # 1. Основной фон окон и текст на нем
-        p.setColor(QPalette.Window, QColor("#393D44"))         # Темно-серый фон окна
-        p.setColor(QPalette.WindowText, QColor("#FFFFFF"))     # Белый текст на окне
-        
-        # 2. Поля ввода (QLineEdit) и списки (QListWidget)
-        p.setColor(QPalette.Base, QColor("#2A2D33"))           # Фон для полей и списков (чуть темнее окон)
-        p.setColor(QPalette.Text, QColor("#FFFFFF"))           # Белый текст внутри полей и списков
-        
-        # 3. Кнопки и текст на них
-        p.setColor(QPalette.Button, QColor("#534F55"))         # Фон кнопок
-        p.setColor(QPalette.ButtonText, QColor("#FFFFFF"))     # Белый шрифт кнопок
-        
-        # 4. Выделение текста и элементов списка
-        p.setColor(QPalette.Highlight, QColor("#007AFF"))      # Цвет выделения (акцентный синий)
-        p.setColor(QPalette.HighlightedText, QColor("#FFFFFF")) # Цвет текста при выделении
-        
-        # 5. Вспомогательный текст (подсказки / placeholder)
-        p.setColor(QPalette.PlaceholderText, QColor("#8E8E93")) # Серый цвет для подсказок ввода
-
-        p.setColor(QPalette.Inactive, QPalette.Highlight, QColor("#55555A"))     
-        p.setColor(QPalette.Inactive, QPalette.HighlightedText, QColor("#FFFFFF"))
-        
+        # p.setColor(QPalette.Highlight, QColor("#0059d1"))
         return p
 
 

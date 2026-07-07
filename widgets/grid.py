@@ -4,6 +4,7 @@ from PyQt5.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
 from PyQt5.QtGui import (QColor, QContextMenuEvent, QDrag, QKeyEvent,
                          QMouseEvent, QPalette, QPixmap, QResizeEvent)
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (QAction, QApplication, QFrame,
                              QGraphicsDropShadowEffect, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QWidget)
@@ -16,8 +17,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UMenu, USubMenu, USvgSqareWidget, UVBoxLayout,
-                            VScrollArea)
+from ._base_widgets import UMenu, USubMenu, UVBoxLayout, VScrollArea
 from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -240,37 +240,23 @@ class Thumb(QFrame):
         self.white_text_wid.set_text()
 
 
-class UpBtn(QFrame):
+class UpBtn(QSvgWidget):
     scroll_to_top = pyqtSignal()
-    icon = "./images/up.svg"
+    svg_path = "./images/up.svg"
     icon_size = 44
-    radius = 22
-    STYLE = f"""
-        background: rgba(125, 125, 125, 0.5);
-        border-radius: {radius}px;
-    """
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
-        self.setStyleSheet(self.STYLE)
-
-        v_layout = UVBoxLayout()
-        self.setLayout(v_layout)
-
-        self.svg = USvgSqareWidget(self.icon, self.icon_size)
-        v_layout.addWidget(self.svg, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.load(self.svg_path)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
             self.scroll_to_top.emit()
         super().mouseReleaseEvent(ev)
 
-\
-class Grid(VScrollArea):
-    """Сетка миниатюр с сигналами для действий с файлами и интерфейсом."""
 
-    # --- Сигналы ---
+class Grid(VScrollArea):
     load_st_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)

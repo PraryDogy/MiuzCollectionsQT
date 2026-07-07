@@ -36,17 +36,11 @@ class UVBoxLayout(QVBoxLayout):
 class UMenuStyle(QMenu):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.setStyleSheet(
-            f"""
-                QMenu {{ 
-                    border-radius: 0px;
-                }}
-                QMenu::separator {{
-                    height: 1px;
-                    padding-left: 5px;
-                    padding-right: 5px;
-                }}
+            """
+            QMenu {
+                border-radius: 0px;
+            }
             """
         )
 
@@ -75,27 +69,17 @@ class USubMenu(UMenuStyle):
 
 
 class ULineEdit(QLineEdit):
-    """
-    QLineEdit с фиксированной высотой, кастомными отступами и шириной контекстного меню.
-    
-    Атрибуты:
-        hh (int): высота виджета.
-        padding (tuple[int, int]): отступы слева и справа.
-        menu_width (int): ширина контекстного меню.
-    """
     hh = 30
-    padding = (2, 28)
 
     def __init__(self):
         super().__init__()
-
         self.setFixedHeight(self.hh)
-        style = f"""
-            padding-left: {self.padding[0]}px;
-            padding-right: {self.padding[1]}px;
-        """
-        # border-radius: 6px;
-        self.setStyleSheet(self.styleSheet() + style)
+        self.setStyleSheet(
+            f"""
+                padding-left: 2px;
+                padding-right: 28px;
+            """
+        )
 
     def cut_selection(self, *args):
         text = self.selectedText()
@@ -131,7 +115,11 @@ class USvgSqareWidget(QSvgWidget):
         Квадратный Svg виджет
         """
         super().__init__()
-        self.setStyleSheet(f"""background-color: transparent;""")
+        # self.setStyleSheet(
+        #     """
+        #         background-color: transparent;
+        #     """
+        # )
         self.renderer().setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
         self.setFixedSize(size, size)
         if src:
