@@ -241,8 +241,36 @@ class ZoomWidget(CustomSvg):
         super().__init__()
         self.load(self.svg_path)
         self.zone_width = self.width() / 4
+        self.start_pos = None
+        self.is_move = False
 
-    def mouseReleaseEvent(self, a0):
+    def mousePressEvent(self, e: QMouseEvent):
+        self.start_pos = e.pos()
+        self.is_move = False
+        super().mousePressEvent(e)
+
+    def mouseMoveEvent(self, e: QMouseEvent):
+        if not self.start_pos:
+            return
+        dx = e.x() - self.start_pos.x()
+        if abs(dx) > 30:  # горизонтальное движение
+            self.is_move = True
+            self.setCursor(Qt.CursorShape.SizeHorCursor)
+            if dx > 0:
+                self.zoom_in.emit()
+            else:
+                self.zoom_out.emit()
+            self.start_pos = e.pos()
+        super().mouseMoveEvent(e)
+
+
+    def mouseReleaseEvent(self, a0: QMouseEvent):
+
+        self.setCursor(Qt.CursorShape.ArrowCursor)
+        if self.is_move:
+            self.is_move = False
+            return  # не считаем клик, если двигали мышь
+
         zone_index = int(a0.pos().x() // self.zone_width)
         if zone_index == 0:
             self.zoom_out.emit()
@@ -252,7 +280,6 @@ class ZoomWidget(CustomSvg):
             self.zoom_fit.emit()
         else:
             self.zoom_close.emit()
-
         return super().mouseReleaseEvent(a0)
 
 
