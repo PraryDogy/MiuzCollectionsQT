@@ -28,6 +28,7 @@ class Static:
     external_servers = os.path.join(external_files_dir, "servers.json")
 
     internal_files_dir = "./_preload"
+    internal_images = "./images"
 
     max_img_size = 210
     pixmap_sizes = [50, 70, 100, 170]

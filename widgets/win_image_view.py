@@ -114,13 +114,33 @@ class ImgWid(QGraphicsView):
             self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
     
 
-class UserSvg(USvgSqareWidget):
-    def __init__(self, src, size):
-        super().__init__(src, size)
-        self.value = None
+class CustomSvg(QSvgWidget):
+    clicked = pyqtSignal()
+    svg_size = 50
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(self.svg_size, self.svg_size)
+        self.setStyleSheet(
+            """
+                background: transparent;
+            """
+        )
+
+    def mouseReleaseEvent(self, a0):
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        return super().mouseReleaseEvent(a0)
 
 
-class ZoomBtns(QFrame):
+class _ZoomButton(CustomSvg):
+    def __init__(self, value: int):
+        super().__init__()
+        self.setFixedSize(self.svg_size - 15, self.svg_size - 15)
+        self.value = value
+
+
+class ZoomWidget(QFrame):
     zoom_close = pyqtSignal()
     zoom_in = pyqtSignal()
     zoom_out = pyqtSignal()
@@ -128,48 +148,52 @@ class ZoomBtns(QFrame):
 
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setStyleSheet("""
-            background-color: rgba(128, 128, 128, 0.5);
-            border-radius: 15px;
-        """)
+        self.setFixedHeight(CustomSvg.svg_size)
+        self.setStyleSheet(
+            """
+            ZoomWidget {
+                background: rgba(128, 128, 128, 0.5);
+                border-radius: 15px;
+            }
+            """
+        )
 
         h_layout = QHBoxLayout(self)
-        h_layout.setSpacing(10)
-        h_layout.setContentsMargins(5, 0, 5, 0)
+        h_layout.setSpacing(20)
+        h_layout.setContentsMargins(10, 0, 10, 0)
 
-        def add_btn(name, val):
-            btn = UserSvg(os.path.join("./images", name), 45)
-            btn.value = val
-            h_layout.addWidget(btn)
-            return btn
+        zoom_out = _ZoomButton(value=-1)
+        zoom_out.load(os.path.join(Static.internal_images, "zoom_out.svg"))
+        zoom_out.clicked.connect(self.zoom_out.emit)
+        h_layout.addWidget(zoom_out)
 
-        # h_layout.addSpacerItem(QSpacerItem(5, 0))
-        add_btn("zoom_out.svg", -1)
-        # h_layout.addSpacerItem(QSpacerItem(10, 0))
-        add_btn("zoom_in.svg", 1)
-        # h_layout.addSpacerItem(QSpacerItem(10, 0))
-        add_btn("zoom_fit.svg", 0)
-        # h_layout.addSpacerItem(QSpacerItem(10, 0))
-        add_btn("zoom_close.svg", 9999)
-        # h_layout.addSpacerItem(QSpacerItem(5, 0))
+        zoom_in = _ZoomButton(value=1)
+        zoom_in.load(os.path.join(Static.internal_images, "zoom_in.svg"))
+        zoom_in.clicked.connect(self.zoom_in.emit)
+        h_layout.addWidget(zoom_in)
 
-        self.mappings = {
-            -1: self.zoom_out.emit,
-            1: self.zoom_in.emit,
-            0: self.zoom_fit.emit,
-            9999: self.zoom_close.emit
-        }
+        zoom_fit = _ZoomButton(value=0)
+        zoom_fit.load(os.path.join(Static.internal_images, "zoom_fit.svg"))
+        zoom_fit.clicked.connect(self.zoom_fit.emit)
+        h_layout.addWidget(zoom_fit)
+
+        zoom_close = _ZoomButton(value=9999)
+        zoom_close.load(os.path.join(Static.internal_images, "zoom_close.svg"))
+        zoom_close.clicked.connect(self.zoom_close.emit)
+        h_layout.addWidget(zoom_close)
 
         self.start_pos = None
         self.is_move = False
         self.adjustSize()
 
     def mousePressEvent(self, e):
+        return
         self.start_pos = e.pos()
         self.is_move = False
         super().mousePressEvent(e)
 
     def mouseMoveEvent(self, e):
+        return
         if not self.start_pos:
             return
 
@@ -185,6 +209,7 @@ class ZoomBtns(QFrame):
         super().mouseMoveEvent(e)
 
     def mouseReleaseEvent(self, e):
+        return
         self.setCursor(Qt.CursorShape.ArrowCursor)
         if self.is_move:
             self.is_move = False
@@ -198,26 +223,20 @@ class ZoomBtns(QFrame):
         super().mouseReleaseEvent(e)
 
 
-class SwitchImgBtn(USvgSqareWidget):
-    pressed = pyqtSignal()
+class PrevButton(CustomSvg):
+    svg_path = os.path.join(Static.internal_images, "prev.svg")
 
-    def __init__(self, src: str, parent: QWidget) -> None:
-        super().__init__(src, 54)
-        self.setParent(parent)
-
-    def mouseReleaseEvent(self, a0):
-        self.pressed.emit()
-        return super().mouseReleaseEvent(a0)
+    def __init__(self) -> None:
+        super().__init__()
+        self.load(self.svg_path)
 
 
-class PrevImgBtn(SwitchImgBtn):
-    def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(os.path.join("./images", "prev.svg"), parent)
+class NextButton(CustomSvg):
+    svg_path = os.path.join(Static.internal_images, "next.svg")
 
-
-class NextImgBtn(SwitchImgBtn):
-    def __init__(self, parent: QWidget = None) -> None:
-        super().__init__(os.path.join("./images", "next.svg"), parent)
+    def __init__(self) -> None:
+        super().__init__()
+        self.load(self.svg_path)
 
 
 class WinImageView(UMainWindow):
@@ -253,13 +272,17 @@ class WinImageView(UMainWindow):
 
         self.img_wid = ImgWid(QPixmap())
         self.central_layout.addWidget(self.img_wid)
-        self.prev_image_btn = PrevImgBtn(self.centralWidget())
-        self.prev_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("-")
 
-        self.next_image_btn = NextImgBtn(self.centralWidget())
-        self.next_image_btn.mouseReleaseEvent = lambda e: self.button_switch_cmd("+")
+        self.prev_image_btn = PrevButton()
+        self.prev_image_btn.setParent(self.centralWidget())
+        self.prev_image_btn.clicked.connect(lambda: self.switch_image(1))
 
-        self.zoom_btns = ZoomBtns(parent=self)
+        self.next_image_btn = NextButton()
+        self.next_image_btn.setParent(self.centralWidget())
+        self.next_image_btn.clicked.connect(lambda: self.switch_image(-1))
+
+        self.zoom_btns = ZoomWidget()
+        self.zoom_btns.setParent(self.centralWidget())
         self.zoom_btns.zoom_in.connect(lambda: self.zoom_cmd("in"))
         self.zoom_btns.zoom_out.connect(lambda: self.zoom_cmd("out"))
         self.zoom_btns.zoom_fit.connect(lambda: self.zoom_cmd("fit"))
@@ -408,13 +431,6 @@ class WinImageView(UMainWindow):
         self.setWindowTitle(
             self.current_data_item.filename
         )
-
-    def button_switch_cmd(self, flag: Literal["+", "-"]) -> None:
-        if flag == "+":
-            self.switch_image(1)
-        else:
-            self.switch_image(-1)
-        self.img_wid.setCursor(Qt.CursorShape.ArrowCursor)
 
 
 # EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS EVENTS 
