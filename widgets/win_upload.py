@@ -3,13 +3,13 @@ import os
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QGroupBox, QLabel, QTreeWidget, QTreeWidgetItem,
-                             QWidget)
+from PyQt6.QtWidgets import (QAbstractItemView, QGroupBox, QLabel, QTreeWidget,
+                             QTreeWidgetItem, QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
 
-from ._base_widgets import UMainWindow, SmallBtn, UHBoxLayout
+from ._base_widgets import SmallBtn, UHBoxLayout, UMainWindow
 
 
 class TreeWid(QTreeWidget):
@@ -80,7 +80,7 @@ class TreeWid(QTreeWidget):
             item.setExpanded(True)
             item = item.parent()
         self.setCurrentItem(self.items[path])
-        self.scrollToItem(self.items[path], QTreeWidget.PositionAtCenter)
+        self.scrollToItem(self.items[path], QAbstractItemView.ScrollHint.PositionAtCenter)
 
 
 class UploadWin(UMainWindow):
