@@ -475,7 +475,7 @@ class ThemeBtn(QWidget):
         self.svg = f"./images/{theme}_theme.svg"
         self.svg_selected = f"./images/{theme}_theme_selected.svg"
         text_mappings = {
-            Themes.macos: Lng.macintosh_theme,
+            Themes.macintosh: Lng.macintosh_theme,
             Themes.dark: Lng.dark_theme,
             Themes.light: Lng.light_theme,
         }
@@ -523,7 +523,7 @@ class ThemesWidget(SettingsGroup):
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
         
-        for i in (Themes.macos, Themes.dark, Themes.light):
+        for i in (Themes.macintosh, Themes.dark, Themes.light):
             btn = ThemeBtn(i)
             btn.clicked.connect(lambda theme, btn=btn: self.on_btn_clicked(theme, btn))
             themes_layout.addWidget(btn)
