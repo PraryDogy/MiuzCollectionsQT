@@ -37,9 +37,9 @@ from .win_warn import ConfirmWindow, WarningWindow
 
 
 def restart_app():
-    ProcessWorker.stop_all()
-    QApplication.quit()
+    ProcessWorker.stop_all() 
     os.execl(sys.executable, sys.executable, *sys.argv)
+    QApplication.exit(0)
 
 
 @dataclass(slots=True)

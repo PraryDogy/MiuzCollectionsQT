@@ -16,9 +16,9 @@ from .path_widget import PathWidget
 
 
 def restart_app():
-    ProcessWorker.stop_all()
-    QApplication.quit()
+    ProcessWorker.stop_all() 
     os.execl(sys.executable, sys.executable, *sys.argv)
+    QApplication.exit(0)
 
 
 class SuperWarnWindow(UMainWindow):
