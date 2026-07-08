@@ -2,15 +2,15 @@ import os
 from multiprocessing import shared_memory
 
 import numpy as np
-from PyQt6.QtCore import (QEvent, QObject, QPointF, QSize, Qt, QTimer,
+from PyQt6.QtCore import (QEvent, QObject, QPoint, QPointF, QSize, Qt, QTimer,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QImage,
-                         QKeyEvent, QMouseEvent, QPixmap, QResizeEvent,
-                         QTransform)
+from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QIcon, QImage,
+                         QKeyEvent, QMouseEvent, QPainter, QPixmap,
+                         QResizeEvent, QTransform)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
                              QGraphicsPixmapItem, QGraphicsScene,
-                             QGraphicsView, QLabel)
+                             QGraphicsView, QLabel, QSizePolicy)
 
 from cfg import Cfg, Static
 from system.items import ImgViewItem
@@ -25,90 +25,84 @@ from ._base_widgets import UMainWindow, UMenu, USubMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
-class ImgWid(QGraphicsView):
+class ImgWid(QLabel):
     mouse_moved = pyqtSignal()
 
-    def __init__(self, pixmap: QPixmap = None):
+    def __init__(self, pixmap: QPixmap):
         super().__init__()
-
         self.setMouseTracking(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
-        self.scene_ = QGraphicsScene()
-        self.setScene(self.scene_)
-
-        self.pixmap_item: QGraphicsPixmapItem = None
-        self._last_mouse_pos: QPointF = None
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        self.orig_pixmap = pixmap
+        self.zoom_factor = 1.0
+        self.offset = QPoint(0, 0)
+        self._last_mouse_pos = None
         self.is_zoomed = False
 
-        if pixmap:
-            self.pixmap_item = QGraphicsPixmapItem(pixmap)
-            self.scene_.addItem(self.pixmap_item)
-            self.resetTransform()
-            self.horizontalScrollBar().setValue(0)
-            self.verticalScrollBar().setValue(0)
+    def _apply_image_state(self):
+        if not self.is_zoomed:
+            self.setContentsMargins(0, 0, 0, 0)
+            
+            w_ratio = self.width() / self.orig_pixmap.width()
+            h_ratio = self.height() / self.orig_pixmap.height()
+            scale_ratio = min(w_ratio, h_ratio)
+            
+            if self.orig_pixmap.width() > self.orig_pixmap.height():
+                max_side = int(self.orig_pixmap.width() * scale_ratio)
+            else:
+                max_side = int(self.orig_pixmap.height() * scale_ratio)
+            
+            resized = Utils.qiconed_resize(self.orig_pixmap, max_side)
+            self.setPixmap(resized)
+        else:
+            base_side = max(self.orig_pixmap.width(), self.orig_pixmap.height())
+            target_side = int(base_side * self.zoom_factor)
+                
+            resized = Utils.qiconed_resize(self.orig_pixmap, target_side)
+            self.setPixmap(resized)
+            
+            self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+            
+            margin_x = max(0, self.offset.x()) if resized.width() < self.width() else self.offset.x()
+            margin_y = max(0, self.offset.y()) if resized.height() < self.height() else self.offset.y()
+            self.setContentsMargins(margin_x, margin_y, 0, 0)
+
+    def set_new_pixmap(self, pixmap: QPixmap):
+        self.orig_pixmap = pixmap
+        self.offset = QPoint(0, 0)
+        self.zoom_factor = 1.0
+        self.is_zoomed = False
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._apply_image_state()
 
     def zoom_in(self):
-        self.scale(1.1, 1.1)
-        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.zoom_factor *= 1.1
+        self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
         self.is_zoomed = True
+        self._apply_image_state()
 
     def zoom_out(self):
-        self.scale(0.9, 0.9)
-        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.zoom_factor *= 0.9
+        if self.zoom_factor < 0.1:
+            self.zoom_factor = 0.1
+        self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
         self.is_zoomed = True
+        self._apply_image_state()
 
     def zoom_fit(self):
-        if self.pixmap_item:
-            self.resetTransform()
-            self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
-            self.is_zoomed = False
-            self.setCursor(Qt.CursorShape.ArrowCursor)
-
-    def set_transparent(self, value: float):
-        effect = QGraphicsOpacityEffect(self)
-        effect.setOpacity(value)
-        self.pixmap_item.setGraphicsEffect(effect)
-
-    # ---------------------- Drag через мышь ----------------------
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.setCursor(Qt.CursorShape.ClosedHandCursor)
-            self._last_mouse_pos = event.pos()
-        super().mousePressEvent(event)
-
-    def mouseMoveEvent(self, event: QMouseEvent):
-        self.mouse_moved.emit()
-        if self._last_mouse_pos and event.buttons() & Qt.MouseButton.LeftButton:
-            delta = event.pos() - self._last_mouse_pos
-            self._last_mouse_pos = event.pos()
-
-            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
-            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
-        super().mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event: QMouseEvent):
-        if self.is_zoomed:
-            self.setCursor(Qt.CursorShape.OpenHandCursor)
-        else:
-            self.setCursor(Qt.CursorShape.ArrowCursor)
-        self._last_mouse_pos = None
-        super().mouseReleaseEvent(event)
-
-    def keyPressEvent(self, event):
-        # Если это стрелки, не обрабатываем их здесь
-        if event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down):
-            event.ignore()  # передаём событие родителю
-            return
-        # для остальных клавиш можно оставить стандартную обработку
-        super().keyPressEvent(event)
+        self.zoom_factor = 1.0
+        self.is_zoomed = False
+        self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._apply_image_state()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if self.pixmap_item:
-            self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
-    
+        if not self.is_zoomed:
+            self._apply_image_state()
+
+
+
 
 class CustomSvg(QSvgWidget):
     clicked = pyqtSignal()
@@ -236,7 +230,9 @@ class WinImageView(UMainWindow):
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
-        self.img_wid = ImgWid(QPixmap())
+        pixmap = QPixmap(10, 10)
+        pixmap.fill(Qt.GlobalColor.black)
+        self.img_wid = ImgWid(pixmap)
         self.central_layout.addWidget(self.img_wid)
 
         self.prev_image_btn = PrevButton()
@@ -254,10 +250,6 @@ class WinImageView(UMainWindow):
         self.zoom_btns.zoom_fit.connect(lambda: self.zoom_cmd("fit"))
         self.zoom_btns.zoom_close.connect(self.deleteLater)
 
-        self.text_label = QLabel(self)
-        self.text_label.setStyleSheet("background: black;")
-        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
         # self.hide_all_buttons()
         QTimer.singleShot(100, self.load_thumb)
 
@@ -272,24 +264,11 @@ class WinImageView(UMainWindow):
         actions[flag]()
 
     def restart_img_wid(self, pixmap: QPixmap):
-        self.text_label.hide()
-        self.img_wid.hide()  # скрываем старый
-        new_wid = ImgWid(pixmap)
-        new_wid.mouse_moved.connect(self.zoom_btns.show)
-        self.central_layout.addWidget(new_wid)
-
-        self.img_wid.deleteLater()
-        self.img_wid = new_wid
-        self.img_wid.show()
+        self.img_wid.set_new_pixmap(pixmap)
 
         btns = (self.zoom_btns, self.prev_image_btn, self.next_image_btn)
         for i in btns:
             i.raise_()
-
-    def show_text_label(self, text: str):
-        self.text_label.setText(text)
-        self.text_label.raise_()  # поверх остальных
-        self.text_label.show()
 
     def load_thumb(self):
         self.restart_img_wid(self.current_data_item.pixmap)
@@ -366,7 +345,7 @@ class WinImageView(UMainWindow):
 
 
     def rotate(self, value: int):
-        pixmap = self.img_wid.pixmap_item.pixmap()
+        pixmap = self.img_wid.pixmap()
         transform = QTransform().rotate(value)
         pixmap = pixmap.transformed(transform)
         self.restart_img_wid(pixmap)
@@ -527,7 +506,6 @@ class WinImageView(UMainWindow):
         bottom_window_side = a0.size().height() - self.zoom_btns.height()
         self.zoom_btns.move(horizontal_center, bottom_window_side - 50)
 
-        self.text_label.resize(self.size())
         self.setFocus()
 
         return super().resizeEvent(a0)
