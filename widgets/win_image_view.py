@@ -159,7 +159,7 @@ class ZoomWidget(CustomSvg):
     def mouseMoveEvent(self, e: QMouseEvent):
         if not self.start_pos:
             return
-        dx = e.x() - self.start_pos.x()
+        dx = e.pos().x() - self.start_pos.x()
         if abs(dx) > 30:  # горизонтальное движение
             self.is_move = True
             self.setCursor(Qt.CursorShape.SizeHorCursor)
