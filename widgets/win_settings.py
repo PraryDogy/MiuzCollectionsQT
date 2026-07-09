@@ -583,7 +583,7 @@ class AboutWid(QGroupBox):
 
         icon = QLabel()
         pixmap = QPixmap(self.png_icon)
-        pixmap = Utils.qiconed_resize(85)
+        pixmap = Utils.qiconed_resize(pixmap, 85)
         icon.setPixmap(pixmap)
         h_lay.addWidget(icon)
 
