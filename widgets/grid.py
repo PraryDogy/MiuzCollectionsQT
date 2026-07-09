@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QWidget)
 
 from cfg import Cfg, Dynamic, Static
+from system.image import UPixmap
 from system.items import Buffer, DataItem, DbImagesItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -208,6 +209,7 @@ class Thumb(QFrame):
         self.setFixedSize(self.thumb_width, self.thumb_height)
 
         self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
+
         self.img_wid.setPixmap(
             Utils.qiconed_resize(self.data_item.pixmap, self.img_wid_size)
         )
@@ -764,7 +766,7 @@ class Grid(VScrollArea):
             drag.setMimeData(mime_data)
 
             # иконка для drag
-            drag_icon = QPixmap(self.png_copy_files)
+            drag_icon = UPixmap(self.png_copy_files)
             drag.setPixmap(drag_icon)
 
             # назначаем urls

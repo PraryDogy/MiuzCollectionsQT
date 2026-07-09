@@ -17,6 +17,7 @@ from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes
 from system.filters import Filters
+from system.image import UPixmap
 from system.items import HashDirSizeItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -582,8 +583,8 @@ class AboutWid(QGroupBox):
         self.setLayout(h_lay)
 
         icon = QLabel()
-        pixmap = QPixmap(self.png_icon)
-        pixmap = Utils.qiconed_resize(pixmap, 85)
+        pixmap = UPixmap(self.png_icon)
+        pixmap = pixmap.qiconed_resize(85)
         icon.setPixmap(pixmap)
         h_lay.addWidget(icon)
 
