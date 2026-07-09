@@ -3,7 +3,6 @@ from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import QLabel, QMenu, QMenuBar, QSpacerItem, QWidget
 
 from cfg import Cfg, Static
-from system.image import QPixmap
 from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
