@@ -14,8 +14,6 @@ from PyQt6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
                              QScrollArea, QSplitter, QTextEdit, QVBoxLayout,
                              QWidget)
 
-from system.image import UPixmap
-
 exts = (".jpg", ".jpeg", ".png")
 gray_style = "background-color: rgba(100, 100, 100, 50);"
 red_style = "background-color: rgba(137, 0, 0, 0.3);"
@@ -523,7 +521,7 @@ class MainWindow(QWidget):
             item.setCheckState(Qt.CheckState.Checked if color_name in self.selected_colors else Qt.CheckState.Unchecked)
             item.value = (lower, upper)
 
-            pixmap = UPixmap(12, 12)
+            pixmap = QPixmap(12, 12)
             pixmap.fill(QColor(hex_color))
             item.setIcon(QIcon(pixmap))
             self.list_widget.addItem(item)

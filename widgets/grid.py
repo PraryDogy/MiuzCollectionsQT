@@ -2,16 +2,14 @@ import os
 
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
-                         QKeyEvent, QMouseEvent, QPalette, QPixmap,
-                         QResizeEvent)
+from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QDrag, QKeyEvent,
+                         QMouseEvent, QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QWidget)
 
 from cfg import Cfg, Dynamic, Static
-from system.image import UPixmap
-from system.items import Buffer, DataItem, DbImagesItem, SettingsItem
+from system.items import DataItem, DbImagesItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
@@ -211,7 +209,7 @@ class Thumb(QFrame):
         self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
 
         self.img_wid.setPixmap(
-            self.data_item.pixmap.qiconed_resize(self.img_wid_size)
+            Utils.qiconed_resize(self.data_item.pixmap, self.img_wid_size)
         )
 
     def set_frame(self):
@@ -766,7 +764,7 @@ class Grid(VScrollArea):
             drag.setMimeData(mime_data)
 
             # иконка для drag
-            drag_icon = UPixmap(self.png_copy_files)
+            drag_icon = QPixmap(self.png_copy_files)
             drag.setPixmap(drag_icon)
 
             # назначаем urls

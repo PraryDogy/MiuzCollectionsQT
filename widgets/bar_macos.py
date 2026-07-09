@@ -3,7 +3,7 @@ from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import QLabel, QMenu, QMenuBar, QSpacerItem, QWidget
 
 from cfg import Cfg, Static
-from system.image import UPixmap
+from system.image import QPixmap
 from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
@@ -86,8 +86,8 @@ class AboutWin(UMainWindow):
 
         # --- Иконка приложения ---
         icon = QLabel()
-        pixmap = UPixmap(self.png_icon)
-        pixmap = pixmap.qiconed_resize(self.svg_ww)
+        pixmap = QPixmap(self.png_icon)
+        pixmap = Utils.qiconed_resize(pixmap, self.svg_ww)
         icon.setPixmap(pixmap)
         self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 

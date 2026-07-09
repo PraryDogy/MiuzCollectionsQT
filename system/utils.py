@@ -67,6 +67,10 @@ class Utils:
             return None
 
     @classmethod
+    def qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
+        return QIcon(pixmap).pixmap(QSize(max_side, max_side))
+
+    @classmethod
     def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str | None:
         filename = hashlib.md5(rel_img_path.encode('utf-8')).hexdigest() + ".jpg"
         new_folder = os.path.join(

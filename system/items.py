@@ -4,10 +4,8 @@ from typing import Literal, Optional
 
 import numpy as np
 import sqlalchemy
-from PyQt6.QtGui import QImage
+from PyQt6.QtGui import QImage, QPixmap
 from watchdog.events import FileSystemEvent
-
-from system.image import UPixmap
 
 from .main_folder import Mf
 
@@ -140,7 +138,7 @@ class HashDirSizeItem:
 
 @dataclass(slots=True)
 class DataItem:
-    pixmap: UPixmap
+    pixmap: QPixmap
     rel_path: str
     fav: bool
     month_year: str

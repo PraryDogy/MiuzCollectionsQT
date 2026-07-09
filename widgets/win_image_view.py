@@ -13,7 +13,6 @@ from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
                              QGraphicsView, QLabel, QScrollArea, QSizePolicy)
 
 from cfg import Cfg, Static
-from system.image import UPixmap
 from system.items import ImgViewItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -240,7 +239,7 @@ class WinImageView(UMainWindow):
         self.mouse_move_timer.setSingleShot(True)
         self.mouse_move_timer.timeout.connect(self.hide_all_buttons)
 
-        pixmap = UPixmap(10, 10)
+        pixmap = QPixmap(10, 10)
         pixmap.fill(Qt.GlobalColor.black)
         self.img_wid = ImgWid(pixmap)
         self.central_layout.addWidget(self.img_wid)
