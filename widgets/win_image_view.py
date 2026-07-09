@@ -275,15 +275,14 @@ class WinImageView(UMainWindow):
     def restart_img_wid(self, pixmap: QPixmap):
         self.img_wid.hide()  # скрываем старый
         new_wid = ImgWid(pixmap)
-        # new_wid.mouse_moved.connect(self.show_)
+        new_wid.mouse_moved.connect(self.zoom_btns.show)
         self.central_layout.addWidget(new_wid)
 
         self.img_wid.deleteLater()
         self.img_wid = new_wid
         self.img_wid.show()
-        self.img_wid.lower()
 
-        btns = (self.prev_btn, self.next_btn, self.zoom_btns)
+        btns = (self.zoom_btns, self.prev_image_btn, self.next_image_btn)
         for i in btns:
             i.raise_()
 
