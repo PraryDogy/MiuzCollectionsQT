@@ -25,30 +25,17 @@ from ._base_widgets import UMainWindow, UMenu, USubMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
-def resize(pixmap: QPixmap, w, h):
-    return Utils.qiconed_resize(
-        pixmap,
-        max((w, h))
-    )
-
-from PyQt6.QtWidgets import QLabel
-from PyQt6.QtGui import QPixmap, QCursor
-from PyQt6.QtCore import pyqtSignal, Qt
-
-from PyQt6.QtWidgets import QLabel
-from PyQt6.QtGui import QPixmap, QIcon, QCursor
-from PyQt6.QtCore import pyqtSignal, Qt, QSize
-
 class ImgWid(QLabel):
     mouse_moved = pyqtSignal()
 
     def __init__(self, pixmap: QPixmap):
         super().__init__()
         self.setMouseTracking(True)
+        # Центрируем картинку, чтобы при уменьшении она не прижималась к углам
         self.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         self.orig_pixmap = pixmap
         self.zoom_factor = 1.0
-        # Инициализируем первый зум
+        # Изначально фитим картинку под размер окна
         self.zoom_fit()
 
     def set_new_pixmap(self, pixmap: QPixmap):
@@ -73,7 +60,8 @@ class ImgWid(QLabel):
 
     def _zoom(self, factor: float):
         new_factor = self.zoom_factor * factor
-        if 0.05 <= new_factor <= 20.0:
+        # Ограничение снизу 5%, сверху лимита нет для бесконечного зума
+        if 0.05 <= new_factor:
             self.zoom_factor = new_factor
             self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
             self.update_view()
@@ -84,43 +72,45 @@ class ImgWid(QLabel):
     def zoom_out(self):
         self._zoom(0.9)
 
-    def qiconed_resize(self, pixmap: QPixmap, target_size: QSize):
+    def qiconed_resize(self, pixmap: QPixmap, target_size: QSize) -> QPixmap:
+        """Ресайз через QIcon для корректного отображения маленьких/сжатых картинок."""
         return QIcon(pixmap).pixmap(target_size)
 
     def update_view(self):
-        """Перерасчет размера картинки с выбором алгоритма масштабирования."""
+        """Перерасчет размера картинки: до 100% через QIcon, выше — через scaled."""
         if self.orig_pixmap.isNull():
             return
             
+        # Рассчитываем целевые размеры
         new_width = int(self.orig_pixmap.width() * self.zoom_factor)
         new_height = int(self.orig_pixmap.height() * self.zoom_factor)
         
+        # Защита от нулевых размеров
         new_width = max(1, new_width)
         new_height = max(1, new_height)
-        
-        widget_width = self.width()
-        widget_height = self.height()
 
-        # Проверяем по ОРИГИНАЛЬНЫМ размерам картинки (как в вашем условии)
-        if self.orig_pixmap.width() < widget_width and self.orig_pixmap.height() < widget_height:
+        # До 100% включительно (zoom_factor <= 1.0) используем QIcon
+        if self.zoom_factor <= 1.0:
+            scaled_pixmap = self.qiconed_resize(
+                pixmap=self.orig_pixmap,
+                target_size=QSize(new_width, new_height)
+            )
+        # Выше 100% используем встроенный scaled для бесконечного зума
+        else:
             scaled_pixmap = self.orig_pixmap.scaled(
                 new_width, 
                 new_height, 
                 Qt.AspectRatioMode.KeepAspectRatio, 
                 Qt.TransformationMode.SmoothTransformation
             )
-        else:
-            # Передаем точные рассчитанные размеры в виде QSize
-            scaled_pixmap = self.qiconed_resize(
-                pixmap=self.orig_pixmap,
-                target_size=QSize(new_width, new_height)
-            )
             
         self.setPixmap(scaled_pixmap)
 
     def mouseMoveEvent(self, event):
+        """Переопределение движения мыши с отправкой сигнала."""
         self.mouse_moved.emit()
         super().mouseMoveEvent(event)
+
 
 
 
