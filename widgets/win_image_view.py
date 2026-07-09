@@ -25,82 +25,102 @@ from ._base_widgets import UMainWindow, UMenu, USubMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
+def resize(pixmap: QPixmap, w, h):
+    return Utils.qiconed_resize(
+        pixmap,
+        max((w, h))
+    )
+
+from PyQt6.QtWidgets import QLabel
+from PyQt6.QtGui import QPixmap, QCursor
+from PyQt6.QtCore import pyqtSignal, Qt
+
+from PyQt6.QtWidgets import QLabel
+from PyQt6.QtGui import QPixmap, QIcon, QCursor
+from PyQt6.QtCore import pyqtSignal, Qt, QSize
+
 class ImgWid(QLabel):
     mouse_moved = pyqtSignal()
 
     def __init__(self, pixmap: QPixmap):
         super().__init__()
         self.setMouseTracking(True)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         self.orig_pixmap = pixmap
         self.zoom_factor = 1.0
-        self.offset = QPoint(0, 0)
-        self._last_mouse_pos = None
-        self.is_zoomed = False
-
-    def _apply_image_state(self):
-        if not self.is_zoomed:
-            self.setContentsMargins(0, 0, 0, 0)
-            
-            w_ratio = self.width() / self.orig_pixmap.width()
-            h_ratio = self.height() / self.orig_pixmap.height()
-            scale_ratio = min(w_ratio, h_ratio)
-            
-            if self.orig_pixmap.width() > self.orig_pixmap.height():
-                max_side = int(self.orig_pixmap.width() * scale_ratio)
-            else:
-                max_side = int(self.orig_pixmap.height() * scale_ratio)
-            
-            resized = Utils.qiconed_resize(self.orig_pixmap, max_side)
-            self.setPixmap(resized)
-        else:
-            base_side = max(self.orig_pixmap.width(), self.orig_pixmap.height())
-            target_side = int(base_side * self.zoom_factor)
-                
-            resized = Utils.qiconed_resize(self.orig_pixmap, target_side)
-            self.setPixmap(resized)
-            
-            self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-            
-            margin_x = max(0, self.offset.x()) if resized.width() < self.width() else self.offset.x()
-            margin_y = max(0, self.offset.y()) if resized.height() < self.height() else self.offset.y()
-            self.setContentsMargins(margin_x, margin_y, 0, 0)
+        # Инициализируем первый зум
+        self.zoom_fit()
 
     def set_new_pixmap(self, pixmap: QPixmap):
         self.orig_pixmap = pixmap
-        self.offset = QPoint(0, 0)
-        self.zoom_factor = 1.0
-        self.is_zoomed = False
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._apply_image_state()
-
-    def zoom_in(self):
-        self.zoom_factor *= 1.1
-        self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
-        self.is_zoomed = True
-        self._apply_image_state()
-
-    def zoom_out(self):
-        self.zoom_factor *= 0.9
-        if self.zoom_factor < 0.1:
-            self.zoom_factor = 0.1
-        self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
-        self.is_zoomed = True
-        self._apply_image_state()
+        self.zoom_fit()
 
     def zoom_fit(self):
-        self.zoom_factor = 1.0
-        self.is_zoomed = False
+        """Рассчитывает zoom_factor так, чтобы картинка вписалась в текущий размер QLabel."""
+        if self.orig_pixmap.isNull() or self.width() <= 0 or self.height() <= 0:
+            self.zoom_factor = 1.0
+            return
+
+        # Находим соотношение сторон окна к картинке по ширине и высоте
+        ratio_w = self.width() / self.orig_pixmap.width()
+        ratio_h = self.height() / self.orig_pixmap.height()
+        
+        # Выбираем минимальный коэффициент, чтобы вся картинка влезла
+        self.zoom_factor = min(ratio_w, ratio_h)
+        
         self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._apply_image_state()
+        self.update_view()
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        if not self.is_zoomed:
-            self._apply_image_state()
+    def _zoom(self, factor: float):
+        new_factor = self.zoom_factor * factor
+        if 0.05 <= new_factor <= 20.0:
+            self.zoom_factor = new_factor
+            self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
+            self.update_view()
 
+    def zoom_in(self):
+        self._zoom(1.1)
+
+    def zoom_out(self):
+        self._zoom(0.9)
+
+    def qiconed_resize(self, pixmap: QPixmap, target_size: QSize):
+        return QIcon(pixmap).pixmap(target_size)
+
+    def update_view(self):
+        """Перерасчет размера картинки с выбором алгоритма масштабирования."""
+        if self.orig_pixmap.isNull():
+            return
+            
+        new_width = int(self.orig_pixmap.width() * self.zoom_factor)
+        new_height = int(self.orig_pixmap.height() * self.zoom_factor)
+        
+        new_width = max(1, new_width)
+        new_height = max(1, new_height)
+        
+        widget_width = self.width()
+        widget_height = self.height()
+
+        # Проверяем по ОРИГИНАЛЬНЫМ размерам картинки (как в вашем условии)
+        if self.orig_pixmap.width() < widget_width and self.orig_pixmap.height() < widget_height:
+            scaled_pixmap = self.orig_pixmap.scaled(
+                new_width, 
+                new_height, 
+                Qt.AspectRatioMode.KeepAspectRatio, 
+                Qt.TransformationMode.SmoothTransformation
+            )
+        else:
+            # Передаем точные рассчитанные размеры в виде QSize
+            scaled_pixmap = self.qiconed_resize(
+                pixmap=self.orig_pixmap,
+                target_size=QSize(new_width, new_height)
+            )
+            
+        self.setPixmap(scaled_pixmap)
+
+    def mouseMoveEvent(self, event):
+        self.mouse_moved.emit()
+        super().mouseMoveEvent(event)
 
 
 
