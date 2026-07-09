@@ -120,18 +120,6 @@ class Utils:
         return res
 
     @classmethod
-    def qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
-        return QIcon(pixmap).pixmap(QSize(max_side, max_side))
-
-    def short_text(self, text: str, row_limit: int = 100) -> str:
-        """
-        Сокращает текст, оставляя начало и конец, вставляя '...' посередине.
-        """
-        if len(text) > row_limit:
-            return f"{text[:row_limit]}..."
-        return text
-
-    @classmethod
     def print_error(cls):
         print()
         print("Исключение обработано")

@@ -9,6 +9,7 @@ from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout, QWidget)
 from sqlalchemy import func
+from system.image import UPixmap
 
 from cfg import Cfg, Dynamic, Static
 from system.database import Dbase, Thumbs
@@ -250,10 +251,8 @@ class WinImgSearch(UMainWindow):
                         self.img_label.width(),
                         self.img_label.height()
                     )
-                    resized_qpixmap = Utils.qiconed_resize(
-                        QPixmap.fromImage(qimage),
-                        min_size
-                    )
+                    pixmap = UPixmap.fromImage(qimage)
+                    resized_qpixmap = pixmap.qiconed_resize(min_size)
                     self.img_label.setPixmap(resized_qpixmap)
             if not self.read_img_task.is_alive():
                 self.read_img_task.terminate_join()

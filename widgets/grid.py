@@ -211,7 +211,7 @@ class Thumb(QFrame):
         self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
 
         self.img_wid.setPixmap(
-            Utils.qiconed_resize(self.data_item.pixmap, self.img_wid_size)
+            self.data_item.pixmap.qiconed_resize(self.img_wid_size)
         )
 
     def set_frame(self):
