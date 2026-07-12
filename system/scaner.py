@@ -546,7 +546,7 @@ class _RemovedDirsWorker:
                 conn.execute(stmt)
 
 
-class AllDirScaner:
+class BaseScaner:
     @staticmethod
     def start(mf_list: list[Mf], lng_index: int, queue: Queue):
         engine = Dbase.create_engine()
@@ -565,7 +565,7 @@ class AllDirScaner:
                 scaner_item.mf.set_mf_current_path(avaiable_mf_path)
                 try:
                     print("scaner started", scaner_item.mf.mf_alias)
-                    AllDirScaner.single_mf_scan(scaner_item)
+                    BaseScaner.single_mf_scan(scaner_item)
                     print("scaner finished", scaner_item.mf.mf_alias)
                 except Exception as e:
                     print(traceback.format_exc())
@@ -592,7 +592,7 @@ class AllDirScaner:
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существуетre
         if removed_dirs:
-            AllDirScaner.log_removed_dirs(scaner_item, finder_dirs, removed_dirs)
+            BaseScaner.log_removed_dirs(scaner_item, finder_dirs, removed_dirs)
             if len(finder_dirs) != len(removed_dirs):
                 _RemovedDirsWorker.remove_thumbs(removed_dirs, scaner_item)
                 _RemovedDirsWorker.remove_dirs(removed_dirs, scaner_item)
@@ -628,13 +628,13 @@ class AllDirScaner:
         Tools.log("\n".join(lines))
 
 
-class SingleDirScaner:
+class ForcedScaner:
 
     @staticmethod
     def start(item_list: list[SingleDirScanerItem], lng_index: int, queue: Queue):
         for item in item_list:
             print("single dir scaner started, mf:", item.mf.mf_alias)
-            SingleDirScaner.single_mf_scan(
+            ForcedScaner.single_mf_scan(
                 mf=item.mf,
                 dirs_to_scan=item.dirs_to_scan,
                 lng_index=lng_index,

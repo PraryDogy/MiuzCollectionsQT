@@ -16,7 +16,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
                                  UpdateThumb)
-from system.scaner import AllDirScaner, SingleDirScaner
+from system.scaner import BaseScaner, ForcedScaner
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
@@ -787,13 +787,13 @@ class WinMain(UMainWindow):
                     for mf, dirs_to_scan in self.scaner_data.items()
                 ]
                 self.scaner_task = ProcessWorker(
-                    target=SingleDirScaner.start,
+                    target=ForcedScaner.start,
                     args=(item_list, Cfg.lng_index, )
                     )
             else:
                 # print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ProcessWorker(
-                    target=AllDirScaner.start,
+                    target=BaseScaner.start,
                     args=(Mf.items, Cfg.lng_index, )
                 )
                 self.scaner_data.clear()
