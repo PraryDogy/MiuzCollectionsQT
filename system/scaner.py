@@ -18,11 +18,6 @@ from .items import (ScanerDirItem, ScanerImgItem, ScanerItem,
 
 
 class Tools:
-    
-    @staticmethod
-    def send_text(queue: Queue, text: str):
-        queue.put(text)
-
     @staticmethod
     def mf_exists(scaner_item: ScanerItem):
         """
@@ -52,7 +47,7 @@ class _DirsLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        Tools.send_text(scaner_item.queue, text)
+        scaner_item.queue.put(text)
 
         dirs: list[ScanerDirItem] = []
         stack = [scaner_item.mf.mf_current_path]
@@ -340,8 +335,7 @@ class _ThumbsUpdater:
 
         def _remove_thumb(img_item: ScanerImgItem):
             scaner_item.current_count += 1
-            Tools.send_text(
-                scaner_item.queue,
+            scaner_item.queue.put(
                 _ThumbsUpdater.get_gui_text(scaner_item)
             )
             abs_thumb_path = Utils.get_abs_thumb_path(
@@ -439,8 +433,7 @@ class _ThumbsUpdater:
             Создает и записывает в `hashdir` миниатюру.
             """
             scaner_item.current_count += 1
-            Tools.send_text(
-                scaner_item.queue,
+            scaner_item.queue.put(
                 _ThumbsUpdater.get_gui_text(scaner_item)
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
@@ -593,7 +586,7 @@ class AllDirScaner:
                     f"{scaner_item.mf.mf_alias}: "
                     f"{Lng.no_connection[lng_index].lower()}"
                 )
-                Tools.send_text(scaner_item.queue, text)
+                scaner_item.queue.put(text)
                 print(text)
                 sleep(3)
         engine.dispose()
