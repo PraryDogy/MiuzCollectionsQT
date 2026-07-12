@@ -79,16 +79,6 @@ class AboutWin(UMainWindow):
 
 
 class BarMacos(QMenuBar):
-    """
-    Меню-бар для macOS с основными пунктами:
-        - Открыть настройки
-        - О приложении
-
-    Атрибуты:
-        settings_win: экземпляр окна настроек (WinSettings)
-        about_win: экземпляр окна "О программе" (AboutWin)
-    """
-
     def __init__(self):
         super().__init__()
         self.mainMenu = QMenu(Lng.menu[Cfg.lng_index], self)
@@ -97,19 +87,16 @@ class BarMacos(QMenuBar):
         server_win.triggered.connect(self.open_server_window)
         self.mainMenu.addAction(server_win)
 
-        # --- Пункт "Открыть настройки" ---
         actionSettings = QAction(Lng.open_settings_window[Cfg.lng_index], self)
         actionSettings.triggered.connect(self.open_settings_window)
         self.mainMenu.addAction(actionSettings)
 
         self.mainMenu.addSeparator()
 
-        # --- Пункт "О приложении" ---
         actionAbout = QAction(Lng.show_about[Cfg.lng_index], self)
         actionAbout.triggered.connect(self.open_about_window)
         self.mainMenu.addAction(actionAbout)
 
-        # --- Добавляем меню в меню-бар ---
         self.addMenu(self.mainMenu)
         self.setNativeMenuBar(True)
 
@@ -119,14 +106,12 @@ class BarMacos(QMenuBar):
         self.server_win.show()
 
     def open_settings_window(self):
-        """Открывает окно настроек приложения."""
         item = SettingsItem("general", "")
         self.settings_win = WinSettings(item)
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
 
     def open_about_window(self):
-        """Открывает окно 'О программе'."""
         self.about_win = AboutWin()
         self.about_win.center_to_parent(self.window())
         self.about_win.show()
