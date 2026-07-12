@@ -17,18 +17,7 @@ from .items import (ScanerDirItem, ScanerImgItem, ScanerItem,
                     SingleDirScanerItem)
 
 
-class Tools:
-    @staticmethod
-    def mf_exists(scaner_item: ScanerItem):
-        """
-        обязательная проверка подключения к сетевому диску
-        потому что если сканер прервется и добавит не все директории
-        то при сравнении с БД он посчитает директории удаленными
-        """
-        if os.path.exists(scaner_item.mf.mf_current_path):
-            return True
-        return False
-    
+class Tools:    
     def log(text: str):
         filepath = os.path.join(Static.external_files_dir, "log.txt")
         with open(filepath, "a") as f:
@@ -163,7 +152,7 @@ class _DirsDbUpdater:
         Запускать в самом конце сканирования, когда обновлена таблица Thumbs
         и произведена работа с миниатюрами в `hashdir`.
         """
-        if not Tools.mf_exists(scaner_item):
+        if not os.path.exists(scaner_item.mf.mf_current_path):
             return
         with scaner_item.engine.begin() as conn:
             rel_paths = [dir_item.rel_path for dir_item in dirs_to_scan]
@@ -358,7 +347,7 @@ class _ThumbsUpdater:
             for i in range(0, len(del_images), step)
         ]
         for chunk in chunked_del_images:
-            if not Tools.mf_exists(scaner_item):
+            if not os.path.exists(scaner_item.mf.mf_current_path):
                 break
             good_chunk: list[ScanerImgItem] = []
             for img_item in chunk:
@@ -456,7 +445,7 @@ class _ThumbsUpdater:
             for i in range(0, len(new_images), step)
         ]
         for chunk in chunked_new_images:
-            if not Tools.mf_exists(scaner_item):
+            if not os.path.exists(scaner_item.mf.mf_current_path):
                 break
             good_chunk: list[ScanerImgItem] = []
             for img_item in chunk:
