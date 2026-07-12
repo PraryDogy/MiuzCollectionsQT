@@ -13,8 +13,8 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 
-from .items import (ScanerDirItem, ScanerImgItem, ScanerItem,
-                    SingleDirScanerItem)
+from .items import (ScanerDirItem, ScanerImgItem, BaseScanerItem,
+                    ForcedScanerItem)
 
 
 class Tools:    
@@ -26,7 +26,7 @@ class Tools:
 
 class _DirsLoader:
     @staticmethod
-    def get_finder_dirs(scaner_item: ScanerItem):
+    def get_finder_dirs(scaner_item: BaseScanerItem):
         """
         Собирает список директорий, которые:
         - есть в каталоге `Mf.curr_path`
@@ -77,7 +77,7 @@ class _DirsLoader:
         return dirs
 
     @staticmethod
-    def get_db_dirs(scaner_item: ScanerItem):
+    def get_db_dirs(scaner_item: BaseScanerItem):
         """
         Возвращает список директорий из базы данных, которые:
         - соответствуют условию DIRS.c.brand == `Mf.alias`
@@ -145,7 +145,7 @@ class _DirsDbUpdater:
 
     @staticmethod
     def upsert_records(
-        scaner_item: ScanerItem,
+        scaner_item: BaseScanerItem,
         dirs_to_scan: list[ScanerDirItem]
     ):
         """
@@ -177,7 +177,7 @@ class _DirsDbUpdater:
 class _ImgLoader:
     @staticmethod
     def get_finder_images(
-        scaner_item: ScanerItem,
+        scaner_item: BaseScanerItem,
         dirs_to_scan: list[ScanerDirItem]
     ):
         """
@@ -210,7 +210,7 @@ class _ImgLoader:
 
     @staticmethod
     def get_db_images(
-        scaner_item: ScanerItem,
+        scaner_item: BaseScanerItem,
         dirs_to_scan: list[ScanerDirItem]
     ):
         """
@@ -299,7 +299,7 @@ class _ImgCompator:
 class _ThumbsUpdater:
 
     @staticmethod
-    def del_thumbs(scaner_item: ScanerItem, del_images: list[ScanerImgItem]):
+    def del_thumbs(scaner_item: BaseScanerItem, del_images: list[ScanerImgItem]):
         """
         Удаляет миниатюры и соответствующие записи из БД пакетами по 10.
 
@@ -357,7 +357,7 @@ class _ThumbsUpdater:
                 _del_records(good_chunk)
 
     @staticmethod
-    def add_thumbs(scaner_item: ScanerItem, new_images: list[ScanerImgItem]):
+    def add_thumbs(scaner_item: BaseScanerItem, new_images: list[ScanerImgItem]):
         """
         Создает миниатюры и соответствующие записи из БД пакетами по 10.
 
@@ -454,7 +454,7 @@ class _ThumbsUpdater:
             if good_chunk:
                 _upsert_records(good_chunk)
     
-    def get_gui_text(scaner_item: ScanerItem):
+    def get_gui_text(scaner_item: BaseScanerItem):
         # sleep(0.5)
         return (
             f"{scaner_item.mf.mf_alias}: "
@@ -465,7 +465,7 @@ class _ThumbsUpdater:
 
 class _DirsToScanWorker:    
     @staticmethod
-    def start(dirs_to_scan: list[ScanerDirItem], scaner_item: ScanerItem):
+    def start(dirs_to_scan: list[ScanerDirItem], scaner_item: BaseScanerItem):
         """
         Параметры: 
         - dirs_to_scan список DirItem
@@ -487,7 +487,7 @@ class _RemovedDirsWorker:
     @staticmethod
     def remove_thumbs(
         removed_dirs: list[ScanerDirItem],
-        scaner_item: ScanerItem
+        scaner_item: BaseScanerItem
     ):
         """
         Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
@@ -531,7 +531,7 @@ class _RemovedDirsWorker:
 
     def remove_dirs(
             removed_dirs: list[ScanerDirItem],
-            scaner_item: ScanerItem
+            scaner_item: BaseScanerItem
         ):
         """
         Удаляет записи в базе данных Dirs
@@ -552,7 +552,7 @@ class BaseScaner:
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
-            scaner_item = ScanerItem(
+            scaner_item = BaseScanerItem(
                 mf=mf,
                 engine=engine, 
                 queue=queue,
@@ -581,7 +581,7 @@ class BaseScaner:
         engine.dispose()
 
     @staticmethod
-    def single_mf_scan(scaner_item: ScanerItem):
+    def single_mf_scan(scaner_item: BaseScanerItem):
         finder_dirs = _DirsLoader.get_finder_dirs(scaner_item)
         db_dirs = _DirsLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
@@ -601,7 +601,7 @@ class BaseScaner:
     
     @staticmethod
     def log_removed_dirs(
-        scaner_item: ScanerItem,
+        scaner_item: BaseScanerItem,
         finder_dirs: list[ScanerDirItem],
         removed_dirs: list[ScanerDirItem]
     ):
@@ -631,7 +631,7 @@ class BaseScaner:
 class ForcedScaner:
 
     @staticmethod
-    def start(item_list: list[SingleDirScanerItem], lng_index: int, queue: Queue):
+    def start(item_list: list[ForcedScanerItem], lng_index: int, queue: Queue):
         for item in item_list:
             print("single dir scaner started, mf:", item.mf.mf_alias)
             ForcedScaner.single_mf_scan(
@@ -653,7 +653,7 @@ class ForcedScaner:
         - dirs_to_scan: директории, которые нужно просканировать
         """
         engine = Dbase.create_engine()
-        scaner_item = ScanerItem(
+        scaner_item = BaseScanerItem(
             mf=mf,
             engine=engine,
             queue=queue,

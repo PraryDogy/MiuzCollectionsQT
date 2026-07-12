@@ -27,7 +27,7 @@ class ReadImgItem:
 
 
 @dataclass(slots=True)
-class ScanerItem:
+class BaseScanerItem:
     mf: Mf
     engine: sqlalchemy.Engine
     queue: Queue
@@ -37,9 +37,10 @@ class ScanerItem:
 
 
 @dataclass(slots=True)
-class SingleDirScanerItem:
+class ForcedScanerItem:
     mf: Mf
     dirs_to_scan: list[str]
+    lng_index: int
 
 
 @dataclass(slots=True)

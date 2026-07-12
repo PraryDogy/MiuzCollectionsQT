@@ -11,7 +11,7 @@ from typing_extensions import Literal
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
 from system.items import (Buffer, ImgViewItem, SettingsItem,
-                          SingleDirScanerItem, UpdateThumbItem, WatchDogItem)
+                          ForcedScanerItem, UpdateThumbItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
@@ -73,7 +73,7 @@ class WinMain(UMainWindow):
 
         self.setMenuBar(BarMacos())
 
-        self.scaner_data: defaultdict[Mf, list[str]] = defaultdict(list)
+        self.forced_scaner_dirs = set()
         self.go_to_url = str()
 
         h_wid_main = QWidget()
@@ -400,7 +400,7 @@ class WinMain(UMainWindow):
             mf_path=Mf.current_mf.mf_current_path,
             rel_path=Dynamic.current_dir
         )
-        self.scaner_data[Mf.current_mf].append(target_dir)
+        self.forced_scaner_dirs.add(target_dir)
         copy_files_win = self.copy_files_win(
             files_to_copy=self.buffer.files_to_copy,
             target_dir=target_dir
@@ -455,7 +455,9 @@ class WinMain(UMainWindow):
                 file_remover.process_queue.get()
             if not file_remover.is_alive():
                 file_remover.terminate_join()
-                self.scaner_data[mf].extend(dirs_to_scan)
+                for i in dirs_to_scan:
+                    self.forced_scaner_dirs.add(i)
+
                 self.start_scaner_task()
             else:
                 QTimer.singleShot(ms, poll_file_remover)
@@ -756,19 +758,18 @@ class WinMain(UMainWindow):
 
         # задача завершена
         if not alive:
-            # print("сканер завершен, можно запускать новый")
             can_start = True
 
         if can_start:
-            if self.scaner_data:
-                # print("штатно запускаю SINGLE сканер")
-                item_list = [
-                    SingleDirScanerItem(mf, dirs_to_scan)
-                    for mf, dirs_to_scan in self.scaner_data.items()
-                ]
+            if self.forced_scaner_dirs:
+                forced_scaner_item = ForcedScanerItem(
+                    mf=Mf.current_mf,
+                    dirs_to_scan=self.forced_scaner_dirs.copy(),
+                    lng_index=Cfg.lng_index
+                )
                 self.scaner_task = ProcessWorker(
                     target=ForcedScaner.start,
-                    args=(item_list, Cfg.lng_index, )
+                    args=(forced_scaner_item, )
                     )
             else:
                 # print("штатно запускаю ОБЩИЙ сканер")
@@ -776,7 +777,7 @@ class WinMain(UMainWindow):
                     target=BaseScaner.start,
                     args=(Mf.items, Cfg.lng_index, )
                 )
-                self.scaner_data.clear()
+            self.forced_scaner_dirs.clear()
             self.db_mtime = int(os.stat(Static.external_db).st_mtime)
             self.bar_bottom.progress_bar.stop_timer_text()
             self.scaner_task.start()
@@ -787,8 +788,7 @@ class WinMain(UMainWindow):
         else:
             # проверяем каждую минуту, что задача завершена
             self.scaner_check_timer.stop()
-            self.scaner_check_timer.start(1*5000)
-            # print("ожидание сканера")
+            self.scaner_check_timer.start(5000)
 
     def restart_scaner_task(self):
         try:
