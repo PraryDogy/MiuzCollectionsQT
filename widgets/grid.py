@@ -17,10 +17,9 @@ from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import UMenu, USubMenu, UVBoxLayout, VScrollArea
-from .actions import (CopyFiles, CopyName, CopyPath, CutFiles, OpenInView,
-                      PasteFiles, RemoveFiles, RevealInFinder, Save,
-                      ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
-                      WinInfoAction)
+from .actions import (CopyFiles, CopyName, CopyPath, OpenInView, PasteFiles,
+                      RemoveFiles, RevealInFinder, Save, ScanerRestart, SetFav,
+                      ShowInFolder, UpdateThumbAction, WinInfoAction)
 
 
 class ULabel(QLabel):
@@ -270,7 +269,7 @@ class Grid(VScrollArea):
     set_fav = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
     paste_files = pyqtSignal()
-    set_clipboard = pyqtSignal(tuple)
+    set_clipboard = pyqtSignal(list)
     setup_mf = pyqtSignal(SettingsItem)
     update_thumb = pyqtSignal(list)
     show_in_app = pyqtSignal(str)
@@ -453,7 +452,7 @@ class Grid(VScrollArea):
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
             self.set_clipboard.emit(
-                ("copy", [i.data_item.rel_path for i in self.selected_widgets])
+                [i.data_item.rel_path for i in self.selected_widgets]
             )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             if not event.isAutoRepeat():
@@ -667,7 +666,7 @@ class Grid(VScrollArea):
 
             act = CopyFiles(self.menu_, rel_paths)
             act.triggered.connect(
-                lambda: self.set_clipboard.emit(("copy", rel_paths))
+                lambda: self.set_clipboard.emit(rel_paths)
             )
             self.menu_.addAction(act)
 

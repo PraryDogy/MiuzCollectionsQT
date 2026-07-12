@@ -136,7 +136,7 @@ class WinCopyFiles(WinProgressbar):
     finished_ = pyqtSignal(list)
     ms = 100
 
-    def __init__(self, target_dir: str, files_to_copy: list[str], action_type: bool):
+    def __init__(self, target_dir: str, files_to_copy: list[str]):
         super().__init__(Lng.copying[Cfg.lng_index])
         self.cancel.connect(self.stop_task)
         self.cancel.connect(self.deleteLater)
@@ -149,12 +149,10 @@ class WinCopyFiles(WinProgressbar):
         )
 
         self.dst_urls: list[str] = []
-        action_type = True if action_type == "cut" else False
 
         self.copy_task_item = CopyTaskItem(
             dst_dir=target_dir,
             src_urls=files_to_copy,
-            is_cut=action_type,
             current_percent=0,
             copied_bytes=0,
             total_bytes=0,

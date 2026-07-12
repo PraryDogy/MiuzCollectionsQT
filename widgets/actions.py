@@ -75,12 +75,6 @@ class RemoveFiles(QAction):
         super().__init__(text_, parent)
 
 
-class CutFiles(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.cut[Cfg.lng_index]}"
-        super().__init__(text=text, parent=parent)
-
-
 class CopyFiles(QAction):
     def __init__(self, parent: QMenu, rel_paths: list[str]):
         if len(rel_paths) == 1:

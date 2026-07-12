@@ -377,28 +377,22 @@ class WinMain(UMainWindow):
                 target_dir = downloads
         copy_files_win = self.copy_files_win(
             files_to_copy=abs_files_to_copy,
-            target_dir=target_dir,
-            action_type="copy"
+            target_dir=target_dir
         )
         copy_files_win.finished_.connect(
             Utils.reveal_files
         )
 
     @with_conn
-    def set_buffer(self, mf: Mf, data: tuple):
-        buffer_type, rel_files_to_copy = data
+    def set_buffer(self, mf: Mf, rel_files_to_copy: tuple):
         abs_files_to_copy = [
-            Utils.get_abs_any_path(mf.mf_current_path, i)
+            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
             for i in rel_files_to_copy
         ]
         self.buffer = Buffer(
-            type_=buffer_type,
             source_mf=Mf.current_mf,
             files_to_copy=abs_files_to_copy
         )
-        if self.buffer.type_ == "cut":
-            for i in self.grid.selected_widgets:
-                i.set_transparent_frame(0.5)
 
     @with_conn
     def paste_files(self, mf: Mf):
@@ -406,23 +400,10 @@ class WinMain(UMainWindow):
             mf_path=Mf.current_mf.mf_current_path,
             rel_path=Dynamic.current_dir
         )
-        # готовим информацию для сканера
-        # сканировать директорию куда вставлены изображения
         self.scaner_data[Mf.current_mf].append(target_dir)
-        # сканировать директорию откуда вырезано
-        if self.buffer.type_ == "cut":
-            dirs_to_scan = list(set(
-                os.path.dirname(i)
-                for i in self.buffer.files_to_copy
-            ))
-            if self.buffer.source_mf == Mf.current_mf:
-                self.scaner_data[Mf.current_mf].extend(dirs_to_scan)
-            else:
-                self.scaner_data[self.buffer.source_mf].extend(dirs_to_scan)
         copy_files_win = self.copy_files_win(
             files_to_copy=self.buffer.files_to_copy,
-            target_dir=target_dir,
-            action_type=self.buffer.type_
+            target_dir=target_dir
         )
         del self.buffer
         copy_files_win.finished_.connect(
@@ -625,7 +606,7 @@ class WinMain(UMainWindow):
             lambda: self.paste_files(Mf.current_mf)
         )
         self.grid.set_clipboard.connect(
-            lambda data: self.set_buffer(Mf.current_mf, data)
+            lambda rel_files: self.set_buffer(Mf.current_mf, rel_files)
         )
         self.grid.setup_mf.connect(
             lambda item: self.open_settings_win(item)
@@ -861,13 +842,11 @@ class WinMain(UMainWindow):
     def copy_files_win(
             self,
             files_to_copy: list[str],
-            target_dir: str,
-            action_type: Literal["cut", "copy"]
+            target_dir: str
         ):
         progress_win = WinCopyFiles(
             files_to_copy=files_to_copy,
-            target_dir=target_dir,
-            action_type=action_type
+            target_dir=target_dir
         )
         progress_win.center_to_parent(self)
         progress_win.show()   

@@ -182,9 +182,6 @@ class CopyTask:
                 copy_item.msg = "error"
                 process_queue.put(copy_item)
                 return
-            if copy_item.is_cut:
-                os.remove(src)
-                "удаляем файлы чтобы очистить директории"
         
         copy_item.msg = "finished"
         process_queue.put(copy_item)

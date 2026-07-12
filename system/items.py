@@ -46,7 +46,6 @@ class SingleDirScanerItem:
 class CopyTaskItem:
     dst_dir: str
     src_urls: list[str]
-    is_cut: bool
     current_percent: int
     copied_bytes: int
     total_bytes: int
@@ -71,7 +70,6 @@ class SettingsItem:
 
 @dataclass(slots=True)
 class Buffer:
-    type_: Literal["cut", "copy"]
     source_mf: Mf
     files_to_copy: Optional[list[str]]
 

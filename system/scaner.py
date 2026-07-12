@@ -653,7 +653,14 @@ class ForcedScaner:
         - dirs_to_scan: директории, которые нужно просканировать
         """
         engine = Dbase.create_engine()
-        scaner_item = ScanerItem(mf, engine, queue, lng_index, 0)
+        scaner_item = ScanerItem(
+            mf=mf,
+            engine=engine,
+            queue=queue,
+            lng_index=lng_index, 
+            total_count=0,
+            current_count=0
+        )
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             scaner_item.mf.set_mf_current_path(avaiable_mf_path)
