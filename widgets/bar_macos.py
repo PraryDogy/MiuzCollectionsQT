@@ -1,6 +1,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap
-from PyQt6.QtWidgets import QLabel, QMenu, QMenuBar, QSpacerItem, QWidget
+from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QLabel, QMenu, QMenuBar,
+                             QSpacerItem, QWidget)
 
 from cfg import Cfg, Static
 from system.items import SettingsItem
@@ -13,14 +14,6 @@ from .win_settings import WinSettings
 
 
 class SelectableLabel(QLabel):
-    """
-    QLabel с возможностью выделения текста и кастомным контекстным меню для копирования.
-
-    Особенности:
-        - Текст можно выделять мышью.
-        - Контекстное меню позволяет копировать выделенный текст или весь текст.
-    """
-
     INFO_TEXT = "\n".join([
         f"Version {Static.app_ver}",
         "Developed by Evlosh",
@@ -30,72 +23,54 @@ class SelectableLabel(QLabel):
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-
-        # --- Текст информации ---
         self.setText(self.INFO_TEXT)
-
-        # --- Настройка взаимодействия с текстом ---
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        """Создаёт кастомное контекстное меню для копирования текста."""
         context_menu = UMenu(ev)
-
-        # --- Копировать выделенный текст ---
         copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng_index])
         copy_text.triggered.connect(
             lambda: Utils.copy_text(self.selectedText())
         )
         context_menu.addAction(copy_text)
-
         context_menu.addSeparator()
-
-        # --- Копировать весь текст ---
         select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng_index])
         select_all.triggered.connect(
             lambda: Utils.copy_text(self.text())
         )
         context_menu.addAction(select_all)
-
-        # --- Показать контекстное меню ---
         context_menu.show_menu()
 
 
 class AboutWin(UMainWindow):
-    """
-    Окно "О программе" с информацией о версии, авторе и контактами.
-    
-    Особенности:
-        - Отображает иконку приложения.
-        - Содержит SelectableLabel с информацией, которую можно копировать.
-        - Закрывается по Escape или Enter.
-    """
-    ww, hh = 280, 240
-    svg_ww, svg_hh = 150, 130
-    png_icon = "./images/icon_2.png"
+    ww = 280
+    icon_path = "./images/icon.png"
+    icon_size = 150
+    opacity = 0.85
 
     def __init__(self):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        # --- Настройка окна ---
         self.setWindowTitle(Static.app_name)
-        self.setFixedSize(self.ww, self.hh)
+        self.setFixedWidth(self.ww)
+        self.central_layout.setContentsMargins(10, 0, 10, 10)
 
-        # --- Иконка приложения ---
         icon = QLabel()
-        pixmap = QPixmap(self.png_icon)
-        pixmap = Utils.qiconed_resize(pixmap, self.svg_ww)
+        pixmap = QPixmap(self.icon_path)
+        pixmap = Utils.qiconed_resize(pixmap, self.icon_size)
         icon.setPixmap(pixmap)
+        opacity_effect = QGraphicsOpacityEffect()
+        opacity_effect.setOpacity(self.opacity) 
+        icon.setGraphicsEffect(opacity_effect)
         self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # --- Разделитель ---
-        self.central_layout.addSpacerItem(QSpacerItem(0, 20))
-
-        # --- Информационный текст ---
+        self.central_layout.addSpacerItem(QSpacerItem(0, 10))
         lbl = SelectableLabel(self)
         self.central_layout.addWidget(lbl)
+
+        self.adjustSize()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         """Закрывает окно по Escape или Enter."""

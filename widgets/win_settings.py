@@ -10,9 +10,10 @@ from dataclasses import dataclass
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QLabel,
-                             QLineEdit, QSpacerItem, QSpinBox, QSplitter,
-                             QTableWidget, QTableWidgetItem, QWidget)
+from PyQt6.QtWidgets import (QApplication, QFileDialog, QGraphicsOpacityEffect,
+                             QGroupBox, QLabel, QLineEdit, QSpacerItem,
+                             QSpinBox, QSplitter, QTableWidget,
+                             QTableWidgetItem, QWidget)
 from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes
@@ -574,7 +575,9 @@ class SelectableLabel(SettingsLabel):
 
 
 class AboutWid(QGroupBox):
-    png_icon = "./images/icon_2.png"
+    icon_path = "./images/icon.png"
+    icon_size = 85
+    opacity = 0.85
 
     def __init__(self):
         super().__init__()
@@ -582,9 +585,12 @@ class AboutWid(QGroupBox):
         self.setLayout(h_lay)
 
         icon = QLabel()
-        pixmap = QPixmap(self.png_icon)
-        pixmap = Utils.qiconed_resize(pixmap, 85)
+        pixmap = QPixmap(self.icon_path)
+        pixmap = Utils.qiconed_resize(pixmap, self.icon_size)
         icon.setPixmap(pixmap)
+        opacity_effect = QGraphicsOpacityEffect()
+        opacity_effect.setOpacity(self.opacity) 
+        icon.setGraphicsEffect(opacity_effect)
         h_lay.addWidget(icon)
 
         h_lay.addSpacerItem(QSpacerItem(0, 20))
