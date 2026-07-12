@@ -232,7 +232,7 @@ class Lng:
     indexing = ("Индексация файлов", "Indexing files")
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
-    show_about = ("Об авторе", "About")
+    show_about = ("О приложении", "Аbout the app")
     alias_error = ("Имя должно быть уникальным", "Name must be unique")
     already_taken = (
         "Каталог с таким именем уже существует. Имя должно быть уникальным",

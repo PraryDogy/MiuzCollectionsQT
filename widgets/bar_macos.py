@@ -83,19 +83,23 @@ class BarMacos(QMenuBar):
         super().__init__()
         self.mainMenu = QMenu(Lng.menu[Cfg.lng_index], self)
 
-        server_win = QAction(Lng.connect_to_server[Cfg.lng_index], self)
-        server_win.triggered.connect(self.open_server_window)
-        self.mainMenu.addAction(server_win)
+        # Добавили self. к действию подключения к серверу
+        self.server_win = QAction(Lng.connect_to_server[Cfg.lng_index], self)
+        self.server_win.triggered.connect(self.open_server_window)
+        self.mainMenu.addAction(self.server_win)
 
-        actionSettings = QAction(Lng.open_settings_window[Cfg.lng_index], self)
-        actionSettings.triggered.connect(self.open_settings_window)
-        self.mainMenu.addAction(actionSettings)
+        # Добавили self. к действию настроек
+        self.actionSettings = QAction(Lng.open_settings_window[Cfg.lng_index], self)
+        self.actionSettings.triggered.connect(self.open_settings_window)
+        self.mainMenu.addAction(self.actionSettings)
 
         self.mainMenu.addSeparator()
 
-        actionAbout = QAction(Lng.show_about[Cfg.lng_index], self)
-        actionAbout.triggered.connect(self.open_about_window)
-        self.mainMenu.addAction(actionAbout)
+        # Добавили self. к действию "О программе"
+        self.actionAbout = QAction(Lng.show_about[Cfg.lng_index], self)
+        self.actionAbout.setMenuRole(QAction.MenuRole.NoRole)
+        self.actionAbout.triggered.connect(self.open_about_window)
+        self.mainMenu.addAction(self.actionAbout)
 
         self.addMenu(self.mainMenu)
         self.setNativeMenuBar(True)
