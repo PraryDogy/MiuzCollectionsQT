@@ -499,7 +499,6 @@ class WinMain(UMainWindow):
             ]
 
             self.buffer = Buffer(
-                type_="copy",
                 source_mf=Mf.current_mf,
                 files_to_copy=files_to_copy
             )

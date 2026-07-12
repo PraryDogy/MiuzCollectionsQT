@@ -560,6 +560,8 @@ class Grid(VScrollArea):
         def menu_empty():
             self.clear_selected_widgets()
 
+            # ВСТАВИТЬ В СЕТКУ
+
             update_grid = QAction(Lng.update_grid[Cfg.lng_index], self.menu_)
             update_grid.triggered.connect(
                 lambda: self.load_st_grid.emit()
