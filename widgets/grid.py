@@ -560,7 +560,15 @@ class Grid(VScrollArea):
         def menu_empty():
             self.clear_selected_widgets()
 
-            # ВСТАВИТЬ В СЕТКУ
+            # это костыль, может сломаться если мы переименуем buffer в main_win
+            if hasattr(self.window(), "buffer"):
+                self.menu_.addSeparator()
+                paste = PasteFiles(self.menu_)
+                paste.triggered.connect(
+                    lambda: self.paste_files.emit()
+                )
+                self.menu_.addAction(paste)
+                self.menu_.addSeparator()
 
             update_grid = QAction(Lng.update_grid[Cfg.lng_index], self.menu_)
             update_grid.triggered.connect(
@@ -580,15 +588,6 @@ class Grid(VScrollArea):
                 lambda: self.reveal_in_finder.emit([Dynamic.current_dir])
             )
             self.menu_.addAction(reveal)
-
-            if hasattr(self, "buffer"):
-                self.menu_.addSeparator()
-                paste = PasteFiles(self.menu_)
-                paste.triggered.connect(
-                    lambda: self.paste_files.emit()
-                )
-                self.menu_.addAction(paste)
-                self.menu_.addSeparator()
 
         def menu_widget(clicked: Thumb):
             if not self.selected_widgets:

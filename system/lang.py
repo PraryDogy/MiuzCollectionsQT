@@ -105,7 +105,6 @@ class Lng:
     no_photo = ("Нет фотографий", "No photos")
     open_settings_window = ("Открыть настройки", "Open settings window")
     paste = ("Вставить (⌘ + V)", "Paste (⌘ + V)")
-    paste_objects = ("Вставить объекты (⌘ + V)", "Paste objects (⌘ + V)")
     place = ("Место", "Place")
     scan_folder = ("Искать изображения", "Find images")
     update_grid = ("Обновить", "Update")
