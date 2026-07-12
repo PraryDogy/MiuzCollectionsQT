@@ -631,16 +631,16 @@ class BaseScaner:
 class ForcedScaner:
 
     @staticmethod
-    def start(item_list: list[ForcedScanerItem], lng_index: int, queue: Queue):
-        for item in item_list:
-            print("single dir scaner started, mf:", item.mf.mf_alias)
-            ForcedScaner.single_mf_scan(
-                mf=item.mf,
-                dirs_to_scan=item.dirs_to_scan,
-                lng_index=lng_index,
-                queue=queue
-            )
-            print("single dir scaner finished, mf:", item.mf.mf_alias)
+    def start(item: ForcedScanerItem, queue: Queue):
+        print("single dir scaner started, mf:", item.mf.mf_alias)
+        ForcedScaner.single_mf_scan(
+            mf=item.mf,
+            dirs_to_scan=item.dirs_to_scan,
+            lng_index=item.lng_index,
+            queue=queue
+        )
+        print("single dir scaner finished, mf:", item.mf.mf_alias)
+
 
     @staticmethod
     def single_mf_scan(mf: Mf, dirs_to_scan: list[str], lng_index: int, queue: Queue):
