@@ -8,7 +8,7 @@ from time import sleep
 
 import sqlalchemy
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
-from watchdog.observers.polling import PollingObserver as Observer
+from watchdog.observers.polling import PollingObserver
 
 from cfg import Cfg, Static
 
@@ -291,28 +291,39 @@ class MfRemover:
             conn.execute(stmt)
 
 
-class _DirChangedHandler(FileSystemEventHandler):
-    def __init__(self, callback):
+class WatchDogHandler(FileSystemEventHandler):
+    def __init__(self, callback: callable):
         super().__init__()
         self.callback = callback
 
     def on_any_event(self, event: FileSystemEvent):
         if event.is_directory:
-            self.callback(event)
+            self.callback(event.src_path)
 
 
-class DirWatcher:
+class WatchDog:
     @staticmethod
     def start(mf_list: list[Mf], queue: Queue):
-        observer = Observer()
+        observer = PollingObserver()
 
         for mf in mf_list:
-            callback = lambda e, mf=mf: queue.put(
-                WatchDogItem(mf=mf, event=e)
-            )
-            handler = _DirChangedHandler(callback)
-            observer.schedule(handler, mf.mf_current_path, recursive=False)
+            avaiable_path = mf.get_avaiable_mf_path()
+            if not avaiable_path:
+                print(mf.mf_alias, "watchdog: нет подключения")
+                continue
+            else:
+                print(mf.mf_alias, "watchdog started", mf.mf_current_path)
+
+            callback = lambda x, mf=mf: queue.put(WatchDogItem(mf, x))
+            handler = WatchDogHandler(callback)
+            observer.schedule(handler, mf.mf_current_path, recursive=True)
+
+        # очень долго будет обходить все подпапки и очень долго будет
+        # получать уведомления от WatchDogHandler из-за скорости диска
+        # короче не подходит нам
+        print("starting observer")
         observer.start()
+        print("observer started")
 
         try:
             while True:

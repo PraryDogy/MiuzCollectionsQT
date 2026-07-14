@@ -14,7 +14,7 @@ from system.items import (Buffer, ImgViewItem, SettingsItem,
                           ForcedScanerItem, UpdateThumbItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import (DirWatcher, FilesRemover, ProcessWorker,
+from system.multiprocess import (WatchDog, FilesRemover, ProcessWorker,
                                  UpdateThumb)
 from system.scaner import BaseScaner, ForcedScaner
 from system.shared_utils import ImgUtils
@@ -190,7 +190,6 @@ class WinMain(UMainWindow):
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
-
 
         # from .win_smb import SuperWarnWindow
         # self.super_window = SuperWarnWindow()
@@ -685,35 +684,29 @@ class WinMain(UMainWindow):
         self.view_win.show()
 
     def start_wachdog(self):
+
         return
 
         def poll_task():
-            q = self.watchdog_task.proc_q
+            queue = self.watchdog_task.process_queue
             if not queue.empty():
                 watchdog_item: WatchDogItem = queue.get()
-                print(
-                    watchdog_item.mf.alias,
-                    watchdog_item.event.event_type
-                )
+                changed_dir = watchdog_item.src_path
+                print(changed_dir)
             self.watchdog_timer.start(1000)
 
         if hasattr(self, "watchdog_task"):
             self.watchdog_task.terminate_join()
-            
-        mf_list: list[Mf] = []
-        for mf in Mf.items:
-            if mf.get_available_path():
-                mf_list.append(mf)
-        if mf_list:
-            self.watchdog_task = ProcessWorker(
-                target=DirWatcher.start,
-                args=(mf_list, )
-            )
-            self.watchdog_timer = QTimer(self)
-            self.watchdog_timer.setSingleShot(True)
-            self.watchdog_timer.timeout.connect(poll_task)
-            self.watchdog_timer.start(1000)
-            self.watchdog_task.start()
+
+        self.watchdog_task = ProcessWorker(
+            target=WatchDog.start,
+            args=(Mf.items, )
+        )
+        self.watchdog_timer = QTimer(self)
+        self.watchdog_timer.setSingleShot(True)
+        self.watchdog_timer.timeout.connect(poll_task)
+        self.watchdog_timer.start(1000)
+        self.watchdog_task.start()
 
     def poll_scaner_task(self, ms: int = 3000):
         if not hasattr(self, "scaner_task") or not self.scaner_task:
