@@ -23,7 +23,7 @@ class UploadWin(UMainWindow):
     def __init__(self, mf: Mf, current_dir: str, dropped_files: list[str]):
         super().__init__()
         self.setWindowTitle("Подтверждение выгрузки")
-        self.resize(900, 500)
+        self.resize(700, 500)
 
         # Приводим все пути к абсолютному виду
         self.root_dir = mf.mf_current_path
@@ -36,6 +36,7 @@ class UploadWin(UMainWindow):
 
         # Главный сплиттер (Разделяет дерево и правое превью)
         splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setHandleWidth(15)
         self.central_layout.addWidget(splitter)
 
         # === ЛЕВАЯ ПАНЕЛЬ: Куда загружаем ===
@@ -67,7 +68,8 @@ class UploadWin(UMainWindow):
         # === ПРАВАЯ ПАНЕЛЬ: Что загружаем ===
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
-        right_layout.setContentsMargins(10, 0, 10, 0)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(5)
 
         right_layout.addWidget(QLabel("Список выгружаемых файлов"))
 
@@ -86,39 +88,39 @@ class UploadWin(UMainWindow):
                 total_size += os.path.getsize(full_path)
 
         right_layout.addWidget(self.list_widget)
-
-        # === Карточка со сводной информацией ===
-        info_frame = QFrame()
-        info_layout = QVBoxLayout(info_frame)
         
         size_mb = total_size / (1024 * 1024)
-        info_layout.addWidget(QLabel(f"<b>Всего файлов:</b> {len(self.target_files)} шт."))
-        info_layout.addWidget(QLabel(f"<b>Общий размер:</b> {size_mb:.2f} MB"))
+        right_layout.addWidget(QLabel(f"Всего файлов: {len(self.target_files)} шт."))
+        right_layout.addWidget(QLabel(f"Общий размер: {size_mb:.2f} MB"))
         
         self.lbl_target_dir = QLabel()
         self.update_target_dir_label(self.target_dir)
-        info_layout.addWidget(self.lbl_target_dir)
+        right_layout.addWidget(self.lbl_target_dir)
         
-        right_layout.addWidget(info_frame)
         splitter.addWidget(right_widget)
 
         # Левое дерево строго 210 пикселей при старте
         splitter.setSizes([210, self.width() - 210])
 
-        # === НИЖНЯЯ ПАНЕЛЬ: Кнопки управления окном ===
         btn_layout = QHBoxLayout()
-        self.btn_cancel = QPushButton("Отмена")
-        self.btn_ok = QPushButton("Загрузить")
-        
-        btn_layout.addStretch()
-        btn_layout.addWidget(self.btn_cancel)
-        btn_layout.addWidget(self.btn_ok)
-        self.central_layout.addLayout(btn_layout)
+        right_layout.addLayout(btn_layout)
+        btn_layout.setContentsMargins(0, 0, 0, 0)
+        btn_layout.setSpacing(10)
 
-        # Логика кнопок
-        self.btn_cancel.clicked.connect(self.deleteLater)
+        btn_layout.addStretch()
+
+        self.btn_ok = SmallBtn(Lng.ok[Cfg.lng_index])
         self.btn_ok.clicked.connect(self.ok_clicked.emit)
         self.btn_ok.clicked.connect(self.deleteLater)
+        self.btn_ok.setFixedWidth(90)
+        btn_layout.addWidget(self.btn_ok)
+
+        self.btn_cancel = SmallBtn(Lng.cancel[Cfg.lng_index])
+        self.btn_cancel.clicked.connect(self.deleteLater)
+        self.btn_cancel.setFixedWidth(90)
+        btn_layout.addWidget(self.btn_cancel)
+
+        btn_layout.addStretch()
 
     def _expand_to_target(self):
 
@@ -132,7 +134,7 @@ class UploadWin(UMainWindow):
 
     def update_target_dir_label(self, path: str):
         folder_name = os.path.basename(path) or path
-        self.lbl_target_dir.setText(f"<b>Целевая папка:</b> {folder_name}")
+        self.lbl_target_dir.setText(f"Целевая папка: {folder_name}")
         self.lbl_target_dir.setToolTip(path)
 
     def on_folder_selected(self, index):
