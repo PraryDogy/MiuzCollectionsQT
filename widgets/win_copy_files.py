@@ -10,7 +10,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskWorker
 
-from ._base_widgets import SmallBtn, UMainWindow, WinProgressbar
+from ._base_widgets import UPushButton, UMainWindow, WinProgressbar
 
 
 class ReplaceFilesWin(UMainWindow):
@@ -54,17 +54,17 @@ class ReplaceFilesWin(UMainWindow):
         btn_lay.setSpacing(10)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = SmallBtn(Lng.replace_all[Cfg.lng_index])
+        replace_all_btn = UPushButton(Lng.replace_all[Cfg.lng_index])
         replace_all_btn.setFixedWidth(self.btn_w)
         replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
         btn_lay.addWidget(replace_all_btn)
 
-        replace_one_btn = SmallBtn(Lng.replace_one[Cfg.lng_index])
+        replace_one_btn = UPushButton(Lng.replace_one[Cfg.lng_index])
         replace_one_btn.setFixedWidth(self.btn_w)
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = SmallBtn(Lng.stop[Cfg.lng_index])
+        stop_btn = UPushButton(Lng.stop[Cfg.lng_index])
         stop_btn.setFixedWidth(self.btn_w)
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
@@ -111,7 +111,7 @@ class ErrorWin(UMainWindow):
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
-        ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
+        ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         ok_btn.clicked.connect(self.deleteLater)
         ok_btn.setFixedWidth(90)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)

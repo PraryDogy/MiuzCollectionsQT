@@ -5,7 +5,7 @@ from cfg import Cfg, Dynamic
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (SmallBtn, UMainWindow, VListSpacerItem,
+from ._base_widgets import (UPushButton, UMainWindow, VListSpacerItem,
                             VListWidget, VListWidgetItem)
 
 
@@ -65,7 +65,7 @@ class WinFilters(UMainWindow):
         marings.setBottom(15)
         self.central_layout.setContentsMargins(marings)
 
-        self.reset_btn = SmallBtn(Lng.reset[Cfg.lng_index])
+        self.reset_btn = UPushButton(Lng.reset[Cfg.lng_index])
         self.reset_btn.setFixedWidth(100)
         self.reset_btn.clicked.connect(self.reset_cmd)
         self.central_layout.addWidget(

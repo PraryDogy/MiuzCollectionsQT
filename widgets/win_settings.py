@@ -28,7 +28,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, ULineEdit,
+from ._base_widgets import (HSep, RowArrowWidget, UPushButton, ULineEdit,
                             UMainWindow, UMenu, UTextEdit, VListSpacerItem,
                             VListWidget, VListWidgetItem)
 from .path_widget import PathWidget
@@ -65,7 +65,7 @@ class SettingsLabel(QLabel):
         self.setMinimumWidth(30)
 
 
-class SettingsButton(SmallBtn):
+class SettingsButton(UPushButton):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setFixedWidth(100)

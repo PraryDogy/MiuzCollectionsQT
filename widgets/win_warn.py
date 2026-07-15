@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QHBoxLayout, QLabel
 from cfg import Cfg, Static
 from system.lang import Lng
 
-from ._base_widgets import SmallBtn, UMainWidget
+from ._base_widgets import UPushButton, UMainWidget
 
 
 class ConfirmWindow(UMainWidget):
@@ -46,12 +46,12 @@ class ConfirmWindow(UMainWidget):
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.addLayout(btn_layout)
 
-        self.ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         btn_layout.addWidget(self.ok_btn)
 
-        self.cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
+        self.cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)

@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
 
-from ._base_widgets import RowArrowWidget, SmallBtn, UMainWindow
+from ._base_widgets import RowArrowWidget, UPushButton, UMainWindow
 
 
 class UploadWin(UMainWindow):
@@ -117,12 +117,12 @@ class UploadWin(UMainWindow):
 
         btn_layout.addStretch()
 
-        self.btn_ok = SmallBtn(Lng.ok[Cfg.lng_index])
+        self.btn_ok = UPushButton(Lng.ok[Cfg.lng_index])
         self.btn_ok.clicked.connect(self.ok_clicked_cmd)
         self.btn_ok.setFixedWidth(90)
         btn_layout.addWidget(self.btn_ok)
 
-        self.btn_cancel = SmallBtn(Lng.cancel[Cfg.lng_index])
+        self.btn_cancel = UPushButton(Lng.cancel[Cfg.lng_index])
         self.btn_cancel.clicked.connect(self.deleteLater)
         self.btn_cancel.setFixedWidth(90)
         btn_layout.addWidget(self.btn_cancel)

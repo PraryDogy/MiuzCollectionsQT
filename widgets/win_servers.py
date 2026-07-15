@@ -11,7 +11,7 @@ from cfg import Cfg, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (SmallBtn, ULineEdit, UMainWindow, UMenu,
+from ._base_widgets import (UPushButton, ULineEdit, UMainWindow, UMenu,
                             VListWidget, VListWidgetItem)
 from .win_warn import ConfirmWindow
 
@@ -156,12 +156,12 @@ class LoginWin(UMainWindow):
 
         self.btn_layout.addStretch()
 
-        self.ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(90)
         self.btn_layout.addWidget(self.ok_btn)
 
-        self.cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
+        self.cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.deleteLater)
         self.btn_layout.addWidget(self.cancel_btn)
@@ -247,12 +247,12 @@ class ServersWin(UMainWindow):
 
         btn_layout.addStretch()
 
-        btn_add = SmallBtn(Lng.add[Cfg.lng_index])
+        btn_add = UPushButton(Lng.add[Cfg.lng_index])
         btn_add.setFixedWidth(90)
         btn_add.clicked.connect(self.show_login_win)
         btn_layout.addWidget(btn_add)
 
-        btn_connect = SmallBtn(Lng.connect[Cfg.lng_index])
+        btn_connect = UPushButton(Lng.connect[Cfg.lng_index])
         btn_connect.setFixedWidth(90)
         btn_connect.clicked.connect(self.connect_cmd)
         btn_layout.addWidget(btn_connect)

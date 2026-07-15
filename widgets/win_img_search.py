@@ -6,8 +6,8 @@ import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QImage, QPixmap
-from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QPushButton,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QVBoxLayout,
+                             QWidget)
 from sqlalchemy import func
 
 from cfg import Cfg, Dynamic, Static
@@ -20,7 +20,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow, USlider
+from ._base_widgets import UMainWindow, UPushButton, USlider
 
 
 class ProgressWin(UMainWindow):
@@ -41,7 +41,7 @@ class ProgressWin(UMainWindow):
         self.text_label.setFixedSize(200, 30)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.cancel_btn = QPushButton(Lng.stop[Cfg.lng_index])
+        self.cancel_btn = UPushButton(Lng.stop[Cfg.lng_index])
         self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.cancel_image_search.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -142,12 +142,12 @@ class WinImgSearch(UMainWindow):
 
         btn_layout.addStretch()
 
-        self.start_btn = QPushButton(Lng.start[Cfg.lng_index])
+        self.start_btn = UPushButton(Lng.start[Cfg.lng_index])
         self.start_btn.clicked.connect(self.start_image_searcher)
         self.start_btn.setFixedWidth(90)
         btn_layout.addWidget(self.start_btn)
 
-        cancel_btn = QPushButton(Lng.close[Cfg.lng_index])
+        cancel_btn = UPushButton(Lng.close[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         cancel_btn.setFixedWidth(90)
         btn_layout.addWidget(cancel_btn)

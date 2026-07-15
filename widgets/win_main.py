@@ -5,7 +5,7 @@ from collections import defaultdict
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
-                             QPushButton, QSplitter, QVBoxLayout, QWidget)
+                             QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
@@ -20,7 +20,7 @@ from system.scaner import BaseScaner, ForcedScaner
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import HSep, UMainWindow
+from ._base_widgets import HSep, UMainWindow, UPushButton
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -48,7 +48,7 @@ class TestWid(QFrame):
 
         v_layout = QVBoxLayout(self)
 
-        btn = QPushButton('test btn')
+        btn = UPushButton('test btn')
         v_layout.addWidget(btn)
         btn.clicked.connect(self.reload)
 

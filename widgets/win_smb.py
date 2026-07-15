@@ -3,15 +3,14 @@ import sys
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QPushButton,
-                             QWidget)
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLabel, QWidget
 
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 
-from ._base_widgets import UMainWindow
+from ._base_widgets import UMainWindow, UPushButton
 from .path_widget import PathWidget
 
 
@@ -57,11 +56,11 @@ class SuperWarnWindow(UMainWindow):
         self.central_layout.addLayout(btns_lay)
 
         btns_lay.addStretch()
-        self.ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         self.ok_btn.setFixedWidth(90)
         btns_lay.addWidget(self.ok_btn)
-        cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         cancel_btn.setFixedWidth(90)
         btns_lay.addWidget(cancel_btn)
@@ -125,11 +124,11 @@ class WinSmb(UMainWindow):
         btns_lay.setSpacing(10)
 
         btns_lay.addStretch()
-        self.ok_btn = QPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.ok_btn.setFixedWidth(90)
         btns_lay.addWidget(self.ok_btn)
-        cancel_btn = QPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         cancel_btn.setFixedWidth(90)
         btns_lay.addWidget(cancel_btn)

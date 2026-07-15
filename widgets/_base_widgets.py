@@ -236,7 +236,7 @@ class VListWidget(QListWidget):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 
-class SmallBtn(QPushButton):
+class UPushButton(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
         self.setStyleSheet(
