@@ -34,15 +34,25 @@ class UploadWin(UMainWindow):
         splitter.setHandleWidth(15)
         self.central_layout.addWidget(splitter)
 
-        self.tree_view = QTreeView()
-        self.tree_view.header().hide()
+        # Инициализируем стандартную файловую модель папок
         self.file_model = QFileSystemModel()
         self.file_model.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
         self.file_model.setRootPath(self.root_dir)
+
+        self.tree_view = QTreeView()
+        self.tree_view.setIndentation(10)
+        self.tree_view.header().hide()
         self.tree_view.setModel(self.file_model)
-        self.tree_view.setRootIndex(self.file_model.index(self.root_dir))
+        
+        # Задаем корень отображения на уровень выше, чтобы видеть саму папку root_dir
+        parent_dir_index = self.file_model.index(os.path.dirname(self.root_dir))
+        self.tree_view.setRootIndex(parent_dir_index)
+        
+        # Подключаем скрытие соседей и автораскрытие целевой папки к сигналу загрузки
+        self.file_model.directoryLoaded.connect(self._hide_neighbor_folders)
         self.file_model.directoryLoaded.connect(self._expand_to_target)
         self.tree_view.clicked.connect(self.on_folder_selected)
+        
         for i in range(1, 4):
             self.tree_view.setColumnHidden(i, True)
 
@@ -119,9 +129,27 @@ class UploadWin(UMainWindow):
 
         btn_layout.addStretch()
 
-    def _expand_to_target(self):
+    def _hide_neighbor_folders(self, loaded_path):
+        """Скрывает все папки на верхнем уровне интерфейса, кроме self.root_dir."""
+        if os.path.normpath(loaded_path) == os.path.normpath(os.path.dirname(self.root_dir)):
+            parent_idx = self.file_model.index(loaded_path)
+            
+            # Итерируем по всем элементам внутри родительского каталога
+            for row in range(self.file_model.rowCount(parent_idx)):
+                child_idx = self.file_model.index(row, 0, parent_idx)
+                child_path = self.file_model.filePath(child_idx)
+                
+                # Если путь папки не совпадает с нашей корневой — скрываем строчку в TreeView
+                if os.path.normpath(child_path) != os.path.normpath(self.root_dir):
+                    self.tree_view.setRowHidden(row, parent_idx, True)
 
+    def _expand_to_target(self):
         def cmd():
+            # Раскрываем видимый корневой узел дерева
+            root_idx = self.file_model.index(self.root_dir)
+            self.tree_view.expand(root_idx)
+            
+            # Раскрываем и позиционируем дерево на целевую папку назначения
             idx = self.file_model.index(self.dest)
             self.tree_view.expand(idx)
             self.tree_view.setCurrentIndex(idx)
@@ -149,4 +177,3 @@ class UploadWin(UMainWindow):
         elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.ok_clicked_cmd()
         return super().keyPressEvent(a0)
-
