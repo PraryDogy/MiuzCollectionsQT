@@ -20,21 +20,22 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow, UPushButton, USlider
+from ._base_widgets import UMainWidget, UPushButton, USlider
 
 
-class ProgressWin(UMainWindow):
+class ProgressWin(UMainWidget):
     cancel_image_search = pyqtSignal()
+    ww = 200
 
     def __init__(self):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setFixedHeight(70)
+        self.setFixedWidth(self.ww)
         self.setWindowTitle(Lng.progress[Cfg.lng_index])
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.setSpacing(5)
-        self.central_layout.setContentsMargins(0, 0, 0, 0)
+        self.central_layout.setContentsMargins(0, 0, 0, 10)
 
         self.text_label = QLabel(Lng.preparing[Cfg.lng_index])
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -42,7 +43,6 @@ class ProgressWin(UMainWindow):
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.cancel_btn = UPushButton(Lng.stop[Cfg.lng_index])
-        self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.cancel_image_search.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -62,6 +62,7 @@ class ProgressWin(UMainWindow):
             self.text_label.setText(text)
 
     def closeEvent(self, a0):
+        ...
         a0.ignore()
 
 
@@ -98,7 +99,7 @@ class SliderWidget(QWidget):
         self.current_value = value
 
 
-class WinImgSearch(UMainWindow):
+class WinImgSearch(UMainWidget):
     found_image = pyqtSignal()
     search_started = pyqtSignal()
     ww = 250
@@ -106,11 +107,17 @@ class WinImgSearch(UMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        # self.pr = ProgressWin()
+        # self.pr.text_label.setText("Поиск 2999 из 100000")
+        # self.pr.show()
+        # return
+
         self.set_always_on_top()
         self.set_close_only()
         self.setAcceptDrops(True)
         self.setWindowTitle(Lng.image_search[Cfg.lng_index])
-        self.central_layout.setContentsMargins(15, 10, 15, 5)
+        self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
 
         group = QGroupBox()
@@ -144,12 +151,10 @@ class WinImgSearch(UMainWindow):
 
         self.start_btn = UPushButton(Lng.start[Cfg.lng_index])
         self.start_btn.clicked.connect(self.start_image_searcher)
-        self.start_btn.setFixedWidth(90)
         btn_layout.addWidget(self.start_btn)
 
         cancel_btn = UPushButton(Lng.close[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(90)
         btn_layout.addWidget(cancel_btn)
 
         btn_layout.addStretch()

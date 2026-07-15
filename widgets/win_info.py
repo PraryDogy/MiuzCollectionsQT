@@ -9,7 +9,7 @@ from system.items import OneFileInfoItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
 
-from ._base_widgets import SelectableLabel, UMainWindow
+from ._base_widgets import SelectableLabel, UMainWidget
 
 
 class ULabel(QLabel):
@@ -24,7 +24,7 @@ class Selectable(SelectableLabel):
         self.setStyleSheet("font-size: 11px;")
 
 
-class WinInfo(UMainWindow):
+class WinInfo(UMainWidget):
     finished_ = pyqtSignal()
 
     def __init__(self, paths: list[str]):
