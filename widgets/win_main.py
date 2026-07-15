@@ -68,13 +68,11 @@ class WinMain(UMainWindow):
         self.resize(self.ww, self.hh)
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.app_name}")
-
-        self.setWindowIconText(f"{Static.app_name} {Static.app_ver}")
-
         self.setMenuBar(BarMacos())
 
         self.forced_scaner_dirs = set()
-        self.go_to_url = str()
+        self.go_to_url: str | None = None
+        self.buffer: Buffer | None = None
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -392,6 +390,7 @@ class WinMain(UMainWindow):
             source_mf=Mf.current_mf,
             files_to_copy=abs_files_to_copy
         )
+        self.grid.buffer = True
 
     @with_conn
     def paste_files(self, mf: Mf):
@@ -404,7 +403,8 @@ class WinMain(UMainWindow):
             files_to_copy=self.buffer.files_to_copy,
             target_dir=target_dir
         )
-        del self.buffer
+        self.buffer = None
+        self.grid.buffer = False
         copy_files_win.finished_.connect(
             lambda x: self.start_scaner_task()
         )

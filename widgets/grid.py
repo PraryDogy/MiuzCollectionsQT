@@ -287,7 +287,7 @@ class Grid(VScrollArea):
         self.selected_widgets: list[Thumb] = []
         self.cell_to_wid: dict[tuple, Thumb] = {}
         self.url_to_wid: dict[str, Thumb] = {}
-        self.is_first_load = True
+        self.buffer = False
 
         self.image_apps = {
             i: os.path.basename(i)
