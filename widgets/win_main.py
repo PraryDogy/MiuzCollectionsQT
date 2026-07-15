@@ -187,7 +187,6 @@ class WinMain(UMainWindow):
             self.start_scaner_task()
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
-        self.start_wachdog()
 
     @staticmethod
     def with_conn(fn: callable):
@@ -385,7 +384,6 @@ class WinMain(UMainWindow):
         """
         files_to_copy, dest
         """
-
         copy_files_win = self.copy_files_win(
             files_to_copy=files_to_copy,
             dest=dest
@@ -542,6 +540,7 @@ class WinMain(UMainWindow):
         Dynamic.loaded_thumbs = 0
         self.grid.deleteLater()
         self.grid = GridStandart()
+        self.grid.files_to_copy = self.files_to_copy
         self.grid.restart_scaner.connect(
             lambda: self.restart_scaner_task()
         )
@@ -573,10 +572,10 @@ class WinMain(UMainWindow):
         self.grid.paste_files.connect(
             lambda: self.paste_files(
                 self.files_to_copy,
-                os.path.join(Mf.current_mf.mf_current_path, Dynamic.current_dir.strip())
+                os.path.join(Mf.current_mf.mf_current_path, Dynamic.current_dir.strip(os.sep))
                 )
         )
-        self.grid.set_clipboard.connect(
+        self.grid.set_files_to_copy.connect(
             lambda rel_paths: self.set_files_to_copy(rel_paths)
         )
         self.grid.setup_mf.connect(
@@ -650,31 +649,6 @@ class WinMain(UMainWindow):
             self.view_win.resize(WinImageView.ww, WinImageView.hh)
             self.view_win.move(WinImageView.xx, WinImageView.yy)
         self.view_win.show()
-
-    def start_wachdog(self):
-
-        return
-
-        def poll_task():
-            queue = self.watchdog_task.process_queue
-            if not queue.empty():
-                watchdog_item: WatchDogItem = queue.get()
-                changed_dir = watchdog_item.src_path
-                print(changed_dir)
-            self.watchdog_timer.start(1000)
-
-        if hasattr(self, "watchdog_task"):
-            self.watchdog_task.terminate_join()
-
-        self.watchdog_task = ProcessWorker(
-            target=WatchDog.start,
-            args=(Mf.items, )
-        )
-        self.watchdog_timer = QTimer(self)
-        self.watchdog_timer.setSingleShot(True)
-        self.watchdog_timer.timeout.connect(poll_task)
-        self.watchdog_timer.start(1000)
-        self.watchdog_task.start()
 
     def poll_scaner_task(self, ms: int = 3000):
         if not hasattr(self, "scaner_task") or not self.scaner_task:
@@ -799,11 +773,7 @@ class WinMain(UMainWindow):
         )
         UThreadPool.start(self.task)
 
-    def copy_files_win(
-            self,
-            files_to_copy: list[str],
-            dest: str
-        ):
+    def copy_files_win(self, files_to_copy: list[str], dest: str):
         progress_win = WinCopyFiles(
             files_to_copy=files_to_copy,
             target_dir=dest

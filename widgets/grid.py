@@ -268,7 +268,7 @@ class Grid(VScrollArea):
     set_fav = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
     paste_files = pyqtSignal()
-    set_clipboard = pyqtSignal(list)
+    set_files_to_copy = pyqtSignal(list)
     setup_mf = pyqtSignal(SettingsItem)
     update_thumb = pyqtSignal(list)
     show_in_app = pyqtSignal(str)
@@ -450,7 +450,7 @@ class Grid(VScrollArea):
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_A:
             select_all()
         elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
-            self.set_clipboard.emit(
+            self.set_files_to_copy.emit(
                 [i.data_item.rel_path for i in self.selected_widgets]
             )
         elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
@@ -666,7 +666,7 @@ class Grid(VScrollArea):
 
             act = CopyFiles(self.menu_, rel_paths)
             act.triggered.connect(
-                lambda: self.set_clipboard.emit(rel_paths)
+                lambda: self.set_files_to_copy.emit(rel_paths)
             )
             self.menu_.addAction(act)
 

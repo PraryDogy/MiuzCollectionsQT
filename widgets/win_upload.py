@@ -155,13 +155,6 @@ class UploadWin(UMainWindow):
         self.lbl_target_dir.text_widget.setText(f"Целевая папка: {folder_name}")
 
     def ok_clicked_cmd(self):
-        # files = [
-        #     os.path.join(self.target_dir, os.path.basename(i))
-        #     for i in self.target_files
-        # ]
-        # for i in files:
-        #     print(i)
-        #     print(self.target_files[files.index(i)])
         self.ok_clicked.emit(self.dest)
 
     def on_folder_selected(self, index):
