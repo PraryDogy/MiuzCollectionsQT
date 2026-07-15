@@ -71,7 +71,14 @@ class UploadWin(UMainWindow):
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(5)
 
-        right_layout.addWidget(QLabel("Список выгружаемых файлов"))
+        group_one = QGroupBox()
+        group_one_layout = QVBoxLayout(group_one)
+        group_one_layout.setContentsMargins(2, 5, 2, 5)
+        group_one_layout.setSpacing(10)
+
+        right_layout.addWidget(group_one)
+
+        group_one_layout.addWidget(QLabel("Список выгружаемых файлов"))
 
         self.list_widget = QListWidget()
         total_size = 0
@@ -87,7 +94,7 @@ class UploadWin(UMainWindow):
             if os.path.exists(full_path):
                 total_size += os.path.getsize(full_path)
 
-        right_layout.addWidget(self.list_widget)
+        group_one_layout.addWidget(self.list_widget)
         
         size_mb = total_size / (1024 * 1024)
         right_layout.addWidget(QLabel(f"Всего файлов: {len(self.target_files)} шт."))
