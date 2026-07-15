@@ -143,11 +143,13 @@ class WinCopyFiles(WinProgressbar):
         super().__init__(Lng.copying[Cfg.lng_index])
 
         # # отладка
-        self.rel = ReplaceFilesWin()
-        self.er = ErrorWin()
-        self.rel.show()
-        self.er.show()
-        return
+        # self.rel = ReplaceFilesWin()
+        # self.er = ErrorWin()
+        # self.rel.show()
+        # self.er.show()
+        # self.above_label.setText("above label")
+        # self.below_label.setText("below label")
+        # return
 
         self.cancel.connect(self.stop_task)
         self.cancel.connect(self.deleteLater)

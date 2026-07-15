@@ -408,17 +408,21 @@ class USlider(QSlider):
         self.clicked.emit(value)
 
 
-class WinProgressbar(UMainWindow):
+class WinProgressbar(UMainWidget):
     cancel = pyqtSignal()
     files_icon_path = os.path.join(Static.internal_images, "files.svg")
     images_icon_path = os.path.join(Static.internal_images, "clear.svg")
+    ww = 370
 
     def __init__(self, title: str):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(title)
-        self.setFixedSize(400, 70)
+        self.setFixedWidth(self.ww)
+
+        self.central_layout.setContentsMargins(10, 5, 10, 10)
+        self.central_layout.setSpacing(0)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -433,7 +437,7 @@ class WinProgressbar(UMainWindow):
         right_side_wid = QWidget()
         right_side_lay = QVBoxLayout(right_side_wid)
         right_side_lay.setContentsMargins(0, 0, 0, 0)
-        right_side_lay.setSpacing(0)
+        right_side_lay.setSpacing(2)
         h_lay.addWidget(right_side_wid)
 
         self.above_label = QLabel()
@@ -457,6 +461,8 @@ class WinProgressbar(UMainWindow):
 
         self.below_label = QLabel()
         right_side_lay.addWidget(self.below_label)
+
+        self.adjustSize()
 
     def cancel_cmd(self, *args):
         self.cancel.emit()
