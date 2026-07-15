@@ -470,13 +470,16 @@ class WinMain(UMainWindow):
         self.remove_files_win.show()
     
     @with_conn
-    def upload_files(self, abs_paths: list[str]):
+    def upload_files(self, dropped_files: list[str]):
 
-        def fin(target_dir: str):
+        def fin(target_dir: str, target_files: list[str]):
+            print(target_dir)
+            print(target_files)
+            return
             self.upload_win.deleteLater()
             files_to_copy = [
                 i
-                for i in abs_paths
+                for i in dropped_files
                 if i.endswith(ImgUtils.ext_all)
             ]
 
@@ -487,18 +490,23 @@ class WinMain(UMainWindow):
 
             self.paste_files()
 
-        target_dir = Utils.get_abs_any_path(
-            Mf.current_mf.mf_current_path,
-            Dynamic.current_dir
+        # target_dir = Utils.get_abs_any_path(
+        #     Mf.current_mf.mf_current_path,
+        #     Dynamic.current_dir
+        # )
+        # target_files = [
+        #     os.path.join(target_dir, os.path.basename(i))
+        #     for i in abs_paths
+        #     if i.endswith(ImgUtils.ext_all)
+        # ]
+
+        self.upload_win = UploadWin(
+            mf=Mf.current_mf,
+            current_dir=Dynamic.current_dir,
+            dropped_files=dropped_files
         )
-        target_files = [
-            os.path.join(target_dir, os.path.basename(i))
-            for i in abs_paths
-            if i.endswith(ImgUtils.ext_all)
-        ]
-        self.upload_win = UploadWin(target_dir, target_files)
         self.upload_win.ok_clicked.connect(
-            lambda: fin(target_dir)
+            lambda data: fin(*data)
         )
         self.upload_win.center_to_parent(self)
         self.upload_win.show()

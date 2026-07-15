@@ -1,173 +1,38 @@
 import os
+import sys
 
-from PyQt6.QtCore import QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import QDir, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QFileSystemModel, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QAbstractItemView, QGroupBox, QLabel, QTreeWidget,
-                             QTreeWidgetItem, QWidget)
+from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QFrame,
+                             QGroupBox, QHBoxLayout, QLabel, QListWidget,
+                             QListWidgetItem, QMainWindow, QPushButton,
+                             QSplitter, QTreeView, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import Cfg
 from system.lang import Lng
+from system.main_folder import Mf
 
 from ._base_widgets import SmallBtn, UHBoxLayout, UMainWindow
-import os
-import sys
-from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QSplitter, QTreeView, 
-    QListWidget, QListWidgetItem, QVBoxLayout, QWidget, 
-    QLabel, QHBoxLayout, QPushButton, QFrame
-)
-from PyQt6.QtCore import QDir, Qt
-from PyQt6.QtGui import QFileSystemModel
-
-
-
-class TreeWid(QTreeWidget):
-    tree_reveal = pyqtSignal(str)
-    tree_open = pyqtSignal(str)
-
-    svg_folder = "./images/folder.svg"
-    svg_image = "./images/img.svg"
-    svg_size = 16
-    item_height = 25
-
-    def __init__(self, target_dir: str, target_files: list[str]):
-        super().__init__()
-        self.selected_path: str = None
-        self.items: dict[str, QTreeWidgetItem] = {}
-        self.setHeaderHidden(True)
-        self.setAutoScroll(False)
-        self.setIconSize(QSize(self.svg_size, self.svg_size))
-        self.setIndentation(10)
-        # self.setSelectionMode(QTreeWidget.NoSelection)
-        self.build_tree(target_dir, target_files)
-
-    def build_tree(self, target_dir: str, target_files: list[str]):
-        self.clear()
-        self.items = {}
-
-        # строим папки
-        parts = target_dir.split(os.sep)
-        current_path = ""
-        parent_item = None
-        for part in parts:
-            if part == "":
-                current_path = os.sep
-                continue
-            if current_path == os.sep:
-                current_path = os.path.join(os.sep, part)
-            else:
-                current_path = os.path.join(current_path, part)
-            if current_path not in self.items:
-                item = QTreeWidgetItem([part])
-                item.setIcon(0, QIcon(self.svg_folder))
-                item.setSizeHint(0, QSize(0, self.item_height))
-                item.setData(0, Qt.ItemDataRole.UserRole, current_path)
-                if parent_item:
-                    parent_item.addChild(item)
-                else:
-                    self.addTopLevelItem(item)
-                self.items[current_path] = item
-            parent_item = self.items[current_path]
-
-        # добавляем файлы
-        for target_file in target_files:
-            file_name = os.path.basename(target_file)
-            file_item = QTreeWidgetItem([file_name])
-            file_item.setIcon(0, QIcon(self.svg_image))
-            file_item.setSizeHint(0, QSize(0, self.item_height))
-            file_item.setData(0, Qt.ItemDataRole.UserRole, file_name)
-            parent_item.addChild(file_item)
-
-        self.expand_to_path(target_dir)
-
-    def expand_to_path(self, path: str):
-        path = os.path.normpath(path)
-        item = self.items.get(path)
-        if not item:
-            return
-        while item:
-            item.setExpanded(True)
-            item = item.parent()
-        self.setCurrentItem(self.items[path])
-        self.scrollToItem(self.items[path], QAbstractItemView.ScrollHint.PositionAtCenter)
-
-
-# class UploadWin(UMainWindow):
-#     ok_clicked = pyqtSignal()
-#     mrg = 2
-#     group_spacing = 7
-#     btn_spacing = 10
-#     icon_size = 35
-#     btn_w = 90
-#     icon_path = "./images/warning.svg"
-
-#     def __init__(self, target_dir: str, target_files: list[str]):
-#         super().__init__()
-#         self.set_always_on_top()
-#         self.set_close_only()
-#         self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
-#         self.setFixedSize(400, 400)
-#         self.central_layout.setSpacing(10)
-
-#         group = QGroupBox()
-#         self.central_layout.addWidget(group)
-
-#         group_lay = UHBoxLayout()
-#         group_lay.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
-#         group_lay.setSpacing(self.group_spacing)
-#         group.setLayout(group_lay)
-
-#         warn = QSvgWidget()
-#         warn.load(self.icon_path)
-#         warn.setFixedSize(self.icon_size, self.icon_size)
-#         group_lay.addWidget(warn)
-
-#         descr = QLabel(Lng.upload_descr[Cfg.lng_index])
-#         group_lay.addWidget(descr)
-
-#         tree = TreeWid(target_dir, target_files)
-#         self.central_layout.addWidget(tree)
-
-#         btn_wid = QWidget()
-#         self.central_layout.addWidget(btn_wid)
-#         btn_lay = UHBoxLayout()
-#         btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-#         btn_lay.setSpacing(self.btn_spacing)
-#         btn_wid.setLayout(btn_lay)
-
-#         ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
-#         ok_btn.clicked.connect(self.ok_clicked)
-#         ok_btn.setFixedWidth(self.btn_w)
-#         btn_lay.addWidget(ok_btn)
-
-#         cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
-#         cancel_btn.clicked.connect(self.deleteLater)
-#         cancel_btn.setFixedWidth(self.btn_w)
-#         btn_lay.addWidget(cancel_btn)
-
-#     def keyPressEvent(self, a0):
-#         if a0.key() == Qt.Key.Key_Escape:
-#             self.deleteLater()
-#         elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
-#             self.ok_clicked.emit()
-#         return super().keyPressEvent(a0)
-    
-
-
-
 
 
 class UploadWin(UMainWindow):
     ok_clicked = pyqtSignal()
 
-    def __init__(self, target_dir: str, target_files: list[str]):
+    def __init__(self, mf: Mf, current_dir: str, dropped_files: list[str]):
         super().__init__()
         self.setWindowTitle("Подтверждение выгрузки")
         self.resize(900, 500)
 
-        self.target_dir = target_dir
-        self.target_files = target_files
+        # Приводим все пути к абсолютному виду
+        self.root_dir = mf.mf_current_path
+        self.target_dir = os.path.join(
+            mf.mf_current_path,
+            current_dir.strip(os.sep)
+        ).rstrip(os.sep)
+
+        self.target_files = dropped_files
 
         # Главный сплиттер (Разделяет дерево и правое превью)
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -175,15 +40,28 @@ class UploadWin(UMainWindow):
 
         # === ЛЕВАЯ ПАНЕЛЬ: Куда загружаем ===
         self.tree_view = QTreeView()
+        self.tree_view.header().hide()  # Скрываем имя колонки
+        
         self.file_model = QFileSystemModel()
-        self.file_model.setRootPath(QDir.rootPath())
+        
+        # Модель инициализируем от корня ограничителя, чтобы она читала только его
+        self.file_model.setRootPath(self.root_dir)
         self.tree_view.setModel(self.file_model)
         
-        # Скрываем колонки размера/типа, оставляя только чистую структуру папок
+        # Скрываем лишние колонки
         for i in range(1, 4):
             self.tree_view.setColumnHidden(i, True)
             
-        self.tree_view.setRootIndex(self.file_model.index(self.target_dir))
+        # ОГРАНИЧЕНИЕ: Пользователь заперт внутри root_dir (например, Downloads)
+        root_index = self.file_model.index(self.root_dir)
+        self.tree_view.setRootIndex(root_index)
+        
+        # ПОШАГОВОЕ РАСКРЫТИЕ: Подключаемся к загрузке директорий
+        self.file_model.directoryLoaded.connect(self._expand_to_target)
+        
+        # Подключаем клики для ручного выбора подпапок пользователем
+        self.tree_view.clicked.connect(self.on_folder_selected)
+        
         splitter.addWidget(self.tree_view)
 
         # === ПРАВАЯ ПАНЕЛЬ: Что загружаем ===
@@ -202,29 +80,30 @@ class UploadWin(UMainWindow):
             item.setToolTip(file_path)
             self.list_widget.addItem(item)
             
-            if os.path.exists(file_path):
-                total_size += os.path.getsize(file_path)
+            # Считаем размер файлов относительно папки назначения
+            full_path = file_path if os.path.isabs(file_path) else os.path.join(self.target_dir, file_path)
+            if os.path.exists(full_path):
+                total_size += os.path.getsize(full_path)
 
         right_layout.addWidget(self.list_widget)
 
         # === Карточка со сводной информацией ===
         info_frame = QFrame()
-        # info_frame.setFrameShape(QFrame.Shape.StyledPanel)
-        # info_frame.setStyleSheet("background-color: #f9f9f9; border-radius: 4px;")
         info_layout = QVBoxLayout(info_frame)
         
-        # Переводим байты в мегабайты для наглядности
         size_mb = total_size / (1024 * 1024)
-        
         info_layout.addWidget(QLabel(f"<b>Всего файлов:</b> {len(self.target_files)} шт."))
         info_layout.addWidget(QLabel(f"<b>Общий размер:</b> {size_mb:.2f} MB"))
-        info_layout.addWidget(QLabel(f"<b>Целевая папка:</b> {os.path.basename(self.target_dir)}"))
+        
+        self.lbl_target_dir = QLabel()
+        self.update_target_dir_label(self.target_dir)
+        info_layout.addWidget(self.lbl_target_dir)
         
         right_layout.addWidget(info_frame)
         splitter.addWidget(right_widget)
 
-        # Пропорции сплиттера: 40% дерево папок, 60% список файлов
-        splitter.setSizes([360, 540])
+        # Левое дерево строго 210 пикселей при старте
+        splitter.setSizes([210, self.width() - 210])
 
         # === НИЖНЯЯ ПАНЕЛЬ: Кнопки управления окном ===
         btn_layout = QHBoxLayout()
@@ -241,6 +120,27 @@ class UploadWin(UMainWindow):
         self.btn_ok.clicked.connect(self.ok_clicked.emit)
         self.btn_ok.clicked.connect(self.deleteLater)
 
+    def _expand_to_target(self):
+
+        def cmd():
+            idx = self.file_model.index(self.target_dir)
+            self.tree_view.expand(idx)
+            self.tree_view.setCurrentIndex(idx)
+            self.tree_view.scrollTo(idx, QTreeView.ScrollHint.PositionAtCenter)  
+
+        QTimer.singleShot(100, cmd)
+
+    def update_target_dir_label(self, path: str):
+        folder_name = os.path.basename(path) or path
+        self.lbl_target_dir.setText(f"<b>Целевая папка:</b> {folder_name}")
+        self.lbl_target_dir.setToolTip(path)
+
+    def on_folder_selected(self, index):
+        if self.file_model.isDir(index):
+            selected_path = self.file_model.filePath(index)
+            self.target_dir = selected_path
+            self.update_target_dir_label(selected_path)
+
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
@@ -248,3 +148,4 @@ class UploadWin(UMainWindow):
             self.ok_clicked.emit()
             self.deleteLater()
         return super().keyPressEvent(a0)
+
