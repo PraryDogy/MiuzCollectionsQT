@@ -560,7 +560,7 @@ class Grid(VScrollArea):
             self.clear_selected_widgets()
 
             # это костыль, может сломаться если мы переименуем buffer в main_win
-            if hasattr(self.window(), "buffer"):
+            if self.buffer:
                 self.menu_.addSeparator()
                 paste = PasteFiles(self.menu_)
                 paste.triggered.connect(
