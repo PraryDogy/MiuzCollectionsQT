@@ -14,24 +14,6 @@ from system.lang import Lng
 from system.utils import Utils
 
 
-class UHBoxLayout(QHBoxLayout):
-    """QHBoxLayout с нулевыми отступами и нулевым расстоянием между виджетами."""
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSpacing(0)
-
-
-class UVBoxLayout(QVBoxLayout):
-    """QVBoxLayout с нулевыми отступами и нулевым расстоянием между виджетами."""
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setSpacing(0)
-
-
 class UMenuStyle(QMenu):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -187,16 +169,18 @@ class UMainWindow(WindowMixin, QMainWindow):
         super().__init__(parent)
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
-        self.central_layout = UVBoxLayout(central_widget)
+        self.central_layout = QVBoxLayout(central_widget)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(0)
         self.register_window()
 
 
 class UMainWidget(WindowMixin, QWidget):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-        self.central_layout = UVBoxLayout(self)
+        self.central_layout = QVBoxLayout(self)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(0)
         self.register_window()
 
 
@@ -322,10 +306,13 @@ class RowArrowWidget(QWidget):
     def __init__(self, text: str):
         super().__init__()
         self.setFixedHeight(self.hh)
-        self.main_layout = UVBoxLayout(self)
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
 
         self.above_wid = QWidget()
-        self.above_layout = UHBoxLayout(self.above_wid)
+        self.above_layout = QHBoxLayout(self.above_wid)
+        self.above_layout.setSpacing(0)
         self.above_layout.setSpacing(10)
 
         self.sep = HSep()
@@ -432,7 +419,8 @@ class WinProgressbar(UMainWindow):
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
-        h_lay = UHBoxLayout()
+        h_lay = QHBoxLayout()
+        h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
         h_wid.setLayout(h_lay)
 
@@ -441,7 +429,9 @@ class WinProgressbar(UMainWindow):
         h_lay.addWidget(left_side_icon)
 
         right_side_wid = QWidget()
-        right_side_lay = UVBoxLayout()
+        right_side_lay = QVBoxLayout()
+        right_side_lay.setContentsMargins(0, 0, 0, 0)
+        right_side_lay.setSpacing(0)
         right_side_wid.setLayout(right_side_lay)
         h_lay.addWidget(right_side_wid)
 
@@ -450,7 +440,8 @@ class WinProgressbar(UMainWindow):
 
         progressbar_row = QWidget()
         right_side_lay.addWidget(progressbar_row)
-        progressbar_lay = UHBoxLayout()
+        progressbar_lay = QHBoxLayout()
+        progressbar_lay.setContentsMargins(0, 0, 0, 0)
         progressbar_lay.setSpacing(10)
         progressbar_row.setLayout(progressbar_lay)
 

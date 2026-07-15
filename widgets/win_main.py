@@ -4,8 +4,8 @@ from collections import defaultdict
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
-from PyQt6.QtWidgets import (QFileDialog, QFrame, QLabel, QPushButton,
-                             QSpacerItem, QSplitter, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
+                             QPushButton, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
@@ -20,7 +20,7 @@ from system.scaner import BaseScaner, ForcedScaner
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import HSep, UHBoxLayout, UMainWindow, UVBoxLayout
+from ._base_widgets import HSep, UMainWindow
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -75,8 +75,9 @@ class WinMain(UMainWindow):
         self.files_to_copy = set()
 
         h_wid_main = QWidget()
-        h_lay_main = UHBoxLayout()
+        h_lay_main = QHBoxLayout()
         h_lay_main.setContentsMargins(5, 0, 5, 5)
+        h_lay_main.setSpacing(0)
         h_wid_main.setLayout(h_lay_main)
         self.central_layout.addWidget(h_wid_main)
 
@@ -112,8 +113,9 @@ class WinMain(UMainWindow):
         # Правый виджет
         right_wid = QWidget()
         self.splitter.addWidget(right_wid)
-        self.right_layout = UVBoxLayout()
+        self.right_layout = QVBoxLayout()
         self.right_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_layout.setSpacing(0)
         right_wid.setLayout(self.right_layout)
 
         # Добавляем элементы в правую панель

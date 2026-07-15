@@ -1,13 +1,13 @@
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QFrame, QLabel, QWidget
+from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from cfg import Cfg, Dynamic
 from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import UHBoxLayout, ULineEdit, UMenu, UVBoxLayout
+from ._base_widgets import ULineEdit, UMenu
 
 
 class ClearBtn(QSvgWidget):
@@ -123,7 +123,8 @@ class BarTopBtn(QWidget):
     def __init__(self):
         super().__init__()
         
-        self.v_lay = UVBoxLayout()
+        self.v_lay = QVBoxLayout()
+        self.v_lay.setContentsMargins(0, 0, 0, 0)
         self.v_lay.setSpacing(1)
         self.v_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.v_lay)
@@ -131,7 +132,9 @@ class BarTopBtn(QWidget):
         # --- Фрейм под SVG ---
         self.svg_frame = UFrame()
         self.svg_frame.setFixedSize(self.width_, self.height_)
-        self.svg_lay = UVBoxLayout()
+        self.svg_lay = QVBoxLayout()
+        self.svg_lay.setContentsMargins(0, 0, 0, 0)
+        self.svg_lay.setSpacing(0)
         self.svg_frame.setLayout(self.svg_lay)
         self.v_lay.addWidget(self.svg_frame, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -276,7 +279,7 @@ class ExitImgSearchBtn(UFrame):
     hh = 30
     def __init__(self):
         super().__init__()
-        h_layout = UHBoxLayout(self)
+        h_layout = QHBoxLayout(self)
         h_layout.setContentsMargins(2, 0, 2, 0)
         h_layout.setSpacing(5)
 
@@ -317,7 +320,7 @@ class BarTop(QWidget):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(self.text_height)
-        self.h_layout = UHBoxLayout()
+        self.h_layout = QHBoxLayout()
         self.h_layout.setContentsMargins(0, 3, 0, 3)
         self.h_layout.setSpacing(self.text_spacing)
         self.setLayout(self.h_layout)
@@ -350,7 +353,7 @@ class BarTop(QWidget):
         right_widget = QWidget()
         right_widget.setFixedWidth(WidSearch.ww)
         self.h_layout.addWidget(right_widget)
-        right_layout = UHBoxLayout(right_widget)
+        right_layout = QHBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(0)
 

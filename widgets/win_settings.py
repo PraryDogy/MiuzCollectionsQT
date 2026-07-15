@@ -11,9 +11,9 @@ from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFileDialog, QGraphicsOpacityEffect,
-                             QGroupBox, QLabel, QLineEdit, QSpacerItem,
-                             QSpinBox, QSplitter, QTableWidget,
-                             QTableWidgetItem, QWidget)
+                             QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+                             QSpacerItem, QSpinBox, QSplitter, QTableWidget,
+                             QTableWidgetItem, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes
@@ -28,10 +28,9 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, UHBoxLayout,
-                            ULineEdit, UMainWindow, UMenu, UTextEdit,
-                            UVBoxLayout, VListSpacerItem, VListWidget,
-                            VListWidgetItem)
+from ._base_widgets import (HSep, RowArrowWidget, SmallBtn, ULineEdit,
+                            UMainWindow, UMenu, UTextEdit, VListSpacerItem,
+                            VListWidget, VListWidgetItem)
 from .path_widget import PathWidget
 from .win_smb import SuperWarnWindow
 from .win_warn import ConfirmWindow, WarningWindow
@@ -78,7 +77,7 @@ class SettingsGroup(QGroupBox):
         QGroupBox + self.layout_ (vertical layout)
         """
         super().__init__()
-        self.layout_ = UVBoxLayout()
+        self.layout_ = QVBoxLayout()
         self.layout_.setContentsMargins(6, 0, 6, 0)
         self.layout_.setSpacing(0)
         self.setLayout(self.layout_)
@@ -156,7 +155,8 @@ class ExportWin(UMainWindow):
             item.set_checkable()
             v_list.addItem(item)
 
-        btn_layout = UHBoxLayout()
+        btn_layout = QHBoxLayout()
+        btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)
         self.central_layout.addLayout(btn_layout)
 
@@ -353,11 +353,13 @@ class SizesWin(UMainWindow):
 
         central = QWidget()
         self.setCentralWidget(central)
-        layout = UVBoxLayout()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         central.setLayout(layout)
 
         info_widget = QWidget()
-        info_layout = UVBoxLayout(info_widget)
+        info_layout = QVBoxLayout(info_widget)
         info_layout.setContentsMargins(5, 5, 5, 5)
         info_layout.setSpacing(5)
 
@@ -483,7 +485,9 @@ class ThemeBtn(QWidget):
 
         self.setFixedWidth(self.ww)
 
-        layout_ = UVBoxLayout(self)
+        layout_ = QVBoxLayout(self)
+        layout_.setContentsMargins(0, 0, 0, 0)
+        layout_.setSpacing(0)
         
         self.svg_widget = QSvgWidget()
         self.svg_widget.setFixedSize(50, 50)
@@ -519,7 +523,8 @@ class ThemesWidget(SettingsGroup):
         self.layout_.addSpacerItem(spacer)
 
         themes_wid = QWidget()
-        themes_layout = UHBoxLayout(themes_wid)
+        themes_layout = QHBoxLayout(themes_wid)
+        themes_layout.setContentsMargins(0, 0, 0, 0)
         themes_layout.setSpacing(5)
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.layout_.addWidget(themes_wid)
@@ -581,7 +586,9 @@ class AboutWid(QGroupBox):
 
     def __init__(self):
         super().__init__()
-        h_lay = UHBoxLayout()
+        h_lay = QHBoxLayout()
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(0)
         self.setLayout(h_lay)
 
         icon = QLabel()
@@ -607,7 +614,7 @@ class GeneralSettings(QWidget, StateWid):
     def __init__(self, cfg_data: CfgData):
         super().__init__()
 
-        v_lay = UVBoxLayout()
+        v_lay = QVBoxLayout()
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.setSpacing(10)
         v_lay.setContentsMargins(0, 0, 0, 10)
@@ -753,7 +760,8 @@ class MfSettings(QWidget, StateWid):
         self.mf = mf
         self.mf_list_clone = mf_list_clone
 
-        main_lay = UVBoxLayout()
+        main_lay = QVBoxLayout()
+        main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(15)
         self.setLayout(main_lay)
 
@@ -902,7 +910,8 @@ class NewFolder(QWidget, StateWid):
         )
         self.mf_list_clone = mf_list_clone
 
-        main_lay = UVBoxLayout()
+        main_lay = QVBoxLayout()
+        main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(15)
         self.setLayout(main_lay)
 
@@ -1083,7 +1092,9 @@ class WinSettings(UMainWindow):
             self.left_menu.addItem(new_folder)
 
         self.right_wid = QWidget()
-        self.right_lay = UVBoxLayout()
+        self.right_lay = QVBoxLayout()
+        self.right_lay.setContentsMargins(0, 0, 0, 0)
+        self.right_lay.setSpacing(0)
         self.right_wid.setLayout(self.right_lay)
         self.splitter.addWidget(self.right_wid)
 
@@ -1091,7 +1102,8 @@ class WinSettings(UMainWindow):
 
         self.btns_wid = QWidget()
         self.right_lay.addWidget(self.btns_wid)
-        btns_lay = UHBoxLayout()
+        btns_lay = QHBoxLayout()
+        btns_lay.setContentsMargins(0, 0, 0, 0)
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btns_lay.setSpacing(10)
         self.btns_wid.setLayout(btns_lay)

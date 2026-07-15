@@ -4,7 +4,7 @@ import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QSplitter, QTabWidget, QTreeWidget,
+from PyQt6.QtWidgets import (QHBoxLayout, QSplitter, QTabWidget, QTreeWidget,
                              QTreeWidgetItem, QWidget)
 
 from cfg import Cfg, Dynamic
@@ -14,8 +14,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UHBoxLayout, UMenu, UVBoxLayout, VListWidget,
-                            VListWidgetItem)
+from ._base_widgets import UMenu, VListWidget, VListWidgetItem
 
 ITEM_HEIGHT = 25
 
@@ -322,8 +321,9 @@ class MenuLeft(QWidget):
 
     def __init__(self):
         super().__init__()
-        v_lay = UHBoxLayout(self)
+        v_lay = QHBoxLayout(self)
         v_lay.setContentsMargins(0, 5, 0, 0)
+        v_lay.setSpacing(0)
         self.splitter = QSplitter()
         self.splitter.setHandleWidth(15)
         self.splitter.setOrientation(Qt.Orientation.Vertical)

@@ -1,12 +1,12 @@
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QLabel
+from PyQt6.QtWidgets import QHBoxLayout, QLabel
 
 from cfg import Cfg
 from system.lang import Lng
 
-from ._base_widgets import SmallBtn, UHBoxLayout, UMainWidget
+from ._base_widgets import SmallBtn, UMainWidget
 
 
 class ConfirmWindow(UMainWidget):
@@ -23,7 +23,7 @@ class ConfirmWindow(UMainWidget):
         self.setMaximumWidth(360)
         self.setMinimumWidth(280)
 
-        text_layout = UHBoxLayout()
+        text_layout = QHBoxLayout()
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(15)
         self.central_layout.addLayout(text_layout)
@@ -38,7 +38,7 @@ class ConfirmWindow(UMainWidget):
         text_wid.adjustSize()
         text_layout.addWidget(text_wid)
 
-        btn_layout = UHBoxLayout()
+        btn_layout = QHBoxLayout()
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)

@@ -1,12 +1,12 @@
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QMouseEvent, QWheelEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QGraphicsOpacityEffect, QLabel, QSlider, QWidget
+from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QHBoxLayout, QLabel,
+                             QWidget)
 
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 
-from ._base_widgets import UHBoxLayout, USlider
+from ._base_widgets import USlider
 
 
 class ThumbnailsSlider(USlider):
@@ -84,7 +84,7 @@ class BarBottom(QWidget):
         self.setFixedHeight(self.hh)
 
         # --- Горизонтальный layout ---
-        self.h_layout = UHBoxLayout(self)
+        self.h_layout = QHBoxLayout(self)
         self.h_layout.setSpacing(5)
         self.h_layout.setContentsMargins(0, 0, 15, 0)
 

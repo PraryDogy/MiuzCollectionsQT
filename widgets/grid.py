@@ -6,7 +6,8 @@ from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QDrag, QKeyEvent,
                          QMouseEvent, QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
-                             QGridLayout, QLabel, QRubberBand, QWidget)
+                             QGridLayout, QLabel, QRubberBand, QVBoxLayout,
+                             QWidget)
 
 from cfg import Cfg, Dynamic, Static
 from system.items import DataItem, DbImagesItem, SettingsItem
@@ -16,9 +17,9 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMenu, USubMenu, UVBoxLayout, VScrollArea
-from .actions import (CopyFiles, CopyName, CopyPath, OpenInView, PasteFiles,
-                      RemoveFiles, RevealInFinder, Save, ScanerRestart, SetFav,
+from ._base_widgets import UMenu, USubMenu, VScrollArea
+from .actions import (CopyFiles, CopyPath, OpenInView, PasteFiles, RemoveFiles,
+                      RevealInFinder, Save, ScanerRestart, SetFav,
                       ShowInFolder, UpdateThumbAction, WinInfoAction)
 
 
@@ -164,7 +165,8 @@ class Thumb(QFrame):
             self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
 
         # --- Layout ---
-        self.v_layout = UVBoxLayout()
+        self.v_layout = QVBoxLayout()
+        self.v_layout.setContentsMargins(0, 0, 0, 0)
         self.v_layout.setSpacing(2)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.v_layout)
@@ -304,7 +306,9 @@ class Grid(VScrollArea):
         # --- Вкладка прокрутки ---
         self.scroll_wid = QWidget()
         self.setWidget(self.scroll_wid)
-        self.scroll_layout = UVBoxLayout()
+        self.scroll_layout = QVBoxLayout()
+        self.scroll_layout.setContentsMargins(0, 0, 0, 0)
+        self.scroll_layout.setSpacing(0)
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.scroll_wid.setLayout(self.scroll_layout)
 

@@ -3,14 +3,13 @@ from typing import Literal
 
 from PyQt6.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
-from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QLabel, QSpinBox,
-                             QToolButton, QWidget)
+from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QHBoxLayout, QLabel,
+                             QSpinBox, QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Cfg, Dynamic
 from system.lang import Lng
 
-from ._base_widgets import (HSep, UMainWindow, SmallBtn, UHBoxLayout,
-                            UVBoxLayout)
+from ._base_widgets import HSep, SmallBtn, UMainWindow
 
 
 class DatesTools:
@@ -61,7 +60,8 @@ class MyCalendar(QGroupBox):
 
     def __init__(self, title: str):
         super().__init__()
-        v_layout = UVBoxLayout(self)
+        v_layout = QVBoxLayout(self)
+        v_layout.setContentsMargins(0, 0, 0, 0)
         v_layout.setSpacing(10)
         margins = v_layout.contentsMargins()
         margins.setTop(5)
@@ -173,7 +173,8 @@ class WinDates(UMainWindow):
 
         dates_h_wid = QWidget()
         self.central_layout.addWidget(dates_h_wid)
-        dates_h_lay = UHBoxLayout()
+        dates_h_lay = QHBoxLayout()
+        dates_h_lay.setContentsMargins(0, 0, 0, 0)
         dates_h_lay.setSpacing(10)
         dates_h_wid.setLayout(dates_h_lay)
 
