@@ -10,8 +10,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskWorker
 
-from ._base_widgets import (UMainWidget, UMainWindow, UPushButton,
-                            WinProgressbar)
+from ._base_widgets import UMainWidget, UPushButton, WinProgressbar
 
 
 class ReplaceButton(UPushButton):

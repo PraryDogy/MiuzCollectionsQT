@@ -10,7 +10,7 @@ from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QIcon, QImage,
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
                              QGraphicsPixmapItem, QGraphicsScene,
-                             QGraphicsView, QLabel, QScrollArea, QSizePolicy)
+                             QGraphicsView)
 
 from cfg import Cfg, Static
 from system.items import ImgViewItem
@@ -21,7 +21,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow, UMenu, USubMenu
+from ._base_widgets import UMainWidget, UMenu, USubMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
@@ -109,8 +109,6 @@ class ImgWid(QGraphicsView):
         super().resizeEvent(event)
         if self.pixmap_item:
             self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
-
-
 
 
 class CustomSvg(QSvgWidget):
@@ -208,7 +206,7 @@ class NextButton(CustomSvg):
         self.load(self.svg_path)
 
 
-class WinImageView(UMainWindow):
+class WinImageView(UMainWidget):
     select_thumb = pyqtSignal(str)
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)
@@ -233,6 +231,8 @@ class WinImageView(UMainWindow):
         self.setStyleSheet("background: black;")
         self.setMinimumSize(QSize(self.min_w, self.min_h))
         self.installEventFilter(self)
+        self.central_layout.setContentsMargins(0, 0, 0, 0)
+        self.central_layout.setSpacing(0)
 
         self.mouse_move_timer = QTimer(self)
         self.mouse_move_timer.setSingleShot(True)
@@ -244,15 +244,15 @@ class WinImageView(UMainWindow):
         self.central_layout.addWidget(self.img_wid)
 
         self.prev_image_btn = PrevButton()
-        self.prev_image_btn.setParent(self.centralWidget())
+        self.prev_image_btn.setParent(self)
         self.prev_image_btn.clicked.connect(lambda: self.switch_image(1))
 
         self.next_image_btn = NextButton()
-        self.next_image_btn.setParent(self.centralWidget())
+        self.next_image_btn.setParent(self)
         self.next_image_btn.clicked.connect(lambda: self.switch_image(-1))
 
         self.zoom_btns = ZoomWidget()
-        self.zoom_btns.setParent(self.centralWidget())
+        self.zoom_btns.setParent(self)
         self.zoom_btns.zoom_in.connect(lambda: self.zoom_cmd("in"))
         self.zoom_btns.zoom_out.connect(lambda: self.zoom_cmd("out"))
         self.zoom_btns.zoom_fit.connect(lambda: self.zoom_cmd("fit"))

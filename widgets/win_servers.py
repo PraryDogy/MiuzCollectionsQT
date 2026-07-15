@@ -5,13 +5,14 @@ from dataclasses import dataclass
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QSpacerItem, QWidget
+from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QSpacerItem,
+                             QVBoxLayout, QWidget)
 
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (UPushButton, ULineEdit, UMainWindow, UMenu,
+from ._base_widgets import (ULineEdit, UMainWidget, UMenu, UPushButton,
                             VListWidget, VListWidgetItem)
 from .win_warn import ConfirmWindow
 
@@ -105,7 +106,7 @@ class ServerLabel(QLabel):
         self.setStyleSheet("padding-left: 1px;")
 
 
-class LoginWin(UMainWindow):
+class LoginWin(UMainWidget):
     ok_pressed = pyqtSignal(ServerItem)
     ww = 300
 
@@ -115,40 +116,46 @@ class LoginWin(UMainWindow):
         self.set_always_on_top()
         self.set_close_only()
         self.setFixedWidth(self.ww)
-        self.central_layout.setSpacing(5)
+        self.central_layout.setSpacing(10)
+
+        group = QGroupBox()
+        grop_lay = QVBoxLayout(group)
+        grop_lay.setContentsMargins(0, 0, 0, 5)
+        grop_lay.setSpacing(5)
+        self.central_layout.addWidget(group)
 
         alias_label = ServerLabel(text=Lng.alias[Cfg.lng_index].capitalize())
-        self.central_layout.addWidget(alias_label)
+        grop_lay.addWidget(alias_label)
 
         self.alias = ULineEdit()
         self.alias.setPlaceholderText(Lng.alias[Cfg.lng_index].capitalize())
-        self.central_layout.addWidget(self.alias)
+        grop_lay.addWidget(self.alias)
 
         server_label = ServerLabel(text=Lng.server[Cfg.lng_index].capitalize())
-        self.central_layout.addWidget(server_label)
+        grop_lay.addWidget(server_label)
 
         self.server = ULineEdit()
         self.server.setPlaceholderText(Lng.server[Cfg.lng_index].capitalize())
-        self.central_layout.addWidget(self.server)
+        grop_lay.addWidget(self.server)
 
         login_label = ServerLabel(text=Lng.login[Cfg.lng_index].capitalize())
-        self.central_layout.addWidget(login_label)
+        grop_lay.addWidget(login_label)
 
         self.login = ULineEdit()
         self.login.setPlaceholderText(Lng.login[Cfg.lng_index].capitalize())
-        self.central_layout.addWidget(self.login)
+        grop_lay.addWidget(self.login)
 
-        self.central_layout.addSpacerItem(QSpacerItem(0, 10))
+        # grop_lay.addSpacerItem(QSpacerItem(0, 10))
 
         pass_label = ServerLabel(text=Lng.password[Cfg.lng_index].capitalize())
-        self.central_layout.addWidget(pass_label)
+        grop_lay.addWidget(pass_label)
 
         self.pass_ = ULineEdit()
         self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
-        self.pass_.setPlaceholderText(f"{Lng.password[Cfg.lng_index]}")
-        self.central_layout.addWidget(self.pass_)
+        self.pass_.setPlaceholderText(f"{Lng.password[Cfg.lng_index].capitalize()}")
+        grop_lay.addWidget(self.pass_)
 
-        self.central_layout.addSpacerItem(QSpacerItem(0, 10))
+        # grop_lay.addSpacerItem(QSpacerItem(0, 10))
 
         self.btn_layout = QHBoxLayout()
         self.btn_layout.setSpacing(10)
@@ -158,11 +165,9 @@ class LoginWin(UMainWindow):
 
         self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.clicked.connect(self.ok_cmd)
-        self.ok_btn.setFixedWidth(90)
         self.btn_layout.addWidget(self.ok_btn)
 
         self.cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
-        self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.deleteLater)
         self.btn_layout.addWidget(self.cancel_btn)
 
@@ -179,7 +184,7 @@ class LoginWin(UMainWindow):
         self.eye_svg = EyeSvg()
         self.eye_svg.setParent(self.pass_)
         self.eye_svg.move(
-            self.ww - 50,
+            self.ww - 45,
             5
         )
         self.eye_svg.show()
@@ -218,7 +223,7 @@ class LoginWin(UMainWindow):
         return super().keyPressEvent(a0)
 
 
-class ServersWin(UMainWindow):
+class ServersWin(UMainWidget):
     def __init__(self):
         super().__init__()
         self.set_always_on_top()
@@ -226,17 +231,23 @@ class ServersWin(UMainWindow):
         self.setWindowTitle(Lng.connect_to_server[Cfg.lng_index])
         self.setFixedSize(350, 250)
 
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setContentsMargins(5, 5, 5, 10)
         self.central_layout.setSpacing(10)
 
+        group = QGroupBox()
+        group_lay = QVBoxLayout(group)
+        group_lay.setContentsMargins(0, 0, 0, 0)
+        group_lay.setSpacing(10)
+        self.central_layout.addWidget(group)
+
         favs = ServerLabel(Lng.favorites[Cfg.lng_index])
-        self.central_layout.addWidget(favs)
+        group_lay.addWidget(favs)
 
         self.v_list = ServerList()
         self.v_list.edit_server.connect(self.show_login_win)
         self.v_list.remove_server.connect(self.remove_cmd)
         self.v_list.connect_server.connect(self.connect_cmd)
-        self.central_layout.addWidget(self.v_list)
+        group_lay.addWidget(self.v_list)
 
         # Кнопки
         btn_widget = QWidget()
@@ -248,12 +259,10 @@ class ServersWin(UMainWindow):
         btn_layout.addStretch()
 
         btn_add = UPushButton(Lng.add[Cfg.lng_index])
-        btn_add.setFixedWidth(90)
         btn_add.clicked.connect(self.show_login_win)
         btn_layout.addWidget(btn_add)
 
         btn_connect = UPushButton(Lng.connect[Cfg.lng_index])
-        btn_connect.setFixedWidth(90)
         btn_connect.clicked.connect(self.connect_cmd)
         btn_layout.addWidget(btn_connect)
 
