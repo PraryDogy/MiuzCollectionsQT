@@ -14,7 +14,7 @@ from cfg import Cfg
 from system.lang import Lng
 from system.main_folder import Mf
 
-from ._base_widgets import SmallBtn, UHBoxLayout, UMainWindow
+from ._base_widgets import RowArrowWidget, SmallBtn, UHBoxLayout, UMainWindow
 
 
 class UploadWin(UMainWindow):
@@ -69,7 +69,7 @@ class UploadWin(UMainWindow):
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 0)
-        right_layout.setSpacing(5)
+        right_layout.setSpacing(10)
 
         group_one = QGroupBox()
         group_one_layout = QVBoxLayout(group_one)
@@ -86,6 +86,7 @@ class UploadWin(UMainWindow):
         for file_path in self.target_files:
             file_name = os.path.basename(file_path)
             item = QListWidgetItem(file_name)
+            item.setIcon(QIcon("./images/img.svg"))
             item.setToolTip(file_path)
             self.list_widget.addItem(item)
             
@@ -95,14 +96,28 @@ class UploadWin(UMainWindow):
                 total_size += os.path.getsize(full_path)
 
         group_one_layout.addWidget(self.list_widget)
+
+
+        group_two = QGroupBox()
+        group_two_layout = QVBoxLayout(group_two)
+        group_two_layout.setContentsMargins(2, 0, 0, 0)
+        group_two_layout.setSpacing(0)
+        right_layout.addWidget(group_two)
         
+        total_files = RowArrowWidget(f"Всего файлов: {len(self.target_files)} шт.")
+        total_files.hide_arrow()
+        group_two_layout.addWidget(total_files)
+
         size_mb = total_size / (1024 * 1024)
-        right_layout.addWidget(QLabel(f"Всего файлов: {len(self.target_files)} шт."))
-        right_layout.addWidget(QLabel(f"Общий размер: {size_mb:.2f} MB"))
-        
-        self.lbl_target_dir = QLabel()
-        self.update_target_dir_label(self.target_dir)
-        right_layout.addWidget(self.lbl_target_dir)
+        total_size = RowArrowWidget(f"Общий размер: {size_mb:.2f} MB")
+        total_size.hide_arrow()
+        group_two_layout.addWidget(total_size)
+
+        self.lbl_target_dir = RowArrowWidget("")
+        self.lbl_target_dir.hide_arrow()
+        self.lbl_target_dir.hide_sep()
+        self.update_target_dir_label()
+        group_two_layout.addWidget(self.lbl_target_dir)
         
         splitter.addWidget(right_widget)
 
@@ -139,16 +154,14 @@ class UploadWin(UMainWindow):
 
         QTimer.singleShot(100, cmd)
 
-    def update_target_dir_label(self, path: str):
-        folder_name = os.path.basename(path) or path
-        self.lbl_target_dir.setText(f"Целевая папка: {folder_name}")
-        self.lbl_target_dir.setToolTip(path)
+    def update_target_dir_label(self):
+        folder_name = os.path.basename(self.target_dir) 
+        self.lbl_target_dir.text_widget.setText(f"Целевая папка: {folder_name}")
 
     def on_folder_selected(self, index):
         if self.file_model.isDir(index):
-            selected_path = self.file_model.filePath(index)
-            self.target_dir = selected_path
-            self.update_target_dir_label(selected_path)
+            self.target_dir = self.file_model.filePath(index)
+            self.update_target_dir_label()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
