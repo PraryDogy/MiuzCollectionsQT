@@ -2,9 +2,9 @@ import os
 
 from PyQt6.QtCore import QDir, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFileSystemModel, QIcon
-from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QListWidget,
-                             QListWidgetItem, QSpacerItem, QSplitter,
-                             QTreeView, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QListWidget,
+                             QListWidgetItem, QSplitter, QTreeView,
+                             QVBoxLayout, QWidget)
 
 from cfg import Cfg, Static
 from system.lang import Lng
