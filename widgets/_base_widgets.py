@@ -244,6 +244,7 @@ class UPushButton(QPushButton):
             font-size: 11pt;
             """
         )
+        self.setFixedWidth(80)
 
 
 class HSep(QFrame):

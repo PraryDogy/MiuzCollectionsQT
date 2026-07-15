@@ -10,12 +10,21 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskWorker
 
-from ._base_widgets import UPushButton, UMainWindow, WinProgressbar
+from ._base_widgets import (UMainWidget, UMainWindow, UPushButton,
+                            WinProgressbar)
 
 
-class ReplaceFilesWin(UMainWindow):
-    btn_w = 100
-    icon_size = 50
+class ReplaceButton(UPushButton):
+    def __init__(self, text):
+        super().__init__(text)
+        self.setStyleSheet("font-size: 9pt;")
+        self.setFixedWidth(75)
+
+
+
+class ReplaceFilesWin(UMainWidget):
+    icon_size = 40
+    ww = 330
     icon_path = os.path.join(Static.internal_images, "warning.svg")
 
     replace_one_press = pyqtSignal()
@@ -27,8 +36,8 @@ class ReplaceFilesWin(UMainWindow):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.replace[Cfg.lng_index])
-        self.setFixedSize(350, 90)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.setFixedWidth(self.ww)
+        self.central_layout.setContentsMargins(5, 5, 10, 5)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -54,18 +63,15 @@ class ReplaceFilesWin(UMainWindow):
         btn_lay.setSpacing(10)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = UPushButton(Lng.replace_all[Cfg.lng_index])
-        replace_all_btn.setFixedWidth(self.btn_w)
+        replace_all_btn = ReplaceButton(Lng.replace_all[Cfg.lng_index])
         replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
         btn_lay.addWidget(replace_all_btn)
 
-        replace_one_btn = UPushButton(Lng.replace_one[Cfg.lng_index])
-        replace_one_btn.setFixedWidth(self.btn_w)
+        replace_one_btn = ReplaceButton(Lng.replace_one[Cfg.lng_index])
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = UPushButton(Lng.stop[Cfg.lng_index])
-        stop_btn.setFixedWidth(self.btn_w)
+        stop_btn = ReplaceButton(Lng.stop[Cfg.lng_index])
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
         
@@ -84,8 +90,8 @@ class ReplaceFilesWin(UMainWindow):
         a0.ignore()
     
 
-class ErrorWin(UMainWindow):
-    icon_size = 50
+class ErrorWin(UMainWidget):
+    icon_size = 40
     icon_path = os.path.join(Static.internal_images, "warning.svg")
 
     def __init__(self):
@@ -93,7 +99,7 @@ class ErrorWin(UMainWindow):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.error[Cfg.lng_index])
-        self.setFixedSize(350, 90)
+        self.central_layout.setContentsMargins(5, 5, 10, 10)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -113,7 +119,7 @@ class ErrorWin(UMainWindow):
 
         ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         ok_btn.clicked.connect(self.deleteLater)
-        ok_btn.setFixedWidth(90)
+        ok_btn.setFixedWidth(80)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.adjustSize()
@@ -136,12 +142,12 @@ class WinCopyFiles(WinProgressbar):
     def __init__(self, target_dir: str, files_to_copy: list[str]):
         super().__init__(Lng.copying[Cfg.lng_index])
 
-        # отладка
-        # self.rel = ReplaceFilesWin()
-        # self.er = ErrorWin()
-        # self.rel.show()
-        # self.er.show()
-        # return
+        # # отладка
+        self.rel = ReplaceFilesWin()
+        self.er = ErrorWin()
+        self.rel.show()
+        self.er.show()
+        return
 
         self.cancel.connect(self.stop_task)
         self.cancel.connect(self.deleteLater)
