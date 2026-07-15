@@ -479,7 +479,7 @@ class WinMain(UMainWindow):
         self.upload_win = UploadWin(
             mf=Mf.current_mf,
             current_dir=Dynamic.current_dir,
-            dropped_files=dropped_files
+            files_to_copy=dropped_files
         )
         self.upload_win.ok_clicked.connect(
             lambda dest: fin(dest)

@@ -120,6 +120,7 @@ class Lng:
     )
     settings = ("Настройки", "Settings")
     total = ("Всего", "Total")
+    total_files = ("Всего файлов", "Total files")
     type_ = ("Тип", "Type")
     open = ("Открыть", "Open")
     recents = ("Недавние", "Recents")
@@ -329,10 +330,6 @@ class Lng:
     login = ("логин", "login")
     password = ("пароль", "password")
     upload_in = ("Загрузить в ...", "Upload in ...")
-    upload_descr = (
-        "Вы загрузите изображения в коллекции.\nНажмите Oк.",
-        "You will upload images to collections.\nClick Ok."
-    )
     swipe_text = ("\u2039 Проведите мышкой \u203A", "\u2039 Drag with mouse \u203A")
     rotate = ("Повернуть", "Rotate")
     clockwise = ("Повернуть по ч.с. (⌘ + →)", "Rotate cw (⌘ + →)")
@@ -488,4 +485,12 @@ class Lng:
     close_search = (
         "Закрыть поиск",
         "Close search"
+    )
+    upload_list = (
+        "Список загружаемых файлов",
+        "Upload list"
+    )
+    dest_folder = (
+        "Целевая папка",
+        "Destination folder"
     )

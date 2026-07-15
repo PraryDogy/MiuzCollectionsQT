@@ -1,72 +1,53 @@
 import os
-import sys
 
-from PyQt6.QtCore import QDir, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QDir, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFileSystemModel, QIcon
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QFrame,
-                             QGroupBox, QHBoxLayout, QLabel, QListWidget,
-                             QListWidgetItem, QMainWindow, QPushButton,
-                             QSpacerItem, QSplitter, QTreeView, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QListWidget,
+                             QListWidgetItem, QSpacerItem, QSplitter,
+                             QTreeView, QVBoxLayout, QWidget)
 
-from cfg import Cfg
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
+from system.shared_utils import SharedUtils
 
-from ._base_widgets import RowArrowWidget, SmallBtn, UHBoxLayout, UMainWindow
+from ._base_widgets import RowArrowWidget, SmallBtn, UMainWindow
 
 
 class UploadWin(UMainWindow):
     ok_clicked = pyqtSignal(str)
+    img_icon_path = os.path.join(Static.internal_images, "img.svg")
 
-    def __init__(self, mf: Mf, current_dir: str, dropped_files: list[str]):
+    def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
         super().__init__()
-        self.setWindowTitle("Подтверждение выгрузки")
+        self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
         self.resize(700, 500)
 
-        # Приводим все пути к абсолютному виду
         self.root_dir = mf.mf_current_path
         self.dest = os.path.join(
             mf.mf_current_path,
             current_dir.strip(os.sep)
         ).rstrip(os.sep)
-        self.target_files = dropped_files
+        self.files_to_copy = files_to_copy
 
-        # Главный сплиттер (Разделяет дерево и правое превью)
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setHandleWidth(15)
         self.central_layout.addWidget(splitter)
 
-        # === ЛЕВАЯ ПАНЕЛЬ: Куда загружаем ===
         self.tree_view = QTreeView()
-        self.tree_view.header().hide()  # Скрываем имя колонки
-        
+        self.tree_view.header().hide()
         self.file_model = QFileSystemModel()
         self.file_model.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
-
-        
-        # Модель инициализируем от корня ограничителя, чтобы она читала только его
         self.file_model.setRootPath(self.root_dir)
         self.tree_view.setModel(self.file_model)
-        
-        # Скрываем лишние колонки
+        self.tree_view.setRootIndex(self.file_model.index(self.root_dir))
+        self.file_model.directoryLoaded.connect(self._expand_to_target)
+        self.tree_view.clicked.connect(self.on_folder_selected)
         for i in range(1, 4):
             self.tree_view.setColumnHidden(i, True)
-            
-        # ОГРАНИЧЕНИЕ: Пользователь заперт внутри root_dir (например, Downloads)
-        root_index = self.file_model.index(self.root_dir)
-        self.tree_view.setRootIndex(root_index)
-        
-        # ПОШАГОВОЕ РАСКРЫТИЕ: Подключаемся к загрузке директорий
-        self.file_model.directoryLoaded.connect(self._expand_to_target)
-        
-        # Подключаем клики для ручного выбора подпапок пользователем
-        self.tree_view.clicked.connect(self.on_folder_selected)
-        
+
         splitter.addWidget(self.tree_view)
 
-        # === ПРАВАЯ ПАНЕЛЬ: Что загружаем ===
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 0)
@@ -74,37 +55,35 @@ class UploadWin(UMainWindow):
 
         group_one = QGroupBox()
         group_one_layout = QVBoxLayout(group_one)
-        group_one_layout.setContentsMargins(2, 5, 2, 0)
+        group_one_layout.setContentsMargins(5, 0, 5, 0)
         group_one_layout.setSpacing(0)
         right_layout.addWidget(group_one)
 
-        group_one_layout.addWidget(QLabel("Список выгружаемых файлов"))
-
-        group_one_layout.addSpacerItem(QSpacerItem(0, 10))
+        title = RowArrowWidget(Lng.upload_list[Cfg.lng_index])
+        title.hide_arrow()
+        title.hide_sep()
+        group_one_layout.addWidget(title)
 
         self.list_widget = QListWidget()
         total_size = 0
-        
-        for file_path in self.target_files:
+        for file_path in self.files_to_copy:
             file_name = os.path.basename(file_path)
             item = QListWidgetItem(file_name)
-            item.setIcon(QIcon("./images/img.svg"))
+            item.setIcon(QIcon(self.img_icon_path))
             item.setToolTip(file_path)
             self.list_widget.addItem(item)
-            
-            # Считаем размер файлов относительно папки назначения
-            full_path = file_path if os.path.isabs(file_path) else os.path.join(self.dest, file_path)
-            if os.path.exists(full_path):
-                total_size += os.path.getsize(full_path)
+            total_size += os.path.getsize(file_path)    
 
         group_one_layout.addWidget(self.list_widget)
         
-        total_files = RowArrowWidget(f"Всего файлов: {len(self.target_files)} шт.")
+        total_files = RowArrowWidget(
+            f"{Lng.total_files[Cfg.lng_index]}: {len(self.files_to_copy)}"
+        )
         total_files.hide_arrow()
         group_one_layout.addWidget(total_files)
 
-        size_mb = total_size / (1024 * 1024)
-        total_size = RowArrowWidget(f"Общий размер: {size_mb:.2f} MB")
+        size_mb = SharedUtils.get_f_size(total_size)
+        total_size = RowArrowWidget(f"{Lng.file_size[Cfg.lng_index]}: {size_mb}")
         total_size.hide_arrow()
         group_one_layout.addWidget(total_size)
 
@@ -152,7 +131,9 @@ class UploadWin(UMainWindow):
 
     def update_target_dir_label(self):
         folder_name = os.path.basename(self.dest) 
-        self.lbl_target_dir.text_widget.setText(f"Целевая папка: {folder_name}")
+        self.lbl_target_dir.text_widget.setText(
+            f"{Lng.dest_folder[Cfg.lng_index]}: {folder_name}"
+        )
 
     def ok_clicked_cmd(self):
         self.ok_clicked.emit(self.dest)
