@@ -1,9 +1,11 @@
+import os
+
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QLabel
 
-from cfg import Cfg
+from cfg import Cfg, Static
 from system.lang import Lng
 
 from ._base_widgets import SmallBtn, UMainWidget
@@ -13,7 +15,7 @@ class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
     ww = 360
-    svg_icon = "./images/warning.svg"
+    icon_path = os.path.join(Static.internal_images, "warning.svg")
 
     def __init__(self, text: str):
         super().__init__()
@@ -29,7 +31,7 @@ class ConfirmWindow(UMainWidget):
         self.central_layout.addLayout(text_layout)
 
         svg_wid = QSvgWidget()
-        svg_wid.load(self.svg_icon)
+        svg_wid.load(self.icon_path)
         svg_wid.setFixedSize(50, 50)
         text_layout.addWidget(svg_wid)
 

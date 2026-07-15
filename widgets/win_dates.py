@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 from typing import Literal
 
@@ -6,7 +7,7 @@ from PyQt6.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
 from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QHBoxLayout, QLabel,
                              QSpinBox, QToolButton, QVBoxLayout, QWidget)
 
-from cfg import Cfg, Dynamic
+from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 
 from ._base_widgets import HSep, SmallBtn, UMainWindow
@@ -120,9 +121,10 @@ class MyCalendar(QGroupBox):
         for wid in widgets:
             name = wid.objectName()
             if name == "qt_calendar_prevmonth":
-                wid.setIcon(QIcon("./images/prev.svg"))
+                wid.setIcon(QIcon(os.path.join(Static.internal_images, "prev.svg")))
             elif name == "qt_calendar_nextmonth":
-                wid.setIcon(QIcon("./images/next.svg"))
+                wid.setIcon(QIcon(os.path.join(Static.internal_images, "next.svg")))
+
 
         for child in self.calendar.findChildren(QSpinBox):
             child.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)

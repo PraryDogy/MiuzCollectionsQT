@@ -6,7 +6,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QPushButton,
                              QWidget)
 
-from cfg import Cfg
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
@@ -23,8 +23,8 @@ def restart_app():
 
 class SuperWarnWindow(UMainWindow):
     ok_clicked = pyqtSignal()
-    svg = "./images/super_warning.svg"
-    svg_size = 60
+    icon_path = os.path.join(Static.internal_images, "super_warning.svg")
+    icon_size = 60
 
     def __init__(self):
         super().__init__()
@@ -38,8 +38,8 @@ class SuperWarnWindow(UMainWindow):
         self.central_layout.addLayout(above_layout)
 
         svg_widget = QSvgWidget()
-        svg_widget.load(self.svg)
-        svg_widget.setFixedSize(self.svg_size, self.svg_size)
+        svg_widget.load(self.icon_path)
+        svg_widget.setFixedSize(self.icon_size, self.icon_size)
         above_layout.addWidget(svg_widget)
 
         question = QLabel(Lng.confirm_mf_path[Cfg.lng_index])

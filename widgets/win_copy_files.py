@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 
-from cfg import Cfg
+from cfg import Cfg, Static
 from system.items import CopyTaskItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -16,7 +16,7 @@ from ._base_widgets import SmallBtn, UMainWindow, WinProgressbar
 class ReplaceFilesWin(UMainWindow):
     btn_w = 100
     icon_size = 50
-    icon_path = "./images/warning.svg"
+    icon_path = os.path.join(Static.internal_images, "warning.svg")
 
     replace_one_press = pyqtSignal()
     replace_all_press = pyqtSignal()
@@ -86,7 +86,7 @@ class ReplaceFilesWin(UMainWindow):
 
 class ErrorWin(UMainWindow):
     icon_size = 50
-    icon_path = "./images/warning.svg"
+    icon_path = os.path.join(Static.internal_images, "warning.svg")
 
     def __init__(self):
         super().__init__()

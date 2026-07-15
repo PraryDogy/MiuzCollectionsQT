@@ -287,7 +287,7 @@ class App(QApplication):
             self.installEventFilter(self)
             self.aboutToQuit.connect(lambda: self.win_main.on_exit())
 
-            icon = QIcon("./images/icon.png")
+            icon = QIcon(os.path.join(Static.internal_images, "icon.png"))
             # self.setWindowIcon(icon)
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:

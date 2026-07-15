@@ -1,3 +1,4 @@
+import os
 import subprocess
 from dataclasses import dataclass
 
@@ -6,7 +7,7 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QSpacerItem, QWidget
 
-from cfg import Cfg
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.servers import Servers
 
@@ -30,8 +31,8 @@ class ServerListItem(VListWidgetItem):
 
 
 class EyeSvg(QSvgWidget):
-    eye_on = "./images/eye_on.svg"
-    eye_off = "./images/eye_off.svg"
+    eye_on = os.path.join(Static.internal_images, "eye_on.svg")
+    eye_off = os.path.join(Static.internal_images, "eye_off.svg")
 
     def __init__(self):
         super().__init__()

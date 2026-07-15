@@ -1,3 +1,5 @@
+import os
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QLabel, QMenu, QMenuBar,
@@ -45,7 +47,7 @@ class SelectableLabel(QLabel):
 
 class AboutWin(UMainWindow):
     ww = 280
-    icon_path = "./images/icon.png"
+    icon_path = os.path.join(Static.internal_images, "icon.png")
     icon_size = 150
     opacity = 0.85
 

@@ -1,3 +1,5 @@
+import os
+
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QHBoxLayout, QLabel,
@@ -74,8 +76,8 @@ class BarBottom(QWidget):
 
     resize_thumbnails = pyqtSignal()
     hh = 25
-    icon = "./images/next.svg"
-    svg_size = 15
+    icon_path = os.path.join(Static.internal_images, "next.svg")
+    icon_size = 15
 
     def __init__(self):
         super().__init__()
@@ -91,15 +93,15 @@ class BarBottom(QWidget):
         # self.h_layout.addStretch()
 
         self.svg_wid = QSvgWidget()
-        self.svg_wid.load(self.icon)
-        self.svg_wid.setFixedSize(self.svg_size, self.svg_size)
+        self.svg_wid.load(self.icon_path)
+        self.svg_wid.setFixedSize(self.icon_size, self.icon_size)
         self.h_layout.addWidget(self.svg_wid)
 
         # --- Прогресс-бар ---
         self.progress_bar = ProgressWidget()
-        self.progress_bar.setFixedHeight(self.svg_size)
+        self.progress_bar.setFixedHeight(self.icon_size)
         self.progress_bar.setText("")
-        self.progress_bar.setFixedHeight(self.svg_size)
+        self.progress_bar.setFixedHeight(self.icon_size)
         self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         # --- Разделитель перед слайдером ---

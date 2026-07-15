@@ -11,7 +11,9 @@ import numpy as np
 import pillow_heif
 import rawpy
 import tifffile
-from PIL import Image, ImageOps, ImageCms
+from PIL import Image
+
+from cfg import Static
 
 
 class SharedUtils:
@@ -203,7 +205,7 @@ class ImgUtils:
 
     @classmethod
     def _get_broken_image(cls):
-        path = Path("./images/broken_image.jpg")
+        path = Path(os.path.join(Static.internal_images, "broken_image.jpg"))
         img = Image.open(path)
         array_img = np.array(img)
         img.close()

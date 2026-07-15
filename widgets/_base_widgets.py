@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
                              QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
-from cfg import Cfg, Themes
+from cfg import Cfg, Static
 from system.lang import Lng
 from system.utils import Utils
 
@@ -299,8 +299,8 @@ class SelectableLabel(QLabel):
 class RowArrowWidget(QWidget):
     hh = 35
     clicked = pyqtSignal()
-    arrow_svg = "./images/next.svg"
-    warning_svg = "./images/warning.svg"
+    arrow_svg = os.path.join(Static.internal_images, "next.svg")
+    warning_svg = os.path.join(Static.internal_images, "warning.svg")
     svg_size = 16
 
     def __init__(self, text: str):
@@ -409,6 +409,8 @@ class USlider(QSlider):
 
 class WinProgressbar(UMainWindow):
     cancel = pyqtSignal()
+    files_icon_path = os.path.join(Static.internal_images, "files.svg")
+    images_icon_path = os.path.join(Static.internal_images, "clear.svg")
 
     def __init__(self, title: str):
         super().__init__()
@@ -423,7 +425,7 @@ class WinProgressbar(UMainWindow):
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
-        left_side_icon = QSvgWidget("./images/files.svg")
+        left_side_icon = QSvgWidget(self.files_icon_path)
         left_side_icon.setFixedSize(40, 40)
         h_lay.addWidget(left_side_icon)
 
@@ -447,7 +449,7 @@ class WinProgressbar(UMainWindow):
         self.progressbar.setFixedHeight(6)
         progressbar_lay.addWidget(self.progressbar)
 
-        self.cancel_btn = QSvgWidget("./images/clear.svg")
+        self.cancel_btn = QSvgWidget(self.images_icon_path)
         self.cancel_btn.setFixedSize(15, 15)
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         progressbar_lay.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)

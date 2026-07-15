@@ -7,7 +7,7 @@ from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (QHBoxLayout, QSplitter, QTabWidget, QTreeWidget,
                              QTreeWidgetItem, QWidget)
 
-from cfg import Cfg, Dynamic
+from cfg import Cfg, Static
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -30,8 +30,8 @@ class TreeWid(QTreeWidget):
     on_tree_clicked = pyqtSignal(str)
     on_hide_digits_clicked = pyqtSignal()
 
-    svg_folder = "./images/folder.svg"
-    svg_size = 16
+    icon_path = os.path.join(Static.internal_images, "folder.svg")
+    icon_size = 16
 
     def __init__(self):
         super().__init__()
@@ -40,7 +40,7 @@ class TreeWid(QTreeWidget):
 
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
-        self.setIconSize(QSize(self.svg_size, self.svg_size))
+        self.setIconSize(QSize(self.icon_size, self.icon_size))
         self.setIndentation(15)
 
         self.itemClicked.connect(self.on_item_click)
@@ -72,7 +72,7 @@ class TreeWid(QTreeWidget):
         root_item = UTreeWidgetItem(os.sep, [Mf.current_mf.mf_alias])
         root_item.setSizeHint(0, QSize(0, ITEM_HEIGHT))
         root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
-        root_item.setIcon(0, QIcon(self.svg_folder))
+        root_item.setIcon(0, QIcon(self.icon_path))
         self.addTopLevelItem(root_item)
 
         task = DbDirsLoader(Mf.current_mf)
@@ -98,7 +98,7 @@ class TreeWid(QTreeWidget):
                 continue
 
             child = UTreeWidgetItem(path, [name])
-            child.setIcon(0, QIcon(self.svg_folder))
+            child.setIcon(0, QIcon(self.icon_path))
             child.setSizeHint(0, QSize(0, ITEM_HEIGHT))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
             child.setToolTip(1, os.path.basename(path))
@@ -233,8 +233,8 @@ class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
-    svg_folder = "./images/img_folder.svg"
-    svg_size = 16
+    icon_path = os.path.join(Static.internal_images, "img_folder.svg")
+    icon_size = 16
 
     def __init__(self, parent: QWidget):
         super().__init__(parent=parent)
@@ -242,14 +242,14 @@ class MfList(VListWidget):
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
-        self.setIconSize(QSize(self.svg_size, self.svg_size))
+        self.setIconSize(QSize(self.icon_size, self.icon_size))
         self.init_ui()
         self.setCurrentRow(0)
 
     def init_ui(self):
         for i in Mf.items:
             item = MfListItem(parent=self, text=i.mf_alias)
-            item.setIcon(QIcon(self.svg_folder))
+            item.setIcon(QIcon(self.icon_path))
             item.mf = i
             self.addItem(item)
 

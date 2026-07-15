@@ -1,9 +1,11 @@
+import os
+
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
-from cfg import Cfg, Dynamic
+from cfg import Cfg, Dynamic, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
@@ -12,13 +14,13 @@ from ._base_widgets import ULineEdit, UMenu
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
-    svg_clear = "./images/clear.svg"
-    svg_size = 14
+    icon_path = os.path.join(Static.internal_images, "clear.svg")
+    icon_size = 14
 
     def __init__(self, parent: ULineEdit):
         super().__init__(parent=parent)
-        self.setFixedSize(self.svg_size, self.svg_size)
-        self.load(self.svg_clear)
+        self.setFixedSize(self.icon_size, self.icon_size)
+        self.load(self.icon_path)
 
     def disable(self):
         self.hide()
@@ -172,7 +174,7 @@ class DatesBtn(BarTopBtn):
         - Использует SVG-иконку календаря.
     """
 
-    ICON_PATH = "./images/calendar.svg"
+    ICON_PATH = os.path.join(Static.internal_images, "calendar.svg")
 
     def __init__(self):
         super().__init__()
@@ -197,7 +199,7 @@ class FiltersBtn(BarTopBtn):
         - Имеет пункт сброса всех фильтров.
     """
 
-    ICON_PATH = "./images/filters.svg"
+    ICON_PATH = os.path.join(Static.internal_images, "filters.svg")
     menu_ww = 200
     # edit_filters = pyqtSignal(SettingsItem)
 
@@ -208,7 +210,7 @@ class FiltersBtn(BarTopBtn):
         
 
 class SortBtn(BarTopBtn):
-    ICON_PATH = "./images/sort.svg"
+    ICON_PATH = os.path.join(Static.internal_images, "sort.svg")
 
     def __init__(self):
         super().__init__()
@@ -262,7 +264,7 @@ class SettingsBtn(BarTopBtn):
         - Отображает подпись "Настройки".
     """
 
-    ICON_PATH = "./images/settings.svg"
+    ICON_PATH = os.path.join(Static.internal_images, "settings.svg")
 
     def __init__(self):
         super().__init__()
@@ -272,8 +274,8 @@ class SettingsBtn(BarTopBtn):
 
 class ExitImgSearchBtn(UFrame):
     clicked_ = pyqtSignal()
-    ICON_PATH = "./images/clear.svg"
-    svg_size = 15
+    ICON_PATH = os.path.join(Static.internal_images, "clear.svg")
+    icon_size = 15
     hh = 30
     def __init__(self):
         super().__init__()

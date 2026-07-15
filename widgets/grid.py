@@ -242,13 +242,13 @@ class Thumb(QFrame):
 
 class UpBtn(QSvgWidget):
     scroll_to_top = pyqtSignal()
-    svg_path = "./images/up.svg"
+    icon_path = os.path.join(Static.internal_images, "up.svg")
     icon_size = 44
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
-        self.load(self.svg_path)
+        self.load(self.icon_path)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -276,7 +276,7 @@ class Grid(VScrollArea):
     finished_ = pyqtSignal()
     
     resize_ms = 10
-    png_copy_files = "./images/copy_files.png"
+    copy_files_path = os.path.join(Static.internal_images, "copy_files.png")
 
     def __init__(self):
         super().__init__()
@@ -762,7 +762,7 @@ class Grid(VScrollArea):
             drag.setMimeData(mime_data)
 
             # иконка для drag
-            drag_icon = QPixmap(self.png_copy_files)
+            drag_icon = QPixmap(self.copy_files_path)
             drag.setPixmap(drag_icon)
 
             # назначаем urls
