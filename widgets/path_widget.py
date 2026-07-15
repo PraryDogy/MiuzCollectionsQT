@@ -132,6 +132,7 @@ class PathWidget(QGroupBox):
     def start_checker(self):
 
         def poll_task():
+            self.task_timer.stop()
             if not self.task.process_queue.empty():
                 self.mf_temp_path = self.task.process_queue.get().rstrip(os.sep)
                 if self.check_mf_temp_path():
@@ -143,19 +144,25 @@ class PathWidget(QGroupBox):
                     QTimer.singleShot(1, self.no_path_widget)
                     self.open_win_warn()
             else:
-                QTimer.singleShot(500, poll_task)
+                self.task_timer.start(500)
 
         self.task = ProcessWorker(
             target=SmbChecker.start,
             args=(self.mf, )
         )
         self.task.start()
-        QTimer.singleShot(500, poll_task)
+        self.task_timer = QTimer(self)
+        self.task_timer.setSingleShot(True)
+        self.task_timer.timeout.connect(poll_task)
+        self.task_timer.start(500)
 
     def stop_task(self):
+        print("stop task start")
         if hasattr(self, "task"):
             try:
+                self.task_timer.stop()
                 self.task.terminate_join()
+                print("stop task end")
             except Exception as e:
                 print("path widget stop task error", e)
 

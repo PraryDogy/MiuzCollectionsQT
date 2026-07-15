@@ -135,6 +135,14 @@ class WinCopyFiles(WinProgressbar):
 
     def __init__(self, target_dir: str, files_to_copy: list[str]):
         super().__init__(Lng.copying[Cfg.lng_index])
+
+        # отладка
+        # self.rel = ReplaceFilesWin()
+        # self.er = ErrorWin()
+        # self.rel.show()
+        # self.er.show()
+        # return
+
         self.cancel.connect(self.stop_task)
         self.cancel.connect(self.deleteLater)
 

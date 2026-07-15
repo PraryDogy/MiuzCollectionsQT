@@ -429,8 +429,8 @@ class WinProgressbar(UMainWindow):
         left_side_icon.setFixedSize(40, 40)
         h_lay.addWidget(left_side_icon)
 
-        right_side_wid = QWidget(right_side_wid)
-        right_side_lay = QVBoxLayout()
+        right_side_wid = QWidget()
+        right_side_lay = QVBoxLayout(right_side_wid)
         right_side_lay.setContentsMargins(0, 0, 0, 0)
         right_side_lay.setSpacing(0)
         h_lay.addWidget(right_side_wid)
