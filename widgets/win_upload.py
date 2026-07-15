@@ -10,6 +10,16 @@ from cfg import Cfg
 from system.lang import Lng
 
 from ._base_widgets import SmallBtn, UHBoxLayout, UMainWindow
+import os
+import sys
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QSplitter, QTreeView, 
+    QListWidget, QListWidgetItem, QVBoxLayout, QWidget, 
+    QLabel, QHBoxLayout, QPushButton, QFrame
+)
+from PyQt6.QtCore import QDir, Qt
+from PyQt6.QtGui import QFileSystemModel
+
 
 
 class TreeWid(QTreeWidget):
@@ -83,62 +93,158 @@ class TreeWid(QTreeWidget):
         self.scrollToItem(self.items[path], QAbstractItemView.ScrollHint.PositionAtCenter)
 
 
+# class UploadWin(UMainWindow):
+#     ok_clicked = pyqtSignal()
+#     mrg = 2
+#     group_spacing = 7
+#     btn_spacing = 10
+#     icon_size = 35
+#     btn_w = 90
+#     icon_path = "./images/warning.svg"
+
+#     def __init__(self, target_dir: str, target_files: list[str]):
+#         super().__init__()
+#         self.set_always_on_top()
+#         self.set_close_only()
+#         self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
+#         self.setFixedSize(400, 400)
+#         self.central_layout.setSpacing(10)
+
+#         group = QGroupBox()
+#         self.central_layout.addWidget(group)
+
+#         group_lay = UHBoxLayout()
+#         group_lay.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
+#         group_lay.setSpacing(self.group_spacing)
+#         group.setLayout(group_lay)
+
+#         warn = QSvgWidget()
+#         warn.load(self.icon_path)
+#         warn.setFixedSize(self.icon_size, self.icon_size)
+#         group_lay.addWidget(warn)
+
+#         descr = QLabel(Lng.upload_descr[Cfg.lng_index])
+#         group_lay.addWidget(descr)
+
+#         tree = TreeWid(target_dir, target_files)
+#         self.central_layout.addWidget(tree)
+
+#         btn_wid = QWidget()
+#         self.central_layout.addWidget(btn_wid)
+#         btn_lay = UHBoxLayout()
+#         btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#         btn_lay.setSpacing(self.btn_spacing)
+#         btn_wid.setLayout(btn_lay)
+
+#         ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
+#         ok_btn.clicked.connect(self.ok_clicked)
+#         ok_btn.setFixedWidth(self.btn_w)
+#         btn_lay.addWidget(ok_btn)
+
+#         cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
+#         cancel_btn.clicked.connect(self.deleteLater)
+#         cancel_btn.setFixedWidth(self.btn_w)
+#         btn_lay.addWidget(cancel_btn)
+
+#     def keyPressEvent(self, a0):
+#         if a0.key() == Qt.Key.Key_Escape:
+#             self.deleteLater()
+#         elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+#             self.ok_clicked.emit()
+#         return super().keyPressEvent(a0)
+    
+
+
+
+
+
 class UploadWin(UMainWindow):
     ok_clicked = pyqtSignal()
-    mrg = 2
-    group_spacing = 7
-    btn_spacing = 10
-    icon_size = 35
-    btn_w = 90
-    icon_path = "./images/warning.svg"
 
     def __init__(self, target_dir: str, target_files: list[str]):
         super().__init__()
-        self.set_always_on_top()
-        self.set_close_only()
-        self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
-        self.setFixedSize(400, 400)
-        self.central_layout.setSpacing(10)
+        self.setWindowTitle("Подтверждение выгрузки")
+        self.resize(900, 500)
 
-        group = QGroupBox()
-        self.central_layout.addWidget(group)
+        self.target_dir = target_dir
+        self.target_files = target_files
 
-        group_lay = UHBoxLayout()
-        group_lay.setContentsMargins(self.mrg, self.mrg, self.mrg, self.mrg)
-        group_lay.setSpacing(self.group_spacing)
-        group.setLayout(group_lay)
+        # Главный сплиттер (Разделяет дерево и правое превью)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        self.central_layout.addWidget(splitter)
 
-        warn = QSvgWidget()
-        warn.load(self.icon_path)
-        warn.setFixedSize(self.icon_size, self.icon_size)
-        group_lay.addWidget(warn)
+        # === ЛЕВАЯ ПАНЕЛЬ: Куда загружаем ===
+        self.tree_view = QTreeView()
+        self.file_model = QFileSystemModel()
+        self.file_model.setRootPath(QDir.rootPath())
+        self.tree_view.setModel(self.file_model)
+        
+        # Скрываем колонки размера/типа, оставляя только чистую структуру папок
+        for i in range(1, 4):
+            self.tree_view.setColumnHidden(i, True)
+            
+        self.tree_view.setRootIndex(self.file_model.index(self.target_dir))
+        splitter.addWidget(self.tree_view)
 
-        descr = QLabel(Lng.upload_descr[Cfg.lng_index])
-        group_lay.addWidget(descr)
+        # === ПРАВАЯ ПАНЕЛЬ: Что загружаем ===
+        right_widget = QWidget()
+        right_layout = QVBoxLayout(right_widget)
+        right_layout.setContentsMargins(10, 0, 10, 0)
 
-        tree = TreeWid(target_dir, target_files)
-        self.central_layout.addWidget(tree)
+        right_layout.addWidget(QLabel("Список выгружаемых файлов"))
 
-        btn_wid = QWidget()
-        self.central_layout.addWidget(btn_wid)
-        btn_lay = UHBoxLayout()
-        btn_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        btn_lay.setSpacing(self.btn_spacing)
-        btn_wid.setLayout(btn_lay)
+        self.list_widget = QListWidget()
+        total_size = 0
+        
+        for file_path in self.target_files:
+            file_name = os.path.basename(file_path)
+            item = QListWidgetItem(file_name)
+            item.setToolTip(file_path)
+            self.list_widget.addItem(item)
+            
+            if os.path.exists(file_path):
+                total_size += os.path.getsize(file_path)
 
-        ok_btn = SmallBtn(Lng.ok[Cfg.lng_index])
-        ok_btn.clicked.connect(self.ok_clicked)
-        ok_btn.setFixedWidth(self.btn_w)
-        btn_lay.addWidget(ok_btn)
+        right_layout.addWidget(self.list_widget)
 
-        cancel_btn = SmallBtn(Lng.cancel[Cfg.lng_index])
-        cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(self.btn_w)
-        btn_lay.addWidget(cancel_btn)
+        # === Карточка со сводной информацией ===
+        info_frame = QFrame()
+        # info_frame.setFrameShape(QFrame.Shape.StyledPanel)
+        # info_frame.setStyleSheet("background-color: #f9f9f9; border-radius: 4px;")
+        info_layout = QVBoxLayout(info_frame)
+        
+        # Переводим байты в мегабайты для наглядности
+        size_mb = total_size / (1024 * 1024)
+        
+        info_layout.addWidget(QLabel(f"<b>Всего файлов:</b> {len(self.target_files)} шт."))
+        info_layout.addWidget(QLabel(f"<b>Общий размер:</b> {size_mb:.2f} MB"))
+        info_layout.addWidget(QLabel(f"<b>Целевая папка:</b> {os.path.basename(self.target_dir)}"))
+        
+        right_layout.addWidget(info_frame)
+        splitter.addWidget(right_widget)
+
+        # Пропорции сплиттера: 40% дерево папок, 60% список файлов
+        splitter.setSizes([360, 540])
+
+        # === НИЖНЯЯ ПАНЕЛЬ: Кнопки управления окном ===
+        btn_layout = QHBoxLayout()
+        self.btn_cancel = QPushButton("Отмена")
+        self.btn_ok = QPushButton("Загрузить")
+        
+        btn_layout.addStretch()
+        btn_layout.addWidget(self.btn_cancel)
+        btn_layout.addWidget(self.btn_ok)
+        self.central_layout.addLayout(btn_layout)
+
+        # Логика кнопок
+        self.btn_cancel.clicked.connect(self.deleteLater)
+        self.btn_ok.clicked.connect(self.ok_clicked.emit)
+        self.btn_ok.clicked.connect(self.deleteLater)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.ok_clicked.emit()
+            self.deleteLater()
         return super().keyPressEvent(a0)
