@@ -236,10 +236,9 @@ class ProcessDialog(QWidget):
         self.setWindowFlags(flags)
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
 
-        self.v_lay = QVBoxLayout()
+        self.v_lay = QVBoxLayout(self)
         self.v_lay.setContentsMargins(5, 10, 5, 10)
         self.v_lay.setSpacing(10)
-        self.setLayout(self.v_lay)
 
         descr_label = QLabel(descr)
         self.v_lay.addWidget(descr_label, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -275,7 +274,6 @@ class ResultsDialog(QWidget):
         self.main_layout.setSpacing(10)
         self.init_table()
         self.init_btns()
-        self.setLayout(self.main_layout)
 
     def center_to_parent(self, parent: QWidget):
         try:

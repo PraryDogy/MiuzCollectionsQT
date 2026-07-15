@@ -173,10 +173,9 @@ class WinDates(UMainWindow):
 
         dates_h_wid = QWidget()
         self.central_layout.addWidget(dates_h_wid)
-        dates_h_lay = QHBoxLayout()
+        dates_h_lay = QHBoxLayout(dates_h_wid)
         dates_h_lay.setContentsMargins(0, 0, 0, 0)
         dates_h_lay.setSpacing(10)
-        dates_h_wid.setLayout(dates_h_lay)
 
         self.left_calendar = MyCalendar(Lng.start_date[Cfg.lng_index])
         self.left_calendar.dateSelected.connect(

@@ -197,8 +197,7 @@ class LanguageSelect(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Language / Язык")
         
-        btn_layout = QHBoxLayout()
-        self.setLayout(btn_layout)
+        btn_layout = QHBoxLayout(self)
 
         self.btn_ru = ClickableGroupBox(
             "Русский",

@@ -37,10 +37,9 @@ class WinInfo(UMainWindow):
         wid = QWidget()
         self.central_layout.addWidget(wid)
 
-        self.grid_lay = QGridLayout()
+        self.grid_lay = QGridLayout(wid)
         self.grid_lay.setSpacing(5)
         self.grid_lay.setContentsMargins(0, 0, 0, 0)
-        wid.setLayout(self.grid_lay)
 
         self.data = {
             Lng.file_name[Cfg.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),

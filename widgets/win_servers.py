@@ -239,8 +239,7 @@ class ServersWin(UMainWindow):
 
         # Кнопки
         btn_widget = QWidget()
-        btn_layout = QHBoxLayout()
-        btn_widget.setLayout(btn_layout)
+        btn_layout = QHBoxLayout(btn_widget)
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)
         self.central_layout.addWidget(btn_widget)

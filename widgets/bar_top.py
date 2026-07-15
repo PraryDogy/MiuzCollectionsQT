@@ -123,19 +123,17 @@ class BarTopBtn(QWidget):
     def __init__(self):
         super().__init__()
         
-        self.v_lay = QVBoxLayout()
+        self.v_lay = QVBoxLayout(self)
         self.v_lay.setContentsMargins(0, 0, 0, 0)
         self.v_lay.setSpacing(1)
         self.v_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setLayout(self.v_lay)
 
         # --- Фрейм под SVG ---
         self.svg_frame = UFrame()
         self.svg_frame.setFixedSize(self.width_, self.height_)
-        self.svg_lay = QVBoxLayout()
+        self.svg_lay = QVBoxLayout(self.svg_frame)
         self.svg_lay.setContentsMargins(0, 0, 0, 0)
         self.svg_lay.setSpacing(0)
-        self.svg_frame.setLayout(self.svg_lay)
         self.v_lay.addWidget(self.svg_frame, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # --- SVG-иконка ---
@@ -320,10 +318,9 @@ class BarTop(QWidget):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(self.text_height)
-        self.h_layout = QHBoxLayout()
+        self.h_layout = QHBoxLayout(self)
         self.h_layout.setContentsMargins(0, 3, 0, 3)
         self.h_layout.setSpacing(self.text_spacing)
-        self.setLayout(self.h_layout)
 
         self.h_layout.addStretch(0)
 

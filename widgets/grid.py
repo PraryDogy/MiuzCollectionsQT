@@ -165,11 +165,10 @@ class Thumb(QFrame):
             self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
 
         # --- Layout ---
-        self.v_layout = QVBoxLayout()
+        self.v_layout = QVBoxLayout(self)
         self.v_layout.setContentsMargins(0, 0, 0, 0)
         self.v_layout.setSpacing(2)
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.setLayout(self.v_layout)
 
         # --- Виджеты ---
         self.img_wid = ImgWid()
@@ -306,11 +305,10 @@ class Grid(VScrollArea):
         # --- Вкладка прокрутки ---
         self.scroll_wid = QWidget()
         self.setWidget(self.scroll_wid)
-        self.scroll_layout = QVBoxLayout()
+        self.scroll_layout = QVBoxLayout(self.scroll_wid)
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)
         self.scroll_layout.setSpacing(0)
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-        self.scroll_wid.setLayout(self.scroll_layout)
 
         self.up_btn = UpBtn(self.viewport())
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
@@ -318,9 +316,8 @@ class Grid(VScrollArea):
 
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)
-        self.grid_lay = QGridLayout()
+        self.grid_lay = QGridLayout(self.grid_wid)
         self.grid_lay.setSpacing(1)
-        self.grid_wid.setLayout(self.grid_lay)
         self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)

@@ -27,10 +27,9 @@ class PathItem(QWidget):
         self.setFixedHeight(PathItem.item_height)
         self.item_dir = dir
 
-        item_layout = QHBoxLayout()
+        item_layout = QHBoxLayout(self)
         item_layout.setContentsMargins(0, 0, 0, 0)
         item_layout.setSpacing(5)
-        self.setLayout(item_layout)
 
         self.img_wid = QSvgWidget()
         self.img_wid.load(self.folder_svg)
@@ -72,11 +71,10 @@ class PathBar(QWidget):
         self.setFixedHeight(PathBar.bar_height)
         self.current_path: str = None
 
-        self.main_lay = QHBoxLayout()
+        self.main_lay = QHBoxLayout(self)
         self.main_lay.setContentsMargins(0, 0, 0, 0)
         self.main_lay.setSpacing(5)
         self.main_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.setLayout(self.main_lay)
 
     def update(self, dir: str):
         """

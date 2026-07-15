@@ -77,10 +77,9 @@ class SettingsGroup(QGroupBox):
         QGroupBox + self.layout_ (vertical layout)
         """
         super().__init__()
-        self.layout_ = QVBoxLayout()
+        self.layout_ = QVBoxLayout(self)
         self.layout_.setContentsMargins(6, 0, 6, 0)
         self.layout_.setSpacing(0)
-        self.setLayout(self.layout_)
 
 
 class SettingsTextEdit(SettingsGroup):
@@ -353,10 +352,9 @@ class SizesWin(UMainWindow):
 
         central = QWidget()
         self.setCentralWidget(central)
-        layout = QVBoxLayout()
+        layout = QVBoxLayout(central)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        central.setLayout(layout)
 
         info_widget = QWidget()
         info_layout = QVBoxLayout(info_widget)
@@ -586,10 +584,9 @@ class AboutWid(QGroupBox):
 
     def __init__(self):
         super().__init__()
-        h_lay = QHBoxLayout()
+        h_lay = QHBoxLayout(self)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(0)
-        self.setLayout(h_lay)
 
         icon = QLabel()
         pixmap = QPixmap(self.icon_path)
@@ -614,11 +611,10 @@ class GeneralSettings(QWidget, StateWid):
     def __init__(self, cfg_data: CfgData):
         super().__init__()
 
-        v_lay = QVBoxLayout()
+        v_lay = QVBoxLayout(self)
         v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.setSpacing(10)
         v_lay.setContentsMargins(0, 0, 0, 10)
-        self.setLayout(v_lay)
 
         reboot_settings = RebootSettings(cfg_data)
         reboot_settings.cfg_changed.connect(self.changed.emit)
@@ -760,10 +756,9 @@ class MfSettings(QWidget, StateWid):
         self.mf = mf
         self.mf_list_clone = mf_list_clone
 
-        main_lay = QVBoxLayout()
+        main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(15)
-        self.setLayout(main_lay)
 
         # Верхний ряд с названием
         name_group = SettingsGroup()
@@ -910,10 +905,9 @@ class NewFolder(QWidget, StateWid):
         )
         self.mf_list_clone = mf_list_clone
 
-        main_lay = QVBoxLayout()
+        main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(15)
-        self.setLayout(main_lay)
 
         name_wid = SettingsGroup()
         name_wid.layout_.setSpacing(5)
@@ -1092,21 +1086,19 @@ class WinSettings(UMainWindow):
             self.left_menu.addItem(new_folder)
 
         self.right_wid = QWidget()
-        self.right_lay = QVBoxLayout()
+        self.right_lay = QVBoxLayout(self.right_wid)
         self.right_lay.setContentsMargins(0, 0, 0, 0)
         self.right_lay.setSpacing(0)
-        self.right_wid.setLayout(self.right_lay)
         self.splitter.addWidget(self.right_wid)
 
         self.right_lay.addStretch()
 
         self.btns_wid = QWidget()
         self.right_lay.addWidget(self.btns_wid)
-        btns_lay = QHBoxLayout()
+        btns_lay = QHBoxLayout(self.btns_wid)
         btns_lay.setContentsMargins(0, 0, 0, 0)
-        btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btns_lay.setSpacing(10)
-        self.btns_wid.setLayout(btns_lay)
+        btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.warn_wid = QSvgWidget()
         self.warn_wid.load(self.svg_warn)

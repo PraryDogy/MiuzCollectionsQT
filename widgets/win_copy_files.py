@@ -33,10 +33,9 @@ class ReplaceFilesWin(UMainWindow):
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
 
-        h_lay = QHBoxLayout()
+        h_lay = QHBoxLayout(h_wid)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
-        h_wid.setLayout(h_lay)
 
         warn = QSvgWidget()
         warn.load(self.icon_path)
@@ -50,10 +49,9 @@ class ReplaceFilesWin(UMainWindow):
         btn_wid = QWidget()
         self.central_layout.addWidget(btn_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
-        btn_lay = QHBoxLayout()
+        btn_lay = QHBoxLayout(btn_wid)
         btn_lay.setContentsMargins(0, 0, 0, 0)
         btn_lay.setSpacing(10)
-        btn_wid.setLayout(btn_lay)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         replace_all_btn = SmallBtn(Lng.replace_all[Cfg.lng_index])
@@ -100,10 +98,9 @@ class ErrorWin(UMainWindow):
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
 
-        h_lay = QHBoxLayout()
+        h_lay = QHBoxLayout(h_wid)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
-        h_wid.setLayout(h_lay)
 
         warn = QSvgWidget()
         warn.load(self.icon_path)
