@@ -10,7 +10,7 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow, UMenu
+from ._base_widgets import UMainWidget, UMenu
 from .win_servers import ServersWin
 from .win_settings import WinSettings
 
@@ -45,7 +45,7 @@ class SelectableLabel(QLabel):
         context_menu.show_menu()
 
 
-class AboutWin(UMainWindow):
+class AboutWin(UMainWidget):
     ww = 280
     icon_path = os.path.join(Static.internal_images, "icon.png")
     icon_size = 150

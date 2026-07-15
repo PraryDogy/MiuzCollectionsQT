@@ -1,15 +1,15 @@
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QSizePolicy
+from PyQt6.QtWidgets import QTabWidget, QVBoxLayout
 
 from cfg import Cfg, Dynamic
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (UPushButton, UMainWindow, VListSpacerItem,
+from ._base_widgets import (UMainWidget, UPushButton, VListSpacerItem,
                             VListWidget, VListWidgetItem)
 
 
-class WinFilters(UMainWindow):
+class WinFilters(UMainWidget):
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     ww = 300
@@ -22,9 +22,16 @@ class WinFilters(UMainWindow):
         self.setWindowTitle(Lng.filters[Cfg.lng_index])
         self.setFixedSize(self.ww, self.hh)
 
+        self.central_layout.setSpacing(12)
+        self.central_layout.setContentsMargins(5, 15, 5, 15)
+
+        group = QTabWidget()
+        group.tabBar().hide()
+        self.central_layout.addWidget(group)
+
         self.list_widget = VListWidget()
         self.list_widget.itemClicked.connect(self.item_cmd)
-        self.central_layout.addWidget(self.list_widget)
+        group.addTab(self.list_widget, "1")
 
         favs_item = VListWidgetItem(
             parent=self.list_widget,
@@ -60,13 +67,7 @@ class WinFilters(UMainWindow):
 
         self.list_widget.setCurrentRow(0)
 
-        self.central_layout.setSpacing(10)
-        marings = self.central_layout.contentsMargins()
-        marings.setBottom(15)
-        self.central_layout.setContentsMargins(marings)
-
         self.reset_btn = UPushButton(Lng.reset[Cfg.lng_index])
-        self.reset_btn.setFixedWidth(100)
         self.reset_btn.clicked.connect(self.reset_cmd)
         self.central_layout.addWidget(
             self.reset_btn,

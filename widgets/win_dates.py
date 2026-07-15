@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QHBoxLayout, QLabel,
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 
-from ._base_widgets import HSep, UPushButton, UMainWindow
+from ._base_widgets import HSep, UMainWidget, UPushButton
 
 
 class DatesTools:
@@ -159,7 +159,7 @@ class MyCalendar(QGroupBox):
         """)
 
 
-class WinDates(UMainWindow):
+class WinDates(UMainWidget):
     dates_btn_solid = pyqtSignal()
     dates_btn_normal = pyqtSignal()
     reload_thumbnails = pyqtSignal()
@@ -194,7 +194,7 @@ class WinDates(UMainWindow):
         self.central_layout.addWidget(HSep())
 
         clear_btn = UPushButton(text=Lng.reset[Cfg.lng_index])
-        clear_btn.setFixedWidth(100)
+        # clear_btn.setFixedWidth(100)
         clear_btn.clicked.connect(self.clear_btn_cmd)
         self.central_layout.addWidget(
             clear_btn,
