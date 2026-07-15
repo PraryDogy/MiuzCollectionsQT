@@ -7,7 +7,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QFrame,
                              QGroupBox, QHBoxLayout, QLabel, QListWidget,
                              QListWidgetItem, QMainWindow, QPushButton,
-                             QSplitter, QTreeView, QTreeWidget,
+                             QSpacerItem, QSplitter, QTreeView, QTreeWidget,
                              QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import Cfg
@@ -44,6 +44,8 @@ class UploadWin(UMainWindow):
         self.tree_view.header().hide()  # Скрываем имя колонки
         
         self.file_model = QFileSystemModel()
+        self.file_model.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
+
         
         # Модель инициализируем от корня ограничителя, чтобы она читала только его
         self.file_model.setRootPath(self.root_dir)
@@ -73,12 +75,13 @@ class UploadWin(UMainWindow):
 
         group_one = QGroupBox()
         group_one_layout = QVBoxLayout(group_one)
-        group_one_layout.setContentsMargins(2, 5, 2, 5)
-        group_one_layout.setSpacing(10)
-
+        group_one_layout.setContentsMargins(2, 5, 2, 0)
+        group_one_layout.setSpacing(0)
         right_layout.addWidget(group_one)
 
         group_one_layout.addWidget(QLabel("Список выгружаемых файлов"))
+
+        group_one_layout.addSpacerItem(QSpacerItem(0, 10))
 
         self.list_widget = QListWidget()
         total_size = 0
@@ -96,33 +99,28 @@ class UploadWin(UMainWindow):
                 total_size += os.path.getsize(full_path)
 
         group_one_layout.addWidget(self.list_widget)
-
-
-        group_two = QGroupBox()
-        group_two_layout = QVBoxLayout(group_two)
-        group_two_layout.setContentsMargins(2, 0, 0, 0)
-        group_two_layout.setSpacing(0)
-        right_layout.addWidget(group_two)
         
         total_files = RowArrowWidget(f"Всего файлов: {len(self.target_files)} шт.")
         total_files.hide_arrow()
-        group_two_layout.addWidget(total_files)
+        group_one_layout.addWidget(total_files)
 
         size_mb = total_size / (1024 * 1024)
         total_size = RowArrowWidget(f"Общий размер: {size_mb:.2f} MB")
         total_size.hide_arrow()
-        group_two_layout.addWidget(total_size)
+        group_one_layout.addWidget(total_size)
 
         self.lbl_target_dir = RowArrowWidget("")
         self.lbl_target_dir.hide_arrow()
         self.lbl_target_dir.hide_sep()
         self.update_target_dir_label()
-        group_two_layout.addWidget(self.lbl_target_dir)
+        group_one_layout.addWidget(self.lbl_target_dir)
         
         splitter.addWidget(right_widget)
 
         # Левое дерево строго 210 пикселей при старте
         splitter.setSizes([210, self.width() - 210])
+
+        right_layout.addStretch()
 
         btn_layout = QHBoxLayout()
         right_layout.addLayout(btn_layout)
