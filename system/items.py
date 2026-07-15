@@ -69,12 +69,6 @@ class SettingsItem:
 
 
 @dataclass(slots=True)
-class Buffer:
-    source_mf: Mf
-    files_to_copy: Optional[list[str]]
-
-
-@dataclass(slots=True)
 class WatchDogItem:
     mf: Mf
     src_path: str

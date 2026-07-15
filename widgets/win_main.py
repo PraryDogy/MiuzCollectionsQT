@@ -5,17 +5,17 @@ from collections import defaultdict
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QLabel, QPushButton,
-                             QSplitter, QVBoxLayout, QWidget, QSpacerItem)
+                             QSpacerItem, QSplitter, QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
-from system.items import (Buffer, ImgViewItem, SettingsItem,
-                          ForcedScanerItem, UpdateThumbItem, WatchDogItem)
+from system.items import (ForcedScanerItem, ImgViewItem, SettingsItem,
+                          UpdateThumbItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import (WatchDog, FilesRemover, ProcessWorker,
-                                 UpdateThumb)
+from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
+                                 WatchDog)
 from system.scaner import BaseScaner, ForcedScaner
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
@@ -72,7 +72,7 @@ class WinMain(UMainWindow):
 
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
-        self.buffer: Buffer | None = None
+        self.files_to_copy = set()
 
         h_wid_main = QWidget()
         h_lay_main = UHBoxLayout()
@@ -364,40 +364,36 @@ class WinMain(UMainWindow):
         ]
         copy_files_win = self.copy_files_win(
             files_to_copy=abs_paths,
-            target_dir=downloads
+            dest=downloads
         )
         copy_files_win.finished_.connect(
             Utils.reveal_files
         )
 
     @with_conn
-    def set_buffer(self, rel_paths: tuple):
-        abs_files_to_copy = [
+    def set_files_to_copy(self, rel_paths: tuple):
+        abs_files_to_copy = set(
             Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
-        ]
-        self.buffer = Buffer(
-            source_mf=Mf.current_mf,
-            files_to_copy=abs_files_to_copy
         )
-        self.grid.buffer = True
+
+        self.files_to_copy = abs_files_to_copy
+        self.grid.files_to_copy = abs_files_to_copy
 
     @with_conn
-    def paste_files(self):
-        target_dir = Utils.get_abs_any_path(
-            mf_path=Mf.current_mf.mf_current_path,
-            rel_path=Dynamic.current_dir
-        )
-        self.forced_scaner_dirs.add(target_dir)
+    def paste_files(self, files_to_copy: list[str], dest: str):
+        """
+        files_to_copy, dest
+        """
+
         copy_files_win = self.copy_files_win(
-            files_to_copy=self.buffer.files_to_copy,
-            target_dir=target_dir
+            files_to_copy=files_to_copy,
+            dest=dest
         )
-        self.buffer = None
-        self.grid.buffer = False
-        copy_files_win.finished_.connect(
-            lambda x: self.start_scaner_task()
-        )
+        copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
+        self.forced_scaner_dirs.add(dest)
+        self.files_to_copy.clear()
+        self.grid.files_to_copy.clear()
 
     @with_conn
     def open_in_app(self, rel_paths: list[str], app_path: str):
@@ -472,41 +468,23 @@ class WinMain(UMainWindow):
     @with_conn
     def upload_files(self, dropped_files: list[str]):
 
-        def fin(target_dir: str, target_files: list[str]):
-            print(target_dir)
-            print(target_files)
-            return
+        def fin(dest: str):
             self.upload_win.deleteLater()
-            files_to_copy = [
-                i
-                for i in dropped_files
-                if i.endswith(ImgUtils.ext_all)
-            ]
+            self.paste_files(dropped_files, dest)
 
-            self.buffer = Buffer(
-                source_mf=Mf.current_mf,
-                files_to_copy=files_to_copy
-            )
 
-            self.paste_files()
-
-        # target_dir = Utils.get_abs_any_path(
-        #     Mf.current_mf.mf_current_path,
-        #     Dynamic.current_dir
-        # )
-        # target_files = [
-        #     os.path.join(target_dir, os.path.basename(i))
-        #     for i in abs_paths
-        #     if i.endswith(ImgUtils.ext_all)
-        # ]
-
+        dropped_files = [
+            i
+            for i in dropped_files
+            if i.endswith(ImgUtils.ext_all)
+        ]
         self.upload_win = UploadWin(
             mf=Mf.current_mf,
             current_dir=Dynamic.current_dir,
             dropped_files=dropped_files
         )
         self.upload_win.ok_clicked.connect(
-            lambda data: fin(*data)
+            lambda dest: fin(dest)
         )
         self.upload_win.center_to_parent(self)
         self.upload_win.show()
@@ -591,11 +569,15 @@ class WinMain(UMainWindow):
         self.grid.open_in_app.connect(
             lambda data: self.open_in_app(*data)
         )
+        # контекстное меню, берешь files_to_copy из буффера
         self.grid.paste_files.connect(
-            lambda: self.paste_files()
+            lambda: self.paste_files(
+                self.files_to_copy,
+                os.path.join(Mf.current_mf.mf_current_path, Dynamic.current_dir.strip())
+                )
         )
         self.grid.set_clipboard.connect(
-            lambda rel_paths: self.set_buffer(rel_paths)
+            lambda rel_paths: self.set_files_to_copy(rel_paths)
         )
         self.grid.setup_mf.connect(
             lambda item: self.open_settings_win(item)
@@ -820,11 +802,11 @@ class WinMain(UMainWindow):
     def copy_files_win(
             self,
             files_to_copy: list[str],
-            target_dir: str
+            dest: str
         ):
         progress_win = WinCopyFiles(
             files_to_copy=files_to_copy,
-            target_dir=target_dir
+            target_dir=dest
         )
         progress_win.center_to_parent(self)
         progress_win.show()   
@@ -842,8 +824,11 @@ class WinMain(UMainWindow):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         
         if a0.key() == Qt.Key.Key_V:
-            if self.buffer:
-                self.paste_files()
+            dest = os.path.join(
+                Mf.current_mf.mf_current_path,
+                Dynamic.current_dir.strip(os.sep)
+            )
+            self.paste_files(self.files_to_copy, dest)
         
         elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:

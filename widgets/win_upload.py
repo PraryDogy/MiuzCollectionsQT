@@ -18,7 +18,7 @@ from ._base_widgets import RowArrowWidget, SmallBtn, UHBoxLayout, UMainWindow
 
 
 class UploadWin(UMainWindow):
-    ok_clicked = pyqtSignal()
+    ok_clicked = pyqtSignal(str)
 
     def __init__(self, mf: Mf, current_dir: str, dropped_files: list[str]):
         super().__init__()
@@ -27,11 +27,10 @@ class UploadWin(UMainWindow):
 
         # Приводим все пути к абсолютному виду
         self.root_dir = mf.mf_current_path
-        self.target_dir = os.path.join(
+        self.dest = os.path.join(
             mf.mf_current_path,
             current_dir.strip(os.sep)
         ).rstrip(os.sep)
-
         self.target_files = dropped_files
 
         # Главный сплиттер (Разделяет дерево и правое превью)
@@ -94,7 +93,7 @@ class UploadWin(UMainWindow):
             self.list_widget.addItem(item)
             
             # Считаем размер файлов относительно папки назначения
-            full_path = file_path if os.path.isabs(file_path) else os.path.join(self.target_dir, file_path)
+            full_path = file_path if os.path.isabs(file_path) else os.path.join(self.dest, file_path)
             if os.path.exists(full_path):
                 total_size += os.path.getsize(full_path)
 
@@ -130,8 +129,7 @@ class UploadWin(UMainWindow):
         btn_layout.addStretch()
 
         self.btn_ok = SmallBtn(Lng.ok[Cfg.lng_index])
-        self.btn_ok.clicked.connect(self.ok_clicked.emit)
-        self.btn_ok.clicked.connect(self.deleteLater)
+        self.btn_ok.clicked.connect(self.ok_clicked_cmd)
         self.btn_ok.setFixedWidth(90)
         btn_layout.addWidget(self.btn_ok)
 
@@ -145,7 +143,7 @@ class UploadWin(UMainWindow):
     def _expand_to_target(self):
 
         def cmd():
-            idx = self.file_model.index(self.target_dir)
+            idx = self.file_model.index(self.dest)
             self.tree_view.expand(idx)
             self.tree_view.setCurrentIndex(idx)
             self.tree_view.scrollTo(idx, QTreeView.ScrollHint.PositionAtCenter)  
@@ -153,19 +151,28 @@ class UploadWin(UMainWindow):
         QTimer.singleShot(100, cmd)
 
     def update_target_dir_label(self):
-        folder_name = os.path.basename(self.target_dir) 
+        folder_name = os.path.basename(self.dest) 
         self.lbl_target_dir.text_widget.setText(f"Целевая папка: {folder_name}")
+
+    def ok_clicked_cmd(self):
+        # files = [
+        #     os.path.join(self.target_dir, os.path.basename(i))
+        #     for i in self.target_files
+        # ]
+        # for i in files:
+        #     print(i)
+        #     print(self.target_files[files.index(i)])
+        self.ok_clicked.emit(self.dest)
 
     def on_folder_selected(self, index):
         if self.file_model.isDir(index):
-            self.target_dir = self.file_model.filePath(index)
+            self.dest = self.file_model.filePath(index)
             self.update_target_dir_label()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
-            self.ok_clicked.emit()
-            self.deleteLater()
+            self.ok_clicked_cmd()
         return super().keyPressEvent(a0)
 

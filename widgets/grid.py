@@ -286,7 +286,7 @@ class Grid(VScrollArea):
         self.selected_widgets: list[Thumb] = []
         self.cell_to_wid: dict[tuple, Thumb] = {}
         self.url_to_wid: dict[str, Thumb] = {}
-        self.buffer = False
+        self.files_to_copy = set()
 
         self.image_apps = {
             i: os.path.basename(i)
@@ -560,7 +560,7 @@ class Grid(VScrollArea):
             self.clear_selected_widgets()
 
             # это костыль, может сломаться если мы переименуем buffer в main_win
-            if self.buffer:
+            if self.files_to_copy:
                 self.menu_.addSeparator()
                 paste = PasteFiles(self.menu_)
                 paste.triggered.connect(

@@ -230,7 +230,6 @@ class CopyTask:
 
             fdst.flush()            # Скидывает данные из буфера Python в буфер ОС [1]
             os.fsync(fdst.fileno()) # Принудительно заставляет ОС записать всё на физический диск прямо сейчас [1]
-            print("end")
 
         #             print("put", percent)
         #     print("end while")
