@@ -312,7 +312,7 @@ class RowArrowWidget(QWidget):
 
         self.above_wid = QWidget()
         self.above_layout = QHBoxLayout(self.above_wid)
-        self.above_layout.setSpacing(0)
+        self.above_layout.setContentsMargins(0, 0, 0, 0)
         self.above_layout.setSpacing(10)
 
         self.sep = HSep()
