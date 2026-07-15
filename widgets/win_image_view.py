@@ -212,10 +212,9 @@ class WinImageView(UMainWindow):
     select_thumb = pyqtSignal(str)
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)
-    copy_name = pyqtSignal(list)
     reveal_in_finder = pyqtSignal(list)
     set_fav = pyqtSignal(tuple)
-    save_files = pyqtSignal(tuple)
+    save_files = pyqtSignal(list)
     open_in_app = pyqtSignal(tuple)
     image_not_exists = pyqtSignal()
     
@@ -503,9 +502,7 @@ class WinImageView(UMainWindow):
 
         save = Save(self.menu_, 1)
         save.triggered.connect(
-            lambda: self.save_files.emit(
-                (os.path.expanduser("~/Downloads"), rel_paths)
-            )
+            lambda: self.save_files.emit(rel_paths)
         )
         self.menu_.addAction(save)
 

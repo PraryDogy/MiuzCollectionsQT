@@ -26,8 +26,8 @@ class UTreeWidgetItem(QTreeWidgetItem):
 
 
 class TreeWid(QTreeWidget):
-    reveal = pyqtSignal(tuple)
-    copy_path = pyqtSignal(tuple)
+    reveal = pyqtSignal(list)
+    copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
     on_hide_digits_clicked = pyqtSignal()
 
@@ -209,13 +209,13 @@ class TreeWid(QTreeWidget):
 
         copy_path = QAction(Lng.copy_dirpath[Cfg.lng_index], menu)
         copy_path.triggered.connect(
-            lambda: self.copy_path.emit((Mf.current_mf, [rel_path, ]))
+            lambda: self.copy_path.emit([rel_path, ])
         )
         menu.addAction(copy_path)
 
         reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
         reveal.triggered.connect(
-            lambda: self.reveal.emit((Mf.current_mf, [rel_path, ]))
+            lambda: self.reveal.emit([rel_path, ])
         )
         menu.addAction(reveal)
 
@@ -313,8 +313,8 @@ class MfList(VListWidget):
 class MenuLeft(QWidget):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
-    reveal = pyqtSignal(tuple)
-    copy_path = pyqtSignal(tuple)
+    reveal = pyqtSignal(list)
+    copy_path = pyqtSignal(list)
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
     on_hide_digits_clicked = pyqtSignal()
@@ -334,7 +334,7 @@ class MenuLeft(QWidget):
         self.splitter.addWidget(tree_parent)
         self.tree_wid = TreeWid()
         self.tree_wid.reveal.connect(
-            lambda data: self.reveal.emit(data)
+            lambda rel_paths: self.reveal.emit(rel_paths)
         )
         self.tree_wid.on_tree_clicked.connect(
             lambda abs_path: self.on_tree_clicked.emit(abs_path)
@@ -343,7 +343,7 @@ class MenuLeft(QWidget):
             lambda: self.on_hide_digits_clicked.emit()
         )
         self.tree_wid.copy_path.connect(
-            lambda data: self.copy_path.emit(data)
+            lambda rel_paths: self.copy_path.emit(rel_paths)
         )
         self.tree_wid.init_ui()
         tree_parent.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])

@@ -93,10 +93,10 @@ class WinMain(UMainWindow):
             lambda settings_item: self.open_settings_win(settings_item)
         )
         self.left_menu.reveal.connect(
-            lambda data: self.reveal_in_finder(*data)
+            lambda rel_paths: self.reveal_in_finder(rel_paths)
         )
         self.left_menu.on_tree_clicked.connect(
-            lambda abs_path: self.on_tree_clicked(Mf.current_mf, abs_path)
+            lambda abs_path: self.on_tree_clicked(abs_path)
         )
         self.left_menu.on_mf_clicked.connect(
             lambda mf: self.on_mf_clicked(mf)
@@ -105,7 +105,7 @@ class WinMain(UMainWindow):
             lambda: self.on_hide_digits_clicked()
         )
         self.left_menu.copy_path.connect(
-            lambda data: self.copy_path(*data)
+            lambda rel_paths: self.copy_path(rel_paths)
         )
         self.splitter.addWidget(self.left_menu)
 
@@ -189,20 +189,15 @@ class WinMain(UMainWindow):
             print("СКАНЕР ВЫКЛЮЧЕН")
         self.start_wachdog()
 
-        # from .win_smb import SuperWarnWindow
-        # self.super_window = SuperWarnWindow()
-        # self.super_window.center_to_parent(self)
-        # QTimer.singleShot(100, self.super_window.show)
-
     @staticmethod
-    def with_conn(fn):
-        def wrapper(self: "WinMain", mf: Mf, *args):
-            avaiable_mf_path = mf.get_avaiable_mf_path()
+    def with_conn(fn: callable):
+        def wrapper(self: "WinMain", *args):
+            avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
             if avaiable_mf_path:
-                mf.set_mf_current_path(avaiable_mf_path)
-                return fn(self, mf, *args)
+                Mf.current_mf.set_mf_current_path(avaiable_mf_path)
+                return fn(self, *args)
             else:
-                self.open_win_smb(mf)
+                self.open_win_smb(Mf.current_mf)
         return wrapper
 
     def set_no_filters(self):
@@ -312,17 +307,6 @@ class WinMain(UMainWindow):
         self.win_smb.center_to_parent(self.win_list[-2])
         self.win_smb.show()
 
-    @with_conn
-    def on_tree_clicked(self, mf: Mf, abs_path: str):
-        rel_path = Utils.get_rel_any_path(
-            mf_path=mf.mf_current_path,
-            abs_img_path=abs_path
-        )
-        Dynamic.current_dir = rel_path
-        self.set_no_filters()
-        self.load_st_grid()
-        self.path_bar_update(Dynamic.current_dir)
-
     def on_mf_clicked(self, mf: Mf):
         self.set_no_filters()
         Mf.current_mf = mf
@@ -337,7 +321,18 @@ class WinMain(UMainWindow):
             self.open_win_smb(mf)
  
     @with_conn
-    def start_update_thumb(self, mf: Mf, rel_img_paths: list[str]):
+    def on_tree_clicked(self, abs_path: str):
+        rel_path = Utils.get_rel_any_path(
+            mf_path=Mf.current_mf.mf_current_path,
+            abs_img_path=abs_path
+        )
+        Dynamic.current_dir = rel_path
+        self.set_no_filters()
+        self.load_st_grid()
+        self.path_bar_update(Dynamic.current_dir)
+
+    @with_conn
+    def start_update_thumb(self, rel_paths: list[str]):
 
         def poll_task():
             queue = self.update_thumb_task.process_queue
@@ -355,36 +350,31 @@ class WinMain(UMainWindow):
 
         self.update_thumb_task = ProcessWorker(
             target=UpdateThumb.start,
-            args=(Mf.current_mf, rel_img_paths, )
+            args=(Mf.current_mf, rel_paths, )
         )
         self.update_thumb_task.start()
         QTimer.singleShot(300, poll_task)
 
     @with_conn
-    def save_files(self, mf: Mf, data: tuple):
-        target_dir, rel_files_to_copy = data
-        abs_files_to_copy = [
-            Utils.get_abs_any_path(mf.mf_current_path, i)
-            for i in rel_files_to_copy
+    def save_to_downloads(self, rel_paths: list[str]):
+        downloads = os.path.expanduser("~/Downloads")
+        abs_paths = [
+            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            for i in rel_paths
         ]
-        if target_dir is None:
-            downloads = os.path.expanduser("~/Downloads")
-            target_dir = QFileDialog.getExistingDirectory(directory=downloads)
-            if not target_dir:
-                target_dir = downloads
         copy_files_win = self.copy_files_win(
-            files_to_copy=abs_files_to_copy,
-            target_dir=target_dir
+            files_to_copy=abs_paths,
+            target_dir=downloads
         )
         copy_files_win.finished_.connect(
             Utils.reveal_files
         )
 
     @with_conn
-    def set_buffer(self, mf: Mf, rel_files_to_copy: tuple):
+    def set_buffer(self, rel_paths: tuple):
         abs_files_to_copy = [
             Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
-            for i in rel_files_to_copy
+            for i in rel_paths
         ]
         self.buffer = Buffer(
             source_mf=Mf.current_mf,
@@ -393,7 +383,7 @@ class WinMain(UMainWindow):
         self.grid.buffer = True
 
     @with_conn
-    def paste_files(self, mf: Mf):
+    def paste_files(self):
         target_dir = Utils.get_abs_any_path(
             mf_path=Mf.current_mf.mf_current_path,
             rel_path=Dynamic.current_dir
@@ -410,19 +400,18 @@ class WinMain(UMainWindow):
         )
 
     @with_conn
-    def open_in_app(self, mf: Mf, data: tuple):
-        rel_paths, app_path = data
+    def open_in_app(self, rel_paths: list[str], app_path: str):
         for i in rel_paths:
-            abs_path = Utils.get_abs_any_path(mf.mf_current_path, i)
+            abs_path = Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
             if app_path:
                 subprocess.Popen(["open", "-a", app_path, abs_path])
             else:
                 subprocess.Popen(["open", abs_path])
 
     @with_conn
-    def reveal_in_finder(self, mf: Mf, rel_paths: list):
+    def reveal_in_finder(self, rel_paths: list):
         abs_paths = [
-            Utils.get_abs_any_path(mf.mf_current_path, i)
+            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         if os.path.isdir(abs_paths[0]):
@@ -431,23 +420,15 @@ class WinMain(UMainWindow):
             Utils.reveal_files(abs_paths)
 
     @with_conn
-    def copy_name(self, mf: Mf, rel_paths: list[str]):
-        names = [
-            os.path.splitext(os.path.basename(i))[0]
-            for i in rel_paths
-        ]
-        Utils.copy_text("\n".join(names))
-
-    @with_conn
-    def copy_path(self, mf: Mf, rel_paths: list[str]):
+    def copy_path(self, rel_paths: list[str]):
         abs_paths = [
-            Utils.get_abs_any_path(mf.mf_current_path, i)
+            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         Utils.copy_text("\n".join(abs_paths))
 
     @with_conn
-    def remove_files(self, mf: Mf, rel_paths: list, ms = 300):
+    def remove_files(self, rel_paths: list, ms = 300):
         
         def poll_file_remover():
             if not file_remover.process_queue.empty():
@@ -466,7 +447,7 @@ class WinMain(UMainWindow):
             QTimer.singleShot(ms, poll_file_remover)
 
         abs_paths = [
-            Utils.get_abs_any_path(mf.mf_current_path, i)
+            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
@@ -489,7 +470,7 @@ class WinMain(UMainWindow):
         self.remove_files_win.show()
     
     @with_conn
-    def upload_files(self, mf: Mf, abs_paths: list[str]):
+    def upload_files(self, abs_paths: list[str]):
 
         def fin(target_dir: str):
             self.upload_win.deleteLater()
@@ -504,9 +485,12 @@ class WinMain(UMainWindow):
                 files_to_copy=files_to_copy
             )
 
-            self.paste_files(Mf.current_mf)
+            self.paste_files()
 
-        target_dir = Utils.get_abs_any_path(mf.mf_current_path, Dynamic.current_dir)
+        target_dir = Utils.get_abs_any_path(
+            Mf.current_mf.mf_current_path,
+            Dynamic.current_dir
+        )
         target_files = [
             os.path.join(target_dir, os.path.basename(i))
             for i in abs_paths
@@ -520,10 +504,10 @@ class WinMain(UMainWindow):
         self.upload_win.show()
 
     @with_conn
-    def open_info_win(self, mf: Mf, rel_paths: list[str]):
+    def open_info_win(self, rel_paths: list[str]):
         
         abs_paths = [
-            Utils.get_abs_any_path(mf.mf_current_path, i)
+            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         self.info_win = WinInfo(abs_paths)
@@ -576,37 +560,34 @@ class WinMain(UMainWindow):
             lambda: self.restart_scaner_task()
         )
         self.grid.remove_files.connect(
-            lambda p: self.remove_files(Mf.current_mf, p)
+            lambda rel_paths: self.remove_files(rel_paths)
         )
         self.grid.open_img_view.connect(
             lambda: self.open_view_win(Mf.current_mf)
         )
         self.grid.save_files.connect(
-            lambda data: self.save_files(Mf.current_mf, data)
+            lambda rel_paths: self.save_to_downloads(rel_paths)
         )
         self.grid.open_info_win.connect(
-            lambda p: self.open_info_win(Mf.current_mf, p)
+            lambda rel_paths: self.open_info_win(rel_paths)
         )
         self.grid.copy_path.connect(
-            lambda p: self.copy_path(Mf.current_mf, p)
-        )
-        self.grid.copy_name.connect(
-            lambda p: self.copy_name(Mf.current_mf, p)
+            lambda rel_paths: self.copy_path(rel_paths)
         )
         self.grid.reveal_in_finder.connect(
-            lambda p: self.reveal_in_finder(Mf.current_mf, p)
+            lambda rel_paths: self.reveal_in_finder(rel_paths)
         )
         self.grid.set_fav.connect(
             lambda data: self.set_fav(data)
         )
         self.grid.open_in_app.connect(
-            lambda data: self.open_in_app(Mf.current_mf, data)
+            lambda data: self.open_in_app(*data)
         )
         self.grid.paste_files.connect(
-            lambda: self.paste_files(Mf.current_mf)
+            lambda: self.paste_files()
         )
         self.grid.set_clipboard.connect(
-            lambda rel_files: self.set_buffer(Mf.current_mf, rel_files)
+            lambda rel_paths: self.set_buffer(rel_paths)
         )
         self.grid.setup_mf.connect(
             lambda item: self.open_settings_win(item)
@@ -615,7 +596,7 @@ class WinMain(UMainWindow):
             lambda rel_path: self.path_bar_update(rel_path)
         )
         self.grid.update_thumb.connect(
-            lambda p: self.start_update_thumb(Mf.current_mf, p)
+            lambda rel_paths: self.start_update_thumb(rel_paths)
         )
         self.grid.show_in_app.connect(
             self.show_in_app
@@ -627,7 +608,7 @@ class WinMain(UMainWindow):
             self.load_st_grid
         )
         self.grid.upload_files.connect(
-            lambda p: self.upload_files(Mf.current_mf, p)
+            lambda abs_paths: self.upload_files(abs_paths)
         )
         # -1 для pyqt6
         self.right_layout.insertWidget(layout_index-1, self.grid)
@@ -649,13 +630,10 @@ class WinMain(UMainWindow):
         )
         self.view_win = WinImageView(item)
         self.view_win.open_win_info.connect(
-            lambda rel_paths: self.open_info_win(Mf.current_mf, rel_paths)
+            lambda rel_paths: self.open_info_win(rel_paths)
         )
         self.view_win.copy_path.connect(
-            lambda rel_paths: self.copy_path(Mf.current_mf, rel_paths)
-        )
-        self.view_win.copy_name.connect(
-            lambda rel_paths: self.copy_name(Mf.current_mf, rel_paths)
+            lambda rel_paths: self.copy_path(rel_paths)
         )
         self.view_win.reveal_in_finder.connect(
             lambda rel_paths: self.reveal_in_finder(Mf.current_mf, rel_paths)
@@ -664,13 +642,13 @@ class WinMain(UMainWindow):
             self.set_fav
         )
         self.view_win.save_files.connect(
-            lambda data: self.save_files(Mf.current_mf, data)
+            lambda rel_paths: self.save_to_downloads(rel_paths)
         )
         self.view_win.select_thumb.connect(
             lambda path: self.grid.select_by_url(path)
         )
         self.view_win.open_in_app.connect(
-            lambda data: self.open_in_app(Mf.current_mf, data)
+            lambda data: self.open_in_app(*data)
         )
         self.view_win.image_not_exists.connect(
             lambda: self.open_win_smb(Mf.current_mf)
@@ -856,8 +834,8 @@ class WinMain(UMainWindow):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         
         if a0.key() == Qt.Key.Key_V:
-            if hasattr(self, "buffer"):
-                self.paste_files(Mf.current_mf)
+            if self.buffer:
+                self.paste_files()
         
         elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:

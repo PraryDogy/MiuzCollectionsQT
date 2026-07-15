@@ -259,12 +259,11 @@ class Grid(VScrollArea):
     load_st_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
-    save_files = pyqtSignal(tuple)
+    save_files = pyqtSignal(list)
     path_bar_update = pyqtSignal(str)
     open_img_view = pyqtSignal()
     open_info_win = pyqtSignal(list)
     copy_path = pyqtSignal(list)
-    copy_name = pyqtSignal(list)
     reveal_in_finder = pyqtSignal(list)
     set_fav = pyqtSignal(tuple)
     open_in_app = pyqtSignal(tuple)
@@ -585,7 +584,7 @@ class Grid(VScrollArea):
             self.menu_.addSeparator()
             reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], self.menu_)
             reveal.triggered.connect(
-                lambda: self.reveal_in_finder.emit([Dynamic.current_dir])
+                lambda: self.reveal_in_finder.emit([Dynamic.current_dir, ])
             )
             self.menu_.addAction(reveal)
 
@@ -681,9 +680,7 @@ class Grid(VScrollArea):
 
             act = Save(self.menu_, len(rel_paths))
             act.triggered.connect(
-                lambda: self.save_files.emit(
-                    (os.path.expanduser("~/Downloads"), rel_paths)
-                )
+                lambda: self.save_files.emit(rel_paths)
             )
             self.menu_.addAction(act)
 
