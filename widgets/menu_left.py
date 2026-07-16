@@ -4,7 +4,7 @@ import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QHBoxLayout, QSplitter, QTabWidget, QTreeWidget,
+from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QSplitter, QTreeWidget,
                              QTreeWidgetItem, QWidget)
 
 from cfg import Cfg, Static
@@ -329,10 +329,14 @@ class MenuLeft(QWidget):
         self.splitter.setOrientation(Qt.Orientation.Vertical)
         v_lay.addWidget(self.splitter)
 
-        tree_parent = QTabWidget()
-        tree_parent.tabBar().hide()
+        tree_parent = QGroupBox()
         self.splitter.addWidget(tree_parent)
+        tree_layout = QHBoxLayout(tree_parent)
+        tree_layout.setContentsMargins(1, 10, 1, 1)
+        tree_layout.setSpacing(0)
+
         self.tree_wid = TreeWid()
+        tree_layout.addWidget(self.tree_wid)
         self.tree_wid.reveal.connect(
             lambda rel_paths: self.reveal.emit(rel_paths)
         )
@@ -346,11 +350,12 @@ class MenuLeft(QWidget):
             lambda rel_paths: self.copy_path.emit(rel_paths)
         )
         self.tree_wid.init_ui()
-        tree_parent.addTab(self.tree_wid, Lng.contents[Cfg.lng_index])
 
-        mf_list_parent = QTabWidget()
-        mf_list_parent.tabBar().hide()
+        mf_list_parent = QGroupBox()
         self.splitter.addWidget(mf_list_parent)
+        mf_list_layout = QHBoxLayout(mf_list_parent)
+        mf_list_layout.setContentsMargins(1, 10, 1, 1)
+        mf_list_layout.setSpacing(0)
 
         self.mf_list_widget = MfList(mf_list_parent)
         self.mf_list_widget.mf_open.connect(
@@ -358,7 +363,7 @@ class MenuLeft(QWidget):
         )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        mf_list_parent.addTab(self.mf_list_widget, Lng.catalogs[Cfg.lng_index])
+        mf_list_layout.addWidget(self.mf_list_widget)
 
         self.splitter.setSizes([
             self.height() - self.mf_list_hh,

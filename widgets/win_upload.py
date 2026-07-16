@@ -11,10 +11,10 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
 
-from ._base_widgets import RowArrowWidget, UPushButton, UMainWindow
+from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton
 
 
-class UploadWin(UMainWindow):
+class UploadWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
     img_icon_path = os.path.join(Static.internal_images, "img.svg")
 
@@ -39,6 +39,13 @@ class UploadWin(UMainWindow):
         self.file_model.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
         self.file_model.setRootPath(self.root_dir)
 
+        left_wid = QGroupBox()
+        splitter.addWidget(left_wid)
+        left_layout = QVBoxLayout(left_wid)
+        left_layout.setContentsMargins(1, 10, 1, 1)
+        left_layout.setSpacing(0)
+
+
         self.tree_view = QTreeView()
         self.tree_view.setIndentation(10)
         self.tree_view.header().hide()
@@ -56,7 +63,7 @@ class UploadWin(UMainWindow):
         for i in range(1, 4):
             self.tree_view.setColumnHidden(i, True)
 
-        splitter.addWidget(self.tree_view)
+        left_layout.addWidget(self.tree_view)
 
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)

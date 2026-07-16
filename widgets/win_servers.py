@@ -229,15 +229,15 @@ class ServersWin(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.connect_to_server[Cfg.lng_index])
-        self.setFixedSize(350, 250)
+        self.setFixedWidth(350)
 
         self.central_layout.setContentsMargins(5, 5, 5, 10)
         self.central_layout.setSpacing(10)
 
         group = QGroupBox()
         group_lay = QVBoxLayout(group)
-        group_lay.setContentsMargins(0, 0, 0, 0)
-        group_lay.setSpacing(10)
+        group_lay.setContentsMargins(1, 1, 1, 1)
+        group_lay.setSpacing(5)
         self.central_layout.addWidget(group)
 
         favs = ServerLabel(Lng.favorites[Cfg.lng_index])
