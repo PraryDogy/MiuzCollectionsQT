@@ -14,6 +14,7 @@ class WinFilters(UMainWidget):
     reload_thumbnails = pyqtSignal()
     ww = 300
     hh = 300
+    item_h = 25
 
     def __init__(self):
         super().__init__()
@@ -37,7 +38,8 @@ class WinFilters(UMainWidget):
 
         favs_item = VListWidgetItem(
             parent=self.list_widget,
-            text=Lng.favorites[Cfg.lng_index]
+            text=Lng.favorites[Cfg.lng_index],
+            height=self.item_h
         )
         favs_item.set_checkable()
         self.list_widget.addItem(favs_item)
@@ -46,7 +48,8 @@ class WinFilters(UMainWidget):
 
         folder_item = VListWidgetItem(
             parent=self.list_widget,
-            text=Lng.only_this_folder[Cfg.lng_index]
+            text=Lng.only_this_folder[Cfg.lng_index],
+            height=self.item_h
         )
         folder_item.set_checkable()
         self.list_widget.addItem(folder_item)
@@ -60,7 +63,8 @@ class WinFilters(UMainWidget):
         for i in Filters.items:
             item = VListWidgetItem(
                 parent=self.list_widget,
-                text=i
+                text=i,
+                height=self.item_h
             )
             item.set_checkable()
             self.list_widget.addItem(item)
