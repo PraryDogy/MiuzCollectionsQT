@@ -371,7 +371,11 @@ class SizesWin(UMainWidget):
         sec_row = QLabel(f"{Lng.images[Cfg.lng_index]}: {total}")
         self.central_layout.addWidget(sec_row)
 
-        headers = [Lng.folder[Cfg.lng_index], Lng.file_size[Cfg.lng_index], Lng.images[Cfg.lng_index]]
+        headers = [
+            Lng.folder[Cfg.lng_index],
+            Lng.file_size[Cfg.lng_index],
+            Lng.images[Cfg.lng_index]
+        ]
         self.table = QTableWidget()
         self.table.setSortingEnabled(True)
         self.table.setColumnCount(len(headers))
@@ -1055,10 +1059,16 @@ class WinSettings(UMainWidget):
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.central_layout.addWidget(self.splitter)
 
+        left_group = QGroupBox()
+        self.splitter.addWidget(left_group)
+        left_layout = QVBoxLayout(left_group)
+        left_layout.setContentsMargins(1, 10, 1, 1)
+        left_layout.setSpacing(0)
+
         self.left_menu = VListWidget()
         self.left_menu.clicked.connect(self.left_menu_click)
         self.left_menu.setIconSize(QSize(self.svg_size, self.svg_size))
-        self.splitter.addWidget(self.left_menu)
+        left_layout.addWidget(self.left_menu)
 
         main_settings_item = VListWidgetItem(
             parent=self.left_menu,
@@ -1113,13 +1123,13 @@ class WinSettings(UMainWidget):
         self.warn_wid.hide()
         btns_lay.addWidget(self.warn_wid)
 
-        self.ok_btn = SettingsButton(Lng.ok[Cfg.lng_index])
-        self.ok_btn.setFixedWidth(95)
+        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        # self.ok_btn.setFixedWidth(95)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = SettingsButton(Lng.cancel[Cfg.lng_index])
-        cancel_btn.setFixedWidth(95)
+        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
+        # cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
 
@@ -1149,7 +1159,7 @@ class WinSettings(UMainWidget):
         self.init_right_side(idx)
 
     def blink_ok_btn(self):
-        self.ok_btn.setText(Lng.restart[Cfg.lng_index])
+        # self.ok_btn.setText(Lng.restart[Cfg.lng_index])
         self.warn_wid.show()
 
     def init_right_side(self, idx: int):
@@ -1195,7 +1205,7 @@ class WinSettings(UMainWidget):
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
         self.warn_wid.hide()
-        self.ok_btn.setText(Lng.ok[Cfg.lng_index])
+        # self.ok_btn.setText(Lng.ok[Cfg.lng_index])
 
         wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
