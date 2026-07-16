@@ -146,9 +146,7 @@ class ExportWin(UMainWidget):
             Static.external_hashdir
         )
 
-
         tab_widget = QGroupBox()
-        # tab_widget.tabBar().hide()
         tab_widget.setFixedSize(self.ww, self.hh)
         self.central_layout.addWidget(tab_widget)
 
@@ -258,8 +256,8 @@ class RebootSettings(SettingsGroup):
 
         lng_wid = RowArrowWidget(Lng.language_max[Cfg.lng_index])
         self.layout_.addWidget(lng_wid)
-        self.lng_btn = SettingsButton(text=Lng.russian[Cfg.lng_index])
-        self.lng_btn.setFixedWidth(109)
+        self.lng_btn = UPushButton(text=Lng.russian[Cfg.lng_index])
+        self.lng_btn.setFixedWidth(100)
         self.lng_btn.setMenu(lng_menu)
         lng_wid.replace_arrow_widget(self.lng_btn)
 
@@ -361,29 +359,17 @@ class SizesWin(UMainWidget):
         self.set_close_only()
         self.setWindowTitle(Lng.data_size[Cfg.lng_index])
         self.resize(self.ww, self.hh)
-
-        central = QWidget()
-        self.setCentralWidget(central)
-        layout = QVBoxLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        info_widget = QWidget()
-        info_layout = QVBoxLayout(info_widget)
-        info_layout.setContentsMargins(5, 5, 5, 5)
-        info_layout.setSpacing(5)
+        self.central_layout.setSpacing(10)
 
         total_size = SharedUtils.get_f_size(sum(
             item.size for item in size_items
         ))
         first_row = QLabel(f"{Lng.data_size[Cfg.lng_index]}: {total_size}")
-        info_layout.addWidget(first_row)
+        self.central_layout.addWidget(first_row)
 
         total = sum(item.total_images for item in size_items)
         sec_row = QLabel(f"{Lng.images[Cfg.lng_index]}: {total}")
-        info_layout.addWidget(sec_row)
-
-        layout.addWidget(info_widget)
+        self.central_layout.addWidget(sec_row)
 
         headers = [Lng.folder[Cfg.lng_index], Lng.file_size[Cfg.lng_index], Lng.images[Cfg.lng_index]]
         self.table = QTableWidget()
@@ -392,7 +378,7 @@ class SizesWin(UMainWidget):
         self.table.setHorizontalHeaderLabels(headers)
         self.table.setRowCount(len(size_items))
         self.table.verticalHeader().hide()
-        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.horizontalScrollBar().setDisabled(True)
         self.table.horizontalScrollBar().hide()
@@ -403,7 +389,7 @@ class SizesWin(UMainWidget):
         self.table.setColumnWidth(1, other_width)
         self.table.setColumnWidth(2, other_width)
 
-        layout.addWidget(self.table)
+        self.central_layout.addWidget(self.table)
 
         self.populate_table(size_items)
         self.setFocus()
