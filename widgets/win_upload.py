@@ -126,12 +126,10 @@ class UploadWin(UMainWidget):
 
         self.btn_ok = UPushButton(Lng.ok[Cfg.lng_index])
         self.btn_ok.clicked.connect(self.ok_clicked_cmd)
-        self.btn_ok.setFixedWidth(90)
         btn_layout.addWidget(self.btn_ok)
 
         self.btn_cancel = UPushButton(Lng.cancel[Cfg.lng_index])
         self.btn_cancel.clicked.connect(self.deleteLater)
-        self.btn_cancel.setFixedWidth(90)
         btn_layout.addWidget(self.btn_cancel)
 
         btn_layout.addStretch()
@@ -171,7 +169,10 @@ class UploadWin(UMainWidget):
         )
 
     def ok_clicked_cmd(self):
-        self.ok_clicked.emit(self.dest)
+        if self.files_to_copy:
+            self.ok_clicked.emit(self.dest)
+        else:
+            self.deleteLater()
 
     def on_folder_selected(self, index):
         if self.file_model.isDir(index):
