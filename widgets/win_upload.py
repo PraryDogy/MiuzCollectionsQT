@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QListWidget,
 from cfg import Cfg, Static
 from system.lang import Lng
 from system.main_folder import Mf
-from system.shared_utils import SharedUtils
+from system.shared_utils import ImgUtils, SharedUtils
 
 from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton
 
@@ -22,6 +22,7 @@ class UploadWin(UMainWidget):
         super().__init__()
         self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
         self.resize(700, 500)
+        # self.setAcceptDrops(True)
 
         self.root_dir = mf.mf_current_path
         self.dest = os.path.join(
@@ -44,7 +45,6 @@ class UploadWin(UMainWidget):
         left_layout = QVBoxLayout(left_wid)
         left_layout.setContentsMargins(1, 10, 1, 1)
         left_layout.setSpacing(0)
-
 
         self.tree_view = QTreeView()
         self.tree_view.setIndentation(10)
@@ -82,27 +82,15 @@ class UploadWin(UMainWidget):
         group_one_layout.addWidget(title)
 
         self.list_widget = QListWidget()
-        total_size = 0
-        for file_path in self.files_to_copy:
-            file_name = os.path.basename(file_path)
-            item = QListWidgetItem(file_name)
-            item.setIcon(QIcon(self.img_icon_path))
-            item.setToolTip(file_path)
-            self.list_widget.addItem(item)
-            total_size += os.path.getsize(file_path)    
-
         group_one_layout.addWidget(self.list_widget)
         
-        total_files = RowArrowWidget(
-            f"{Lng.total_files[Cfg.lng_index]}: {len(self.files_to_copy)}"
-        )
-        total_files.hide_arrow()
-        group_one_layout.addWidget(total_files)
+        self.total_files_widget = RowArrowWidget("")
+        self.total_files_widget.hide_arrow()
+        group_one_layout.addWidget(self.total_files_widget)
 
-        size_mb = SharedUtils.get_f_size(total_size)
-        total_size = RowArrowWidget(f"{Lng.file_size[Cfg.lng_index]}: {size_mb}")
-        total_size.hide_arrow()
-        group_one_layout.addWidget(total_size)
+        self.total_size_widget = RowArrowWidget("")
+        self.total_size_widget.hide_arrow()
+        group_one_layout.addWidget(self.total_size_widget)
 
         self.lbl_target_dir = RowArrowWidget("")
         self.lbl_target_dir.hide_arrow()
@@ -133,6 +121,29 @@ class UploadWin(UMainWidget):
         btn_layout.addWidget(self.btn_cancel)
 
         btn_layout.addStretch()
+
+        self.init_list()
+
+    def init_list(self):
+        total_size = 0
+        self.list_widget.clear()
+
+        for file_path in self.files_to_copy:
+            file_name = os.path.basename(file_path)
+            item = QListWidgetItem(file_name)
+            item.setIcon(QIcon(self.img_icon_path))
+            item.setToolTip(file_path)
+            self.list_widget.addItem(item)
+            total_size += os.path.getsize(file_path)    
+
+
+        txt = f"{Lng.total_files[Cfg.lng_index]}: {len(self.files_to_copy)}"
+        self.total_files_widget.text_widget.setText(txt)
+
+        size_mb = SharedUtils.get_f_size(total_size)
+        text = f"{Lng.file_size[Cfg.lng_index]}: {size_mb}"
+        self.total_size_widget.text_widget.setText(text)
+
 
     def _hide_neighbor_folders(self, loaded_path):
         """Скрывает все папки на верхнем уровне интерфейса, кроме self.root_dir."""
@@ -185,3 +196,20 @@ class UploadWin(UMainWidget):
         elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.ok_clicked_cmd()
         return super().keyPressEvent(a0)
+
+    def dragEnterEvent(self, a0):
+        a0.accept()
+        return super().dragEnterEvent(a0)
+    
+    def dropEvent(self, a0):
+
+        if a0.mimeData().hasUrls():
+            urls = [
+                i
+                for i in a0.mimeData().urls()
+                if i.toLocalFile().endswith(ImgUtils.ext_all)
+                and
+                os.path.isfile(i.toLocalFile())
+            ]
+
+        return super().dropEvent(a0)
