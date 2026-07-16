@@ -30,6 +30,7 @@ class BaseScanerItem:
     mf: Mf
     engine: sqlalchemy.Engine
     queue: Queue
+    response_queue: Queue
     lng_index: int
     total_count: int
     current_count: int

@@ -1,16 +1,5 @@
-class Foo:
+finder_images = [i for i in range(0, 50)]
+del_images = [i for i in range(0, 10)]
 
-    def __init__(self, callback: callable):
-        super().__init__()
-        self.callback = callback
-
-    def task(self):
-        self.callback()
-
-
-paths = ["path 1", "path 2", ]
-app = "Photoshop"
-data = (paths, app)
-callback = lambda data=data: print(data)
-foo = Foo(callback)
-foo.task()
+if len(del_images) > len(finder_images) * 0.5:
+    print("опасное удаление")

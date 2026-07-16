@@ -14,9 +14,8 @@ from system.items import (ForcedScanerItem, ImgViewItem, SettingsItem,
                           UpdateThumbItem, WatchDogItem)
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
-                                 WatchDog)
-from system.scaner import BaseScaner, ForcedScaner
+from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
+from system.scaner import BaseScaner, ForcedScaner, ScanerWorker
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
@@ -56,6 +55,14 @@ class TestWid(QFrame):
         ...
 
 
+class DangerWarn(ConfirmWindow):
+    def __init__(self, text):
+        super().__init__(text)
+        self.ok_btn.setText("Разрешить")
+        self.cancel_btn.setText("Запретить")
+
+
+
 class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
@@ -72,6 +79,7 @@ class WinMain(UMainWindow):
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
         self.files_to_copy = set()
+        self.stop_scaner = True
 
         h_wid_main = QWidget()
         h_lay_main = QHBoxLayout(h_wid_main)
@@ -650,13 +658,30 @@ class WinMain(UMainWindow):
         self.view_win.show()
 
     def poll_scaner_task(self, ms: int = 3000):
+
+        def can_continue(value: bool):
+            """
+            True = продолжить сканирование, False = прервать сканирование
+            """
+            self.win_warn.deleteLater()
+            self.scaner_task.response_queue.put(value)
+
         if not hasattr(self, "scaner_task") or not self.scaner_task:
             self.scaner_poll_timer.start(ms)
             return
         while not self.scaner_task.process_queue.empty():
             text = self.scaner_task.process_queue.get()
+
+            if text == "9000":
+                self.win_warn = DangerWarn("Обнаружено опасное удаление, нажмите ок чтобы разрешить удаление")
+                self.win_warn.center_to_parent(self)
+                self.win_warn.ok_clicked.connect(lambda: can_continue(True))
+                self.win_warn.cancel_clicked.connect(lambda: can_continue(False))
+                self.win_warn.show()
+
             if self.bar_bottom.progress_bar.text() != text:
                 self.bar_bottom.progress_bar.setText(text)
+
         if not self.scaner_task.is_alive():
             self.scaner_task.terminate_join()
             self.bar_bottom.progress_bar.setText("")
@@ -701,13 +726,13 @@ class WinMain(UMainWindow):
                     dirs_to_scan=self.forced_scaner_dirs.copy(),
                     lng_index=Cfg.lng_index
                 )
-                self.scaner_task = ProcessWorker(
+                self.scaner_task = ScanerWorker(
                     target=ForcedScaner.start,
                     args=(forced_scaner_item, )
                     )
             else:
                 # print("штатно запускаю ОБЩИЙ сканер")
-                self.scaner_task = ProcessWorker(
+                self.scaner_task = ScanerWorker(
                     target=BaseScaner.start,
                     args=(Mf.items, Cfg.lng_index, )
                 )

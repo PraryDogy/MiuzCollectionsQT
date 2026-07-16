@@ -10,11 +10,12 @@ from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
+from system.multiprocess import BaseProcessWorker
 from system.shared_utils import ImgUtils
 from system.utils import Utils
 
-from .items import (ScanerDirItem, ScanerImgItem, BaseScanerItem,
-                    ForcedScanerItem)
+from .items import (BaseScanerItem, ForcedScanerItem, ScanerDirItem,
+                    ScanerImgItem)
 
 
 class Tools:    
@@ -22,6 +23,13 @@ class Tools:
         filepath = os.path.join(Static.external_files_dir, "log.txt")
         with open(filepath, "a") as f:
             f.write(text)
+
+
+class ScanerWorker(BaseProcessWorker):
+    def __init__(self, target: callable, args: tuple):
+        self.process_queue = Queue()
+        self.response_queue = Queue()
+        super().__init__(target, (*args, self.process_queue, self.response_queue))
 
 
 class _DirsLoader:
@@ -292,7 +300,7 @@ class _ImgCompator:
             img_item
             for data, img_item in finder_dict.items()
             if data not in db_dict
-        ]
+        ]        
         return removed_images, new_images
 
 
@@ -463,7 +471,9 @@ class _ThumbsUpdater:
         )
 
 
-class _DirsToScanWorker:    
+class _DirsToScanWorker:   
+    warning_code = "9000"
+
     @staticmethod
     def start(dirs_to_scan: list[ScanerDirItem], scaner_item: BaseScanerItem):
         """
@@ -474,10 +484,24 @@ class _DirsToScanWorker:
         """
         finder_images = _ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
         db_images = _ImgLoader.get_db_images(scaner_item, dirs_to_scan)
-        del_images, new_images = _ImgCompator.start(finder_images, db_images)
+        removed_images, new_images = _ImgCompator.start(finder_images, db_images)
+
+        if len(removed_images) > len(db_images) * 0.5:
+            scaner_item.queue.put(_DirsToScanWorker.warning_code)
+
+            while True:
+                if not scaner_item.response_queue.empty():
+                    can_continue = scaner_item.response_queue.get()
+                    if can_continue:
+                        print("сканирование продолжено")
+                        break
+                    else:
+                        print("сканирование прервано")
+                        return
+
         # общий счет для отображения в GUI
-        scaner_item.total_count = len(del_images) + len(new_images)
-        _ThumbsUpdater.del_thumbs(scaner_item, del_images)
+        scaner_item.total_count = len(removed_images) + len(new_images)
+        _ThumbsUpdater.del_thumbs(scaner_item, removed_images)
         _ThumbsUpdater.add_thumbs(scaner_item, new_images)
         _DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
     
@@ -548,7 +572,7 @@ class _RemovedDirsWorker:
 
 class BaseScaner:
     @staticmethod
-    def start(mf_list: list[Mf], lng_index: int, queue: Queue):
+    def start(mf_list: list[Mf], lng_index: int, queue: Queue, response_queue: Queue):
         engine = Dbase.create_engine()
         # нельзя обращаться сразу к Mf так как это мультипроцесс
         for mf in mf_list:
@@ -556,6 +580,7 @@ class BaseScaner:
                 mf=mf,
                 engine=engine, 
                 queue=queue,
+                response_queue=response_queue,
                 lng_index=lng_index,
                 total_count=0,
                 current_count=0
@@ -631,19 +656,20 @@ class BaseScaner:
 class ForcedScaner:
 
     @staticmethod
-    def start(item: ForcedScanerItem, queue: Queue):
+    def start(item: ForcedScanerItem, queue: Queue, response_queue: Queue):
         print("single dir scaner started, mf:", item.mf.mf_alias)
         ForcedScaner.single_mf_scan(
             mf=item.mf,
             dirs_to_scan=item.dirs_to_scan,
             lng_index=item.lng_index,
-            queue=queue
+            queue=queue,
+            response_queue=response_queue
         )
         print("single dir scaner finished, mf:", item.mf.mf_alias)
 
 
     @staticmethod
-    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], lng_index: int, queue: Queue):
+    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], lng_index: int, queue: Queue, response_queue: Queue):
         """
         Сканирует заданне директории в пределах Mf на предмет новых или
         удаленных изображений.
@@ -657,6 +683,7 @@ class ForcedScaner:
             mf=mf,
             engine=engine,
             queue=queue,
+            response_queue=response_queue,
             lng_index=lng_index, 
             total_count=0,
             current_count=0
