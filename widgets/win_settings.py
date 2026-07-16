@@ -13,7 +13,8 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFileDialog, QGraphicsOpacityEffect,
                              QGroupBox, QHBoxLayout, QLabel, QLineEdit,
                              QSpacerItem, QSpinBox, QSplitter, QTableWidget,
-                             QTableWidgetItem, QVBoxLayout, QWidget)
+                             QTableWidgetItem, QTabWidget, QVBoxLayout,
+                             QWidget)
 from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes
@@ -28,8 +29,8 @@ from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, RowArrowWidget, UPushButton, ULineEdit,
-                            UMainWindow, UMenu, UTextEdit, VListSpacerItem,
+from ._base_widgets import (HSep, RowArrowWidget, ULineEdit, UMainWidget,
+                            UMenu, UPushButton, UTextEdit, VListSpacerItem,
                             VListWidget, VListWidgetItem)
 from .path_widget import PathWidget
 from .win_smb import SuperWarnWindow
@@ -125,15 +126,16 @@ class SettingsListItem(VListWidgetItem):
 # ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ
 
 
-class ExportWin(UMainWindow):
-    ww = 250
-    hh = 300
+class ExportWin(UMainWidget):
+    ww = 230
+    hh = 290
     def __init__(self):
         super().__init__()
         self.setWindowTitle(Lng.export_settings[Cfg.lng_index])
         self.set_always_on_top()
         self.set_close_only()
         self.central_layout.setSpacing(5)
+        self.central_layout.setContentsMargins(5, 10, 5, 5)
 
         urls = (
             Static.external_cfg,
@@ -144,9 +146,19 @@ class ExportWin(UMainWindow):
             Static.external_hashdir
         )
 
+
+        tab_widget = QGroupBox()
+        # tab_widget.tabBar().hide()
+        tab_widget.setFixedSize(self.ww, self.hh)
+        self.central_layout.addWidget(tab_widget)
+
+        tab_layout = QVBoxLayout(tab_widget)
+        tab_layout.setContentsMargins(0, 10, 0, 0)
+        tab_layout.setSpacing(0)
+
         v_list = VListWidget(self)
         v_list.itemClicked.connect(self.item_cmd)
-        self.central_layout.addWidget(v_list)
+        tab_layout.addWidget(v_list)
 
         for i in urls:
             text = os.path.basename(i)
@@ -161,13 +173,13 @@ class ExportWin(UMainWindow):
 
         btn_layout.addStretch()
 
-        btn_ok = SettingsButton(Lng.ok[Cfg.lng_index])
+        btn_ok = UPushButton(Lng.ok[Cfg.lng_index])
         btn_ok.clicked.connect(
             lambda: self.export_files(self.get_urls())
         )
         btn_layout.addWidget(btn_ok)
 
-        btn_cancel = SettingsButton(Lng.cancel[Cfg.lng_index])
+        btn_cancel = UPushButton(Lng.cancel[Cfg.lng_index])
         btn_cancel.clicked.connect(self.deleteLater)
         btn_layout.addWidget(btn_cancel)
 
@@ -339,7 +351,7 @@ class RebootSettings(SettingsGroup):
         self.cfg_changed.emit()
 
 
-class SizesWin(UMainWindow):
+class SizesWin(UMainWidget):
     ww = 500
     hh = 330
 
@@ -821,7 +833,7 @@ class MfSettings(QWidget, StateWid):
                 QTimer.singleShot(1000, poll_task)
 
         def fin():
-            for i in UMainWindow.win_list:
+            for i in UMainWidget.win_list:
                 i.hide()
             self.mf_remover.start()
             QTimer.singleShot(1000, poll_task)
@@ -1026,7 +1038,7 @@ class NewFolder(QWidget, StateWid):
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
-class WinSettings(UMainWindow):
+class WinSettings(UMainWidget):
     closed = pyqtSignal()
     svg_folder = os.path.join(Static.internal_images, "img_folder.svg")
     svg_filters = os.path.join(Static.internal_images, "filters.svg")
@@ -1258,7 +1270,7 @@ class WinSettings(UMainWindow):
         return super().mouseReleaseEvent(a0)
 
 
-class NewMfWin(UMainWindow):
+class NewMfWin(UMainWidget):
     """
     Окно настроек при первой настройке приложения.
     """
