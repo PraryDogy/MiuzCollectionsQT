@@ -47,12 +47,10 @@ class ConfirmWindow(UMainWidget):
         self.central_layout.addLayout(btn_layout)
 
         self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
-        self.ok_btn.setFixedWidth(90)
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         btn_layout.addWidget(self.ok_btn)
 
         self.cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
-        self.cancel_btn.setFixedWidth(90)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn)
