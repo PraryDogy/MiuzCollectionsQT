@@ -66,12 +66,6 @@ class SettingsLabel(QLabel):
         self.setMinimumWidth(30)
 
 
-class SettingsButton(UPushButton):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setFixedWidth(100)
-
-
 class SettingsGroup(QGroupBox):
     def __init__(self):
         """

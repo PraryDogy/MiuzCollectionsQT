@@ -10,7 +10,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 
-from ._base_widgets import UMainWindow, UPushButton
+from ._base_widgets import UMainWidget, UPushButton
 from .path_widget import PathWidget
 
 
