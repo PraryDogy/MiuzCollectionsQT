@@ -44,7 +44,7 @@ class _DirsLoader:
             f"{scaner_item.mf.mf_alias}: "
             f"{Lng.search_in[scaner_item.lng_index].lower()}"
         )
-        scaner_item.queue.put(text)
+        scaner_item.process_queue.put(text)
 
         dirs: list[ScanerDirItem] = []
         stack = [scaner_item.mf.mf_current_path]
@@ -332,7 +332,7 @@ class _ThumbsUpdater:
 
         def _remove_thumb(img_item: ScanerImgItem):
             scaner_item.current_count += 1
-            scaner_item.queue.put(
+            scaner_item.process_queue.put(
                 _ThumbsUpdater.get_gui_text(scaner_item)
             )
             abs_thumb_path = Utils.get_abs_thumb_path(
@@ -430,7 +430,7 @@ class _ThumbsUpdater:
             Создает и записывает в `hashdir` миниатюру.
             """
             scaner_item.current_count += 1
-            scaner_item.queue.put(
+            scaner_item.process_queue.put(
                 _ThumbsUpdater.get_gui_text(scaner_item)
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
@@ -487,7 +487,8 @@ class _DirsToScanWorker:
         removed_images, new_images = _ImgCompator.start(finder_images, db_images)
 
         if len(removed_images) > len(db_images) * 0.5:
-            scaner_item.queue.put(_DirsToScanWorker.warning_code)
+            data = ("9000", scaner_item.mf.mf_alias)
+            scaner_item.process_queue.put(data)
 
             while True:
                 if not scaner_item.response_queue.empty():
@@ -579,7 +580,7 @@ class BaseScaner:
             scaner_item = BaseScanerItem(
                 mf=mf,
                 engine=engine, 
-                queue=queue,
+                process_queue=queue,
                 response_queue=response_queue,
                 lng_index=lng_index,
                 total_count=0,
@@ -600,7 +601,7 @@ class BaseScaner:
                     f"{scaner_item.mf.mf_alias}: "
                     f"{Lng.no_connection[lng_index].lower()}"
                 )
-                scaner_item.queue.put(text)
+                scaner_item.process_queue.put(text)
                 print(text)
                 sleep(3)
         engine.dispose()
@@ -682,7 +683,7 @@ class ForcedScaner:
         scaner_item = BaseScanerItem(
             mf=mf,
             engine=engine,
-            queue=queue,
+            process_queue=queue,
             response_queue=response_queue,
             lng_index=lng_index, 
             total_count=0,

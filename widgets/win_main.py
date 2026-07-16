@@ -56,8 +56,12 @@ class TestWid(QFrame):
 
 
 class DangerWarn(ConfirmWindow):
-    def __init__(self, text):
+    icon_path = os.path.join(Static.internal_images, "super_warning.svg")
+
+    def __init__(self, mf_alias: str):
+        text = f"{mf_alias}: Обнаружено опасное удаление, нажмите ок чтобы разрешить удаление"
         super().__init__(text)
+        self.svg_widget.load(self.icon_path)
         self.ok_btn.setText("Разрешить")
         self.cancel_btn.setText("Запретить")
 
@@ -659,28 +663,36 @@ class WinMain(UMainWindow):
 
     def poll_scaner_task(self, ms: int = 3000):
 
-        def can_continue(value: bool):
+        def can_continue(can_continue: bool, mf_alias: str):
             """
             True = продолжить сканирование, False = прервать сканирование
             """
             self.win_warn.deleteLater()
-            self.scaner_task.response_queue.put(value)
+            self.scaner_task.response_queue.put(can_continue)
+            if not can_continue:
+                for mf in Mf.items:
+                    if mf.mf_alias == mf_alias:
+                        mf.set_mf_current_path(None)
+                        mf.mf_paths = ["", ]
+                        self.open_win_smb(mf)
 
         if not hasattr(self, "scaner_task") or not self.scaner_task:
             self.scaner_poll_timer.start(ms)
             return
         while not self.scaner_task.process_queue.empty():
-            text = self.scaner_task.process_queue.get()
+            data = self.scaner_task.process_queue.get()
 
-            if text == "9000":
-                self.win_warn = DangerWarn("Обнаружено опасное удаление, нажмите ок чтобы разрешить удаление")
+            if isinstance(data, tuple):
+                error_code, mf_alias = data
+                self.win_warn = DangerWarn(mf_alias)
                 self.win_warn.center_to_parent(self)
-                self.win_warn.ok_clicked.connect(lambda: can_continue(True))
-                self.win_warn.cancel_clicked.connect(lambda: can_continue(False))
+                self.win_warn.ok_clicked.connect(lambda: can_continue(True, mf_alias))
+                self.win_warn.cancel_clicked.connect(lambda: can_continue(False, mf_alias))
                 self.win_warn.show()
 
-            if self.bar_bottom.progress_bar.text() != text:
-                self.bar_bottom.progress_bar.setText(text)
+            else:
+                if self.bar_bottom.progress_bar.text() != data:
+                    self.bar_bottom.progress_bar.setText(data)
 
         if not self.scaner_task.is_alive():
             self.scaner_task.terminate_join()

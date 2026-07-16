@@ -29,7 +29,7 @@ class ReadImgItem:
 class BaseScanerItem:
     mf: Mf
     engine: sqlalchemy.Engine
-    queue: Queue
+    process_queue: Queue
     response_queue: Queue
     lng_index: int
     total_count: int

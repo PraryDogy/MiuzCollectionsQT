@@ -30,10 +30,10 @@ class ConfirmWindow(UMainWidget):
         text_layout.setSpacing(15)
         self.central_layout.addLayout(text_layout)
 
-        svg_wid = QSvgWidget()
-        svg_wid.load(self.icon_path)
-        svg_wid.setFixedSize(50, 50)
-        text_layout.addWidget(svg_wid)
+        self.svg_widget = QSvgWidget()
+        self.svg_widget.load(self.icon_path)
+        self.svg_widget.setFixedSize(50, 50)
+        text_layout.addWidget(self.svg_widget)
 
         text_wid = QLabel(text)
         text_wid.setWordWrap(True)
