@@ -20,7 +20,7 @@ def restart_app():
     QApplication.exit(0)
 
 
-class SuperWarnWindow(UMainWindow):
+class SuperWarnWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     icon_path = os.path.join(Static.internal_images, "super_warning.svg")
     icon_size = 60
@@ -30,10 +30,13 @@ class SuperWarnWindow(UMainWindow):
         self.setWindowTitle(Lng.attention[Cfg.lng_index])
         self.set_always_on_top()
         self.set_close_only()
+
+        self.central_layout.setContentsMargins(5, 5, 5, 2)
+        self.central_layout.setSpacing(0)
+
         above_layout = QHBoxLayout()
         above_layout.setSpacing(5)
-        above_layout.setContentsMargins(0, 0, 15, 0)
-        self.central_layout.setSpacing(10)
+        above_layout.setContentsMargins(0, 0, 0, 0)
         self.central_layout.addLayout(above_layout)
 
         svg_widget = QSvgWidget()
@@ -58,11 +61,9 @@ class SuperWarnWindow(UMainWindow):
         btns_lay.addStretch()
         self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
-        self.ok_btn.setFixedWidth(90)
         btns_lay.addWidget(self.ok_btn)
         cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(90)
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()
 
@@ -81,7 +82,7 @@ class WarnWidget(QWidget):
         super().__init__()
         self.setFixedWidth(350)
         h_lay = QHBoxLayout(self)
-        h_lay.setContentsMargins(2, 5, 2, 5)
+        h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
         warn_wid = QSvgWidget()
@@ -98,7 +99,7 @@ class WarnWidget(QWidget):
         h_lay.addWidget(up_label)
 
 
-class WinSmb(UMainWindow):
+class WinSmb(UMainWidget):
 
     def __init__(self, mf: Mf):
         super().__init__()
@@ -126,11 +127,9 @@ class WinSmb(UMainWindow):
         btns_lay.addStretch()
         self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
         self.ok_btn.clicked.connect(self.ok_cmd)
-        self.ok_btn.setFixedWidth(90)
         btns_lay.addWidget(self.ok_btn)
         cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
-        cancel_btn.setFixedWidth(90)
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()
 
