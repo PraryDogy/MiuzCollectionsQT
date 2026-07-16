@@ -494,3 +494,17 @@ class Lng:
         "Целевая папка",
         "Destination folder"
     )
+    allow = (
+        "Разрешить",
+        "Allow"
+    )
+
+    deny = (
+        "Запретить",
+        "Deny"
+    )
+    dangerous_text = (
+        "Обнаружено опасное действие!\nВозможно, неверно указан путь к каталогу изображений.\nНажмите «Разрешить», чтобы продолжить, или «Запретить», чтобы указать правильный путь.",
+        "Dangerous action detected!\nThe image directory path might be incorrect.\nClick \"Allow\" to continue, or \"Deny\" to specify the correct path."
+    )
+

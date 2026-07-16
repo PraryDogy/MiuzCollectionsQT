@@ -57,14 +57,15 @@ class TestWid(QFrame):
 
 class DangerWarn(ConfirmWindow):
     icon_path = os.path.join(Static.internal_images, "super_warning.svg")
+    hh = 165
 
     def __init__(self, mf_alias: str):
-        text = f"{mf_alias}: Обнаружено опасное удаление, нажмите ок чтобы разрешить удаление"
+        text = f"{mf_alias}:\n{Lng.dangerous_text[Cfg.lng_index]}"
         super().__init__(text)
         self.svg_widget.load(self.icon_path)
-        self.ok_btn.setText("Разрешить")
-        self.cancel_btn.setText("Запретить")
-
+        self.ok_btn.setText(Lng.allow[Cfg.lng_index])
+        self.cancel_btn.setText(Lng.deny[Cfg.lng_index])
+        self.setFixedHeight(self.hh)
 
 
 class WinMain(UMainWindow):
@@ -79,6 +80,10 @@ class WinMain(UMainWindow):
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.app_name}")
         self.setMenuBar(BarMacos())
+
+        # self.test = DangerWarn(Mf.current_mf.mf_alias)
+        # self.test.center_to_parent(self)
+        # self.test.show()
 
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
