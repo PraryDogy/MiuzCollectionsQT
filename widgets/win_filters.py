@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QTabWidget, QVBoxLayout
+from PyQt6.QtWidgets import QVBoxLayout, QGroupBox
 
 from cfg import Cfg, Dynamic
 from system.filters import Filters
@@ -22,16 +22,18 @@ class WinFilters(UMainWidget):
         self.setWindowTitle(Lng.filters[Cfg.lng_index])
         self.setFixedSize(self.ww, self.hh)
 
-        self.central_layout.setSpacing(12)
-        self.central_layout.setContentsMargins(5, 15, 5, 15)
+        self.central_layout.setSpacing(10)
+        self.central_layout.setContentsMargins(5, 5, 5, 10)
 
-        group = QTabWidget()
-        group.tabBar().hide()
+        group = QGroupBox()
         self.central_layout.addWidget(group)
+        group_lay = QVBoxLayout(group)
+        group_lay.setContentsMargins(1, 10, 1, 1)
+        group_lay.setSpacing(0)
 
         self.list_widget = VListWidget()
         self.list_widget.itemClicked.connect(self.item_cmd)
-        group.addTab(self.list_widget, "1")
+        group_lay.addWidget(self.list_widget)
 
         favs_item = VListWidgetItem(
             parent=self.list_widget,

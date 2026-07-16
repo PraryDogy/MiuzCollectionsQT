@@ -13,8 +13,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFileDialog, QGraphicsOpacityEffect,
                              QGroupBox, QHBoxLayout, QLabel, QLineEdit,
                              QSpacerItem, QSpinBox, QSplitter, QTableWidget,
-                             QTableWidgetItem, QTabWidget, QVBoxLayout,
-                             QWidget)
+                             QTableWidgetItem, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes
