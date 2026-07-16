@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
 from system.items import SettingsItem
@@ -82,81 +83,41 @@ class WidSearch(ULineEdit):
     def mouseDoubleClickEvent(self, a0):
         self.open_img_search.emit()
         return super().mouseDoubleClickEvent(a0)
-    
-
-class UFrame(QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setObjectName("uFrame")
-        self.normal_style()
-
-    def normal_style(self):
-        self.setStyleSheet("""
-            uFrame {
-                background: transparent;
-                padding-left: 2px;
-                padding-right: 2px;
-            }
-        """)
-
-    def solid_style(self):
-        self.setStyleSheet("""
-            uFrame {
-                background: rgba(128, 128, 128, 0.5);
-                border-radius: 7px;
-                padding-left: 2px;
-                padding-right: 2px;
-            }
-        """)
 
 
 class BarTopBtn(QWidget):
-    """
-    QFrame с иконкой SVG (в отдельном фрейме) и подписью.
-    Меняет стиль только иконки при наведении/клике, текст остаётся неизменным.
-    """
-
     clicked_ = pyqtSignal()
-    width_ = 40
-    height_ = 35
-    svg_size = 20
+    svg_size = 30
 
-
-    def __init__(self):
+    def __init__(self, filename: Literal["sort", "filters", "calendar", "settings"]):
         super().__init__()
+        self.filename = filename
         
         self.v_lay = QVBoxLayout(self)
         self.v_lay.setContentsMargins(0, 0, 0, 0)
         self.v_lay.setSpacing(1)
         self.v_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # --- Фрейм под SVG ---
-        self.svg_frame = UFrame()
-        self.svg_frame.setFixedSize(self.width_, self.height_)
-        self.svg_lay = QVBoxLayout(self.svg_frame)
-        self.svg_lay.setContentsMargins(0, 0, 0, 0)
-        self.svg_lay.setSpacing(0)
-        self.v_lay.addWidget(self.svg_frame, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        # --- SVG-иконка ---
         self.svg_btn = QSvgWidget()
         self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
-        self.svg_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # --- Подпись ---
         self.lbl = QLabel()
-        self.lbl.setStyleSheet(
-            """
-                font-size: 10px;
-            """
-        )
+        self.lbl.setStyleSheet("font-size: 10px;")
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        self.set_normal_style()
+
     def set_solid_style(self):
-        self.svg_frame.solid_style()
+        icon_name = f"{self.filename}_selected.svg"
+        icon_path = os.path.join(Static.internal_images, icon_name)
+        self.svg_btn.load(icon_path)
 
     def set_normal_style(self):
-        self.svg_frame.normal_style()
+        icon_name = f"{self.filename}.svg"
+        icon_path = os.path.join(Static.internal_images, icon_name)
+        self.svg_btn.load(icon_path)
 
     def mouseReleaseEvent(self, a0):
         """Испускает сигнал при клике левой кнопкой мыши."""
@@ -165,21 +126,11 @@ class BarTopBtn(QWidget):
 
 
 class DatesBtn(BarTopBtn):
-    """
-    Кнопка для выбора даты с SVG-иконкой календаря и подписью.
-    
-    Особенности:
-        - Испускает сигнал `clicked_` при клике.
-        - Меняет стиль на сплошной при нажатии.
-        - Использует SVG-иконку календаря.
-    """
-
-    ICON_PATH = os.path.join(Static.internal_images, "calendar.svg")
+    filename = "calendar"
 
     def __init__(self):
-        super().__init__()
+        super().__init__(self.filename)
         self.lbl.setText(Lng.dates[Cfg.lng_index])
-        self.svg_btn.load(self.ICON_PATH)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         """Испускает сигнал и применяет сплошной стиль при клике левой кнопкой мыши."""
@@ -189,32 +140,18 @@ class DatesBtn(BarTopBtn):
 
 
 class FiltersBtn(BarTopBtn):
-    """
-    Кнопка для управления фильтрами с SVG-иконкой.
-
-    Особенности:
-        - Отображает список фильтров через выпадающее меню.
-        - Позволяет включать/выключать фильтры.
-        - Сигнал `clicked_` испускается при изменении фильтров.
-        - Имеет пункт сброса всех фильтров.
-    """
-
-    ICON_PATH = os.path.join(Static.internal_images, "filters.svg")
-    menu_ww = 200
-    # edit_filters = pyqtSignal(SettingsItem)
+    filename = "filters"
 
     def __init__(self):
-        super().__init__()
+        super().__init__(self.filename)
         self.lbl.setText(Lng.filters[Cfg.lng_index])
-        self.svg_btn.load(self.ICON_PATH)
         
 
 class SortBtn(BarTopBtn):
-    ICON_PATH = os.path.join(Static.internal_images, "sort.svg")
+    filename = "sort"
 
     def __init__(self):
-        super().__init__()
-        self.svg_btn.load(self.ICON_PATH)
+        super().__init__(self.filename)
         self.set_text()
 
     def set_text(self):
@@ -256,23 +193,14 @@ class SortBtn(BarTopBtn):
 
 
 class SettingsBtn(BarTopBtn):
-    """
-    Кнопка для открытия окна настроек с SVG-иконкой.
-
-    Особенности:
-        - Испускает сигнал `clicked_` при клике.
-        - Отображает подпись "Настройки".
-    """
-
-    ICON_PATH = os.path.join(Static.internal_images, "settings.svg")
+    filename = "settings"
 
     def __init__(self):
-        super().__init__()
+        super().__init__(self.filename)
         self.lbl.setText(Lng.settings[Cfg.lng_index])
-        self.svg_btn.load(self.ICON_PATH)
 
 
-class ExitImgSearchBtn(UFrame):
+class ExitImgSearchBtn(QFrame):
     clicked_ = pyqtSignal()
     ICON_PATH = os.path.join(Static.internal_images, "clear.svg")
     icon_size = 15
@@ -296,7 +224,7 @@ class ExitImgSearchBtn(UFrame):
         svg_widget.setParent(icon_container)
         svg_widget.move(0, 2)
 
-        self.solid_style()
+        # self.solid_style()
         self.setFixedHeight(self.hh)
 
     def mouseReleaseEvent(self, a0):
