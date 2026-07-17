@@ -1,6 +1,7 @@
 import os
+import re
 
-from PyQt6.QtCore import QDir, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QDir, Qt, QTimer, pyqtSignal, QSortFilterProxyModel
 from PyQt6.QtGui import QFileSystemModel, QIcon
 from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QListWidget,
                              QListWidgetItem, QSplitter, QTreeView,
@@ -12,6 +13,25 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
 from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton
+
+
+class LetterFirstProxyModel(QSortFilterProxyModel):
+    """Кастомный прокси для сортировки папок строго по первой букве."""
+    def lessThan(self, left, right):
+        left_name = self.sourceModel().data(left)
+        right_name = self.sourceModel().data(right)
+        
+        if not isinstance(left_name, str): left_name = ""
+        if not isinstance(right_name, str): right_name = ""
+        
+        # Регулярное выражение удаляет любые символы в начале, кроме букв (включая кириллицу)
+        left_clean = re.sub(r"^[^a-zA-Zа-яА-ЯёЁ]+", "", left_name).lower()
+        right_clean = re.sub(r"^[^a-zA-Zа-яА-ЯёЁ]+", "", right_name).lower()
+        
+        if not left_clean: left_clean = left_name.lower()
+        if not right_clean: right_clean = right_name.lower()
+        
+        return left_clean < right_clean
 
 
 class UploadWin(UMainWidget):
@@ -40,6 +60,10 @@ class UploadWin(UMainWidget):
         self.file_model.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
         self.file_model.setRootPath(self.root_dir)
 
+        # Используем наш кастомный прокси-класс вместо стандартного
+        self.proxy_model = LetterFirstProxyModel()
+        self.proxy_model.setSourceModel(self.file_model)
+
         left_wid = QGroupBox()
         splitter.addWidget(left_wid)
         left_layout = QVBoxLayout(left_wid)
@@ -49,13 +73,18 @@ class UploadWin(UMainWidget):
         self.tree_view = QTreeView()
         self.tree_view.setIndentation(10)
         self.tree_view.header().hide()
-        self.tree_view.setModel(self.file_model)
         
-        # Задаем корень отображения на уровень выше, чтобы видеть саму папку root_dir
-        parent_dir_index = self.file_model.index(os.path.dirname(self.root_dir))
-        self.tree_view.setRootIndex(parent_dir_index)
+        # Устанавливаем прокси-модель в дерево и активируем сортировку
+        self.tree_view.setModel(self.proxy_model)
+        self.tree_view.setSortingEnabled(True)
+        self.proxy_model.sort(0, Qt.SortOrder.AscendingOrder)
         
-        # Подключаем скрытие соседей и автораскрытие целевой папки к сигналу загрузки
+        # Задаем корень отображения на уровень выше
+        parent_dir_src_idx = self.file_model.index(os.path.dirname(self.root_dir))
+        parent_dir_proxy_idx = self.proxy_model.mapFromSource(parent_dir_src_idx)
+        self.tree_view.setRootIndex(parent_dir_proxy_idx)
+        
+        # Подключаем скрытие соседей и автораскрытие целевой папки
         self.file_model.directoryLoaded.connect(self._hide_neighbor_folders)
         self.file_model.directoryLoaded.connect(self._expand_to_target)
         self.tree_view.clicked.connect(self.on_folder_selected)
@@ -136,7 +165,6 @@ class UploadWin(UMainWidget):
             self.list_widget.addItem(item)
             total_size += os.path.getsize(file_path)    
 
-
         txt = f"{Lng.total_files[Cfg.lng_index]}: {len(self.files_to_copy)}"
         self.total_files_widget.text_widget.setText(txt)
 
@@ -144,32 +172,32 @@ class UploadWin(UMainWidget):
         text = f"{Lng.file_size[Cfg.lng_index]}: {size_mb}"
         self.total_size_widget.text_widget.setText(text)
 
-
     def _hide_neighbor_folders(self, loaded_path):
         """Скрывает все папки на верхнем уровне интерфейса, кроме self.root_dir."""
         if os.path.normpath(loaded_path) == os.path.normpath(os.path.dirname(self.root_dir)):
-            parent_idx = self.file_model.index(loaded_path)
+            parent_src_idx = self.file_model.index(loaded_path)
+            parent_proxy_idx = self.proxy_model.mapFromSource(parent_src_idx)
             
-            # Итерируем по всем элементам внутри родительского каталога
-            for row in range(self.file_model.rowCount(parent_idx)):
-                child_idx = self.file_model.index(row, 0, parent_idx)
-                child_path = self.file_model.filePath(child_idx)
+            for row in range(self.proxy_model.rowCount(parent_proxy_idx)):
+                child_proxy_idx = self.proxy_model.index(row, 0, parent_proxy_idx)
+                child_src_idx = self.proxy_model.mapToSource(child_proxy_idx)
+                child_path = self.file_model.filePath(child_src_idx)
                 
-                # Если путь папки не совпадает с нашей корневой — скрываем строчку в TreeView
                 if os.path.normpath(child_path) != os.path.normpath(self.root_dir):
-                    self.tree_view.setRowHidden(row, parent_idx, True)
+                    self.tree_view.setRowHidden(row, parent_proxy_idx, True)
 
     def _expand_to_target(self):
         def cmd():
-            # Раскрываем видимый корневой узел дерева
-            root_idx = self.file_model.index(self.root_dir)
-            self.tree_view.expand(root_idx)
+            root_src_idx = self.file_model.index(self.root_dir)
+            dest_src_idx = self.file_model.index(self.dest)
             
-            # Раскрываем и позиционируем дерево на целевую папку назначения
-            idx = self.file_model.index(self.dest)
-            self.tree_view.expand(idx)
-            self.tree_view.setCurrentIndex(idx)
-            self.tree_view.scrollTo(idx, QTreeView.ScrollHint.PositionAtCenter)  
+            root_proxy_idx = self.proxy_model.mapFromSource(root_src_idx)
+            dest_proxy_idx = self.proxy_model.mapFromSource(dest_src_idx)
+            
+            self.tree_view.expand(root_proxy_idx)
+            self.tree_view.expand(dest_proxy_idx)
+            self.tree_view.setCurrentIndex(dest_proxy_idx)
+            self.tree_view.scrollTo(dest_proxy_idx, QTreeView.ScrollHint.PositionAtCenter)  
 
         QTimer.singleShot(100, cmd)
 
@@ -185,9 +213,10 @@ class UploadWin(UMainWidget):
         else:
             self.deleteLater()
 
-    def on_folder_selected(self, index):
-        if self.file_model.isDir(index):
-            self.dest = self.file_model.filePath(index)
+    def on_folder_selected(self, proxy_index):
+        src_index = self.proxy_model.mapToSource(proxy_index)
+        if self.file_model.isDir(src_index):
+            self.dest = self.file_model.filePath(src_index)
             self.update_target_dir_label()
 
     def keyPressEvent(self, a0):
@@ -202,7 +231,6 @@ class UploadWin(UMainWidget):
         return super().dragEnterEvent(a0)
     
     def dropEvent(self, a0):
-
         if a0.mimeData().hasUrls():
             urls = [
                 i
@@ -211,5 +239,4 @@ class UploadWin(UMainWidget):
                 and
                 os.path.isfile(i.toLocalFile())
             ]
-
         return super().dropEvent(a0)
