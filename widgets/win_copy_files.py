@@ -146,8 +146,8 @@ class WinCopyFiles(WinProgressbar):
         # self.er = ErrorWin()
         # self.rel.show()
         # self.er.show()
-        # self.above_label.setText("above label")
-        # self.below_label.setText("below label")
+        # self.above_label.setText("above label above label above label")
+        # self.below_label.setText("below label below label below label below label")
         # return
 
         self.cancel.connect(self.stop_task)

@@ -421,7 +421,7 @@ class WinProgressbar(UMainWidget):
         self.setWindowTitle(title)
         self.setFixedWidth(self.ww)
 
-        self.central_layout.setContentsMargins(10, 5, 10, 10)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(0)
 
         h_wid = QWidget()
