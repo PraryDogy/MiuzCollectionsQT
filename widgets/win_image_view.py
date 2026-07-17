@@ -275,7 +275,7 @@ class WinImageView(UMainWidget):
     def restart_img_wid(self, pixmap: QPixmap):
         self.img_wid.hide()  # скрываем старый
         new_wid = ImgWid(pixmap)
-        new_wid.mouse_moved.connect(self.zoom_btns.show)
+        new_wid.mouse_moved.connect(self.show_all_buttons)
         self.central_layout.addWidget(new_wid)
 
         self.img_wid.deleteLater()
@@ -374,6 +374,11 @@ class WinImageView(UMainWidget):
             return
         for i in btns:
             i.hide()
+
+    def show_all_buttons(self):
+        btns = (self.prev_image_btn, self.next_image_btn, self.zoom_btns)
+        for i in btns:
+            i.show()
 
     def switch_image(self, offset):
         current_index = self.img_view_item.data_items.index(self.current_data_item)
@@ -522,15 +527,11 @@ class WinImageView(UMainWidget):
         self.setFocus()
 
         return super().resizeEvent(a0)
-
-    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
-        if a1.type() == 129:
-            self.mouse_move_timer.stop()
-            self.prev_image_btn.show()
-            self.next_image_btn.show()
-            self.zoom_btns.show()
-            self.mouse_move_timer.start(2000)
-        return super().eventFilter(a0, a1)
+    
+    def enterEvent(self, event):
+        self.show_all_buttons()
+        self.mouse_move_timer.start(2000)
+        return super().enterEvent(event)
 
     def leaveEvent(self, a0: QEvent | None) -> None:
         self.hide_all_buttons()
