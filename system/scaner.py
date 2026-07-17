@@ -472,7 +472,7 @@ class _ThumbsUpdater:
 
 
 class _DirsToScanWorker:   
-    warning_code = "9000"
+    removed_images_count = 10
 
     @staticmethod
     def start(dirs_to_scan: list[ScanerDirItem], scaner_item: BaseScanerItem):
@@ -486,18 +486,25 @@ class _DirsToScanWorker:
         db_images = _ImgLoader.get_db_images(scaner_item, dirs_to_scan)
         removed_images, new_images = _ImgCompator.start(finder_images, db_images)
 
-        if len(removed_images) > len(db_images) * 0.5:
-            data = ("9000", scaner_item.mf.mf_alias)
+        # мы проверяем на удаление
+        # если из каталога удаляется более Х изображений
+        # это подозрительно
+        # возможно пользователь указал неправильный путь к каталогу
+        # из-за чего приложение пытается все удалить из старого каталога
+        # чтобы добавить все из нового
+        stmt = all((
+            len(removed_images) > _DirsToScanWorker.removed_images_count,
+            scaner_item.scaner_type == "base",
+        ))
+        if stmt:
+            data = (scaner_item.mf.mf_alias, len(removed_images))
             scaner_item.process_queue.put(data)
-
             while True:
                 if not scaner_item.response_queue.empty():
                     can_continue = scaner_item.response_queue.get()
                     if can_continue:
-                        print("сканирование продолжено")
                         break
                     else:
-                        print("сканирование прервано")
                         return
 
         # общий счет для отображения в GUI
@@ -584,7 +591,8 @@ class BaseScaner:
                 response_queue=response_queue,
                 lng_index=lng_index,
                 total_count=0,
-                current_count=0
+                current_count=0,
+                scaner_type="base"
             )
             avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
             if avaiable_mf_path:
@@ -687,7 +695,8 @@ class ForcedScaner:
             response_queue=response_queue,
             lng_index=lng_index, 
             total_count=0,
-            current_count=0
+            current_count=0,
+            scaner_type="forced"
         )
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:

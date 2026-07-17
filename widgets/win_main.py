@@ -59,8 +59,9 @@ class DangerWarn(ConfirmWindow):
     icon_path = os.path.join(Static.internal_images, "super_warning.svg")
     hh = 165
 
-    def __init__(self, mf_alias: str):
+    def __init__(self, mf_alias: str, removed_images_count: int):
         text = f"{mf_alias}:\n{Lng.dangerous_text[Cfg.lng_index]}"
+        text = f"{mf_alias}: будет удалено {removed_images_count} изображений"
         super().__init__(text)
         self.svg_widget.load(self.icon_path)
         self.ok_btn.setText(Lng.allow[Cfg.lng_index])
@@ -674,12 +675,12 @@ class WinMain(UMainWindow):
             """
             self.win_warn.deleteLater()
             self.scaner_task.response_queue.put(can_continue)
-            if not can_continue:
-                for mf in Mf.items:
-                    if mf.mf_alias == mf_alias:
-                        mf.set_mf_current_path(None)
-                        mf.mf_paths = ["", ]
-                        self.open_win_smb(mf)
+            # if not can_continue:
+            #     for mf in Mf.items:
+            #         if mf.mf_alias == mf_alias:
+            #             mf.set_mf_current_path(None)
+            #             mf.mf_paths = ["", ]
+            #             self.open_win_smb(mf)
 
         if not hasattr(self, "scaner_task") or not self.scaner_task:
             self.scaner_poll_timer.start(ms)
@@ -688,8 +689,8 @@ class WinMain(UMainWindow):
             data = self.scaner_task.process_queue.get()
 
             if isinstance(data, tuple):
-                error_code, mf_alias = data
-                self.win_warn = DangerWarn(mf_alias)
+                mf_alias, removed_images_count = data
+                self.win_warn = DangerWarn(mf_alias, removed_images_count)
                 self.win_warn.center_to_parent(self)
                 self.win_warn.ok_clicked.connect(lambda: can_continue(True, mf_alias))
                 self.win_warn.cancel_clicked.connect(lambda: can_continue(False, mf_alias))

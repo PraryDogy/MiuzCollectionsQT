@@ -34,6 +34,7 @@ class BaseScanerItem:
     lng_index: int
     total_count: int
     current_count: int
+    scaner_type: Literal["forced", "base"]
 
 
 @dataclass(slots=True)
