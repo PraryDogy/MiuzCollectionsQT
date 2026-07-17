@@ -3,7 +3,8 @@ import os
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSizePolicy,
+                             QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
@@ -99,6 +100,7 @@ class BarTopBtn(QWidget):
         self.v_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.svg_btn = QSvgWidget()
+        # self.svg_btn.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
