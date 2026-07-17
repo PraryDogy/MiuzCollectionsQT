@@ -472,7 +472,7 @@ class _ThumbsUpdater:
 
 
 class _DirsToScanWorker:   
-    removed_images_count = 10
+    removed_images_count = 50
 
     @staticmethod
     def start(dirs_to_scan: list[ScanerDirItem], scaner_item: BaseScanerItem):
