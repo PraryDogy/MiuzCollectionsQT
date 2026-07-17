@@ -11,6 +11,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
                              QGraphicsPixmapItem, QGraphicsScene,
                              QGraphicsView)
+from typing_extensions import Literal
 
 from cfg import Cfg, Static
 from system.items import ImgViewItem
@@ -263,7 +264,7 @@ class WinImageView(UMainWidget):
 
 # SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM SYSTEM
     
-    def zoom_cmd(self, flag: str):
+    def zoom_cmd(self, flag: Literal["in", "out", "fit"]):
         actions = {
             "in": self.img_wid.zoom_in,
             "out": self.img_wid.zoom_out,
