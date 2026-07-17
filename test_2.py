@@ -1,5 +1,8 @@
-finder_images = [i for i in range(0, 50)]
-del_images = [i for i in range(0, 10)]
+text = (
+    "Будет удалено {} файлов",
+    "Добавляю {} файлов",
+)
+text_index = 0
 
-if len(del_images) > len(finder_images) * 0.5:
-    print("опасное удаление")
+final_text = text[text_index].format(100)
+print(final_text)

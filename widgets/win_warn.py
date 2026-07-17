@@ -8,7 +8,14 @@ from PyQt6.QtWidgets import QHBoxLayout, QLabel
 from cfg import Cfg, Static
 from system.lang import Lng
 
-from ._base_widgets import UPushButton, UMainWidget
+from ._base_widgets import UPushButton, UMainWidget, SelectableLabel
+
+
+class NewSelectableLabel(SelectableLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.setWordWrap(True)
+        self.adjustSize()
 
 
 class ConfirmWindow(UMainWidget):
@@ -35,10 +42,8 @@ class ConfirmWindow(UMainWidget):
         self.svg_widget.setFixedSize(50, 50)
         text_layout.addWidget(self.svg_widget)
 
-        text_wid = QLabel(text)
-        text_wid.setWordWrap(True)
-        text_wid.adjustSize()
-        text_layout.addWidget(text_wid)
+        self.text_wid = NewSelectableLabel(text)
+        text_layout.addWidget(self.text_wid)
 
         btn_layout = QHBoxLayout()
         btn_layout.setContentsMargins(0, 0, 0, 0)

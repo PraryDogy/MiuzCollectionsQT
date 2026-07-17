@@ -504,8 +504,25 @@ class Lng:
         "Deny"
     )
     dangerous_text = (
-        "Обнаружено опасное действие!\nВозможно, неверно указан путь к каталогу изображений.\nНажмите «Разрешить», чтобы продолжить, или «Запретить», чтобы указать правильный путь.",
-        "Dangerous action detected!\nThe image directory path might be incorrect.\nClick \"Allow\" to continue, or \"Deny\" to specify the correct path."
+        # [0] Русская версия
+        "Мы обнаружили подозрительные действия.\n"
+        "Будет удалено {} изображений.\n"
+        "Вероятно, путь к каталогу указан неправильно.\n"
+        "• Нажмите \"Запретить\", если вы изменили путь к каталогу изображений.\n"
+        "• Нажмите \"Разрешить\", если вы не совершали никаких действий.\n"
+        "Для вопросов свяжитесь с нами:\n"
+        "- Telegram: @evlosh\n"
+        "- Email: evlosh@gmail.com",
+
+        # [1] Английская версия
+        "Suspicious activity detected.\n"
+        "{} images will be deleted.\n"
+        "The directory path is likely incorrect.\n"
+        "• Click \"Deny\" if you have changed the image directory path.\n"
+        "• Click \"Allow\" if you have not taken any action.\n"
+        "If you have any questions, please contact us:\n"
+        "- Telegram: @evlosh\n"
+        "- Email: evlosh@gmail.com"
     )
 
     sort_standart = (
