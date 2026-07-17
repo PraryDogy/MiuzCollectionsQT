@@ -61,8 +61,8 @@ class CustomTreeView(QTreeView):
         menu = QMenu(self)
         
         # Создаем действия (Actions)
-        standard_sort_action = QAction("Стандартная сортировка", self)
-        letter_sort_action = QAction("Сортировка А-Я", self)
+        standard_sort_action = QAction(Lng.sort_standart[Cfg.lng_index], self)
+        letter_sort_action = QAction(Lng.sort_alphabet[Cfg.lng_index], self)
         
         # Добавляем галочки для наглядности текущего режима
         standard_sort_action.setCheckable(True)

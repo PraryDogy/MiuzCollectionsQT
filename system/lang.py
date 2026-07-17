@@ -508,3 +508,11 @@ class Lng:
         "Dangerous action detected!\nThe image directory path might be incorrect.\nClick \"Allow\" to continue, or \"Deny\" to specify the correct path."
     )
 
+    sort_standart = (
+        "Стандартная сортировка",
+        "Default sorting"
+    )
+    sort_alphabet = (
+        "Сортировка по алфавиту",
+        "Alphabetical sorting"
+    )
