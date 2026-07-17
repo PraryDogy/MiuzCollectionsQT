@@ -70,6 +70,12 @@ class DangerWarn(ConfirmWindow):
         self.cancel_btn.setText(Lng.deny[Cfg.lng_index])
         self.setFixedSize(self.ww ,self.hh)
 
+    def closeEvent(self, a0):
+        a0.ignore()
+
+    def keyPressEvent(self, a0):
+        return
+
 
 class WinMain(UMainWindow):
     min_w = 750
@@ -84,9 +90,9 @@ class WinMain(UMainWindow):
         self.setWindowTitle(f"{Static.app_name}")
         self.setMenuBar(BarMacos())
 
-        self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
-        self.test.center_to_parent(self)
-        self.test.show()
+        # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
+        # self.test.center_to_parent(self)
+        # self.test.show()
 
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
@@ -677,12 +683,12 @@ class WinMain(UMainWindow):
             """
             self.win_warn.deleteLater()
             self.scaner_task.response_queue.put(can_continue)
-            # if not can_continue:
-            #     for mf in Mf.items:
-            #         if mf.mf_alias == mf_alias:
-            #             mf.set_mf_current_path(None)
-            #             mf.mf_paths = ["", ]
-            #             self.open_win_smb(mf)
+            if not can_continue:
+                for mf in Mf.items:
+                    if mf.mf_alias == mf_alias:
+                        mf.set_mf_current_path(None)
+                        mf.mf_paths = ["", ]
+                        self.open_win_smb(mf)
 
         if not hasattr(self, "scaner_task") or not self.scaner_task:
             self.scaner_poll_timer.start(ms)
