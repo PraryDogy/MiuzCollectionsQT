@@ -2,10 +2,10 @@ import os
 import re
 
 from PyQt6.QtCore import QDir, Qt, QTimer, pyqtSignal, QSortFilterProxyModel
-from PyQt6.QtGui import QFileSystemModel, QIcon
+from PyQt6.QtGui import QFileSystemModel, QIcon, QAction
 from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QListWidget,
                              QListWidgetItem, QSplitter, QTreeView,
-                             QVBoxLayout, QWidget)
+                             QVBoxLayout, QWidget, QMenu)
 
 from cfg import Cfg, Static
 from system.lang import Lng
@@ -16,7 +16,12 @@ from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
-    """Кастомный прокси для сортировки папок строго по первой букве."""
+    """Кастомный прокси для гибкой сортировки папок."""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # Флаг режима сортировки: True — по первой букве, False — стандартная
+        self.letter_only_mode = True
+
     def lessThan(self, left, right):
         left_name = self.sourceModel().data(left)
         right_name = self.sourceModel().data(right)
@@ -24,14 +29,65 @@ class LetterFirstProxyModel(QSortFilterProxyModel):
         if not isinstance(left_name, str): left_name = ""
         if not isinstance(right_name, str): right_name = ""
         
-        # Регулярное выражение удаляет любые символы в начале, кроме букв (включая кириллицу)
-        left_clean = re.sub(r"^[^a-zA-Zа-яА-ЯёЁ]+", "", left_name).lower()
-        right_clean = re.sub(r"^[^a-zA-Zа-яА-ЯёЁ]+", "", right_name).lower()
+        if self.letter_only_mode:
+            # Сортировка А-Я: удаляем любые символы в начале, кроме букв
+            left_clean = re.sub(r"^[^a-zA-Zа-яА-ЯёЁ]+", "", left_name).lower()
+            right_clean = re.sub(r"^[^a-zA-Zа-яА-ЯёЁ]+", "", right_name).lower()
+            
+            if not left_clean: left_clean = left_name.lower()
+            if not right_clean: right_clean = right_name.lower()
+            
+            return left_clean < right_clean
+        else:
+            # Стандартная сортировка ОС (регистронезависимая)
+            return left_name.lower() < right_name.lower()
+
+
+class CustomTreeView(QTreeView):
+    """Кастомное дерево с контекстным меню для переключения режимов сортировки."""
+    def __init__(self, proxy_model: LetterFirstProxyModel, parent=None):
+        super().__init__(parent)
+        self.proxy_model = proxy_model
         
-        if not left_clean: left_clean = left_name.lower()
-        if not right_clean: right_clean = right_name.lower()
+        self.setIndentation(10)
+        self.header().hide()
+        self.setModel(self.proxy_model)
+        self.setSortingEnabled(True)
         
-        return left_clean < right_clean
+        # Задаем контекстное меню по умолчанию через событие
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
+
+    def contextMenuEvent(self, event):
+        menu = QMenu(self)
+        
+        # Создаем действия (Actions)
+        standard_sort_action = QAction("Стандартная сортировка", self)
+        letter_sort_action = QAction("Сортировка А-Я", self)
+        
+        # Добавляем галочки для наглядности текущего режима
+        standard_sort_action.setCheckable(True)
+        letter_sort_action.setCheckable(True)
+        
+        if self.proxy_model.letter_only_mode:
+            letter_sort_action.setChecked(True)
+        else:
+            standard_sort_action.setChecked(True)
+            
+        # Подключаем слоты
+        standard_sort_action.triggered.connect(lambda: self.set_sorting_mode(False))
+        letter_sort_action.triggered.connect(lambda: self.set_sorting_mode(True))
+        
+        menu.addAction(standard_sort_action)
+        menu.addAction(letter_sort_action)
+        
+        menu.exec(event.globalPos())
+
+    def set_sorting_mode(self, letter_only: bool):
+        if self.proxy_model.letter_only_mode != letter_only:
+            self.proxy_model.letter_only_mode = letter_only
+            # Принудительно заставляем модель инвалидировать кэш и пересортировать дерево
+            self.proxy_model.invalidate()
+            self.proxy_model.sort(0, Qt.SortOrder.AscendingOrder)
 
 
 class UploadWin(UMainWidget):
@@ -42,7 +98,6 @@ class UploadWin(UMainWidget):
         super().__init__()
         self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
         self.resize(700, 500)
-        # self.setAcceptDrops(True)
 
         self.root_dir = mf.mf_current_path
         self.dest = os.path.join(
@@ -60,7 +115,7 @@ class UploadWin(UMainWidget):
         self.file_model.setFilter(QDir.Filter.AllDirs | QDir.Filter.NoDotAndDotDot)
         self.file_model.setRootPath(self.root_dir)
 
-        # Используем наш кастомный прокси-класс вместо стандартного
+        # Инициализируем прокси-модель
         self.proxy_model = LetterFirstProxyModel()
         self.proxy_model.setSourceModel(self.file_model)
 
@@ -70,13 +125,8 @@ class UploadWin(UMainWidget):
         left_layout.setContentsMargins(1, 10, 1, 1)
         left_layout.setSpacing(0)
 
-        self.tree_view = QTreeView()
-        self.tree_view.setIndentation(10)
-        self.tree_view.header().hide()
-        
-        # Устанавливаем прокси-модель в дерево и активируем сортировку
-        self.tree_view.setModel(self.proxy_model)
-        self.tree_view.setSortingEnabled(True)
+        # Используем наш кастомный TreeView вместо стандартного
+        self.tree_view = CustomTreeView(self.proxy_model)
         self.proxy_model.sort(0, Qt.SortOrder.AscendingOrder)
         
         # Задаем корень отображения на уровень выше
@@ -173,7 +223,6 @@ class UploadWin(UMainWidget):
         self.total_size_widget.text_widget.setText(text)
 
     def _hide_neighbor_folders(self, loaded_path):
-        """Скрывает все папки на верхнем уровне интерфейса, кроме self.root_dir."""
         if os.path.normpath(loaded_path) == os.path.normpath(os.path.dirname(self.root_dir)):
             parent_src_idx = self.file_model.index(loaded_path)
             parent_proxy_idx = self.proxy_model.mapFromSource(parent_src_idx)
