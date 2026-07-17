@@ -322,7 +322,6 @@ class Lng:
     location = ("Расположение", "Location")
     modified = ("Изменен", "Modified")
     statistic = ("Статистика данных", "Data statistics")
-    level_up = ("Наверх", "Level up")
     connect_to_server = ("Подключение к серверу (⌘ + K)", "Connect to server (⌘ + K)")
     connect = ("Подкл.", "Connect")
     server = ("Адрес сервера", "Server address")

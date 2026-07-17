@@ -238,7 +238,6 @@ class BarTop(QWidget):
     open_filters_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     history_press = pyqtSignal()
-    level_up = pyqtSignal()
     open_img_search = pyqtSignal()
     exit_img_search = pyqtSignal()
     open_base_search = pyqtSignal()
