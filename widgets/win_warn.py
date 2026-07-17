@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QHBoxLayout, QLabel
 from cfg import Cfg, Static
 from system.lang import Lng
 
-from ._base_widgets import UPushButton, UMainWidget, SelectableLabel
+from ._base_widgets import SelectableLabel, UMainWidget, UPushButton
 
 
 class NewSelectableLabel(SelectableLabel):
