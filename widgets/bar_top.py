@@ -92,6 +92,8 @@ class BarTopBtn(QWidget):
     def __init__(self, filename: Literal["sort", "filters", "calendar", "settings"]):
         super().__init__()
         self.filename = filename
+        
+        # Загружаем данные один раз при инициализации
         self.normal_svg_data = self._load_svg_data(f"{filename}.svg")
         self.solid_svg_data = self._load_svg_data(f"{filename}_selected.svg")
 
@@ -104,7 +106,6 @@ class BarTopBtn(QWidget):
         self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # --- Подпись ---
         self.lbl = QLabel()
         self.lbl.setStyleSheet("font-size: 10px;")
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -118,19 +119,23 @@ class BarTopBtn(QWidget):
 
     def set_solid_style(self):
         self.svg_btn.load(self.solid_svg_data)
+        self.svg_btn.update()  # Принудительное обновление кадра
 
     def set_normal_style(self):
         self.svg_btn.load(self.normal_svg_data)
-
-    def mouseReleaseEvent(self, a0):
-        """Испускает сигнал при клике левой кнопкой мыши."""
-        if a0.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
+        self.svg_btn.update()  # Принудительное обновление кадра
 
     def mousePressEvent(self, a0):
-        if a0 and a0.button() == Qt.MouseButton.LeftButton:
+        if a0.button() == Qt.MouseButton.LeftButton:
             self.set_solid_style()
-        return super().mousePressEvent(a0)
+        super().mousePressEvent(a0)  # Передаем событие дальше
+
+    def mouseReleaseEvent(self, a0):
+        if a0.button() == Qt.MouseButton.LeftButton:
+            self.set_normal_style()  # Возвращаем исходный стиль при отпускании
+            self.clicked_.emit()
+        super().mouseReleaseEvent(a0)  # ОБЯЗАТЕЛЬНО вызываем базовый класс
+
 
 
 class DatesBtn(BarTopBtn):
