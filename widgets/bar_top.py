@@ -100,7 +100,6 @@ class BarTopBtn(QWidget):
         self.v_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.svg_btn = QSvgWidget()
-        # self.svg_btn.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -243,15 +242,14 @@ class BarTop(QWidget):
     open_img_search = pyqtSignal()
     exit_img_search = pyqtSignal()
     open_base_search = pyqtSignal()
-    text_height = 60
-    text_spacing = 15
+    hh = 60
 
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(self.text_height)
+        self.setFixedHeight(self.hh)
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setContentsMargins(0, 3, 0, 3)
-        self.h_layout.setSpacing(self.text_spacing)
+        self.h_layout.setSpacing(15)
 
         self.h_layout.addStretch(0)
 
