@@ -121,12 +121,16 @@ class BarTopBtn(QWidget):
 
     def set_normal_style(self):
         self.svg_btn.load(self.normal_svg_data)
-    
 
     def mouseReleaseEvent(self, a0):
         """Испускает сигнал при клике левой кнопкой мыши."""
         if a0.button() == Qt.MouseButton.LeftButton:
             self.clicked_.emit()
+
+    def mousePressEvent(self, a0):
+        if a0 and a0.button() == Qt.MouseButton.LeftButton:
+            self.set_solid_style()
+        return super().mousePressEvent(a0)
 
 
 class DatesBtn(BarTopBtn):
@@ -140,7 +144,6 @@ class DatesBtn(BarTopBtn):
         """Испускает сигнал и применяет сплошной стиль при клике левой кнопкой мыши."""
         if ev and ev.button() == Qt.MouseButton.LeftButton:
             self.clicked_.emit()
-            self.set_solid_style()
 
 
 class FiltersBtn(BarTopBtn):
@@ -172,7 +175,6 @@ class SortBtn(BarTopBtn):
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         """Показывает меню выбора сортировки при клике левой кнопкой мыши."""
         if ev and ev.button() == Qt.MouseButton.LeftButton:
-            self.set_solid_style()
             menu = UMenu(ev)
 
             # --- Создаем пункты меню ---
