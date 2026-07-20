@@ -1,10 +1,9 @@
 import os
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSizePolicy,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
@@ -93,7 +92,9 @@ class BarTopBtn(QWidget):
     def __init__(self, filename: Literal["sort", "filters", "calendar", "settings"]):
         super().__init__()
         self.filename = filename
-        
+        self.normal_svg_data = self._load_svg_data(f"{filename}.svg")
+        self.solid_svg_data = self._load_svg_data(f"{filename}_selected.svg")
+
         self.v_lay = QVBoxLayout(self)
         self.v_lay.setContentsMargins(0, 0, 0, 0)
         self.v_lay.setSpacing(1)
@@ -110,15 +111,17 @@ class BarTopBtn(QWidget):
 
         self.set_normal_style()
 
+    def _load_svg_data(self, icon_name: str):
+        path = os.path.join(Static.internal_images, icon_name)
+        with open(path, "rb") as f:
+            return QByteArray(f.read())
+
     def set_solid_style(self):
-        icon_name = f"{self.filename}_selected.svg"
-        icon_path = os.path.join(Static.internal_images, icon_name)
-        self.svg_btn.load(icon_path)
+        self.svg_btn.load(self.solid_svg_data)
 
     def set_normal_style(self):
-        icon_name = f"{self.filename}.svg"
-        icon_path = os.path.join(Static.internal_images, icon_name)
-        self.svg_btn.load(icon_path)
+        self.svg_btn.load(self.normal_svg_data)
+    
 
     def mouseReleaseEvent(self, a0):
         """Испускает сигнал при клике левой кнопкой мыши."""
