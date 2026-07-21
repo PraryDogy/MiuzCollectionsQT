@@ -7,13 +7,15 @@ from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 from cfg import Static
 from system.shared_utils import ImgUtils
 
+from ._base_widgets import GrayLabel
+
 
 class PathItem(QWidget):
     min_wid = 5
     new_history_item = pyqtSignal(str)
     load_st_grid = pyqtSignal()
     arrow_right = " \U0000203A" # ›
-    item_height = 15
+    item_height = 12
     info_win = pyqtSignal(list)
     add_fav = pyqtSignal(str)
     del_fav = pyqtSignal(str)
@@ -36,7 +38,8 @@ class PathItem(QWidget):
         self.img_wid.setFixedSize(self.item_height, self.item_height)
         item_layout.addWidget(self.img_wid)
         
-        self.text_wid = QLabel(text=name)
+        self.text_wid = GrayLabel(text=name)
+        self.text_wid.set_text_size(11)
         self.collapse()
         item_layout.addWidget(self.text_wid)
 

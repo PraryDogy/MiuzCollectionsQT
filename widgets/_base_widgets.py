@@ -471,3 +471,22 @@ class WinProgressbar(UMainWidget):
     def closeEvent(self, a0):
         self.cancel.emit()
         return super().closeEvent(a0)
+
+
+class GrayLabel(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.font_size_px = 9
+        self._update_stylesheet()
+
+    def _update_stylesheet(self):
+        self.setStyleSheet(
+            f"""
+                color: rgba(128, 128, 128, 1.0);
+                font-size: {self.font_size_px}px;
+            """
+        )
+
+    def set_text_size(self, size_px: int = 9):
+        self.font_size_px = size_px
+        self._update_stylesheet()

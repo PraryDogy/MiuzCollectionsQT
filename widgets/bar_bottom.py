@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QHBoxLayout, QLabel,
 from cfg import Cfg, Dynamic, Static
 from system.lang import Lng
 
-from ._base_widgets import USlider
+from ._base_widgets import GrayLabel, USlider
 
 
 class ThumbnailsSlider(USlider):
@@ -20,20 +20,19 @@ class ThumbnailsSlider(USlider):
         super()._on_value_changed(value)
 
 
-class ProgressWidget(QLabel):
+class ProgressWidget(GrayLabel):
     interval_ms = 1000  # 1 секунда
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.set_text_size(11)
+
         self.total_seconds = Cfg.scaner_minutes * 60
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer_text)
 
     def start_timer_text(self):
-        effect = QGraphicsOpacityEffect(self)
-        effect.setOpacity(0.5)
-        self.setGraphicsEffect(effect)
 
         self.timer.stop()
         self.total_seconds = Cfg.scaner_minutes * 60
@@ -66,31 +65,17 @@ class ProgressWidget(QLabel):
 
 
 class BarBottom(QWidget):
-    
-    """
-    Нижняя панель с прогресс-баром и слайдером для изменения размера миниатюр.
-
-    Сигналы:
-        resize_thumbnails (pyqtSignal): испускается при изменении размера миниатюр.
-    """
-
     resize_thumbnails = pyqtSignal()
-    hh = 25
     icon_path = os.path.join(Static.internal_images, "next.svg")
-    icon_size = 15
+    icon_size = 12
 
     def __init__(self):
         super().__init__()
 
-        # --- Настройка размеров панели ---
-        self.setFixedHeight(self.hh)
-
         # --- Горизонтальный layout ---
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setSpacing(5)
-        self.h_layout.setContentsMargins(0, 0, 15, 0)
-
-        # self.h_layout.addStretch()
+        self.h_layout.setContentsMargins(0, 5, 15, 0)
 
         self.svg_wid = QSvgWidget()
         self.svg_wid.load(self.icon_path)
