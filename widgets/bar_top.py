@@ -107,7 +107,12 @@ class BarTopBtn(QWidget):
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.lbl = QLabel()
-        self.lbl.setStyleSheet("font-size: 10px;")
+        self.lbl.setStyleSheet(
+            f"""
+                color: rgba(128, 128, 128, 1.0);
+                font-size: 9px;
+            """
+        )
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.set_normal_style()
@@ -256,9 +261,9 @@ class BarTop(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(self.hh)
+        # self.setFixedHeight(self.hh)
         self.h_layout = QHBoxLayout(self)
-        self.h_layout.setContentsMargins(0, 3, 0, 3)
+        self.h_layout.setContentsMargins(0, 3, 0, 5)
         self.h_layout.setSpacing(15)
 
         self.h_layout.addStretch(0)
