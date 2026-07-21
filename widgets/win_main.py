@@ -101,7 +101,7 @@ class WinMain(UMainWindow):
 
         h_wid_main = QWidget()
         h_lay_main = QHBoxLayout(h_wid_main)
-        h_lay_main.setContentsMargins(5, 0, 5, 5)
+        h_lay_main.setContentsMargins(5, 0, 5, 0)
         h_lay_main.setSpacing(0)
         self.central_layout.addWidget(h_wid_main)
 
@@ -109,8 +109,18 @@ class WinMain(UMainWindow):
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(14)
 
-        # Левый виджет (MenuLeft)
+        # Левый виджет (MenuLeft) в контейнере QWidget
+        self.left_menu_container = QWidget()
+        self.left_menu_layout = QVBoxLayout(self.left_menu_container)
+        
+        # Убираем внешние отступы, чтобы меню прилегало к границам сплиттера
+        self.left_menu_layout.setContentsMargins(0, 0, 0, 5)
+        self.left_menu_layout.setSpacing(0)
+
         self.left_menu = MenuLeft()
+        self.left_menu_layout.addWidget(self.left_menu)
+
+        # Подключение сигналов
         self.left_menu.mf_edit.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
@@ -132,7 +142,9 @@ class WinMain(UMainWindow):
         self.left_menu.copy_path.connect(
             lambda rel_paths: self.copy_path(rel_paths)
         )
-        self.splitter.addWidget(self.left_menu)
+        
+        # Добавляем контейнер вместо самого меню в сплиттер
+        self.splitter.addWidget(self.left_menu_container)
 
         # Правый виджет
         right_wid = QWidget()

@@ -67,15 +67,13 @@ class PathBar(QWidget):
     add_fav = pyqtSignal(str)
     del_fav = pyqtSignal(str)
     last_item_limit = 40
-    bar_height = 25
 
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(PathBar.bar_height)
         self.current_path: str = None
 
         self.main_lay = QHBoxLayout(self)
-        self.main_lay.setContentsMargins(0, 0, 0, 0)
+        self.main_lay.setContentsMargins(0, 5, 0, 5)
         self.main_lay.setSpacing(5)
         self.main_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
 

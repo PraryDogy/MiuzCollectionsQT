@@ -75,7 +75,8 @@ class BarBottom(QWidget):
         # --- Горизонтальный layout ---
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setSpacing(5)
-        self.h_layout.setContentsMargins(0, 5, 15, 0)
+        self.h_layout.setContentsMargins(0, 0, 15, 0)
+        self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.svg_wid = QSvgWidget()
         self.svg_wid.load(self.icon_path)
