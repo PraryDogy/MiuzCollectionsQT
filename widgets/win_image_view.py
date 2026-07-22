@@ -1,4 +1,5 @@
 import os
+from dataclasses import dataclass
 from multiprocessing import shared_memory
 
 import numpy as np
@@ -14,7 +15,7 @@ from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
 from typing_extensions import Literal
 
 from cfg import Cfg, Static
-from system.items import ImgViewItem
+from system.items import DataItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
@@ -24,6 +25,13 @@ from system.utils import Utils
 
 from ._base_widgets import UMainWidget, UMenu, USubMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
+
+
+@dataclass(slots=True)
+class ImgViewItem:
+    start_data_item: DataItem
+    data_items: list[DataItem]
+    is_selection: bool
 
 
 class ImgWid(QGraphicsView):

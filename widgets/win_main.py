@@ -6,12 +6,10 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QSplitter, QVBoxLayout, QWidget)
-from typing_extensions import Literal
 
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
-from system.items import (ForcedScanerItem, ImgViewItem, SettingsItem,
-                          UpdateThumbItem, WatchDogItem)
+from system.items import ForcedScanerItem, SettingsItem, UpdateThumbItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
@@ -29,7 +27,7 @@ from .menu_left import MenuLeft
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_filters import WinFilters
-from .win_image_view import WinImageView
+from .win_image_view import ImgViewItem, WinImageView
 from .win_img_search import WinImgSearch
 from .win_info import WinInfo
 from .win_servers import ServersWin

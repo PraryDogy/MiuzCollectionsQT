@@ -107,10 +107,3 @@ class DataItem:
     month_year: str
     day_month_year: str
     filename: str
-
-
-@dataclass(slots=True)
-class ImgViewItem:
-    start_data_item: DataItem
-    data_items: list[DataItem]
-    is_selection: bool
