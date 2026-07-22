@@ -11,6 +11,7 @@ from ._base_widgets import UMainWidget
 
 class WinCollage(UMainWidget):
     ww, hh = 700, 700
+
     def __init__(self, data_items: list[DataItem]):
         super().__init__()
         self.set_always_on_top()
