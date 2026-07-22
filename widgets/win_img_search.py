@@ -12,10 +12,9 @@ from sqlalchemy import func
 
 from cfg import Cfg, Dynamic, Static
 from system.database import Dbase, Thumbs
-from system.items import ReadImgItem
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import ProcessWorker, ReadImg
+from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils

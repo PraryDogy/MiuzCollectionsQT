@@ -5,9 +5,8 @@ from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtWidgets import QGridLayout, QLabel, QSpacerItem, QWidget
 
 from cfg import Cfg
-from system.items import OneFileInfoItem
 from system.lang import Lng
-from system.multiprocess import OneFileInfo, ProcessWorker
+from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 
 from ._base_widgets import SelectableLabel, UMainWidget
 

@@ -5,10 +5,9 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from cfg import Cfg, Static
-from system.items import CopyTaskItem
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import CopyTask, CopyTaskWorker
+from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import UMainWidget, UPushButton, WinProgressbar
 

@@ -9,13 +9,13 @@ from time import sleep
 
 import numpy as np
 import sqlalchemy
+from typing_extensions import Literal
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
 from cfg import Cfg, Static
 
 from .database import Dbase, Dirs, Thumbs
-from .items import CopyTaskItem, OneFileInfoItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
@@ -71,6 +71,14 @@ class ProcessWorker(BaseProcessWorker):
         super().__init__(target, (*args, self.process_queue))
 
 
+@dataclass(slots=True)
+class ReadImgItem:
+    src: str
+    shm_name: str
+    shape: tuple[int, ...]
+    dtype: str
+
+
 class ReadImg:
     @staticmethod
     def start(src: str, size: int, queue: Queue):
@@ -88,6 +96,14 @@ class ReadImg:
         )
         queue.put(item)
         shm.close()
+
+
+@dataclass(slots=True)
+class OneFileInfoItem:
+    type_: str
+    size: str
+    mod: str
+    res: str
 
 
 class OneFileInfo:
@@ -129,6 +145,26 @@ class OneFileInfo:
                 for i in range(0, len(text), max_row)
             )
         return text
+
+
+@dataclass(slots=True)
+class CopyTaskItem:
+    dst_dir: str
+    src_urls: list[str]
+    current_percent: int
+    copied_bytes: int
+    total_bytes: int
+    current_file_count: int
+    total_file_count: int
+    dst_urls: list[str]
+    msg: Literal[
+        "none",
+        "error",
+        "need_replace",
+        "replace_one",
+        "replace_all",
+        "finished"
+    ]
 
 
 class CopyTaskWorker(BaseProcessWorker):

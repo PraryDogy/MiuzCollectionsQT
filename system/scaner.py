@@ -6,6 +6,7 @@ from multiprocessing import Queue
 from time import sleep
 
 import sqlalchemy
+from typing_extensions import Literal
 
 from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
@@ -14,8 +15,6 @@ from system.main_folder import Mf
 from system.multiprocess import BaseProcessWorker
 from system.shared_utils import ImgUtils
 from system.utils import Utils
-
-from .items import BaseScanerItem, ForcedScanerItem
 
 
 class Tools:    
@@ -61,6 +60,25 @@ class ImgItem:
     size: int
     mod: int
     rel_thumb_path: str = ""
+
+
+@dataclass(slots=True)
+class ForcedScanerItem:
+    mf: Mf
+    dirs_to_scan: list[str]
+    lng_index: int
+
+
+@dataclass(slots=True)
+class BaseScanerItem:
+    mf: Mf
+    engine: sqlalchemy.Engine
+    process_queue: Queue
+    response_queue: Queue
+    lng_index: int
+    total_count: int
+    current_count: int
+    scaner_type: Literal["forced", "base"]
 
 
 class _DirsLoader:

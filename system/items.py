@@ -1,67 +1,7 @@
 from dataclasses import dataclass
-from multiprocessing import Queue
-from typing import Literal, Optional
+from typing import Literal
 
-import numpy as np
-import sqlalchemy
-from PyQt6.QtGui import QImage, QPixmap
-
-from .main_folder import Mf
-
-
-@dataclass(slots=True)
-class OneFileInfoItem:
-    type_: str
-    size: str
-    mod: str
-    res: str
-
-
-@dataclass(slots=True)
-class ReadImgItem:
-    src: str
-    shm_name: str
-    shape: tuple[int, ...]
-    dtype: str
-
-
-@dataclass(slots=True)
-class BaseScanerItem:
-    mf: Mf
-    engine: sqlalchemy.Engine
-    process_queue: Queue
-    response_queue: Queue
-    lng_index: int
-    total_count: int
-    current_count: int
-    scaner_type: Literal["forced", "base"]
-
-
-@dataclass(slots=True)
-class ForcedScanerItem:
-    mf: Mf
-    dirs_to_scan: list[str]
-    lng_index: int
-
-
-@dataclass(slots=True)
-class CopyTaskItem:
-    dst_dir: str
-    src_urls: list[str]
-    current_percent: int
-    copied_bytes: int
-    total_bytes: int
-    current_file_count: int
-    total_file_count: int
-    dst_urls: list[str]
-    msg: Literal[
-        "none",
-        "error",
-        "need_replace",
-        "replace_one",
-        "replace_all",
-        "finished"
-    ]
+from PyQt6.QtGui import QPixmap
 
 
 @dataclass(slots=True)
