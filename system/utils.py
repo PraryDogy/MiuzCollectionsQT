@@ -1,10 +1,8 @@
 import hashlib
 import os
 import subprocess
-import sys
 import traceback
 
-import cv2
 import numpy as np
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon, QImage, QPixmap
