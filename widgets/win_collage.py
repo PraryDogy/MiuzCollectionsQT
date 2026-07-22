@@ -63,8 +63,8 @@ class WinCollage(UMainWidget):
         # 6. Рисуем сетку картинок
         painter = QPainter(collage_pixmap)
         # Включаем сглаживание, чтобы уменьшенные картинки выглядели красиво
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        # painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        # painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
 
         for index, pixmap in enumerate(self.pixmaps):
             # Координаты текущей ячейки в сетке
