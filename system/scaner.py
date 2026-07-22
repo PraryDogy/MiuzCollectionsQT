@@ -33,7 +33,7 @@ class ScanerWorker(BaseProcessWorker):
 
 
 @dataclass(slots=True)
-class ScanerDirItem:
+class DirItem:
     """
     Параметры:
     - rel_path: относительный путь к подкаталогу относительно `Mf.curr_path`.
@@ -49,7 +49,7 @@ class ScanerDirItem:
 
 
 @dataclass(slots=True)
-class ScanerImgItem:
+class ImgItem:
     """
     Параметры:
     - abs_img_path: полный путь до изображения
@@ -77,7 +77,7 @@ class _DirsLoader:
         )
         scaner_item.process_queue.put(text)
 
-        dirs: list[ScanerDirItem] = []
+        dirs: list[DirItem] = []
         stack = [scaner_item.mf.mf_current_path]
         while stack:
             try:
@@ -100,12 +100,12 @@ class _DirsLoader:
                     )
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
-                    dir_item = ScanerDirItem(entry.path, rel_path, mod)
+                    dir_item = DirItem(entry.path, rel_path, mod)
                     dirs.append(dir_item)
         try:
             stats = os.stat(scaner_item.mf.mf_current_path)
             mod = int(stats.st_mtime)
-            dir_item = ScanerDirItem(
+            dir_item = DirItem(
                 scaner_item.mf.mf_current_path,
                 os.sep,
                 mod
@@ -126,7 +126,7 @@ class _DirsLoader:
             sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
             .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
         )
-        dirs: list[ScanerDirItem] = []
+        dirs: list[DirItem] = []
         for rel_path, mod in conn.execute(q):
             rel_path: str
             abs_dir_path = os.path.join(
@@ -134,7 +134,7 @@ class _DirsLoader:
                 scaner_item.mf.mf_current_path.strip(os.sep),
                 rel_path.strip(os.sep)
             )
-            item = ScanerDirItem(abs_dir_path, rel_path, mod)
+            item = DirItem(abs_dir_path, rel_path, mod)
             dirs.append(item)
         conn.close()
         return dirs
@@ -154,8 +154,8 @@ class _DirsCompator:
 
     @staticmethod
     def get_dirs_to_remove(
-        finder_dirs: list[ScanerDirItem],
-        db_dirs: list[ScanerDirItem]
+        finder_dirs: list[DirItem],
+        db_dirs: list[DirItem]
     ):
         """
         Собирает список `DirItem`:
@@ -171,8 +171,8 @@ class _DirsCompator:
 
     @staticmethod
     def get_dirs_to_scan(
-        finder_dirs: list[ScanerDirItem],
-        db_dirs: list[ScanerDirItem]
+        finder_dirs: list[DirItem],
+        db_dirs: list[DirItem]
     ):
         """
         Собирает список `DirItem`:
@@ -195,7 +195,7 @@ class _DirsDbUpdater:
     @staticmethod
     def upsert_records(
         scaner_item: BaseScanerItem,
-        dirs_to_scan: list[ScanerDirItem]
+        dirs_to_scan: list[DirItem]
     ):
         """
         Запускать в самом конце сканирования, когда обновлена таблица Thumbs
@@ -227,13 +227,13 @@ class _ImgLoader:
     @staticmethod
     def get_finder_images(
         scaner_item: BaseScanerItem,
-        dirs_to_scan: list[ScanerDirItem]
+        dirs_to_scan: list[DirItem]
     ):
         """
         Собирает список `ImgItem` из указанных директорий:
         - fider_images список ImgItem
         """
-        finder_images: list[ScanerImgItem] = []
+        finder_images: list[ImgItem] = []
         for dir_item in dirs_to_scan:
             try:
                 scandir_iterator = os.scandir(dir_item.abs_path)
@@ -253,21 +253,21 @@ class _ImgLoader:
                     # в коллекциях
                     # if size == 0:
                         # continue
-                    img_item = ScanerImgItem(entry.path, size, mod)
+                    img_item = ImgItem(entry.path, size, mod)
                     finder_images.append(img_item)
         return finder_images
 
     @staticmethod
     def get_db_images(
         scaner_item: BaseScanerItem,
-        dirs_to_scan: list[ScanerDirItem]
+        dirs_to_scan: list[DirItem]
     ):
         """
         Возвращает информацию об изображениях в БД из указанных директорий:
         - db_images список ImgItem
         """
         conn = scaner_item.engine.connect()
-        db_images: list[ScanerImgItem] = []
+        db_images: list[ImgItem] = []
         for dir_item in dirs_to_scan:
             stmt = (
                 sqlalchemy.select(
@@ -299,7 +299,7 @@ class _ImgLoader:
                     mf_path=scaner_item.mf.mf_current_path,
                     rel_path=rel_path
                 )
-                img_item = ScanerImgItem(
+                img_item = ImgItem(
                     abs_img_path, size, mod, rel_thumb_path
                 )
                 db_images.append(img_item)
@@ -310,8 +310,8 @@ class _ImgLoader:
 class _ImgCompator:
     @staticmethod
     def start(
-        finder_images: list[ScanerImgItem],
-        db_images: list[ScanerImgItem]
+        finder_images: list[ImgItem],
+        db_images: list[ImgItem]
     ):
         """
         Сравнивает данные об изображениях из Finder и базы данных.  
@@ -348,7 +348,7 @@ class _ImgCompator:
 class _ThumbsUpdater:
 
     @staticmethod
-    def del_thumbs(scaner_item: BaseScanerItem, del_images: list[ScanerImgItem]):
+    def del_thumbs(scaner_item: BaseScanerItem, del_images: list[ImgItem]):
         """
         Удаляет миниатюры и соответствующие записи из БД пакетами по 10.
 
@@ -356,7 +356,7 @@ class _ThumbsUpdater:
         прерывается при его недоступности.
         """
 
-        def _del_records(good_chunk: list[ScanerImgItem]):
+        def _del_records(good_chunk: list[ImgItem]):
             """
             Удаляет из БД записи о миниатюрах.
             """
@@ -371,7 +371,7 @@ class _ThumbsUpdater:
                 )
                 conn.execute(stmt)
 
-        def _remove_thumb(img_item: ScanerImgItem):
+        def _remove_thumb(img_item: ImgItem):
             scaner_item.current_count += 1
             scaner_item.process_queue.put(
                 _ThumbsUpdater.get_gui_text(scaner_item)
@@ -398,7 +398,7 @@ class _ThumbsUpdater:
         for chunk in chunked_del_images:
             if not os.path.exists(scaner_item.mf.mf_current_path):
                 break
-            good_chunk: list[ScanerImgItem] = []
+            good_chunk: list[ImgItem] = []
             for img_item in chunk:
                 if _remove_thumb(img_item):
                     good_chunk.append(img_item)
@@ -406,7 +406,7 @@ class _ThumbsUpdater:
                 _del_records(good_chunk)
 
     @staticmethod
-    def add_thumbs(scaner_item: BaseScanerItem, new_images: list[ScanerImgItem]):
+    def add_thumbs(scaner_item: BaseScanerItem, new_images: list[ImgItem]):
         """
         Создает миниатюры и соответствующие записи из БД пакетами по 10.
 
@@ -414,7 +414,7 @@ class _ThumbsUpdater:
         прерывается при его недоступности.
         """
 
-        def _upsert_records(good_chunk: list[ScanerImgItem]):
+        def _upsert_records(good_chunk: list[ImgItem]):
             """
             Добавляет записи в БД об миниатюрах.
             """
@@ -466,7 +466,7 @@ class _ThumbsUpdater:
                 stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
                 conn.execute(stmt)
 
-        def _create_thumb(img_item: ScanerImgItem):
+        def _create_thumb(img_item: ImgItem):
             """
             Создает и записывает в `hashdir` миниатюру.
             """
@@ -496,7 +496,7 @@ class _ThumbsUpdater:
         for chunk in chunked_new_images:
             if not os.path.exists(scaner_item.mf.mf_current_path):
                 break
-            good_chunk: list[ScanerImgItem] = []
+            good_chunk: list[ImgItem] = []
             for img_item in chunk:
                 if _create_thumb(img_item):
                     good_chunk.append(img_item)
@@ -516,7 +516,7 @@ class _DirsToScanWorker:
     removed_images_count = 50
 
     @staticmethod
-    def start(dirs_to_scan: list[ScanerDirItem], scaner_item: BaseScanerItem):
+    def start(dirs_to_scan: list[DirItem], scaner_item: BaseScanerItem):
         """
         Параметры: 
         - dirs_to_scan список DirItem
@@ -559,14 +559,14 @@ class _RemovedDirsWorker:
 
     @staticmethod
     def remove_thumbs(
-        removed_dirs: list[ScanerDirItem],
+        removed_dirs: list[DirItem],
         scaner_item: BaseScanerItem
     ):
         """
         Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
         """
 
-        def _get_thumbs(conn: sqlalchemy.Connection, dir_item: ScanerDirItem):
+        def _get_thumbs(conn: sqlalchemy.Connection, dir_item: DirItem):
             one_slash = f"{dir_item.rel_path}/%"
             stmt_thumbs_to_remove = (
                 sqlalchemy.select(Thumbs.rel_thumb_path)
@@ -603,7 +603,7 @@ class _RemovedDirsWorker:
                     _remove_records(conn, thumbs_to_remove)
 
     def remove_dirs(
-            removed_dirs: list[ScanerDirItem],
+            removed_dirs: list[DirItem],
             scaner_item: BaseScanerItem
         ):
         """
@@ -677,8 +677,8 @@ class BaseScaner:
     @staticmethod
     def log_removed_dirs(
         scaner_item: BaseScanerItem,
-        finder_dirs: list[ScanerDirItem],
-        removed_dirs: list[ScanerDirItem]
+        finder_dirs: list[DirItem],
+        removed_dirs: list[DirItem]
     ):
         finder_lines = [f"{i.abs_path}, {i.rel_path}" for i in finder_dirs]
         removed_lines = [f"{i.abs_path}, {i.rel_path}" for i in removed_dirs]
@@ -742,14 +742,14 @@ class ForcedScaner:
         avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             scaner_item.mf.set_mf_current_path(avaiable_mf_path)
-            dir_items: list[ScanerDirItem] = []
+            dir_items: list[DirItem] = []
             for i in dirs_to_scan:
                 try:
                     mod = int(os.stat(i).st_mtime)
                 except Exception as e:
                     print(traceback.format_exc())
                     continue
-                item = ScanerDirItem(
+                item = DirItem(
                     abs_path=i,
                     rel_path=Utils.get_rel_any_path(mf.mf_current_path, i),
                     mod=mod
