@@ -45,10 +45,11 @@ def move_app_to_desktop(appname: str):
         print(e)
 
 
+test_mf = "_preload/test_mf.zip"
 def include_files(folder_name: str) -> list[str, list]:
     return (
         folder_name,
-        [i.path for i in os.scandir(folder_name)]
+        [i.path for i in os.scandir(folder_name) if test_mf not in i.path]
     )
 
 
