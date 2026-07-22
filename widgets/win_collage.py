@@ -10,6 +10,8 @@ from ._base_widgets import UMainWidget
 class WinCollage(UMainWidget):
     def __init__(self, data_items: list['DataItem']):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
 
         self.resize(500, 500)
         self.img_widget = QLabel()
