@@ -1,11 +1,13 @@
 import os
 import shutil
 import traceback
+from dataclasses import dataclass
 from datetime import datetime
 from multiprocessing import Process, Queue, shared_memory
 from pathlib import Path
 from time import sleep
 
+import numpy as np
 import sqlalchemy
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
@@ -13,13 +15,12 @@ from watchdog.observers.polling import PollingObserver
 from cfg import Cfg, Static
 
 from .database import Dbase, Dirs, Thumbs
-from .items import (CopyTaskItem, OneFileInfoItem, ReadImgItem,
-                    UpdateThumbItem, WatchDogItem)
+from .items import CopyTaskItem, OneFileInfoItem, ReadImgItem
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
 from .tasks import Utils
-import numpy as np
+
 
 class BaseProcessWorker:
     _registry = []
@@ -300,6 +301,12 @@ class WatchDogHandler(FileSystemEventHandler):
             self.callback(event.src_path)
 
 
+@dataclass(slots=True)
+class WatchDogItem:
+    mf: Mf
+    src_path: str
+
+
 class WatchDog:
     @staticmethod
     def start(mf_list: list[Mf], queue: Queue):
@@ -330,6 +337,12 @@ class WatchDog:
         finally:
             observer.stop()
             observer.join()
+
+
+@dataclass(slots=True)
+class UpdateThumbItem:
+    rel_img_path: str
+    array: np.ndarray
 
 
 class UpdateThumb:

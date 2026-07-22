@@ -10,11 +10,11 @@ from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QWidget)
 
 from cfg import Cfg, Dynamic, Static
-from system.items import DataItem, DbImagesItem, SettingsItem
+from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
-from system.tasks import DbImagesLoader, UThreadPool
+from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import UMenu, USubMenu, VScrollArea
@@ -801,7 +801,7 @@ class GridStandart(Grid):
         self.task_.sigs.finished_.connect(self.create_thumbnails)
         UThreadPool.start(self.task_)
 
-    def create_thumbnails(self, db_images: list[DbImagesItem]):
+    def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
         Thumb.calculate_size()
         for image_item in db_images:
             pixmap = QPixmap.fromImage(image_item.qimage)

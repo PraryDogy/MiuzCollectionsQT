@@ -9,10 +9,11 @@ from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
 
 from cfg import Cfg, Dynamic, Static
 from system.filters import Filters
-from system.items import ForcedScanerItem, SettingsItem, UpdateThumbItem
+from system.items import ForcedScanerItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
+from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
+                                 UpdateThumbItem)
 from system.scaner import BaseScaner, ForcedScaner, ScanerWorker
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils

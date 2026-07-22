@@ -71,35 +71,6 @@ class SettingsItem:
 
 
 @dataclass(slots=True)
-class WatchDogItem:
-    mf: Mf
-    src_path: str
-
-
-@dataclass(slots=True)
-class UpdateThumbItem:
-    rel_img_path: str
-    array: np.ndarray
-
-
-@dataclass(slots=True)
-class DbImagesItem:
-    rel_img_path: str
-    rel_thumb_path: str
-    fav: int
-    qimage: QImage
-    day_month_year: str
-    month_year: str
-
-
-@dataclass(slots=True)
-class HashDirSizeItem:
-    mf: Mf
-    size: int
-    total_images: int
-
-
-@dataclass(slots=True)
 class DataItem:
     pixmap: QPixmap
     rel_path: str

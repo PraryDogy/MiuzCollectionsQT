@@ -18,14 +18,15 @@ from typing_extensions import Literal, Optional
 
 from cfg import Cfg, Static, Themes
 from system.filters import Filters
-from system.items import HashDirSizeItem, SettingsItem
+from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
 from system.paletes import ThemeChanger
 from system.servers import Servers
 from system.shared_utils import SharedUtils
-from system.tasks import HashDirSize, MfDataCleaner, UThreadPool
+from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
+                          UThreadPool)
 from system.utils import Utils
 
 from ._base_widgets import (HSep, RowArrowWidget, ULineEdit, UMainWidget,

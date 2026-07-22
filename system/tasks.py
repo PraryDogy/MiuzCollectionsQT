@@ -1,5 +1,6 @@
 import os
 import traceback
+from dataclasses import dataclass
 from datetime import datetime
 
 import cv2
@@ -13,7 +14,6 @@ from PyQt6.QtGui import QImage
 from cfg import Cfg, Dynamic, Static
 
 from .database import Dbase, Dirs, Thumbs
-from .items import DbImagesItem, HashDirSizeItem
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
@@ -77,6 +77,16 @@ class SetFav(URunnable):
         self.sigs.finished_.emit(self.value)
 
 
+@dataclass(slots=True)
+class DbImagesLoaderItem:
+    rel_img_path: str
+    rel_thumb_path: str
+    fav: int
+    qimage: QImage
+    day_month_year: str
+    month_year: str
+
+
 class DbImagesLoader(URunnable):
     """
     Загружает изображения из БД и формирует словарь для UI.
@@ -126,7 +136,7 @@ class DbImagesLoader(URunnable):
             day_month_year = f"{date_.day} {month_gen_} {date_.year}"
             month_year = f"{month_} {date_.year}"
 
-            item = DbImagesItem(
+            item = DbImagesLoaderItem(
                 rel_img_path=rel_img_path,
                 rel_thumb_path=rel_thumb_path,
                 fav=fav,
@@ -301,6 +311,13 @@ class DbDirsLoader(URunnable):
                 curr = curr + "/" + part if curr else "/" + part
                 full_set.add(curr)
         return sorted(full_set)
+
+
+@dataclass(slots=True)
+class HashDirSizeItem:
+    mf: Mf
+    size: int
+    total_images: int
 
 
 class HashDirSize(URunnable):
