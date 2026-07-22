@@ -81,6 +81,41 @@ class BaseScanerItem:
     scaner_type: Literal["forced", "base"]
 
 
+class _DirsChangeWatcher:
+
+    @staticmethod
+    def is_changed(scaner_item: BaseScanerItem) -> bool:
+        db_dirs: list[DirItem] = []
+        q = (
+            sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
+            .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
+        )
+        base_path = scaner_item.mf.mf_current_path.strip(os.sep)
+        with scaner_item.engine.connect() as conn:
+            for rel_path, mod in conn.execute(q):
+                abs_dir_path = os.path.join(
+                    os.sep,
+                    base_path,
+                    rel_path.strip(os.sep)
+                )
+                item = DirItem(
+                    abs_path=abs_dir_path,
+                    rel_path=rel_path,
+                    mod=mod
+                )
+                db_dirs.append(item)
+                if not os.path.exists(abs_dir_path):
+                    return True
+                try:
+                    stat = os.stat(abs_dir_path)
+                except Exception as e:
+                    print("DirsChangeWatcher error", abs_dir_path, e)
+                    continue
+                if int(stat.st_mtime) > mod:
+                    return True
+        return False, db_dirs
+    
+
 class _DirsLoader:
     @staticmethod
     def get_finder_dirs(scaner_item: BaseScanerItem):
@@ -132,58 +167,6 @@ class _DirsLoader:
         except Exception as e:
             print(traceback.format_exc())
         return dirs
-
-    @staticmethod
-    def get_db_dirs(scaner_item: BaseScanerItem):
-        """
-        Возвращает список директорий из базы данных, которые:
-        - соответствуют условию DIRS.c.brand == `Mf.alias`
-        """
-        conn = scaner_item.engine.connect()
-        q = (
-            sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
-            .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
-        )
-        dirs: list[DirItem] = []
-        for rel_path, mod in conn.execute(q):
-            rel_path: str
-            abs_dir_path = os.path.join(
-                os.sep,
-                scaner_item.mf.mf_current_path.strip(os.sep),
-                rel_path.strip(os.sep)
-            )
-            item = DirItem(abs_dir_path, rel_path, mod)
-            dirs.append(item)
-        conn.close()
-        return dirs
-
-
-class DirsChangeWatcher:
-
-    @staticmethod
-    def is_changed(scaner_item: BaseScanerItem) -> bool:
-        q = (
-            sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
-            .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
-        )
-        base_path = scaner_item.mf.mf_current_path.strip(os.sep)
-        with scaner_item.engine.connect() as conn:
-            for rel_path, mod in conn.execute(q):
-                abs_dir_path = os.path.join(
-                    os.sep,
-                    base_path,
-                    rel_path.strip(os.sep)
-                )
-                if not os.path.exists(abs_dir_path):
-                    return True
-                try:
-                    stat = os.stat(abs_dir_path)
-                except Exception as e:
-                    print("DirsChangeWatcher error", abs_dir_path, e)
-                    continue
-                if int(stat.st_mtime) > mod:
-                    return True
-        return False
 
 
 class _DirsCompator:
@@ -693,13 +676,11 @@ class BaseScaner:
 
     @staticmethod
     def single_mf_scan(scaner_item: BaseScanerItem):
-        
-        if not DirsChangeWatcher.is_changed(scaner_item):
+        is_changed, db_dirs = _DirsChangeWatcher.is_changed(scaner_item)
+        if not is_changed:
             print(scaner_item.mf.mf_alias, "not changed")
             return
-
         finder_dirs = _DirsLoader.get_finder_dirs(scaner_item)
-        db_dirs = _DirsLoader.get_db_dirs(scaner_item)
         if not finder_dirs:
             return
         removed_dirs = _DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
