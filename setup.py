@@ -70,9 +70,6 @@ DATA_FILES = [
     ]
 
 
-
-
-
 # ****************** DON'T CHANGE IT ******************
 
 YEAR = datetime.now().year # CURRENT YEAR
