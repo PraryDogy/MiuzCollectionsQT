@@ -84,7 +84,7 @@ class BaseScanerItem:
 class _DirsChangeWatcher:
 
     @staticmethod
-    def is_changed(scaner_item: BaseScanerItem) -> bool:
+    def is_changed(scaner_item: BaseScanerItem):
         db_dirs: list[DirItem] = []
         q = (
             sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
@@ -104,16 +104,20 @@ class _DirsChangeWatcher:
                     mod=mod
                 )
                 db_dirs.append(item)
-                if not os.path.exists(abs_dir_path):
-                    return True
-                try:
-                    stat = os.stat(abs_dir_path)
-                except Exception as e:
-                    print("DirsChangeWatcher error", abs_dir_path, e)
-                    continue
-                if int(stat.st_mtime) > mod:
-                    return True
-        return False, db_dirs
+        is_changed_flag = False
+        for item in db_dirs:
+            if not os.path.exists(item.abs_path):
+                is_changed_flag = True
+                break
+            try:
+                stat = os.stat(item.abs_path)
+            except Exception as e:
+                print("DirsChangeWatcher error", item.abs_path, e)
+                continue
+            if int(stat.st_mtime) > item.mod:
+                is_changed_flag = True
+                break
+        return (is_changed_flag, db_dirs)
     
 
 class _DirsLoader:
