@@ -18,9 +18,7 @@ from cfg import Static
 
 
 def remove_trash():
-
     trash = ("build", ".eggs", "dist")
-
     for i in trash:
         try:
             shutil.rmtree(i)
@@ -29,23 +27,18 @@ def remove_trash():
 
 
 def move_app_to_desktop(appname: str):
-
     desktop = os.path.expanduser("~/Desktop")
-
     dest = os.path.join(desktop, f"{appname}.app")
     src = os.path.join("dist", f"{appname}.app")
-
     try:
         if os.path.exists(dest):
             shutil.rmtree(dest)
     except Exception as e:
         print(e)
-
     try:
         shutil.move(src, dest)
     except Exception as e:
         print(e)
-
     try:
         subprocess.Popen(["open", "-R", dest])
     except Exception as e:
@@ -55,11 +48,8 @@ def move_app_to_desktop(appname: str):
 def include_files(folder_name: str) -> list[str, list]:
     return (
         folder_name,
-        [os.path.join(folder_name, i) for i in os.listdir(folder_name)]
-        )
-
-
-
+        [i.path for i in os.scandir(folder_name)]
+    )
 
 
 # ****************** YOUR DATA ******************
