@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QVBoxLayout,
                              QWidget)
 
-from cfg import JsonData, Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -18,9 +18,10 @@ from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import UMenu, USubMenu, VScrollArea
-from .actions import (CopyFiles, CopyPath, OpenInView, PasteFiles, RemoveFiles,
-                      RevealInFinder, Save, ScanerRestart, SetFav,
-                      ShowInFolder, UpdateThumbAction, WinInfoAction)
+from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
+                      PasteFiles, RemoveFiles, RevealInFinder, Save,
+                      ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
+                      WinInfoAction)
 
 
 class ULabel(QLabel):
@@ -274,6 +275,7 @@ class Grid(VScrollArea):
     update_thumb = pyqtSignal(list)
     show_in_app = pyqtSignal(str)
     finished_ = pyqtSignal()
+    collage = pyqtSignal(list)
     
     resize_ms = 10
     copy_files_path = os.path.join(Static.internal_images, "copy_files.png")
@@ -596,7 +598,8 @@ class Grid(VScrollArea):
                 self.clear_selected_widgets()
                 self.wid_to_selected_widgets(clicked)
 
-            rel_paths = [w.data_item.rel_path for w in self.selected_widgets]
+            data_items = [w.data_item for w in self.selected_widgets]
+            rel_paths = [di.rel_path for di in data_items]
 
             # просмотр
             act = OpenInView(rel_paths, self.menu_)
@@ -656,6 +659,13 @@ class Grid(VScrollArea):
                 lambda: self.reveal_in_finder.emit(rel_paths)
             )
             self.menu_.addAction(act)
+
+            if len(rel_paths) > 1:
+                collage = CollageAction(self.menu_)
+                collage.triggered.connect(
+                    lambda: self.collage.emit(data_items)
+                )
+                self.menu_.addAction(collage)
 
             update_thumb = UpdateThumbAction(self.menu_, rel_paths)
             update_thumb.triggered.connect(

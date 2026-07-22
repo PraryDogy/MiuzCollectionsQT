@@ -7,9 +7,9 @@ from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QSplitter, QVBoxLayout, QWidget)
 
-from cfg import JsonData, Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
-from system.items import SettingsItem
+from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
@@ -26,6 +26,7 @@ from .bar_path import PathBar
 from .bar_top import BarTop
 from .grid import Grid, GridStandart
 from .menu_left import MenuLeft
+from .win_collage import WinCollage
 from .win_copy_files import WinCopyFiles
 from .win_dates import WinDates
 from .win_filters import WinFilters
@@ -636,7 +637,10 @@ class WinMain(UMainWindow):
         self.grid.upload_files.connect(
             lambda abs_paths: self.upload_files(abs_paths)
         )
-        # -1 для pyqt6
+        self.grid.collage.connect(
+            lambda data_items: self.open_collage_win(data_items)
+        )
+
         self.right_layout.insertWidget(layout_index-1, self.grid)
 
     @with_conn
@@ -818,6 +822,11 @@ class WinMain(UMainWindow):
         Filters.write_json_data()
         Mf.write_json_data()
         os._exit(0)
+
+    def open_collage_win(self, data_items: list[DataItem]):
+        self.collage_win = WinCollage(data_items)
+        self.collage_win.center_to_parent(self)
+        self.collage_win.show()
 
     def set_fav(self, data: tuple[str, int]):
 

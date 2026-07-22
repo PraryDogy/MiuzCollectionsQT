@@ -104,3 +104,11 @@ class ShowInFolder(QAction):
             text=Lng.show_in_folder[JsonData.lng_index],
             parent=parent
         )
+
+
+class CollageAction(QAction):
+    def __init__(self, parent: QMenu):
+        super().__init__(
+            text=Lng.collage[JsonData.lng_index],
+            parent=parent
+        )

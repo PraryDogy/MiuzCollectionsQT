@@ -532,3 +532,7 @@ class Lng:
         "Сортировка по алфавиту",
         "Alphabetical sorting"
     )
+    collage = (
+        "Коллаж",
+        "Collage"
+    )
