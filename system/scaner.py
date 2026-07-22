@@ -117,6 +117,8 @@ class _DirsChangeWatcher:
             if int(stat.st_mtime) > item.mod:
                 is_changed_flag = True
                 break
+        if not db_dirs:
+            is_changed_flag = True
         return (is_changed_flag, db_dirs)
     
 
