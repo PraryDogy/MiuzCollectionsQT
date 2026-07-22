@@ -10,11 +10,12 @@ from ._base_widgets import UMainWidget
 
 
 class WinCollage(UMainWidget):
+    ww, hh = 700, 700
     def __init__(self, data_items: list[DataItem]):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.resize(700, 700)
+        self.resize(self.ww, self.hh)
         self.setWindowTitle(Lng.collage[JsonData.lng_index])
         self.central_layout.setContentsMargins(0, 0, 0, 0)
 
