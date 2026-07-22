@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtWidgets import QGridLayout, QLabel, QSpacerItem, QWidget
 
-from cfg import Cfg
+from cfg import JsonData
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 
@@ -30,7 +30,7 @@ class WinInfo(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.info[Cfg.lng_index])
+        self.setWindowTitle(Lng.info[JsonData.lng_index])
         self.path = paths[0]
 
         wid = QWidget()
@@ -41,12 +41,12 @@ class WinInfo(UMainWidget):
         self.grid_lay.setContentsMargins(5, 2, 5, 5)
 
         self.data = {
-            Lng.file_name[Cfg.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
-            Lng.type_[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
-            Lng.file_size[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
-            Lng.place[Cfg.lng_index]: OneFileInfo.lined_text(self.path),
-            Lng.changed[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
-            Lng.resol[Cfg.lng_index]: Lng.calculating[Cfg.lng_index],
+            Lng.file_name[JsonData.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
+            Lng.type_[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+            Lng.file_size[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+            Lng.place[JsonData.lng_index]: OneFileInfo.lined_text(self.path),
+            Lng.changed[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+            Lng.resol[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
         }
 
         selectable_labels: list[Selectable] = []

@@ -1,7 +1,7 @@
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QVBoxLayout, QGroupBox
 
-from cfg import Cfg, Dynamic
+from cfg import JsonData, Dynamic
 from system.filters import Filters
 from system.lang import Lng
 
@@ -20,7 +20,7 @@ class WinFilters(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.filters[Cfg.lng_index])
+        self.setWindowTitle(Lng.filters[JsonData.lng_index])
         self.setFixedSize(self.ww, self.hh)
 
         self.central_layout.setSpacing(10)
@@ -38,7 +38,7 @@ class WinFilters(UMainWidget):
 
         favs_item = VListWidgetItem(
             parent=self.list_widget,
-            text=Lng.favorites[Cfg.lng_index],
+            text=Lng.favorites[JsonData.lng_index],
             height=self.item_h
         )
         favs_item.set_checkable()
@@ -48,7 +48,7 @@ class WinFilters(UMainWidget):
 
         folder_item = VListWidgetItem(
             parent=self.list_widget,
-            text=Lng.only_this_folder[Cfg.lng_index],
+            text=Lng.only_this_folder[JsonData.lng_index],
             height=self.item_h
         )
         folder_item.set_checkable()
@@ -73,7 +73,7 @@ class WinFilters(UMainWidget):
 
         self.list_widget.setCurrentRow(0)
 
-        self.reset_btn = UPushButton(Lng.reset[Cfg.lng_index])
+        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.clicked.connect(self.reset_cmd)
         self.central_layout.addWidget(
             self.reset_btn,
@@ -83,14 +83,14 @@ class WinFilters(UMainWidget):
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):
             return
-        if item.text() == Lng.favorites[Cfg.lng_index]:
+        if item.text() == Lng.favorites[JsonData.lng_index]:
             if Dynamic.filter_favs:
                 Dynamic.filter_favs = False
                 item.setCheckState(Qt.CheckState.Unchecked)
             else:
                 Dynamic.filter_favs = True
                 item.setCheckState(Qt.CheckState.Checked)
-        elif item.text() == Lng.only_this_folder[Cfg.lng_index]:
+        elif item.text() == Lng.only_this_folder[JsonData.lng_index]:
             if Dynamic.filter_only_folder:
                 Dynamic.filter_only_folder = False
                 item.setCheckState(Qt.CheckState.Unchecked)

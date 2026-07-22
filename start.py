@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
                              QLabel, QPushButton, QTextEdit, QVBoxLayout)
 from typing_extensions import Literal
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.database import Dbase
 from system.filters import Filters
 from system.main_folder import Mf
@@ -137,13 +137,13 @@ class FirstLoad(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(Lng.settings_title[Cfg.lng_index])
+        self.setWindowTitle(Lng.settings_title[JsonData.lng_index])
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         layout = QVBoxLayout(self)
         layout.setSpacing(15)
 
-        self.title_label = QLabel(Lng.description[Cfg.lng_index])
+        self.title_label = QLabel(Lng.description[JsonData.lng_index])
         self.title_label.setWordWrap(True)
         self.title_label.setFixedWidth(310)
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -154,7 +154,7 @@ class FirstLoad(QDialog):
         layout.addLayout(groups_layout)
 
         self.group_app = ClickableGroupBox(
-            Lng.setup_app[Cfg.lng_index],
+            Lng.setup_app[JsonData.lng_index],
             self.setup_app
         )
         groups_layout.addWidget(self.group_app)
@@ -214,7 +214,7 @@ class LanguageSelect(QDialog):
         self.adjustSize()
 
     def select_lang(self, index):
-        Cfg.lng_index = index
+        JsonData.lng_index = index
         self.closed_.emit()
         self.deleteLater()
     
@@ -243,9 +243,9 @@ class App(QApplication):
             new_mf_win.show()
 
         def copy_preload_files():
-            Cfg.remake_external_dir()
-            Cfg.copy_preloaded_zip()
-            Cfg.write_json_data()
+            JsonData.remake_external_dir()
+            JsonData.copy_preloaded_zip()
+            JsonData.write_json_data()
 
         def first_load_win():
             first_load = FirstLoad()
@@ -259,14 +259,14 @@ class App(QApplication):
             lng_win.closed_.connect(first_load_win)
             lng_win.exec()
 
-        Cfg.json_to_app()
+        JsonData.json_to_app()
 
         for i in (Mf, Filters):
             i.items.clear()
             i.json_to_app()
 
-        if not Cfg.check_files():
-            Cfg.make_empty_external_files()
+        if not JsonData.check_files():
+            JsonData.make_empty_external_files()
             lng_win()
 
         elif not Mf.items:

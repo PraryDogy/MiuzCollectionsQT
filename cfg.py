@@ -12,7 +12,7 @@ class Themes:
 
 
 class Static:
-    app_ver = 5.3
+    app_ver = 5.4
     app_name = "Collections"
     thumbs_load_limit = 100
     
@@ -69,7 +69,7 @@ class Dynamic:
     thumb_path_set: set[str] = set()
 
 
-class Cfg:
+class JsonData:
     app_ver = Static.app_ver
     lng_index = 0
     theme = Themes.macos
@@ -80,10 +80,10 @@ class Cfg:
     def get_data(cls):
         return {
             k: v
-            for k, v in vars(Cfg).items()
+            for k, v in vars(JsonData).items()
             if not k.startswith("__")
             and
-            not callable(getattr(Cfg, k))
+            not callable(getattr(JsonData, k))
         }
     
     @classmethod
@@ -93,8 +93,8 @@ class Cfg:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
-            if Cfg.theme not in (Themes.macos, Themes.dark, Themes.light):
-                Cfg.theme = Themes.macos
+            if JsonData.theme not in (Themes.macos, Themes.dark, Themes.light):
+                JsonData.theme = Themes.macos
         except Exception as e:
             print("Cfg json to app error",e)
     

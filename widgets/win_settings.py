@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (QApplication, QFileDialog, QGraphicsOpacityEffect,
                              QTableWidgetItem, QVBoxLayout, QWidget)
 from typing_extensions import Literal, Optional
 
-from cfg import Cfg, Static, Themes
+from cfg import JsonData, Static, Themes
 from system.filters import Filters
 from system.items import SettingsItem
 from system.lang import Lng
@@ -125,7 +125,7 @@ class ExportWin(UMainWidget):
     hh = 290
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.export_settings[Cfg.lng_index])
+        self.setWindowTitle(Lng.export_settings[JsonData.lng_index])
         self.set_always_on_top()
         self.set_close_only()
         self.central_layout.setSpacing(5)
@@ -165,13 +165,13 @@ class ExportWin(UMainWidget):
 
         btn_layout.addStretch()
 
-        btn_ok = UPushButton(Lng.ok[Cfg.lng_index])
+        btn_ok = UPushButton(Lng.ok[JsonData.lng_index])
         btn_ok.clicked.connect(
             lambda: self.export_files(self.get_urls())
         )
         btn_layout.addWidget(btn_ok)
 
-        btn_cancel = UPushButton(Lng.cancel[Cfg.lng_index])
+        btn_cancel = UPushButton(Lng.cancel[JsonData.lng_index])
         btn_cancel.clicked.connect(self.deleteLater)
         btn_layout.addWidget(btn_cancel)
 
@@ -212,7 +212,7 @@ class ExportWin(UMainWidget):
         return urls
 
     def export_files(self, files: list[str]):
-        Cfg.json_to_app()
+        JsonData.json_to_app()
         Mf.json_to_app()
         Servers.json_to_app()
         Filters.json_to_app()
@@ -248,14 +248,14 @@ class RebootSettings(SettingsGroup):
             action.triggered.connect(lambda e, v=value: self.lang_action_cmd(v))
             lng_menu.addAction(action)
 
-        lng_wid = RowArrowWidget(Lng.language_max[Cfg.lng_index])
+        lng_wid = RowArrowWidget(Lng.language_max[JsonData.lng_index])
         self.layout_.addWidget(lng_wid)
-        self.lng_btn = UPushButton(text=Lng.russian[Cfg.lng_index])
+        self.lng_btn = UPushButton(text=Lng.russian[JsonData.lng_index])
         self.lng_btn.setFixedWidth(100)
         self.lng_btn.setMenu(lng_menu)
         lng_wid.replace_arrow_widget(self.lng_btn)
 
-        scaner_time_wid = RowArrowWidget(Lng.search_interval[Cfg.lng_index])
+        scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
         self.layout_.addWidget(scaner_time_wid)
         self.spin = QSpinBox(self)
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
@@ -264,20 +264,20 @@ class RebootSettings(SettingsGroup):
         self.spin.setFixedHeight(27)
         self.spin.setFixedWidth(100)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
-        self.spin.setSuffix(f" {Lng.minutes[Cfg.lng_index]}")
+        self.spin.setSuffix(f" {Lng.minutes[JsonData.lng_index]}")
         self.spin.setValue(self.cfg_data.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.replace_arrow_widget(self.spin)
 
-        reset_data_wid = RowArrowWidget(Lng.erase_data[Cfg.lng_index])
+        reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
         reset_data_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(reset_data_wid)
 
-        self.export_wid = RowArrowWidget(Lng.export_settings[Cfg.lng_index])
+        self.export_wid = RowArrowWidget(Lng.export_settings[JsonData.lng_index])
         self.export_wid.clicked.connect(self.export_settings)
         self.layout_.addWidget(self.export_wid)
 
-        self.import_wid = RowArrowWidget(Lng.import_settings[Cfg.lng_index])
+        self.import_wid = RowArrowWidget(Lng.import_settings[JsonData.lng_index])
         self.import_wid.clicked.connect(self.import_settings)
         self.import_wid.hide_sep()
         self.layout_.addWidget(self.import_wid)
@@ -298,7 +298,7 @@ class RebootSettings(SettingsGroup):
             with zipfile.ZipFile(zip_path, "r") as z:
                 z.extractall(Static.external_files_dir)
 
-            Cfg.json_to_app()
+            JsonData.json_to_app()
             Mf.json_to_app()
             Filters.json_to_app()
             Servers.json_to_app()
@@ -322,7 +322,7 @@ class RebootSettings(SettingsGroup):
             shutil.rmtree(Static.external_files_dir)
             restart_app()
 
-        reset_win = ConfirmWindow(Lng.erase_data_long[Cfg.lng_index])
+        reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index])
         reset_win.center_to_parent(self.window())
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
@@ -351,24 +351,24 @@ class SizesWin(UMainWidget):
         super().__init__(parent)
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.data_size[Cfg.lng_index])
+        self.setWindowTitle(Lng.data_size[JsonData.lng_index])
         self.resize(self.ww, self.hh)
         self.central_layout.setSpacing(10)
 
         total_size = SharedUtils.get_f_size(sum(
             item.size for item in size_items
         ))
-        first_row = QLabel(f"{Lng.data_size[Cfg.lng_index]}: {total_size}")
+        first_row = QLabel(f"{Lng.data_size[JsonData.lng_index]}: {total_size}")
         self.central_layout.addWidget(first_row)
 
         total = sum(item.total_images for item in size_items)
-        sec_row = QLabel(f"{Lng.images[Cfg.lng_index]}: {total}")
+        sec_row = QLabel(f"{Lng.images[JsonData.lng_index]}: {total}")
         self.central_layout.addWidget(sec_row)
 
         headers = [
-            Lng.folder[Cfg.lng_index],
-            Lng.file_size[Cfg.lng_index],
-            Lng.images[Cfg.lng_index]
+            Lng.folder[JsonData.lng_index],
+            Lng.file_size[JsonData.lng_index],
+            Lng.images[JsonData.lng_index]
         ]
         self.table = QTableWidget()
         self.table.setSortingEnabled(True)
@@ -432,11 +432,11 @@ class NonRebootSettings(SettingsGroup):
         super().__init__()
         self.size_items = {}
 
-        data_size_wid = RowArrowWidget(Lng.statistic[Cfg.lng_index])
+        data_size_wid = RowArrowWidget(Lng.statistic[JsonData.lng_index])
         data_size_wid.clicked.connect(self.show_sizes_win)
         self.layout_.addWidget(data_size_wid)
 
-        show_files_wid = RowArrowWidget(Lng.show_system_files[Cfg.lng_index])
+        show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
         show_files_wid.clicked.connect(self.show_files_cmd)
         show_files_wid.hide_sep()
         self.layout_.addWidget(show_files_wid)
@@ -493,7 +493,7 @@ class ThemeBtn(QWidget):
         self.svg_widget.setFixedSize(50, 50)
         layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        label = QLabel(text_mappings[theme][Cfg.lng_index])
+        label = QLabel(text_mappings[theme][JsonData.lng_index])
         layout_.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.clear_selection()
@@ -515,7 +515,7 @@ class ThemesWidget(SettingsGroup):
     def __init__(self):
         super().__init__()
 
-        title_wid = RowArrowWidget(Lng.theme[Cfg.lng_index])
+        title_wid = RowArrowWidget(Lng.theme[JsonData.lng_index])
         title_wid.hide_arrow()
         self.layout_.addWidget(title_wid)
 
@@ -533,16 +533,16 @@ class ThemesWidget(SettingsGroup):
             btn = ThemeBtn(i)
             btn.clicked.connect(lambda theme, btn=btn: self.on_btn_clicked(theme, btn))
             themes_layout.addWidget(btn)
-            if i == Cfg.theme:
+            if i == JsonData.theme:
                 btn.select()
 
     def on_btn_clicked(self, theme: Literal["macintosh", "light", "dark"], btn: ThemeBtn):
         theme_btns = self.findChildren(ThemeBtn)
-        if theme != Cfg.theme:
+        if theme != JsonData.theme:
             for i in theme_btns:
                 i.clear_selection()
             btn.select()
-            Cfg.theme = theme
+            JsonData.theme = theme
             ThemeChanger.init()
 
 
@@ -562,13 +562,13 @@ class SelectableLabel(SettingsLabel):
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
 
-        copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng_index])
+        copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng_index])
         copy_text.triggered.connect(self.copy_text_md)
         context_menu.addAction(copy_text)
 
         context_menu.addSeparator()
 
-        select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng_index])
+        select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lng_index])
         select_all.triggered.connect(lambda: Utils.copy_text(self.text()))
         context_menu.addAction(select_all)
 
@@ -658,14 +658,14 @@ class FiltersWid(SettingsGroup, StateWid):
         super().__init__()
         self.filters_clone = filters_clone
 
-        filters_text = SettingsLabel(Lng.filters_descr[Cfg.lng_index])
+        filters_text = SettingsLabel(Lng.filters_descr[JsonData.lng_index])
         filters_text.setWordWrap(True)
         self.layout_.addWidget(filters_text)
 
         self.layout_.addSpacerItem(QSpacerItem(0, 5))
         self.layout_.addWidget(HSep())
 
-        erase_filters_wid = RowArrowWidget(Lng.reset_filters[Cfg.lng_index])
+        erase_filters_wid = RowArrowWidget(Lng.reset_filters[JsonData.lng_index])
         erase_filters_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(erase_filters_wid)
 
@@ -673,7 +673,7 @@ class FiltersWid(SettingsGroup, StateWid):
 
         self.filters_edit = UTextEdit()
         self.filters_edit.setFixedHeight(220)
-        self.filters_edit.setPlaceholderText(Lng.filters[Cfg.lng_index])
+        self.filters_edit.setPlaceholderText(Lng.filters[JsonData.lng_index])
         self.filters_edit.setPlainText("\n".join(self.filters_clone))
         self.filters_edit.textChanged.connect(self.on_text_changed)
         self.layout_.addWidget(self.filters_edit)
@@ -687,7 +687,7 @@ class FiltersWid(SettingsGroup, StateWid):
             self.changed.emit()
             self.set_was_changed()
 
-        self.filters_win = ConfirmWindow(Lng.reset_filters_long[Cfg.lng_index])
+        self.filters_win = ConfirmWindow(Lng.reset_filters_long[JsonData.lng_index])
         self.filters_win.ok_clicked.connect(fin)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -710,8 +710,8 @@ class FiltersWid(SettingsGroup, StateWid):
 class MfStopList(SettingsTextEdit):
     def __init__(self, mf: Mf):
         super().__init__(
-            title=Lng.ignore_list_descr[Cfg.lng_index],
-            placeholder=Lng.ignore_list[Cfg.lng_index],
+            title=Lng.ignore_list_descr[JsonData.lng_index],
+            placeholder=Lng.ignore_list[JsonData.lng_index],
             text="\n".join(i for i in mf.mf_stop_list),
         )
         self.mf = mf
@@ -739,7 +739,7 @@ class MfSave(SettingsGroup):
     def __init__(self):
         super().__init__()
 
-        self.save_wid = RowArrowWidget(Lng.save[Cfg.lng_index])
+        self.save_wid = RowArrowWidget(Lng.save[JsonData.lng_index])
         self.save_wid.hide_sep()
         self.layout_.addWidget(self.save_wid)
 
@@ -766,7 +766,7 @@ class MfSettings(QWidget, StateWid):
         name_group = SettingsGroup()
         main_lay.addWidget(name_group)
 
-        self.name_wid = RowArrowWidget(f"{Lng.alias[Cfg.lng_index]}: {mf.mf_alias}")
+        self.name_wid = RowArrowWidget(f"{Lng.alias[JsonData.lng_index]}: {mf.mf_alias}")
         self.name_wid.hide_arrow()
         self.name_wid.hide_sep()
         name_group.layout_.addWidget(self.name_wid)
@@ -783,11 +783,11 @@ class MfSettings(QWidget, StateWid):
         general_wid = SettingsGroup()
         main_lay.addWidget(general_wid)
 
-        reset_wid = RowArrowWidget(Lng.reset_mf[Cfg.lng_index])
+        reset_wid = RowArrowWidget(Lng.reset_mf[JsonData.lng_index])
         reset_wid.clicked.connect(self.set_reset_flag)
         general_wid.layout_.addWidget(reset_wid)
 
-        remove_wid = RowArrowWidget(Lng.remove_folder[Cfg.lng_index])
+        remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
         remove_wid.clicked.connect(self.remove_cmd)
         remove_wid.hide_sep()
         general_wid.layout_.addWidget(remove_wid)
@@ -808,9 +808,9 @@ class MfSettings(QWidget, StateWid):
                     if i.mf_alias == self.mf.mf_alias:
                         Mf.items.remove(i)
                         break
-                if self.mf.mf_alias in Cfg.hide_digits_mf_lst:
-                    Cfg.hide_digits_mf_lst.remove(self.mf.mf_alias)
-                    Cfg.write_json_data()
+                if self.mf.mf_alias in JsonData.hide_digits_mf_lst:
+                    JsonData.hide_digits_mf_lst.remove(self.mf.mf_alias)
+                    JsonData.write_json_data()
                 Mf.write_json_data()
                 restart_app()
             else:
@@ -828,9 +828,9 @@ class MfSettings(QWidget, StateWid):
         )
 
         if len(self.mf_list_clone) == 1:
-            win = WarningWindow(Lng.at_least_one_folder_required[Cfg.lng_index])
+            win = WarningWindow(Lng.at_least_one_folder_required[JsonData.lng_index])
         else:
-            win = ConfirmWindow(Lng.app_will_restarted[Cfg.lng_index])
+            win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
             win.ok_clicked.connect(fin)
         win.center_to_parent(self.window())
         win.show()
@@ -842,7 +842,7 @@ class MfSettings(QWidget, StateWid):
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
-        win = ConfirmWindow(Lng.app_will_restarted[Cfg.lng_index])
+        win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
         win.ok_clicked.connect(reset_data)
         win.center_to_parent(self.window())
         win.show()
@@ -873,7 +873,7 @@ class MfSettings(QWidget, StateWid):
             paths.append(self.path_widget.mf_temp_path)
 
         if not paths:
-            show_warn(Lng.select_folder_path[Cfg.lng_index])
+            show_warn(Lng.select_folder_path[JsonData.lng_index])
             return
         
         super_win = SuperWarnWindow()
@@ -915,11 +915,11 @@ class NewFolder(QWidget, StateWid):
         name_wid.layout_.setSpacing(5)
         main_lay.addWidget(name_wid)
 
-        self.name_text = QLabel(Lng.folder_name[Cfg.lng_index])
+        self.name_text = QLabel(Lng.folder_name[JsonData.lng_index])
         name_wid.layout_.addWidget(self.name_text)
 
         self.name_line_edit = ULineEdit()
-        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[Cfg.lng_index])
+        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[JsonData.lng_index])
         name_wid.layout_.addWidget(self.name_line_edit)
 
         self.path_widget = PathWidget(self.mf)
@@ -935,7 +935,7 @@ class NewFolder(QWidget, StateWid):
         save_group = SettingsGroup()
         main_lay.addWidget(save_group)
 
-        self.save_wid = RowArrowWidget(Lng.save[Cfg.lng_index])
+        self.save_wid = RowArrowWidget(Lng.save[JsonData.lng_index])
         self.save_wid.hide_sep()
         self.save_wid.clicked.connect(self.save_start)
         save_group.layout_.addWidget(self.save_wid)
@@ -986,28 +986,28 @@ class NewFolder(QWidget, StateWid):
             paths.append(self.path_widget.mf_temp_path)
 
         if not folder_name:
-            show_warn(Lng.enter_alias_warning[Cfg.lng_index])
+            show_warn(Lng.enter_alias_warning[JsonData.lng_index])
             return
 
         elif any(i.mf_alias == folder_name for i in self.mf_list_clone):
             show_warn(
-                f'{Lng.already_taken[Cfg.lng_index]}'
+                f'{Lng.already_taken[JsonData.lng_index]}'
             )
             return
 
         elif len(folder_name) < 5 or len(folder_name) > 30:
-            show_warn(f'{Lng.string_limit[Cfg.lng_index]}')
+            show_warn(f'{Lng.string_limit[JsonData.lng_index]}')
             return
 
         elif not re.fullmatch(pattern, folder_name):
-            show_warn(f'{Lng.valid_message[Cfg.lng_index]}')
+            show_warn(f'{Lng.valid_message[JsonData.lng_index]}')
             return
 
         elif not paths:
-            show_warn(Lng.select_folder_path[Cfg.lng_index])
+            show_warn(Lng.select_folder_path[JsonData.lng_index])
             return
 
-        win = ConfirmWindow(Lng.save_text_long[Cfg.lng_index])
+        win = ConfirmWindow(Lng.save_text_long[JsonData.lng_index])
         win.ok_clicked.connect(
             lambda: self.save_fin(folder_name, paths, stop_list)
         )
@@ -1035,12 +1035,12 @@ class WinSettings(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.settings[Cfg.lng_index])
+        self.setWindowTitle(Lng.settings[JsonData.lng_index])
         self.setFixedSize(700, 560)
 
         self.cfg_data = CfgData(
-            lng_index=Cfg.lng_index,
-            scaner_minutes=Cfg.scaner_minutes
+            lng_index=JsonData.lng_index,
+            scaner_minutes=JsonData.scaner_minutes
         )
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
@@ -1066,21 +1066,21 @@ class WinSettings(UMainWidget):
 
         main_settings_item = VListWidgetItem(
             parent=self.left_menu,
-            text=Lng.general[Cfg.lng_index]
+            text=Lng.general[JsonData.lng_index]
         )
         main_settings_item.setIcon(QIcon(self.svg_settings))
         self.left_menu.addItem(main_settings_item)
         
         filter_settings = VListWidgetItem(
             parent=self.left_menu,
-            text=Lng.filters[Cfg.lng_index]
+            text=Lng.filters[JsonData.lng_index]
         )
         filter_settings.setIcon(QIcon(self.svg_filters))
         self.left_menu.addItem(filter_settings)
 
         new_folder = VListWidgetItem(
             parent=self.left_menu,
-            text=Lng.new_folder[Cfg.lng_index]
+            text=Lng.new_folder[JsonData.lng_index]
         )
         new_folder.setIcon(QIcon(self.svg_new_folder))
         self.left_menu.addItem(new_folder)
@@ -1117,12 +1117,12 @@ class WinSettings(UMainWidget):
         self.warn_wid.hide()
         btns_lay.addWidget(self.warn_wid)
 
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
         # self.ok_btn.setFixedWidth(95)
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
 
-        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         # cancel_btn.setFixedWidth(95)
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
@@ -1193,8 +1193,8 @@ class WinSettings(UMainWidget):
 
     def clear_right_side(self):
         self.cfg_data = CfgData(
-            lng_index=Cfg.lng_index,
-            scaner_minutes=Cfg.scaner_minutes
+            lng_index=JsonData.lng_index,
+            scaner_minutes=JsonData.scaner_minutes
         )
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
@@ -1225,7 +1225,7 @@ class WinSettings(UMainWidget):
         folder_no_paths = validate_folders()
         if folder_no_paths:
             win_warn = WarningWindow(
-                f"{Lng.select_folder_path[Cfg.lng_index]} \"{folder_no_paths}\""
+                f"{Lng.select_folder_path[JsonData.lng_index]} \"{folder_no_paths}\""
             )
             win_warn.center_to_parent(self.window())
             win_warn.show()
@@ -1236,9 +1236,9 @@ class WinSettings(UMainWidget):
             Filters.items = self.filters_clone
             Filters.write_json_data()
 
-            Cfg.lng_index = self.cfg_data.lng_index
-            Cfg.scaner_minutes = self.cfg_data.scaner_minutes
-            Cfg.write_json_data()
+            JsonData.lng_index = self.cfg_data.lng_index
+            JsonData.scaner_minutes = self.cfg_data.scaner_minutes
+            JsonData.write_json_data()
 
             restart_app()
 
@@ -1284,10 +1284,10 @@ class NewMfWin(UMainWidget):
             mf_current_path=""
         )
         Mf.items.append(mf)
-        Cfg.remake_external_dir()
-        Cfg.make_empty_external_files()
+        JsonData.remake_external_dir()
+        JsonData.make_empty_external_files()
         Mf.write_json_data()
-        Cfg.write_json_data()
+        JsonData.write_json_data()
         Filters.write_json_data()
         restart_app()
 

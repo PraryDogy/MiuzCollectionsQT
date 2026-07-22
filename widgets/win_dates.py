@@ -7,7 +7,7 @@ from PyQt6.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
 from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QHBoxLayout, QLabel,
                              QSpinBox, QToolButton, QVBoxLayout, QWidget)
 
-from cfg import Cfg, Dynamic, Static
+from cfg import JsonData, Dynamic, Static
 from system.lang import Lng
 
 from ._base_widgets import HSep, UMainWidget, UPushButton
@@ -44,11 +44,11 @@ class DatesTitle(QLabel):
 
     def get_named_weekday(self, date: datetime) -> str:
         day_number = str(date.weekday())
-        return Lng.weekdays_short[Cfg.lng_index][day_number]
+        return Lng.weekdays_short[JsonData.lng_index][day_number]
     
     def get_named_date(self, date: datetime) -> str:
         month_number = str(date.month)
-        month = Lng.months_gen[Cfg.lng_index][month_number]
+        month = Lng.months_gen[JsonData.lng_index][month_number]
         return f"{date.day} {month} {date.year}"
     
     def setText(self, a0):
@@ -77,7 +77,7 @@ class MyCalendar(QGroupBox):
         self.calendar.setFixedSize(300, 300)
 
         v_layout.addWidget(self.calendar)
-        if Cfg.lng_index == 0:
+        if JsonData.lng_index == 0:
             self.calendar.setLocale(QLocale(QLocale.Language.Russian))
         else:
             self.calendar.setLocale(QLocale(QLocale.Language.English))
@@ -168,7 +168,7 @@ class WinDates(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.search_dates[Cfg.lng_index])
+        self.setWindowTitle(Lng.search_dates[JsonData.lng_index])
 
         self.central_layout.setSpacing(10)
         self.central_layout.setContentsMargins(10, 10, 10, 10)
@@ -179,13 +179,13 @@ class WinDates(UMainWidget):
         dates_h_lay.setContentsMargins(0, 0, 0, 0)
         dates_h_lay.setSpacing(10)
 
-        self.left_calendar = MyCalendar(Lng.start_date[Cfg.lng_index])
+        self.left_calendar = MyCalendar(Lng.start_date[JsonData.lng_index])
         self.left_calendar.dateSelected.connect(
             lambda date: self.date_change(date=date, flag="start")
         )
         dates_h_lay.addWidget(self.left_calendar)
 
-        self.right_calendar = MyCalendar(Lng.end_date[Cfg.lng_index])
+        self.right_calendar = MyCalendar(Lng.end_date[JsonData.lng_index])
         self.right_calendar.dateSelected.connect(
             lambda date: self.date_change(date=date, flag="end")
         )
@@ -193,7 +193,7 @@ class WinDates(UMainWidget):
 
         self.central_layout.addWidget(HSep())
 
-        clear_btn = UPushButton(text=Lng.reset[Cfg.lng_index])
+        clear_btn = UPushButton(text=Lng.reset[JsonData.lng_index])
         # clear_btn.setFixedWidth(100)
         clear_btn.clicked.connect(self.clear_btn_cmd)
         self.central_layout.addWidget(

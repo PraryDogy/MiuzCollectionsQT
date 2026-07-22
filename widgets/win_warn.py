@@ -5,7 +5,7 @@ from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QLabel
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.lang import Lng
 
 from ._base_widgets import SelectableLabel, UMainWidget, UPushButton
@@ -28,7 +28,7 @@ class ConfirmWindow(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.attention[Cfg.lng_index])
+        self.setWindowTitle(Lng.attention[JsonData.lng_index])
         self.setMaximumWidth(360)
         self.setMinimumWidth(280)
 
@@ -51,11 +51,11 @@ class ConfirmWindow(UMainWidget):
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.addLayout(btn_layout)
 
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         btn_layout.addWidget(self.ok_btn)
 
-        self.cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
+        self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn)

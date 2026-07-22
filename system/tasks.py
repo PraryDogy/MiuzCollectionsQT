@@ -11,7 +11,7 @@ from PIL import Image
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 from PyQt6.QtGui import QImage
 
-from cfg import Cfg, Dynamic, Static
+from cfg import JsonData, Dynamic, Static
 
 from .database import Dbase, Dirs, Thumbs
 from .lang import Lng
@@ -131,8 +131,8 @@ class DbImagesLoader(URunnable):
             qimage = Utils.qimage_from_array(array_)
 
             date_ = datetime.fromtimestamp(mod).date()
-            month_ = Lng.months[Cfg.lng_index][str(date_.month)]
-            month_gen_ = Lng.months_gen[Cfg.lng_index][str(date_.month)]
+            month_ = Lng.months[JsonData.lng_index][str(date_.month)]
+            month_gen_ = Lng.months_gen[JsonData.lng_index][str(date_.month)]
             day_month_year = f"{date_.day} {month_gen_} {date_.year}"
             month_year = f"{month_} {date_.year}"
 

@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
                              QGraphicsView)
 from typing_extensions import Literal
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.items import DataItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -452,11 +452,11 @@ class WinImageView(UMainWidget):
         rel_paths = [self.current_data_item.rel_path, ]
         # открыть в приложении
         open_menu = USubMenu(
-            f"{Lng.open_in[Cfg.lng_index]}",
+            f"{Lng.open_in[JsonData.lng_index]}",
             self.menu_
         )
 
-        act = QAction(Lng.open_default[Cfg.lng_index], open_menu)
+        act = QAction(Lng.open_default[JsonData.lng_index], open_menu)
         act.triggered.connect(
             lambda: self.open_in_app.emit((rel_paths, None))
         )
@@ -504,11 +504,11 @@ class WinImageView(UMainWidget):
 
         self.menu_.addSeparator()
 
-        rotate_cw = QAction(Lng.clockwise[Cfg.lng_index], self.menu_)
+        rotate_cw = QAction(Lng.clockwise[JsonData.lng_index], self.menu_)
         rotate_cw.triggered.connect(lambda: self.rotate(90))
         self.menu_.addAction(rotate_cw)
 
-        rotate_ccw = QAction(Lng.counter_clockwise[Cfg.lng_index], self.menu_)
+        rotate_ccw = QAction(Lng.counter_clockwise[JsonData.lng_index], self.menu_)
         rotate_ccw.triggered.connect(lambda: self.rotate(-90))
         self.menu_.addAction(rotate_ccw)
 

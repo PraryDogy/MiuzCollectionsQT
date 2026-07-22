@@ -6,7 +6,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from typing_extensions import Literal
 
-from cfg import Cfg, Dynamic, Static
+from cfg import JsonData, Dynamic, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
@@ -48,7 +48,7 @@ class WidSearch(ULineEdit):
         self.setFixedWidth(self.ww)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(Lng.search[Cfg.lng_index])
+        self.setPlaceholderText(Lng.search[JsonData.lng_index])
 
         self.clear_btn = ClearBtn(parent=self)
         self.clear_btn.clicked_.connect(self.clear_search)
@@ -142,7 +142,7 @@ class DatesBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.filename)
-        self.lbl.setText(Lng.dates[Cfg.lng_index])
+        self.lbl.setText(Lng.dates[JsonData.lng_index])
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         """Испускает сигнал и применяет сплошной стиль при клике левой кнопкой мыши."""
@@ -155,7 +155,7 @@ class FiltersBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.filename)
-        self.lbl.setText(Lng.filters[Cfg.lng_index])
+        self.lbl.setText(Lng.filters[JsonData.lng_index])
         
 
 class SortBtn(BarTopBtn):
@@ -167,7 +167,7 @@ class SortBtn(BarTopBtn):
 
     def set_text(self):
         """Устанавливает текст кнопки в зависимости от текущей сортировки."""
-        text = Lng.sort_by_mod_short[Cfg.lng_index] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[Cfg.lng_index]
+        text = Lng.sort_by_mod_short[JsonData.lng_index] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[JsonData.lng_index]
         self.lbl.setText(text)
 
     def menu_clicked(self, value: bool):
@@ -182,8 +182,8 @@ class SortBtn(BarTopBtn):
             menu = UMenu(ev)
 
             # --- Создаем пункты меню ---
-            act_mod = QAction(Lng.sort_by_mod[Cfg.lng_index], self, checkable=True)
-            act_recent = QAction(Lng.sort_by_recent[Cfg.lng_index], self, checkable=True)
+            act_mod = QAction(Lng.sort_by_mod[JsonData.lng_index], self, checkable=True)
+            act_recent = QAction(Lng.sort_by_recent[JsonData.lng_index], self, checkable=True)
 
             act_mod.setChecked(Dynamic.sort_by_mod)
             act_recent.setChecked(not Dynamic.sort_by_mod)
@@ -207,7 +207,7 @@ class SettingsBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.filename)
-        self.lbl.setText(Lng.settings[Cfg.lng_index])
+        self.lbl.setText(Lng.settings[JsonData.lng_index])
 
 
 class ExitImgSearchBtn(QFrame):
@@ -223,7 +223,7 @@ class ExitImgSearchBtn(QFrame):
 
         h_layout.addStretch()
 
-        text_label = QLabel(Lng.close_search[Cfg.lng_index])
+        text_label = QLabel(Lng.close_search[JsonData.lng_index])
         h_layout.addWidget(text_label)
 
         icon_container = QWidget()

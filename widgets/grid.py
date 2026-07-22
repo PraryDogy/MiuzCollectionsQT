@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QVBoxLayout,
                              QWidget)
 
-from cfg import Cfg, Dynamic, Static
+from cfg import JsonData, Dynamic, Static
 from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -181,11 +181,11 @@ class Thumb(QFrame):
         self.v_layout.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = (
-            f"{Lng.location[Cfg.lng_index]}: "
+            f"{Lng.location[JsonData.lng_index]}: "
             f"{Mf.current_mf.mf_alias}{self.data_item.rel_path}"
         )
         modified = (
-            f"{Lng.modified[Cfg.lng_index]}: "
+            f"{Lng.modified[JsonData.lng_index]}: "
             f"{self.data_item.day_month_year}"
         )
         self.setToolTip("\n".join([location, modified, ]))
@@ -570,7 +570,7 @@ class Grid(VScrollArea):
                 self.menu_.addAction(paste)
                 self.menu_.addSeparator()
 
-            update_grid = QAction(Lng.update_grid[Cfg.lng_index], self.menu_)
+            update_grid = QAction(Lng.update_grid[JsonData.lng_index], self.menu_)
             update_grid.triggered.connect(
                 lambda: self.load_st_grid.emit()
             )
@@ -583,7 +583,7 @@ class Grid(VScrollArea):
             self.menu_.addAction(reload)
 
             self.menu_.addSeparator()
-            reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], self.menu_)
+            reveal = QAction(Lng.reveal_in_finder[JsonData.lng_index], self.menu_)
             reveal.triggered.connect(
                 lambda: self.reveal_in_finder.emit([Dynamic.current_dir, ])
             )
@@ -608,11 +608,11 @@ class Grid(VScrollArea):
             # открыть в приложении
             if len(rel_paths) == 1:
                 open_menu = USubMenu(
-                    f"{Lng.open_in[Cfg.lng_index]}",
+                    f"{Lng.open_in[JsonData.lng_index]}",
                     self.menu_
                 )
 
-                act = QAction(Lng.open_default[Cfg.lng_index], open_menu)
+                act = QAction(Lng.open_default[JsonData.lng_index], open_menu)
                 act.triggered.connect(
                     lambda: self.open_in_app.emit((rel_paths, None))
                 )
@@ -819,7 +819,7 @@ class GridStandart(Grid):
         if not self.url_to_wid:
             self.grid_wid.hide()
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            lbl = QLabel(Lng.no_photo[Cfg.lng_index])
+            lbl = QLabel(Lng.no_photo[JsonData.lng_index])
             self.scroll_layout.addWidget(lbl)
         else:
             self.rearrange()

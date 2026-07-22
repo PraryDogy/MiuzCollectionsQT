@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QVBoxLayout,
                              QWidget)
 from sqlalchemy import func
 
-from cfg import Cfg, Dynamic, Static
+from cfg import JsonData, Dynamic, Static
 from system.database import Dbase, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
@@ -31,17 +31,17 @@ class ProgressWin(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setFixedWidth(self.ww)
-        self.setWindowTitle(Lng.progress[Cfg.lng_index])
+        self.setWindowTitle(Lng.progress[JsonData.lng_index])
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(0, 0, 0, 10)
 
-        self.text_label = QLabel(Lng.preparing[Cfg.lng_index])
+        self.text_label = QLabel(Lng.preparing[JsonData.lng_index])
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.text_label.setFixedSize(200, 30)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.cancel_btn = UPushButton(Lng.stop[Cfg.lng_index])
+        self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.cancel_image_search.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -52,11 +52,11 @@ class ProgressWin(UMainWidget):
         if current_count > total_count:
             current_count = total_count
         if total_count == 0:
-            text = Lng.preparing[Cfg.lng_index]
+            text = Lng.preparing[JsonData.lng_index]
         else:
             text = (
-                f"{Lng.search[Cfg.lng_index]} {current_count} " 
-                f"{Lng.from_[Cfg.lng_index]} {total_count}"
+                f"{Lng.search[JsonData.lng_index]} {current_count} " 
+                f"{Lng.from_[JsonData.lng_index]} {total_count}"
             )
             self.text_label.setText(text)
 
@@ -76,7 +76,7 @@ class SliderWidget(QWidget):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
-        self.accuracy_label = QLabel(Lng.accuracy[Cfg.lng_index] + ":")
+        self.accuracy_label = QLabel(Lng.accuracy[JsonData.lng_index] + ":")
         self.h_layout.addWidget(self.accuracy_label)
 
         self.slider = USlider()
@@ -115,7 +115,7 @@ class WinImgSearch(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setAcceptDrops(True)
-        self.setWindowTitle(Lng.image_search[Cfg.lng_index])
+        self.setWindowTitle(Lng.image_search[JsonData.lng_index])
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
 
@@ -126,10 +126,10 @@ class WinImgSearch(UMainWidget):
 
         lines_base_text = (
 
-            f"{Lng.search[Cfg.lng_index]} {Lng.in_[Cfg.lng_index]} "
+            f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} "
             f"\"{Mf.current_mf.mf_alias}\".",
 
-            f"{Lng.image_search_drop[Cfg.lng_index]}."
+            f"{Lng.image_search_drop[JsonData.lng_index]}."
         )
         self.base_text = "\n".join(lines_base_text)
         self.img_label = QLabel(self.base_text)
@@ -148,11 +148,11 @@ class WinImgSearch(UMainWidget):
 
         btn_layout.addStretch()
 
-        self.start_btn = UPushButton(Lng.start[Cfg.lng_index])
+        self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
         self.start_btn.clicked.connect(self.start_image_searcher)
         btn_layout.addWidget(self.start_btn)
 
-        cancel_btn = UPushButton(Lng.close[Cfg.lng_index])
+        cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(cancel_btn)
 
@@ -243,7 +243,7 @@ class WinImgSearch(UMainWidget):
                 if ImgUtils.is_grayscale(self.img_array):
                     del self.img_array
                     self.img_label.clear()
-                    self.img_label.setText(Lng.only_color[Cfg.lng_index])
+                    self.img_label.setText(Lng.only_color[JsonData.lng_index])
                     QTimer.singleShot(
                         1500,
                         lambda: self.img_label.setText(self.base_text)
@@ -284,7 +284,7 @@ class WinImgSearch(UMainWidget):
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if first_url.endswith(ImgUtils.ext_all):
                 self.img_label.clear()
-                self.img_label.setText(Lng.loading[Cfg.lng_index])
+                self.img_label.setText(Lng.loading[JsonData.lng_index])
                 self.read_img(first_url)
 
         return super().dropEvent(a0)

@@ -13,7 +13,7 @@ from typing_extensions import Literal
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 
 from .database import Dbase, Dirs, Thumbs
 from .lang import Lng
@@ -132,7 +132,7 @@ class OneFileInfo:
         stats = os.stat(path)
         size = SharedUtils.get_f_size(stats.st_size)
         date_time = datetime.fromtimestamp(stats.st_mtime)
-        month = Lng.months_gen[Cfg.lng_index][str(date_time.month)]
+        month = Lng.months_gen[JsonData.lng_index][str(date_time.month)]
         mod = f"{date_time.day} {month} {date_time.year}"
         item = OneFileInfoItem(type_, size, mod, "")
         return item

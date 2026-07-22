@@ -5,7 +5,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QHBoxLayout, QLabel,
                              QWidget)
 
-from cfg import Cfg, Dynamic, Static
+from cfg import JsonData, Dynamic, Static
 from system.lang import Lng
 
 from ._base_widgets import GrayLabel, USlider
@@ -27,7 +27,7 @@ class ProgressWidget(GrayLabel):
         super().__init__(parent)
         self.set_text_size(11)
 
-        self.total_seconds = Cfg.scaner_minutes * 60
+        self.total_seconds = JsonData.scaner_minutes * 60
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer_text)
@@ -35,7 +35,7 @@ class ProgressWidget(GrayLabel):
     def start_timer_text(self):
 
         self.timer.stop()
-        self.total_seconds = Cfg.scaner_minutes * 60
+        self.total_seconds = JsonData.scaner_minutes * 60
         self.update_label()
         self.timer.start(self.interval_ms)
 
@@ -58,7 +58,7 @@ class ProgressWidget(GrayLabel):
         seconds = self.total_seconds % 60
 
         text = (
-            f"{Lng.next_search[Cfg.lng_index]} "
+            f"{Lng.next_search[JsonData.lng_index]} "
             f"{minutes:02d}:{seconds:02d}"
         )
         self.setText(text)

@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
@@ -33,7 +33,7 @@ class ReplaceFilesWin(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.replace[Cfg.lng_index])
+        self.setWindowTitle(Lng.replace[JsonData.lng_index])
         self.setFixedWidth(self.ww)
         self.central_layout.setContentsMargins(5, 5, 10, 5)
 
@@ -49,7 +49,7 @@ class ReplaceFilesWin(UMainWidget):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(Lng.replace_existing_files[Cfg.lng_index])
+        test_two = QLabel(Lng.replace_existing_files[JsonData.lng_index])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
@@ -61,15 +61,15 @@ class ReplaceFilesWin(UMainWidget):
         btn_lay.setSpacing(10)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = ReplaceButton(Lng.replace_all[Cfg.lng_index])
+        replace_all_btn = ReplaceButton(Lng.replace_all[JsonData.lng_index])
         replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
         btn_lay.addWidget(replace_all_btn)
 
-        replace_one_btn = ReplaceButton(Lng.replace_one[Cfg.lng_index])
+        replace_one_btn = ReplaceButton(Lng.replace_one[JsonData.lng_index])
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = ReplaceButton(Lng.stop[Cfg.lng_index])
+        stop_btn = ReplaceButton(Lng.stop[JsonData.lng_index])
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
         
@@ -96,7 +96,7 @@ class ErrorWin(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.error[Cfg.lng_index])
+        self.setWindowTitle(Lng.error[JsonData.lng_index])
         self.central_layout.setContentsMargins(5, 5, 10, 10)
 
         h_wid = QWidget()
@@ -111,11 +111,11 @@ class ErrorWin(UMainWidget):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(Lng.copy_error[Cfg.lng_index])
+        test_two = QLabel(Lng.copy_error[JsonData.lng_index])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
-        ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
         ok_btn.clicked.connect(self.deleteLater)
         ok_btn.setFixedWidth(80)
         self.central_layout.addWidget(ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -138,7 +138,7 @@ class WinCopyFiles(WinProgressbar):
     ms = 100
 
     def __init__(self, target_dir: str, files_to_copy: list[str]):
-        super().__init__(Lng.copying[Cfg.lng_index])
+        super().__init__(Lng.copying[JsonData.lng_index])
 
         # # отладка
         # self.rel = ReplaceFilesWin()
@@ -156,7 +156,7 @@ class WinCopyFiles(WinProgressbar):
         if not dst_text:
             dst_text = Mf.current_mf.mf_alias
         self.above_label.setText(
-            f"{Lng.copying[Cfg.lng_index]} {Lng.in_[Cfg.lng_index]} \"{dst_text}\""
+            f"{Lng.copying[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} \"{dst_text}\""
         )
 
         self.dst_urls: list[str] = []
@@ -219,7 +219,7 @@ class WinCopyFiles(WinProgressbar):
             below_text = (
                 self.windowTitle(),
                 str(self.copy_item.current_file_count),
-                Lng.from_[Cfg.lng_index],
+                Lng.from_[JsonData.lng_index],
                 str(self.copy_item.total_file_count)
             )
             self.below_label.setText(" ".join(below_text))
@@ -229,7 +229,7 @@ class WinCopyFiles(WinProgressbar):
             below_text = (
                 self.windowTitle(),
                 str(self.copy_item.total_file_count),
-                Lng.from_[Cfg.lng_index],
+                Lng.from_[JsonData.lng_index],
                 str(self.copy_item.total_file_count)
             )
             self.below_label.setText(" ".join(below_text))     

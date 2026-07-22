@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QListWidget,
                              QListWidgetItem, QSplitter, QTreeView,
                              QVBoxLayout, QWidget, QMenu)
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
@@ -61,8 +61,8 @@ class CustomTreeView(QTreeView):
         menu = QMenu(self)
         
         # Создаем действия (Actions)
-        standard_sort_action = QAction(Lng.sort_standart[Cfg.lng_index], self)
-        letter_sort_action = QAction(Lng.sort_alphabet[Cfg.lng_index], self)
+        standard_sort_action = QAction(Lng.sort_standart[JsonData.lng_index], self)
+        letter_sort_action = QAction(Lng.sort_alphabet[JsonData.lng_index], self)
         
         # Добавляем галочки для наглядности текущего режима
         standard_sort_action.setCheckable(True)
@@ -96,7 +96,7 @@ class UploadWin(UMainWidget):
 
     def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
         super().__init__()
-        self.setWindowTitle(Lng.upload_in[Cfg.lng_index])
+        self.setWindowTitle(Lng.upload_in[JsonData.lng_index])
         self.resize(700, 500)
 
         self.root_dir = mf.mf_current_path
@@ -155,7 +155,7 @@ class UploadWin(UMainWidget):
         group_one_layout.setSpacing(0)
         right_layout.addWidget(group_one)
 
-        title = RowArrowWidget(Lng.upload_list[Cfg.lng_index])
+        title = RowArrowWidget(Lng.upload_list[JsonData.lng_index])
         title.hide_arrow()
         title.hide_sep()
         group_one_layout.addWidget(title)
@@ -191,11 +191,11 @@ class UploadWin(UMainWidget):
 
         btn_layout.addStretch()
 
-        self.btn_ok = UPushButton(Lng.ok[Cfg.lng_index])
+        self.btn_ok = UPushButton(Lng.ok[JsonData.lng_index])
         self.btn_ok.clicked.connect(self.ok_clicked_cmd)
         btn_layout.addWidget(self.btn_ok)
 
-        self.btn_cancel = UPushButton(Lng.cancel[Cfg.lng_index])
+        self.btn_cancel = UPushButton(Lng.cancel[JsonData.lng_index])
         self.btn_cancel.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.btn_cancel)
 
@@ -215,11 +215,11 @@ class UploadWin(UMainWidget):
             self.list_widget.addItem(item)
             total_size += os.path.getsize(file_path)    
 
-        txt = f"{Lng.total_files[Cfg.lng_index]}: {len(self.files_to_copy)}"
+        txt = f"{Lng.total_files[JsonData.lng_index]}: {len(self.files_to_copy)}"
         self.total_files_widget.text_widget.setText(txt)
 
         size_mb = SharedUtils.get_f_size(total_size)
-        text = f"{Lng.file_size[Cfg.lng_index]}: {size_mb}"
+        text = f"{Lng.file_size[JsonData.lng_index]}: {size_mb}"
         self.total_size_widget.text_widget.setText(text)
 
     def _hide_neighbor_folders(self, loaded_path):
@@ -253,7 +253,7 @@ class UploadWin(UMainWidget):
     def update_target_dir_label(self):
         folder_name = os.path.basename(self.dest) 
         self.lbl_target_dir.text_widget.setText(
-            f"{Lng.dest_folder[Cfg.lng_index]}: {folder_name}"
+            f"{Lng.dest_folder[JsonData.lng_index]}: {folder_name}"
         )
 
     def ok_clicked_cmd(self):

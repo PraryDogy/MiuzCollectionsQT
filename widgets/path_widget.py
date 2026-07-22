@@ -7,7 +7,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                              QSizePolicy, QVBoxLayout, QWidget)
 
-from cfg import Cfg
+from cfg import JsonData
 from system.database import Dbase, Dirs
 from system.lang import Lng
 from system.main_folder import Mf
@@ -63,8 +63,8 @@ class PathWidget(QGroupBox):
         h_lay.addWidget(right_btn)
         
         lines = (
-            f"{Lng.folder_path[Cfg.lng_index]}:",
-            Lng.path_hint_texts[Cfg.lng_index].lower()
+            f"{Lng.folder_path[JsonData.lng_index]}:",
+            Lng.path_hint_texts[JsonData.lng_index].lower()
         )
         left_label = QLabel("\n".join(lines))
         left_label.setWordWrap(True)
@@ -116,7 +116,7 @@ class PathWidget(QGroupBox):
         h_lay.addWidget(right_btn)
 
         lines = (
-            f"{Lng.folder_path[Cfg.lng_index]}:",
+            f"{Lng.folder_path[JsonData.lng_index]}:",
             self.mf_temp_path
         )
         left_label = SelectableLabel('\n'.join(lines))
@@ -125,7 +125,7 @@ class PathWidget(QGroupBox):
         h_lay.addStretch()
 
     def open_win_warn(self):
-        self.warn_win = WarningWindow(Lng.bad_smb[Cfg.lng_index])
+        self.warn_win = WarningWindow(Lng.bad_smb[JsonData.lng_index])
         self.warn_win.center_to_parent(self.window())
         self.warn_win.show()
 

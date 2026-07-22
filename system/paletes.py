@@ -1,7 +1,7 @@
 from PyQt6.QtGui import QColor, QPalette
 from PyQt6.QtWidgets import QApplication
 
-from cfg import Cfg, Themes
+from cfg import JsonData, Themes
 
 
 class UPallete:
@@ -57,12 +57,12 @@ class ThemeChanger:
     @classmethod
     def init(cls):
         app: QApplication = QApplication.instance()
-        if Cfg.theme == Themes.macos:
+        if JsonData.theme == Themes.macos:
             app.setPalette(UPallete.macinthosh())
             app.setStyle("macos")
-        elif Cfg.theme == Themes.dark:
+        elif JsonData.theme == Themes.dark:
             app.setPalette(UPallete.dark())
             app.setStyle("macos")
-        elif Cfg.theme == Themes.light:
+        elif JsonData.theme == Themes.light:
             app.setPalette(UPallete.light())
             app.setStyle("macos")

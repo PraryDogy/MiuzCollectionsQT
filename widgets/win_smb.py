@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLabel, QWidget
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
@@ -27,7 +27,7 @@ class SuperWarnWindow(UMainWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(Lng.attention[Cfg.lng_index])
+        self.setWindowTitle(Lng.attention[JsonData.lng_index])
         self.set_always_on_top()
         self.set_close_only()
 
@@ -44,8 +44,8 @@ class SuperWarnWindow(UMainWidget):
         svg_widget.setFixedSize(self.icon_size, self.icon_size)
         above_layout.addWidget(svg_widget)
 
-        question = QLabel(Lng.confirm_mf_path[Cfg.lng_index])
-        if Cfg.lng_index == 0:
+        question = QLabel(Lng.confirm_mf_path[JsonData.lng_index])
+        if JsonData.lng_index == 0:
             ww = 270
         else:
             ww = 260
@@ -59,10 +59,10 @@ class SuperWarnWindow(UMainWidget):
         self.central_layout.addLayout(btns_lay)
 
         btns_lay.addStretch()
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         btns_lay.addWidget(self.ok_btn)
-        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()
@@ -91,8 +91,8 @@ class WarnWidget(QWidget):
         h_lay.addWidget(warn_wid)
 
         lines = (
-            f"{Lng.access_error_text[Cfg.lng_index]} \"{mf.mf_alias}\".",
-            Lng.network_error_text[Cfg.lng_index]
+            f"{Lng.access_error_text[JsonData.lng_index]} \"{mf.mf_alias}\".",
+            Lng.network_error_text[JsonData.lng_index]
         )
         up_label = QLabel("\n".join(lines))
         up_label.setWordWrap(True)
@@ -108,7 +108,7 @@ class WinSmb(UMainWidget):
 
         self.set_close_only()
         self.set_always_on_top()
-        self.setWindowTitle(Lng.attention[Cfg.lng_index])
+        self.setWindowTitle(Lng.attention[JsonData.lng_index])
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(10)
 
@@ -125,10 +125,10 @@ class WinSmb(UMainWidget):
         btns_lay.setSpacing(10)
 
         btns_lay.addStretch()
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
         self.ok_btn.clicked.connect(self.ok_cmd)
         btns_lay.addWidget(self.ok_btn)
-        cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
+        cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         cancel_btn.clicked.connect(self.deleteLater)
         btns_lay.addWidget(cancel_btn)
         btns_lay.addStretch()

@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
                              QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
 
@@ -77,9 +77,9 @@ class ULineEdit(QLineEdit):
         self.menu_ = UMenu(event=a0)
 
         actions = [
-            (Lng.cut[Cfg.lng_index], self.cut_selection),
-            (Lng.copy[Cfg.lng_index], lambda: Utils.copy_text(self.selectedText())),
-            (Lng.paste[Cfg.lng_index], self.paste_text),
+            (Lng.cut[JsonData.lng_index], self.cut_selection),
+            (Lng.copy[JsonData.lng_index], lambda: Utils.copy_text(self.selectedText())),
+            (Lng.paste[JsonData.lng_index], self.paste_text),
         ]
 
         for text, slot in actions:
@@ -114,9 +114,9 @@ class UTextEdit(QTextEdit):
         menu_ = UMenu(event=a0)
 
         actions = [
-            (Lng.cut[Cfg.lng_index], self.cut_selection),
-            (Lng.copy[Cfg.lng_index], self.copy_selection),
-            (Lng.paste[Cfg.lng_index], self.paste_text),
+            (Lng.cut[JsonData.lng_index], self.cut_selection),
+            (Lng.copy[JsonData.lng_index], self.copy_selection),
+            (Lng.paste[JsonData.lng_index], self.paste_text),
         ]
 
         for text, slot in actions:
@@ -281,12 +281,12 @@ class SelectableLabel(QLabel):
 
         menu_ = UMenu(event=ev)
 
-        label_text = Lng.copy[Cfg.lng_index]
+        label_text = Lng.copy[JsonData.lng_index]
         sel = QAction(text=label_text, parent=self)
         sel.triggered.connect(lambda: Utils.copy_text(text))
         menu_.addAction(sel)
 
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[Cfg.lng_index])
+        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[JsonData.lng_index])
         reveal.triggered.connect(
             lambda: Utils.reveal_files([full_text])
         )

@@ -8,7 +8,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QSpacerItem,
                              QVBoxLayout, QWidget)
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
@@ -56,7 +56,7 @@ class ServerList(VListWidget):
         super().__init__(parent)
 
     def remove_cmd(self, server_item: ServerItem):
-        self.win_warn = ConfirmWindow(Lng.confirm_delete[Cfg.lng_index])
+        self.win_warn = ConfirmWindow(Lng.confirm_delete[JsonData.lng_index])
         self.win_warn.ok_clicked.connect(
             lambda: self.remove_server.emit(server_item)
         )
@@ -79,19 +79,19 @@ class ServerList(VListWidget):
 
         self.menu_ = UMenu(a0)
 
-        connect = QAction(Lng.connect[Cfg.lng_index], self.menu_)
+        connect = QAction(Lng.connect[JsonData.lng_index], self.menu_)
         connect.triggered.connect(self.connect_server.emit)
         self.menu_.addAction(connect)
 
         self.menu_.addSeparator()
 
-        edit = QAction(Lng.edit[Cfg.lng_index], self.menu_)
+        edit = QAction(Lng.edit[JsonData.lng_index], self.menu_)
         edit.triggered.connect(
             lambda: self.edit_server.emit(list_item.server_item)
         )
         self.menu_.addAction(edit)
 
-        rem = QAction(Lng.delete[Cfg.lng_index], self.menu_)
+        rem = QAction(Lng.delete[JsonData.lng_index], self.menu_)
         rem.triggered.connect(
             lambda: self.remove_cmd(list_item.server_item)
         )
@@ -124,35 +124,35 @@ class LoginWin(UMainWidget):
         grop_lay.setSpacing(5)
         self.central_layout.addWidget(group)
 
-        alias_label = ServerLabel(text=Lng.alias[Cfg.lng_index].capitalize())
+        alias_label = ServerLabel(text=Lng.alias[JsonData.lng_index].capitalize())
         grop_lay.addWidget(alias_label)
 
         self.alias = ULineEdit()
-        self.alias.setPlaceholderText(Lng.alias[Cfg.lng_index].capitalize())
+        self.alias.setPlaceholderText(Lng.alias[JsonData.lng_index].capitalize())
         grop_lay.addWidget(self.alias)
 
-        server_label = ServerLabel(text=Lng.server[Cfg.lng_index].capitalize())
+        server_label = ServerLabel(text=Lng.server[JsonData.lng_index].capitalize())
         grop_lay.addWidget(server_label)
 
         self.server = ULineEdit()
-        self.server.setPlaceholderText(Lng.server[Cfg.lng_index].capitalize())
+        self.server.setPlaceholderText(Lng.server[JsonData.lng_index].capitalize())
         grop_lay.addWidget(self.server)
 
-        login_label = ServerLabel(text=Lng.login[Cfg.lng_index].capitalize())
+        login_label = ServerLabel(text=Lng.login[JsonData.lng_index].capitalize())
         grop_lay.addWidget(login_label)
 
         self.login = ULineEdit()
-        self.login.setPlaceholderText(Lng.login[Cfg.lng_index].capitalize())
+        self.login.setPlaceholderText(Lng.login[JsonData.lng_index].capitalize())
         grop_lay.addWidget(self.login)
 
         # grop_lay.addSpacerItem(QSpacerItem(0, 10))
 
-        pass_label = ServerLabel(text=Lng.password[Cfg.lng_index].capitalize())
+        pass_label = ServerLabel(text=Lng.password[JsonData.lng_index].capitalize())
         grop_lay.addWidget(pass_label)
 
         self.pass_ = ULineEdit()
         self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
-        self.pass_.setPlaceholderText(f"{Lng.password[Cfg.lng_index].capitalize()}")
+        self.pass_.setPlaceholderText(f"{Lng.password[JsonData.lng_index].capitalize()}")
         grop_lay.addWidget(self.pass_)
 
         # grop_lay.addSpacerItem(QSpacerItem(0, 10))
@@ -163,11 +163,11 @@ class LoginWin(UMainWidget):
 
         self.btn_layout.addStretch()
 
-        self.ok_btn = UPushButton(Lng.ok[Cfg.lng_index])
+        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
         self.ok_btn.clicked.connect(self.ok_cmd)
         self.btn_layout.addWidget(self.ok_btn)
 
-        self.cancel_btn = UPushButton(Lng.cancel[Cfg.lng_index])
+        self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.deleteLater)
         self.btn_layout.addWidget(self.cancel_btn)
 
@@ -228,7 +228,7 @@ class ServersWin(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.connect_to_server[Cfg.lng_index])
+        self.setWindowTitle(Lng.connect_to_server[JsonData.lng_index])
         self.setFixedWidth(350)
 
         self.central_layout.setContentsMargins(5, 5, 5, 10)
@@ -240,7 +240,7 @@ class ServersWin(UMainWidget):
         group_lay.setSpacing(5)
         self.central_layout.addWidget(group)
 
-        favs = ServerLabel(Lng.favorites[Cfg.lng_index])
+        favs = ServerLabel(Lng.favorites[JsonData.lng_index])
         group_lay.addWidget(favs)
 
         self.v_list = ServerList()
@@ -258,11 +258,11 @@ class ServersWin(UMainWidget):
 
         btn_layout.addStretch()
 
-        btn_add = UPushButton(Lng.add[Cfg.lng_index])
+        btn_add = UPushButton(Lng.add[JsonData.lng_index])
         btn_add.clicked.connect(self.show_login_win)
         btn_layout.addWidget(btn_add)
 
-        btn_connect = UPushButton(Lng.connect[Cfg.lng_index])
+        btn_connect = UPushButton(Lng.connect[JsonData.lng_index])
         btn_connect.clicked.connect(self.connect_cmd)
         btn_layout.addWidget(btn_connect)
 

@@ -7,7 +7,7 @@ from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QSplitter, QTreeWidget,
                              QTreeWidgetItem, QWidget)
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -46,7 +46,7 @@ class TreeWid(QTreeWidget):
         self.itemClicked.connect(self.on_item_click)
 
     def need_hide_digits(self):
-        if Mf.current_mf.mf_alias not in Cfg.hide_digits_mf_lst:
+        if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
             return False
         return True
 
@@ -146,16 +146,16 @@ class TreeWid(QTreeWidget):
     def contextMenuEvent(self, a0):
 
         def hide_digits_cmd():
-            if Mf.current_mf.mf_alias not in Cfg.hide_digits_mf_lst:
-                Cfg.hide_digits_mf_lst.append(Mf.current_mf.mf_alias)
-                Cfg.write_json_data()
+            if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
+                JsonData.hide_digits_mf_lst.append(Mf.current_mf.mf_alias)
+                JsonData.write_json_data()
                 self.init_ui()
                 self.on_hide_digits_clicked.emit()
 
         def show_digits_cmd():
-            if Mf.current_mf.mf_alias in Cfg.hide_digits_mf_lst:
-                Cfg.hide_digits_mf_lst.remove(Mf.current_mf.mf_alias)
-                Cfg.write_json_data()
+            if Mf.current_mf.mf_alias in JsonData.hide_digits_mf_lst:
+                JsonData.hide_digits_mf_lst.remove(Mf.current_mf.mf_alias)
+                JsonData.write_json_data()
                 self.init_ui()
 
         def collapse_all_cmd():
@@ -172,33 +172,33 @@ class TreeWid(QTreeWidget):
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
             rel_path = Utils.get_rel_any_path(Mf.current_mf.mf_current_path, abs_path)
             self.abs_selected_path = abs_path
-            view = QAction(Lng.open[Cfg.lng_index], menu)
+            view = QAction(Lng.open[JsonData.lng_index], menu)
             view.triggered.connect(lambda: self.on_tree_clicked.emit(self.abs_selected_path))
             menu.addAction(view)
             menu.addSeparator()
 
         if self.abs_selected_path == os.sep:
-            update = QAction(Lng.update_grid[Cfg.lng_index])
+            update = QAction(Lng.update_grid[JsonData.lng_index])
             update.triggered.connect(self.init_ui)
             menu.addAction(update)
 
             menu.addSeparator()
 
-            expand_all = QAction(Lng.expand_all[Cfg.lng_index], menu)
+            expand_all = QAction(Lng.expand_all[JsonData.lng_index], menu)
             expand_all.triggered.connect(lambda: self.expandAll())
             menu.addAction(expand_all)
 
-            collapse_all = QAction(Lng.collapse_all[Cfg.lng_index], menu)
+            collapse_all = QAction(Lng.collapse_all[JsonData.lng_index], menu)
             collapse_all.triggered.connect(lambda: collapse_all_cmd())
             menu.addAction(collapse_all)
 
             menu.addSeparator()
 
             if self.need_hide_digits():
-                text = Lng.show_digits[Cfg.lng_index]
+                text = Lng.show_digits[JsonData.lng_index]
                 cmd = show_digits_cmd
             else:
-                text = Lng.hide_digits[Cfg.lng_index]
+                text = Lng.hide_digits[JsonData.lng_index]
                 cmd = hide_digits_cmd
             digits = QAction(text, menu)
             digits.triggered.connect(cmd)
@@ -206,13 +206,13 @@ class TreeWid(QTreeWidget):
 
         menu.addSeparator()
 
-        copy_path = QAction(Lng.copy_dirpath[Cfg.lng_index], menu)
+        copy_path = QAction(Lng.copy_dirpath[JsonData.lng_index], menu)
         copy_path.triggered.connect(
             lambda: self.copy_path.emit([rel_path, ])
         )
         menu.addAction(copy_path)
 
-        reveal = QAction(Lng.reveal_in_finder[Cfg.lng_index], menu)
+        reveal = QAction(Lng.reveal_in_finder[JsonData.lng_index], menu)
         reveal.triggered.connect(
             lambda: self.reveal.emit([rel_path, ])
         )
@@ -266,15 +266,15 @@ class MfList(VListWidget):
         menu = UMenu(a0)
         item: MfListItem = self.itemAt(a0.pos())
         if item:
-            mf_open = QAction(Lng.open[Cfg.lng_index], menu)
+            mf_open = QAction(Lng.open[JsonData.lng_index], menu)
             mf_open.triggered.connect(lambda: self.mf_open.emit(item.mf))
             menu.addAction(mf_open)
             menu.addSeparator()
-            mf_edit = QAction(Lng.setup[Cfg.lng_index], menu)
+            mf_edit = QAction(Lng.setup[JsonData.lng_index], menu)
             mf_edit.triggered.connect(lambda: self.mf_edit.emit(item.mf))
             menu.addAction(mf_edit)
         else:
-            new_folder = QAction(Lng.new_folder[Cfg.lng_index], menu)
+            new_folder = QAction(Lng.new_folder[JsonData.lng_index], menu)
             new_folder.triggered.connect(lambda: self.mf_new.emit(""))
             menu.addAction(new_folder)
         menu.show_menu()

@@ -5,7 +5,7 @@ from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QLabel, QMenu, QMenuBar,
                              QSpacerItem, QWidget)
 
-from cfg import Cfg, Static
+from cfg import JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
@@ -31,13 +31,13 @@ class SelectableLabel(QLabel):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
         context_menu = UMenu(ev)
-        copy_text = QAction(parent=context_menu, text=Lng.copy[Cfg.lng_index])
+        copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng_index])
         copy_text.triggered.connect(
             lambda: Utils.copy_text(self.selectedText())
         )
         context_menu.addAction(copy_text)
         context_menu.addSeparator()
-        select_all = QAction(parent=context_menu, text=Lng.copy_all[Cfg.lng_index])
+        select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lng_index])
         select_all.triggered.connect(
             lambda: Utils.copy_text(self.text())
         )
@@ -83,22 +83,22 @@ class AboutWin(UMainWidget):
 class BarMacos(QMenuBar):
     def __init__(self):
         super().__init__()
-        self.mainMenu = QMenu(Lng.menu[Cfg.lng_index], self)
+        self.mainMenu = QMenu(Lng.menu[JsonData.lng_index], self)
 
         # Добавили self. к действию подключения к серверу
-        self.server_win = QAction(Lng.connect_to_server[Cfg.lng_index], self)
+        self.server_win = QAction(Lng.connect_to_server[JsonData.lng_index], self)
         self.server_win.triggered.connect(self.open_server_window)
         self.mainMenu.addAction(self.server_win)
 
         # Добавили self. к действию настроек
-        self.actionSettings = QAction(Lng.open_settings_window[Cfg.lng_index], self)
+        self.actionSettings = QAction(Lng.open_settings_window[JsonData.lng_index], self)
         self.actionSettings.triggered.connect(self.open_settings_window)
         self.mainMenu.addAction(self.actionSettings)
 
         self.mainMenu.addSeparator()
 
         # Добавили self. к действию "О программе"
-        self.actionAbout = QAction(Lng.show_about[Cfg.lng_index], self)
+        self.actionAbout = QAction(Lng.show_about[JsonData.lng_index], self)
         self.actionAbout.setMenuRole(QAction.MenuRole.NoRole)
         self.actionAbout.triggered.connect(self.open_about_window)
         self.mainMenu.addAction(self.actionAbout)

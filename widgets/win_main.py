@@ -7,7 +7,7 @@ from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QSplitter, QVBoxLayout, QWidget)
 
-from cfg import Cfg, Dynamic, Static
+from cfg import JsonData, Dynamic, Static
 from system.filters import Filters
 from system.items import SettingsItem
 from system.lang import Lng
@@ -62,12 +62,12 @@ class DangerWarn(ConfirmWindow):
 
     def __init__(self, mf_alias: str, removed_images_count: int):
         text = (
-            f"{Lng.dangerous_text[Cfg.lng_index]}".format(removed_images_count)
+            f"{Lng.dangerous_text[JsonData.lng_index]}".format(removed_images_count)
         )
         super().__init__(text)
         self.svg_widget.load(self.icon_path)
-        self.ok_btn.setText(Lng.allow[Cfg.lng_index])
-        self.cancel_btn.setText(Lng.deny[Cfg.lng_index])
+        self.ok_btn.setText(Lng.allow[JsonData.lng_index])
+        self.cancel_btn.setText(Lng.deny[JsonData.lng_index])
         self.setFixedSize(self.ww ,self.hh)
 
     def closeEvent(self, a0):
@@ -202,7 +202,7 @@ class WinMain(UMainWindow):
         self.right_layout.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
-        self.bar_bottom.progress_bar.setText(Lng.loading[Cfg.lng_index])
+        self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
         self.bar_bottom.resize_thumbnails.connect(
             lambda: self.grid.resize_thumbnails()
         )
@@ -313,7 +313,7 @@ class WinMain(UMainWindow):
         self.bar_path.update(dir)
 
     def on_hide_digits_clicked(self):
-        self.win_warn = WarningWindow(Lng.hide_digits_full[Cfg.lng_index])
+        self.win_warn = WarningWindow(Lng.hide_digits_full[JsonData.lng_index])
         self.win_warn.center_to_parent(self)
         self.win_warn.show()
         
@@ -483,9 +483,9 @@ class WinMain(UMainWindow):
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
         if len(abs_paths) == 1:
-            text = f"{Lng.remove_file_question[Cfg.lng_index]}?"
+            text = f"{Lng.remove_file_question[JsonData.lng_index]}?"
         else:
-            text = f"{Lng.remove_files_question[Cfg.lng_index]}?"
+            text = f"{Lng.remove_files_question[JsonData.lng_index]}?"
         self.remove_files_win = ConfirmWindow(text)
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
@@ -762,7 +762,7 @@ class WinMain(UMainWindow):
                 forced_scaner_item = ForcedScanerItem(
                     mf=Mf.current_mf,
                     dirs_to_scan=self.forced_scaner_dirs.copy(),
-                    lng_index=Cfg.lng_index
+                    lng_index=JsonData.lng_index
                 )
                 self.scaner_task = ScanerWorker(
                     target=ForcedScaner.start,
@@ -772,7 +772,7 @@ class WinMain(UMainWindow):
                 # print("штатно запускаю ОБЩИЙ сканер")
                 self.scaner_task = ScanerWorker(
                     target=BaseScaner.start,
-                    args=(Mf.items, Cfg.lng_index, )
+                    args=(Mf.items, JsonData.lng_index, )
                 )
             self.forced_scaner_dirs.clear()
             self.db_mtime = int(os.stat(Static.external_db).st_mtime)
@@ -781,7 +781,7 @@ class WinMain(UMainWindow):
             self.scaner_poll_timer.stop()
             self.scaner_poll_timer.start(ms)
             self.scaner_check_timer.stop()
-            self.scaner_check_timer.start(Cfg.scaner_minutes * 60 * 1000)
+            self.scaner_check_timer.start(JsonData.scaner_minutes * 60 * 1000)
         else:
             # проверяем каждую минуту, что задача завершена
             self.scaner_check_timer.stop()
@@ -814,7 +814,7 @@ class WinMain(UMainWindow):
             ProcessWorker.stop_all()
         except Exception as e:
             print("on exit main win terminate error", e)
-        Cfg.write_json_data()
+        JsonData.write_json_data()
         Filters.write_json_data()
         Mf.write_json_data()
         os._exit(0)
