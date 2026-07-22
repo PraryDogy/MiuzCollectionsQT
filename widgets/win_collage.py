@@ -18,7 +18,6 @@ class WinCollage(UMainWidget):
         self.setWindowTitle(Lng.collage[JsonData.lng_index])
         self.central_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.PADDING = 10
         self.pixmaps: list[QPixmap] = [i.pixmap for i in data_items]
         self.image_labels: list[QLabel] = []
 
@@ -39,7 +38,7 @@ class WinCollage(UMainWidget):
         self.container.setStyleSheet("background-color: black;")
         self.grid_layout = QGridLayout(self.container)
         
-        self.grid_layout.setSpacing(self.PADDING)
+        self.grid_layout.setSpacing(10)
         self.grid_layout.setContentsMargins(0, 20, 0, 20)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.scroll_area.setWidget(self.container)
