@@ -1,38 +1,89 @@
-from system.main_folder import Strings
-all_slots_dicts = [
-    {
-        "mf_alias": "miuz",
-        "mf_paths": [
-            "/Volumes/shares/Studio/MIUZ/Photo/Art/Ready"
-        ],
-        "mf_stop_list": [
-            "_Archive_Commerce_Брендинг",
-            "Chosed",
-            "LEVIEV"
-        ],
-        "mf_current_path": "/Volumes/shares/Studio/MIUZ/Photo/Art/Ready"
-    },
-    {
-        "mf_alias": "panacea",
-        "mf_paths": [
-            "/Volumes/shares/Studio/PANACEA/Photo/Art/Ready"
-        ],
-        "mf_stop_list": [],
-        "mf_current_path": 123
-    }
-]
+import sys
 
-for d in all_slots_dicts:
-    base_types_ok = (
-        isinstance(d[Strings.mf_alias], str),
-        isinstance(d[Strings.mf_paths], list),
-        isinstance(d[Strings.mf_stop_list], list),
-        isinstance(d[Strings.mf_current_path], str)
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel,
+                             QMenu, QVBoxLayout, QWidget)
+
+from widgets._base_widgets import RowArrowWidget, UMainWidget, UPushButton
+from PyQt6.QtCore import Qt
+
+class Lng:
+    app_lang = (
+        "Язык приложения",
+        "Application language"
     )
-    if all(base_types_ok):
-        lists_are_strings = (
-            all(isinstance(i, str) for i in d[Strings.mf_paths]),
-            all(isinstance(i, str) for i in d[Strings.mf_stop_list])
-        )
-        if all(lists_are_strings):
-            print(f"Объект {d[Strings.mf_alias]} валиден!")
+    lang = (
+        "Язык",
+        "Language"
+    )
+    rus = (
+        "Русский",
+        "Russian"
+    )
+    eng = (
+        "Английский",
+        "English"
+    )
+
+
+class FirstLoadWin(UMainWidget):
+    def __init__(self):
+        super().__init__()
+        self.resize(500, 500)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.lng_index = 0
+
+        self.init_ui()
+
+    def remove_ui(self):
+        for i in self.findChildren(QWidget):
+            i.deleteLater()
+
+    def init_ui(self):
+        self.init_lang_widget()
+        # self.central_layout.addStretch()
+
+    def lng_action(self, value: int):
+        self.lng_index = value
+        self.remove_ui()
+        self.init_ui()
+
+        print(self.lng_index)
+
+    def init_lang_widget(self):
+        lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
+        rus_text = f"{Lng.rus[0]} ({Lng.rus[1]})"
+        eng_text = f"{Lng.eng[0]} ({Lng.eng[1]})"
+        lng_btn_text = f"{Lng.lang[0]} ({Lng.lang[1]})"
+
+        lng_containter = QGroupBox()
+        self.central_layout.addWidget(lng_containter)
+        lng_layout = QHBoxLayout(lng_containter)
+        lng_layout.setContentsMargins(2, 5, 2, 5)
+        lng_layout.setSpacing(0)
+
+        lng_label = QLabel(lng_label_text)
+        lng_layout.addWidget(lng_label)
+        lng_layout.addStretch()
+
+        lng_btn = UPushButton(lng_btn_text)
+        lng_btn.setFixedWidth(125)
+        lng_layout.addWidget(lng_btn)
+
+        lng_menu = QMenu(lng_btn)
+        lng_btn.setMenu(lng_menu)
+
+        rus_action = QAction(rus_text, lng_menu)
+        rus_action.triggered.connect(lambda: self.lng_action(0))
+        lng_menu.addAction(rus_action)
+
+        eng_action = QAction(eng_text, lng_menu)
+        eng_action.triggered.connect(lambda: self.lng_action(1))
+        lng_menu.addAction(eng_action)
+
+
+app = QApplication(sys.argv)
+win = FirstLoadWin()
+win.show()
+app.exec()

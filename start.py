@@ -282,6 +282,7 @@ class App(QApplication):
         else:
             # окно настроек
             print("Открыть окно первичных настроек")
+            os._exit(1)
 
     def create_app(self):
         self.win_main = WinMain(self.argv)
