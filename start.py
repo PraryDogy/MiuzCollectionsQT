@@ -230,9 +230,10 @@ class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
         super().__init__(argv)
         self.argv = argv
-        self.start()
+        self.validate()
+        self.create_app()
 
-    def start(self):
+    def validate(self):
         # валидация путей
         if not os.path.exists(Static.external_dir):
             os.makedirs(Static.external_dir)
@@ -242,17 +243,38 @@ class App(QApplication):
 
         if not os.path.exists(Static.external_db):
             open(Static.external_db, "w")
-            Dbase.create_engine()
+        Dbase.init()
 
         if not os.path.exists(Static.external_json_data):
             JsonData.write_json_data()
-            JsonData.json_to_app()
+        JsonData.json_to_app()
+
+        if not os.path.exists(Static.external_filters):
+            open(Static.external_filters, "w")
+        data = Filters.validate_json()
+        if data:
+            Filters.json_to_app(data)
+
+        if not os.path.exists(Static.external_servers):
+            open(Static.external_filters, "w")
+        data = Servers.validate_json()
 
         if not os.path.exists(Static.external_mf):
             open(Static.external_mf, "w")
+        data = Mf.validate_json()
+        if data:
+            Mf.json_to_app(data)
+        else:
+            print("Открыть окно первичных настроек")
 
-        # валидация mf
-        
+    def create_app(self):
+        self.win_main = WinMain(self.argv)
+        self.win_main.center_screen()
+        self.win_main.show()
+        self.installEventFilter(self)
+        self.aboutToQuit.connect(lambda: self.win_main.on_exit())
+        # icon = QIcon(os.path.join(Static.internal_icons, "icon.png"))
+        # self.setWindowIcon(icon)
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:

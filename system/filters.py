@@ -7,18 +7,36 @@ class Filters:
     items = []
 
     @classmethod
-    def json_to_app(cls):
-        cls.items.clear()
+    def validate_json(cls):
         try:
-            with open(Static.external_filters, "r", encoding="utf-8") as f:
-                data: list[str] = json.load(f)
-            cls.items = [
-                i
-                for i in data
-                if i not in cls.items
-            ]
+            with open(Static.external_filters, "r", encoding="utf-8") as file:
+                data: list[str] = json.load(file)
         except Exception as e:
-            print("Filters json to app error", e)
+            print("Filters, error reading file", e)
+            return False
+
+        if not isinstance(data, list):
+            print("Filters: json data не является списком")
+            return False
+
+        if len(data) == 0:
+            print("Filters: json data список пуст")
+            return False
+
+        filters = []
+        for i in data:
+            if isinstance(i, str):
+                filters.append(i)
+        if not filters:
+            print("Filters, нет string фильтров")
+            return False
+
+        return filters
+
+    @classmethod
+    def json_to_app(cls, data: list[str]):
+        cls.items.clear()
+        cls.items.extend(data)
 
     @classmethod
     def write_json_data(cls):
