@@ -84,7 +84,7 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.lng_container)
         
         lng_layout = QHBoxLayout(self.lng_container)
-        lng_layout.setContentsMargins(2, 5, 2, 5)
+        lng_layout.setContentsMargins(5, 5, 5, 5)
         lng_layout.setSpacing(0)
 
         lng_label = QLabel(lng_label_text)
