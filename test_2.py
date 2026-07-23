@@ -1,29 +1,38 @@
-paths_list = [
-    # Первая цепочка (Users)
-    "/Users/Downloads/Documents",
-    "/Users/Downloads/Documents/Projects",
-    "/Users/Downloads/Documents/Projects/Python",
-    "/Users/Downloads/Documents/Projects/Python/Scripts",
-    "/Users/Downloads/Documents/Projects/Python/Scripts/Logs",
-    
-    # Вторая цепочка (Volumes)
-    "/Volumes/Shares/Folder",
-    "/Volumes/Shares/Folder/Archive",
-    "/Volumes/Shares/Folder/Archive/2026",
-    "/Volumes/Shares/Folder/Archive/2026/Reports",
-    "/Volumes/Shares/Folder/Archive/2026/Reports/Financial"
+from system.main_folder import Strings
+all_slots_dicts = [
+    {
+        "mf_alias": "miuz",
+        "mf_paths": [
+            "/Volumes/shares/Studio/MIUZ/Photo/Art/Ready"
+        ],
+        "mf_stop_list": [
+            "_Archive_Commerce_Брендинг",
+            "Chosed",
+            "LEVIEV"
+        ],
+        "mf_current_path": "/Volumes/shares/Studio/MIUZ/Photo/Art/Ready"
+    },
+    {
+        "mf_alias": "panacea",
+        "mf_paths": [
+            "/Volumes/shares/Studio/PANACEA/Photo/Art/Ready"
+        ],
+        "mf_stop_list": [],
+        "mf_current_path": 123
+    }
 ]
 
-
-def filter_top_level_paths(paths: list[str]):
-    sorted_paths = sorted(paths)
-    top_level = []
-    for path in sorted_paths:
-        if not top_level or not path.startswith(top_level[-1] + "/"):
-            top_level.append(path)
-    return top_level
-
-
-result = filter_top_level_paths(paths_list)
-for i in result:
-    print(i)
+for d in all_slots_dicts:
+    base_types_ok = (
+        isinstance(d[Strings.mf_alias], str),
+        isinstance(d[Strings.mf_paths], list),
+        isinstance(d[Strings.mf_stop_list], list),
+        isinstance(d[Strings.mf_current_path], str)
+    )
+    if all(base_types_ok):
+        lists_are_strings = (
+            all(isinstance(i, str) for i in d[Strings.mf_paths]),
+            all(isinstance(i, str) for i in d[Strings.mf_stop_list])
+        )
+        if all(lists_are_strings):
+            print(f"Объект {d[Strings.mf_alias]} валиден!")

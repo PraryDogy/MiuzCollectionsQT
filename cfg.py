@@ -16,16 +16,16 @@ class Static:
     app_name = "Collections"
     thumbs_load_limit = 100
     
-    external_files = os.path.expanduser(
+    external_dir = os.path.expanduser(
         os.path.join("~", "Library", "Application Support", app_name)
     )
 
-    external_cfg = os.path.join(external_files, "cfg.json")
-    external_db = os.path.join(external_files, "db.db")
-    external_hashdir = os.path.join(external_files, "hashdir")
-    external_mf = os.path.join(external_files, "mf.json")
-    external_filters = os.path.join(external_files, "filters.json")
-    external_servers = os.path.join(external_files, "servers.json")
+    external_json_data = os.path.join(external_dir, "cfg.json")
+    external_db = os.path.join(external_dir, "db.db")
+    external_hashdir = os.path.join(external_dir, "hashdir")
+    external_mf = os.path.join(external_dir, "mf.json")
+    external_filters = os.path.join(external_dir, "filters.json")
+    external_servers = os.path.join(external_dir, "servers.json")
 
     internal_files = "./_preload"
     internal_icons = "./images"
@@ -89,7 +89,7 @@ class JsonData:
     @classmethod
     def json_to_app(cls):
         try:
-            with open(Static.external_cfg, "r", encoding="utf-8") as file:
+            with open(Static.external_json_data, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
@@ -100,7 +100,7 @@ class JsonData:
     
     @classmethod
     def write_json_data(cls):
-        with open(Static.external_cfg, "w", encoding="utf-8") as file:
+        with open(Static.external_json_data, "w", encoding="utf-8") as file:
             json.dump(cls.get_data(), file, ensure_ascii=False, indent=4)
 
     @classmethod
@@ -109,8 +109,8 @@ class JsonData:
         Проверяет наличие файлов
         """
         dirs = (
-            Static.external_files,
-            Static.external_cfg,
+            Static.external_dir,
+            Static.external_json_data,
             Static.external_db,
             Static.external_filters,
             Static.external_hashdir,
@@ -124,23 +124,23 @@ class JsonData:
     
     @classmethod
     def remake_external_dir(cls):
-        if os.path.exists(Static.external_files):
-            shutil.rmtree(Static.external_files)
-        os.makedirs(Static.external_files, exist_ok=True)
+        if os.path.exists(Static.external_dir):
+            shutil.rmtree(Static.external_dir)
+        os.makedirs(Static.external_dir, exist_ok=True)
 
     @classmethod
     def copy_preloaded_zip(cls):
         zip_file = os.listdir(Static.internal_files)[0]
         zip_file = Path(Static.internal_files) / zip_file
-        dst  = shutil.copy2(zip_file, Static.external_files)
-        shutil.unpack_archive(dst, Static.external_files)
+        dst  = shutil.copy2(zip_file, Static.external_dir)
+        shutil.unpack_archive(dst, Static.external_dir)
         os.remove(dst)
 
     @classmethod
     def make_empty_external_files(cls):
         os.makedirs(Static.external_hashdir, exist_ok=True)
         files = (
-            Static.external_cfg,
+            Static.external_json_data,
             Static.external_db,
             Static.external_filters,
             Static.external_mf,

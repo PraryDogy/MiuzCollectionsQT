@@ -132,7 +132,7 @@ class ExportWin(UMainWidget):
         self.central_layout.setContentsMargins(5, 10, 5, 5)
 
         urls = (
-            Static.external_cfg,
+            Static.external_json_data,
             Static.external_mf,
             Static.external_filters,
             Static.external_servers,
@@ -222,7 +222,7 @@ class ExportWin(UMainWidget):
         path = os.path.join(downloads, filename)
         with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
             for file in files:
-                rel_path = file.replace(Static.external_files, "")
+                rel_path = file.replace(Static.external_dir, "")
                 z.write(file, arcname=rel_path)
         Utils.reveal_files([path, ])
         self.deleteLater()
@@ -293,10 +293,10 @@ class RebootSettings(SettingsGroup):
         if url.endswith((".zip", ".ZIP")):
             zip_path = shutil.copy(
                 src=url,
-                dst=Static.external_files
+                dst=Static.external_dir
             )
             with zipfile.ZipFile(zip_path, "r") as z:
-                z.extractall(Static.external_files)
+                z.extractall(Static.external_dir)
 
             JsonData.json_to_app()
             Mf.json_to_app()
@@ -319,7 +319,7 @@ class RebootSettings(SettingsGroup):
     def reset_btn_cmd(self, *args):
         def fin():
             self.deleteLater()
-            shutil.rmtree(Static.external_files)
+            shutil.rmtree(Static.external_dir)
             restart_app()
 
         reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index])
@@ -457,7 +457,7 @@ class NonRebootSettings(SettingsGroup):
 
     def show_files_cmd(self, *args):
         try:
-            subprocess.Popen(["open", Static.external_files])
+            subprocess.Popen(["open", Static.external_dir])
         except Exception as e:
             print(e)
 

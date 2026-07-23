@@ -232,7 +232,33 @@ class App(QApplication):
         self.argv = argv
         self.start()
 
+        # from PyQt6.QtCore import QTimer
+        # QTimer.singleShot(1000, lambda: print(3/0))
+
     def start(self):
+
+        # def setup_new_mf():
+        #     Dbase.init()
+        #     new_mf_win = NewMfWin()
+        #     new_mf_win.show()
+
+        # def copy_preload_files():
+        #     JsonData.remake_external_dir()
+        #     JsonData.copy_preloaded_zip()
+        #     JsonData.write_json_data()
+
+        # def first_load_win():
+        #     first_load = FirstLoad()
+        #     first_load.copy_preload_files.connect(copy_preload_files)
+        #     first_load.copy_preload_files.connect(self.start)
+        #     first_load.setup_new_mf.connect(setup_new_mf)
+        #     first_load.exec()
+
+        # def lng_win():
+        #     lng_win = LanguageSelect()
+        #     lng_win.closed_.connect(first_load_win)
+        #     lng_win.exec()
+
         # валидация путей
         if not os.path.exists(Static.external_dir):
             os.makedirs(Static.external_dir)
@@ -252,7 +278,37 @@ class App(QApplication):
             open(Static.external_mf, "w")
 
         # валидация mf
-        
+
+        # JsonData.json_to_app()
+
+        # for i in (Mf, Filters):
+        #     i.items.clear()
+        #     i.json_to_app()
+
+        # if not JsonData.check_files():
+        #     JsonData.make_empty_external_files()
+        #     lng_win()
+
+        # elif not Mf.items:
+        #     lng_win()
+
+        # elif Static.app_ver > Cfg.app_ver:
+        #     shutil.rmtree(Static.external_files_dir)
+        #     Cfg.app_ver = Static.app_ver
+        #     self.start()
+
+        # else:
+        #     objects = (Dbase, ThemeChanger, UThreadPool)
+        #     for i in objects:
+        #         i.init()
+        #     self.win_main = WinMain(self.argv)
+        #     self.win_main.center_screen()
+        #     self.win_main.show()
+        #     self.installEventFilter(self)
+        #     self.aboutToQuit.connect(lambda: self.win_main.on_exit())
+
+        #     icon = QIcon(os.path.join(Static.internal_icons, "icon.png"))
+            # self.setWindowIcon(icon)
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
