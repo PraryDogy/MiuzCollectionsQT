@@ -15,7 +15,7 @@ from ._base_widgets import ULineEdit, UMenu, GrayLabel
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
-    icon_path = os.path.join(Static.internal_images, "clear.svg")
+    icon_path = os.path.join(Static.internal_icons, "clear.svg")
     icon_size = 14
 
     def __init__(self, parent: ULineEdit):
@@ -112,7 +112,7 @@ class BarTopBtn(QWidget):
         self.set_normal_style()
 
     def _load_svg_data(self, icon_name: str):
-        path = os.path.join(Static.internal_images, icon_name)
+        path = os.path.join(Static.internal_icons, icon_name)
         with open(path, "rb") as f:
             return QByteArray(f.read())
 
@@ -212,7 +212,7 @@ class SettingsBtn(BarTopBtn):
 
 class ExitImgSearchBtn(QFrame):
     clicked_ = pyqtSignal()
-    ICON_PATH = os.path.join(Static.internal_images, "clear.svg")
+    ICON_PATH = os.path.join(Static.internal_icons, "clear.svg")
     icon_size = 15
     hh = 30
     def __init__(self):

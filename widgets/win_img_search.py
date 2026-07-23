@@ -266,7 +266,7 @@ class WinImgSearch(UMainWidget):
 
         self.read_img_task = ProcessWorker(
             target=ReadImg.start,
-            args=(url, Static.max_img_size * 2, )
+            args=(url, Static.max_thumb_size * 2, )
         )
         self.read_img_timer = QTimer(self)
         self.read_img_timer.setSingleShot(True)

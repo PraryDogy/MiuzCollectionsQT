@@ -47,7 +47,7 @@ class SelectableLabel(QLabel):
 
 class AboutWin(UMainWidget):
     ww = 280
-    icon_path = os.path.join(Static.internal_images, "icon.png")
+    icon_path = os.path.join(Static.internal_icons, "icon.png")
     icon_size = 150
     opacity = 0.85
 

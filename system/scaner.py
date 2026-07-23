@@ -19,7 +19,7 @@ from system.utils import Utils
 
 class Tools:    
     def log(text: str):
-        filepath = os.path.join(Static.external_files_dir, "log.txt")
+        filepath = os.path.join(Static.external_files, "log.txt")
         with open(filepath, "a") as f:
             f.write(text)
 
@@ -500,7 +500,7 @@ class _ThumbsUpdater:
                 _ThumbsUpdater.get_gui_text(scaner_item)
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
-            img = ImgUtils.fit_to_thumb(img, Static.max_img_size)
+            img = ImgUtils.fit_to_thumb(img, Static.max_thumb_size)
             rel_img_path = Utils.get_rel_any_path(
                 mf_path=scaner_item.mf.mf_current_path,
                 abs_img_path=img_item.abs_img_path

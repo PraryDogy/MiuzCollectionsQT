@@ -23,7 +23,7 @@ class ReplaceButton(UPushButton):
 class ReplaceFilesWin(UMainWidget):
     icon_size = 40
     ww = 330
-    icon_path = os.path.join(Static.internal_images, "warning.svg")
+    icon_path = os.path.join(Static.internal_icons, "warning.svg")
 
     replace_one_press = pyqtSignal()
     replace_all_press = pyqtSignal()
@@ -90,7 +90,7 @@ class ReplaceFilesWin(UMainWidget):
 
 class ErrorWin(UMainWidget):
     icon_size = 40
-    icon_path = os.path.join(Static.internal_images, "warning.svg")
+    icon_path = os.path.join(Static.internal_icons, "warning.svg")
 
     def __init__(self):
         super().__init__()

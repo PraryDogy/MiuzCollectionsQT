@@ -121,9 +121,9 @@ class MyCalendar(QGroupBox):
         for wid in widgets:
             name = wid.objectName()
             if name == "qt_calendar_prevmonth":
-                wid.setIcon(QIcon(os.path.join(Static.internal_images, "prev.svg")))
+                wid.setIcon(QIcon(os.path.join(Static.internal_icons, "prev.svg")))
             elif name == "qt_calendar_nextmonth":
-                wid.setIcon(QIcon(os.path.join(Static.internal_images, "next.svg")))
+                wid.setIcon(QIcon(os.path.join(Static.internal_icons, "next.svg")))
 
 
         for child in self.calendar.findChildren(QSpinBox):

@@ -159,8 +159,8 @@ class FirstLoad(QDialog):
         )
         groups_layout.addWidget(self.group_app)
 
-        if os.path.exists(Static.internal_files_dir):
-            for i in os.scandir(Static.internal_files_dir):
+        if os.path.exists(Static.internal_files):
+            for i in os.scandir(Static.internal_files):
                 if i.name.endswith((".zip", ".ZIP")):
                     zip_file = Path(i.path)
                     self.preload = ClickableGroupBox(
@@ -259,6 +259,13 @@ class App(QApplication):
             lng_win.closed_.connect(first_load_win)
             lng_win.exec()
 
+        # валидация путей
+        exists_paths = (
+            not os.path.exists(Static)
+        )
+
+
+
         JsonData.json_to_app()
 
         for i in (Mf, Filters):
@@ -287,7 +294,7 @@ class App(QApplication):
             self.installEventFilter(self)
             self.aboutToQuit.connect(lambda: self.win_main.on_exit())
 
-            icon = QIcon(os.path.join(Static.internal_images, "icon.png"))
+            icon = QIcon(os.path.join(Static.internal_icons, "icon.png"))
             # self.setWindowIcon(icon)
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:

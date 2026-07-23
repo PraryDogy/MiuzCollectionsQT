@@ -22,7 +22,7 @@ class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
     ww = 360
-    icon_path = os.path.join(Static.internal_images, "warning.svg")
+    icon_path = os.path.join(Static.internal_icons, "warning.svg")
 
     def __init__(self, text: str):
         super().__init__()

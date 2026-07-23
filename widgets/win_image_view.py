@@ -152,7 +152,7 @@ class ZoomWidget(CustomSvg):
     zoom_in = pyqtSignal()
     zoom_out = pyqtSignal()
     zoom_fit = pyqtSignal()
-    svg_path = os.path.join(Static.internal_images, "zoom.svg")
+    svg_path = os.path.join(Static.internal_icons, "zoom.svg")
 
     def __init__(self):
         super().__init__()
@@ -200,7 +200,7 @@ class ZoomWidget(CustomSvg):
 
 
 class PrevButton(CustomSvg):
-    svg_path = os.path.join(Static.internal_images, "prev.svg")
+    svg_path = os.path.join(Static.internal_icons, "prev.svg")
 
     def __init__(self) -> None:
         super().__init__()
@@ -208,7 +208,7 @@ class PrevButton(CustomSvg):
 
 
 class NextButton(CustomSvg):
-    svg_path = os.path.join(Static.internal_images, "next.svg")
+    svg_path = os.path.join(Static.internal_icons, "next.svg")
 
     def __init__(self) -> None:
         super().__init__()

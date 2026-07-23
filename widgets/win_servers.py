@@ -32,8 +32,8 @@ class ServerListItem(VListWidgetItem):
 
 
 class EyeSvg(QSvgWidget):
-    eye_on = os.path.join(Static.internal_images, "eye_on.svg")
-    eye_off = os.path.join(Static.internal_images, "eye_off.svg")
+    eye_on = os.path.join(Static.internal_icons, "eye_on.svg")
+    eye_off = os.path.join(Static.internal_icons, "eye_off.svg")
 
     def __init__(self):
         super().__init__()

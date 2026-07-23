@@ -388,7 +388,7 @@ class UpdateThumb:
 
         def _write_thumb(abs_img_path: str, abs_thumb_path: str):
             img_array = ImgUtils.read_img(abs_img_path)
-            img_array = ImgUtils.fit_to_thumb(img_array, Static.max_img_size)
+            img_array = ImgUtils.fit_to_thumb(img_array, Static.max_thumb_size)
             if ImgUtils.write_thumb(abs_thumb_path, img_array):
                 return img_array
             return None

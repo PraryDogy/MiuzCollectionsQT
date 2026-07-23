@@ -81,7 +81,7 @@ class Utils:
     @classmethod
     def get_rel_thumb_path(cls, thumb_path: str) -> str | None:
         try:
-            return thumb_path.replace(Static.external_files_dir, "")
+            return thumb_path.replace(Static.external_files, "")
         except Exception as e:
             print(f"get_rel_hash: {e}")
             return None
@@ -89,7 +89,7 @@ class Utils:
     @classmethod
     def get_abs_thumb_path(cls, rel_thumb_path: str) -> str | None:
         try:
-            return Static.external_files_dir + rel_thumb_path
+            return Static.external_files + rel_thumb_path
         except Exception as e:
             print(f"get_abs_hash: {e}")
             return None

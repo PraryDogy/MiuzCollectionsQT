@@ -22,7 +22,7 @@ def restart_app():
 
 class SuperWarnWindow(UMainWidget):
     ok_clicked = pyqtSignal()
-    icon_path = os.path.join(Static.internal_images, "super_warning.svg")
+    icon_path = os.path.join(Static.internal_icons, "super_warning.svg")
     icon_size = 60
 
     def __init__(self):

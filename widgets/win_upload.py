@@ -92,7 +92,7 @@ class CustomTreeView(QTreeView):
 
 class UploadWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
-    img_icon_path = os.path.join(Static.internal_images, "img.svg")
+    img_icon_path = os.path.join(Static.internal_icons, "img.svg")
 
     def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
         super().__init__()

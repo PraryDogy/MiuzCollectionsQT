@@ -222,7 +222,7 @@ class ExportWin(UMainWidget):
         path = os.path.join(downloads, filename)
         with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
             for file in files:
-                rel_path = file.replace(Static.external_files_dir, "")
+                rel_path = file.replace(Static.external_files, "")
                 z.write(file, arcname=rel_path)
         Utils.reveal_files([path, ])
         self.deleteLater()
@@ -293,10 +293,10 @@ class RebootSettings(SettingsGroup):
         if url.endswith((".zip", ".ZIP")):
             zip_path = shutil.copy(
                 src=url,
-                dst=Static.external_files_dir
+                dst=Static.external_files
             )
             with zipfile.ZipFile(zip_path, "r") as z:
-                z.extractall(Static.external_files_dir)
+                z.extractall(Static.external_files)
 
             JsonData.json_to_app()
             Mf.json_to_app()
@@ -319,7 +319,7 @@ class RebootSettings(SettingsGroup):
     def reset_btn_cmd(self, *args):
         def fin():
             self.deleteLater()
-            shutil.rmtree(Static.external_files_dir)
+            shutil.rmtree(Static.external_files)
             restart_app()
 
         reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index])
@@ -457,7 +457,7 @@ class NonRebootSettings(SettingsGroup):
 
     def show_files_cmd(self, *args):
         try:
-            subprocess.Popen(["open", Static.external_files_dir])
+            subprocess.Popen(["open", Static.external_files])
         except Exception as e:
             print(e)
 
@@ -470,11 +470,11 @@ class ThemeBtn(QWidget):
         super().__init__()
         self.theme = theme
         self.svg = os.path.join(
-            Static.internal_images,
+            Static.internal_icons,
             f"{theme}_theme.svg"
         )
         self.svg_selected = os.path.join(
-            Static.internal_images,
+            Static.internal_icons,
             f"{theme}_theme_selected.svg"
         )
         text_mappings = {
@@ -580,7 +580,7 @@ class SelectableLabel(SettingsLabel):
 
 
 class AboutWid(QGroupBox):
-    icon_path = os.path.join(Static.internal_images, "icon.png")
+    icon_path = os.path.join(Static.internal_icons, "icon.png")
     icon_size = 85
     opacity = 0.85
 
@@ -894,7 +894,7 @@ class MfSettings(QWidget, StateWid):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewFolder(QWidget, StateWid):
-    icon_path = os.path.join(Static.internal_images, "warning.svg")
+    icon_path = os.path.join(Static.internal_icons, "warning.svg")
     changed = pyqtSignal()
 
     def __init__(self, mf_list_clone: list[Mf]):
@@ -1024,11 +1024,11 @@ class NewFolder(QWidget, StateWid):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    svg_folder = os.path.join(Static.internal_images, "img_folder.svg")
-    svg_filters = os.path.join(Static.internal_images, "filters.svg")
-    svg_settings = os.path.join(Static.internal_images, "settings.svg")
-    svg_new_folder = os.path.join(Static.internal_images, "new_folder.svg")
-    svg_warn = os.path.join(Static.internal_images, "warning.svg")
+    svg_folder = os.path.join(Static.internal_icons, "img_folder.svg")
+    svg_filters = os.path.join(Static.internal_icons, "filters.svg")
+    svg_settings = os.path.join(Static.internal_icons, "settings.svg")
+    svg_new_folder = os.path.join(Static.internal_icons, "new_folder.svg")
+    svg_warn = os.path.join(Static.internal_icons, "warning.svg")
     svg_size = 16
 
     def __init__(self, settings_item: SettingsItem):
