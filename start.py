@@ -243,7 +243,6 @@ class App(QApplication):
 
         if not os.path.exists(Static.external_db):
             open(Static.external_db, "w")
-        Dbase.init()
 
         if not os.path.exists(Static.external_json_data):
             JsonData.write_json_data()
@@ -270,6 +269,7 @@ class App(QApplication):
         if data:
             Mf.json_to_app(data)
             Mf.current_mf = Mf.items[0]
+            Dbase.init()
             ThemeChanger.init()
             UThreadPool.init()
         else:
