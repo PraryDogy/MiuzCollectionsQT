@@ -38,7 +38,7 @@ from PyQt6.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QMenu, QWidget
 
 class FirstLoadWin(UMainWidget):
     rus_flag = os.path.join(Static.internal_icons, "rus_flag.svg")
-    eng_flag = os.path.join(Static.internal_icons, "eng_flag.png")
+    eng_flag = os.path.join(Static.internal_icons, "eng_flag.svg")
 
     def __init__(self):
         super().__init__()
@@ -90,7 +90,7 @@ class FirstLoadWin(UMainWidget):
         lng_layout.addStretch()
 
         lng_btn = UPushButton(lng_btn_text)
-        lng_btn.setIconSize(QSize(10, 10))
+        # lng_btn.setIconSize(QSize(16, 16))
         lng_layout.addWidget(lng_btn)
 
         lng_menu = QMenu(lng_btn)
