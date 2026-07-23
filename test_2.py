@@ -90,23 +90,21 @@ class FirstLoadWin(UMainWidget):
         lng_layout.addStretch()
 
         lng_btn = UPushButton(lng_btn_text)
-        # lng_btn.setIconSize(QSize(16, 16))
         lng_layout.addWidget(lng_btn)
 
         lng_menu = QMenu(lng_btn)
         lng_btn.setMenu(lng_menu)
 
-        # Важно: используем явный захват переменной в lambda (val=...)
         rus_icon = QIcon(self.rus_flag)
         rus_action = QAction(rus_icon, rus_action_text, lng_menu)
         rus_action.setIconVisibleInMenu(True)
-        rus_action.triggered.connect(lambda checked=False, val=0: self.lng_action(val))
+        rus_action.triggered.connect(lambda val=0: self.lng_action(val))
         lng_menu.addAction(rus_action)
 
         eng_icon = QIcon(self.eng_flag)
         eng_action = QAction(eng_icon, eng_action_text, lng_menu)
         eng_action.setIconVisibleInMenu(True)
-        eng_action.triggered.connect(lambda checked=False, val=1: self.lng_action(val))
+        eng_action.triggered.connect(lambda val=1: self.lng_action(val))
         lng_menu.addAction(eng_action)
 
 
