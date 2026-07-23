@@ -23,12 +23,12 @@ class Mf:
         Strings.mf_current_path,
     ]
 
-    def __init__(self):
+    def __init__(self, mf_alias, mf_paths, mf_stop_list, mf_current_path):
         super().__init__()
-        self.mf_alias
-        self.mf_paths
-        self.mf_stop_list
-        self.mf_current_path
+        self.mf_alias: str = mf_alias
+        self.mf_paths: list[str] = mf_paths
+        self.mf_stop_list: list[str] = mf_stop_list
+        self.mf_current_path: str = mf_current_path
 
     @classmethod
     def validate_json(cls):
@@ -88,7 +88,7 @@ class Mf:
         unique_mf= {}
         for d in all_types_dicts:
             if d[Strings.mf_alias] not in unique_mf:
-                unique_mf[Strings.mf_alias] = d
+                unique_mf[d[Strings.mf_alias]] = d
         unique_mf = list(unique_mf.values())
         if not unique_mf:
             print("Mf: не пройдена проверка по уникальности mf_alias")
@@ -100,7 +100,10 @@ class Mf:
     def json_to_app(cls, data: list[dict]):
         cls.items.clear()
         for d in data:
-            Mf.items.append(Mf(**d))
+            cls.items.append(Mf(**d))
+        # for i in cls.items:
+        #     print(i.mf_alias)
+        # os._exit(1)
 
     def get_avaiable_mf_path(self):
         for i in self.mf_paths:

@@ -261,11 +261,15 @@ class App(QApplication):
         if data:
             Servers.json_to_app(data)
 
+        ThemeChanger.init()
+        UThreadPool.init()
+
         if not os.path.exists(Static.external_mf):
             open(Static.external_mf, "w")
         data = Mf.validate_json()
         if data:
             Mf.json_to_app(data)
+            Mf.current_mf = Mf.items[0]
         else:
             print("Открыть окно первичных настроек")
 
