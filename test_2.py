@@ -63,16 +63,18 @@ class FirstLoadWin(UMainWidget):
         self.init_lang_widget()
 
     def lng_action(self, value: int):
-        # Предотвращаем повторный запуск, если язык не изменился
         if self.lng_index == value:
             return
-            
         self.lng_index = value
         self.remove_ui()
         self.init_ui()
 
     def init_lang_widget(self):
-        lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
+        if self.lng_index == 0:
+            lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
+        else:
+            lng_label_text = f"{Lng.app_lang[1]} ({Lng.app_lang[0]})"
+
         rus_action_text = Lng.rus[self.lng_index]
         eng_action_text = Lng.eng[self.lng_index]
         lng_btn_text = rus_action_text if self.lng_index == 0 else eng_action_text
@@ -98,13 +100,13 @@ class FirstLoadWin(UMainWidget):
         rus_icon = QIcon(self.rus_flag)
         rus_action = QAction(rus_icon, rus_action_text, lng_menu)
         rus_action.setIconVisibleInMenu(True)
-        rus_action.triggered.connect(lambda val=0: self.lng_action(val))
+        rus_action.triggered.connect(lambda e, val=0: self.lng_action(val))
         lng_menu.addAction(rus_action)
 
         eng_icon = QIcon(self.eng_flag)
         eng_action = QAction(eng_icon, eng_action_text, lng_menu)
         eng_action.setIconVisibleInMenu(True)
-        eng_action.triggered.connect(lambda val=1: self.lng_action(val))
+        eng_action.triggered.connect(lambda e, val=1: self.lng_action(val))
         lng_menu.addAction(eng_action)
 
 
