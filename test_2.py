@@ -1,11 +1,14 @@
 import sys
 
-from PyQt6.QtGui import QAction
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel,
                              QMenu, QVBoxLayout, QWidget)
 
+from cfg import Static
 from widgets._base_widgets import RowArrowWidget, UMainWidget, UPushButton
-from PyQt6.QtCore import Qt
+import os
+
 
 class Lng:
     app_lang = (
@@ -27,6 +30,9 @@ class Lng:
 
 
 class FirstLoadWin(UMainWidget):
+    rus_flag = os.path.join(Static.internal_icons, "rus_flag.svg")
+    eng_flag = os.path.join(Static.internal_icons, "eng_flag.svg")
+
     def __init__(self):
         super().__init__()
         self.resize(500, 500)
@@ -42,20 +48,20 @@ class FirstLoadWin(UMainWidget):
 
     def init_ui(self):
         self.init_lang_widget()
-        # self.central_layout.addStretch()
 
     def lng_action(self, value: int):
         self.lng_index = value
         self.remove_ui()
         self.init_ui()
 
-        print(self.lng_index)
-
     def init_lang_widget(self):
         lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
-        rus_text = f"{Lng.rus[0]} ({Lng.rus[1]})"
-        eng_text = f"{Lng.eng[0]} ({Lng.eng[1]})"
-        lng_btn_text = f"{Lng.lang[0]} ({Lng.lang[1]})"
+        rus_action_text = Lng.rus[self.lng_index]
+        eng_action_text = Lng.eng[self.lng_index]
+        if self.lng_index == 0:
+            lng_btn_text = rus_action_text
+        else:
+            lng_btn_text = eng_action_text
 
         lng_containter = QGroupBox()
         self.central_layout.addWidget(lng_containter)
@@ -68,20 +74,28 @@ class FirstLoadWin(UMainWidget):
         lng_layout.addStretch()
 
         lng_btn = UPushButton(lng_btn_text)
-        lng_btn.setFixedWidth(125)
+        lng_btn.setFixedWidth(140)
         lng_layout.addWidget(lng_btn)
 
         lng_menu = QMenu(lng_btn)
         lng_btn.setMenu(lng_menu)
 
-        rus_action = QAction(rus_text, lng_menu)
+        rus_action = QAction(rus_action_text, lng_menu)
+        rus_icon = QIcon(self.rus_flag)
+        rus_action.setIcon(rus_icon)
         rus_action.triggered.connect(lambda: self.lng_action(0))
         lng_menu.addAction(rus_action)
 
-        eng_action = QAction(eng_text, lng_menu)
+        eng_action = QAction(eng_action_text, lng_menu)
+        eng_action.setIcon(QIcon(self.eng_flag))
         eng_action.triggered.connect(lambda: self.lng_action(1))
         lng_menu.addAction(eng_action)
 
+
+
+
+for i in (FirstLoadWin.rus_flag, FirstLoadWin.eng_flag):
+    print(os.path.exists(i))
 
 app = QApplication(sys.argv)
 win = FirstLoadWin()
