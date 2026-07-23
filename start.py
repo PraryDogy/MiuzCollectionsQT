@@ -246,6 +246,7 @@ class App(QApplication):
 
         if not os.path.exists(Static.external_json_data):
             JsonData.write_json_data()
+            # валидация cfg
         JsonData.json_to_app()
 
         if not os.path.exists(Static.external_filters):
