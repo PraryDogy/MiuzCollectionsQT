@@ -36,7 +36,7 @@ class Filters:
     @classmethod
     def json_to_app(cls, data: list[str]):
         cls.items.clear()
-        cls.items.extend(data)
+        cls.items = data
 
     @classmethod
     def write_json_data(cls):

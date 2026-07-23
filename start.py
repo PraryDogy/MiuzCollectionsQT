@@ -258,6 +258,8 @@ class App(QApplication):
         if not os.path.exists(Static.external_servers):
             open(Static.external_filters, "w")
         data = Servers.validate_json()
+        if data:
+            Servers.json_to_app(data)
 
         if not os.path.exists(Static.external_mf):
             open(Static.external_mf, "w")
