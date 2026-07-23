@@ -272,8 +272,9 @@ class ServersWin(UMainWidget):
 
     # Загрузка данных из JSON
     def init_data(self):
-        Servers.items.clear()
-        Servers.json_to_app()
+        data = Servers.validate_json()
+        if data:
+            Servers.json_to_app(data)
 
         for alias, server, login, pass_ in Servers.items:
             server_item = ServerItem(
