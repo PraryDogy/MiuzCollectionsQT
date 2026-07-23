@@ -90,140 +90,140 @@ class System_:
         builtins.print = debug_print
 
 
-class Lng:
-    settings_title = (
-        "Настройки",
-        "Settings"
-    )
-    setup_app = (
-        "Настроить приложение",
-        "Configure Application"
-    )
-    description = (
-        (
-            "Приложение \"Collections\" позволяет индексировать и "
-            "быстро просматривать изображения, что полезно на "
-            "медленных сетевых дисках."
-        ),
-        (
-            "The \"Collections\" app allows you to index and "
-            "quickly browse images, which is especially useful "
-            "for slow network drives."
-        )
-    )
+# class Lng:
+#     settings_title = (
+#         "Настройки",
+#         "Settings"
+#     )
+#     setup_app = (
+#         "Настроить приложение",
+#         "Configure Application"
+#     )
+#     description = (
+#         (
+#             "Приложение \"Collections\" позволяет индексировать и "
+#             "быстро просматривать изображения, что полезно на "
+#             "медленных сетевых дисках."
+#         ),
+#         (
+#             "The \"Collections\" app allows you to index and "
+#             "quickly browse images, which is especially useful "
+#             "for slow network drives."
+#         )
+#     )
 
 
-class ClickableGroupBox(QGroupBox):
-    def __init__(self, title: str, callback: callable):
-        super().__init__()
-        self.setFixedSize(150, 70)
-        self.callback = callback
+# class ClickableGroupBox(QGroupBox):
+#     def __init__(self, title: str, callback: callable):
+#         super().__init__()
+#         self.setFixedSize(150, 70)
+#         self.callback = callback
         
-        layout = QVBoxLayout(self)
-        self.label = QLabel(title)
-        self.label.setWordWrap(True)
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.label)
+#         layout = QVBoxLayout(self)
+#         self.label = QLabel(title)
+#         self.label.setWordWrap(True)
+#         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#         layout.addWidget(self.label)
 
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.callback()
-        super().mousePressEvent(event)
+#     def mouseReleaseEvent(self, event):
+#         if event.button() == Qt.MouseButton.LeftButton:
+#             self.callback()
+#         super().mousePressEvent(event)
 
 
-class FirstLoad(QDialog):
-    copy_preload_files = pyqtSignal()
-    setup_new_mf = pyqtSignal()
+# class FirstLoad(QDialog):
+#     copy_preload_files = pyqtSignal()
+#     setup_new_mf = pyqtSignal()
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle(Lng.settings_title[JsonData.lng_index])
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+#         self.setWindowTitle(Lng.settings_title[JsonData.lng_index])
+#         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-        layout = QVBoxLayout(self)
-        layout.setSpacing(15)
+#         layout = QVBoxLayout(self)
+#         layout.setSpacing(15)
 
-        self.title_label = QLabel(Lng.description[JsonData.lng_index])
-        self.title_label.setWordWrap(True)
-        self.title_label.setFixedWidth(310)
-        self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        layout.addWidget(self.title_label)
+#         self.title_label = QLabel(Lng.description[JsonData.lng_index])
+#         self.title_label.setWordWrap(True)
+#         self.title_label.setFixedWidth(310)
+#         self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+#         layout.addWidget(self.title_label)
 
-        groups_layout = QHBoxLayout()
-        groups_layout.setSpacing(10)
-        layout.addLayout(groups_layout)
+#         groups_layout = QHBoxLayout()
+#         groups_layout.setSpacing(10)
+#         layout.addLayout(groups_layout)
 
-        self.group_app = ClickableGroupBox(
-            Lng.setup_app[JsonData.lng_index],
-            self.setup_app
-        )
-        groups_layout.addWidget(self.group_app)
+#         self.group_app = ClickableGroupBox(
+#             Lng.setup_app[JsonData.lng_index],
+#             self.setup_app
+#         )
+#         groups_layout.addWidget(self.group_app)
 
-        if os.path.exists(Static.internal_files):
-            for i in os.scandir(Static.internal_files):
-                if i.name.endswith((".zip", ".ZIP")):
-                    zip_file = Path(i.path)
-                    self.preload = ClickableGroupBox(
-                        zip_file.stem, 
-                        self.preload_selected_cmd
-                    )
-                    groups_layout.addWidget(self.preload)
-                    break
+#         if os.path.exists(Static.internal_files):
+#             for i in os.scandir(Static.internal_files):
+#                 if i.name.endswith((".zip", ".ZIP")):
+#                     zip_file = Path(i.path)
+#                     self.preload = ClickableGroupBox(
+#                         zip_file.stem, 
+#                         self.preload_selected_cmd
+#                     )
+#                     groups_layout.addWidget(self.preload)
+#                     break
 
-        self.adjustSize()
+#         self.adjustSize()
 
-    def setup_app(self):
-        self.hide()
-        self.setup_new_mf.emit()
-        self.deleteLater()
+#     def setup_app(self):
+#         self.hide()
+#         self.setup_new_mf.emit()
+#         self.deleteLater()
 
-    def preload_selected_cmd(self):
-        self.hide()
-        self.copy_preload_files.emit()
-        self.deleteLater()
+#     def preload_selected_cmd(self):
+#         self.hide()
+#         self.copy_preload_files.emit()
+#         self.deleteLater()
 
-    def closeEvent(self, a0):
-        os._exit(1)
-        return super().closeEvent(a0)
+#     def closeEvent(self, a0):
+#         os._exit(1)
+#         return super().closeEvent(a0)
     
-    def keyPressEvent(self, a0):
-        a0.ignore()
+#     def keyPressEvent(self, a0):
+#         a0.ignore()
 
 
-class LanguageSelect(QDialog):
-    closed_ = pyqtSignal()
+# class LanguageSelect(QDialog):
+#     closed_ = pyqtSignal()
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Language / Язык")
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+#         self.setWindowTitle("Language / Язык")
         
-        btn_layout = QHBoxLayout(self)
+#         btn_layout = QHBoxLayout(self)
 
-        self.btn_ru = ClickableGroupBox(
-            "Русский",
-            lambda: self.select_lang(0)
-        )
-        self.btn_en = ClickableGroupBox(
-            "English",
-            lambda: self.select_lang(1)
-        )
+#         self.btn_ru = ClickableGroupBox(
+#             "Русский",
+#             lambda: self.select_lang(0)
+#         )
+#         self.btn_en = ClickableGroupBox(
+#             "English",
+#             lambda: self.select_lang(1)
+#         )
         
-        btn_layout.addWidget(self.btn_ru)
-        btn_layout.addWidget(self.btn_en)
+#         btn_layout.addWidget(self.btn_ru)
+#         btn_layout.addWidget(self.btn_en)
         
-        self.adjustSize()
+#         self.adjustSize()
 
-    def select_lang(self, index):
-        JsonData.lng_index = index
-        self.closed_.emit()
-        self.deleteLater()
+#     def select_lang(self, index):
+#         JsonData.lng_index = index
+#         self.closed_.emit()
+#         self.deleteLater()
     
-    def closeEvent(self, a0):
-        os._exit(1)
-        return super().closeEvent(a0)
+#     def closeEvent(self, a0):
+#         os._exit(1)
+#         return super().closeEvent(a0)
     
-    def keyPressEvent(self, a0):
-        a0.ignore()
+#     def keyPressEvent(self, a0):
+#         a0.ignore()
 
 
 class App(QApplication):
@@ -251,12 +251,14 @@ class App(QApplication):
 
         if not os.path.exists(Static.external_filters):
             open(Static.external_filters, "w")
+
         data = Filters.validate_json()
         if data:
             Filters.json_to_app(data)
 
         if not os.path.exists(Static.external_servers):
             open(Static.external_filters, "w")
+
         data = Servers.validate_json()
         if data:
             Servers.json_to_app(data)
@@ -266,6 +268,7 @@ class App(QApplication):
 
         if not os.path.exists(Static.external_mf):
             open(Static.external_mf, "w")
+
         data = Mf.validate_json()
         if data:
             Mf.json_to_app(data)
