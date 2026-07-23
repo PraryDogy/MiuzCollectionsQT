@@ -31,7 +31,7 @@ class Lng:
 
 class FirstLoadWin(UMainWidget):
     rus_flag = os.path.join(Static.internal_icons, "rus_flag.svg")
-    eng_flag = os.path.join(Static.internal_icons, "eng_flag.svg")
+    eng_flag = os.path.join(Static.internal_icons, "eng_flag.png")
 
     def __init__(self):
         super().__init__()
@@ -80,22 +80,18 @@ class FirstLoadWin(UMainWidget):
         lng_menu = QMenu(lng_btn)
         lng_btn.setMenu(lng_menu)
 
-        rus_action = QAction(rus_action_text, lng_menu)
         rus_icon = QIcon(self.rus_flag)
-        rus_action.setIcon(rus_icon)
+        rus_action = QAction(rus_icon, rus_action_text, lng_menu)
+        rus_action.setIconVisibleInMenu(True)
         rus_action.triggered.connect(lambda: self.lng_action(0))
         lng_menu.addAction(rus_action)
 
-        eng_action = QAction(eng_action_text, lng_menu)
-        eng_action.setIcon(QIcon(self.eng_flag))
+        eng_icon = QIcon(self.eng_flag)
+        eng_action = QAction(eng_icon, eng_action_text, lng_menu)
+        eng_action.setIconVisibleInMenu(True)
         eng_action.triggered.connect(lambda: self.lng_action(1))
         lng_menu.addAction(eng_action)
 
-
-
-
-for i in (FirstLoadWin.rus_flag, FirstLoadWin.eng_flag):
-    print(os.path.exists(i))
 
 app = QApplication(sys.argv)
 win = FirstLoadWin()
