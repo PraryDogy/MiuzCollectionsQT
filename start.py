@@ -244,36 +244,43 @@ class App(QApplication):
         if not os.path.exists(Static.external_db):
             open(Static.external_db, "w")
 
+        # конфиг
         if not os.path.exists(Static.external_json_data):
             JsonData.write_json_data()
             # валидация cfg
+        # data = JsonData.validate()
+        # if data:
+        #     JsonData.json_to_app(data)
         JsonData.json_to_app()
 
+        # фильтры
         if not os.path.exists(Static.external_filters):
             open(Static.external_filters, "w")
-
         data = Filters.validate_json()
         if data:
             Filters.json_to_app(data)
 
+        # сервера
         if not os.path.exists(Static.external_servers):
             open(Static.external_filters, "w")
-
         data = Servers.validate_json()
         if data:
             Servers.json_to_app(data)
 
+        # mf,самое важное
         if not os.path.exists(Static.external_mf):
             open(Static.external_mf, "w")
-
         data = Mf.validate_json()
         if data:
             Mf.json_to_app(data)
             Mf.current_mf = Mf.items[0]
+            # инициация приложения
             Dbase.init()
             ThemeChanger.init()
             UThreadPool.init()
+            self.create_app()
         else:
+            # окно настроек
             print("Открыть окно первичных настроек")
 
     def create_app(self):
