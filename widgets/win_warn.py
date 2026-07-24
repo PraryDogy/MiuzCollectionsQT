@@ -56,12 +56,15 @@ class ConfirmWindow(UMainWidget):
         btn_layout = QHBoxLayout(btn_widget)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btn_layout.setContentsMargins(0, 0, 0, 0)
+        btn_layout.setSpacing(10)
 
         self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
+        self.ok_btn.setFixedWidth(75)
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         btn_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+        self.cancel_btn.setFixedWidth(75)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
