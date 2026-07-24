@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
 
 from cfg import Static
 from system.lang import Lng
+from system.main_folder import Mf
 from widgets._base_widgets import (RowArrowWidget, SelectableLabel, ULineEdit,
                                    UMainWidget, UPushButton)
 from widgets.win_warn import ConfirmWindow, WarningWindow
@@ -240,8 +241,16 @@ class FirstLoadWin(UMainWidget):
             win_warn.center_to_parent(self.window())
             win_warn.show()
 
-        def save_fin():
-            ...
+        def save_fin(folder_name: str, paths: list[str]):
+            mf = Mf(
+                mf_alias=folder_name,
+                mf_paths=paths,
+                mf_stop_list=[],
+                mf_current_path=paths[0]
+            )
+            Mf.items.clear()
+            Mf.items.append(mf)
+            Mf.write_json_data()
 
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
         folder_name = self.name_line_edit.text()
@@ -266,7 +275,10 @@ class FirstLoadWin(UMainWidget):
             return
 
         win = ConfirmWindow(Lng.save_text_long[self.lng_index])
-        win.ok_clicked.connect(lambda: save_fin())
+        win.setFixedSize(300, 90)
+        win.ok_clicked.connect(
+            lambda: save_fin(folder_name, paths)
+        )
         win.center_to_parent(self.window())
         win.show()
 
