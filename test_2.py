@@ -357,7 +357,14 @@ class FirstLoadWin(UMainWidget):
         self.load_settings_win.show()
 
     def copy_zip_cmd(self, path: str):
+
+        def fin():
+            restart_app()
+
         self.copy_task = ZipTask(path)
+        self.copy_task.sigs.finished.connect(fin)
+        self.load_settings_win.hide()
+        self.hide()
         UThreadPool.start(self.copy_task)
 
     def save_cmd(self, *args):
