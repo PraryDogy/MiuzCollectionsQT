@@ -322,7 +322,7 @@ class RebootSettings(SettingsGroup):
             shutil.rmtree(Static.external_dir)
             restart_app()
 
-        reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index])
+        reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index], 320, 110)
         reset_win.center_to_parent(self.window())
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
@@ -687,7 +687,9 @@ class FiltersWid(SettingsGroup, StateWid):
             self.changed.emit()
             self.set_was_changed()
 
-        self.filters_win = ConfirmWindow(Lng.reset_filters_long[JsonData.lng_index])
+        self.filters_win = ConfirmWindow(
+            Lng.reset_filters_long[JsonData.lng_index], 290, 90
+        )
         self.filters_win.ok_clicked.connect(fin)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
@@ -834,7 +836,9 @@ class MfSettings(QWidget, StateWid):
             )
             win.ok_clicked.connect(win.deleteLater)
         else:
-            win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
+            win = ConfirmWindow(
+                Lng.app_will_restarted[JsonData.lng_index], 300, 90
+            )
             win.ok_clicked.connect(fin)
         win.center_to_parent(self.window())
         win.show()
@@ -846,7 +850,9 @@ class MfSettings(QWidget, StateWid):
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
-        win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
+        win = ConfirmWindow(
+            Lng.app_will_restarted[JsonData.lng_index], 300, 90
+        )
         win.ok_clicked.connect(reset_data)
         win.center_to_parent(self.window())
         win.show()
@@ -1011,7 +1017,9 @@ class NewFolder(QWidget, StateWid):
             show_warn(Lng.select_folder_path[JsonData.lng_index], 280, 85)
             return
 
-        win = ConfirmWindow(Lng.save_text_long[JsonData.lng_index])
+        win = ConfirmWindow(
+            Lng.save_text_long[JsonData.lng_index], 300, 90
+        )
         win.ok_clicked.connect(
             lambda: self.save_fin(folder_name, paths, stop_list)
         )
@@ -1226,7 +1234,9 @@ class WinSettings(UMainWidget):
         if self.warn_wid.isHidden():
             self.deleteLater()
         else:
-            win = ConfirmWindow(Lng.save_text_long[JsonData.lng_index], 300, 90)
+            win = ConfirmWindow(
+                Lng.save_text_long[JsonData.lng_index], 300, 90
+            )
             win.ok_clicked.connect(fin)
             win.center_to_parent(self.window())
             win.show()

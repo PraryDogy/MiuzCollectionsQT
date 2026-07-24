@@ -99,10 +99,9 @@ class PathWidget(QGroupBox):
             self.task_timer.stop()
             if not self.task.process_queue.empty():
                 self.mf_temp_path = self.task.process_queue.get().rstrip(os.sep)
-                if self.check_mf_temp_path():
-                    self.mf_path_avaiable.emit()
-                    self.ok_path_widget()
-                    self.stop_task()
+                self.mf_path_avaiable.emit()
+                self.ok_path_widget()
+                self.stop_task()
             else:
                 self.task_timer.start(500)
 
@@ -133,10 +132,9 @@ class PathWidget(QGroupBox):
         url = dialog.getExistingDirectory()
         if url:
             self.mf_temp_path = url.rstrip(os.sep)
-            if self.check_mf_temp_path():
-                self.mf_path_avaiable.emit()
-                self.ok_path_widget()
-                self.stop_task()
+            self.mf_path_avaiable.emit()
+            self.ok_path_widget()
+            self.stop_task()
         return super().mouseReleaseEvent(a0)
         
     def dropEvent(self, a0):
@@ -144,11 +142,9 @@ class PathWidget(QGroupBox):
             url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if url and os.path.isdir(url):
                 self.mf_temp_path = url.rstrip(os.sep)
-
-                if self.check_mf_temp_path():
-                    self.mf_path_avaiable.emit()
-                    self.ok_path_widget()
-                    self.stop_task()
+                self.mf_path_avaiable.emit()
+                self.ok_path_widget()
+                self.stop_task()
         return super().dropEvent(a0)
     
     def dragEnterEvent(self, a0):
