@@ -1,13 +1,10 @@
 import os
-import shutil
 import sys
 import traceback
-from pathlib import Path
 
-from PyQt6.QtCore import QEvent, QObject, Qt, pyqtSignal
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import (QApplication, QDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QPushButton, QTextEdit, QVBoxLayout)
+from PyQt6.QtCore import QEvent, QObject
+from PyQt6.QtWidgets import (QApplication, QDialog, QPushButton, QTextEdit,
+                             QVBoxLayout)
 from typing_extensions import Literal
 
 from cfg import JsonData, Static
@@ -17,9 +14,9 @@ from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.servers import Servers
 from system.tasks import UThreadPool
+from test_2 import FirstLoadWin
 from widgets._base_widgets import UMainWindow
 from widgets.win_main import WinMain
-from widgets.win_settings import NewMfWin
 
 
 class System_:
@@ -90,148 +87,11 @@ class System_:
         builtins.print = debug_print
 
 
-# class Lng:
-#     settings_title = (
-#         "Настройки",
-#         "Settings"
-#     )
-#     setup_app = (
-#         "Настроить приложение",
-#         "Configure Application"
-#     )
-#     description = (
-#         (
-#             "Приложение \"Collections\" позволяет индексировать и "
-#             "быстро просматривать изображения, что полезно на "
-#             "медленных сетевых дисках."
-#         ),
-#         (
-#             "The \"Collections\" app allows you to index and "
-#             "quickly browse images, which is especially useful "
-#             "for slow network drives."
-#         )
-#     )
-
-
-# class ClickableGroupBox(QGroupBox):
-#     def __init__(self, title: str, callback: callable):
-#         super().__init__()
-#         self.setFixedSize(150, 70)
-#         self.callback = callback
-        
-#         layout = QVBoxLayout(self)
-#         self.label = QLabel(title)
-#         self.label.setWordWrap(True)
-#         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-#         layout.addWidget(self.label)
-
-#     def mouseReleaseEvent(self, event):
-#         if event.button() == Qt.MouseButton.LeftButton:
-#             self.callback()
-#         super().mousePressEvent(event)
-
-
-# class FirstLoad(QDialog):
-#     copy_preload_files = pyqtSignal()
-#     setup_new_mf = pyqtSignal()
-
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         self.setWindowTitle(Lng.settings_title[JsonData.lng_index])
-#         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-
-#         layout = QVBoxLayout(self)
-#         layout.setSpacing(15)
-
-#         self.title_label = QLabel(Lng.description[JsonData.lng_index])
-#         self.title_label.setWordWrap(True)
-#         self.title_label.setFixedWidth(310)
-#         self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-#         layout.addWidget(self.title_label)
-
-#         groups_layout = QHBoxLayout()
-#         groups_layout.setSpacing(10)
-#         layout.addLayout(groups_layout)
-
-#         self.group_app = ClickableGroupBox(
-#             Lng.setup_app[JsonData.lng_index],
-#             self.setup_app
-#         )
-#         groups_layout.addWidget(self.group_app)
-
-#         if os.path.exists(Static.internal_files):
-#             for i in os.scandir(Static.internal_files):
-#                 if i.name.endswith((".zip", ".ZIP")):
-#                     zip_file = Path(i.path)
-#                     self.preload = ClickableGroupBox(
-#                         zip_file.stem, 
-#                         self.preload_selected_cmd
-#                     )
-#                     groups_layout.addWidget(self.preload)
-#                     break
-
-#         self.adjustSize()
-
-#     def setup_app(self):
-#         self.hide()
-#         self.setup_new_mf.emit()
-#         self.deleteLater()
-
-#     def preload_selected_cmd(self):
-#         self.hide()
-#         self.copy_preload_files.emit()
-#         self.deleteLater()
-
-#     def closeEvent(self, a0):
-#         os._exit(1)
-#         return super().closeEvent(a0)
-    
-#     def keyPressEvent(self, a0):
-#         a0.ignore()
-
-
-# class LanguageSelect(QDialog):
-#     closed_ = pyqtSignal()
-
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         self.setWindowTitle("Language / Язык")
-        
-#         btn_layout = QHBoxLayout(self)
-
-#         self.btn_ru = ClickableGroupBox(
-#             "Русский",
-#             lambda: self.select_lang(0)
-#         )
-#         self.btn_en = ClickableGroupBox(
-#             "English",
-#             lambda: self.select_lang(1)
-#         )
-        
-#         btn_layout.addWidget(self.btn_ru)
-#         btn_layout.addWidget(self.btn_en)
-        
-#         self.adjustSize()
-
-#     def select_lang(self, index):
-#         JsonData.lng_index = index
-#         self.closed_.emit()
-#         self.deleteLater()
-    
-#     def closeEvent(self, a0):
-#         os._exit(1)
-#         return super().closeEvent(a0)
-    
-#     def keyPressEvent(self, a0):
-#         a0.ignore()
-
-
 class App(QApplication):
     def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
         super().__init__(argv)
         self.argv = argv
         self.validate()
-        self.create_app()
 
     def validate(self):
         # валидация путей
@@ -280,9 +140,8 @@ class App(QApplication):
             UThreadPool.init()
             self.create_app()
         else:
-            # окно настроек
-            print("Открыть окно первичных настроек")
-            os._exit(1)
+            self.first_load_win = FirstLoadWin()
+            self.first_load_win.show()
 
     def create_app(self):
         self.win_main = WinMain(self.argv)
