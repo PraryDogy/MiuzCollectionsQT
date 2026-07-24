@@ -22,6 +22,62 @@ def restart_app():
     QApplication.exit(0)
 
 
+class LoadSettingsWin(UMainWidget):
+    preload = Static.internal_files
+
+    def __init__(self, lng_index: int):
+        super().__init__()
+        self.setWindowTitle(Lng.load_settings[lng_index])
+        self.set_close_only()
+        self.set_always_on_top()
+        self.lng_index = lng_index
+        self.backups = self.load_backups()
+
+        list_container = QGroupBox()
+        self.central_layout.addWidget(list_container)
+        self.central_layout.setSpacing(10)
+
+        list_layout = QVBoxLayout(list_container)
+        list_layout.setContentsMargins(2, 10, 2, 2)
+
+        self.list_widget = VListWidget(self)
+        self.list_widget.setFixedSize(300, 250)
+        list_layout.addWidget(self.list_widget)
+
+        for i in self.backups:
+            item = VListWidgetItem(self.list_widget, text=i.name)
+            self.list_widget.addItem(item)
+
+        btn_container = QWidget()
+        self.central_layout.addWidget(btn_container)
+
+        btn_layout = QHBoxLayout(btn_container)
+        btn_layout.setContentsMargins(0, 0, 0, 0)
+        btn_layout.setSpacing(10)
+        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        ok_btn = UPushButton(Lng.ok[self.lng_index])
+        btn_layout.addWidget(ok_btn)
+
+        cancel_btn = UPushButton(Lng.cancel[self.lng_index])
+        cancel_btn.clicked.connect(self.deleteLater)
+        btn_layout.addWidget(cancel_btn)
+
+        self.adjustSize()
+
+    def load_backups(self):
+        backups: list[os.DirEntry] = []
+        for i in os.scandir(self.preload):
+            if i.name.endswith((".zip", ".ZIP")):
+                backups.append(i)
+        return backups
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+
+
 class PathWidget(QGroupBox):
     mf_path_avaiable = pyqtSignal(str)
     magnifier = os.path.join(Static.internal_icons, "magnifier.svg")
@@ -126,6 +182,8 @@ class FirstLoadWin(UMainWidget):
     def __init__(self):
         super().__init__()
         self.resize(500, 500)
+        self.set_always_on_top()
+        self.set_close_only()
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(10)
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -233,12 +291,20 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setSpacing(0)
 
         self.backup_widget = RowArrowWidget(Lng.load_settings[self.lng_index])
+        self.backup_widget.clicked.connect(
+            lambda: self.open_load_settings_win()
+        )
         last_block_layout.addWidget(self.backup_widget)
 
         save_widget = RowArrowWidget(Lng.save[self.lng_index])
         save_widget.hide_sep()
         save_widget.clicked.connect(self.save_cmd)
         last_block_layout.addWidget(save_widget)
+
+    def open_load_settings_win(self):
+        self.load_settings_win = LoadSettingsWin(self.lng_index)
+        self.load_settings_win.center_to_parent(self)
+        self.load_settings_win.show()
 
     def save_cmd(self, *args):
 
