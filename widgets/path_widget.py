@@ -8,14 +8,12 @@ from PyQt6.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                              QSizePolicy, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
-from system.database import Dbase, Dirs
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, SmbChecker
 from system.utils import Utils
 
 from ._base_widgets import SelectableLabel
-from .win_warn import WarningWindow
 
 
 class PathWidget(QGroupBox):
@@ -72,9 +70,6 @@ class PathWidget(QGroupBox):
 
         h_lay.addStretch()
 
-    def check_mf_temp_path(self):
-        return os.path.exists(self.mf_temp_path)
-
     def ok_path_widget(self):
         self.main_wid.deleteLater()
         self.main_wid = QWidget()
@@ -98,11 +93,6 @@ class PathWidget(QGroupBox):
 
         h_lay.addStretch()
 
-    def open_win_warn(self):
-        self.warn_win = WarningWindow(Lng.bad_smb[JsonData.lng_index])
-        self.warn_win.center_to_parent(self.window())
-        self.warn_win.show()
-
     def start_checker(self):
 
         def poll_task():
@@ -113,10 +103,6 @@ class PathWidget(QGroupBox):
                     self.mf_path_avaiable.emit()
                     self.ok_path_widget()
                     self.stop_task()
-                else:
-                    self.mf_temp_path = None
-                    QTimer.singleShot(1, self.no_path_widget)
-                    self.open_win_warn()
             else:
                 self.task_timer.start(500)
 
@@ -151,10 +137,6 @@ class PathWidget(QGroupBox):
                 self.mf_path_avaiable.emit()
                 self.ok_path_widget()
                 self.stop_task()
-            else:
-                self.mf_temp_path = None
-                QTimer.singleShot(1, self.no_path_widget)
-                self.open_win_warn()
         return super().mouseReleaseEvent(a0)
         
     def dropEvent(self, a0):
@@ -167,10 +149,6 @@ class PathWidget(QGroupBox):
                     self.mf_path_avaiable.emit()
                     self.ok_path_widget()
                     self.stop_task()
-                else:
-                    self.mf_temp_path = None
-                    QTimer.singleShot(1, self.no_path_widget)
-                    self.open_win_warn()
         return super().dropEvent(a0)
     
     def dragEnterEvent(self, a0):

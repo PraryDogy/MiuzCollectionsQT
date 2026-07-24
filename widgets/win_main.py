@@ -19,7 +19,8 @@ from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import HSep, UMainWindow, UPushButton
+from ._base_widgets import (ConfirmWindow, HSep, UMainWindow, UPushButton,
+                            WarningWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -37,7 +38,6 @@ from .win_servers import ServersWin
 from .win_settings import WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
-from .win_warn import ConfirmWindow, WarningWindow
 
 
 class TestWid(QFrame):
@@ -314,7 +314,10 @@ class WinMain(UMainWindow):
         self.bar_path.update(dir)
 
     def on_hide_digits_clicked(self):
-        self.win_warn = WarningWindow(Lng.hide_digits_full[JsonData.lng_index])
+        self.win_warn = WarningWindow(
+            Lng.hide_digits_full[JsonData.lng_index], 300, 105
+        )
+        self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
         self.win_warn.center_to_parent(self)
         self.win_warn.show()
         

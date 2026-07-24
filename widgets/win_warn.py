@@ -32,6 +32,7 @@ class ConfirmWindow(UMainWidget):
 
         self.central_layout.setContentsMargins(5, 5, 5, 0)
         self.central_layout.setSpacing(0)
+        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         text_container = QWidget()
         # text_container.setStyleSheet("background: red;")
