@@ -7,7 +7,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
                              QSizePolicy, QVBoxLayout, QWidget)
 
-from cfg import JsonData
+from cfg import JsonData, Static
 from system.database import Dbase, Dirs
 from system.lang import Lng
 from system.main_folder import Mf
@@ -20,8 +20,8 @@ from .win_warn import WarningWindow
 
 class PathWidget(QGroupBox):
     mf_path_avaiable = pyqtSignal()
-    magnifier = "images/magnifier.svg"
-    green_checkmark = "images/green_checkmark.svg"
+    magnifier = os.path.join(Static.internal_icons, "magnifier.svg")
+    green_checkmark = os.path.join(Static.internal_icons, "green_checkmark.svg")
     hh = 70
     icon_size = 35
 
@@ -74,32 +74,6 @@ class PathWidget(QGroupBox):
 
     def check_mf_temp_path(self):
         return os.path.exists(self.mf_temp_path)
-        # self.mf_temp_path
-        with Dbase.main_engine.connect() as conn:
-            stmt = (
-                sqlalchemy.select(Dirs.rel_dir_path)
-                .where(Dirs.mf_alias==self.mf.mf_alias)
-            )
-            db_paths = conn.execute(stmt).scalars().all()
-
-        db_exist_paths = []
-        for i in db_paths:
-            abs_path = Utils.get_abs_any_path(self.mf_temp_path,i).rstrip(os.sep)
-            if os.path.exists(abs_path):
-                db_exist_paths.append(abs_path)
-
-        finder_exist_paths = [self.mf_temp_path, ]
-        for i in os.scandir(self.mf_temp_path):
-            if i.is_dir():
-                finder_exist_paths.append(i.path)
-
-        # одноуровневый каталог, типа просто 1 папка с фотками
-        if len(db_paths) == 1 and len(finder_exist_paths) == 1:
-            return True
-        if len(db_exist_paths) == 1 and self.mf_temp_path == db_exist_paths[0]:
-            return False
-        else:
-            return True
 
     def ok_path_widget(self):
         self.main_wid.deleteLater()

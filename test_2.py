@@ -1,13 +1,16 @@
 import os
 import sys
 
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel,
-                             QMenu, QVBoxLayout, QWidget)
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon, QMouseEvent
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
+                             QLabel, QMenu, QSizePolicy, QVBoxLayout, QWidget)
 
 from cfg import Static
-from widgets._base_widgets import RowArrowWidget, UMainWidget, UPushButton
+from widgets._base_widgets import (RowArrowWidget, SelectableLabel, ULineEdit,
+                                   UMainWidget, UPushButton)
+from widgets.win_warn import WarningWindow
 
 
 class Lng:
@@ -27,13 +30,132 @@ class Lng:
         "Английский",
         "English"
     )
+    folder_name = (
+        "Имя:\n"
+        "• уникальное\n"
+        "• 5-30 символов\n"
+        "• русские и английские буквы, цифры и пробелы",
+        "Folder name:\n"
+        "• unique\n"
+        "• up to 5-30 characters\n"
+        "• Russian and English letters, digits, and spaces",
+    )
+    alias_immutable = (
+        "Имя (нельзя изменить после сохранения)",
+        "Name (cannot be changed after saving)"
+    )
+    settings = (
+        "Настройка",
+        "Setup"
+    )
+    folder_path = (
+        "Путь к каталогу",
+        "Catalog path"
+    )
+    path_hint_texts = (
+        "Перетащите каталог сюда или нажмите для выбора",
+        "Drag and drop a catalog here or click to browse"
+    )
+    bad_smb = (
+        "Путь к каталогу изображений указан неверно.",
+        "The image directory path is incorrect."
+    )
 
 
-import os
+class PathWidget(QGroupBox):
+    mf_path_avaiable = pyqtSignal()
+    magnifier = os.path.join(Static.internal_icons, "magnifier.svg")
+    green_checkmark = os.path.join(Static.internal_icons, "green_checkmark.svg")
+    hh = 70
+    icon_size = 35
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QMenu, QWidget
+    def __init__(self, lng_index: int):
+        super().__init__()
+        self.setAcceptDrops(True)
+        self.setFixedHeight(self.hh)
+
+        self.current_path = None
+        self.lng_index = lng_index
+    
+        self.main_lay = QVBoxLayout(self)
+        self.main_lay.setContentsMargins(2, 2, 2, 2)
+        self.main_lay.setSpacing(0)
+
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
+
+        self.no_path_widget()
+
+    def no_path_widget(self):
+        self.main_wid.deleteLater()
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
+
+        h_lay = QHBoxLayout(self.main_wid)
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(10)
+
+        right_btn = QSvgWidget()
+        right_btn.load(self.magnifier)
+        right_btn.setFixedSize(self.icon_size, self.icon_size)
+        h_lay.addWidget(right_btn)
+        
+        lines = (
+            f"{Lng.folder_path[self.lng_index]}:",
+            Lng.path_hint_texts[self.lng_index].lower()
+        )
+        left_label = QLabel("\n".join(lines))
+        left_label.setWordWrap(True)
+        h_lay.addWidget(left_label)
+
+        h_lay.addStretch()
+
+    def ok_path_widget(self):
+        self.main_wid.deleteLater()
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
+
+        h_lay = QHBoxLayout(self.main_wid)
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(10)
+
+        right_btn = QSvgWidget()
+        right_btn.load(self.green_checkmark)
+        right_btn.setFixedSize(35, 35)
+        h_lay.addWidget(right_btn)
+
+        lines = (
+            f"{Lng.folder_path[self.lng_index]}:",
+            self.current_path
+        )
+        left_label = SelectableLabel('\n'.join(lines))
+        h_lay.addWidget(left_label)
+
+        h_lay.addStretch()
+
+    def mouseReleaseEvent(self, a0: QMouseEvent):
+        if not a0.button() != 2:
+            return
+        dialog = QFileDialog()
+        url = dialog.getExistingDirectory()
+        if url and os.path.isdir(url):
+            self.current_path = url.rstrip(os.sep)
+            self.mf_path_avaiable.emit()
+            self.ok_path_widget()
+        return super().mouseReleaseEvent(a0)
+        
+    def dropEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            url = a0.mimeData().urls()[0].toLocalFile()
+            if url and os.path.isdir(url):
+                self.current_path = url.rstrip(os.sep)
+                self.mf_path_avaiable.emit()
+                self.ok_path_widget()
+        return super().dropEvent(a0)
+    
+    def dragEnterEvent(self, a0):
+        a0.accept()
+        return super().dragEnterEvent(a0)
 
 
 class FirstLoadWin(UMainWidget):
@@ -44,23 +166,22 @@ class FirstLoadWin(UMainWidget):
         super().__init__()
         self.resize(500, 500)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(10)
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.lng_index = 0
-
-        # Ссылка на контейнер, чтобы обновлять только его
-        self.lng_container = None 
+        self.margins = 3
         self.init_ui()
 
     def remove_ui(self):
-        """Безопасное и мгновенное удаление старого контейнера."""
-        if self.lng_container is not None:
-            self.central_layout.removeWidget(self.lng_container)
-            self.lng_container.setParent(None)
-            self.lng_container.deleteLater()
-            self.lng_container = None
+        self.lng_container.deleteLater()
+        self.mf_container.deleteLater()
+        self.path_widget.deleteLater()
 
     def init_ui(self):
+        self.setWindowTitle(Lng.settings[self.lng_index])
         self.init_lang_widget()
+        self.init_mf_alias_widget()
+        self.init_path_widget()
 
     def lng_action(self, value: int):
         if self.lng_index == value:
@@ -87,7 +208,7 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.lng_container)
         
         lng_layout = QHBoxLayout(self.lng_container)
-        lng_layout.setContentsMargins(5, 5, 5, 5)
+        lng_layout.setContentsMargins(2, 2, 2, 2)
         lng_layout.setSpacing(0)
 
         lng_label = QLabel(lng_label_text)
@@ -113,6 +234,25 @@ class FirstLoadWin(UMainWidget):
         eng_action.setIconVisibleInMenu(True)
         eng_action.triggered.connect(lambda e, val=1: self.lng_action(val))
         lng_menu.addAction(eng_action)
+
+    def init_mf_alias_widget(self):
+        self.mf_container = QGroupBox()
+        self.central_layout.addWidget(self.mf_container)
+
+        mf_layout = QVBoxLayout(self.mf_container)
+        mf_layout.setContentsMargins(2, 2, 2, 2)
+        mf_layout.setSpacing(5)
+
+        name_text = QLabel(Lng.folder_name[self.lng_index])
+        mf_layout.addWidget(name_text)
+
+        self.name_line_edit = ULineEdit()
+        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[self.lng_index])
+        mf_layout.addWidget(self.name_line_edit)
+
+    def init_path_widget(self):
+        self.path_widget = PathWidget(self.lng_index)
+        self.central_layout.addWidget(self.path_widget)
 
 
 app = QApplication(sys.argv)
