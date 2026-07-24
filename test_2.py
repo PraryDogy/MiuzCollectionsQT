@@ -70,14 +70,17 @@ class FirstLoadWin(UMainWidget):
         self.init_ui()
 
     def init_lang_widget(self):
-        if self.lng_index == 0:
-            lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
-        else:
-            lng_label_text = f"{Lng.app_lang[1]} ({Lng.app_lang[0]})"
-
         rus_action_text = Lng.rus[self.lng_index]
         eng_action_text = Lng.eng[self.lng_index]
-        lng_btn_text = rus_action_text if self.lng_index == 0 else eng_action_text
+
+        if self.lng_index == 0:
+            lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
+            lng_btn_text = rus_action_text
+            lng_btn_icon = QIcon(self.rus_flag)
+        else:
+            lng_label_text = f"{Lng.app_lang[1]} ({Lng.app_lang[0]})"
+            lng_btn_text = eng_action_text
+            lng_btn_icon  = QIcon(self.eng_flag)
 
         # Сохраняем ссылку в self.lng_container
         self.lng_container = QGroupBox()
@@ -92,6 +95,8 @@ class FirstLoadWin(UMainWidget):
         lng_layout.addStretch()
 
         lng_btn = UPushButton(lng_btn_text)
+        lng_btn.setFixedWidth(100)
+        lng_btn.setIcon(lng_btn_icon)
         lng_layout.addWidget(lng_btn)
 
         lng_menu = QMenu(lng_btn)
