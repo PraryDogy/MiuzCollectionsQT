@@ -828,7 +828,10 @@ class MfSettings(QWidget, StateWid):
         )
 
         if len(self.mf_list_clone) == 1:
-            win = WarningWindow(Lng.at_least_one_folder_required[JsonData.lng_index])
+            win = WarningWindow(
+                Lng.at_least_one_folder_required[JsonData.lng_index], 280, 90
+            )
+            win.ok_clicked.connect(win.deleteLater)
         else:
             win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
             win.ok_clicked.connect(fin)
@@ -1212,35 +1215,21 @@ class WinSettings(UMainWidget):
 
     def ok_cmd(self):
 
-        def validate_folders() -> bool:
-            for folder in self.mf_list_clone:
-                if not folder.mf_paths:
-                    return folder.mf_alias
-            return None
-
-        if self.warn_wid.isHidden():
-            self.deleteLater()
-            return
-
-        folder_no_paths = validate_folders()
-        if folder_no_paths:
-            win_warn = WarningWindow(
-                f"{Lng.select_folder_path[JsonData.lng_index]} \"{folder_no_paths}\""
-            )
-            win_warn.center_to_parent(self.window())
-            win_warn.show()
-        else:
-            Mf.items = self.mf_list_clone
-            Mf.write_json_data()
-
-            Filters.items = self.filters_clone
-            Filters.write_json_data()
-
+        def fin():
             JsonData.lng_index = self.cfg_data.lng_index
             JsonData.scaner_minutes = self.cfg_data.scaner_minutes
             JsonData.write_json_data()
-
             restart_app()
+        
+        # это значит, что сохранять нечего
+        if self.warn_wid.isHidden():
+            self.deleteLater()
+        else:
+            win = ConfirmWindow(Lng.save_text_long[JsonData.lng_index], 300, 90)
+            win.ok_clicked.connect(fin)
+            win.center_to_parent(self.window())
+            win.show()
+
 
     def deleteLater(self):
         self.closed.emit()
@@ -1258,39 +1247,3 @@ class WinSettings(UMainWidget):
     def mouseReleaseEvent(self, a0):
         self.setFocus()
         return super().mouseReleaseEvent(a0)
-
-
-class NewMfWin(UMainWidget):
-    """
-    Окно настроек при первой настройке приложения.
-    """
-    def __init__(self):
-        super().__init__()
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
-        self.set_always_on_top()
-        self.set_close_only()
-        self.setFixedWidth(450)
-        self.mf_list_clone = copy.deepcopy(Mf.items)
-        self.new_mf = NewFolder(mf_list_clone=self.mf_list_clone)
-        # перехватываем нажатие кнопки "сохранить"
-        self.new_mf.save_fin = self.new_save_fin
-        self.central_layout.addWidget(self.new_mf)
-
-    def new_save_fin(self, folder_name, paths, stop_list):
-        mf = Mf(
-            mf_alias=folder_name,
-            mf_paths=paths,
-            mf_stop_list=stop_list,
-            mf_current_path=""
-        )
-        Mf.items.append(mf)
-        JsonData.remake_external_dir()
-        JsonData.make_empty_external_files()
-        Mf.write_json_data()
-        JsonData.write_json_data()
-        Filters.write_json_data()
-        restart_app()
-
-    def closeEvent(self, a0):
-        os._exit(1)
-        return super().closeEvent(a0)

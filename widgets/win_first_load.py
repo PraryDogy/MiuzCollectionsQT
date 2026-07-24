@@ -14,10 +14,10 @@ from cfg import Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
-from ._base_widgets import (RowArrowWidget, SelectableLabel, ULineEdit,
-                                   UMainWidget, UPushButton, VListWidget,
-                                   VListWidgetItem)
-from .win_warn import ConfirmWindow, WarningWindow
+
+from ._base_widgets import (ConfirmWindow, RowArrowWidget, SelectableLabel,
+                            ULineEdit, UMainWidget, UPushButton, VListWidget,
+                            VListWidgetItem, WarningWindow)
 
 
 def restart_app():
@@ -416,8 +416,7 @@ class FirstLoadWin(UMainWidget):
             show_warn(Lng.select_folder_path[self.lng_index], 285, 90)
             return
 
-        self.save_win = ConfirmWindow(Lng.save_text_long[self.lng_index])
-        self.save_win.setFixedSize(300, 90)
+        self.save_win = ConfirmWindow(Lng.save_text_long[self.lng_index], 300, 90)
         self.save_win.ok_clicked.connect(
             lambda: save_fin(folder_name, paths)
         )
