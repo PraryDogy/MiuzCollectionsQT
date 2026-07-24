@@ -52,12 +52,16 @@ class ULabel(QLabel):
 
 
 class ImgWid(ULabel):
-    m = 4
+    # чтобы рамка вокруг картинки была больше, но обрежется изображение
+    m = [4, 5, 7, 9]
 
     def __init__(self):
         super().__init__()
-        self.setContentsMargins(self.m, self.m, self.m, self.m)
         self.set_no_frame()
+
+    def set_margins(self):
+        m = self.m[Dynamic.thumb_size_index]
+        self.setContentsMargins(m, m, m, m)
 
     def set_frame(self):
         corner = self.corner_values[Dynamic.thumb_size_index]
@@ -205,6 +209,7 @@ class Thumb(QFrame):
         """Настройка миниатюры: текст, размеры, изображение."""
         self.white_text_wid.set_text()
         self.blue_text_wid.set_text()
+        self.img_wid.set_margins()
         self.setFixedSize(self.thumb_width, self.thumb_height)
 
         self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
