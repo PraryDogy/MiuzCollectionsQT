@@ -14,8 +14,8 @@ from system.main_folder import Mf
 from system.paletes import ThemeChanger
 from system.servers import Servers
 from system.tasks import UThreadPool
-from test_2 import FirstLoadWin
 from widgets._base_widgets import UMainWindow
+from widgets.win_first_load import FirstLoadWin
 from widgets.win_main import WinMain
 
 
