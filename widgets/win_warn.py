@@ -21,11 +21,10 @@ class NewSelectableLabel(SelectableLabel):
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
-    ww = 360
     icon_path = os.path.join(Static.internal_icons, "warning.svg")
     icon_size = 50
 
-    def __init__(self, text: str):
+    def __init__(self, text: str, w: int, h: int):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
@@ -69,6 +68,8 @@ class ConfirmWindow(UMainWidget):
         self.cancel_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        self.setFixedSize(w, h)
+
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
@@ -78,11 +79,6 @@ class ConfirmWindow(UMainWidget):
     
 
 class WarningWindow(ConfirmWindow):
-    def __init__(self, text):
-        super().__init__(text)
+    def __init__(self, text, w, h):
+        super().__init__(text, w, h)
         self.cancel_btn.hide()
-
-    def keyPressEvent(self, a0: QKeyEvent):
-        if a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
-            self.deleteLater()
-        return super().keyPressEvent(a0)
