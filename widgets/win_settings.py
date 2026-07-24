@@ -865,18 +865,18 @@ class MfSettings(QWidget, StateWid):
             Mf.write_json_data()
             restart_app()
 
-        def show_warn(text: str):
-            win_warn = WarningWindow(text)
-            win_warn.center_to_parent(self.window())
-            win_warn.show()
-
         stop_list = self.mf_stop_list.get_list()
         paths = []
         if self.path_widget.mf_temp_path:
             paths.append(self.path_widget.mf_temp_path)
 
         if not paths:
-            show_warn(Lng.select_folder_path[JsonData.lng_index])
+            win_warn = WarningWindow(
+                Lng.select_folder_path[JsonData.lng_index],
+                300, 90
+            )
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
             return
         
         super_win = SuperWarnWindow()
