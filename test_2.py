@@ -4,11 +4,11 @@ import shutil
 import sys
 from zipfile import ZipFile
 
-from PyQt6.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QMenu, QSizePolicy, QVBoxLayout, QWidget)
+                             QLabel, QMenu, QVBoxLayout, QWidget)
 
 from cfg import Static
 from system.lang import Lng
