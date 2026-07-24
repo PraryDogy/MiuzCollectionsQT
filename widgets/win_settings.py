@@ -31,10 +31,10 @@ from system.utils import Utils
 
 from ._base_widgets import (HSep, RowArrowWidget, ULineEdit, UMainWidget,
                             UMenu, UPushButton, UTextEdit, VListSpacerItem,
-                            VListWidget, VListWidgetItem)
+                            VListWidget, VListWidgetItem, WarningWindow)
 from .path_widget import PathWidget
 from .win_smb import SuperWarnWindow
-from .win_warn import ConfirmWindow, WarningWindow
+from .win_warn import ConfirmWindow
 
 
 def restart_app():
@@ -829,7 +829,8 @@ class MfSettings(QWidget, StateWid):
 
         if len(self.mf_list_clone) == 1:
             win = WarningWindow(
-                Lng.at_least_one_folder_required[JsonData.lng_index], 280, 90
+                Lng.at_least_one_folder_required[JsonData.lng_index],
+                280, 90
             )
             win.ok_clicked.connect(win.deleteLater)
         else:
