@@ -10,7 +10,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
                              QLabel, QMenu, QVBoxLayout, QWidget)
 
-from cfg import Static
+from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
@@ -366,6 +366,8 @@ class FirstLoadWin(UMainWidget):
     def copy_zip_cmd(self, path: str):
 
         def fin():
+            JsonData.lng_index = self.lng_index
+            JsonData.write_json_data()
             restart_app()
 
         self.copy_task = ZipTask(path)
@@ -392,6 +394,10 @@ class FirstLoadWin(UMainWidget):
             Mf.items.clear()
             Mf.items.append(mf)
             Mf.write_json_data()
+
+            JsonData.lng_index = self.lng_index
+            JsonData.write_json_data()
+
             restart_app()
 
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
