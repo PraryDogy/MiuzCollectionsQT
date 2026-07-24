@@ -237,20 +237,30 @@ class RebootSettings(SettingsGroup):
     cfg_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
+    rus_flag = os.path.join(Static.internal_icons, "rus_flag.svg")
+    eng_flag = os.path.join(Static.internal_icons, "eng_flag.svg")
 
     def __init__(self, cfg_data: CfgData):
         super().__init__()
         self.cfg_data = cfg_data
 
+        self.lng_icons = (
+            QIcon(self.rus_flag),
+            QIcon(self.eng_flag)
+        )
+
         lng_menu = UMenu(None)
         for value in (0, 1):
             action = QAction(Lng.russian[value], lng_menu)
+            action.setIcon(self.lng_icons[value])
+            action.setIconVisibleInMenu(True)
             action.triggered.connect(lambda e, v=value: self.lang_action_cmd(v))
             lng_menu.addAction(action)
 
         lng_wid = RowArrowWidget(Lng.language_max[JsonData.lng_index])
         self.layout_.addWidget(lng_wid)
         self.lng_btn = UPushButton(text=Lng.russian[JsonData.lng_index])
+        self.lng_btn.setIcon(self.lng_icons[JsonData.lng_index])
         self.lng_btn.setFixedWidth(100)
         self.lng_btn.setMenu(lng_menu)
         lng_wid.replace_arrow_widget(self.lng_btn)
@@ -314,6 +324,7 @@ class RebootSettings(SettingsGroup):
     def lang_action_cmd(self, value: int):
         self.cfg_data.lng_index = value
         self.lng_btn.setText(Lng.russian[value])
+        self.lng_btn.setIcon(self.lng_icons[value])
         self.cfg_changed.emit()
 
     def reset_btn_cmd(self, *args):
