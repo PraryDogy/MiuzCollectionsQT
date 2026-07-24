@@ -243,10 +243,11 @@ class FirstLoadWin(UMainWidget):
         self.setFixedHeight(self.height())
 
     def remove_ui(self):
-        self.lng_container.deleteLater()
-        self.mf_container.deleteLater()
-        self.path_widget.deleteLater()
-        self.last_block_container.deleteLater()
+        while self.central_layout.count():
+            item = self.central_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
 
     def init_ui(self):
         self.setWindowTitle(Lng.settings[self.lng_index])
