@@ -873,9 +873,10 @@ class MfSettings(QWidget, StateWid):
         if not paths:
             win_warn = WarningWindow(
                 Lng.select_folder_path[JsonData.lng_index],
-                300, 90
+                270, 80
             )
             win_warn.center_to_parent(self.window())
+            win_warn.ok_clicked.connect(win_warn.deleteLater)
             win_warn.show()
             return
         
