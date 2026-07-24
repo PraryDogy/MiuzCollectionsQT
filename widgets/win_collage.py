@@ -84,7 +84,6 @@ class WinCollage(UMainWidget):
             self.grid_layout.addWidget(label, row, col)
             self.image_labels.append(label)
 
-
     def increase_sharpness_pillow(self, pixmap: QPixmap, factor: float = 2.0) -> QPixmap:
         # 1. Конвертируем QPixmap в PIL Image через QBuffer
         buffer = QBuffer()
@@ -105,7 +104,6 @@ class WinCollage(UMainWidget):
         new_pixmap = QPixmap()
         new_pixmap.loadFromData(output_buffer.getvalue())
         return new_pixmap
-
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
