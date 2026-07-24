@@ -3,7 +3,7 @@ import os
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QLabel
+from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -23,6 +23,7 @@ class ConfirmWindow(UMainWidget):
     cancel_clicked = pyqtSignal()
     ww = 360
     icon_path = os.path.join(Static.internal_icons, "warning.svg")
+    icon_size = 50
 
     def __init__(self, text: str):
         super().__init__()
@@ -32,14 +33,16 @@ class ConfirmWindow(UMainWidget):
         self.setMaximumWidth(360)
         self.setMinimumWidth(280)
 
-        text_layout = QHBoxLayout()
+        text_container = QWidget()
+        self.central_layout.addWidget(text_container)
+
+        text_layout = QHBoxLayout(text_container)
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(15)
-        self.central_layout.addLayout(text_layout)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(self.icon_path)
-        self.svg_widget.setFixedSize(50, 50)
+        self.svg_widget.setFixedSize(self.icon_size, self.icon_size)
         text_layout.addWidget(self.svg_widget)
 
         self.text_wid = NewSelectableLabel(text)

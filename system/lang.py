@@ -536,3 +536,20 @@ class Lng:
         "Коллаж",
         "Collage"
     )
+
+    app_lang = (
+        "Язык приложения",
+        "Application language"
+    )
+    lang = (
+        "Язык",
+        "Language"
+    )
+    rus = (
+        "Русский",
+        "Russian"
+    )
+    eng = (
+        "Английский",
+        "English"
+    )

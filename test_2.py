@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
@@ -8,58 +9,14 @@ from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
                              QLabel, QMenu, QSizePolicy, QVBoxLayout, QWidget)
 
 from cfg import Static
+from system.lang import Lng
 from widgets._base_widgets import (RowArrowWidget, SelectableLabel, ULineEdit,
                                    UMainWidget, UPushButton)
-from widgets.win_warn import WarningWindow
+from widgets.win_warn import ConfirmWindow, WarningWindow
 
 
-class Lng:
-    app_lang = (
-        "Язык приложения",
-        "Application language"
-    )
-    lang = (
-        "Язык",
-        "Language"
-    )
-    rus = (
-        "Русский",
-        "Russian"
-    )
-    eng = (
-        "Английский",
-        "English"
-    )
-    folder_name = (
-        "Имя:\n"
-        "• уникальное\n"
-        "• 5-30 символов\n"
-        "• русские и английские буквы, цифры и пробелы",
-        "Folder name:\n"
-        "• unique\n"
-        "• up to 5-30 characters\n"
-        "• Russian and English letters, digits, and spaces",
-    )
-    alias_immutable = (
-        "Имя (нельзя изменить после сохранения)",
-        "Name (cannot be changed after saving)"
-    )
-    settings = (
-        "Настройка",
-        "Setup"
-    )
-    folder_path = (
-        "Путь к каталогу",
-        "Catalog path"
-    )
-    path_hint_texts = (
-        "Перетащите каталог сюда или нажмите для выбора",
-        "Drag and drop a catalog here or click to browse"
-    )
-    bad_smb = (
-        "Путь к каталогу изображений указан неверно.",
-        "The image directory path is incorrect."
-    )
+class NewWarningWindow(WarningWindow):
+    ...
 
 
 class PathWidget(QGroupBox):
@@ -176,12 +133,14 @@ class FirstLoadWin(UMainWidget):
         self.lng_container.deleteLater()
         self.mf_container.deleteLater()
         self.path_widget.deleteLater()
+        self.last_block_container.deleteLater()
 
     def init_ui(self):
         self.setWindowTitle(Lng.settings[self.lng_index])
         self.init_lang_widget()
         self.init_mf_alias_widget()
         self.init_path_widget()
+        self.init_last_block()
 
     def lng_action(self, value: int):
         if self.lng_index == value:
@@ -261,6 +220,62 @@ class FirstLoadWin(UMainWidget):
         self.path_widget.mf_path_avaiable.connect(mf_avaiable)
         self.central_layout.addWidget(self.path_widget)
 
+    def init_last_block(self):
+        self.last_block_container = QGroupBox()
+        self.central_layout.addWidget(self.last_block_container)
+
+        last_block_layout = QVBoxLayout(self.last_block_container)
+        last_block_layout.setContentsMargins(2, 0, 2, 0)
+        last_block_layout.setSpacing(0)
+
+        self.backup_widget = RowArrowWidget("Бекап")
+        last_block_layout.addWidget(self.backup_widget)
+
+        save_widget = RowArrowWidget(Lng.save[self.lng_index])
+        save_widget.hide_sep()
+        save_widget.clicked.connect(self.save_cmd)
+        last_block_layout.addWidget(save_widget)
+
+    def save_cmd(self, *args):
+
+        def show_warn(text: str, height: int):
+            win_warn = WarningWindow(text)
+            win_warn.center_to_parent(self.window())
+            win_warn.setFixedHeight(height)
+            win_warn.adjustSize()
+            win_warn.show()
+
+        def save_fin():
+            ...
+
+        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
+        folder_name = self.name_line_edit.text()
+        paths = []
+        if self.path_widget.current_path:
+            paths.append(self.path_widget.current_path)
+
+        if not folder_name:
+            show_warn(Lng.enter_alias_warning[self.lng_index], 90)
+            return
+
+        elif len(folder_name) < 5 or len(folder_name) > 30:
+            show_warn(f'{Lng.string_limit[self.lng_index]}')
+            return
+
+        elif not re.fullmatch(pattern, folder_name):
+            show_warn(f'{Lng.valid_message[self.lng_index]}')
+            return
+
+        elif not paths:
+            show_warn(Lng.select_folder_path[self.lng_index])
+            return
+
+        win = ConfirmWindow(Lng.save_text_long[self.lng_index])
+        # win.ok_clicked.connect(
+        #     lambda: save_fin()
+        # )
+        win.center_to_parent(self.window())
+        win.show()
 
 app = QApplication(sys.argv)
 win = FirstLoadWin()
