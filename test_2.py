@@ -22,8 +22,15 @@ def restart_app():
     QApplication.exit(0)
 
 
+class CustomItem(VListWidgetItem):
+    def __init__(self, parent, path, height = 30, text = None):
+        super().__init__(parent, height, text)
+        self.path: str = path
+
+
 class LoadSettingsWin(UMainWidget):
     preload = Static.internal_files
+    ok_pressed = pyqtSignal(str)
 
     def __init__(self, lng_index: int):
         super().__init__()
@@ -45,8 +52,10 @@ class LoadSettingsWin(UMainWidget):
         list_layout.addWidget(self.list_widget)
 
         for i in self.backups:
-            item = VListWidgetItem(self.list_widget, text=i.name)
+            item = CustomItem(self.list_widget, path=i.path,text=i.name)
             self.list_widget.addItem(item)
+
+        self.list_widget.setCurrentRow(0)
 
         btn_container = QWidget()
         self.central_layout.addWidget(btn_container)
@@ -57,6 +66,7 @@ class LoadSettingsWin(UMainWidget):
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         ok_btn = UPushButton(Lng.ok[self.lng_index])
+        ok_btn.clicked.connect(self.ok_pressed_cmd)
         btn_layout.addWidget(ok_btn)
 
         cancel_btn = UPushButton(Lng.cancel[self.lng_index])
@@ -64,6 +74,11 @@ class LoadSettingsWin(UMainWidget):
         btn_layout.addWidget(cancel_btn)
 
         self.adjustSize()
+
+    def ok_pressed_cmd(self):
+        selected_item: CustomItem = self.list_widget.currentItem()
+        path = selected_item.path
+        self.ok_pressed.emit(path)
 
     def load_backups(self):
         backups: list[os.DirEntry] = []
