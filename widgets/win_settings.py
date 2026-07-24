@@ -29,12 +29,12 @@ from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (HSep, RowArrowWidget, ULineEdit, UMainWidget,
-                            UMenu, UPushButton, UTextEdit, VListSpacerItem,
-                            VListWidget, VListWidgetItem, WarningWindow)
+from ._base_widgets import (ConfirmWindow, HSep, RowArrowWidget, ULineEdit,
+                            UMainWidget, UMenu, UPushButton, UTextEdit,
+                            VListSpacerItem, VListWidget, VListWidgetItem,
+                            WarningWindow)
 from .path_widget import PathWidget
 from .win_smb import SuperWarnWindow
-from .win_warn import ConfirmWindow
 
 
 def restart_app():
@@ -978,8 +978,9 @@ class NewFolder(QWidget, StateWid):
 
     def save_start(self, *args):
 
-        def show_warn(text: str):
-            win_warn = WarningWindow(text)
+        def show_warn(text: str, w, h):
+            win_warn = WarningWindow(text, w, h)
+            win_warn.ok_clicked.connect(win_warn.deleteLater)
             win_warn.center_to_parent(self.window())
             win_warn.show()
 
@@ -991,25 +992,23 @@ class NewFolder(QWidget, StateWid):
             paths.append(self.path_widget.mf_temp_path)
 
         if not folder_name:
-            show_warn(Lng.enter_alias_warning[JsonData.lng_index])
+            show_warn(Lng.enter_alias_warning[JsonData.lng_index], 280, 85)
             return
 
         elif any(i.mf_alias == folder_name for i in self.mf_list_clone):
-            show_warn(
-                f'{Lng.already_taken[JsonData.lng_index]}'
-            )
+            show_warn(f'{Lng.already_taken[JsonData.lng_index]}', 290, 90)
             return
 
         elif len(folder_name) < 5 or len(folder_name) > 30:
-            show_warn(f'{Lng.string_limit[JsonData.lng_index]}')
+            show_warn(f'{Lng.string_limit[JsonData.lng_index]}', 280, 90)
             return
 
         elif not re.fullmatch(pattern, folder_name):
-            show_warn(f'{Lng.valid_message[JsonData.lng_index]}')
+            show_warn(f'{Lng.valid_message[JsonData.lng_index]}', 290, 90)
             return
 
         elif not paths:
-            show_warn(Lng.select_folder_path[JsonData.lng_index])
+            show_warn(Lng.select_folder_path[JsonData.lng_index], 280, 85)
             return
 
         win = ConfirmWindow(Lng.save_text_long[JsonData.lng_index])
