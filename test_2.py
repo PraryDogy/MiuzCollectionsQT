@@ -98,13 +98,13 @@ class LoadSettingsWin(UMainWidget):
         btn_layout.setSpacing(10)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        ok_btn = UPushButton(Lng.ok[self.lng_index])
-        ok_btn.clicked.connect(self.ok_pressed_cmd)
-        btn_layout.addWidget(ok_btn)
+        self.ok_btn = UPushButton(Lng.ok[self.lng_index])
+        self.ok_btn.clicked.connect(self.ok_pressed_cmd)
+        btn_layout.addWidget(self.ok_btn)
 
-        cancel_btn = UPushButton(Lng.cancel[self.lng_index])
-        cancel_btn.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(cancel_btn)
+        self.cancel_btn = UPushButton(Lng.cancel[self.lng_index])
+        self.cancel_btn.clicked.connect(self.deleteLater)
+        btn_layout.addWidget(self.cancel_btn)
 
         self.adjustSize()
 
@@ -259,8 +259,8 @@ class FirstLoadWin(UMainWidget):
     def lng_action(self, value: int):
         if self.lng_index == value:
             return
-        self.lng_index = value
         self.remove_ui()
+        self.lng_index = value
         self.init_ui()
 
     def init_lang_widget(self):
@@ -350,10 +350,10 @@ class FirstLoadWin(UMainWidget):
         )
         last_block_layout.addWidget(self.backup_widget)
 
-        save_widget = RowArrowWidget(Lng.save[self.lng_index])
-        save_widget.hide_sep()
-        save_widget.clicked.connect(self.save_cmd)
-        last_block_layout.addWidget(save_widget)
+        self.save_widget = RowArrowWidget(Lng.save[self.lng_index])
+        self.save_widget.hide_sep()
+        self.save_widget.clicked.connect(lambda: self.save_cmd())
+        last_block_layout.addWidget(self.save_widget)
 
     def open_load_settings_win(self):
         self.load_settings_win = LoadSettingsWin(self.lng_index)
