@@ -63,7 +63,7 @@ class Lng:
 
 
 class PathWidget(QGroupBox):
-    mf_path_avaiable = pyqtSignal()
+    mf_path_avaiable = pyqtSignal(str)
     magnifier = os.path.join(Static.internal_icons, "magnifier.svg")
     green_checkmark = os.path.join(Static.internal_icons, "green_checkmark.svg")
     hh = 70
@@ -140,7 +140,7 @@ class PathWidget(QGroupBox):
         url = dialog.getExistingDirectory()
         if url and os.path.isdir(url):
             self.current_path = url.rstrip(os.sep)
-            self.mf_path_avaiable.emit()
+            self.mf_path_avaiable.emit(self.current_path)
             self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
         
@@ -149,7 +149,7 @@ class PathWidget(QGroupBox):
             url = a0.mimeData().urls()[0].toLocalFile()
             if url and os.path.isdir(url):
                 self.current_path = url.rstrip(os.sep)
-                self.mf_path_avaiable.emit()
+                self.mf_path_avaiable.emit(self.current_path)
                 self.ok_path_widget()
         return super().dropEvent(a0)
     
@@ -251,7 +251,14 @@ class FirstLoadWin(UMainWidget):
         mf_layout.addWidget(self.name_line_edit)
 
     def init_path_widget(self):
+
+        def mf_avaiable(path: str):
+            dir_name = os.path.basename(path)
+            if not self.name_line_edit.text():
+                self.name_line_edit.setText(dir_name)
+
         self.path_widget = PathWidget(self.lng_index)
+        self.path_widget.mf_path_avaiable.connect(mf_avaiable)
         self.central_layout.addWidget(self.path_widget)
 
 
