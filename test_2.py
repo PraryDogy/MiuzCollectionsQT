@@ -15,10 +15,6 @@ from widgets._base_widgets import (RowArrowWidget, SelectableLabel, ULineEdit,
 from widgets.win_warn import ConfirmWindow, WarningWindow
 
 
-class NewWarningWindow(WarningWindow):
-    ...
-
-
 class PathWidget(QGroupBox):
     mf_path_avaiable = pyqtSignal(str)
     magnifier = os.path.join(Static.internal_icons, "magnifier.svg")
@@ -238,11 +234,10 @@ class FirstLoadWin(UMainWidget):
 
     def save_cmd(self, *args):
 
-        def show_warn(text: str, height: int):
+        def show_warn(text: str, w, h):
             win_warn = WarningWindow(text)
+            win_warn.setFixedSize(w, h)
             win_warn.center_to_parent(self.window())
-            win_warn.setFixedHeight(height)
-            win_warn.adjustSize()
             win_warn.show()
 
         def save_fin():
@@ -255,7 +250,7 @@ class FirstLoadWin(UMainWidget):
             paths.append(self.path_widget.current_path)
 
         if not folder_name:
-            show_warn(Lng.enter_alias_warning[self.lng_index], 90)
+            show_warn(Lng.enter_alias_warning[self.lng_index], 260, 90)
             return
 
         elif len(folder_name) < 5 or len(folder_name) > 30:
