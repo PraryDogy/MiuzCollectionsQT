@@ -352,7 +352,9 @@ class FirstLoadWin(UMainWidget):
 
         self.save_widget = RowArrowWidget(Lng.save[self.lng_index])
         self.save_widget.hide_sep()
-        self.save_widget.clicked.connect(lambda: self.save_cmd())
+        self.save_widget.clicked.connect(
+            lambda: self.save_cmd()
+        )
         last_block_layout.addWidget(self.save_widget)
 
     def open_load_settings_win(self):
@@ -372,7 +374,7 @@ class FirstLoadWin(UMainWidget):
         self.hide()
         UThreadPool.start(self.copy_task)
 
-    def save_cmd(self, *args):
+    def save_cmd(self):
 
         def show_warn(text: str, w, h):
             win_warn = WarningWindow(text)
@@ -414,10 +416,10 @@ class FirstLoadWin(UMainWidget):
             show_warn(Lng.select_folder_path[self.lng_index], 285, 90)
             return
 
-        win = ConfirmWindow(Lng.save_text_long[self.lng_index])
-        win.setFixedSize(300, 90)
-        win.ok_clicked.connect(
+        self.save_win = ConfirmWindow(Lng.save_text_long[self.lng_index])
+        self.save_win.setFixedSize(300, 90)
+        self.save_win.ok_clicked.connect(
             lambda: save_fin(folder_name, paths)
         )
-        win.center_to_parent(self.window())
-        win.show()
+        self.save_win.center_to_parent(self.window())
+        self.save_win.show()

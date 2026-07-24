@@ -81,8 +81,6 @@ class WarningWindow(ConfirmWindow):
     def __init__(self, text):
         super().__init__(text)
         self.cancel_btn.hide()
-        self.ok_btn.disconnect()
-        self.ok_btn.clicked.connect(self.deleteLater)
 
     def keyPressEvent(self, a0: QKeyEvent):
         if a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
