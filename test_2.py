@@ -1,8 +1,10 @@
 import os
 import re
+import shutil
 import sys
+from zipfile import ZipFile
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QObject, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
@@ -11,6 +13,7 @@ from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
 from cfg import Static
 from system.lang import Lng
 from system.main_folder import Mf
+from system.tasks import URunnable, UThreadPool
 from widgets._base_widgets import (RowArrowWidget, SelectableLabel, ULineEdit,
                                    UMainWidget, UPushButton, VListWidget,
                                    VListWidgetItem)
@@ -22,6 +25,36 @@ def restart_app():
     QApplication.exit(0)
 
 
+class ZipTask(URunnable):
+
+    class Sigs(QObject):
+        error = pyqtSignal()
+        finished = pyqtSignal()
+
+    def __init__(self, zip_path: str):
+        super().__init__()
+        self.sigs = self.Sigs()
+        self.zip_path: str = zip_path
+
+    def task(self):
+        try:
+            shutil.rmtree(Static.external_dir)
+        except Exception as e:
+            self.sigs.error.emit()
+            return
+        os.makedirs(Static.external_dir, exist_ok=True)
+        dest = shutil.copy(self.zip_path, Static.external_dir)
+
+        with ZipFile(dest, "r") as zip_ref:
+            zip_ref.extractall(Static.external_dir)
+
+        try:
+            os.remove(dest)
+        except Exception as e:
+            print("ZipTask remove zip file error", e)
+            
+        self.sigs.finished.emit()
+    
 class CustomItem(VListWidgetItem):
     def __init__(self, parent, path, height = 30, text = None):
         super().__init__(parent, height, text)
@@ -199,6 +232,7 @@ class FirstLoadWin(UMainWidget):
         self.resize(500, 500)
         self.set_always_on_top()
         self.set_close_only()
+        UThreadPool.init()
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(10)
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -319,7 +353,12 @@ class FirstLoadWin(UMainWidget):
     def open_load_settings_win(self):
         self.load_settings_win = LoadSettingsWin(self.lng_index)
         self.load_settings_win.center_to_parent(self)
+        self.load_settings_win.ok_pressed.connect(self.copy_zip_cmd)
         self.load_settings_win.show()
+
+    def copy_zip_cmd(self, path: str):
+        self.copy_task = ZipTask(path)
+        UThreadPool.start(self.copy_task)
 
     def save_cmd(self, *args):
 

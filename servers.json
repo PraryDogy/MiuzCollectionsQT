@@ -1,0 +1,14 @@
+[
+    [
+        "Studio",
+        "smb://192.168.10.121/shares",
+        "Loshkarev@mjf.lan",
+        "GWdomy863"
+    ],
+    [
+        "Marketing",
+        "smb://192.168.10.105/Shares",
+        "Loshkarev@mjf.lan",
+        "GWdomy863"
+    ]
+]

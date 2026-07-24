@@ -1,0 +1,22 @@
+[
+    {
+        "mf_alias": "miuz",
+        "mf_paths": [
+            "/Volumes/shares/Studio/MIUZ/Photo/Art/Ready"
+        ],
+        "mf_stop_list": [
+            "_Archive_Commerce_Брендинг",
+            "Chosed",
+            "LEVIEV"
+        ],
+        "mf_current_path": "/Volumes/shares/Studio/MIUZ/Photo/Art/Ready"
+    },
+    {
+        "mf_alias": "panacea",
+        "mf_paths": [
+            "/Volumes/shares/Studio/PANACEA/Photo/Art/Ready"
+        ],
+        "mf_stop_list": [],
+        "mf_current_path": "/Volumes/shares/Studio/PANACEA/Photo/Art/Ready"
+    }
+]

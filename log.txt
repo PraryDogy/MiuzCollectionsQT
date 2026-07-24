@@ -1,0 +1,170 @@
+===========
+03/06/2026, 11:40:58
+Mf: Test mf, /Users/Loshkarev/Desktop/NEURO
+Удаление директорий:
+finder dirs: 1
+removed dirs: 3
+
+Список finder dirs (абсолютный путь, относительный путь)
+/Users/Loshkarev/Desktop/NEURO, /
+
+Список removed dirs (абсолютный путь, относительный путь)
+/Users/Loshkarev/Desktop/NEURO/One, /One
+/Users/Loshkarev/Desktop/NEURO/Two, /Two
+/Users/Loshkarev/Desktop/NEURO/sdfsdf, /sdfsdf
+===========
+
+
+===========
+10/06/2026, 12:32:19
+Mf: panacea, /Volumes/shares/Studio/PANACEA/Photo/Art/Ready
+Удаление директорий:
+finder dirs: 137
+removed dirs: 3
+
+Список finder dirs (абсолютный путь, относительный путь)
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection, /0 No collection
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/1 Site, /1 Site
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/2 Shops, /2 Shops
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/3 Web Model, /3 Web Model
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/3 Web Model/2 Model IMG, /3 Web Model/2 Model IMG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/3 Web Model/ВБ ПОСЛОЙНИКИ, /3 Web Model/ВБ ПОСЛОЙНИКИ
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/3 Web Model/ВБ ПОСЛОЙНИКИ/TIFF, /3 Web Model/ВБ ПОСЛОЙНИКИ/TIFF
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/3 Web Model/2 Model IMG/PSD, /3 Web Model/2 Model IMG/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/2 Shops/1 IMG, /2 Shops/1 IMG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/1 Site/2 Model IMG, /1 Site/2 Model IMG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG, /0 No collection/2 Model IMG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other, /0 No collection/3 Other
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG, /0 No collection/1 IMG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/бабл оранж, /0 No collection/1 IMG/бабл оранж
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/без лого для Алины, /0 No collection/1 IMG/без лого для Алины
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/пнг коллаж, /0 No collection/1 IMG/пнг коллаж
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/акция, /0 No collection/1 IMG/акция
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/ресайзы, /0 No collection/1 IMG/ресайзы
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/кольца, /0 No collection/1 IMG/кольца
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/овощебаза, /0 No collection/1 IMG/овощебаза
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/генерации кулоны, /0 No collection/1 IMG/генерации кулоны
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/лапочка кулоны, /0 No collection/1 IMG/лапочка кулоны
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Уроки стиля, /0 No collection/1 IMG/Уроки стиля
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/лиса с куполом С для сайта, /0 No collection/1 IMG/лиса с куполом С для сайта
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/расш для акции, /0 No collection/1 IMG/расш для акции
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/серия 07.10.25, /0 No collection/1 IMG/серия 07.10.25
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/фото из магазина, /0 No collection/1 IMG/фото из магазина
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/PNG пост коллаж, /0 No collection/1 IMG/PNG пост коллаж
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/картонки, /0 No collection/1 IMG/картонки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/лиса селфи генерации, /0 No collection/1 IMG/лиса селфи генерации
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/доминошки, /0 No collection/1 IMG/доминошки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/valentines, /0 No collection/1 IMG/valentines
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/иллюстрации, /0 No collection/1 IMG/иллюстрации
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Ретушь реп чесс, /0 No collection/1 IMG/Ретушь реп чесс
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Ретушь Pasta Queen, /0 No collection/1 IMG/Ретушь Pasta Queen
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/пост на 13.04, /0 No collection/1 IMG/пост на 13.04
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/пост на 13.04/PSD, /0 No collection/1 IMG/пост на 13.04/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/пост на 13.04/JPEG, /0 No collection/1 IMG/пост на 13.04/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Ретушь Pasta Queen/JPEG, /0 No collection/1 IMG/Ретушь Pasta Queen/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Ретушь Pasta Queen/для пасты квин, /0 No collection/1 IMG/Ретушь Pasta Queen/для пасты квин
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Ретушь Pasta Queen/для пасты квин/JPEG, /0 No collection/1 IMG/Ретушь Pasta Queen/для пасты квин/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Ретушь реп чесс/JPEG, /0 No collection/1 IMG/Ретушь реп чесс/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/иллюстрации/PSD, /0 No collection/1 IMG/иллюстрации/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/иллюстрации/JPEG, /0 No collection/1 IMG/иллюстрации/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/valentines/PSD, /0 No collection/1 IMG/valentines/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/valentines/JPEG, /0 No collection/1 IMG/valentines/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/доминошки/PSD, /0 No collection/1 IMG/доминошки/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/доминошки/JPEG, /0 No collection/1 IMG/доминошки/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/лиса селфи генерации/с украшениями, /0 No collection/1 IMG/лиса селфи генерации/с украшениями
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/лиса селфи генерации/JPEG, /0 No collection/1 IMG/лиса селфи генерации/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/лиса селфи генерации/с украшениями/PSD, /0 No collection/1 IMG/лиса селфи генерации/с украшениями/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/лиса селфи генерации/с украшениями/JPEG, /0 No collection/1 IMG/лиса селфи генерации/с украшениями/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/картонки/PSD, /0 No collection/1 IMG/картонки/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/картонки/JPEG, /0 No collection/1 IMG/картонки/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/фото из магазина/PSD, /0 No collection/1 IMG/фото из магазина/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/фото из магазина/JPEG, /0 No collection/1 IMG/фото из магазина/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/серия 07.10.25/PSD, /0 No collection/1 IMG/серия 07.10.25/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/серия 07.10.25/JPEG, /0 No collection/1 IMG/серия 07.10.25/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Уроки стиля/JPEG, /0 No collection/1 IMG/Уроки стиля/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/Уроки стиля/TIFF, /0 No collection/1 IMG/Уроки стиля/TIFF
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/овощебаза/PSD, /0 No collection/1 IMG/овощебаза/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/овощебаза/JPEG, /0 No collection/1 IMG/овощебаза/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/ресайзы/680х300, /0 No collection/1 IMG/ресайзы/680х300
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/ресайзы/1210х300, /0 No collection/1 IMG/ресайзы/1210х300
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/ресайзы/680х300/JPEG, /0 No collection/1 IMG/ресайзы/680х300/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/пнг коллаж/без обрезки и размытия, /0 No collection/1 IMG/пнг коллаж/без обрезки и размытия
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/бабл оранж/БАБЛ правки, /0 No collection/1 IMG/бабл оранж/БАБЛ правки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/1 IMG/бабл оранж/БАБЛ правки/красные, /0 No collection/1 IMG/бабл оранж/БАБЛ правки/красные
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/мешочки, /0 No collection/3 Other/мешочки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/коробочки, /0 No collection/3 Other/коробочки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/пакет, /0 No collection/3 Other/пакет
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/пакет с лисичкой, /0 No collection/3 Other/пакет с лисичкой
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/подарки, /0 No collection/3 Other/подарки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/пакет лиса с украшениями, /0 No collection/3 Other/пакет лиса с украшениями
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ, /0 No collection/3 Other/ГЕНЕРАЦИИ
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ/вб, /0 No collection/3 Other/ГЕНЕРАЦИИ/вб
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ/генерации муж без фона, /0 No collection/3 Other/ГЕНЕРАЦИИ/генерации муж без фона
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ/генерации мужские, /0 No collection/3 Other/ГЕНЕРАЦИИ/генерации мужские
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ/генерации руки, /0 No collection/3 Other/ГЕНЕРАЦИИ/генерации руки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ/вб/Model Base, /0 No collection/3 Other/ГЕНЕРАЦИИ/вб/Model Base
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ/вб/Model Base/Done, /0 No collection/3 Other/ГЕНЕРАЦИИ/вб/Model Base/Done
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/3 Other/ГЕНЕРАЦИИ/вб/Model Base/Done WEB, /0 No collection/3 Other/ГЕНЕРАЦИИ/вб/Model Base/Done WEB
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/0951, /0 No collection/2 Model IMG/0951
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025, /0 No collection/2 Model IMG/Съемка 2025
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/генерации производство, /0 No collection/2 Model IMG/генерации производство
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/генерация лиса с гранями , /0 No collection/2 Model IMG/генерация лиса с гранями 
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ, /0 No collection/2 Model IMG/Съемка НГ
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all, /0 No collection/2 Model IMG/Съемка НГ_all
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026, /0 No collection/2 Model IMG/Съемка 05.03.2026
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 18.03 модель, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 18.03 модель
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 05.04, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 05.04
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/Для рассылки, /0 No collection/2 Model IMG/Съемка 05.03.2026/Для рассылки
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/на 03.05 модель кепка, /0 No collection/2 Model IMG/Съемка 05.03.2026/на 03.05 модель кепка
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 21.04 модель пиджак очки , /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 21.04 модель пиджак очки 
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 21.04 модель пиджак очки /PSD, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 21.04 модель пиджак очки /PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 21.04 модель пиджак очки /JPEG, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 21.04 модель пиджак очки /JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/на 03.05 модель кепка/PSD, /0 No collection/2 Model IMG/Съемка 05.03.2026/на 03.05 модель кепка/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/на 03.05 модель кепка/JPEG, /0 No collection/2 Model IMG/Съемка 05.03.2026/на 03.05 модель кепка/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 05.04/PSD, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 05.04/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 05.04/JPEG, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 05.04/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 18.03 модель/PSD, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 18.03 модель/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 18.03 модель/JPEG, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 18.03 модель/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/продукт нг, /0 No collection/2 Model IMG/Съемка НГ_all/продукт нг
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/женская модель , /0 No collection/2 Model IMG/Съемка НГ_all/женская модель 
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/правки нг, /0 No collection/2 Model IMG/Съемка НГ_all/правки нг
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/пнг герои нг, /0 No collection/2 Model IMG/Съемка НГ_all/пнг герои нг
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/мужская модель, /0 No collection/2 Model IMG/Съемка НГ_all/мужская модель
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/мужская модель/JPEG, /0 No collection/2 Model IMG/Съемка НГ_all/мужская модель/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/мужская модель/TIFF, /0 No collection/2 Model IMG/Съемка НГ_all/мужская модель/TIFF
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/женская модель /JPEG, /0 No collection/2 Model IMG/Съемка НГ_all/женская модель /JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/женская модель /TIFF, /0 No collection/2 Model IMG/Съемка НГ_all/женская модель /TIFF
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/продукт нг/PNG, /0 No collection/2 Model IMG/Съемка НГ_all/продукт нг/PNG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/продукт нг/JPEG, /0 No collection/2 Model IMG/Съемка НГ_all/продукт нг/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ_all/продукт нг/TIFF, /0 No collection/2 Model IMG/Съемка НГ_all/продукт нг/TIFF
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/пнг герои нг, /0 No collection/2 Model IMG/Съемка НГ/пнг герои нг
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/продукт нг, /0 No collection/2 Model IMG/Съемка НГ/продукт нг
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Мужская модель JPEG, /0 No collection/2 Model IMG/Съемка НГ/Мужская модель JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/продукт нг/PNG, /0 No collection/2 Model IMG/Съемка НГ/продукт нг/PNG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/продукт нг/JPEG, /0 No collection/2 Model IMG/Съемка НГ/продукт нг/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/продукт нг/TIFF, /0 No collection/2 Model IMG/Съемка НГ/продукт нг/TIFF
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Василиса Премудрая, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Василиса Премудрая
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Забава, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Забава
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Царевна Несмеяна, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Царевна Несмеяна
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Баба Яга, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Баба Яга
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Жар-птица, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Жар-птица
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Русалочка, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Русалочка
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Снегурочка, /0 No collection/2 Model IMG/Съемка НГ/Женская модель JPEG/Снегурочка
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/генерация лиса с гранями /PNG пост коллаж, /0 No collection/2 Model IMG/генерация лиса с гранями /PNG пост коллаж
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки , /0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки 
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /цвет, /0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /цвет
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /чб, /0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /чб
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /чб/PSD, /0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /чб/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /чб/JPEG, /0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /чб/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /цвет/PSD, /0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /цвет/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /цвет/JPEG, /0 No collection/2 Model IMG/Съемка 2025/дарк фэшн руки /цвет/JPEG
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready, /
+
+Список removed dirs (абсолютный путь, относительный путь)
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 13.04, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 13.04
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 13.04/PSD, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 13.04/PSD
+/Volumes/shares/Studio/PANACEA/Photo/Art/Ready/0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 13.04/JPEG, /0 No collection/2 Model IMG/Съемка 05.03.2026/пост на 13.04/JPEG
+===========
+
+
