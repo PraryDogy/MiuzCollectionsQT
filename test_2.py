@@ -254,11 +254,11 @@ class FirstLoadWin(UMainWidget):
             return
 
         elif len(folder_name) < 5 or len(folder_name) > 30:
-            show_warn(f'{Lng.string_limit[self.lng_index]}')
+            show_warn(f'{Lng.string_limit[self.lng_index]}', 280, 90)
             return
 
         elif not re.fullmatch(pattern, folder_name):
-            show_warn(f'{Lng.valid_message[self.lng_index]}')
+            show_warn(f'{Lng.valid_message[self.lng_index]}', 310, 90)
             return
 
         elif not paths:
