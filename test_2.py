@@ -229,16 +229,18 @@ class FirstLoadWin(UMainWidget):
 
     def __init__(self):
         super().__init__()
-        self.resize(500, 500)
+        self.setFixedWidth(420)
         self.set_always_on_top()
         self.set_close_only()
         UThreadPool.init()
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setContentsMargins(5, 7, 5, 10)
         self.central_layout.setSpacing(10)
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.lng_index = 0
         self.margins = 3
         self.init_ui()
+        self.adjustSize()
+        self.setFixedHeight(self.height())
 
     def remove_ui(self):
         self.lng_container.deleteLater()
@@ -278,7 +280,7 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.lng_container)
         
         lng_layout = QHBoxLayout(self.lng_container)
-        lng_layout.setContentsMargins(2, 2, 2, 2)
+        lng_layout.setContentsMargins(5, 7, 5, 0)
         lng_layout.setSpacing(0)
 
         lng_label = QLabel(lng_label_text)
@@ -305,12 +307,14 @@ class FirstLoadWin(UMainWidget):
         eng_action.triggered.connect(lambda e, val=1: self.lng_action(val))
         lng_menu.addAction(eng_action)
 
+        self.lng_container.adjustSize()
+
     def init_mf_alias_widget(self):
         self.mf_container = QGroupBox()
         self.central_layout.addWidget(self.mf_container)
 
         mf_layout = QVBoxLayout(self.mf_container)
-        mf_layout.setContentsMargins(2, 2, 2, 2)
+        mf_layout.setContentsMargins(5, 2, 5, 2)
         mf_layout.setSpacing(5)
 
         name_text = QLabel(Lng.folder_name[self.lng_index])
@@ -336,7 +340,7 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.last_block_container)
 
         last_block_layout = QVBoxLayout(self.last_block_container)
-        last_block_layout.setContentsMargins(2, 0, 2, 0)
+        last_block_layout.setContentsMargins(5, 0, 5, 0)
         last_block_layout.setSpacing(0)
 
         self.backup_widget = RowArrowWidget(Lng.load_settings[self.lng_index])
@@ -406,7 +410,7 @@ class FirstLoadWin(UMainWidget):
             return
 
         elif not paths:
-            show_warn(Lng.select_folder_path[self.lng_index])
+            show_warn(Lng.select_folder_path[self.lng_index], 285, 90)
             return
 
         win = ConfirmWindow(Lng.save_text_long[self.lng_index])
