@@ -31,7 +31,7 @@ class Static:
     internal_icons = "./images"
 
     max_thumb_size = 210
-    pixmap_sizes = [50, 70, 100, 170]
+    pixmap_sizes = [50, 70, 100, 190]
 
     apps = [
         "preview",

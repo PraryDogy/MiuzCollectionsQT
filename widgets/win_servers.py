@@ -14,7 +14,7 @@ from system.servers import Servers
 
 from ._base_widgets import (ULineEdit, UMainWidget, UMenu, UPushButton,
                             VListWidget, VListWidgetItem)
-from .win_warn import ConfirmWindow
+from ._base_widgets import ConfirmWindow
 
 
 @dataclass(slots=True)
@@ -56,7 +56,9 @@ class ServerList(VListWidget):
         super().__init__(parent)
 
     def remove_cmd(self, server_item: ServerItem):
-        self.win_warn = ConfirmWindow(Lng.confirm_delete[JsonData.lng_index])
+        self.win_warn = ConfirmWindow(
+            Lng.confirm_delete[JsonData.lng_index], 300, 90
+        )
         self.win_warn.ok_clicked.connect(
             lambda: self.remove_server.emit(server_item)
         )
