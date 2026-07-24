@@ -266,9 +266,7 @@ class FirstLoadWin(UMainWidget):
             return
 
         win = ConfirmWindow(Lng.save_text_long[self.lng_index])
-        # win.ok_clicked.connect(
-        #     lambda: save_fin()
-        # )
+        win.ok_clicked.connect(lambda: save_fin())
         win.center_to_parent(self.window())
         win.show()
 
