@@ -46,6 +46,7 @@ class PathWidget(QGroupBox):
         self.no_path_widget()
 
     def no_path_widget(self):
+        self.main_wid.hide()
         self.main_wid.deleteLater()
         self.main_wid = QWidget()
         self.main_lay.addWidget(self.main_wid)
