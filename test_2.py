@@ -12,7 +12,8 @@ from cfg import Static
 from system.lang import Lng
 from system.main_folder import Mf
 from widgets._base_widgets import (RowArrowWidget, SelectableLabel, ULineEdit,
-                                   UMainWidget, UPushButton)
+                                   UMainWidget, UPushButton, VListWidget,
+                                   VListWidgetItem)
 from widgets.win_warn import ConfirmWindow, WarningWindow
 
 
@@ -231,7 +232,7 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setContentsMargins(2, 0, 2, 0)
         last_block_layout.setSpacing(0)
 
-        self.backup_widget = RowArrowWidget("Бекап")
+        self.backup_widget = RowArrowWidget(Lng.load_settings[self.lng_index])
         last_block_layout.addWidget(self.backup_widget)
 
         save_widget = RowArrowWidget(Lng.save[self.lng_index])

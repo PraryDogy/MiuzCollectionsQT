@@ -553,3 +553,7 @@ class Lng:
         "Английский",
         "English"
     )
+    load_settings = (
+        "Загрузить настройки",
+        "Load settings"
+    )
