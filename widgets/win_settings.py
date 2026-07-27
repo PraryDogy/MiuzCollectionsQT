@@ -447,15 +447,20 @@ class SizesWin(UMainWidget):
 
 
 class NonRebootSettings(SettingsGroup):
+    storage_svg = os.path.join(Static.common_icons, "storage.svg")
+    files_svg = os.path.join(Static.common_icons, "files.svg")
+
     def __init__(self):
         super().__init__()
         self.size_items = {}
 
         data_size_wid = RowArrowWidget(Lng.statistic[JsonData.lng_index])
+        data_size_wid.set_left_icon(self.storage_svg)
         data_size_wid.clicked.connect(self.show_sizes_win)
         self.layout_.addWidget(data_size_wid)
 
         show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
+        show_files_wid.set_left_icon(self.files_svg)
         show_files_wid.clicked.connect(self.show_files_cmd)
         show_files_wid.hide_sep()
         self.layout_.addWidget(show_files_wid)
