@@ -31,7 +31,7 @@ class TreeWid(QTreeWidget):
     on_hide_digits_clicked = pyqtSignal()
 
     icon_path = os.path.join(Static.internal_icons, "folder.svg")
-    icon_size = 16
+    icon_size = 25
 
     def __init__(self):
         super().__init__()
