@@ -656,6 +656,7 @@ class GeneralSettings(QWidget, StateWid):
 
 class FiltersWid(SettingsGroup, StateWid):
     changed = pyqtSignal()
+    reset_svg = os.path.join(Static.common_icons, "reset.svg")
     exts = (
         ".jpg",
         ".jpeg",
@@ -677,6 +678,7 @@ class FiltersWid(SettingsGroup, StateWid):
         self.layout_.addWidget(HSep())
 
         erase_filters_wid = RowArrowWidget(Lng.reset_filters[JsonData.lng_index])
+        erase_filters_wid.set_left_icon(self.reset_svg)
         erase_filters_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(erase_filters_wid)
 
