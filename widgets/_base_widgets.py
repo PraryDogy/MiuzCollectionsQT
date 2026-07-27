@@ -226,14 +226,13 @@ class VListSpacerItem(QListWidgetItem):
 
 
 class VListWidget(QListWidget):
-    """QListWidget с вертикальной прокруткой, без горизонтальной."""
+    icon_size = 25
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-
-        # --- Отключаем горизонтальную прокрутку ---
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setIconSize(QSize(self.icon_size, self.icon_size))
 
 
 class UPushButton(QPushButton):

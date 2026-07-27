@@ -234,7 +234,6 @@ class MfList(VListWidget):
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
     icon_path = os.path.join(Static.internal_icons, "mf_folder.svg")
-    icon_size = 16
 
     def __init__(self, parent: QWidget):
         super().__init__(parent=parent)
@@ -242,7 +241,6 @@ class MfList(VListWidget):
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
-        self.setIconSize(QSize(self.icon_size, self.icon_size))
         self.init_ui()
         self.setCurrentRow(0)
 
