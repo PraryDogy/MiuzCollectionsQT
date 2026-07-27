@@ -13,6 +13,8 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
 
+LIST_ICON_SIZE = 25
+
 
 class UMenuStyle(QMenu):
     def __init__(self, *args, **kwargs):
@@ -232,7 +234,7 @@ class VListWidget(QListWidget):
         super().__init__(parent)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setIconSize(QSize(self.icon_size, self.icon_size))
+        self.setIconSize(QSize(LIST_ICON_SIZE, LIST_ICON_SIZE))
 
 
 class UPushButton(QPushButton):

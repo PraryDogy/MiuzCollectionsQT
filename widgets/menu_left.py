@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMenu, VListWidget, VListWidgetItem
+from ._base_widgets import LIST_ICON_SIZE, UMenu, VListWidget, VListWidgetItem
 
 ITEM_HEIGHT = 25
 
@@ -31,7 +31,6 @@ class TreeWid(QTreeWidget):
     on_hide_digits_clicked = pyqtSignal()
 
     icon_path = os.path.join(Static.internal_icons, "folder.svg")
-    icon_size = 25
 
     def __init__(self):
         super().__init__()
@@ -40,8 +39,8 @@ class TreeWid(QTreeWidget):
 
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
-        self.setIconSize(QSize(self.icon_size, self.icon_size))
         self.setIndentation(15)
+        self.setIconSize(QSize(LIST_ICON_SIZE, LIST_ICON_SIZE))
 
         self.itemClicked.connect(self.on_item_click)
 

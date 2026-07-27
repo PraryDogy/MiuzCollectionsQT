@@ -1055,7 +1055,6 @@ class WinSettings(UMainWidget):
     filters_icon = os.path.join(Static.internal_icons, "filters.svg")
     settings_icon = os.path.join(Static.internal_icons, "settings.svg")
     svg_warn = os.path.join(Static.internal_icons, "warning.svg")
-    svg_size = 30
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
@@ -1087,7 +1086,6 @@ class WinSettings(UMainWidget):
 
         self.left_menu = VListWidget()
         self.left_menu.clicked.connect(self.left_menu_click)
-        self.left_menu.setIconSize(QSize(self.svg_size, self.svg_size))
         left_layout.addWidget(self.left_menu)
 
         main_settings_item = VListWidgetItem(
