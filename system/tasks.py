@@ -245,6 +245,14 @@ class MfDataCleaner(URunnable):
         self.sigs.finished_.emit()
 
     def _task(self):
+        # сейчас он просто удаляет dirs и несуществующие миниатюры
+        # а надо удалять dirs для перескана
+        # удалять дубликаты из базы данных?
+        # удалять несуществующие пути к миниатюрам
+        # broken_thumb если есть то попытаться пересканить
+
+
+
         with Dbase.main_engine.begin() as conn:
             stmt = (
                 sqlalchemy.select(Thumbs.rel_thumb_path)
