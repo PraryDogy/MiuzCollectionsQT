@@ -799,11 +799,17 @@ class MfSettings(QWidget, StateWid):
         repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
         repair_widget.clicked.connect(self.repair_cmd)
         general_wid.layout_.addWidget(repair_widget)
+        repair_widget.set_left_icon(
+            os.path.join(Static.common_icons, "repair.svg")
+        )
 
         remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
         remove_wid.clicked.connect(self.remove_cmd)
         remove_wid.hide_sep()
         general_wid.layout_.addWidget(remove_wid)
+        remove_wid.set_left_icon(
+            os.path.join(Static.common_icons, "trash.svg")
+        )
 
         self.mf_save = MfSave()
         self.mf_save.clicked_.connect(self.save)

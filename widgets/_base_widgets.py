@@ -356,7 +356,7 @@ class RowArrowWidget(QWidget):
         self.above_layout.addStretch()
         self.above_layout.addWidget(self.arrow_wid)
     
-    def load_left_icon(self, svg_path: str):
+    def set_left_icon(self, svg_path: str):
         self.left_icon.load(svg_path)
         self.left_icon.show()
 
