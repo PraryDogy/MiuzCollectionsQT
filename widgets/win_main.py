@@ -65,11 +65,10 @@ class DangerWarn(ConfirmWindow):
         text = (
             f"{Lng.dangerous_text[JsonData.lng_index]}".format(removed_images_count)
         )
-        super().__init__(text)
+        super().__init__(text, self.ww, self.hh)
         self.svg_widget.load(self.icon_path)
         self.ok_btn.setText(Lng.allow[JsonData.lng_index])
         self.cancel_btn.setText(Lng.deny[JsonData.lng_index])
-        self.setFixedSize(self.ww ,self.hh)
 
     def closeEvent(self, a0):
         a0.ignore()
@@ -490,7 +489,7 @@ class WinMain(UMainWindow):
             text = f"{Lng.remove_file_question[JsonData.lng_index]}?"
         else:
             text = f"{Lng.remove_files_question[JsonData.lng_index]}?"
-        self.remove_files_win = ConfirmWindow(text)
+        self.remove_files_win = ConfirmWindow(text, 290, 90)
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
                 args=(abs_paths, )

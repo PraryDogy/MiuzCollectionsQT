@@ -309,7 +309,7 @@ class RowArrowWidget(QWidget):
     clicked = pyqtSignal()
     arrow_svg = os.path.join(Static.common_icons, "next.svg")
     warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
-    svg_size = 16
+    svg_size = 22
 
     def __init__(self, text: str):
         """
@@ -454,7 +454,7 @@ class WinProgressbar(UMainWidget):
         h_lay.setSpacing(10)
 
         left_side_icon = QSvgWidget(self.files_icon_path)
-        left_side_icon.setFixedSize(40, 40)
+        left_side_icon.setFixedSize(60, 60)
         h_lay.addWidget(left_side_icon)
 
         right_side_wid = QWidget()
@@ -478,7 +478,7 @@ class WinProgressbar(UMainWidget):
         progressbar_lay.addWidget(self.progressbar)
 
         self.cancel_btn = QSvgWidget(self.images_icon_path)
-        self.cancel_btn.setFixedSize(15, 15)
+        self.cancel_btn.setFixedSize(20, 20)
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         progressbar_lay.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
