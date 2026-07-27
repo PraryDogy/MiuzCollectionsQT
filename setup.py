@@ -44,12 +44,14 @@ def move_app_to_desktop(appname: str):
     except Exception as e:
         print(e)
 
-
-def include_files(folder_name: str) -> list[str, list]:
-    return (
-        folder_name,
-        [i.path for i in os.scandir(folder_name)]
-    )
+def include_files(source_dir):
+    data_files = []
+    for root, dirs, files in os.walk(source_dir):
+        if files:
+            clean_files = [os.path.join(root, f) for f in files if f != '.DS_Store']
+            if clean_files:
+                data_files.append((root, clean_files))
+    return data_files
 
 
 # ****************** YOUR DATA ******************
@@ -64,12 +66,9 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 
 
 DATA_FILES = [
-    include_files(Static.app_icons),
-    include_files(Static.bar_top_icons),
-    include_files(Static.common_icons),
-    include_files(Static.jpeg_icons),
+    include_files(Static.icons),
     include_files(Static.backup_files),
-    include_files(Static.sr),
+    include_files(Static.scripts),
     ]
 
 
