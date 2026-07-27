@@ -132,12 +132,12 @@ class ExportWin(UMainWidget):
         self.central_layout.setContentsMargins(5, 10, 5, 5)
 
         urls = (
-            Static.external_json_data,
-            Static.external_mf,
-            Static.external_filters,
-            Static.external_servers,
-            Static.external_db,
-            Static.external_hashdir
+            Static.cfg_json,
+            Static.mf_json,
+            Static.filters_json,
+            Static.servers_json,
+            Static.db_db,
+            Static.hashdir
         )
 
         tab_widget = QGroupBox()
@@ -200,8 +200,8 @@ class ExportWin(UMainWidget):
 
         # если выбрана база данных то экспортируем 
         # базу данных, кеш изображений, mf.json
-        if Static.external_hashdir in urls:
-            stack = [Static.external_hashdir]
+        if Static.hashdir in urls:
+            stack = [Static.hashdir]
             while stack:
                 current_dir = stack.pop()
                 for x in os.scandir(current_dir):

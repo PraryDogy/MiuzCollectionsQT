@@ -9,7 +9,7 @@ class Filters:
     @classmethod
     def validate_json(cls):
         try:
-            with open(Static.external_filters, "r", encoding="utf-8") as file:
+            with open(Static.filters_json, "r", encoding="utf-8") as file:
                 data: list[str] = json.load(file)
         except Exception as e:
             print("Filters, error reading file", e)
@@ -40,5 +40,5 @@ class Filters:
 
     @classmethod
     def write_json_data(cls):
-        with open(Static.external_filters, "w", encoding="utf-8") as f:
+        with open(Static.filters_json, "w", encoding="utf-8") as f:
             json.dump(cls.items, f, indent=4, ensure_ascii=False)

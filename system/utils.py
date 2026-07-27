@@ -72,7 +72,7 @@ class Utils:
     def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str | None:
         filename = hashlib.md5(rel_img_path.encode('utf-8')).hexdigest() + ".jpg"
         new_folder = os.path.join(
-            Static.external_hashdir,
+            Static.hashdir,
             f"{mf_alias}-{filename[:2]}"
         )
         os.makedirs(new_folder, exist_ok=True)

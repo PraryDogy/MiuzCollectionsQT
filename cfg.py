@@ -20,12 +20,12 @@ class Static:
         os.path.join("~", "Library", "Application Support", app_name)
     )
 
-    external_json_data = os.path.join(external_dir, "cfg.json")
-    external_db = os.path.join(external_dir, "db.db")
-    external_hashdir = os.path.join(external_dir, "hashdir")
-    external_mf = os.path.join(external_dir, "mf.json")
-    external_filters = os.path.join(external_dir, "filters.json")
-    external_servers = os.path.join(external_dir, "servers.json")
+    cfg_json = os.path.join(external_dir, "cfg.json")
+    db_db = os.path.join(external_dir, "db.db")
+    hashdir = os.path.join(external_dir, "hashdir")
+    mf_json = os.path.join(external_dir, "mf.json")
+    filters_json = os.path.join(external_dir, "filters.json")
+    servers_json = os.path.join(external_dir, "servers.json")
 
     backup_files = "./backup_files"
     icons = "./icons"
@@ -89,7 +89,7 @@ class JsonData:
     @classmethod
     def json_to_app(cls):
         try:
-            with open(Static.external_json_data, "r", encoding="utf-8") as file:
+            with open(Static.cfg_json, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
@@ -100,7 +100,7 @@ class JsonData:
     
     @classmethod
     def write_json_data(cls):
-        with open(Static.external_json_data, "w", encoding="utf-8") as file:
+        with open(Static.cfg_json, "w", encoding="utf-8") as file:
             json.dump(cls.get_data(), file, ensure_ascii=False, indent=4)
 
     @classmethod
@@ -110,12 +110,12 @@ class JsonData:
         """
         dirs = (
             Static.external_dir,
-            Static.external_json_data,
-            Static.external_db,
-            Static.external_filters,
-            Static.external_hashdir,
-            Static.external_mf,
-            Static.external_servers
+            Static.cfg_json,
+            Static.db_db,
+            Static.filters_json,
+            Static.hashdir,
+            Static.mf_json,
+            Static.servers_json
         )
         for i in dirs:
             if not os.path.exists(i):
@@ -138,13 +138,13 @@ class JsonData:
 
     @classmethod
     def make_empty_external_files(cls):
-        os.makedirs(Static.external_hashdir, exist_ok=True)
+        os.makedirs(Static.hashdir, exist_ok=True)
         files = (
-            Static.external_json_data,
-            Static.external_db,
-            Static.external_filters,
-            Static.external_mf,
-            Static.external_servers
+            Static.cfg_json,
+            Static.db_db,
+            Static.filters_json,
+            Static.mf_json,
+            Static.servers_json
         )
         for i in files:
             with open(i, "w") as file:

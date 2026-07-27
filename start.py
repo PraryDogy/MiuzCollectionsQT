@@ -98,14 +98,14 @@ class App(QApplication):
         if not os.path.exists(Static.external_dir):
             os.makedirs(Static.external_dir)
 
-        if not os.path.exists(Static.external_hashdir):
-            os.makedirs(Static.external_hashdir)
+        if not os.path.exists(Static.hashdir):
+            os.makedirs(Static.hashdir)
 
-        if not os.path.exists(Static.external_db):
-            open(Static.external_db, "w")
+        if not os.path.exists(Static.db_db):
+            open(Static.db_db, "w")
 
         # конфиг
-        if not os.path.exists(Static.external_json_data):
+        if not os.path.exists(Static.cfg_json):
             JsonData.write_json_data()
             # валидация cfg
         # data = JsonData.validate()
@@ -114,22 +114,22 @@ class App(QApplication):
         JsonData.json_to_app()
 
         # фильтры
-        if not os.path.exists(Static.external_filters):
-            open(Static.external_filters, "w")
+        if not os.path.exists(Static.filters_json):
+            open(Static.filters_json, "w")
         data = Filters.validate_json()
         if data:
             Filters.json_to_app(data)
 
         # сервера
-        if not os.path.exists(Static.external_servers):
-            open(Static.external_filters, "w")
+        if not os.path.exists(Static.servers_json):
+            open(Static.filters_json, "w")
         data = Servers.validate_json()
         if data:
             Servers.json_to_app(data)
 
         # mf,самое важное
-        if not os.path.exists(Static.external_mf):
-            open(Static.external_mf, "w")
+        if not os.path.exists(Static.mf_json):
+            open(Static.mf_json, "w")
         data = Mf.validate_json()
         if data:
             Mf.json_to_app(data)

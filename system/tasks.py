@@ -414,7 +414,7 @@ class ImageSearcher(URunnable):
         return similarity
 
     def start(self):
-        stack = [Static.external_hashdir, ]
+        stack = [Static.hashdir, ]
         while stack:
             current_dir = stack.pop()
             for i in os.scandir(current_dir):
