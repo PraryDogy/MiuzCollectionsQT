@@ -92,7 +92,10 @@ class CustomTreeView(QTreeView):
 
 class UploadWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
-    img_icon_path = os.path.join(Static.common_icons, "image_file.svg")
+    image_file_svg = os.path.join(Static.common_icons, "image_file.svg")
+    files_svg = os.path.join(Static.common_icons, "files.svg")
+    storage_svg = os.path.join(Static.common_icons, "storage.svg")
+    base_folder_svg = os.path.join(Static.common_icons, "base_folder.svg")
 
     def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
         super().__init__()
@@ -164,14 +167,17 @@ class UploadWin(UMainWidget):
         group_one_layout.addWidget(self.list_widget)
         
         self.total_files_widget = RowArrowWidget("")
+        self.total_files_widget.set_left_icon(self.files_svg)
         self.total_files_widget.hide_arrow()
         group_one_layout.addWidget(self.total_files_widget)
 
         self.total_size_widget = RowArrowWidget("")
+        self.total_size_widget.set_left_icon(self.storage_svg)
         self.total_size_widget.hide_arrow()
         group_one_layout.addWidget(self.total_size_widget)
 
         self.lbl_target_dir = RowArrowWidget("")
+        self.lbl_target_dir.set_left_icon(self.base_folder_svg)
         self.lbl_target_dir.hide_arrow()
         self.lbl_target_dir.hide_sep()
         self.update_target_dir_label()
@@ -210,7 +216,7 @@ class UploadWin(UMainWidget):
         for file_path in self.files_to_copy:
             file_name = os.path.basename(file_path)
             item = QListWidgetItem(file_name)
-            item.setIcon(QIcon(self.img_icon_path))
+            item.setIcon(QIcon(self.image_file_svg))
             item.setToolTip(file_path)
             self.list_widget.addItem(item)
             total_size += os.path.getsize(file_path)    
