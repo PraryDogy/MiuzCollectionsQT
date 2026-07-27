@@ -18,8 +18,8 @@ from ._base_widgets import SelectableLabel
 
 class PathWidget(QGroupBox):
     mf_path_avaiable = pyqtSignal()
-    magnifier = os.path.join(Static.internal_icons, "magnifier.svg")
-    green_checkmark = os.path.join(Static.internal_icons, "green_checkmark.svg")
+    magnifier = os.path.join(Static.icons, "magnifier.svg")
+    green_checkmark = os.path.join(Static.icons, "green_checkmark.svg")
     hh = 70
     icon_size = 35
 

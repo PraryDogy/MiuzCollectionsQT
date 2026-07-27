@@ -237,8 +237,8 @@ class RebootSettings(SettingsGroup):
     cfg_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
-    rus_flag = os.path.join(Static.internal_icons, "rus_flag.svg")
-    eng_flag = os.path.join(Static.internal_icons, "eng_flag.svg")
+    rus_flag = os.path.join(Static.icons, "rus_flag.svg")
+    eng_flag = os.path.join(Static.icons, "eng_flag.svg")
 
     def __init__(self, cfg_data: CfgData):
         super().__init__()
@@ -481,11 +481,11 @@ class ThemeBtn(QWidget):
         super().__init__()
         self.theme = theme
         self.svg = os.path.join(
-            Static.internal_icons,
+            Static.icons,
             f"{theme}_theme.svg"
         )
         self.svg_selected = os.path.join(
-            Static.internal_icons,
+            Static.icons,
             f"{theme}_theme_selected.svg"
         )
         text_mappings = {
@@ -591,7 +591,7 @@ class SelectableLabel(SettingsLabel):
 
 
 class AboutWid(QGroupBox):
-    icon_path = os.path.join(Static.internal_icons, "icon.png")
+    icon_path = os.path.join(Static.icons, "icon.png")
     icon_size = 85
     opacity = 0.85
 
@@ -919,7 +919,7 @@ class MfSettings(QWidget, StateWid):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewFolder(QWidget, StateWid):
-    icon_path = os.path.join(Static.internal_icons, "warning.svg")
+    icon_path = os.path.join(Static.icons, "warning.svg")
     changed = pyqtSignal()
 
     def __init__(self, mf_list_clone: list[Mf]):
@@ -1050,11 +1050,11 @@ class NewFolder(QWidget, StateWid):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    mf_icon = os.path.join(Static.internal_icons, "mf_folder.svg")
-    new_mf_icon = os.path.join(Static.internal_icons, "new_mf_folder.svg")
-    filters_icon = os.path.join(Static.internal_icons, "filters.svg")
-    settings_icon = os.path.join(Static.internal_icons, "settings.svg")
-    svg_warn = os.path.join(Static.internal_icons, "warning.svg")
+    mf_icon = os.path.join(Static.icons, "mf_folder.svg")
+    new_mf_icon = os.path.join(Static.icons, "new_mf_folder.svg")
+    filters_icon = os.path.join(Static.icons, "filters.svg")
+    settings_icon = os.path.join(Static.icons, "settings.svg")
+    svg_warn = os.path.join(Static.icons, "warning.svg")
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()

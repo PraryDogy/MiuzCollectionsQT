@@ -62,7 +62,7 @@ class CustomItem(VListWidgetItem):
 
 
 class LoadSettingsWin(UMainWidget):
-    preload = Static.internal_files
+    preload = Static.backup_files
     ok_pressed = pyqtSignal(str)
 
     def __init__(self, lng_index: int):
@@ -128,8 +128,8 @@ class LoadSettingsWin(UMainWidget):
 
 class PathWidget(QGroupBox):
     mf_path_avaiable = pyqtSignal(str)
-    magnifier = os.path.join(Static.internal_icons, "magnifier.svg")
-    green_checkmark = os.path.join(Static.internal_icons, "green_checkmark.svg")
+    magnifier = os.path.join(Static.icons, "magnifier.svg")
+    green_checkmark = os.path.join(Static.icons, "green_checkmark.svg")
     hh = 70
     icon_size = 35
 
@@ -224,8 +224,8 @@ class PathWidget(QGroupBox):
 
 
 class FirstLoadWin(UMainWidget):
-    rus_flag = os.path.join(Static.internal_icons, "rus_flag.svg")
-    eng_flag = os.path.join(Static.internal_icons, "eng_flag.svg")
+    rus_flag = os.path.join(Static.icons, "rus_flag.svg")
+    eng_flag = os.path.join(Static.icons, "eng_flag.svg")
 
     def __init__(self):
         super().__init__()

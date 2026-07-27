@@ -27,8 +27,8 @@ class Static:
     external_filters = os.path.join(external_dir, "filters.json")
     external_servers = os.path.join(external_dir, "servers.json")
 
-    internal_files = "./_preload"
-    internal_icons = "./images"
+    backup_files = "./backup_files"
+    icons = "./icons"
 
     max_thumb_size = 210
     pixmap_sizes = [50, 70, 100, 170]
@@ -130,8 +130,8 @@ class JsonData:
 
     @classmethod
     def copy_preloaded_zip(cls):
-        zip_file = os.listdir(Static.internal_files)[0]
-        zip_file = Path(Static.internal_files) / zip_file
+        zip_file = os.listdir(Static.backup_files)[0]
+        zip_file = Path(Static.backup_files) / zip_file
         dst  = shutil.copy2(zip_file, Static.external_dir)
         shutil.unpack_archive(dst, Static.external_dir)
         os.remove(dst)

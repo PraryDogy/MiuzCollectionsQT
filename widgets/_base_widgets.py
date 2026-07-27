@@ -301,8 +301,8 @@ class SelectableLabel(QLabel):
 class RowArrowWidget(QWidget):
     hh = 35
     clicked = pyqtSignal()
-    arrow_svg = os.path.join(Static.internal_icons, "next.svg")
-    warning_svg = os.path.join(Static.internal_icons, "warning.svg")
+    arrow_svg = os.path.join(Static.icons, "next.svg")
+    warning_svg = os.path.join(Static.icons, "warning.svg")
     svg_size = 16
 
     def __init__(self, text: str):
@@ -427,8 +427,8 @@ class USlider(QSlider):
 
 class WinProgressbar(UMainWidget):
     cancel = pyqtSignal()
-    files_icon_path = os.path.join(Static.internal_icons, "files.svg")
-    images_icon_path = os.path.join(Static.internal_icons, "clear.svg")
+    files_icon_path = os.path.join(Static.icons, "files.svg")
+    images_icon_path = os.path.join(Static.icons, "clear.svg")
     ww = 370
 
     def __init__(self, title: str):
@@ -536,7 +536,7 @@ class NewSelectableLabel(SelectableLabel):
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
-    icon_path = os.path.join(Static.internal_icons, "warning.svg")
+    icon_path = os.path.join(Static.icons, "warning.svg")
     icon_size = 50
 
     def __init__(self, text: str, w: int, h: int):

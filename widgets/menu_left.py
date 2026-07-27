@@ -30,7 +30,7 @@ class TreeWid(QTreeWidget):
     on_tree_clicked = pyqtSignal(str)
     on_hide_digits_clicked = pyqtSignal()
 
-    icon_path = os.path.join(Static.internal_icons, "folder.svg")
+    icon_path = os.path.join(Static.icons, "folder.svg")
 
     def __init__(self):
         super().__init__()
@@ -232,7 +232,7 @@ class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
-    icon_path = os.path.join(Static.internal_icons, "mf_folder.svg")
+    icon_path = os.path.join(Static.icons, "mf_folder.svg")
 
     def __init__(self, parent: QWidget):
         super().__init__(parent=parent)
