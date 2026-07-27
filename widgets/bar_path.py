@@ -15,7 +15,7 @@ class PathItem(QWidget):
     new_history_item = pyqtSignal(str)
     load_st_grid = pyqtSignal()
     arrow_right = " \U0000203A" # ›
-    item_height = 12
+    item_height = 18
     info_win = pyqtSignal(list)
     add_fav = pyqtSignal(str)
     del_fav = pyqtSignal(str)
@@ -26,7 +26,7 @@ class PathItem(QWidget):
 
     def __init__(self, dir: str, name: str):
         super().__init__()
-        self.setFixedHeight(PathItem.item_height)
+        # self.setFixedHeight(PathItem.item_height)
         self.item_dir = dir
 
         item_layout = QHBoxLayout(self)

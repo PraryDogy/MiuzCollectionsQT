@@ -213,29 +213,22 @@ class SettingsBtn(BarTopBtn):
 class ExitImgSearchBtn(QFrame):
     clicked_ = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "cancel.svg")
-    icon_size = 15
-    hh = 30
+    icon_size = 17
     def __init__(self):
         super().__init__()
         h_layout = QHBoxLayout(self)
         h_layout.setContentsMargins(2, 0, 2, 0)
         h_layout.setSpacing(5)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         h_layout.addStretch()
 
         text_label = QLabel(Lng.close_search[JsonData.lng_index])
-        h_layout.addWidget(text_label)
-
-        icon_container = QWidget()
-        icon_container.setFixedSize(14, 18)
-        h_layout.addWidget(icon_container)
+        h_layout.addWidget(text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         svg_widget = ClearBtn(self)
-        svg_widget.setParent(icon_container)
-        svg_widget.move(0, 2)
-
-        # self.solid_style()
-        self.setFixedHeight(self.hh)
+        svg_widget.setFixedSize(self.icon_size, self.icon_size)
+        h_layout.addWidget(svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def mouseReleaseEvent(self, a0):
         self.clicked_.emit()
