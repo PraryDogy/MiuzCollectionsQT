@@ -243,6 +243,7 @@ class RebootSettings(SettingsGroup):
     clock_svg = os.path.join(Static.common_icons, "clock.svg")
     export_svg = os.path.join(Static.common_icons, "export.svg")
     import_svg = os.path.join(Static.common_icons, "import.svg")
+    language_svg = os.path.join(Static.common_icons, "language.svg")
 
     def __init__(self, cfg_data: CfgData):
         super().__init__()
@@ -262,6 +263,7 @@ class RebootSettings(SettingsGroup):
             lng_menu.addAction(action)
 
         lng_wid = RowArrowWidget(Lng.language_max[JsonData.lng_index])
+        lng_wid.set_left_icon(self.language_svg)
         self.layout_.addWidget(lng_wid)
         self.lng_btn = UPushButton(text=Lng.russian[JsonData.lng_index])
         self.lng_btn.setIcon(self.lng_icons[JsonData.lng_index])
