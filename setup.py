@@ -67,7 +67,7 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 DATA_FILES = [
     include_files("icons"),
     include_files("scripts"),
-    include_files("_preload")
+    include_files("backup_files"),
     ]
 
 

@@ -29,6 +29,10 @@ class Static:
 
     backup_files = "./backup_files"
     icons = "./icons"
+    app_icons = os.path.join(icons, "app_icons")
+    bar_top_icons = os.path.join(icons, "bar_top")
+    common_icons = os.path.join(icons, "common")
+    jpeg_icons = os.path.join(icons, "jpeg_icons")
 
     max_thumb_size = 210
     pixmap_sizes = [50, 70, 100, 170]
