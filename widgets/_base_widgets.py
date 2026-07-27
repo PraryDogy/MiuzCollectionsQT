@@ -305,6 +305,13 @@ class RowArrowWidget(QWidget):
     svg_size = 16
 
     def __init__(self, text: str):
+        """
+        replace_arrow_widget (правая стрелочка на любой другой виджет)
+        hide_warning / show_warning воскл знак после текста
+        hide_sep
+        hide_arrow
+        """
+
         super().__init__()
         self.setFixedHeight(self.hh)
         self.main_layout = QVBoxLayout(self)
