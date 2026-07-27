@@ -239,6 +239,10 @@ class RebootSettings(SettingsGroup):
     spin_min = 0
     rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
     eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
+    reset_svg = os.path.join(Static.common_icons, "reset.svg")
+    clock_svg = os.path.join(Static.common_icons, "clock.svg")
+    export_svg = os.path.join(Static.common_icons, "export.svg")
+    import_svg = os.path.join(Static.common_icons, "import.svg")
 
     def __init__(self, cfg_data: CfgData):
         super().__init__()
@@ -266,6 +270,7 @@ class RebootSettings(SettingsGroup):
         lng_wid.replace_arrow_widget(self.lng_btn)
 
         scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
+        scaner_time_wid.set_left_icon(self.clock_svg)
         self.layout_.addWidget(scaner_time_wid)
         self.spin = QSpinBox(self)
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
@@ -280,14 +285,17 @@ class RebootSettings(SettingsGroup):
         scaner_time_wid.replace_arrow_widget(self.spin)
 
         reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
+        reset_data_wid.set_left_icon(self.reset_svg)
         reset_data_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(reset_data_wid)
 
         self.export_wid = RowArrowWidget(Lng.export_settings[JsonData.lng_index])
+        self.export_wid.set_left_icon(self.export_svg)
         self.export_wid.clicked.connect(self.export_settings)
         self.layout_.addWidget(self.export_wid)
 
         self.import_wid = RowArrowWidget(Lng.import_settings[JsonData.lng_index])
+        self.import_wid.set_left_icon(self.import_svg)
         self.import_wid.clicked.connect(self.import_settings)
         self.import_wid.hide_sep()
         self.layout_.addWidget(self.import_wid)
