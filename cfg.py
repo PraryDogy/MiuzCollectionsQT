@@ -84,11 +84,11 @@ class JsonData:
     @classmethod
     def get_data(cls):
         return {
-            k: v
-            for k, v in vars(JsonData).items()
-            if not k.startswith("__")
-            and
-            not callable(getattr(JsonData, k))
+            "app_ver": cls.app_ver,
+            "lng_index": cls.lng_index,
+            "theme": cls.theme,
+            "scaner_minutes": cls.scaner_minutes,
+            "hide_digits_mf_lst": cls.hide_digits_mf_lst,   
         }
     
     @classmethod
