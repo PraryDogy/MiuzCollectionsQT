@@ -1050,10 +1050,10 @@ class NewFolder(QWidget, StateWid):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    svg_folder = os.path.join(Static.internal_icons, "img_folder.svg")
-    svg_filters = os.path.join(Static.internal_icons, "filters.svg")
-    svg_settings = os.path.join(Static.internal_icons, "settings.svg")
-    svg_new_folder = os.path.join(Static.internal_icons, "new_folder.svg")
+    mf_icon = os.path.join(Static.internal_icons, "mf_settings.svg")
+    new_mf_icon = os.path.join(Static.internal_icons, "new_mf_settings.svg")
+    filters_icon = os.path.join(Static.internal_icons, "filters_settings.svg")
+    settings_icon = os.path.join(Static.internal_icons, "settings_settings.svg")
     svg_warn = os.path.join(Static.internal_icons, "warning.svg")
     svg_size = 16
 
@@ -1094,21 +1094,21 @@ class WinSettings(UMainWidget):
             parent=self.left_menu,
             text=Lng.general[JsonData.lng_index]
         )
-        main_settings_item.setIcon(QIcon(self.svg_settings))
+        main_settings_item.setIcon(QIcon(self.settings_icon))
         self.left_menu.addItem(main_settings_item)
         
         filter_settings = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.filters[JsonData.lng_index]
         )
-        filter_settings.setIcon(QIcon(self.svg_filters))
+        filter_settings.setIcon(QIcon(self.filters_icon))
         self.left_menu.addItem(filter_settings)
 
         new_folder = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.new_folder[JsonData.lng_index]
         )
-        new_folder.setIcon(QIcon(self.svg_new_folder))
+        new_folder.setIcon(QIcon(self.new_mf_icon))
         self.left_menu.addItem(new_folder)
         
         spacer = VListSpacerItem(self.left_menu)
@@ -1116,7 +1116,7 @@ class WinSettings(UMainWidget):
 
         for i in Mf.items:
             new_folder = VListWidgetItem(self.left_menu, text=i.mf_alias)
-            new_folder.setIcon(QIcon(self.svg_folder))
+            new_folder.setIcon(QIcon(self.mf_icon))
             self.left_menu.addItem(new_folder)
 
         self.right_wid = QWidget()
@@ -1208,7 +1208,7 @@ class WinSettings(UMainWidget):
     def add_mf(self, mf: Mf):
         self.mf_list_clone.append(mf)
         item = VListWidgetItem(self.left_menu, text=mf.mf_alias)
-        item.setIcon(QIcon(self.svg_folder))
+        item.setIcon(QIcon(self.mf_icon))
         item.mf = mf
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)
