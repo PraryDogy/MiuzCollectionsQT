@@ -912,7 +912,8 @@ class MfSettings(QWidget, StateWid):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewFolder(QWidget, StateWid):
-    icon_path = os.path.join(Static.common_icons, "yellow_warning.svg")
+    yellow_warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
+    save_svg = os.path.join(Static.common_icons, "save.svg")
     changed = pyqtSignal()
 
     def __init__(self, mf_list_clone: list[Mf]):
@@ -954,6 +955,7 @@ class NewFolder(QWidget, StateWid):
         main_lay.addWidget(save_group)
 
         self.save_wid = RowArrowWidget(Lng.save[JsonData.lng_index])
+        self.save_wid.set_left_icon(self.save_svg)
         self.save_wid.hide_sep()
         self.save_wid.clicked.connect(self.save_start)
         save_group.layout_.addWidget(self.save_wid)
