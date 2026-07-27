@@ -591,7 +591,7 @@ class SelectableLabel(SettingsLabel):
 
 
 class AboutWid(QGroupBox):
-    icon_path = os.path.join(Static.icons, "icon.png")
+    icon_path = os.path.join(Static.app_icons, "icon.png")
     icon_size = 85
     opacity = 0.85
 

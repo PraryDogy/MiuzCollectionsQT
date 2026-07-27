@@ -283,10 +283,12 @@ class Grid(VScrollArea):
     collage = pyqtSignal(list)
     
     resize_ms = 10
-    copy_files_path = os.path.join(Static.icons, "copy_files.png")
+    copy_files_path = os.path.join(Static.common_icons, "copy_files.svg")
 
     def __init__(self):
         super().__init__()
+        _copy_files_icon = QPixmap(self.copy_files_path)
+        self.copy_files_icon = Utils.qiconed_resize(_copy_files_icon, 100)
 
         # --- Состояние и данные ---
         self.wid_under_mouse: Thumb = None
@@ -776,9 +778,7 @@ class Grid(VScrollArea):
             mime_data = QMimeData()
             drag.setMimeData(mime_data)
 
-            # иконка для drag
-            drag_icon = QPixmap(self.copy_files_path)
-            drag.setPixmap(drag_icon)
+            drag.setPixmap(self.copy_files_icon)
 
             # назначаем urls
             mime_data.setUrls([QUrl.fromLocalFile(p) for p in paths])
