@@ -112,7 +112,7 @@ class BarTopBtn(QWidget):
         self.set_normal_style()
 
     def _load_svg_data(self, icon_name: str):
-        path = os.path.join(Static.icons, icon_name)
+        path = os.path.join(Static.bar_top_icons, icon_name)
         with open(path, "rb") as f:
             return QByteArray(f.read())
 
