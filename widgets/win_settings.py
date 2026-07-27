@@ -537,11 +537,13 @@ class ThemeBtn(QWidget):
 
 
 class ThemesWidget(SettingsGroup):
+    macos_theme_svg = os.path.join(Static.common_icons, "macos_theme.svg")
 
     def __init__(self):
         super().__init__()
 
         title_wid = RowArrowWidget(Lng.theme[JsonData.lng_index])
+        title_wid.set_left_icon(self.macos_theme_svg)
         title_wid.hide_arrow()
         self.layout_.addWidget(title_wid)
 
