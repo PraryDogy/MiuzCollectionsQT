@@ -249,7 +249,7 @@ class Thumb(QFrame):
 class UpBtn(QSvgWidget):
     scroll_to_top = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "scroll_up.svg")
-    icon_size = 55
+    icon_size = 45
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
@@ -288,7 +288,7 @@ class Grid(VScrollArea):
     def __init__(self):
         super().__init__()
         _copy_files_icon = QPixmap(self.copy_files_path)
-        self.copy_files_icon = Utils.qiconed_resize(_copy_files_icon, 100)
+        self.copy_files_icon = Utils.qiconed_resize(_copy_files_icon, 80)
 
         # --- Состояние и данные ---
         self.wid_under_mouse: Thumb = None

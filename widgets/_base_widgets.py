@@ -227,7 +227,7 @@ class VListSpacerItem(QListWidgetItem):
 
 
 class VListWidget(QListWidget):
-    icon_size = 22
+    icon_size = 16
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
@@ -237,7 +237,7 @@ class VListWidget(QListWidget):
 
 
 class UTreeWidget(QTreeWidget):
-    icon_size = 22
+    icon_size = 16
     def __init__(self):
         super().__init__()
         self.setIconSize(QSize(self.icon_size, self.icon_size))
@@ -545,7 +545,7 @@ class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "yellow_warning.svg")
-    icon_size = 50
+    icon_size = 40
 
     def __init__(self, text: str, w: int, h: int):
         super().__init__()
@@ -553,16 +553,16 @@ class ConfirmWindow(UMainWidget):
         self.set_close_only()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
-        self.central_layout.setContentsMargins(5, 5, 5, 0)
+        self.central_layout.setContentsMargins(15, 5, 5, 0)
         self.central_layout.setSpacing(0)
 
         text_container = QWidget()
-        # text_container.setStyleSheet("background: red;")
         self.central_layout.addWidget(text_container)
 
         text_layout = QHBoxLayout(text_container)
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(15)
+        # text_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(self.icon_path)

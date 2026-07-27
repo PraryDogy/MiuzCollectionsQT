@@ -15,7 +15,7 @@ class PathItem(QWidget):
     new_history_item = pyqtSignal(str)
     load_st_grid = pyqtSignal()
     arrow_right = " \U0000203A" # ›
-    item_height = 18
+    item_height = 15
     info_win = pyqtSignal(list)
     add_fav = pyqtSignal(str)
     del_fav = pyqtSignal(str)

@@ -16,7 +16,7 @@ from ._base_widgets import ULineEdit, UMenu, GrayLabel
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "cancel.svg")
-    icon_size = 14
+    icon_size = 11
 
     def __init__(self, parent: ULineEdit):
         super().__init__(parent=parent)
@@ -53,7 +53,7 @@ class WidSearch(ULineEdit):
         self.clear_btn = ClearBtn(parent=self)
         self.clear_btn.clicked_.connect(self.clear_search)
         self.clear_btn.disable()
-        self.clear_btn.move(self.ww - 20, 8)
+        self.clear_btn.move(self.ww - 20, 10)
 
     def create_search(self, new_text):
         if len(new_text) > 0:
@@ -213,22 +213,22 @@ class SettingsBtn(BarTopBtn):
 class ExitImgSearchBtn(QFrame):
     clicked_ = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "cancel.svg")
-    icon_size = 17
+    icon_size = 11
     def __init__(self):
         super().__init__()
         h_layout = QHBoxLayout(self)
         h_layout.setContentsMargins(2, 0, 2, 0)
         h_layout.setSpacing(5)
-        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        h_layout.addStretch()
+        # h_layout.addStretch()
 
         text_label = QLabel(Lng.close_search[JsonData.lng_index])
-        h_layout.addWidget(text_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(text_label, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         svg_widget = ClearBtn(self)
         svg_widget.setFixedSize(self.icon_size, self.icon_size)
-        h_layout.addWidget(svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(svg_widget, alignment=Qt.AlignmentFlag.AlignVCenter)
 
     def mouseReleaseEvent(self, a0):
         self.clicked_.emit()
