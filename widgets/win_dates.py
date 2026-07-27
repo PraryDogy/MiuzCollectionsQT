@@ -2,12 +2,12 @@ import os
 from datetime import datetime, timedelta
 from typing import Literal
 
-from PyQt6.QtCore import QDate, QLocale, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QDate, QLocale, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
 from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QHBoxLayout, QLabel,
                              QSpinBox, QToolButton, QVBoxLayout, QWidget)
 
-from cfg import JsonData, Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
 from ._base_widgets import HSep, UMainWidget, UPushButton
@@ -112,7 +112,7 @@ class MyCalendar(QGroupBox):
 
         self.calendar.update()
 
-    def set_custom_ui(self, icon_size: int = 10):
+    def set_custom_ui(self, icon_size: int = 20):
         self.calendar.setVerticalHeaderFormat(
             QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
         )
@@ -120,6 +120,7 @@ class MyCalendar(QGroupBox):
         widgets = self.findChildren(QToolButton)
         for wid in widgets:
             name = wid.objectName()
+            wid.setIconSize(QSize(icon_size, icon_size))
             if name == "qt_calendar_prevmonth":
                 wid.setIcon(QIcon(os.path.join(Static.common_icons, "previous.svg")))
             elif name == "qt_calendar_nextmonth":

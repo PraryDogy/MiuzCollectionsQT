@@ -249,7 +249,7 @@ class Thumb(QFrame):
 class UpBtn(QSvgWidget):
     scroll_to_top = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "scroll_up.svg")
-    icon_size = 44
+    icon_size = 55
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)

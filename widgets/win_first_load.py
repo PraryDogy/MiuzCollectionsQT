@@ -129,7 +129,7 @@ class LoadSettingsWin(UMainWidget):
 class PathWidget(QGroupBox):
     mf_path_avaiable = pyqtSignal(str)
     magnifier = os.path.join(Static.common_icons, "magnifier.svg")
-    green_checkmark = os.path.join(Static.icons, "green_checkmark.svg")
+    green_checkmark = os.path.join(Static.common_icons, "green_checkmark.svg")
     hh = 70
     icon_size = 35
 
