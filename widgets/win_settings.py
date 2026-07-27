@@ -1055,7 +1055,7 @@ class WinSettings(UMainWidget):
     filters_icon = os.path.join(Static.internal_icons, "filters_settings.svg")
     settings_icon = os.path.join(Static.internal_icons, "settings_settings.svg")
     svg_warn = os.path.join(Static.internal_icons, "warning.svg")
-    svg_size = 16
+    svg_size = 30
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
