@@ -6,14 +6,13 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
                              QListWidget, QListWidgetItem, QMainWindow, QMenu,
                              QProgressBar, QPushButton, QScrollArea, QSlider,
-                             QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
+                             QSpacerItem, QTextEdit, QTreeWidget, QVBoxLayout,
+                             QWidget)
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
-
-LIST_ICON_SIZE = 30
 
 
 class UMenuStyle(QMenu):
@@ -228,13 +227,20 @@ class VListSpacerItem(QListWidgetItem):
 
 
 class VListWidget(QListWidget):
-    icon_size = 25
+    icon_size = 22
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setIconSize(QSize(LIST_ICON_SIZE, LIST_ICON_SIZE))
+        self.setIconSize(QSize(self.icon_size, self.icon_size))
+
+
+class UTreeWidget(QTreeWidget):
+    icon_size = 22
+    def __init__(self):
+        super().__init__()
+        self.setIconSize(QSize(self.icon_size, self.icon_size))
 
 
 class UPushButton(QPushButton):

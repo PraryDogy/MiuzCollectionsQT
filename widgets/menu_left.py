@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import LIST_ICON_SIZE, UMenu, VListWidget, VListWidgetItem
+from ._base_widgets import UTreeWidget, UMenu, VListWidget, VListWidgetItem
 
 ITEM_HEIGHT = 25
 
@@ -24,7 +24,7 @@ class UTreeWidgetItem(QTreeWidgetItem):
         super().__init__(other)
 
 
-class TreeWid(QTreeWidget):
+class TreeWid(UTreeWidget):
     reveal = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
@@ -40,7 +40,6 @@ class TreeWid(QTreeWidget):
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
         self.setIndentation(15)
-        self.setIconSize(QSize(LIST_ICON_SIZE, LIST_ICON_SIZE))
 
         self.itemClicked.connect(self.on_item_click)
 
