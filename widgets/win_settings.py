@@ -498,10 +498,10 @@ class ThemeBtn(QWidget):
 
         layout_ = QVBoxLayout(self)
         layout_.setContentsMargins(0, 0, 0, 0)
-        layout_.setSpacing(0)
+        layout_.setSpacing(5)
         
         self.svg_widget = QSvgWidget()
-        self.svg_widget.setFixedSize(50, 50)
+        self.svg_widget.setFixedSize(40, 40)
         layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         label = QLabel(text_mappings[theme][JsonData.lng_index])

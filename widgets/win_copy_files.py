@@ -35,7 +35,7 @@ class ReplaceFilesWin(UMainWidget):
         self.set_close_only()
         self.setWindowTitle(Lng.replace[JsonData.lng_index])
         self.setFixedWidth(self.ww)
-        self.central_layout.setContentsMargins(5, 5, 10, 5)
+        self.central_layout.setContentsMargins(15, 5, 10, 5)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -97,7 +97,7 @@ class ErrorWin(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.error[JsonData.lng_index])
-        self.central_layout.setContentsMargins(5, 5, 10, 10)
+        self.central_layout.setContentsMargins(15, 5, 10, 10)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -140,7 +140,7 @@ class WinCopyFiles(WinProgressbar):
     def __init__(self, target_dir: str, files_to_copy: list[str]):
         super().__init__(Lng.copying[JsonData.lng_index])
 
-        # # отладка
+        # отладка
         # self.rel = ReplaceFilesWin()
         # self.er = ErrorWin()
         # self.rel.show()

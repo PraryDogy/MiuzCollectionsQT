@@ -205,7 +205,6 @@ class PrevButton(CustomSvg):
     def __init__(self) -> None:
         super().__init__()
         self.load(self.svg_path)
-        self.setFixedSize(70, 70)
 
 
 class NextButton(CustomSvg):
@@ -214,7 +213,6 @@ class NextButton(CustomSvg):
     def __init__(self) -> None:
         super().__init__()
         self.load(self.svg_path)
-        self.setFixedSize(70, 70)
 
 
 class WinImageView(UMainWidget):

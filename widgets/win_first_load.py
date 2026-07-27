@@ -142,7 +142,7 @@ class PathWidget(QGroupBox):
         self.lng_index = lng_index
     
         self.main_lay = QVBoxLayout(self)
-        self.main_lay.setContentsMargins(2, 2, 2, 2)
+        self.main_lay.setContentsMargins(10, 2, 2, 2)
         self.main_lay.setSpacing(0)
 
         self.main_wid = QWidget()

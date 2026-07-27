@@ -37,7 +37,7 @@ class EyeSvg(QSvgWidget):
 
     def __init__(self):
         super().__init__()
-        self.setFixedSize(20, 20)
+        self.setFixedSize(18, 18)
         self.load(self.eye_off)
 
     def enterEvent(self, a0):

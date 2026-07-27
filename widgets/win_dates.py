@@ -112,7 +112,7 @@ class MyCalendar(QGroupBox):
 
         self.calendar.update()
 
-    def set_custom_ui(self, icon_size: int = 20):
+    def set_custom_ui(self, icon_size: int = 17):
         self.calendar.setVerticalHeaderFormat(
             QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
         )

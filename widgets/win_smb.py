@@ -23,7 +23,7 @@ def restart_app():
 class SuperWarnWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "red_warning.svg")
-    icon_size = 60
+    icon_size = 40
 
     def __init__(self):
         super().__init__()
@@ -32,11 +32,11 @@ class SuperWarnWindow(UMainWidget):
         self.set_close_only()
 
         self.central_layout.setContentsMargins(5, 5, 5, 2)
-        self.central_layout.setSpacing(0)
+        self.central_layout.setSpacing(5)
 
         above_layout = QHBoxLayout()
-        above_layout.setSpacing(5)
-        above_layout.setContentsMargins(0, 0, 0, 0)
+        above_layout.setSpacing(10)
+        above_layout.setContentsMargins(5, 0, 0, 0)
         self.central_layout.addLayout(above_layout)
 
         svg_widget = QSvgWidget()
