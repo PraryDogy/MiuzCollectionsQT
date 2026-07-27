@@ -796,9 +796,9 @@ class MfSettings(QWidget, StateWid):
         general_wid = SettingsGroup()
         main_lay.addWidget(general_wid)
 
-        reset_wid = RowArrowWidget(Lng.reset_mf[JsonData.lng_index])
-        reset_wid.clicked.connect(self.set_reset_flag)
-        general_wid.layout_.addWidget(reset_wid)
+        repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
+        repair_widget.clicked.connect(self.repair_cmd)
+        general_wid.layout_.addWidget(repair_widget)
 
         remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
         remove_wid.clicked.connect(self.remove_cmd)
@@ -854,7 +854,10 @@ class MfSettings(QWidget, StateWid):
         win.center_to_parent(self.window())
         win.show()
 
-    def set_reset_flag(self, *args):
+    def repair_cmd(self, *args):
+        """
+        Удаляет Dirs table по mf_alias и удаляет несуществующие thumbs
+        """
 
         def reset_data():
             self.reset_task = MfDataCleaner(self.mf.mf_alias)

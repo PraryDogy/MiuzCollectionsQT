@@ -293,7 +293,7 @@ class Lng:
     details = ("Подробнее", "Details")
     data_size = ("Размер данных", "Data size")
     calculating = ("Вычисление", "Calculating")
-    reset_mf = (
+    repair_mf = (
         "Исправить ошибки в каталоге",
         "Fix errors in the catalog"
     )
