@@ -64,9 +64,12 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 
 
 DATA_FILES = [
-    include_files("icons"),
-    include_files("scripts"),
-    include_files("backup_files"),
+    include_files(Static.app_icons),
+    include_files(Static.bar_top_icons),
+    include_files(Static.common_icons),
+    include_files(Static.jpeg_icons),
+    include_files(Static.backup_files),
+    include_files(Static.sr),
     ]
 
 

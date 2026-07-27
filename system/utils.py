@@ -10,9 +10,6 @@ from PyQt6.QtWidgets import QApplication
 
 from cfg import Static
 
-SCRIPTS = "scripts"
-REVEAL_SCPT = os.path.join(SCRIPTS, "reveal_files.scpt")
-
 
 class Utils:
 
@@ -105,6 +102,7 @@ class Utils:
         
     @classmethod
     def reveal_files(cls, paths: list[str]):
+        REVEAL_SCPT = os.path.join(Static.scripts, "reveal.scpt")
         subprocess.Popen(["osascript", REVEAL_SCPT] + paths)
         
     @classmethod

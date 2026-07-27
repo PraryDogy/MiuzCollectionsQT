@@ -28,6 +28,7 @@ class Static:
     servers_json = os.path.join(external_dir, "servers.json")
 
     backup_files = "./backup_files"
+    scripts = "./scripts"
     icons = "./icons"
     app_icons = os.path.join(icons, "app_icons")
     bar_top_icons = os.path.join(icons, "bar_top")
