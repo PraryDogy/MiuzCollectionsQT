@@ -237,8 +237,8 @@ class RebootSettings(SettingsGroup):
     cfg_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
-    rus_flag = os.path.join(Static.icons, "rus_flag.svg")
-    eng_flag = os.path.join(Static.icons, "eng_flag.svg")
+    rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
+    eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
 
     def __init__(self, cfg_data: CfgData):
         super().__init__()
@@ -481,11 +481,11 @@ class ThemeBtn(QWidget):
         super().__init__()
         self.theme = theme
         self.svg = os.path.join(
-            Static.icons,
+            Static.common_icons,
             f"{theme}_theme.svg"
         )
         self.svg_selected = os.path.join(
-            Static.icons,
+            Static.common_icons,
             f"{theme}_theme_selected.svg"
         )
         text_mappings = {
@@ -919,7 +919,7 @@ class MfSettings(QWidget, StateWid):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewFolder(QWidget, StateWid):
-    icon_path = os.path.join(Static.icons, "warning.svg")
+    icon_path = os.path.join(Static.common_icons, "yellow_warning.svg")
     changed = pyqtSignal()
 
     def __init__(self, mf_list_clone: list[Mf]):
@@ -1050,11 +1050,11 @@ class NewFolder(QWidget, StateWid):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    mf_icon = os.path.join(Static.icons, "mf_folder.svg")
-    new_mf_icon = os.path.join(Static.icons, "new_mf_folder.svg")
-    filters_icon = os.path.join(Static.icons, "filters.svg")
-    settings_icon = os.path.join(Static.icons, "settings.svg")
-    svg_warn = os.path.join(Static.icons, "warning.svg")
+    base_folder_svg = os.path.join(Static.common_icons, "base_folder.svg")
+    new_folder_svg = os.path.join(Static.common_icons, "new_folder.svg")
+    filters_svg = os.path.join(Static.common_icons, "filters.svg")
+    settings_svg = os.path.join(Static.common_icons, "settings.svg")
+    yellow_warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
@@ -1092,21 +1092,21 @@ class WinSettings(UMainWidget):
             parent=self.left_menu,
             text=Lng.general[JsonData.lng_index]
         )
-        main_settings_item.setIcon(QIcon(self.settings_icon))
+        main_settings_item.setIcon(QIcon(self.settings_svg))
         self.left_menu.addItem(main_settings_item)
         
         filter_settings = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.filters[JsonData.lng_index]
         )
-        filter_settings.setIcon(QIcon(self.filters_icon))
+        filter_settings.setIcon(QIcon(self.filters_svg))
         self.left_menu.addItem(filter_settings)
 
         new_folder = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.new_folder[JsonData.lng_index]
         )
-        new_folder.setIcon(QIcon(self.new_mf_icon))
+        new_folder.setIcon(QIcon(self.new_folder_svg))
         self.left_menu.addItem(new_folder)
         
         spacer = VListSpacerItem(self.left_menu)
@@ -1114,7 +1114,7 @@ class WinSettings(UMainWidget):
 
         for i in Mf.items:
             new_folder = VListWidgetItem(self.left_menu, text=i.mf_alias)
-            new_folder.setIcon(QIcon(self.mf_icon))
+            new_folder.setIcon(QIcon(self.base_folder_svg))
             self.left_menu.addItem(new_folder)
 
         self.right_wid = QWidget()
@@ -1133,7 +1133,7 @@ class WinSettings(UMainWidget):
         btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.warn_wid = QSvgWidget()
-        self.warn_wid.load(self.svg_warn)
+        self.warn_wid.load(self.yellow_warning_svg)
         self.warn_wid.setFixedSize(22, 22)
         pol = self.warn_wid.sizePolicy()
         pol.setRetainSizeWhenHidden(True)
@@ -1206,7 +1206,7 @@ class WinSettings(UMainWidget):
     def add_mf(self, mf: Mf):
         self.mf_list_clone.append(mf)
         item = VListWidgetItem(self.left_menu, text=mf.mf_alias)
-        item.setIcon(QIcon(self.mf_icon))
+        item.setIcon(QIcon(self.base_folder_svg))
         item.mf = mf
         self.left_menu.addItem(item)
         self.left_menu.setCurrentItem(item)

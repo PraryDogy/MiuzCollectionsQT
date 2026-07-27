@@ -22,7 +22,7 @@ def restart_app():
 
 class SuperWarnWindow(UMainWidget):
     ok_clicked = pyqtSignal()
-    icon_path = os.path.join(Static.icons, "super_warning.svg")
+    icon_path = os.path.join(Static.common_icons, "red_warning.svg")
     icon_size = 60
 
     def __init__(self):
@@ -77,7 +77,8 @@ class SuperWarnWindow(UMainWidget):
 
 
 class WarnWidget(QWidget):
-    warn = "images/warning.svg"
+    icon_path = os.path.join(Static.common_icons, "yellow_warning.svg")
+
     def __init__(self, mf: Mf):
         super().__init__()
         self.setFixedWidth(350)
@@ -86,7 +87,7 @@ class WarnWidget(QWidget):
         h_lay.setSpacing(10)
 
         warn_wid = QSvgWidget()
-        warn_wid.load(self.warn)
+        warn_wid.load(self.icon_path)
         warn_wid.setFixedSize(30, 30)
         h_lay.addWidget(warn_wid)
 

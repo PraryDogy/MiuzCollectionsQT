@@ -20,9 +20,9 @@ class PathItem(QWidget):
     add_fav = pyqtSignal(str)
     del_fav = pyqtSignal(str)
     type_to_pixmap: dict = {}
-    folder_svg = os.path.join(Static.icons, "folder.svg")
-    img_folder_svg = os.path.join(Static.icons, "mf_folder.svg")
-    img_svg = os.path.join(Static.icons, "img.svg")
+    base_folder_svg = os.path.join(Static.common_icons, "base_folder.svg")
+    image_folder_svg = os.path.join(Static.common_icons, "image_folder.svg")
+    img_svg = os.path.join(Static.common_icons, "image_file.svg")
 
     def __init__(self, dir: str, name: str):
         super().__init__()
@@ -34,7 +34,7 @@ class PathItem(QWidget):
         item_layout.setSpacing(5)
 
         self.img_wid = QSvgWidget()
-        self.img_wid.load(self.folder_svg)
+        self.img_wid.load(self.base_folder_svg)
         self.img_wid.setFixedSize(self.item_height, self.item_height)
         item_layout.addWidget(self.img_wid)
         
@@ -104,7 +104,7 @@ class PathBar(QWidget):
             path_items[x] = path_item
             self.main_lay.addWidget(path_item)
 
-        path_items[1].img_wid.load(path_items[1].img_folder_svg)
+        path_items[1].img_wid.load(path_items[1].image_folder_svg)
 
         last_item = path_items.get(len(root))
         if dir.endswith(ImgUtils.ext_all):

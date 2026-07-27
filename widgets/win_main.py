@@ -57,7 +57,7 @@ class TestWid(QFrame):
 
 
 class DangerWarn(ConfirmWindow):
-    icon_path = os.path.join(Static.icons, "super_warning.svg")
+    icon_path = os.path.join(Static.common_icons, "red_warning.svg")
     hh = 215
     ww = 400
 
