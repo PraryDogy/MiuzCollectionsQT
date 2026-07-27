@@ -747,24 +747,14 @@ class MfStopList(SettingsTextEdit):
         return super().dropEvent(a0)
 
 
-class MfSave(SettingsGroup):
-    clicked_ = pyqtSignal()
-    def __init__(self):
-        super().__init__()
-
-        self.save_wid = RowArrowWidget(Lng.save[JsonData.lng_index])
-        self.save_wid.hide_sep()
-        self.layout_.addWidget(self.save_wid)
-
-    def mouseReleaseEvent(self, event):
-        self.clicked_.emit()
-        return super().mouseReleaseEvent(event)
-
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ 
 
 
 class MfSettings(QWidget, StateWid):
     changed = pyqtSignal()
+    repair_svg = os.path.join(Static.common_icons, "repair.svg")
+    trash_svg = os.path.join(Static.common_icons, "trash.svg")
+    save_svg = os.path.join(Static.common_icons, "save.svg")
 
     def __init__(self, mf: Mf, mf_list_clone: list[Mf]):
         super().__init__()
@@ -797,26 +787,23 @@ class MfSettings(QWidget, StateWid):
         main_lay.addWidget(general_wid)
 
         repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
+        repair_widget.set_left_icon(self.repair_svg)
         repair_widget.clicked.connect(self.repair_cmd)
         general_wid.layout_.addWidget(repair_widget)
-        repair_widget.set_left_icon(
-            os.path.join(Static.common_icons, "repair.svg")
-        )
 
         remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
+        remove_wid.set_left_icon(self.trash_svg)
         remove_wid.clicked.connect(self.remove_cmd)
-        remove_wid.hide_sep()
         general_wid.layout_.addWidget(remove_wid)
-        remove_wid.set_left_icon(
-            os.path.join(Static.common_icons, "trash.svg")
-        )
 
-        self.mf_save = MfSave()
-        self.mf_save.clicked_.connect(self.save)
-        main_lay.addWidget(self.mf_save)
+        self.mf_save = RowArrowWidget(Lng.save[JsonData.lng_index])
+        self.mf_save.set_left_icon(self.save_svg)
+        self.mf_save.hide_sep()
+        self.mf_save.clicked.connect(self.save)
+        general_wid.layout_.addWidget(self.mf_save)
 
     def set_was_changed(self):
-        self.mf_save.save_wid.show_warning()
+        self.mf_save.show_warning()
         super().set_was_changed()
 
     def remove_cmd(self, *args):

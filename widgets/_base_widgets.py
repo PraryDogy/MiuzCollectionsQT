@@ -338,11 +338,6 @@ class RowArrowWidget(QWidget):
 
         self.text_widget = QLabel(text)
 
-        self.warning_wid = QSvgWidget()
-        self.warning_wid.setFixedSize(self.svg_size, self.svg_size)
-        self.warning_wid.load(self.warning_svg)
-        self.warning_wid.hide()
-
         self.arrow_wid = QSvgWidget()
         self.arrow_wid.setFixedSize(self.svg_size, self.svg_size)
         self.arrow_wid.load(self.arrow_svg)
@@ -352,7 +347,6 @@ class RowArrowWidget(QWidget):
 
         self.above_layout.addWidget(self.left_icon)
         self.above_layout.addWidget(self.text_widget)
-        self.above_layout.addWidget(self.warning_wid)
         self.above_layout.addStretch()
         self.above_layout.addWidget(self.arrow_wid)
     
@@ -373,10 +367,7 @@ class RowArrowWidget(QWidget):
         self.arrow_wid.hide()
 
     def show_warning(self):
-        self.warning_wid.show()
-
-    def hide_warning(self):
-        self.warning_wid.hide()
+        self.set_left_icon(self.warning_svg)
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
