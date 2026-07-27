@@ -1050,10 +1050,10 @@ class NewFolder(QWidget, StateWid):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    mf_icon = os.path.join(Static.internal_icons, "mf_settings.svg")
-    new_mf_icon = os.path.join(Static.internal_icons, "new_mf_settings.svg")
-    filters_icon = os.path.join(Static.internal_icons, "filters_settings.svg")
-    settings_icon = os.path.join(Static.internal_icons, "settings_settings.svg")
+    mf_icon = os.path.join(Static.internal_icons, "mf_folder.svg")
+    new_mf_icon = os.path.join(Static.internal_icons, "new_mf_folder.svg")
+    filters_icon = os.path.join(Static.internal_icons, "filters.svg")
+    settings_icon = os.path.join(Static.internal_icons, "settings.svg")
     svg_warn = os.path.join(Static.internal_icons, "warning.svg")
     svg_size = 30
 
