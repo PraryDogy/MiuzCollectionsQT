@@ -325,6 +325,10 @@ class RowArrowWidget(QWidget):
 
         self.sep = HSep()
 
+        self.left_icon = QSvgWidget()
+        self.left_icon.setFixedSize(self.svg_size, self.svg_size)
+        self.left_icon.hide()
+
         self.text_widget = QLabel(text)
 
         self.warning_wid = QSvgWidget()
@@ -339,10 +343,15 @@ class RowArrowWidget(QWidget):
         self.main_layout.addWidget(self.above_wid)
         self.main_layout.addWidget(self.sep)
 
+        self.above_layout.addWidget(self.left_icon)
         self.above_layout.addWidget(self.text_widget)
         self.above_layout.addWidget(self.warning_wid)
         self.above_layout.addStretch()
         self.above_layout.addWidget(self.arrow_wid)
+    
+    def load_left_icon(self, svg_path: str):
+        self.left_icon.load(svg_path)
+        self.left_icon.show()
 
     def replace_arrow_widget(self, widget: QWidget):
         self.arrow_wid.hide()
