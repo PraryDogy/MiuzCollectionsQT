@@ -13,7 +13,7 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
 
-LIST_ICON_SIZE = 25
+LIST_ICON_SIZE = 30
 
 
 class UMenuStyle(QMenu):
