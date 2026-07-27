@@ -226,10 +226,15 @@ class PathWidget(QGroupBox):
 class FirstLoadWin(UMainWidget):
     rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
     eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
+    language_svg = os.path.join(Static.common_icons, "language.svg")
+    import_svg = os.path.join(Static.common_icons, "import.svg")
+    save_svg = os.path.join(Static.common_icons, "save.svg")
+    svg_size = 16
+    ww = 440
 
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(420)
+        self.setFixedWidth(self.ww)
         self.set_always_on_top()
         self.set_close_only()
         UThreadPool.init()
@@ -282,7 +287,12 @@ class FirstLoadWin(UMainWidget):
         
         lng_layout = QHBoxLayout(self.lng_container)
         lng_layout.setContentsMargins(5, 7, 5, 0)
-        lng_layout.setSpacing(0)
+        lng_layout.setSpacing(10)
+
+        lng_icon = QSvgWidget()
+        lng_icon.load(self.language_svg)
+        lng_icon.setFixedSize(self.svg_size, self.svg_size)
+        lng_layout.addWidget(lng_icon)
 
         lng_label = QLabel(lng_label_text)
         lng_layout.addWidget(lng_label)
@@ -345,12 +355,14 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setSpacing(0)
 
         self.backup_widget = RowArrowWidget(Lng.load_settings[self.lng_index])
+        self.backup_widget.set_left_icon(self.import_svg)
         self.backup_widget.clicked.connect(
             lambda: self.open_load_settings_win()
         )
         last_block_layout.addWidget(self.backup_widget)
 
         self.save_widget = RowArrowWidget(Lng.save[self.lng_index])
+        self.save_widget.set_left_icon(self.save_svg)
         self.save_widget.hide_sep()
         self.save_widget.clicked.connect(
             lambda: self.save_cmd()
@@ -379,7 +391,8 @@ class FirstLoadWin(UMainWidget):
     def save_cmd(self):
 
         def show_warn(text: str, w, h):
-            win_warn = WarningWindow(text)
+            win_warn = WarningWindow(text, w, h)
+            win_warn.ok_clicked.connect(win_warn.deleteLater)
             win_warn.setFixedSize(w, h)
             win_warn.center_to_parent(self.window())
             win_warn.show()
