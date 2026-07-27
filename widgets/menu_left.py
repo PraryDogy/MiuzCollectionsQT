@@ -233,7 +233,7 @@ class MfList(VListWidget):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
-    icon_path = os.path.join(Static.internal_icons, "img_folder.svg")
+    icon_path = os.path.join(Static.internal_icons, "mf_folder.svg")
     icon_size = 16
 
     def __init__(self, parent: QWidget):
