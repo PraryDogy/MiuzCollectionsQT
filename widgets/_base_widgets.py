@@ -768,6 +768,7 @@ class MfPathWidget(QGroupBox):
 
 
 class MfStopListWidget(QGroupBox):
+    changed = pyqtSignal()
 
     def __init__(self, lng_index: int, mf_stop_list: list[str]):
         super().__init__()
@@ -782,6 +783,7 @@ class MfStopListWidget(QGroupBox):
 
         self.text_edit = UTextEdit()
         self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
+        self.text_edit.textChanged.connect(self.changed.emit)
         v_layout.addWidget(self.text_edit)
 
         if mf_stop_list:

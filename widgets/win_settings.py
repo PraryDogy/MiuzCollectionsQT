@@ -757,11 +757,17 @@ class MfSettings(QWidget):
             lng_index=JsonData.lng_index,
             mf_path=self.mf.get_avaiable_mf_path()
         )
+        self.path_widget.changed.connect(
+            lambda: self.mf_save_widget.show_warning()
+        )
         main_lay.addWidget(self.path_widget)
 
         self.mf_stop_list = MfStopListWidget(
             lng_index=JsonData.lng_index,
             mf_stop_list=self.mf.mf_stop_list
+        )
+        self.mf_stop_list.text_edit.textChanged.connect(
+            lambda: self.mf_save_widget.show_warning()
         )
         main_lay.addWidget(self.mf_stop_list)
 
@@ -778,10 +784,10 @@ class MfSettings(QWidget):
         remove_wid.clicked.connect(self.remove_cmd)
         general_wid.layout_.addWidget(remove_wid)
 
-        self.mf_save = SaveRowArrowWidget(JsonData.lng_index)
-        self.mf_save.hide_sep()
-        self.mf_save.clicked.connect(self.save_mf_settings)
-        general_wid.layout_.addWidget(self.mf_save)
+        self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
+        self.mf_save_widget.hide_sep()
+        self.mf_save_widget.clicked.connect(self.save_mf_settings)
+        general_wid.layout_.addWidget(self.mf_save_widget)
 
     def remove_cmd(self, *args):
         
