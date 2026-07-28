@@ -630,7 +630,7 @@ class GeneralSettings(QWidget, StateWid):
 
 
 
-class FiltersWid(GroupBoxContainer, StateWid):
+class FiltersWid(QWidget):
     changed = pyqtSignal()
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     exts = (
@@ -642,32 +642,48 @@ class FiltersWid(GroupBoxContainer, StateWid):
         ".psb",
     )
 
-    def __init__(self, filters_clone: list[str]):
+    def __init__(self):
         super().__init__()
-        self.filters_clone = filters_clone
+        main_lay = QVBoxLayout(self)
+        main_lay.setContentsMargins(0, 0, 0, 0)
+        main_lay.setSpacing(10)
 
+        first_container = QGroupBox()
+        main_lay.addWidget(first_container)
+        first_container_layout = QVBoxLayout(first_container)
+        first_container_layout.setContentsMargins(5, 2, 5, 2)
+        first_container_layout.setSpacing(10)
+        
         filters_text = LabelMinWidth(Lng.filters_descr[JsonData.lng_index])
         filters_text.setWordWrap(True)
-        self.layout_.addWidget(filters_text)
-
-        self.layout_.addSpacerItem(QSpacerItem(0, 5))
-        self.layout_.addWidget(HSep())
-
-        erase_filters_wid = RowArrowWidget(Lng.reset_filters[JsonData.lng_index])
-        erase_filters_wid.set_left_icon(self.reset_svg)
-        erase_filters_wid.clicked.connect(self.reset_btn_cmd)
-        self.layout_.addWidget(erase_filters_wid)
-
-        self.layout_.addSpacerItem(QSpacerItem(0, 10))
+        first_container_layout.addWidget(filters_text)
 
         self.filters_edit = UTextEdit()
         self.filters_edit.setFixedHeight(220)
         self.filters_edit.setPlaceholderText(Lng.filters[JsonData.lng_index])
-        self.filters_edit.setPlainText("\n".join(self.filters_clone))
+        self.filters_edit.setPlainText("\n".join(Filters.items))
         self.filters_edit.textChanged.connect(self.on_text_changed)
-        self.layout_.addWidget(self.filters_edit)
+        first_container_layout.addWidget(self.filters_edit)
 
-        self.layout_.addStretch()
+        second_container = QGroupBox()
+        main_lay.addWidget(second_container)
+        second_container_layout = QVBoxLayout(second_container)
+        second_container_layout.setContentsMargins(5, 2, 5, 2)
+        second_container_layout.setSpacing(0)
+
+        erase_filters_wid = RowArrowWidget(Lng.reset_filters[JsonData.lng_index])
+        erase_filters_wid.set_left_icon(self.reset_svg)
+        erase_filters_wid.clicked.connect(self.reset_btn_cmd)
+        second_container_layout.addWidget(erase_filters_wid)
+
+        self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
+        self.save_wid.clicked.connect(lambda: print("save filters"))
+        self.save_wid.hide_sep()
+        second_container_layout.addWidget(self.save_wid)
+
+
+
+        main_lay.addStretch()
         
     def reset_btn_cmd(self, *args):
         def fin():
@@ -1048,7 +1064,7 @@ class WinSettings(UMainWidget):
         if idx == 0:
             r_wid = GeneralSettings(self.cfg_data)
         elif idx == 1:
-            r_wid = FiltersWid(self.filters_clone)
+            r_wid = FiltersWid()
         elif idx == 2:
             r_wid = NewMfSettings()
         elif idx > 3:
