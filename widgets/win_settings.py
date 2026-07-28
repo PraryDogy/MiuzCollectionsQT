@@ -29,10 +29,10 @@ from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (ConfirmWindow, HSep, RowArrowWidget, ULineEdit,
-                            UMainWidget, UMenu, UPushButton, UTextEdit,
-                            VListSpacerItem, VListWidget, VListWidgetItem,
-                            WarningWindow)
+from ._base_widgets import (ConfirmWindow, HSep, RowArrowWidget, SaveRowArrowWidget,
+                            ULineEdit, UMainWidget, UMenu, UPushButton,
+                            UTextEdit, VListSpacerItem, VListWidget,
+                            VListWidgetItem, WarningWindow)
 from .path_widget import PathWidget
 from .win_smb import SuperWarnWindow
 
@@ -773,7 +773,6 @@ class MfSettings(QWidget, StateWid):
     changed = pyqtSignal()
     repair_svg = os.path.join(Static.common_icons, "repair.svg")
     trash_svg = os.path.join(Static.common_icons, "trash.svg")
-    save_svg = os.path.join(Static.common_icons, "save.svg")
 
     def __init__(self, mf: Mf, mf_list_clone: list[Mf]):
         super().__init__()
@@ -815,8 +814,7 @@ class MfSettings(QWidget, StateWid):
         remove_wid.clicked.connect(self.remove_cmd)
         general_wid.layout_.addWidget(remove_wid)
 
-        self.mf_save = RowArrowWidget(Lng.save[JsonData.lng_index])
-        self.mf_save.set_left_icon(self.save_svg)
+        self.mf_save = SaveRowArrowWidget()
         self.mf_save.hide_sep()
         self.mf_save.clicked.connect(self.save)
         general_wid.layout_.addWidget(self.mf_save)
@@ -973,8 +971,7 @@ class NewFolder(QWidget, StateWid):
         save_group = SettingsGroup()
         main_lay.addWidget(save_group)
 
-        self.save_wid = RowArrowWidget(Lng.save[JsonData.lng_index])
-        self.save_wid.set_left_icon(self.save_svg)
+        self.save_wid = SaveRowArrowWidget()
         self.save_wid.hide_sep()
         self.save_wid.clicked.connect(self.save_start)
         save_group.layout_.addWidget(self.save_wid)

@@ -596,3 +596,11 @@ class WarningWindow(ConfirmWindow):
     def __init__(self, text, w, h):
         super().__init__(text, w, h)
         self.cancel_btn.hide()
+
+
+class SaveRowArrowWidget(RowArrowWidget):
+    save_svg = os.path.join(Static.common_icons, "save.svg")
+
+    def __init__(self):
+        super().__init__(Lng.save[JsonData.lng_index])
+        self.set_left_icon(self.save_svg)
