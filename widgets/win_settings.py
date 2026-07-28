@@ -60,7 +60,7 @@ class StateWid:
         self.was_changed = False
 
 
-class SettingsLabel(QLabel):
+class LabelMinWidth(QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setMinimumWidth(30)
@@ -85,7 +85,7 @@ class SettingsTextEdit(GroupBoxContainer):
         self.setAcceptDrops(True)
         self.layout_.setSpacing(10)
 
-        self.title_wid = SettingsLabel(title)
+        self.title_wid = LabelMinWidth(title)
         self.title_wid.setWordWrap(True)
         self.layout_.addWidget(self.title_wid)
 
@@ -533,7 +533,7 @@ class ThemesWidget(GroupBoxContainer):
             ThemeChanger.init()
 
 
-class SelectableLabel(SettingsLabel):
+class SelectableLabel(LabelMinWidth):
     txt = "\n".join([
         f"Version {Static.app_ver}",
         "Developed by Evlosh",
@@ -646,7 +646,7 @@ class FiltersWid(GroupBoxContainer, StateWid):
         super().__init__()
         self.filters_clone = filters_clone
 
-        filters_text = SettingsLabel(Lng.filters_descr[JsonData.lng_index])
+        filters_text = LabelMinWidth(Lng.filters_descr[JsonData.lng_index])
         filters_text.setWordWrap(True)
         self.layout_.addWidget(filters_text)
 
