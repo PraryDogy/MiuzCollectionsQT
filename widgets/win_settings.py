@@ -29,11 +29,11 @@ from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (ConfirmWindow, HSep, MfStopListWidget,
-                            RowArrowWidget, SaveRowArrowWidget, ULineEdit,
-                            UMainWidget, UMenu, UPushButton, UTextEdit,
-                            VListSpacerItem, VListWidget, VListWidgetItem,
-                            WarningWindow, MfPathWidget)
+from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
+                            MfStopListWidget, RowArrowWidget,
+                            SaveRowArrowWidget, ULineEdit, UMainWidget, UMenu,
+                            UPushButton, UTextEdit, VListSpacerItem,
+                            VListWidget, VListWidgetItem, WarningWindow)
 from .win_smb import SuperWarnWindow
 
 
@@ -883,41 +883,36 @@ class MfSettings(QWidget):
 
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
-class NewFolder(QWidget, StateWid):
+class NewMfSettings(QWidget):
     yellow_warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
-    save_svg = os.path.join(Static.common_icons, "save.svg")
-    changed = pyqtSignal()
 
-    def __init__(self, mf_list_clone: list[Mf]):
+    def __init__(self):
         super().__init__()
-        self.mf = Mf(
-            mf_alias = "",
-            mf_paths = [],
-            mf_stop_list = [],
-            mf_current_path = ""
-        )
-        self.mf_list_clone = mf_list_clone
+        # self.mf = Mf(
+        #     mf_alias = "",
+        #     mf_paths = [],
+        #     mf_stop_list = [],
+        #     mf_current_path = ""
+        # )
 
         main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(15)
 
-        name_wid = GroupBoxContainer()
-        name_wid.layout_.setSpacing(5)
-        main_lay.addWidget(name_wid)
+        self.mf_alias_widget = MfAliasWidget(JsonData.lng_index)
+        self.mf_alias_widget.changed.connect(
+            lambda: self.save_wid.show_warning()
+        )
+        main_lay.addWidget(self.mf_alias_widget)
 
-        self.name_text = QLabel(Lng.folder_name[JsonData.lng_index])
-        name_wid.layout_.addWidget(self.name_text)
-
-        self.name_line_edit = ULineEdit()
-        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[JsonData.lng_index])
-        name_wid.layout_.addWidget(self.name_line_edit)
-
-        # self.path_widget = PathWidget(self.mf)
-        # self.path_widget.mf_path_avaiable.connect(self.set_was_changed)
-        # self.path_widget.mf_path_avaiable.connect(self.set_mf_alias)
-        # self.path_widget.setFixedHeight(self.path_widget.hh)
-        # main_lay.addWidget(self.path_widget)
+        self.mf_path_widget = MfPathWidget(
+            lng_index=JsonData.lng_index,
+            mf_path=None
+        )
+        self.mf_path_widget.changed.connect(
+            lambda: self.mf_path_widget_changed()
+        )
+        main_lay.addWidget(self.mf_path_widget)
 
         # self.mf_stop_list = MfStopList(self.mf)
         # self.mf_stop_list.textChanged.connect(self.set_was_changed)
@@ -931,14 +926,10 @@ class NewFolder(QWidget, StateWid):
         self.save_wid.clicked.connect(self.save_start)
         save_group.layout_.addWidget(self.save_wid)
 
-    def set_mf_alias(self):
-        name = os.path.basename(self.path_widget.mf_temp_path)
-        if not self.name_line_edit.text():
-            self.name_line_edit.setText(name)
-
-    def set_was_changed(self):
+    def mf_path_widget_changed(self):
+        basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
+        self.mf_alias_widget.line_edit.setText(basename)
         self.save_wid.show_warning()
-        super().set_was_changed()
 
     def preset_new_folder(self, url: str):
         if url:
@@ -947,11 +938,14 @@ class NewFolder(QWidget, StateWid):
             self.name_line_edit.setText(basename)
             self.save_wid.show_warning()
             
-            self.path_widget.mf_temp_path = url
-            self.path_widget.ok_path_widget()
-            self.path_widget.stop_task()
+            self.mf_path_widget.mf_temp_path = url
+            self.mf_path_widget.ok_path_widget()
+            self.mf_path_widget.stop_task()
 
     def save_fin(self, folder_name: str, paths: list, stop_list: list):
+
+        return
+
         self.mf.mf_alias = folder_name
         self.mf.mf_paths = paths
         self.mf.mf_stop_list = stop_list
@@ -964,6 +958,8 @@ class NewFolder(QWidget, StateWid):
 
     def save_start(self, *args):
 
+        return
+
         def show_warn(text: str, w, h):
             win_warn = WarningWindow(text, w, h)
             win_warn.ok_clicked.connect(win_warn.deleteLater)
@@ -974,8 +970,8 @@ class NewFolder(QWidget, StateWid):
         folder_name = self.name_line_edit.text()
         stop_list = self.mf_stop_list.get_list()
         paths = []
-        if self.path_widget.mf_temp_path:
-            paths.append(self.path_widget.mf_temp_path)
+        if self.mf_path_widget.mf_temp_path:
+            paths.append(self.mf_path_widget.mf_temp_path)
 
         if not folder_name:
             show_warn(Lng.enter_alias_warning[JsonData.lng_index], 280, 85)
@@ -1155,7 +1151,7 @@ class WinSettings(UMainWidget):
             r_wid = FiltersWid(self.filters_clone)
         elif idx == 2:
             self.btns_wid.hide()
-            r_wid = NewFolder(self.mf_list_clone)
+            r_wid = NewMfSettings()
             r_wid.preset_new_folder(self.settings_item.content)
         elif idx > 3:
             self.btns_wid.hide()
@@ -1190,7 +1186,7 @@ class WinSettings(UMainWidget):
         self.warn_wid.hide()
         # self.ok_btn.setText(Lng.ok[Cfg.lng_index])
 
-        wids = (GeneralSettings, MfSettings, NewFolder, FiltersWid)
+        wids = (GeneralSettings, MfSettings, NewMfSettings, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
         right_wid.deleteLater()
 
