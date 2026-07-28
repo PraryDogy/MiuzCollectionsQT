@@ -419,14 +419,6 @@ class Lng:
         "Путь к каталогу изображений указан неверно.",
         "The image directory path is incorrect."
     )
-    export_settings = (
-        "Экспорт настроек",
-        "Export settings"
-    )
-    import_settings = (
-        "Импорт настроек",
-        "Import settings"
-    )
     export_full = (
         "Полная копия",
         "Full copy"

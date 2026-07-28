@@ -241,8 +241,6 @@ class RebootSettings(SettingsGroup):
     eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     clock_svg = os.path.join(Static.common_icons, "clock.svg")
-    export_svg = os.path.join(Static.common_icons, "export.svg")
-    import_svg = os.path.join(Static.common_icons, "import.svg")
     language_svg = os.path.join(Static.common_icons, "language.svg")
 
     def __init__(self, cfg_data: CfgData):
@@ -290,46 +288,6 @@ class RebootSettings(SettingsGroup):
         reset_data_wid.set_left_icon(self.reset_svg)
         reset_data_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(reset_data_wid)
-
-        self.export_wid = RowArrowWidget(Lng.export_settings[JsonData.lng_index])
-        self.export_wid.set_left_icon(self.export_svg)
-        self.export_wid.clicked.connect(self.export_settings)
-        self.layout_.addWidget(self.export_wid)
-
-        self.import_wid = RowArrowWidget(Lng.import_settings[JsonData.lng_index])
-        self.import_wid.set_left_icon(self.import_svg)
-        self.import_wid.clicked.connect(self.import_settings)
-        self.import_wid.hide_sep()
-        self.layout_.addWidget(self.import_wid)
-    
-    def import_settings(self, *args):
-        downloads = os.path.expanduser("~/Downloads")
-        try:
-            url = QFileDialog.getOpenFileName(directory=downloads)[0]
-        except Exception as e:
-            import traceback
-            print(traceback.format_exc())
-            return
-        if url.endswith((".zip", ".ZIP")):
-            zip_path = shutil.copy(
-                src=url,
-                dst=Static.external_dir
-            )
-            with zipfile.ZipFile(zip_path, "r") as z:
-                z.extractall(Static.external_dir)
-
-            JsonData.json_to_app()
-            Mf.json_to_app()
-            Filters.json_to_app()
-            Servers.json_to_app()
-
-            os.remove(zip_path)
-            restart_app()
-
-    def export_settings(self, *args):
-        self.export_win = ExportWin()
-        self.export_win.center_to_parent(self.window())
-        self.export_win.show()
 
     def lang_action_cmd(self, value: int):
         self.cfg_data.lng_index = value
