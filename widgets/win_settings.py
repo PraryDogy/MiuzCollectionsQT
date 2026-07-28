@@ -662,7 +662,9 @@ class FiltersWid(QWidget):
         self.filters_edit.setFixedHeight(220)
         self.filters_edit.setPlaceholderText(Lng.filters[JsonData.lng_index])
         self.filters_edit.setPlainText("\n".join(Filters.items))
-        self.filters_edit.textChanged.connect(self.on_text_changed)
+        self.filters_edit.textChanged.connect(
+            lambda: self.save_wid.show_warning()
+        )
         first_container_layout.addWidget(self.filters_edit)
 
         second_container = QGroupBox()
@@ -677,7 +679,7 @@ class FiltersWid(QWidget):
         second_container_layout.addWidget(erase_filters_wid)
 
         self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
-        self.save_wid.clicked.connect(lambda: print("save filters"))
+        self.save_wid.clicked.connect(lambda: self.save_filters_cmd())
         self.save_wid.hide_sep()
         second_container_layout.addWidget(self.save_wid)
 
@@ -697,13 +699,14 @@ class FiltersWid(QWidget):
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
 
-    def on_text_changed(self):
-        text = self.filters_edit.toPlainText().strip()
-        lines = [line for line in text.split("\n") if line]
-        self.filters_clone.clear()   # очищаем текущий список
-        self.filters_clone.extend(lines)  # добавляем новые элементы
-        self.changed.emit()
-        self.set_was_changed()
+    def save_filters_cmd(self):
+        Filters.items = [
+            line.strip() 
+            for line in self.filters_edit.toPlainText().split("\n") 
+            if line.strip()
+        ]
+        Filters.write_json_data()
+        restart_app()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
