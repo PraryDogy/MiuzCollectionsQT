@@ -666,6 +666,8 @@ class FiltersWid(GroupBoxContainer, StateWid):
         self.filters_edit.setPlainText("\n".join(self.filters_clone))
         self.filters_edit.textChanged.connect(self.on_text_changed)
         self.layout_.addWidget(self.filters_edit)
+
+        self.layout_.addStretch()
         
     def reset_btn_cmd(self, *args):
         def fin():
@@ -694,38 +696,6 @@ class FiltersWid(GroupBoxContainer, StateWid):
     def mouseReleaseEvent(self, a0):
         self.setFocus()
         return super().mouseReleaseEvent(a0)
-
-
-# ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ 
-
-# class MfStopList(SettingsTextEdit):
-#     def __init__(self, mf: Mf):
-#         super().__init__(
-#             title=Lng.ignore_list_descr[JsonData.lng_index],
-#             placeholder=Lng.ignore_list[JsonData.lng_index],
-#             text="\n".join(i for i in mf.mf_stop_list),
-#         )
-#         self.mf = mf
-#         self.textChanged.connect(self.set_data)
-
-#     def set_data(self, *args):
-#         self.mf.mf_stop_list = self.get_list()
-
-#     def dropEvent(self, a0):
-#         if a0.mimeData().hasUrls():
-#             urls = [
-#                 os.path.basename(i.toLocalFile().rstrip(os.sep))
-#                 for i in a0.mimeData().urls()
-#                 if os.path.isdir(i.toLocalFile())
-#             ]
-#             text = "\n".join(
-#                 (self.text_edit_wid.toPlainText(), *urls)
-#             ).strip()
-#             self.text_edit_wid.setPlainText(text)
-#         return super().dropEvent(a0)
-
-
-# ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ 
 
 
 class MfSettings(QWidget):
@@ -788,6 +758,8 @@ class MfSettings(QWidget):
         self.mf_save_widget.hide_sep()
         self.mf_save_widget.clicked.connect(self.save_mf_settings)
         general_wid.layout_.addWidget(self.mf_save_widget)
+
+        main_lay.addStretch()
 
     def remove_mf(self, *args):
         
@@ -920,6 +892,8 @@ class NewMfSettings(QWidget):
         self.mf_save_widget.hide_sep()
         self.mf_save_widget.clicked.connect(self.save_mf_settings)
         save_group.layout_.addWidget(self.mf_save_widget)
+
+        main_lay.addStretch()
 
     def mf_path_widget_changed(self):
         basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
@@ -1063,7 +1037,7 @@ class WinSettings(UMainWidget):
         elif settings_item.type_ == "new_folder":
             idx = 2
         elif settings_item.type_ == "edit_folder":
-            for x, i in enumerate(self.mf_list_clone, start=4):
+            for x, i in enumerate(Mf.items, start=4):
                 if i.mf_alias == self.settings_item.content:
                     idx = x
                     break
@@ -1079,34 +1053,15 @@ class WinSettings(UMainWidget):
             r_wid = NewMfSettings()
         elif idx > 3:
             item: VListWidgetItem = self.left_menu.item(idx)
-            for mf in self.mf_list_clone:
+            for index, mf in enumerate(Mf.items):
                 if mf.mf_alias == item.text():
-                    r_wid = MfSettings(self.mf_list_clone.index(mf))
+                    r_wid = MfSettings(index)
                     self.settings_item.type_ = "general"
                     self.settings_item.content = ""
                     break
         self.right_lay.insertWidget(0, r_wid)
 
-    def add_mf(self, mf: Mf):
-        self.mf_list_clone.append(mf)
-        item = VListWidgetItem(self.left_menu, text=mf.mf_alias)
-        item.setIcon(QIcon(self.base_folder_svg))
-        item.mf = mf
-        self.left_menu.addItem(item)
-        self.left_menu.setCurrentItem(item)
-        self.clear_right_side()
-        index = self.left_menu.count() - 1
-        self.init_right_side(index)
-        self.blink_ok_btn()
-
     def clear_right_side(self):
-        self.cfg_data = CfgData(
-            lng_index=JsonData.lng_index,
-            scaner_minutes=JsonData.scaner_minutes
-        )
-        self.mf_list_clone = copy.deepcopy(Mf.items)
-        self.filters_clone = copy.deepcopy(Filters.items)
-
         wids = (GeneralSettings, MfSettings, NewMfSettings, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
         right_wid.deleteLater()
