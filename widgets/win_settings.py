@@ -1049,39 +1049,6 @@ class WinSettings(UMainWidget):
         self.right_lay.setContentsMargins(0, 0, 0, 0)
         self.right_lay.setSpacing(0)
         self.splitter.addWidget(self.right_wid)
-
-        self.right_lay.addStretch()
-
-        self.btns_wid = QWidget()
-        self.right_lay.addWidget(self.btns_wid)
-        btns_lay = QHBoxLayout(self.btns_wid)
-        btns_lay.setContentsMargins(0, 0, 0, 0)
-        btns_lay.setSpacing(10)
-        btns_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.warn_wid = QSvgWidget()
-        self.warn_wid.load(self.yellow_warning_svg)
-        self.warn_wid.setFixedSize(22, 22)
-        pol = self.warn_wid.sizePolicy()
-        pol.setRetainSizeWhenHidden(True)
-        self.warn_wid.setSizePolicy(pol)
-        self.warn_wid.hide()
-        btns_lay.addWidget(self.warn_wid)
-
-        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
-        # self.ok_btn.setFixedWidth(95)
-        self.ok_btn.clicked.connect(self.ok_cmd)
-        btns_lay.addWidget(self.ok_btn)
-
-        cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
-        # cancel_btn.setFixedWidth(95)
-        cancel_btn.clicked.connect(self.deleteLater)
-        btns_lay.addWidget(cancel_btn)
-
-        self.btns_wid.adjustSize()
-
-        self.central_layout.addSpacerItem(QSpacerItem(0, 5))
-
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([200, 600])
@@ -1103,22 +1070,14 @@ class WinSettings(UMainWidget):
         self.left_menu.setCurrentRow(idx)
         self.init_right_side(idx)
 
-    def blink_ok_btn(self):
-        # self.ok_btn.setText(Lng.restart[Cfg.lng_index])
-        self.warn_wid.show()
-
     def init_right_side(self, idx: int):
         if idx == 0:
-            self.btns_wid.show()
             r_wid = GeneralSettings(self.cfg_data)
         elif idx == 1:
-            self.btns_wid.show()
             r_wid = FiltersWid(self.filters_clone)
         elif idx == 2:
-            self.btns_wid.hide()
             r_wid = NewMfSettings()
         elif idx > 3:
-            self.btns_wid.hide()
             item: VListWidgetItem = self.left_menu.item(idx)
             for mf in self.mf_list_clone:
                 if mf.mf_alias == item.text():
@@ -1147,8 +1106,6 @@ class WinSettings(UMainWidget):
         )
         self.mf_list_clone = copy.deepcopy(Mf.items)
         self.filters_clone = copy.deepcopy(Filters.items)
-        self.warn_wid.hide()
-        # self.ok_btn.setText(Lng.ok[Cfg.lng_index])
 
         wids = (GeneralSettings, MfSettings, NewMfSettings, FiltersWid)
         right_wid = self.right_wid.findChild(wids)
@@ -1158,26 +1115,6 @@ class WinSettings(UMainWidget):
         self.clear_right_side()
         idx = self.left_menu.currentRow()
         self.init_right_side(idx)
-
-    def ok_cmd(self):
-
-        def fin():
-            JsonData.lng_index = self.cfg_data.lng_index
-            JsonData.scaner_minutes = self.cfg_data.scaner_minutes
-            JsonData.write_json_data()
-            restart_app()
-        
-        # это значит, что сохранять нечего
-        if self.warn_wid.isHidden():
-            self.deleteLater()
-        else:
-            win = ConfirmWindow(
-                Lng.save_text_long[JsonData.lng_index], 300, 90
-            )
-            win.ok_clicked.connect(fin)
-            win.center_to_parent(self.window())
-            win.show()
-
 
     def deleteLater(self):
         self.closed.emit()
@@ -1191,7 +1128,3 @@ class WinSettings(UMainWidget):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
-    
-    def mouseReleaseEvent(self, a0):
-        self.setFocus()
-        return super().mouseReleaseEvent(a0)
