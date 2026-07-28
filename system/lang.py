@@ -233,7 +233,10 @@ class Lng:
     changed = ("Изменен", "Changed")
     file_name = ("Имя файла", "File name")
     show_about = ("О приложении", "Аbout the app")
-    alias_error = ("Имя должно быть уникальным", "Name must be unique")
+    alias_already_exists = (
+        "Имя каталога уже занято",
+        "The catalog name is already taken"
+    )
     already_taken = (
         "Каталог с таким именем уже существует. Имя должно быть уникальным",
         "A directory with this name already exists. The name must be unique"

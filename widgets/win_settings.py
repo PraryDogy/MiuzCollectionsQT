@@ -926,76 +926,58 @@ class NewMfSettings(QWidget):
         self.mf_alias_widget.line_edit.setText(basename)
         self.mf_save_widget.show_warning()
 
-    def preset_new_folder(self, url: str):
-        if url:
-            url = os.sep + url.strip(os.sep)
-            basename = os.path.basename(url)
-            self.name_line_edit.setText(basename)
-            self.mf_save_widget.show_warning()
+    # def preset_new_folder(self, url: str):
+    #     if url:
+    #         url = os.sep + url.strip(os.sep)
+    #         basename = os.path.basename(url)
+    #         self.name_line_edit.setText(basename)
+    #         self.mf_save_widget.show_warning()
             
-            self.mf_path_widget.mf_temp_path = url
-            self.mf_path_widget.ok_path_widget()
-            self.mf_path_widget.stop_task()
+    #         self.mf_path_widget.mf_temp_path = url
+    #         self.mf_path_widget.ok_path_widget()
+    #         self.mf_path_widget.stop_task()
 
-    def save_fin(self, folder_name: str, paths: list, stop_list: list):
+    def save_mf_settings(self):
 
-        return
+        def save_mf(mf_alias, mf_path, mf_stop_list):
+            mf = Mf(
+                mf_alias=mf_alias,
+                mf_paths=[mf_path, ],
+                mf_stop_list=mf_stop_list,
+                mf_current_path=mf_path
+            )
+            Mf.items.append(mf)
+            Mf.write_json_data()
+            restart_app()
 
-        self.mf.mf_alias = folder_name
-        self.mf.mf_paths = paths
-        self.mf.mf_stop_list = stop_list
-        # мы добавляем новую папку менно в Mf.list_ а не в clone
-        # чтобы отменить изменения из других отделов
-        # и применить изменения только по новой папке
-        Mf.items.append(self.mf)
-        Mf.write_json_data()
-        restart_app()
+        def get_mf_alias():
+            mf_alias = self.mf_alias_widget.validate()
+            if not mf_alias:
+                return None
+            for i in Mf.items:
+                if i.mf_alias == mf_alias:
+                    win_warn = WarningWindow(
+                        Lng.alias_already_exists[JsonData.lng_index],
+                        270, 80
+                    )
+                    win_warn.center_to_parent(self.window())
+                    win_warn.ok_clicked.connect(win_warn.deleteLater)
+                    win_warn.show()
+                    return None
+            return mf_alias
 
-    def save_start(self, *args):
+        mf_path = self.mf_path_widget.validate()
+        mf_alias = get_mf_alias()
+        mf_stop_list = self.mf_stop_list.text_edit.toPlainText().split("\n")
 
-        return
+        if mf_path and mf_alias:
+            super_win = SuperWarnWindow()
+            super_win.ok_clicked.connect(
+                lambda: save_mf(mf_alias, mf_path, mf_stop_list)
+            )
+            super_win.center_to_parent(self.window())
+            super_win.show()
 
-        def show_warn(text: str, w, h):
-            win_warn = WarningWindow(text, w, h)
-            win_warn.ok_clicked.connect(win_warn.deleteLater)
-            win_warn.center_to_parent(self.window())
-            win_warn.show()
-
-        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
-        folder_name = self.name_line_edit.text()
-        stop_list = self.mf_stop_list.get_list()
-        paths = []
-        if self.mf_path_widget.mf_temp_path:
-            paths.append(self.mf_path_widget.mf_temp_path)
-
-        if not folder_name:
-            show_warn(Lng.enter_alias_warning[JsonData.lng_index], 280, 85)
-            return
-
-        elif any(i.mf_alias == folder_name for i in self.mf_list_clone):
-            show_warn(f'{Lng.already_taken[JsonData.lng_index]}', 290, 90)
-            return
-
-        elif len(folder_name) < 5 or len(folder_name) > 30:
-            show_warn(f'{Lng.string_limit[JsonData.lng_index]}', 280, 90)
-            return
-
-        elif not re.fullmatch(pattern, folder_name):
-            show_warn(f'{Lng.valid_message[JsonData.lng_index]}', 290, 90)
-            return
-
-        elif not paths:
-            show_warn(Lng.select_folder_path[JsonData.lng_index], 280, 85)
-            return
-
-        win = ConfirmWindow(
-            Lng.save_text_long[JsonData.lng_index], 300, 90
-        )
-        win.ok_clicked.connect(
-            lambda: self.save_fin(folder_name, paths, stop_list)
-        )
-        win.center_to_parent(self.window())
-        win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
