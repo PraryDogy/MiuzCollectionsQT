@@ -234,7 +234,7 @@ class ExportWin(UMainWidget):
 
 
 class RebootSettings(GroupBoxContainer):
-    cfg_changed = pyqtSignal()
+    changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
     rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
@@ -243,9 +243,10 @@ class RebootSettings(GroupBoxContainer):
     clock_svg = os.path.join(Static.common_icons, "clock.svg")
     language_svg = os.path.join(Static.common_icons, "language.svg")
 
-    def __init__(self, cfg_data: CfgData):
+    def __init__(self):
         super().__init__()
-        self.cfg_data = cfg_data
+        self.scaner_minutes = JsonData.scaner_minutes
+        self.lng_index = JsonData.lng_index
 
         self.lng_icons = (
             QIcon(self.rus_flag),
@@ -257,7 +258,7 @@ class RebootSettings(GroupBoxContainer):
             action = QAction(Lng.russian[value], lng_menu)
             action.setIcon(self.lng_icons[value])
             action.setIconVisibleInMenu(True)
-            action.triggered.connect(lambda e, v=value: self.lang_action_cmd(v))
+            action.triggered.connect(lambda e, v=value: self.change_language(v))
             lng_menu.addAction(action)
 
         lng_wid = RowArrowWidget(Lng.language_max[JsonData.lng_index])
@@ -287,25 +288,15 @@ class RebootSettings(GroupBoxContainer):
         reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
         reset_data_wid.set_left_icon(self.reset_svg)
         reset_data_wid.hide_sep()
-        reset_data_wid.clicked.connect(self.reset_btn_cmd)
+        reset_data_wid.clicked.connect(self.erase_all_data)
         self.layout_.addWidget(reset_data_wid)
 
-    def lang_action_cmd(self, value: int):
+    def change_language(self, value: int):
         self.cfg_data.lng_index = value
         self.lng_btn.setText(Lng.russian[value])
         self.lng_btn.setIcon(self.lng_icons[value])
-        self.cfg_changed.emit()
-
-    def reset_btn_cmd(self, *args):
-        def fin():
-            self.deleteLater()
-            shutil.rmtree(Static.external_dir)
-            restart_app()
-
-        reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index], 320, 110)
-        reset_win.center_to_parent(self.window())
-        reset_win.ok_clicked.connect(fin)
-        reset_win.show()
+        self.lng_index = value
+        self.changed.emit()
 
     def change_scan_time(self, value: int):
         if value == self.spin_max:
@@ -318,9 +309,20 @@ class RebootSettings(GroupBoxContainer):
             self.spin.setValue(self.spin_max - 1)
             self.spin.blockSignals(False)
             value = self.spin.maximum()
+        self.scaner_minutes = value
+        self.changed.emit()
 
-        self.cfg_data.scaner_minutes = value
-        self.cfg_changed.emit()
+    def erase_all_data(self, *args):
+
+        def fin():
+            self.hide()
+            shutil.rmtree(Static.external_dir)
+            restart_app()
+
+        reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index], 320, 110)
+        reset_win.center_to_parent(self.window())
+        reset_win.ok_clicked.connect(fin)
+        reset_win.show()
 
 
 class SizesWin(UMainWidget):
