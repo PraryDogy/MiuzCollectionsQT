@@ -62,6 +62,7 @@ class FirstLoadWin(UMainWidget):
     rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
     eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
     language_svg = os.path.join(Static.common_icons, "language.svg")
+    miuz_svg = os.path.join(Static.common_icons, "miuz.svg")
     svg_size = 16
     ww = 440
 
@@ -179,6 +180,7 @@ class FirstLoadWin(UMainWidget):
             self.copy_zip_widget = RowArrowWidget(
                 Lng.miuz_diamonds[self.lng_index]
             )
+            self.copy_zip_widget.set_left_icon(self.miuz_svg)
             self.copy_zip_widget.clicked.connect(
                 lambda: self.copy_zip_cmd(Static.miuz_zip)
             )
