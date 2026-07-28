@@ -727,7 +727,7 @@ class MfSettings(QWidget):
 class NewMfSettings(QWidget):
     yellow_warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
 
-    def __init__(self):
+    def __init__(self, mf_path: str = None):
         super().__init__()
         main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
@@ -741,7 +741,7 @@ class NewMfSettings(QWidget):
 
         self.mf_path_widget = MfPathWidget(
             lng_index=JsonData.lng_index,
-            mf_path=None
+            mf_path=mf_path
         )
         self.mf_path_widget.changed.connect(
             lambda: self.mf_path_widget_changed()
@@ -769,6 +769,9 @@ class NewMfSettings(QWidget):
         save_group_container.addWidget(self.mf_save_widget)
 
         main_lay.addStretch()
+
+        if mf_path:
+            self.mf_path_widget_changed()
 
     def mf_path_widget_changed(self):
         basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
@@ -919,7 +922,12 @@ class WinSettings(UMainWidget):
         elif idx == 1:
             r_wid = FiltersWid()
         elif idx == 2:
-            r_wid = NewMfSettings()
+            if self.settings_item.type_ == "new_folder":
+                r_wid = NewMfSettings(self.settings_item.content)
+                self.settings_item.type_ = "general"
+                self.settings_item.content = ""
+            else:
+                r_wid = NewMfSettings()
         elif idx > 3:
             item: VListWidgetItem = self.left_menu.item(idx)
             for index, mf in enumerate(Mf.items):
