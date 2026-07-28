@@ -162,9 +162,17 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.mf_alias_widget)
 
     def init_path_widget(self):
+
+        def mf_path_changed():
+            if self.path_widget.mf_path:
+                basename = os.path.basename(self.path_widget.mf_path).capitalize()
+                self.mf_alias_widget.line_edit.setText(basename)
+            self.path_widget.mf_path
+            self.save_widget.show_warning()
+
         self.path_widget = MfPathWidget(self.lng_index)
         self.path_widget.changed.connect(
-            lambda: self.save_widget.show_warning()
+            lambda: mf_path_changed()
         )
         self.central_layout.addWidget(self.path_widget)
 
