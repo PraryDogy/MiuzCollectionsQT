@@ -1,20 +1,16 @@
-import copy
 import os
-import re
 import shutil
 import subprocess
 import sys
-import zipfile
-from dataclasses import dataclass
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QFileDialog, QGraphicsOpacityEffect,
-                             QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-                             QSpacerItem, QSpinBox, QSplitter, QTableWidget,
+from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGroupBox,
+                             QHBoxLayout, QLabel, QLineEdit, QSpacerItem,
+                             QSpinBox, QSplitter, QTableWidget,
                              QTableWidgetItem, QVBoxLayout, QWidget)
-from typing_extensions import Literal, Optional
+from typing_extensions import Literal
 
 from cfg import JsonData, Static, Themes
 from system.filters import Filters
@@ -23,15 +19,14 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
 from system.paletes import ThemeChanger
-from system.servers import Servers
 from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
+from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
-                            SaveRowArrowWidget, ULineEdit, UMainWidget, UMenu,
+                            SaveRowArrowWidget, UMainWidget, UMenu,
                             UPushButton, UTextEdit, VListSpacerItem,
                             VListWidget, VListWidgetItem, WarningWindow)
 from .win_smb import SuperWarnWindow
@@ -43,197 +38,13 @@ def restart_app():
     QApplication.exit(0)
 
 
-@dataclass(slots=True)
-class CfgData:
-    lng_index: int
-    scaner_minutes: int
-
-
-class StateWid:
-    def __init__(self):
-        self.was_changed = False
-
-    def set_was_changed(self, *args):
-        self.was_changed = True
-
-    def reset_was_changed(self, *args):
-        self.was_changed = False
-
-
 class LabelMinWidth(QLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setMinimumWidth(30)
 
 
-class GroupBoxContainer(QGroupBox):
-    def __init__(self):
-        """
-        QGroupBox + self.layout_ (vertical layout)
-        """
-        super().__init__()
-        self.layout_ = QVBoxLayout(self)
-        self.layout_.setContentsMargins(6, 0, 6, 0)
-        self.layout_.setSpacing(0)
-
-
-# class SettingsTextEdit(GroupBoxContainer):
-#     textChanged = pyqtSignal()
-
-#     def __init__(self, title: str, placeholder: str, text: Optional[str]):
-#         super().__init__()
-#         self.setAcceptDrops(True)
-#         self.layout_.setSpacing(10)
-
-#         self.title_wid = LabelMinWidth(title)
-#         self.title_wid.setWordWrap(True)
-#         self.layout_.addWidget(self.title_wid)
-
-#         self.text_edit_wid = UTextEdit()
-#         self.text_edit_wid.setFixedHeight(100)
-#         self.text_edit_wid.setPlaceholderText(placeholder)
-#         self.text_edit_wid.textChanged.connect(self.textChanged.emit)
-#         self.text_edit_wid.setAcceptDrops(False)
-#         self.layout_.addWidget(self.text_edit_wid)
-
-#         if text:
-#             self.text_edit_wid.setPlainText(text)
-
-#     def get_list(self):
-#         return [
-#             i
-#             for i in self.text_edit_wid.toPlainText().split("\n")
-#             if i.strip()
-#         ]
-
-#     def dragEnterEvent(self, a0):
-#         a0.accept()
-#         return super().dragEnterEvent(a0)
-    
-
-class SettingsListItem(VListWidgetItem):
-    def __init__(self, url: str, parent, height = 30, text = None):
-        super().__init__(parent, height, text)
-        self.url = url
-    
-
-# ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ ОСНОВНЫЕ НАСТРОЙКИ
-
-
-class ExportWin(UMainWidget):
-    ww = 230
-    hh = 290
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle(Lng.export_settings[JsonData.lng_index])
-        self.set_always_on_top()
-        self.set_close_only()
-        self.central_layout.setSpacing(5)
-        self.central_layout.setContentsMargins(5, 10, 5, 5)
-
-        urls = (
-            Static.cfg_json,
-            Static.mf_json,
-            Static.filters_json,
-            Static.servers_json,
-            Static.db_db,
-            Static.hashdir
-        )
-
-        tab_widget = QGroupBox()
-        tab_widget.setFixedSize(self.ww, self.hh)
-        self.central_layout.addWidget(tab_widget)
-
-        tab_layout = QVBoxLayout(tab_widget)
-        tab_layout.setContentsMargins(0, 10, 0, 0)
-        tab_layout.setSpacing(0)
-
-        v_list = VListWidget(self)
-        v_list.itemClicked.connect(self.item_cmd)
-        tab_layout.addWidget(v_list)
-
-        for i in urls:
-            text = os.path.basename(i)
-            item = SettingsListItem(i, v_list, text=text)
-            item.set_checkable()
-            v_list.addItem(item)
-
-        btn_layout = QHBoxLayout()
-        btn_layout.setContentsMargins(0, 0, 0, 0)
-        btn_layout.setSpacing(10)
-        self.central_layout.addLayout(btn_layout)
-
-        btn_layout.addStretch()
-
-        btn_ok = UPushButton(Lng.ok[JsonData.lng_index])
-        btn_ok.clicked.connect(
-            lambda: self.export_files(self.get_urls())
-        )
-        btn_layout.addWidget(btn_ok)
-
-        btn_cancel = UPushButton(Lng.cancel[JsonData.lng_index])
-        btn_cancel.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(btn_cancel)
-
-        btn_layout.addStretch()
-
-        self.adjustSize()
-
-    def item_cmd(self, item: VListWidgetItem):
-        if item.checkState() == Qt.CheckState.Unchecked:
-            item.setCheckState(Qt.CheckState.Checked)
-        else:
-            item.setCheckState(Qt.CheckState.Unchecked)
-
-    def get_urls(self):
-        list_widget = self.findChild(VListWidget)
-        items = [
-            list_widget.item(i)
-            for i in range(list_widget.count())
-        ]
-        urls = []
-
-        for i in items:
-            i: SettingsListItem
-            if i.checkState() == Qt.CheckState.Checked:
-                urls.append(i.url)
-
-        # если выбрана база данных то экспортируем 
-        # базу данных, кеш изображений, mf.json
-        if Static.hashdir in urls:
-            stack = [Static.hashdir]
-            while stack:
-                current_dir = stack.pop()
-                for x in os.scandir(current_dir):
-                    if x.is_dir():
-                        stack.append(x)
-                    else:
-                        urls.append(x.path)
-        return urls
-
-    def export_files(self, files: list[str]):
-        JsonData.json_to_app()
-        Mf.json_to_app()
-        Servers.json_to_app()
-        Filters.json_to_app()
-        
-        downloads = os.path.expanduser("~/Downloads")
-        filename = f"{Static.app_name}Settings.zip"
-        path = os.path.join(downloads, filename)
-        with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-            for file in files:
-                rel_path = file.replace(Static.external_dir, "")
-                z.write(file, arcname=rel_path)
-        Utils.reveal_files([path, ])
-        self.deleteLater()
-
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
-        return super().keyPressEvent(a0)
-
-
-class RebootSettings(GroupBoxContainer):
+class RebootableSettings(QGroupBox):
     changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
@@ -245,9 +56,12 @@ class RebootSettings(GroupBoxContainer):
 
     def __init__(self):
         super().__init__()
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(5, 0, 5, 0)
+        main_layout.setSpacing(0)
+
         self.scaner_minutes = JsonData.scaner_minutes
         self.lng_index = JsonData.lng_index
-
         self.lng_icons = (
             QIcon(self.rus_flag),
             QIcon(self.eng_flag)
@@ -263,7 +77,7 @@ class RebootSettings(GroupBoxContainer):
 
         lng_wid = RowArrowWidget(Lng.language_max[JsonData.lng_index])
         lng_wid.set_left_icon(self.language_svg)
-        self.layout_.addWidget(lng_wid)
+        main_layout.addWidget(lng_wid)
         self.lng_btn = UPushButton(text=Lng.russian[JsonData.lng_index])
         self.lng_btn.setIcon(self.lng_icons[JsonData.lng_index])
         self.lng_btn.setFixedWidth(100)
@@ -272,7 +86,7 @@ class RebootSettings(GroupBoxContainer):
 
         scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
         scaner_time_wid.set_left_icon(self.clock_svg)
-        self.layout_.addWidget(scaner_time_wid)
+        main_layout.addWidget(scaner_time_wid)
         self.spin = QSpinBox(self)
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.spin.setMinimum(self.spin_min)
@@ -281,7 +95,7 @@ class RebootSettings(GroupBoxContainer):
         self.spin.setFixedWidth(100)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[JsonData.lng_index]}")
-        self.spin.setValue(self.cfg_data.scaner_minutes)
+        self.spin.setValue(JsonData.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.replace_arrow_widget(self.spin)
 
@@ -289,10 +103,9 @@ class RebootSettings(GroupBoxContainer):
         reset_data_wid.set_left_icon(self.reset_svg)
         reset_data_wid.hide_sep()
         reset_data_wid.clicked.connect(self.erase_all_data)
-        self.layout_.addWidget(reset_data_wid)
+        main_layout.addWidget(reset_data_wid)
 
     def change_language(self, value: int):
-        self.cfg_data.lng_index = value
         self.lng_btn.setText(Lng.russian[value])
         self.lng_btn.setIcon(self.lng_icons[value])
         self.lng_index = value
@@ -409,24 +222,29 @@ class SizesWin(UMainWidget):
         return super().keyPressEvent(a0)
 
 
-class NonRebootSettings(GroupBoxContainer):
+class NonRebootableSettings(QGroupBox):
     storage_svg = os.path.join(Static.common_icons, "storage.svg")
     files_svg = os.path.join(Static.common_icons, "files.svg")
 
     def __init__(self):
         super().__init__()
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(5, 0, 5, 0)
+        main_layout.setSpacing(0)
+
+
         self.size_items = {}
 
         data_size_wid = RowArrowWidget(Lng.statistic[JsonData.lng_index])
         data_size_wid.set_left_icon(self.storage_svg)
         data_size_wid.clicked.connect(self.show_sizes_win)
-        self.layout_.addWidget(data_size_wid)
+        main_layout.addWidget(data_size_wid)
 
         show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
         show_files_wid.set_left_icon(self.files_svg)
         show_files_wid.clicked.connect(self.show_files_cmd)
         show_files_wid.hide_sep()
-        self.layout_.addWidget(show_files_wid)
+        main_layout.addWidget(show_files_wid)
 
         self.get_sizes()
 
@@ -497,26 +315,29 @@ class ThemeBtn(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class ThemesWidget(GroupBoxContainer):
+class ThemesWidget(QGroupBox):
     macos_theme_svg = os.path.join(Static.common_icons, "macos_theme.svg")
 
     def __init__(self):
         super().__init__()
+        main_lay = QVBoxLayout(self)
+        main_lay.setContentsMargins(5, 0, 5, 0)
+        main_lay.setSpacing(0)
 
         title_wid = RowArrowWidget(Lng.theme[JsonData.lng_index])
         title_wid.set_left_icon(self.macos_theme_svg)
         title_wid.hide_arrow()
-        self.layout_.addWidget(title_wid)
+        main_lay.addWidget(title_wid)
 
         spacer = QSpacerItem(0, 5)
-        self.layout_.addSpacerItem(spacer)
+        main_lay.addSpacerItem(spacer)
 
         themes_wid = QWidget()
         themes_layout = QHBoxLayout(themes_wid)
         themes_layout.setContentsMargins(0, 0, 0, 0)
         themes_layout.setSpacing(5)
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.layout_.addWidget(themes_wid)
+        main_lay.addWidget(themes_wid)
         
         for i in (Themes.macos, Themes.dark, Themes.light):
             btn = ThemeBtn(i)
@@ -596,24 +417,23 @@ class AboutWid(QGroupBox):
         h_lay.addStretch()
 
 
-class GeneralSettings(QWidget, StateWid):
-    changed = pyqtSignal()
+class GeneralSettings(QWidget):
 
-    def __init__(self, cfg_data: CfgData):
+    def __init__(self):
         super().__init__()
 
         v_lay = QVBoxLayout(self)
-        v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
         v_lay.setSpacing(10)
-        v_lay.setContentsMargins(0, 0, 0, 10)
+        v_lay.setContentsMargins(0, 0, 0, 0)
 
-        reboot_settings = RebootSettings(cfg_data)
-        reboot_settings.cfg_changed.connect(self.changed.emit)
-        reboot_settings.cfg_changed.connect(self.set_was_changed)
-        v_lay.addWidget(reboot_settings)
+        self.rebootable_settings = RebootableSettings()
+        self.rebootable_settings.changed.connect(
+            lambda: self.save_wid.show_warning()
+        )
+        v_lay.addWidget(self.rebootable_settings)
 
-        data_settings = NonRebootSettings()
-        v_lay.addWidget(data_settings)
+        non_rebootable_settings = NonRebootableSettings()
+        v_lay.addWidget(non_rebootable_settings)
 
         themes = ThemesWidget()
         v_lay.addWidget(themes)
@@ -621,10 +441,35 @@ class GeneralSettings(QWidget, StateWid):
         about = AboutWid()
         v_lay.addWidget(about)
 
-    def set_need_reset(self):
-        self.need_reset_item.need_reset = True
-        self.changed.emit()
-        self.set_was_changed()
+        save_container = QGroupBox()
+        v_lay.addWidget(save_container)
+        save_container_lay = QVBoxLayout(save_container)
+        save_container_lay.setContentsMargins(5, 0, 5, 0)
+        save_container_lay.setSpacing(0)
+
+        self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
+        self.save_wid.hide_sep()
+        self.save_wid.clicked.connect(
+            lambda: self.save_settings_cmd()
+        )
+        save_container_lay.addWidget(self.save_wid)
+
+        v_lay.addStretch()
+
+    def save_settings_cmd(self):
+
+        def fin():
+            JsonData.scaner_minutes = self.rebootable_settings.scaner_minutes
+            JsonData.lng_index = self.rebootable_settings.lng_index
+            JsonData.write_json_data()
+            restart_app()
+
+        win = ConfirmWindow(
+            Lng.app_will_restarted[JsonData.lng_index], 300, 90
+        )
+        win.ok_clicked.connect(fin)
+        win.center_to_parent(self.window())
+        win.show()
 
 
 class FiltersWid(QWidget):
@@ -731,18 +576,21 @@ class MfSettings(QWidget):
 
         main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
-        main_lay.setSpacing(15)
+        main_lay.setSpacing(10)
 
         # Верхний ряд с названием
-        name_group = GroupBoxContainer()
+        name_group = QGroupBox()
         main_lay.addWidget(name_group)
+        name_group_lay = QVBoxLayout(name_group)
+        name_group_lay.setContentsMargins(5, 0, 5, 0)
+        name_group_lay.setSpacing(0)
 
         self.name_wid = RowArrowWidget(
             text=f"{Lng.alias[JsonData.lng_index]}: {self.mf.mf_alias}"
         )
         self.name_wid.hide_arrow()
         self.name_wid.hide_sep()
-        name_group.layout_.addWidget(self.name_wid)
+        name_group_lay.addWidget(self.name_wid)
 
         self.path_widget = MfPathWidget(
             lng_index=JsonData.lng_index,
@@ -762,23 +610,26 @@ class MfSettings(QWidget):
         )
         main_lay.addWidget(self.mf_stop_list)
 
-        general_wid = GroupBoxContainer()
+        general_wid = QGroupBox()
         main_lay.addWidget(general_wid)
+        general_wid_lay = QVBoxLayout(general_wid)
+        general_wid_lay.setContentsMargins(5, 0, 5, 0)
+        general_wid_lay.setSpacing(0)
 
         repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
         repair_widget.set_left_icon(self.repair_svg)
         repair_widget.clicked.connect(self.repair_mf)
-        general_wid.layout_.addWidget(repair_widget)
+        general_wid_lay.addWidget(repair_widget)
 
         remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
         remove_wid.set_left_icon(self.trash_svg)
         remove_wid.clicked.connect(self.remove_mf)
-        general_wid.layout_.addWidget(remove_wid)
+        general_wid_lay.addWidget(remove_wid)
 
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
         self.mf_save_widget.hide_sep()
         self.mf_save_widget.clicked.connect(self.save_mf_settings)
-        general_wid.layout_.addWidget(self.mf_save_widget)
+        general_wid_lay.addWidget(self.mf_save_widget)
 
         main_lay.addStretch()
 
@@ -880,7 +731,7 @@ class NewMfSettings(QWidget):
         super().__init__()
         main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
-        main_lay.setSpacing(15)
+        main_lay.setSpacing(10)
 
         self.mf_alias_widget = MfAliasWidget(JsonData.lng_index)
         self.mf_alias_widget.changed.connect(
@@ -906,13 +757,16 @@ class NewMfSettings(QWidget):
         )
         main_lay.addWidget(self.mf_stop_list)
 
-        save_group = GroupBoxContainer()
+        save_group = QGroupBox()
         main_lay.addWidget(save_group)
+        save_group_container = QVBoxLayout(save_group)
+        save_group_container.setContentsMargins(5, 0, 5, 0)
+        save_group_container.setSpacing(0)
 
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
         self.mf_save_widget.hide_sep()
         self.mf_save_widget.clicked.connect(self.save_mf_settings)
-        save_group.layout_.addWidget(self.mf_save_widget)
+        save_group_container.addWidget(self.mf_save_widget)
 
         main_lay.addStretch()
 
@@ -985,12 +839,6 @@ class WinSettings(UMainWidget):
         self.setWindowTitle(Lng.settings[JsonData.lng_index])
         self.setFixedSize(700, 560)
 
-        self.cfg_data = CfgData(
-            lng_index=JsonData.lng_index,
-            scaner_minutes=JsonData.scaner_minutes
-        )
-        self.mf_list_clone = copy.deepcopy(Mf.items)
-        self.filters_clone = copy.deepcopy(Filters.items)
         self.settings_item = settings_item
 
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -1067,7 +915,7 @@ class WinSettings(UMainWidget):
 
     def init_right_side(self, idx: int):
         if idx == 0:
-            r_wid = GeneralSettings(self.cfg_data)
+            r_wid = GeneralSettings()
         elif idx == 1:
             r_wid = FiltersWid()
         elif idx == 2:
