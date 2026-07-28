@@ -850,7 +850,7 @@ class MfSettings(QWidget):
                     break
             mf_stop_list = self.mf_stop_list.text_edit.toPlainText().split("\n")
             current_mf.mf_paths = [self.path_widget.mf_path, ]
-            current_mf.current_path = self.path_widget.mf_path
+            current_mf.mf_current_path = self.path_widget.mf_path
             current_mf.mf_stop_list = mf_stop_list
             Mf.write_json_data()
             restart_app()
@@ -1160,7 +1160,6 @@ class WinSettings(UMainWidget):
                     self.settings_item.type_ = "general"
                     self.settings_item.content = ""
                     break
-        r_wid.changed.connect(self.blink_ok_btn)
         self.right_lay.insertWidget(0, r_wid)
 
     def add_mf(self, mf: Mf):
