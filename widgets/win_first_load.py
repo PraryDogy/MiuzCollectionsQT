@@ -15,9 +15,10 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow, RowArrowWidget, SelectableLabel,
-                            ULineEdit, UMainWidget, UPushButton, VListWidget,
-                            VListWidgetItem, WarningWindow)
+from ._base_widgets import (ConfirmWindow, RowArrowWidget, SaveRowArrowWidget,
+                            SelectableLabel, ULineEdit, UMainWidget,
+                            UPushButton, VListWidget, VListWidgetItem,
+                            WarningWindow)
 
 
 def restart_app():
@@ -54,76 +55,6 @@ class ZipTask(URunnable):
             print("ZipTask remove zip file error", e)
             
         self.sigs.finished.emit()
-    
-class CustomItem(VListWidgetItem):
-    def __init__(self, parent, path, height = 30, text = None):
-        super().__init__(parent, height, text)
-        self.path: str = path
-
-
-class LoadSettingsWin(UMainWidget):
-    preload = Static.backup_files
-    ok_pressed = pyqtSignal(str)
-
-    def __init__(self, lng_index: int):
-        super().__init__()
-        self.setWindowTitle(Lng.load_settings[lng_index])
-        self.set_close_only()
-        self.set_always_on_top()
-        self.lng_index = lng_index
-        self.backups = self.load_backups()
-
-        list_container = QGroupBox()
-        self.central_layout.addWidget(list_container)
-        self.central_layout.setSpacing(10)
-
-        list_layout = QVBoxLayout(list_container)
-        list_layout.setContentsMargins(2, 10, 2, 2)
-
-        self.list_widget = VListWidget(self)
-        self.list_widget.setFixedSize(300, 250)
-        list_layout.addWidget(self.list_widget)
-
-        for i in self.backups:
-            item = CustomItem(self.list_widget, path=i.path,text=i.name)
-            self.list_widget.addItem(item)
-
-        self.list_widget.setCurrentRow(0)
-
-        btn_container = QWidget()
-        self.central_layout.addWidget(btn_container)
-
-        btn_layout = QHBoxLayout(btn_container)
-        btn_layout.setContentsMargins(0, 0, 0, 0)
-        btn_layout.setSpacing(10)
-        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.ok_btn = UPushButton(Lng.ok[self.lng_index])
-        self.ok_btn.clicked.connect(self.ok_pressed_cmd)
-        btn_layout.addWidget(self.ok_btn)
-
-        self.cancel_btn = UPushButton(Lng.cancel[self.lng_index])
-        self.cancel_btn.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(self.cancel_btn)
-
-        self.adjustSize()
-
-    def ok_pressed_cmd(self):
-        selected_item: CustomItem = self.list_widget.currentItem()
-        path = selected_item.path
-        self.ok_pressed.emit(path)
-
-    def load_backups(self):
-        backups: list[os.DirEntry] = []
-        for i in os.scandir(self.preload):
-            if i.name.endswith((".zip", ".ZIP")):
-                backups.append(i)
-        return backups
-
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
-        return super().keyPressEvent(a0)
 
 
 class PathWidget(QGroupBox):
@@ -227,8 +158,6 @@ class FirstLoadWin(UMainWidget):
     rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
     eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
     language_svg = os.path.join(Static.common_icons, "language.svg")
-    import_svg = os.path.join(Static.common_icons, "import.svg")
-    save_svg = os.path.join(Static.common_icons, "save.svg")
     svg_size = 16
     ww = 440
 
@@ -354,26 +283,10 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setContentsMargins(5, 0, 5, 0)
         last_block_layout.setSpacing(0)
 
-        self.backup_widget = RowArrowWidget(Lng.load_settings[self.lng_index])
-        self.backup_widget.set_left_icon(self.import_svg)
-        self.backup_widget.clicked.connect(
-            lambda: self.open_load_settings_win()
-        )
-        last_block_layout.addWidget(self.backup_widget)
-
-        self.save_widget = RowArrowWidget(Lng.save[self.lng_index])
-        self.save_widget.set_left_icon(self.save_svg)
+        self.save_widget = SaveRowArrowWidget()
         self.save_widget.hide_sep()
-        self.save_widget.clicked.connect(
-            lambda: self.save_cmd()
-        )
+        self.save_widget.clicked.connect(lambda: self.save_cmd())
         last_block_layout.addWidget(self.save_widget)
-
-    def open_load_settings_win(self):
-        self.load_settings_win = LoadSettingsWin(self.lng_index)
-        self.load_settings_win.center_to_parent(self)
-        self.load_settings_win.ok_pressed.connect(self.copy_zip_cmd)
-        self.load_settings_win.show()
 
     def copy_zip_cmd(self, path: str):
 

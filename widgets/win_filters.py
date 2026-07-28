@@ -1,12 +1,12 @@
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QVBoxLayout, QGroupBox
+from PyQt6.QtWidgets import QGroupBox, QVBoxLayout
 
-from cfg import JsonData, Dynamic
+from cfg import Dynamic, JsonData
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (UMainWidget, UPushButton, VListSpacerItem,
-                            VListWidget, VListWidgetItem)
+from ._base_widgets import (SaveRowArrowWidget, UMainWidget, UPushButton,
+                            VListSpacerItem, VListWidget, VListWidgetItem)
 
 
 class WinFilters(UMainWidget):
