@@ -805,7 +805,7 @@ class MfSettings(QWidget):
             else:
                 QTimer.singleShot(1000, poll_task)
 
-        def fin():
+        def start_mf_remover():
             for i in UMainWidget.win_list:
                 i.hide()
             self.mf_remover.start()
@@ -816,7 +816,7 @@ class MfSettings(QWidget):
             args=(self.mf.mf_alias, )
         )
 
-        if len(self.mf_list_clone) == 1:
+        if len(Mf.items) == 1:
             win = WarningWindow(
                 Lng.at_least_one_folder_required[JsonData.lng_index],
                 280, 90
@@ -826,7 +826,7 @@ class MfSettings(QWidget):
             win = ConfirmWindow(
                 Lng.app_will_restarted[JsonData.lng_index], 300, 90
             )
-            win.ok_clicked.connect(fin)
+            win.ok_clicked.connect(start_mf_remover)
         win.center_to_parent(self.window())
         win.show()
 
