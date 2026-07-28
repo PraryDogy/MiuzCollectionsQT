@@ -533,7 +533,7 @@ class ThemesWidget(GroupBoxContainer):
             ThemeChanger.init()
 
 
-class SelectableLabel(LabelMinWidth):
+class AboutWidLabel(LabelMinWidth):
     txt = "\n".join([
         f"Version {Static.app_ver}",
         "Developed by Evlosh",
@@ -588,7 +588,7 @@ class AboutWid(QGroupBox):
 
         h_lay.addSpacerItem(QSpacerItem(0, 20))
 
-        lbl = SelectableLabel(self)
+        lbl = AboutWidLabel(self)
         h_lay.addWidget(lbl)
 
         h_lay.addStretch()
@@ -623,11 +623,6 @@ class GeneralSettings(QWidget, StateWid):
         self.need_reset_item.need_reset = True
         self.changed.emit()
         self.set_was_changed()
-
-
-
-# ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ 
-
 
 
 class FiltersWid(QWidget):
