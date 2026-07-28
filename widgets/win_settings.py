@@ -66,7 +66,7 @@ class SettingsLabel(QLabel):
         self.setMinimumWidth(30)
 
 
-class SettingsGroup(QGroupBox):
+class GroupBoxContainer(QGroupBox):
     def __init__(self):
         """
         QGroupBox + self.layout_ (vertical layout)
@@ -77,7 +77,7 @@ class SettingsGroup(QGroupBox):
         self.layout_.setSpacing(0)
 
 
-class SettingsTextEdit(SettingsGroup):
+class SettingsTextEdit(GroupBoxContainer):
     textChanged = pyqtSignal()
 
     def __init__(self, title: str, placeholder: str, text: Optional[str]):
@@ -233,7 +233,7 @@ class ExportWin(UMainWidget):
         return super().keyPressEvent(a0)
 
 
-class RebootSettings(SettingsGroup):
+class RebootSettings(GroupBoxContainer):
     cfg_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
@@ -407,7 +407,7 @@ class SizesWin(UMainWidget):
         return super().keyPressEvent(a0)
 
 
-class NonRebootSettings(SettingsGroup):
+class NonRebootSettings(GroupBoxContainer):
     storage_svg = os.path.join(Static.common_icons, "storage.svg")
     files_svg = os.path.join(Static.common_icons, "files.svg")
 
@@ -495,7 +495,7 @@ class ThemeBtn(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class ThemesWidget(SettingsGroup):
+class ThemesWidget(GroupBoxContainer):
     macos_theme_svg = os.path.join(Static.common_icons, "macos_theme.svg")
 
     def __init__(self):
@@ -630,7 +630,7 @@ class GeneralSettings(QWidget, StateWid):
 
 
 
-class FiltersWid(SettingsGroup, StateWid):
+class FiltersWid(GroupBoxContainer, StateWid):
     changed = pyqtSignal()
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     exts = (
@@ -743,7 +743,7 @@ class MfSettings(QWidget, StateWid):
         main_lay.setSpacing(15)
 
         # Верхний ряд с названием
-        name_group = SettingsGroup()
+        name_group = GroupBoxContainer()
         main_lay.addWidget(name_group)
 
         self.name_wid = RowArrowWidget(f"{Lng.alias[JsonData.lng_index]}: {mf.mf_alias}")
@@ -760,7 +760,7 @@ class MfSettings(QWidget, StateWid):
         self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
-        general_wid = SettingsGroup()
+        general_wid = GroupBoxContainer()
         main_lay.addWidget(general_wid)
 
         repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
@@ -906,7 +906,7 @@ class NewFolder(QWidget, StateWid):
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(15)
 
-        name_wid = SettingsGroup()
+        name_wid = GroupBoxContainer()
         name_wid.layout_.setSpacing(5)
         main_lay.addWidget(name_wid)
 
@@ -927,7 +927,7 @@ class NewFolder(QWidget, StateWid):
         self.mf_stop_list.textChanged.connect(self.set_was_changed)
         main_lay.addWidget(self.mf_stop_list)
 
-        save_group = SettingsGroup()
+        save_group = GroupBoxContainer()
         main_lay.addWidget(save_group)
 
         self.save_wid = SaveRowArrowWidget()
