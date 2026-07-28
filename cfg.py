@@ -34,6 +34,7 @@ class Static:
     bar_top_icons = os.path.join(icons, "bar_top")
     common_icons = os.path.join(icons, "common")
     jpeg_icons = os.path.join(icons, "jpeg_icons")
+    backup_miuz_zip = os.path.join(backup_files, "miuz.zip")
 
     max_thumb_size = 210
     pixmap_sizes = [50, 70, 100, 170]

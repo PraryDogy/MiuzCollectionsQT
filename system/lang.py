@@ -561,3 +561,7 @@ class Lng:
         "Путь к каталогу изображений не существует",
         "The path to the image catalog does not exist"
     )
+    miuz_diamonds = (
+        "MIUZ Diamonds",
+        "MIUZ Diamonds"
+    )
