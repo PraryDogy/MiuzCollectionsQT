@@ -918,24 +918,13 @@ class NewMfSettings(QWidget):
 
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
         self.mf_save_widget.hide_sep()
-        self.mf_save_widget.clicked.connect(self.save_start)
+        self.mf_save_widget.clicked.connect(self.save_mf_settings)
         save_group.layout_.addWidget(self.mf_save_widget)
 
     def mf_path_widget_changed(self):
         basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
         self.mf_alias_widget.line_edit.setText(basename)
         self.mf_save_widget.show_warning()
-
-    # def preset_new_folder(self, url: str):
-    #     if url:
-    #         url = os.sep + url.strip(os.sep)
-    #         basename = os.path.basename(url)
-    #         self.name_line_edit.setText(basename)
-    #         self.mf_save_widget.show_warning()
-            
-    #         self.mf_path_widget.mf_temp_path = url
-    #         self.mf_path_widget.ok_path_widget()
-    #         self.mf_path_widget.stop_task()
 
     def save_mf_settings(self):
 
@@ -977,7 +966,6 @@ class NewMfSettings(QWidget):
             )
             super_win.center_to_parent(self.window())
             super_win.show()
-
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -1129,7 +1117,6 @@ class WinSettings(UMainWidget):
         elif idx == 2:
             self.btns_wid.hide()
             r_wid = NewMfSettings()
-            r_wid.preset_new_folder(self.settings_item.content)
         elif idx > 3:
             self.btns_wid.hide()
             item: VListWidgetItem = self.left_menu.item(idx)
