@@ -67,8 +67,8 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 
 DATA_FILES = [
     *include_files(Static.icons),
-    *include_files(Static.backup_files),
     *include_files(Static.scripts),
+    Static.miuz_zip
     ]
 
 

@@ -175,15 +175,14 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setContentsMargins(5, 0, 5, 0)
         last_block_layout.setSpacing(0)
 
-        if os.path.exists(Static.backup_files):
-            if os.path.exists(Static.backup_miuz_zip):
-                self.copy_zip_widget = RowArrowWidget(
-                    Lng.miuz_diamonds[self.lng_index]
-                )
-                self.copy_zip_widget.clicked.connect(
-                    lambda: self.copy_zip_cmd(Static.backup_miuz_zip)
-                )
-                last_block_layout.addWidget(self.copy_zip_widget)
+        if os.path.exists(Static.miuz_zip):
+            self.copy_zip_widget = RowArrowWidget(
+                Lng.miuz_diamonds[self.lng_index]
+            )
+            self.copy_zip_widget.clicked.connect(
+                lambda: self.copy_zip_cmd(Static.miuz_zip)
+            )
+            last_block_layout.addWidget(self.copy_zip_widget)
 
         self.save_widget = SaveRowArrowWidget(self.lng_index)
         self.save_widget.hide_sep()
@@ -199,7 +198,6 @@ class FirstLoadWin(UMainWidget):
 
         self.copy_task = ZipTask(path)
         self.copy_task.sigs.finished.connect(fin)
-        self.load_settings_win.hide()
         self.hide()
         UThreadPool.start(self.copy_task)
 
