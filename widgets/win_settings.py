@@ -286,6 +286,7 @@ class RebootSettings(SettingsGroup):
 
         reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
         reset_data_wid.set_left_icon(self.reset_svg)
+        reset_data_wid.hide_sep()
         reset_data_wid.clicked.connect(self.reset_btn_cmd)
         self.layout_.addWidget(reset_data_wid)
 
