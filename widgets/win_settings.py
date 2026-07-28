@@ -668,12 +668,12 @@ class FiltersWid(QWidget):
         second_container = QGroupBox()
         main_lay.addWidget(second_container)
         second_container_layout = QVBoxLayout(second_container)
-        second_container_layout.setContentsMargins(5, 2, 5, 2)
+        second_container_layout.setContentsMargins(5, 0, 5, 0)
         second_container_layout.setSpacing(0)
 
         erase_filters_wid = RowArrowWidget(Lng.reset_filters[JsonData.lng_index])
         erase_filters_wid.set_left_icon(self.reset_svg)
-        erase_filters_wid.clicked.connect(self.reset_btn_cmd)
+        erase_filters_wid.clicked.connect(self.reset_filters_cmd)
         second_container_layout.addWidget(erase_filters_wid)
 
         self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
@@ -681,18 +681,14 @@ class FiltersWid(QWidget):
         self.save_wid.hide_sep()
         second_container_layout.addWidget(self.save_wid)
 
-
-
         main_lay.addStretch()
         
-    def reset_btn_cmd(self, *args):
+    def reset_filters_cmd(self):
+
         def fin():
-            # Filters.items = self.exts
-            self.filters_edit.clear()
-            self.filters_edit.insertPlainText("\n".join(self.exts))
-            self.filters_win.deleteLater()
-            self.changed.emit()
-            self.set_was_changed()
+            Filters.items = self.exts
+            Filters.write_json_data()
+            restart_app()
 
         self.filters_win = ConfirmWindow(
             Lng.reset_filters_long[JsonData.lng_index], 290, 90
