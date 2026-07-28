@@ -700,13 +700,22 @@ class FiltersWid(QWidget):
         self.filters_win.show()
 
     def save_filters_cmd(self):
-        Filters.items = [
-            line.strip() 
-            for line in self.filters_edit.toPlainText().split("\n") 
-            if line.strip()
-        ]
-        Filters.write_json_data()
-        restart_app()
+
+        def fin():
+            Filters.items = [
+                line.strip() 
+                for line in self.filters_edit.toPlainText().split("\n") 
+                if line.strip()
+            ]
+            Filters.write_json_data()
+            restart_app()
+
+        win = ConfirmWindow(
+            Lng.app_will_restarted[JsonData.lng_index], 300, 90
+        )
+        win.ok_clicked.connect(fin)
+        win.center_to_parent(self.window())
+        win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
