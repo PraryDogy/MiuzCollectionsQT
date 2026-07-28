@@ -656,12 +656,12 @@ class MfPathWidget(QGroupBox):
     hh = 70
     icon_size = 35
 
-    def __init__(self, lng_index: int):
+    def __init__(self, lng_index: int, mf_path: str = None):
         super().__init__()
         self.setAcceptDrops(True)
         self.setFixedHeight(self.hh)
 
-        self.mf_path = None
+        self.mf_path = mf_path
         self.lng_index = lng_index
     
         self.main_lay = QVBoxLayout(self)
@@ -671,7 +671,10 @@ class MfPathWidget(QGroupBox):
         self.main_wid = QWidget()
         self.main_lay.addWidget(self.main_wid)
 
-        self.no_path_widget()
+        if mf_path is None:
+            self.no_path_widget()
+        else:
+            self.ok_path_widget()
 
     def no_path_widget(self):
         self.main_wid.hide()
@@ -762,3 +765,24 @@ class MfPathWidget(QGroupBox):
     def dragEnterEvent(self, a0):
         a0.accept()
         return super().dragEnterEvent(a0)
+
+
+class MfStopListWidget(QGroupBox):
+
+    def __init__(self, lng_index: int, mf_stop_list: list[str]):
+        super().__init__()
+        self.lng_index = lng_index
+
+        v_layout = QVBoxLayout(self)
+        v_layout.setContentsMargins(5, 2, 5, 2)
+        v_layout.setSpacing(5)
+
+        name_text = QLabel(Lng.ignore_list_descr[lng_index])
+        v_layout.addWidget(name_text)
+
+        self.text_edit = UTextEdit()
+        self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
+        v_layout.addWidget(self.text_edit)
+
+        if mf_stop_list:
+            self.text_edit.setPlainText("\n".join(mf_stop_list))

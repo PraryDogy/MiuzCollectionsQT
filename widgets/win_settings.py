@@ -29,11 +29,11 @@ from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (ConfirmWindow, HSep, RowArrowWidget, SaveRowArrowWidget,
-                            ULineEdit, UMainWidget, UMenu, UPushButton,
-                            UTextEdit, VListSpacerItem, VListWidget,
-                            VListWidgetItem, WarningWindow)
-from .path_widget import PathWidget
+from ._base_widgets import (ConfirmWindow, HSep, MfStopListWidget,
+                            RowArrowWidget, SaveRowArrowWidget, ULineEdit,
+                            UMainWidget, UMenu, UPushButton, UTextEdit,
+                            VListSpacerItem, VListWidget, VListWidgetItem,
+                            WarningWindow, MfPathWidget)
 from .win_smb import SuperWarnWindow
 
 
@@ -77,38 +77,38 @@ class GroupBoxContainer(QGroupBox):
         self.layout_.setSpacing(0)
 
 
-class SettingsTextEdit(GroupBoxContainer):
-    textChanged = pyqtSignal()
+# class SettingsTextEdit(GroupBoxContainer):
+#     textChanged = pyqtSignal()
 
-    def __init__(self, title: str, placeholder: str, text: Optional[str]):
-        super().__init__()
-        self.setAcceptDrops(True)
-        self.layout_.setSpacing(10)
+#     def __init__(self, title: str, placeholder: str, text: Optional[str]):
+#         super().__init__()
+#         self.setAcceptDrops(True)
+#         self.layout_.setSpacing(10)
 
-        self.title_wid = LabelMinWidth(title)
-        self.title_wid.setWordWrap(True)
-        self.layout_.addWidget(self.title_wid)
+#         self.title_wid = LabelMinWidth(title)
+#         self.title_wid.setWordWrap(True)
+#         self.layout_.addWidget(self.title_wid)
 
-        self.text_edit_wid = UTextEdit()
-        self.text_edit_wid.setFixedHeight(100)
-        self.text_edit_wid.setPlaceholderText(placeholder)
-        self.text_edit_wid.textChanged.connect(self.textChanged.emit)
-        self.text_edit_wid.setAcceptDrops(False)
-        self.layout_.addWidget(self.text_edit_wid)
+#         self.text_edit_wid = UTextEdit()
+#         self.text_edit_wid.setFixedHeight(100)
+#         self.text_edit_wid.setPlaceholderText(placeholder)
+#         self.text_edit_wid.textChanged.connect(self.textChanged.emit)
+#         self.text_edit_wid.setAcceptDrops(False)
+#         self.layout_.addWidget(self.text_edit_wid)
 
-        if text:
-            self.text_edit_wid.setPlainText(text)
+#         if text:
+#             self.text_edit_wid.setPlainText(text)
 
-    def get_list(self):
-        return [
-            i
-            for i in self.text_edit_wid.toPlainText().split("\n")
-            if i.strip()
-        ]
+#     def get_list(self):
+#         return [
+#             i
+#             for i in self.text_edit_wid.toPlainText().split("\n")
+#             if i.strip()
+#         ]
 
-    def dragEnterEvent(self, a0):
-        a0.accept()
-        return super().dragEnterEvent(a0)
+#     def dragEnterEvent(self, a0):
+#         a0.accept()
+#         return super().dragEnterEvent(a0)
     
 
 class SettingsListItem(VListWidgetItem):
@@ -698,45 +698,45 @@ class FiltersWid(GroupBoxContainer, StateWid):
 
 # ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ ВИДЖЕТЫ ПАПОК С КОЛЛЕКЦИЯМИ 
 
-class MfStopList(SettingsTextEdit):
-    def __init__(self, mf: Mf):
-        super().__init__(
-            title=Lng.ignore_list_descr[JsonData.lng_index],
-            placeholder=Lng.ignore_list[JsonData.lng_index],
-            text="\n".join(i for i in mf.mf_stop_list),
-        )
-        self.mf = mf
-        self.textChanged.connect(self.set_data)
+# class MfStopList(SettingsTextEdit):
+#     def __init__(self, mf: Mf):
+#         super().__init__(
+#             title=Lng.ignore_list_descr[JsonData.lng_index],
+#             placeholder=Lng.ignore_list[JsonData.lng_index],
+#             text="\n".join(i for i in mf.mf_stop_list),
+#         )
+#         self.mf = mf
+#         self.textChanged.connect(self.set_data)
 
-    def set_data(self, *args):
-        self.mf.mf_stop_list = self.get_list()
+#     def set_data(self, *args):
+#         self.mf.mf_stop_list = self.get_list()
 
-    def dropEvent(self, a0):
-        if a0.mimeData().hasUrls():
-            urls = [
-                os.path.basename(i.toLocalFile().rstrip(os.sep))
-                for i in a0.mimeData().urls()
-                if os.path.isdir(i.toLocalFile())
-            ]
-            text = "\n".join(
-                (self.text_edit_wid.toPlainText(), *urls)
-            ).strip()
-            self.text_edit_wid.setPlainText(text)
-        return super().dropEvent(a0)
+#     def dropEvent(self, a0):
+#         if a0.mimeData().hasUrls():
+#             urls = [
+#                 os.path.basename(i.toLocalFile().rstrip(os.sep))
+#                 for i in a0.mimeData().urls()
+#                 if os.path.isdir(i.toLocalFile())
+#             ]
+#             text = "\n".join(
+#                 (self.text_edit_wid.toPlainText(), *urls)
+#             ).strip()
+#             self.text_edit_wid.setPlainText(text)
+#         return super().dropEvent(a0)
 
 
 # ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ ПАПКА С КОЛЛЕКЦИЯМИ 
 
 
-class MfSettings(QWidget, StateWid):
-    changed = pyqtSignal()
+class MfSettings(QWidget):
     repair_svg = os.path.join(Static.common_icons, "repair.svg")
     trash_svg = os.path.join(Static.common_icons, "trash.svg")
 
-    def __init__(self, mf: Mf, mf_list_clone: list[Mf]):
+    def __init__(self, mf_index: int):
         super().__init__()
-        self.mf = mf
-        self.mf_list_clone = mf_list_clone
+
+        #  Получаем объект Mf по индексу
+        self.mf = Mf.items[mf_index]
 
         main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
@@ -746,18 +746,23 @@ class MfSettings(QWidget, StateWid):
         name_group = GroupBoxContainer()
         main_lay.addWidget(name_group)
 
-        self.name_wid = RowArrowWidget(f"{Lng.alias[JsonData.lng_index]}: {mf.mf_alias}")
+        self.name_wid = RowArrowWidget(
+            text=f"{Lng.alias[JsonData.lng_index]}: {self.mf.mf_alias}"
+        )
         self.name_wid.hide_arrow()
         self.name_wid.hide_sep()
         name_group.layout_.addWidget(self.name_wid)
 
-        self.path_widget = PathWidget(mf)
-        self.path_widget.setFixedHeight(self.path_widget.hh)
-        self.path_widget.mf_path_avaiable.connect(self.set_was_changed)
+        self.path_widget = MfPathWidget(
+            lng_index=JsonData.lng_index,
+            mf_path=self.mf.get_avaiable_mf_path()
+        )
         main_lay.addWidget(self.path_widget)
 
-        self.mf_stop_list = MfStopList(mf)
-        self.mf_stop_list.textChanged.connect(self.set_was_changed)
+        self.mf_stop_list = MfStopListWidget(
+            lng_index=JsonData.lng_index,
+            mf_stop_list=self.mf.mf_stop_list
+        )
         main_lay.addWidget(self.mf_stop_list)
 
         general_wid = GroupBoxContainer()
@@ -773,14 +778,10 @@ class MfSettings(QWidget, StateWid):
         remove_wid.clicked.connect(self.remove_cmd)
         general_wid.layout_.addWidget(remove_wid)
 
-        self.mf_save = SaveRowArrowWidget()
+        self.mf_save = SaveRowArrowWidget(JsonData.lng_index)
         self.mf_save.hide_sep()
-        self.mf_save.clicked.connect(self.save)
+        self.mf_save.clicked.connect(self.save_mf_settings)
         general_wid.layout_.addWidget(self.mf_save)
-
-    def set_was_changed(self):
-        self.mf_save.show_warning()
-        super().set_was_changed()
 
     def remove_cmd(self, *args):
         
@@ -827,7 +828,6 @@ class MfSettings(QWidget, StateWid):
         """
         Удаляет Dirs table по mf_alias и удаляет несуществующие thumbs
         """
-
         def reset_data():
             self.reset_task = MfDataCleaner(self.mf.mf_alias)
             self.reset_task.sigs.finished_.connect(restart_app)
@@ -840,27 +840,28 @@ class MfSettings(QWidget, StateWid):
         win.center_to_parent(self.window())
         win.show()
 
-    def save(self, *args):
+    def save_mf_settings(self):
 
-        def fin():
-            self.mf.mf_paths = paths
-            self.mf.mf_stop_list = stop_list
-
+        def final():
+            current_mf = None
             for i in Mf.items:
                 if i.mf_alias == self.mf.mf_alias:
-                    i.mf_paths = paths
-                    i.mf_stop_list = stop_list
+                    current_mf = i
                     break
-
+            mf_stop_list = self.mf_stop_list.text_edit.toPlainText().split("\n")
+            current_mf.mf_paths = [self.path_widget.mf_path, ]
+            current_mf.current_path = self.path_widget.mf_path
+            current_mf.mf_stop_list = mf_stop_list
             Mf.write_json_data()
             restart_app()
 
-        stop_list = self.mf_stop_list.get_list()
-        paths = []
-        if self.path_widget.mf_temp_path:
-            paths.append(self.path_widget.mf_temp_path)
-
-        if not paths:
+        mf_path = self.path_widget.validate()
+        if mf_path:
+            super_win = SuperWarnWindow()
+            super_win.ok_clicked.connect(final)
+            super_win.center_to_parent(self.window())
+            super_win.show()
+        else:
             win_warn = WarningWindow(
                 Lng.select_folder_path[JsonData.lng_index],
                 270, 80
@@ -868,17 +869,6 @@ class MfSettings(QWidget, StateWid):
             win_warn.center_to_parent(self.window())
             win_warn.ok_clicked.connect(win_warn.deleteLater)
             win_warn.show()
-            return
-        
-        super_win = SuperWarnWindow()
-        super_win.ok_clicked.connect(fin)
-        super_win.center_to_parent(self.window())
-        super_win.show()
-
-        # win = ConfirmWindow(Lng.save_text_long[Cfg.lng_index])
-        # win.ok_clicked.connect(fin)
-        # win.center_to_parent(self.window())
-        # win.show()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
@@ -917,20 +907,20 @@ class NewFolder(QWidget, StateWid):
         self.name_line_edit.setPlaceholderText(Lng.alias_immutable[JsonData.lng_index])
         name_wid.layout_.addWidget(self.name_line_edit)
 
-        self.path_widget = PathWidget(self.mf)
-        self.path_widget.mf_path_avaiable.connect(self.set_was_changed)
-        self.path_widget.mf_path_avaiable.connect(self.set_mf_alias)
-        self.path_widget.setFixedHeight(self.path_widget.hh)
-        main_lay.addWidget(self.path_widget)
+        # self.path_widget = PathWidget(self.mf)
+        # self.path_widget.mf_path_avaiable.connect(self.set_was_changed)
+        # self.path_widget.mf_path_avaiable.connect(self.set_mf_alias)
+        # self.path_widget.setFixedHeight(self.path_widget.hh)
+        # main_lay.addWidget(self.path_widget)
 
-        self.mf_stop_list = MfStopList(self.mf)
-        self.mf_stop_list.textChanged.connect(self.set_was_changed)
-        main_lay.addWidget(self.mf_stop_list)
+        # self.mf_stop_list = MfStopList(self.mf)
+        # self.mf_stop_list.textChanged.connect(self.set_was_changed)
+        # main_lay.addWidget(self.mf_stop_list)
 
         save_group = GroupBoxContainer()
         main_lay.addWidget(save_group)
 
-        self.save_wid = SaveRowArrowWidget()
+        self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
         self.save_wid.hide_sep()
         self.save_wid.clicked.connect(self.save_start)
         save_group.layout_.addWidget(self.save_wid)
@@ -1166,7 +1156,7 @@ class WinSettings(UMainWidget):
             item: VListWidgetItem = self.left_menu.item(idx)
             for mf in self.mf_list_clone:
                 if mf.mf_alias == item.text():
-                    r_wid = MfSettings(mf, self.mf_list_clone)
+                    r_wid = MfSettings(self.mf_list_clone.index(mf))
                     self.settings_item.type_ = "general"
                     self.settings_item.content = ""
                     break
