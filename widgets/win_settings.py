@@ -776,12 +776,12 @@ class MfSettings(QWidget):
 
         repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
         repair_widget.set_left_icon(self.repair_svg)
-        repair_widget.clicked.connect(self.repair_cmd)
+        repair_widget.clicked.connect(self.repair_mf)
         general_wid.layout_.addWidget(repair_widget)
 
         remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
         remove_wid.set_left_icon(self.trash_svg)
-        remove_wid.clicked.connect(self.remove_cmd)
+        remove_wid.clicked.connect(self.remove_mf)
         general_wid.layout_.addWidget(remove_wid)
 
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
@@ -789,7 +789,7 @@ class MfSettings(QWidget):
         self.mf_save_widget.clicked.connect(self.save_mf_settings)
         general_wid.layout_.addWidget(self.mf_save_widget)
 
-    def remove_cmd(self, *args):
+    def remove_mf(self, *args):
         
         def poll_task():
             if not self.mf_remover.is_alive():
@@ -830,10 +830,7 @@ class MfSettings(QWidget):
         win.center_to_parent(self.window())
         win.show()
 
-    def repair_cmd(self, *args):
-        """
-        Удаляет Dirs table по mf_alias и удаляет несуществующие thumbs
-        """
+    def repair_mf(self, *args):
         def reset_data():
             self.reset_task = MfDataCleaner(self.mf.mf_alias)
             self.reset_task.sigs.finished_.connect(restart_app)
@@ -888,20 +885,13 @@ class NewMfSettings(QWidget):
 
     def __init__(self):
         super().__init__()
-        # self.mf = Mf(
-        #     mf_alias = "",
-        #     mf_paths = [],
-        #     mf_stop_list = [],
-        #     mf_current_path = ""
-        # )
-
         main_lay = QVBoxLayout(self)
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(15)
 
         self.mf_alias_widget = MfAliasWidget(JsonData.lng_index)
         self.mf_alias_widget.changed.connect(
-            lambda: self.save_wid.show_warning()
+            lambda: self.mf_save_widget.show_warning()
         )
         main_lay.addWidget(self.mf_alias_widget)
 
@@ -914,29 +904,34 @@ class NewMfSettings(QWidget):
         )
         main_lay.addWidget(self.mf_path_widget)
 
-        # self.mf_stop_list = MfStopList(self.mf)
-        # self.mf_stop_list.textChanged.connect(self.set_was_changed)
-        # main_lay.addWidget(self.mf_stop_list)
+        self.mf_stop_list = MfStopListWidget(
+            lng_index=JsonData.lng_index,
+            mf_stop_list=[]
+        )
+        self.mf_stop_list.text_edit.textChanged.connect(
+            lambda: self.mf_save_widget.show_warning()
+        )
+        main_lay.addWidget(self.mf_stop_list)
 
         save_group = GroupBoxContainer()
         main_lay.addWidget(save_group)
 
-        self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
-        self.save_wid.hide_sep()
-        self.save_wid.clicked.connect(self.save_start)
-        save_group.layout_.addWidget(self.save_wid)
+        self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
+        self.mf_save_widget.hide_sep()
+        self.mf_save_widget.clicked.connect(self.save_start)
+        save_group.layout_.addWidget(self.mf_save_widget)
 
     def mf_path_widget_changed(self):
         basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
         self.mf_alias_widget.line_edit.setText(basename)
-        self.save_wid.show_warning()
+        self.mf_save_widget.show_warning()
 
     def preset_new_folder(self, url: str):
         if url:
             url = os.sep + url.strip(os.sep)
             basename = os.path.basename(url)
             self.name_line_edit.setText(basename)
-            self.save_wid.show_warning()
+            self.mf_save_widget.show_warning()
             
             self.mf_path_widget.mf_temp_path = url
             self.mf_path_widget.ok_path_widget()
