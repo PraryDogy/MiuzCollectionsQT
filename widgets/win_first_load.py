@@ -15,7 +15,8 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow, RowArrowWidget, SaveRowArrowWidget,
+from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
+                            RowArrowWidget, SaveRowArrowWidget,
                             SelectableLabel, ULineEdit, UMainWidget,
                             UPushButton, VListWidget, VListWidgetItem,
                             WarningWindow)
@@ -55,103 +56,6 @@ class ZipTask(URunnable):
             print("ZipTask remove zip file error", e)
             
         self.sigs.finished.emit()
-
-
-class PathWidget(QGroupBox):
-    mf_path_avaiable = pyqtSignal(str)
-    magnifier = os.path.join(Static.common_icons, "magnifier.svg")
-    green_checkmark = os.path.join(Static.common_icons, "green_checkmark.svg")
-    hh = 70
-    icon_size = 35
-
-    def __init__(self, lng_index: int):
-        super().__init__()
-        self.setAcceptDrops(True)
-        self.setFixedHeight(self.hh)
-
-        self.current_path = None
-        self.lng_index = lng_index
-    
-        self.main_lay = QVBoxLayout(self)
-        self.main_lay.setContentsMargins(10, 2, 2, 2)
-        self.main_lay.setSpacing(0)
-
-        self.main_wid = QWidget()
-        self.main_lay.addWidget(self.main_wid)
-
-        self.no_path_widget()
-
-    def no_path_widget(self):
-        self.main_wid.hide()
-        self.main_wid.deleteLater()
-        self.main_wid = QWidget()
-        self.main_lay.addWidget(self.main_wid)
-
-        h_lay = QHBoxLayout(self.main_wid)
-        h_lay.setContentsMargins(0, 0, 0, 0)
-        h_lay.setSpacing(10)
-
-        right_btn = QSvgWidget()
-        right_btn.load(self.magnifier)
-        right_btn.setFixedSize(self.icon_size, self.icon_size)
-        h_lay.addWidget(right_btn)
-        
-        lines = (
-            f"{Lng.folder_path[self.lng_index]}:",
-            Lng.path_hint_texts[self.lng_index].lower()
-        )
-        left_label = QLabel("\n".join(lines))
-        left_label.setWordWrap(True)
-        h_lay.addWidget(left_label)
-
-        h_lay.addStretch()
-
-    def ok_path_widget(self):
-        self.main_wid.deleteLater()
-        self.main_wid = QWidget()
-        self.main_lay.addWidget(self.main_wid)
-
-        h_lay = QHBoxLayout(self.main_wid)
-        h_lay.setContentsMargins(0, 0, 0, 0)
-        h_lay.setSpacing(10)
-
-        right_btn = QSvgWidget()
-        right_btn.load(self.green_checkmark)
-        right_btn.setFixedSize(35, 35)
-        h_lay.addWidget(right_btn)
-
-        lines = (
-            f"{Lng.folder_path[self.lng_index]}:",
-            self.current_path
-        )
-        left_label = SelectableLabel('\n'.join(lines))
-        h_lay.addWidget(left_label)
-
-        h_lay.addStretch()
-
-    def mouseReleaseEvent(self, a0: QMouseEvent):
-        if not a0.button() != 2:
-            return
-        dialog = QFileDialog()
-        url = dialog.getExistingDirectory()
-        if url and os.path.isdir(url):
-            self.current_path = url.rstrip(os.sep)
-            self.mf_path_avaiable.emit(self.current_path)
-            self.ok_path_widget()
-        return super().mouseReleaseEvent(a0)
-        
-    def dropEvent(self, a0):
-        if a0.mimeData().hasUrls():
-            url = a0.mimeData().urls()[0].toLocalFile()
-            if url and os.path.isdir(url):
-                self.current_path = url.rstrip(os.sep)
-                self.mf_path_avaiable.emit(self.current_path)
-                self.ok_path_widget()
-        return super().dropEvent(a0)
-    
-    def dragEnterEvent(self, a0):
-        a0.accept()
-        return super().dragEnterEvent(a0)
 
 
 class FirstLoadWin(UMainWidget):
@@ -250,29 +154,17 @@ class FirstLoadWin(UMainWidget):
         self.lng_container.adjustSize()
 
     def init_mf_alias_widget(self):
-        self.mf_container = QGroupBox()
-        self.central_layout.addWidget(self.mf_container)
-
-        mf_layout = QVBoxLayout(self.mf_container)
-        mf_layout.setContentsMargins(5, 2, 5, 2)
-        mf_layout.setSpacing(5)
-
-        name_text = QLabel(Lng.folder_name[self.lng_index])
-        mf_layout.addWidget(name_text)
-
-        self.name_line_edit = ULineEdit()
-        self.name_line_edit.setPlaceholderText(Lng.alias_immutable[self.lng_index])
-        mf_layout.addWidget(self.name_line_edit)
+        self.mf_alias_widget = MfAliasWidget(self.lng_index)
+        self.mf_alias_widget.changed.connect(
+            lambda: self.save_widget.show_warning()
+        )
+        self.central_layout.addWidget(self.mf_alias_widget)
 
     def init_path_widget(self):
-
-        def mf_avaiable(path: str):
-            dir_name = os.path.basename(path)
-            if not self.name_line_edit.text():
-                self.name_line_edit.setText(dir_name)
-
-        self.path_widget = PathWidget(self.lng_index)
-        self.path_widget.mf_path_avaiable.connect(mf_avaiable)
+        self.path_widget = MfPathWidget(self.lng_index)
+        self.path_widget.changed.connect(
+            lambda: self.save_widget.show_warning()
+        )
         self.central_layout.addWidget(self.path_widget)
 
     def init_last_block(self):
@@ -283,7 +175,7 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setContentsMargins(5, 0, 5, 0)
         last_block_layout.setSpacing(0)
 
-        self.save_widget = SaveRowArrowWidget()
+        self.save_widget = SaveRowArrowWidget(self.lng_index)
         self.save_widget.hide_sep()
         self.save_widget.clicked.connect(lambda: self.save_cmd())
         last_block_layout.addWidget(self.save_widget)
@@ -303,54 +195,28 @@ class FirstLoadWin(UMainWidget):
 
     def save_cmd(self):
 
-        def show_warn(text: str, w, h):
-            win_warn = WarningWindow(text, w, h)
-            win_warn.ok_clicked.connect(win_warn.deleteLater)
-            win_warn.setFixedSize(w, h)
-            win_warn.center_to_parent(self.window())
-            win_warn.show()
-
-        def save_fin(folder_name: str, paths: list[str]):
+        def save_fin(mf_alias: str, mf_path: str):
             mf = Mf(
-                mf_alias=folder_name,
-                mf_paths=paths,
+                mf_alias=mf_alias,
+                mf_paths=[mf_path, ],
                 mf_stop_list=[],
-                mf_current_path=paths[0]
+                mf_current_path=mf_path
             )
             Mf.items.clear()
             Mf.items.append(mf)
             Mf.write_json_data()
-
             JsonData.lng_index = self.lng_index
             JsonData.write_json_data()
-
             restart_app()
 
-        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
-        folder_name = self.name_line_edit.text()
-        paths = []
-        if self.path_widget.current_path:
-            paths.append(self.path_widget.current_path)
-
-        if not folder_name:
-            show_warn(Lng.enter_alias_warning[self.lng_index], 260, 90)
-            return
-
-        elif len(folder_name) < 5 or len(folder_name) > 30:
-            show_warn(f'{Lng.string_limit[self.lng_index]}', 280, 90)
-            return
-
-        elif not re.fullmatch(pattern, folder_name):
-            show_warn(f'{Lng.valid_message[self.lng_index]}', 310, 90)
-            return
-
-        elif not paths:
-            show_warn(Lng.select_folder_path[self.lng_index], 285, 90)
-            return
-
-        self.save_win = ConfirmWindow(Lng.save_text_long[self.lng_index], 300, 90)
-        self.save_win.ok_clicked.connect(
-            lambda: save_fin(folder_name, paths)
-        )
-        self.save_win.center_to_parent(self.window())
-        self.save_win.show()
+        mf_alias = self.mf_alias_widget.validate()
+        mf_path = self.path_widget.validate()
+        if mf_alias and mf_path:
+            self.save_win = ConfirmWindow(
+                Lng.save_text_long[self.lng_index], 300, 90
+            )
+            self.save_win.ok_clicked.connect(
+                lambda: save_fin(mf_alias, mf_path)
+            )
+            self.save_win.center_to_parent(self.window())
+            self.save_win.show()

@@ -1,13 +1,14 @@
 import os
+import re
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QCloseEvent, QContextMenuEvent, QKeyEvent
+from PyQt6.QtGui import QAction, QCloseEvent, QContextMenuEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
-                             QListWidget, QListWidgetItem, QMainWindow, QMenu,
-                             QProgressBar, QPushButton, QScrollArea, QSlider,
-                             QSpacerItem, QTextEdit, QTreeWidget, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
+                             QLabel, QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QProgressBar, QPushButton,
+                             QScrollArea, QSlider, QSpacerItem, QTextEdit,
+                             QTreeWidget, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -601,6 +602,163 @@ class WarningWindow(ConfirmWindow):
 class SaveRowArrowWidget(RowArrowWidget):
     save_svg = os.path.join(Static.common_icons, "save.svg")
 
-    def __init__(self):
-        super().__init__(Lng.save[JsonData.lng_index])
+    def __init__(self, lng_index: int):
+        super().__init__(Lng.save[lng_index])
         self.set_left_icon(self.save_svg)
+
+
+class MfAliasWidget(QGroupBox):
+    changed = pyqtSignal()
+
+    def __init__(self, lng_index: int):
+        super().__init__()
+        self.lng_index = lng_index
+
+        v_layout = QVBoxLayout(self)
+        v_layout.setContentsMargins(5, 2, 5, 2)
+        v_layout.setSpacing(5)
+
+        name_text = QLabel(Lng.folder_name[lng_index])
+        v_layout.addWidget(name_text)
+
+        self.line_edit = ULineEdit()
+        self.line_edit.textChanged.connect(self.changed.emit)
+        self.line_edit.setPlaceholderText(Lng.alias_immutable[lng_index])
+        v_layout.addWidget(self.line_edit)
+
+    def validate(self):
+
+        def show_warn(text: str, w, h):
+            win_warn = WarningWindow(text, w, h)
+            win_warn.ok_clicked.connect(win_warn.deleteLater)
+            win_warn.setFixedSize(w, h)
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
+
+        pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
+        mf_alias = self.line_edit.text()
+        result = None
+        if not mf_alias:
+            show_warn(Lng.enter_alias_warning[self.lng_index], 260, 90)
+        elif len(mf_alias) < 5 or len(mf_alias) > 50:
+            show_warn(f'{Lng.string_limit[self.lng_index]}', 280, 90)
+        elif not re.fullmatch(pattern, mf_alias):
+            show_warn(f'{Lng.valid_message[self.lng_index]}', 310, 90)
+        else:
+            result = mf_alias
+        return result
+
+
+class MfPathWidget(QGroupBox):
+    changed = pyqtSignal()
+    magnifier = os.path.join(Static.common_icons, "magnifier.svg")
+    green_checkmark = os.path.join(Static.common_icons, "green_checkmark.svg")
+    hh = 70
+    icon_size = 35
+
+    def __init__(self, lng_index: int):
+        super().__init__()
+        self.setAcceptDrops(True)
+        self.setFixedHeight(self.hh)
+
+        self.mf_path = None
+        self.lng_index = lng_index
+    
+        self.main_lay = QVBoxLayout(self)
+        self.main_lay.setContentsMargins(10, 2, 2, 2)
+        self.main_lay.setSpacing(0)
+
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
+
+        self.no_path_widget()
+
+    def no_path_widget(self):
+        self.main_wid.hide()
+        self.main_wid.deleteLater()
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
+
+        h_lay = QHBoxLayout(self.main_wid)
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(10)
+
+        right_btn = QSvgWidget()
+        right_btn.load(self.magnifier)
+        right_btn.setFixedSize(self.icon_size, self.icon_size)
+        h_lay.addWidget(right_btn)
+        
+        lines = (
+            f"{Lng.folder_path[self.lng_index]}:",
+            Lng.path_hint_texts[self.lng_index].lower()
+        )
+        left_label = QLabel("\n".join(lines))
+        left_label.setWordWrap(True)
+        h_lay.addWidget(left_label)
+
+        h_lay.addStretch()
+
+    def ok_path_widget(self):
+        self.main_wid.deleteLater()
+        self.main_wid = QWidget()
+        self.main_lay.addWidget(self.main_wid)
+
+        h_lay = QHBoxLayout(self.main_wid)
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(10)
+
+        right_btn = QSvgWidget()
+        right_btn.load(self.green_checkmark)
+        right_btn.setFixedSize(35, 35)
+        h_lay.addWidget(right_btn)
+
+        lines = (
+            f"{Lng.folder_path[self.lng_index]}:",
+            self.mf_path
+        )
+        left_label = SelectableLabel('\n'.join(lines))
+        h_lay.addWidget(left_label)
+
+        h_lay.addStretch()
+
+    def validate(self):
+
+        def show_warn(text: str, w, h):
+            win_warn = WarningWindow(text, w, h)
+            win_warn.ok_clicked.connect(win_warn.deleteLater)
+            win_warn.setFixedSize(w, h)
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
+
+        result = None
+        if not self.mf_path:
+            show_warn(Lng.select_folder_path[self.lng_index], 260, 90)
+        elif not os.path.exists(self.mf_path):
+            show_warn(Lng.path_not_exists[self.lng_index], 260, 90)
+        else:
+            result = self.mf_path
+        return result
+
+    def mouseReleaseEvent(self, a0: QMouseEvent):
+        if not a0.button() != 2:
+            return
+        dialog = QFileDialog()
+        url = dialog.getExistingDirectory()
+        if url and os.path.isdir(url):
+            self.mf_path = url.rstrip(os.sep)
+            self.changed.emit()
+            self.ok_path_widget()
+        return super().mouseReleaseEvent(a0)
+        
+    def dropEvent(self, a0):
+        if a0.mimeData().hasUrls():
+            url = a0.mimeData().urls()[0].toLocalFile()
+            if url and os.path.isdir(url):
+                self.mf_path = url.rstrip(os.sep)
+                self.changed.emit()
+                self.ok_path_widget()
+        return super().dropEvent(a0)
+    
+    def dragEnterEvent(self, a0):
+        a0.accept()
+        return super().dragEnterEvent(a0)

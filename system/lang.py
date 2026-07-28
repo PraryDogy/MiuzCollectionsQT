@@ -557,3 +557,7 @@ class Lng:
         "Загрузить настройки",
         "Load settings"
     )
+    path_not_exists = (
+        "Путь к каталогу изображений не существует",
+        "The path to the image catalog does not exist"
+    )
