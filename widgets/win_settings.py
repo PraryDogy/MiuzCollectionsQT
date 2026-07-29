@@ -316,7 +316,7 @@ class ThemeBtn(QWidget):
 
 
 class ThemesWidget(QGroupBox):
-    macos_theme_svg = os.path.join(Static.common_icons, "macos_theme.svg")
+    theme_svg = os.path.join(Static.common_icons, "theme.svg")
 
     def __init__(self):
         super().__init__()
@@ -325,7 +325,7 @@ class ThemesWidget(QGroupBox):
         main_lay.setSpacing(0)
 
         title_wid = RowArrowWidget(Lng.theme[JsonData.lng_index])
-        title_wid.set_left_icon(self.macos_theme_svg)
+        title_wid.set_left_icon(self.theme_svg)
         title_wid.hide_arrow()
         main_lay.addWidget(title_wid)
 
