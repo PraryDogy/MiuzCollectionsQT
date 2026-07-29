@@ -159,6 +159,10 @@ class WinCopyFiles(WinProgressbar):
             f"{Lng.copying[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} \"{dst_text}\""
         )
 
+        self.below_label.setText(
+            Lng.preparing[JsonData.lng_index]
+        )
+
         self.dst_urls: list[str] = []
 
         self.copy_task_item = CopyTaskItem(
