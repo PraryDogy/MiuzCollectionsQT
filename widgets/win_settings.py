@@ -50,7 +50,7 @@ class RebootableSettings(QGroupBox):
     spin_min = 0
     rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
     eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
-    reset_svg = os.path.join(Static.common_icons, "reset.svg")
+    eraser_svg = os.path.join(Static.common_icons, "eraser.svg")
     clock_svg = os.path.join(Static.common_icons, "clock.svg")
     language_svg = os.path.join(Static.common_icons, "language.svg")
 
@@ -100,7 +100,7 @@ class RebootableSettings(QGroupBox):
         scaner_time_wid.replace_arrow_widget(self.spin)
 
         reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
-        reset_data_wid.set_left_icon(self.reset_svg)
+        reset_data_wid.set_left_icon(self.eraser_svg)
         reset_data_wid.hide_sep()
         reset_data_wid.clicked.connect(self.erase_all_data)
         main_layout.addWidget(reset_data_wid)
@@ -223,8 +223,8 @@ class SizesWin(UMainWidget):
 
 
 class NonRebootableSettings(QGroupBox):
-    storage_svg = os.path.join(Static.common_icons, "storage.svg")
-    files_svg = os.path.join(Static.common_icons, "files.svg")
+    finder_svg = os.path.join(Static.common_icons, "finder.svg")
+    hdd_svg = os.path.join(Static.common_icons, "hdd.svg")
 
     def __init__(self):
         super().__init__()
@@ -236,12 +236,12 @@ class NonRebootableSettings(QGroupBox):
         self.size_items = {}
 
         data_size_wid = RowArrowWidget(Lng.statistic[JsonData.lng_index])
-        data_size_wid.set_left_icon(self.storage_svg)
+        data_size_wid.set_left_icon(self.hdd_svg)
         data_size_wid.clicked.connect(self.show_sizes_win)
         main_layout.addWidget(data_size_wid)
 
         show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
-        show_files_wid.set_left_icon(self.files_svg)
+        show_files_wid.set_left_icon(self.finder_svg)
         show_files_wid.clicked.connect(self.show_files_cmd)
         show_files_wid.hide_sep()
         main_layout.addWidget(show_files_wid)
