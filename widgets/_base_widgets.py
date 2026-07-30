@@ -7,8 +7,8 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
                              QLabel, QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSlider, QSpacerItem, QTextEdit,
-                             QTreeWidget, QVBoxLayout, QWidget)
+                             QScrollArea, QSlider, QSpacerItem, QStackedWidget,
+                             QTextEdit, QTreeWidget, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -659,42 +659,38 @@ class MfPathWidget(QGroupBox):
     icon_size = 35
 
     def __init__(self, lng_index: int, mf_path: str = None):
-        """
-        Виджет, который ожидает корректный путь к каталогу изображений (mf_path)
-        Ожидание тремя способами:
-        - drop event
-        - q file dialog
-        - по QTimer
-        Обязательно делайте validate
-        """
-
         super().__init__()
         self.setAcceptDrops(True)
         self.setFixedHeight(self.hh)
 
         self.mf_path = mf_path
         self.lng_index = lng_index
+        
+        # Таймер инициализируем один раз как атрибут класса
+        self.watch_timer = QTimer(self)
+        self.watch_timer.timeout.connect(self.check_path_by_timer)
     
         self.main_lay = QVBoxLayout(self)
         self.main_lay.setContentsMargins(10, 2, 2, 2)
         self.main_lay.setSpacing(0)
 
-        self.main_wid = QWidget()
-        self.main_lay.addWidget(self.main_wid)
+        # Используем QStackedWidget для безопасного переключения экранов
+        self.stack = QStackedWidget()
+        self.main_lay.addWidget(self.stack)
 
-        if mf_path is None or not os.path.exists(mf_path):
-            self.no_path_widget()
-            self.wait_mf_path()
+        # Создаем обе панели заранее
+        self.init_no_path_ui()
+        self.init_ok_path_ui()
+
+        if self.mf_path and os.path.exists(self.mf_path):
+            self.show_ok_path()
         else:
-            self.ok_path_widget()
+            self.show_no_path()
 
-    def no_path_widget(self):
-        self.main_wid.hide()
-        self.main_wid.deleteLater()
-        self.main_wid = QWidget()
-        self.main_lay.addWidget(self.main_wid)
-
-        h_lay = QHBoxLayout(self.main_wid)
+    def init_no_path_ui(self):
+        """Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
+        widget = QWidget()
+        h_lay = QHBoxLayout(widget)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
@@ -707,18 +703,17 @@ class MfPathWidget(QGroupBox):
             f"{Lng.folder_path[self.lng_index]}:",
             Lng.path_hint_texts[self.lng_index].lower()
         )
-        left_label = QLabel("\n".join(lines))
-        left_label.setWordWrap(True)
-        h_lay.addWidget(left_label)
-
+        self.no_path_label = QLabel("\n".join(lines))
+        self.no_path_label.setWordWrap(True)
+        h_lay.addWidget(self.no_path_label)
         h_lay.addStretch()
+        
+        self.stack.addWidget(widget)
 
-    def ok_path_widget(self):
-        self.main_wid.deleteLater()
-        self.main_wid = QWidget()
-        self.main_lay.addWidget(self.main_wid)
-
-        h_lay = QHBoxLayout(self.main_wid)
+    def init_ok_path_ui(self):
+        """Создание панели 'Путь корректен' (индекс 1 в стеке)"""
+        widget = QWidget()
+        h_lay = QHBoxLayout(widget)
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
@@ -727,17 +722,38 @@ class MfPathWidget(QGroupBox):
         right_btn.setFixedSize(35, 35)
         h_lay.addWidget(right_btn)
 
-        lines = (
-            f"{Lng.folder_path[self.lng_index]}:",
-            self.mf_path
-        )
-        left_label = SelectableLabel('\n'.join(lines))
-        h_lay.addWidget(left_label)
-
+        self.ok_path_label = SelectableLabel("")
+        h_lay.addWidget(self.ok_path_label)
         h_lay.addStretch()
 
-    def validate(self):
+        self.stack.addWidget(widget)
 
+    def show_no_path(self):
+        """Включение режима ожидания пути"""
+        self.stack.setCurrentIndex(0)
+        if not self.watch_timer.isActive():
+            self.watch_timer.start(1000)  # Проверка каждую секунду
+
+    def show_ok_path(self):
+        """Включение режима успешного пути"""
+        self.watch_timer.stop()  # Важно: останавливаем таймер сразу
+        lines = (f"{Lng.folder_path[self.lng_index]}:", self.mf_path)
+        self.ok_path_label.setText('\n'.join(lines))
+        self.stack.setCurrentIndex(1)
+
+    def check_path_by_timer(self):
+        """Срабатывание таймера"""
+        if self.mf_path and os.path.exists(self.mf_path):
+            self.changed.emit()
+            self.show_ok_path()
+
+    def update_path(self, new_path: str):
+        """Единый метод обновления пути из любых событий"""
+        self.mf_path = new_path.rstrip(os.sep)
+        self.changed.emit()
+        self.show_ok_path()
+
+    def validate(self):
         def show_warn(text: str, w, h):
             win_warn = WarningWindow(text, w, h)
             win_warn.ok_clicked.connect(win_warn.deleteLater)
@@ -745,44 +761,34 @@ class MfPathWidget(QGroupBox):
             win_warn.center_to_parent(self.window())
             win_warn.show()
 
-        result = None
         if not self.mf_path:
             show_warn(Lng.select_folder_path[self.lng_index], 260, 90)
-        elif not os.path.exists(self.mf_path):
+            return None
+        if not os.path.exists(self.mf_path):
             show_warn(Lng.path_not_exists[self.lng_index], 260, 90)
-        else:
-            result = self.mf_path
-        return result
-
-    def wait_mf_path(self):
-        if self.mf_path is None or not os.path.exists(self.mf_path):
-            QTimer.singleShot(1000, self.wait_mf_path)
-        else:
-            self.changed.emit()
-            self.ok_path_widget()
+            return None
+        return self.mf_path
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
-        if not a0.button() != 2:
-            return
+        if a0.button() != Qt.MouseButton.LeftButton:  # Исправлена проверка кнопки мыши
+            return super().mouseReleaseEvent(a0)
+        
         dialog = QFileDialog()
         url = dialog.getExistingDirectory()
         if url and os.path.isdir(url):
-            self.mf_path = url.rstrip(os.sep)
-            self.changed.emit()
-            self.ok_path_widget()
+            self.update_path(url)
         return super().mouseReleaseEvent(a0)
         
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
             url = a0.mimeData().urls()[0].toLocalFile()
             if url and os.path.isdir(url):
-                self.mf_path = url.rstrip(os.sep)
-                self.changed.emit()
-                self.ok_path_widget()
+                self.update_path(url)
         return super().dropEvent(a0)
     
     def dragEnterEvent(self, a0):
-        a0.accept()
+        if a0.mimeData().hasUrls():  # Принимаем дроп только если это ссылки/файлы
+            a0.accept()
         return super().dragEnterEvent(a0)
 
 
