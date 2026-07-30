@@ -161,7 +161,12 @@ class WinDates(UMainWidget):
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
         self.handle_preset_change(index)
-        self.apply_filter(index)
+        
+        # Если выбрали "Все время" (индекс 0) — это триггер полного сброса
+        if index == 0:
+            self.clear_btn_cmd()
+        else:
+            self.apply_filter(index)
         
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
@@ -172,7 +177,9 @@ class WinDates(UMainWidget):
         if not is_custom:
             self.date_to.setDate(today)
             if index == 0:
-                self.date_from.setDate(QDate(2018, 1, 1))
+                # Нам больше не нужна жесткая дата 2018 года, 
+                # но для визуального порядка в заблокированном QDateEdit поставим текущий день
+                self.date_from.setDate(today)
             elif index == 1: # Сегодня
                 self.date_from.setDate(today)
             elif index == 2: # За неделю
