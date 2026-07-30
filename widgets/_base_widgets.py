@@ -350,6 +350,8 @@ class RowArrowWidget(QWidget):
         self.above_layout.addWidget(self.text_widget)
         self.above_layout.addStretch()
         self.above_layout.addWidget(self.arrow_wid)
+
+        self.adjustSize()
     
     def set_left_icon(self, svg_path: str):
         self.left_icon.load(svg_path)
@@ -361,8 +363,9 @@ class RowArrowWidget(QWidget):
 
     def hide_sep(self):
         self.sep.hide()
-        spacer = QSpacerItem(0, self.sep.height())
-        self.main_layout.addSpacerItem(spacer)
+        self.sep.deleteLater()
+        # spacer = QSpacerItem(0, self.sep.height())
+        # self.main_layout.addSpacerItem(spacer)
 
     def hide_arrow(self):
         self.arrow_wid.hide()

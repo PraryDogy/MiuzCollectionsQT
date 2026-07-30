@@ -83,17 +83,11 @@ class WinFilters(UMainWidget):
         reset_layout.setSpacing(0)
 
         self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
+        self.reset_btn.setFixedHeight(self.reset_btn.hh - 5)
         self.reset_btn.hide_sep()
         self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.clicked.connect(self.reset_cmd)
         reset_layout.addWidget(self.reset_btn)
-
-        # self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        # self.reset_btn.clicked.connect(self.reset_cmd)
-        # self.central_layout.addWidget(
-        #     self.reset_btn,
-        #     alignment=Qt.AlignmentFlag.AlignCenter
-        # )
 
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):
