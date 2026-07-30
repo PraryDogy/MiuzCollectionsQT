@@ -1,7 +1,7 @@
 import os
 
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QGroupBox, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QSplitter
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -29,9 +29,15 @@ class WinFilters(UMainWidget):
         self.central_layout.setSpacing(10)
         self.central_layout.setContentsMargins(10, 10, 10, 13)
 
+        # Создаем вертикальный сплиттер
+        self.splitter = QSplitter(Qt.Orientation.Vertical)
+        self.central_layout.addWidget(self.splitter)
+
+        # Создаем и настраиваем список
         self.list_widget = VListWidget()
         self.list_widget.itemClicked.connect(self.item_cmd)
-        self.central_layout.addWidget(self.list_widget)
+        # Добавляем список ВНУТРЬ сплиттера вместо центрального лейаута
+        self.splitter.addWidget(self.list_widget)
 
         favs_item = VListWidgetItem(
             parent=self.list_widget,
@@ -69,12 +75,24 @@ class WinFilters(UMainWidget):
                 item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.setCurrentRow(0)
+        
+        # Создаем и настраиваем текстовое поле активных фильтров
         txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
         self.active_filters = UTextEdit()
         self.active_filters.setReadOnly(True)
         self.active_filters.setText(txt)
-        self.central_layout.addWidget(self.active_filters)
+        # Добавляем текстовое поле ВНУТРЬ сплиттера ниже списка
+        self.splitter.addWidget(self.active_filters)
 
+        # Устанавливаем базовые пропорции (список ~300px, текстовое поле ~100px)
+        self.splitter.setSizes([300, 100])
+        
+        # Задаем коэффициенты растяжения:
+        # Индекс 0 (список) растягивается (1), Индекс 1 (текст) держит фиксированные 100px (0)
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 0)
+
+        # Кнопка сброса остается внизу, вне сплиттера
         self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.clicked.connect(self.reset_cmd)
         self.central_layout.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
