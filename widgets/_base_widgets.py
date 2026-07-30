@@ -746,11 +746,13 @@ class MfPathWidget(QGroupBox):
         return result
 
     def wait_mf_path(self):
-        if os.path.exists(self.mf_path):
-            self.ok_path_widget()
+        if self.mf_path is None or not os.path.exists(self.mf_path):
+            QTimer.singleShot(1000, self.wait_mf_path)
+            print("wait good path")
         else:
-            QTimer.singleShot(500, self.wait_mf_path)
-        print(self.mf_path, "wait")
+            self.changed.emit()
+            self.ok_path_widget()
+            print("good path")
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
         if not a0.button() != 2:
@@ -759,8 +761,6 @@ class MfPathWidget(QGroupBox):
         url = dialog.getExistingDirectory()
         if url and os.path.isdir(url):
             self.mf_path = url.rstrip(os.sep)
-            self.changed.emit()
-            self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
         
     def dropEvent(self, a0):
@@ -768,8 +768,6 @@ class MfPathWidget(QGroupBox):
             url = a0.mimeData().urls()[0].toLocalFile()
             if url and os.path.isdir(url):
                 self.mf_path = url.rstrip(os.sep)
-                self.changed.emit()
-                self.ok_path_widget()
         return super().dropEvent(a0)
     
     def dragEnterEvent(self, a0):
