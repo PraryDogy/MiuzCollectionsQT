@@ -1,21 +1,15 @@
 import os
-import sys
-from datetime import datetime, timedelta
-from typing import Literal
 
-from PyQt6.QtCore import QDate, QLocale, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import (QAction, QBrush, QColor, QIcon, QKeyEvent,
-                         QTextCharFormat)
-from PyQt6.QtWidgets import (QApplication, QCalendarWidget, QComboBox,
-                             QDateEdit, QDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QMainWindow, QPushButton, QSpacerItem,
-                             QSpinBox, QToolButton, QVBoxLayout, QWidget)
+from PyQt6.QtCore import QDate, QLocale, QSize, Qt, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import (QDateEdit, QGroupBox, QHBoxLayout, QLabel,
+                             QSpacerItem, QSpinBox, QToolButton, QVBoxLayout,
+                             QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import (HSep, RowArrowWidget, UMainWidget, UMenu,
-                            UPushButton)
+from ._base_widgets import HSep, UMainWidget, UMenu, UPushButton
 
 
 def style_date_edit_calendar(date_edit: QDateEdit):
