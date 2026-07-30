@@ -526,12 +526,6 @@ class HoverGrayLabel(GrayLabel):
             """
         )
 
-class NewSelectableLabel(SelectableLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
-        self.setWordWrap(True)
-        self.adjustSize()
-
 
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
@@ -554,14 +548,14 @@ class ConfirmWindow(UMainWidget):
         text_layout = QHBoxLayout(text_container)
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(15)
-        # text_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(self.icon_path)
         self.svg_widget.setFixedSize(self.icon_size, self.icon_size)
         text_layout.addWidget(self.svg_widget)
 
-        self.text_wid = NewSelectableLabel(text)
+        self.text_wid = SelectableLabel(text)
+        self.text_wid.setWordWrap(True)
         text_layout.addWidget(self.text_wid)
 
         btn_widget = QWidget()
