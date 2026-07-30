@@ -7,8 +7,9 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (QLabel, QWidget, UMainWidget, UPushButton,
-                            VListSpacerItem, VListWidget, VListWidgetItem)
+from ._base_widgets import (QLabel, QWidget, RowArrowWidget, UMainWidget,
+                            UPushButton, UTextEdit, VListSpacerItem,
+                            VListWidget, VListWidgetItem)
 
 
 class WinFilters(UMainWidget):
@@ -18,6 +19,7 @@ class WinFilters(UMainWidget):
     ww = 600
     hh = 390
     item_h = 25
+    right_group_hh = 280
 
     def __init__(self):
         super().__init__()
@@ -26,26 +28,21 @@ class WinFilters(UMainWidget):
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
         self.setFixedSize(self.ww, self.hh)
 
-        self.central_layout.setSpacing(10)
-        self.central_layout.setContentsMargins(10, 10, 10, 13)
-
         # Создаем ГОРИЗОНТАЛЬНЫЙ сплиттер
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(15)
         self.central_layout.addWidget(self.splitter)
 
-        # --- Левая группа (Список фильтров остается в GroupBox) ---
+        # --- Левая группа (Список фильтров) ---
         self.list_group = QGroupBox()
         list_group_lay = QVBoxLayout(self.list_group)
         list_group_lay.setContentsMargins(1, 10, 1, 1)
         list_group_lay.setSpacing(0)
         
         self.list_widget = VListWidget()
-        # self.list_widget.setFixedHeight(350)
         self.list_widget.itemClicked.connect(self.item_cmd)
         list_group_lay.addWidget(self.list_widget)
         
-        # Добавляем ЛЕВУЮ ГРУППУ в сплиттер
         self.splitter.addWidget(self.list_group)
 
         # Заполнение списка элементами
@@ -86,27 +83,55 @@ class WinFilters(UMainWidget):
 
         self.list_widget.setCurrentRow(0)
         
-        # --- Правая часть (Контейнер для лейбла и кнопки) ---
+        # --- Правая часть (Контейнер) ---
         self.right_container = QWidget()
         right_lay = QVBoxLayout(self.right_container)
-        right_lay.setContentsMargins(0, 5, 0, 5)
-        right_lay.setSpacing(15)
+        right_lay.setContentsMargins(0, 0, 0, 0)
+        right_lay.setSpacing(10)
 
-        # Создаем лейбл
-        self.active_filters = QLabel(self.get_filters_text())
-        self.active_filters.setWordWrap(True)
-        self.active_filters.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        right_lay.addWidget(self.active_filters, stretch=1)
+        # Групбокс для активных фильтров
+        self.active_group = QGroupBox()
+        active_group_lay = QVBoxLayout(self.active_group)
+        active_group_lay.setContentsMargins(1, 5, 2, 1)
+        active_group_lay.setSpacing(10)
 
-        # Кнопка сброса теперь находится здесь
-        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        self.active_group.setFixedHeight(self.right_group_hh)
+
+        # Шапка групбокса: статичный лейбл
+        self.active_label = QLabel(f" {Lng.active_filters[JsonData.lng_index]}:")
+        active_group_lay.addWidget(self.active_label)
+
+        # Текстовое поле для вывода списка
+        self.active_filters = UTextEdit()
+        self.active_filters.setReadOnly(True)
+        self.active_filters.setText(self.get_filters_text())
+        active_group_lay.addWidget(self.active_filters)
+
+        right_lay.addWidget(self.active_group)
+
+        # --- Группа для кнопки сброса с нулевыми отступами ---
+        self.reset_group = QGroupBox()
+        reset_group_lay = QVBoxLayout(self.reset_group)
+        reset_group_lay.setContentsMargins(5, 0, 5, 0)
+        reset_group_lay.setSpacing(0)
+
+        # Создаем кастомную кнопку сброса
+        self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
+        self.reset_btn.setFixedHeight(25)
+        self.reset_btn.set_left_icon(self.reset_svg)
+        self.reset_btn.hide_sep()
         self.reset_btn.clicked.connect(self.reset_cmd)
-        right_lay.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
-        # Добавляем ПРАВЫЙ КОНТЕЙНЕР в сплиттер справа
+        # Добавляем кнопку в слой группы, а группу — в основной правый контейнер
+        reset_group_lay.addWidget(self.reset_btn)
+        right_lay.addWidget(self.reset_group)
+
+        right_lay.addStretch()
+
+        
         self.splitter.addWidget(self.right_container)
 
-        # Устанавливаем базовые пропорции ширины (левая группа ~350px, правая ~150px)
+        # Устанавливаем пропорции ширины
         self.splitter.setSizes([250, 350])
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 0)
@@ -114,27 +139,19 @@ class WinFilters(UMainWidget):
     def get_filters_text(self):
         active_list = []
 
-        # 1. Проверяем фильтр Избранного
         if Dynamic.filter_favs:
             active_list.append(Lng.favorites[JsonData.lng_index])
 
-        # 2. Проверяем фильтр текущей папки
         if Dynamic.filter_only_folder:
             active_list.append(Lng.only_this_folder[JsonData.lng_index])
 
-        # 3. Добавляем активные расширения (из списка строк)
         if Dynamic.filters_enabled:
             active_list.extend(Dynamic.filters_enabled)
 
-        # 4. Если ничего не выбрано — пишем локализованное "нет", иначе соединяем через запятую
         if not active_list:
-            filters_str = Lng.no[JsonData.lng_index]
-        else:
-            filters_str = ', '.join(active_list)
-
-        # Перенос строки '\n' сделает отображение в правой панели более компактным
-        return f"{Lng.active_filters[JsonData.lng_index]}:\n{filters_str}"
-
+            return Lng.no[JsonData.lng_index]
+        
+        return ', '.join(active_list)
 
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):
@@ -168,8 +185,7 @@ class WinFilters(UMainWidget):
             self.list_widget.item(i)
             for i in range(self.list_widget.count())
         ]
-        # удаляем спейсер
-        items.pop(2)
+        items.pop(2)  # удаляем спейсер из списка обработки
         for item in items:
             item.setCheckState(Qt.CheckState.Unchecked)
         Dynamic.filter_favs = False
