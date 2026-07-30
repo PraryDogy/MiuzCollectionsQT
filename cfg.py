@@ -62,6 +62,7 @@ class Static:
 class Dynamic:
     date_start: datetime = None
     date_end: datetime = None
+    date_index: int = 0
     loaded_thumbs: int = 0
     search_widget_text: str = None
     thumb_size_index: int = 2
