@@ -363,8 +363,6 @@ class RowArrowWidget(QWidget):
 
     def hide_sep(self):
         self.sep.hide()
-        # self.sep.deleteLater()
-        # self.setFixedHeight(self.hh - self.sep.height())
         # spacer = QSpacerItem(0, self.sep.height())
         # self.main_layout.addSpacerItem(spacer)
 

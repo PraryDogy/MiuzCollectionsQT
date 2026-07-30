@@ -83,7 +83,6 @@ class WinFilters(UMainWidget):
         reset_layout.setSpacing(0)
 
         self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
-        # self.reset_btn.setFixedHeight(self.reset_btn.hh - 5)
         self.reset_btn.hide_sep()
         self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.clicked.connect(self.reset_cmd)
