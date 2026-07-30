@@ -17,6 +17,75 @@ from system.lang import Lng
 from ._base_widgets import HSep, UMainWidget, UMenu, UPushButton
 
 
+from PyQt6.QtWidgets import QDateEdit, QToolButton, QSpinBox
+from PyQt6.QtCore import QDate, Qt, QSize
+from PyQt6.QtGui import QIcon
+import os
+
+
+def style_date_edit_calendar(date_edit: QDateEdit):
+    date_edit.setCalendarPopup(True)
+    calendar = date_edit.calendarWidget()
+    if JsonData.lng_index == 0:
+        calendar.setLocale(QLocale(QLocale.Language.Russian))
+    else:
+        calendar.setLocale(QLocale(QLocale.Language.English))
+
+    calendar.setFixedSize(300, 300)
+    calendar.setMaximumDate(QDate.currentDate())
+    calendar.setMinimumDate(QDate(2018, 1, 1))
+    calendar.setVerticalHeaderFormat(
+        calendar.VerticalHeaderFormat.NoVerticalHeader
+    )
+
+    widgets = calendar.findChildren(QToolButton)
+    for wid in widgets:
+        name = wid.objectName()
+        wid.setIconSize(QSize(17, 17)) # Твой icon_size
+        if name == "qt_calendar_prevmonth":
+            wid.setIcon(
+                QIcon(os.path.join(Static.common_icons, "previous.svg"))
+            )
+        elif name == "qt_calendar_nextmonth":
+            wid.setIcon(
+                QIcon(os.path.join(Static.common_icons, "next.svg"))
+            )
+
+    for child in calendar.findChildren(QSpinBox):
+        child.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
+
+    # Применяем ТВОЙ оригинальный CSS-стиль напрямую к календарю
+    calendar.setStyleSheet("""
+        #qt_calendar_monthbutton::menu-indicator {
+            image: none;
+            width: 0px;
+        }
+
+        #qt_calendar_prevmonth,
+        #qt_calendar_nextmonth,
+        #qt_calendar_monthbutton,
+        #qt_calendar_yearbutton {
+            height: 25px;
+            background: transparent;                                 
+        }
+
+        #qt_calendar_prevmonth,
+        #qt_calendar_nextmont {
+            width: 25px;
+        }
+
+        #qt_calendar_prevmonth:hover,
+        #qt_calendar_nextmonth:hover,
+        #qt_calendar_monthbutton:hover,
+        #qt_calendar_yearbutton:hover {                  
+            background: transparent;  
+            border: transparent;
+            color: white;                                 
+        }
+    """)
+
+
+
 class DatesTitle(QLabel):
     def __init__(self, default_text: str):
         super().__init__()
@@ -182,8 +251,9 @@ class WinDates(UMainWidget):
         date_layout.addWidget(self.date_to)
 
         for widget in [self.date_from, self.date_to]:
-            widget.setCalendarPopup(True) # Встроенный выпадающий календарь
-            widget.setEnabled(False)      # По умолчанию заблокирован
+            widget.setEnabled(False)
+            # Просто вызываем функцию стилизации для каждого виджета!
+            style_date_edit_calendar(widget)
 
         from_label = QLabel("С:")
         date_layout.addWidget(from_label)
@@ -216,8 +286,8 @@ class WinDates(UMainWidget):
         today = QDate.currentDate()
         if not is_custom:
             self.date_to.setDate(today)
-            if index == 0:   # Все время
-                self.date_from.setDate(QDate(1970, 1, 1)) # Или любая минимальная дата вашей галереи
+            if index == 0:
+                self.date_from.setDate(QDate(2018, 1, 1))
             elif index == 1: # Сегодня
                 self.date_from.setDate(today)
             elif index == 2: # За неделю
