@@ -593,7 +593,7 @@ class MfSettings(QWidget):
 
         self.path_widget = MfPathWidget(
             lng_index=JsonData.lng_index,
-            mf_path=self.mf.get_avaiable_mf_path()
+            mf_path=self.mf.mf_current_path
         )
         self.path_widget.changed.connect(
             lambda: self.mf_save_widget.show_warning()

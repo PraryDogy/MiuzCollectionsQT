@@ -673,8 +673,9 @@ class MfPathWidget(QGroupBox):
         self.main_wid = QWidget()
         self.main_lay.addWidget(self.main_wid)
 
-        if mf_path is None:
+        if mf_path is None or not os.path.exists(mf_path):
             self.no_path_widget()
+            self.wait_mf_path()
         else:
             self.ok_path_widget()
 
@@ -743,6 +744,13 @@ class MfPathWidget(QGroupBox):
         else:
             result = self.mf_path
         return result
+
+    def wait_mf_path(self):
+        if os.path.exists(self.mf_path):
+            self.ok_path_widget()
+        else:
+            QTimer.singleShot(500, self.wait_mf_path)
+        print(self.mf_path, "wait")
 
     def mouseReleaseEvent(self, a0: QMouseEvent):
         if not a0.button() != 2:
