@@ -659,6 +659,15 @@ class MfPathWidget(QGroupBox):
     icon_size = 35
 
     def __init__(self, lng_index: int, mf_path: str = None):
+        """
+        Виджет, который ожидает корректный путь к каталогу изображений (mf_path)
+        Ожидание тремя способами:
+        - drop event
+        - q file dialog
+        - по QTimer
+        Обязательно делайте validate
+        """
+
         super().__init__()
         self.setAcceptDrops(True)
         self.setFixedHeight(self.hh)
