@@ -1,7 +1,7 @@
 import os
 
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QSplitter
+from PyQt6.QtWidgets import QGroupBox, QSplitter, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -15,7 +15,7 @@ class WinFilters(UMainWidget):
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    ww = 350
+    ww = 320
     hh = 450
     item_h = 25
 
@@ -31,14 +31,23 @@ class WinFilters(UMainWidget):
 
         # Создаем вертикальный сплиттер
         self.splitter = QSplitter(Qt.Orientation.Vertical)
+        self.splitter.setHandleWidth(15)
         self.central_layout.addWidget(self.splitter)
 
-        # Создаем и настраиваем список
+        # --- Верхняя группа (Список фильтров) ---
+        self.list_group = QGroupBox()
+        list_group_lay = QVBoxLayout(self.list_group)
+        list_group_lay.setContentsMargins(1, 10, 1, 1)
+        list_group_lay.setSpacing(0)
+        
         self.list_widget = VListWidget()
         self.list_widget.itemClicked.connect(self.item_cmd)
-        # Добавляем список ВНУТРЬ сплиттера вместо центрального лейаута
-        self.splitter.addWidget(self.list_widget)
+        list_group_lay.addWidget(self.list_widget)
+        
+        # Добавляем ПЕРВУЮ ГРУППУ в сплиттер
+        self.splitter.addWidget(self.list_group)
 
+        # Заполнение списка элементами
         favs_item = VListWidgetItem(
             parent=self.list_widget,
             text=Lng.favorites[JsonData.lng_index],
@@ -76,26 +85,31 @@ class WinFilters(UMainWidget):
 
         self.list_widget.setCurrentRow(0)
         
-        # Создаем и настраиваем текстовое поле активных фильтров
+        # --- Нижняя группа (Активные фильтры) ---
+        self.active_group = QGroupBox()
+        active_group_lay = QVBoxLayout(self.active_group)
+        active_group_lay.setContentsMargins(1, 10, 1, 1)
+        active_group_lay.setSpacing(0)
+
         txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
         self.active_filters = UTextEdit()
         self.active_filters.setReadOnly(True)
         self.active_filters.setText(txt)
-        # Добавляем текстовое поле ВНУТРЬ сплиттера ниже списка
-        self.splitter.addWidget(self.active_filters)
-
-        # Устанавливаем базовые пропорции (список ~300px, текстовое поле ~100px)
-        self.splitter.setSizes([300, 100])
+        active_group_lay.addWidget(self.active_filters)
         
-        # Задаем коэффициенты растяжения:
-        # Индекс 0 (список) растягивается (1), Индекс 1 (текст) держит фиксированные 100px (0)
+        # Добавляем ВТОРУЮ ГРУППУ в сплиттер
+        self.splitter.addWidget(self.active_group)
+
+        # Устанавливаем базовые пропорции и логику растяжения для групп в сплиттере
+        self.splitter.setSizes([300, 100])
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 0)
 
-        # Кнопка сброса остается внизу, вне сплиттера
+        # Кнопка сброса
         self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.clicked.connect(self.reset_cmd)
         self.central_layout.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
 
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):

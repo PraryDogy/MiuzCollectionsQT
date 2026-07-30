@@ -859,7 +859,7 @@ class WinSettings(UMainWidget):
         self.central_layout.setContentsMargins(5, 5, 5, 5)
 
         self.splitter = QSplitter()
-        self.splitter.setHandleWidth(14)
+        self.splitter.setHandleWidth(15)
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.central_layout.addWidget(self.splitter)
 
