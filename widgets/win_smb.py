@@ -93,7 +93,7 @@ class WinSmb(UMainWidget):
         if self.path_widget.mf_temp_path:
             self.super_win = SuperConfirmWindow(
                 Lng.confirm_mf_path[JsonData.lng_index],
-                300, 105
+                301, 105
             )
             self.super_win.ok_clicked.connect(ok_clicked)
             self.super_win.center_to_parent(self)
