@@ -1,30 +1,20 @@
 import os
+import sys
 from datetime import datetime, timedelta
 from typing import Literal
 
 from PyQt6.QtCore import QDate, QLocale, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QBrush, QColor, QIcon, QKeyEvent, QTextCharFormat
-from PyQt6.QtWidgets import (QCalendarWidget, QGroupBox, QHBoxLayout, QLabel,
-                             QSpinBox, QToolButton, QVBoxLayout, QWidget)
+from PyQt6.QtGui import (QAction, QBrush, QColor, QIcon, QKeyEvent,
+                         QTextCharFormat)
+from PyQt6.QtWidgets import (QApplication, QCalendarWidget, QComboBox,
+                             QDateEdit, QDialog, QGroupBox, QHBoxLayout,
+                             QLabel, QMainWindow, QPushButton, QSpinBox,
+                             QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import HSep, UMainWidget, UPushButton
-
-
-class DatesTools:
-    @classmethod
-    def date_to_text(cls, date: datetime):
-        return date.strftime("%d.%m.%Y")
-
-    @classmethod
-    def add_or_subtract_days(cls, date: datetime, days: int):
-        return date + timedelta(days=days)
-    
-    @classmethod
-    def text_to_datetime_date(cls, text: str):
-        return datetime.strptime(text, "%d.%m.%Y").date()
+from ._base_widgets import HSep, UMainWidget, UMenu, UPushButton
 
 
 class DatesTitle(QLabel):
@@ -64,6 +54,7 @@ class MyCalendar(QGroupBox):
         v_layout = QVBoxLayout(self)
         v_layout.setContentsMargins(0, 0, 0, 0)
         v_layout.setSpacing(10)
+
         margins = v_layout.contentsMargins()
         margins.setTop(5)
         v_layout.setContentsMargins(margins)
@@ -90,27 +81,6 @@ class MyCalendar(QGroupBox):
     def set_date(self, py_date: datetime):
         qdate = QDate(py_date.year, py_date.month, py_date.day)
         self.calendar.setSelectedDate(qdate)
-
-    def highlight_range(self, start_date: datetime, end_date: datetime):
-        # Преобразуем datetime в QDate
-        q_start = QDate(start_date.year, start_date.month, start_date.day)
-        q_end = QDate(end_date.year, end_date.month, end_date.day)
-        
-        # Настраиваем стиль выделения
-        fmt = QTextCharFormat()
-        fmt.setBackground(QColor(100, 150, 255, 100)) # Светло-синий цвет фона
-        # fmt.setForeground(QColor("white")) # Можно также изменить цвет текста
-        
-        # Сначала очищаем предыдущие выделения (опционально)
-        self.calendar.setDateTextFormat(QDate(), QTextCharFormat())
-        
-        # Проходим циклом по всем датам диапазона и применяем формат
-        current = q_start
-        while current <= q_end:
-            self.calendar.setDateTextFormat(current, fmt)
-            current = current.addDays(1)
-
-        self.calendar.update()
 
     def set_custom_ui(self, icon_size: int = 17):
         self.calendar.setVerticalHeaderFormat(
@@ -165,58 +135,103 @@ class WinDates(UMainWidget):
     dates_btn_normal = pyqtSignal()
     reload_thumbnails = pyqtSignal()
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.search_dates[JsonData.lng_index])
 
-        self.central_layout.setSpacing(10)
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
+        preset_widget = QWidget()
+        self.central_layout.addWidget(preset_widget)
+        preset_layout = QHBoxLayout(preset_widget)
+        preset_layout.setContentsMargins(0, 0, 0, 0)
+        preset_layout.setSpacing(0)
 
-        dates_h_wid = QWidget()
-        self.central_layout.addWidget(dates_h_wid)
-        dates_h_lay = QHBoxLayout(dates_h_wid)
-        dates_h_lay.setContentsMargins(0, 0, 0, 0)
-        dates_h_lay.setSpacing(10)
+        period_label = QLabel("Период")
+        preset_layout.addWidget(period_label)
 
-        self.left_calendar = MyCalendar(Lng.start_date[JsonData.lng_index])
-        self.left_calendar.dateSelected.connect(
-            lambda date: self.date_change(date=date, flag="start")
-        )
-        dates_h_lay.addWidget(self.left_calendar)
 
-        self.right_calendar = MyCalendar(Lng.end_date[JsonData.lng_index])
-        self.right_calendar.dateSelected.connect(
-            lambda date: self.date_change(date=date, flag="end")
-        )
-        dates_h_lay.addWidget(self.right_calendar)
+        self.preset_button = UPushButton("")
+        self.preset_button.setFixedWidth(120)
+        preset_layout.addWidget(self.preset_button)
 
-        self.central_layout.addWidget(HSep())
+        preset_menu = UMenu(None)
+        self.preset_button.setMenu(preset_menu)
 
-        clear_btn = UPushButton(text=Lng.reset[JsonData.lng_index])
-        # clear_btn.setFixedWidth(100)
-        clear_btn.clicked.connect(self.clear_btn_cmd)
-        self.central_layout.addWidget(
-            clear_btn,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        self.preset_actions = [
+            QAction("Все время", preset_menu),
+            QAction("Сегодня", preset_menu),
+            QAction("За неделю", preset_menu),
+            QAction("За месяц", preset_menu),
+            QAction("За год", preset_menu),
+            QAction("Диапазон", preset_menu),
+        ]
 
-        m = self.central_layout.contentsMargins()
-        m.setBottom(15)
-        self.central_layout.setContentsMargins(m)
-        if Dynamic.date_start:
-            self.left_calendar.highlight_range(
-                Dynamic.date_start, Dynamic.date_end
+        for x, act in enumerate(self.preset_actions, start=0):
+            act.triggered.connect(
+                lambda e, ind=x, act=act: self.action_cmd(e, ind, act)
             )
-            self.left_calendar.title.set_named_date_text(Dynamic.date_start)
-        if Dynamic.date_end:
-            self.right_calendar.highlight_range(
-                Dynamic.date_start, Dynamic.date_end
-            )
-            self.right_calendar.title.set_named_date_text(Dynamic.date_end)
+            preset_menu.addAction(act)
+        
+        date_layout = QHBoxLayout()
+        self.central_layout.addLayout(date_layout)
+        self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
+        date_layout.addWidget(self.date_from)
+
+        self.date_to = QDateEdit(QDate.currentDate())
+        date_layout.addWidget(self.date_to)
+
+        for widget in [self.date_from, self.date_to]:
+            widget.setCalendarPopup(True) # Встроенный выпадающий календарь
+            widget.setEnabled(False)      # По умолчанию заблокирован
+
+        from_label = QLabel("С:")
+        date_layout.addWidget(from_label)
+
+        to_label = QLabel("По:")
+        date_layout.addWidget(to_label)
+        
+        self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        self.apply_btn.clicked.connect(
+            lambda index=0: self.handle_preset_change(index)
+        )
+        self.apply_btn.clicked.connect(
+            lambda: self.apply_filter()
+        )
+        self.apply_btn.clicked.connect(self.apply_filter)
+        self.central_layout.addWidget(self.apply_btn)
 
         self.adjustSize()
+
+    def action_cmd(self, e, index: int, action: QAction):
+        self.preset_button.setText(action.text())
+        self.handle_preset_change(index)
+        self.apply_filter()
+        
+    def handle_preset_change(self, index):
+        is_custom = (index == len(self.preset_actions) - 1)
+        self.date_from.setEnabled(is_custom)
+        self.date_to.setEnabled(is_custom)
+        
+        today = QDate.currentDate()
+        if not is_custom:
+            self.date_to.setDate(today)
+            if index == 0:   # Все время
+                self.date_from.setDate(QDate(1970, 1, 1)) # Или любая минимальная дата вашей галереи
+            elif index == 1: # Сегодня
+                self.date_from.setDate(today)
+            elif index == 2: # За неделю
+                self.date_from.setDate(today.addDays(-7))
+            elif index == 3: # За месяц
+                self.date_from.setDate(today.addMonths(-1))
+            elif index == 4: # За year
+                self.date_from.setDate(today.addYears(-1))
+
+    def apply_filter(self):
+        Dynamic.date_start = self.date_from.date().toPyDate()
+        Dynamic.date_end = self.date_to.date().toPyDate()
+        self.reload_thumbnails.emit()
+        self.dates_btn_solid.emit()
 
     def clear_btn_cmd(self, *args):
         reload = True
@@ -230,39 +245,7 @@ class WinDates(UMainWidget):
             self.dates_btn_normal.emit()
             self.deleteLater()
 
-    def date_change(self, date: QDate, flag: Literal["start", "end"]):
-        date = date.toPyDate()
-        if flag == "start":
-            Dynamic.date_start = date
-            self.left_calendar.title.set_named_date_text(date)
-        else:
-            Dynamic.date_end = date
-            self.right_calendar.title.set_named_date_text(date)
-            self.left_calendar.calendar.setMaximumDate(
-                QDate(date.year, date.month, date.day)
-            )            
-
-        if all((Dynamic.date_start, Dynamic.date_end)):
-            self.reload_thumbnails.emit()
-            self.dates_btn_solid.emit()
-
-            for i in (self.left_calendar, self.right_calendar):
-                i.highlight_range(Dynamic.date_start, Dynamic.date_end)
-    
-    def named_date(self, date: datetime) -> str:
-        return date.strftime("%d.%m.%Y")
-    
-    def closeEvent(self, a0):
-        if not all((Dynamic.date_start, Dynamic.date_end)):
-            self.dates_btn_normal.emit()
-        return super().closeEvent(a0)
-    
-    def deleteLater(self):
-        if not all((Dynamic.date_start, Dynamic.date_end)):
-            self.dates_btn_normal.emit()
-        return super().deleteLater()
-
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+    def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
