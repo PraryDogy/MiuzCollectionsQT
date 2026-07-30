@@ -46,6 +46,7 @@ class LabelMinWidth(QLabel):
 
 class RebootableSettings(QGroupBox):
     changed = pyqtSignal()
+    lang_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
     rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
@@ -110,6 +111,7 @@ class RebootableSettings(QGroupBox):
         self.lng_btn.setIcon(self.lng_icons[value])
         self.lng_index = value
         self.changed.emit()
+        self.lang_changed.emit()
 
     def change_scan_time(self, value: int):
         if value == self.spin_max:
@@ -418,6 +420,7 @@ class AboutWid(QGroupBox):
 
 
 class GeneralSettings(QWidget):
+    lang_changed = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -429,6 +432,9 @@ class GeneralSettings(QWidget):
         self.rebootable_settings = RebootableSettings()
         self.rebootable_settings.changed.connect(
             lambda: self.save_wid.show_warning()
+        )
+        self.rebootable_settings.lang_changed.connect(
+            lambda: self.lang_changed.emit()
         )
         v_lay.addWidget(self.rebootable_settings)
 
@@ -925,6 +931,7 @@ class WinSettings(UMainWidget):
     def init_right_side(self, idx: int):
         if idx == 0:
             r_wid = GeneralSettings()
+            # r_wid.lang_changed.connect(lambda: self.left_menu_click())
         elif idx == 1:
             r_wid = FiltersWid()
         elif idx == 2:
