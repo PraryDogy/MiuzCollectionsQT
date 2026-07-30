@@ -599,6 +599,63 @@ class WarningWindow(ConfirmWindow):
         self.cancel_btn.hide()
 
 
+class SuperConfirmWindow(ConfirmWindow):
+    icon_path = os.path.join(Static.common_icons, "red_warning.svg")
+
+    def __init__(self, text: str, w: int, h: int):
+        super().__init__(text, w, h)
+        self.svg_widget.load(self.icon_path)
+
+        # Lng.confirm_mf_path[JsonData.lng_index]
+
+        # self.setWindowTitle(Lng.attention[JsonData.lng_index])
+        # self.set_always_on_top()
+        # self.set_close_only()
+
+        # self.central_layout.setContentsMargins(5, 5, 5, 2)
+        # self.central_layout.setSpacing(5)
+
+        # above_layout = QHBoxLayout()
+        # above_layout.setSpacing(10)
+        # above_layout.setContentsMargins(5, 0, 0, 0)
+        # self.central_layout.addLayout(above_layout)
+
+        # svg_widget = QSvgWidget()
+        # svg_widget.load(self.icon_path)
+        # svg_widget.setFixedSize(self.icon_size, self.icon_size)
+        # above_layout.addWidget(svg_widget)
+
+        # question = QLabel(Lng.confirm_mf_path[JsonData.lng_index])
+        # if JsonData.lng_index == 0:
+        #     ww = 270
+        # else:
+        #     ww = 260
+        # question.setFixedWidth(ww)
+        # question.setWordWrap(True)
+        # above_layout.addWidget(question)
+
+        # btns_lay = QHBoxLayout()
+        # btns_lay.setContentsMargins(0, 0, 0, 0)
+        # btns_lay.setSpacing(10)
+        # self.central_layout.addLayout(btns_lay)
+
+        # btns_lay.addStretch()
+        # self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
+        # self.ok_btn.clicked.connect(self.ok_clicked.emit)
+        # btns_lay.addWidget(self.ok_btn)
+        # cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+        # cancel_btn.clicked.connect(self.deleteLater)
+        # btns_lay.addWidget(cancel_btn)
+        # btns_lay.addStretch()
+
+        # self.adjustSize()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)
+
+
 class SaveRowArrowWidget(RowArrowWidget):
     save_svg = os.path.join(Static.common_icons, "save.svg")
 

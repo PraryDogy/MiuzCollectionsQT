@@ -26,10 +26,9 @@ from system.utils import Utils
 
 from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
-                            SaveRowArrowWidget, UMainWidget, UMenu,
-                            UPushButton, UTextEdit, VListSpacerItem,
+                            SaveRowArrowWidget, SuperConfirmWindow, UMainWidget,
+                            UMenu, UPushButton, UTextEdit, VListSpacerItem,
                             VListWidget, VListWidgetItem, WarningWindow)
-from .win_smb import SuperWarnWindow
 
 
 def restart_app():
@@ -704,9 +703,12 @@ class MfSettings(QWidget):
 
         mf_path = self.path_widget.validate()
         if mf_path:
-            super_win = SuperWarnWindow()
-            super_win.ok_clicked.connect(final)
+            super_win = SuperConfirmWindow(
+                Lng.confirm_mf_path[JsonData.lng_index],
+                300, 105
+            )
             super_win.center_to_parent(self.window())
+            super_win.ok_clicked.connect(final)
             super_win.show()
         else:
             win_warn = WarningWindow(
@@ -812,7 +814,7 @@ class NewMfSettings(QWidget):
         mf_stop_list = self.mf_stop_list.text_edit.toPlainText().split("\n")
 
         if mf_path and mf_alias:
-            super_win = SuperWarnWindow()
+            super_win = SuperConfirmWindow()
             super_win.ok_clicked.connect(
                 lambda: save_mf(mf_alias, mf_path, mf_stop_list)
             )
