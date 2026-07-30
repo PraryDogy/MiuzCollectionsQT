@@ -560,3 +560,14 @@ class Lng:
         "MIUZ Diamonds",
         "MIUZ Diamonds"
     )
+    period = ("Период", "Period")
+    from_text = ("С:", "From:")
+    to_text = ("По:", "To:")
+
+    # Пресеты меню
+    preset_all_time = ("Все время", "All time")
+    preset_today = ("Сегодня", "Today")
+    preset_week = ("За неделю", "Past week")
+    preset_month = ("За месяц", "Past month")
+    preset_year = ("За год", "Past year")
+    preset_custom = ("Диапазон", "Custom range")

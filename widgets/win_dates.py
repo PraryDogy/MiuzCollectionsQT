@@ -100,7 +100,7 @@ class WinDates(UMainWidget):
         preset_layout.setContentsMargins(0, 0, 0, 0)
         preset_layout.setSpacing(10)
 
-        period_label = QLabel("Период")
+        period_label = QLabel(Lng.period[JsonData.lng_index])
         preset_layout.addWidget(period_label)
 
         self.preset_button = UPushButton("")
@@ -113,12 +113,12 @@ class WinDates(UMainWidget):
         self.preset_button.setMenu(preset_menu)
 
         self.preset_actions = [
-            QAction("Все время", preset_menu),
-            QAction("Сегодня", preset_menu),
-            QAction("За неделю", preset_menu),
-            QAction("За месяц", preset_menu),
-            QAction("За год", preset_menu),
-            QAction("Диапазон", preset_menu),
+            QAction(Lng.preset_all_time[JsonData.lng_index], preset_menu),
+            QAction(Lng.preset_today[JsonData.lng_index], preset_menu),
+            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),
+            QAction(Lng.preset_month[JsonData.lng_index], preset_menu),
+            QAction(Lng.preset_year[JsonData.lng_index], preset_menu),
+            QAction(Lng.preset_custom[JsonData.lng_index], preset_menu),
         ]
 
         self.preset_button.setText(
@@ -140,7 +140,7 @@ class WinDates(UMainWidget):
         date_layout.setContentsMargins(0, 5, 0, 5)
         date_layout.setSpacing(2)
 
-        from_label = QLabel("С:")
+        from_label = QLabel(Lng.from_text[JsonData.lng_index])
         date_layout.addWidget(from_label)
         self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
         self.date_from.setFixedWidth(110)
@@ -148,7 +148,7 @@ class WinDates(UMainWidget):
 
         date_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        to_label = QLabel("По:")
+        to_label = QLabel(Lng.to_text[JsonData.lng_index])
         date_layout.addWidget(to_label)
         self.date_to = QDateEdit(QDate.currentDate())
         self.date_to.setFixedWidth(110)
@@ -159,9 +159,9 @@ class WinDates(UMainWidget):
             dt = QDate(dt.year, dt.month, dt.day)
             self.date_from.setDate(dt)
 
-            dt = Dynamic.date_end
-            dt = QDate(dt.year, dt.month, dt.day)
-            self.date_to.setDate(Dynamic.date_end)
+            # ИСПРАВЛЕНИЕ: здесь была ошибка, передавался объект Dynamic.date_end напрямую вместо QDate
+            dt_end = Dynamic.date_end
+            self.date_to.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
 
         for widget in [self.date_from, self.date_to]:
             widget.setEnabled(False)
@@ -186,15 +186,11 @@ class WinDates(UMainWidget):
         if index == 0:
             self.clear_btn_cmd()
         elif index == len(self.preset_actions) - 1:
-            # ИСПРАВЛЕНИЕ: Если выбран "Диапазон", мы НЕ отправляем фильтр сразу.
-            # Мы просто дали пользователю доступ к QDateEdit и ждем его кликов по календарю.
             pass
         else:
             self.apply_filter(index)
             
     def on_custom_date_changed(self, qdate):
-        """Срабатывает каждый раз, когда пользователь выбирает дату в календаре ручного диапазона"""
-        # Проверяем, что сейчас действительно выбран режим ручного диапазона
         custom_index = len(self.preset_actions) - 1
         if Dynamic.date_index == custom_index or self.date_from.isEnabled():
             self.apply_filter(custom_index)
@@ -202,8 +198,6 @@ class WinDates(UMainWidget):
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
         
-        # Блокируем сигналы на время программной установки дат для готовых пресетов,
-        # чтобы метод on_custom_date_changed случайно не триггерился лишний раз
         self.date_from.blockSignals(True)
         self.date_to.blockSignals(True)
         
@@ -215,16 +209,15 @@ class WinDates(UMainWidget):
             self.date_to.setDate(today)
             if index == 0:
                 self.date_from.setDate(today)
-            elif index == 1: # Сегодня
+            elif index == 1:
                 self.date_from.setDate(today)
-            elif index == 2: # За неделю
+            elif index == 2:
                 self.date_from.setDate(today.addDays(-7))
-            elif index == 3: # За месяц
+            elif index == 3:
                 self.date_from.setDate(today.addMonths(-1))
-            elif index == 4: # За год
+            elif index == 4:
                 self.date_from.setDate(today.addYears(-1))
                 
-        # Возвращаем обработку сигналов обратно
         self.date_from.blockSignals(False)
         self.date_to.blockSignals(False)
 
@@ -233,7 +226,6 @@ class WinDates(UMainWidget):
         Dynamic.date_end = self.date_to.date().toPyDate()
         Dynamic.date_index = index
         self.reload_thumbnails.emit()
-        # self.dates_btn_solid.emit()
 
     def clear_btn_cmd(self, *args):
         Dynamic.loaded_thumbs = 0
