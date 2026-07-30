@@ -91,6 +91,7 @@ class WinDates(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.search_dates[JsonData.lng_index])
+        self.setFixedSize(300, 110)
         self.central_layout.setSpacing(10)
 
         group_box = QGroupBox()
@@ -142,26 +143,27 @@ class WinDates(UMainWidget):
         group_layout.addWidget(date_widget)
         date_layout = QHBoxLayout(date_widget)
         date_layout.setContentsMargins(0, 0, 0, 0)
-        date_layout.setSpacing(5)
+        date_layout.setSpacing(2)
 
         from_label = QLabel("С:")
         date_layout.addWidget(from_label)
         self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
+        self.date_from.setFixedWidth(110)
         date_layout.addWidget(self.date_from)
 
-        date_layout.addSpacerItem(QSpacerItem(15, 0))
+        date_layout.addSpacerItem(QSpacerItem(10, 0))
 
         to_label = QLabel("По:")
         date_layout.addWidget(to_label)
         self.date_to = QDateEdit(QDate.currentDate())
+        self.date_to.setFixedWidth(110)
         date_layout.addWidget(self.date_to)
 
         for widget in [self.date_from, self.date_to]:
             widget.setEnabled(False)
             style_date_edit_calendar(widget)
 
-        self.adjustSize()
-
+        date_layout.addStretch(1)
 
         self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.apply_btn.clicked.connect(self.clear_btn_cmd) 
