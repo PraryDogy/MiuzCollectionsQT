@@ -122,7 +122,7 @@ class App(QApplication):
 
         # сервера
         if not os.path.exists(Static.servers_json):
-            open(Static.filters_json, "w")
+            open(Static.servers_json, "w")
         data = Servers.validate_json()
         if data:
             Servers.json_to_app(data)
