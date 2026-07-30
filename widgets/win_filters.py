@@ -111,12 +111,30 @@ class WinFilters(UMainWidget):
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 0)
 
-
     def get_filters_text(self):
-        no_filters_text = Lng.no[JsonData.lng_index]
-        filters_str = ', '.join(Dynamic.filters_enabled) if Dynamic.filters_enabled else no_filters_text
-        txt = f"{Lng.active_filters[JsonData.lng_index]}: {filters_str}"
-        return txt
+        active_list = []
+
+        # 1. Проверяем фильтр Избранного
+        if Dynamic.filter_favs:
+            active_list.append(Lng.favorites[JsonData.lng_index])
+
+        # 2. Проверяем фильтр текущей папки
+        if Dynamic.filter_only_folder:
+            active_list.append(Lng.only_this_folder[JsonData.lng_index])
+
+        # 3. Добавляем активные расширения (из списка строк)
+        if Dynamic.filters_enabled:
+            active_list.extend(Dynamic.filters_enabled)
+
+        # 4. Если ничего не выбрано — пишем локализованное "нет", иначе соединяем через запятую
+        if not active_list:
+            filters_str = Lng.no[JsonData.lng_index]
+        else:
+            filters_str = ', '.join(active_list)
+
+        # Перенос строки '\n' сделает отображение в правой панели более компактным
+        return f"{Lng.active_filters[JsonData.lng_index]}:\n{filters_str}"
+
 
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):
