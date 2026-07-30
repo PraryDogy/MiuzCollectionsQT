@@ -1,130 +1,128 @@
 import sys
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QPushButton, QComboBox, QDateEdit, 
-                             QLabel, QDialog)
-from PyQt6.QtCore import QDate, Qt
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
+    QLineEdit, QListWidget, QListWidgetItem, QPushButton, QTextEdit
+)
+from PyQt6.QtCore import Qt
 
-
-class DateFilterDialog(QDialog):
-    """Отдельное компактное окно для фильтрации дат (Tool Window)"""
-    def __init__(self, parent=None):
+class LargeExtensionFilterWidget(QWidget):
+    def __init__(self, extensions: list[str], parent=None):
         super().__init__(parent)
-        self.initUI()
+        self.extensions = sorted(extensions)
+        self.parent_widget = parent
         
-    def initUI(self):
-        # Настройка стиля окна: компактное окно-инструмент, всегда поверх главного
-        self.setWindowTitle("Фильтр по датам")
-        self.setWindowFlags(Qt.WindowType.Tool | Qt.WindowType.WindowCloseButtonHint)
-        self.setModal(False) # Оставляем галерею кликабельной во время выбора дат
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(6)
         
-        # Основной вертикальный лейаут
-        layout = QVBoxLayout(self)
+        # --- Верхняя панель: Поиск и Управление ---
+        top_layout = QHBoxLayout()
         
-        # 1. Блок быстрых пресетов
-        preset_layout = QHBoxLayout()
-        preset_layout.addWidget(QLabel("Период:"))
-        self.preset_combo = QComboBox()
-        self.preset_combo.addItems([
-            "Все время", "Сегодня", "За неделю", "За месяц", "За год", "Указать диапазон..."
-        ])
-        self.preset_combo.currentIndexChanged.connect(self.handle_preset_change)
-        preset_layout.addWidget(self.preset_combo)
-        layout.addLayout(preset_layout)
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Поиск расширения...")
+        self.search_input.textChanged.connect(self._filter_list_items)
+        top_layout.addWidget(self.search_input)
         
-        # 2. Блок ручного выбора дат (Диапазон)
-        date_layout = QHBoxLayout()
-        self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
-        self.date_to = QDateEdit(QDate.currentDate())
+        # Кнопка: Выбрать всё
+        self.select_all_btn = QPushButton("Все")
+        self.select_all_btn.clicked.connect(lambda: self.set_all_states(Qt.CheckState.Checked))
+        top_layout.addWidget(self.select_all_btn)
         
-        for widget in [self.date_from, self.date_to]:
-            widget.setCalendarPopup(True) # Встроенный выпадающий календарь
-            widget.setEnabled(False)      # По умолчанию заблокирован
+        # Кнопка: Снять все
+        self.clear_all_btn = QPushButton("Ничего")
+        self.clear_all_btn.clicked.connect(lambda: self.set_all_states(Qt.CheckState.Unchecked))
+        top_layout.addWidget(self.clear_all_btn)
+        
+        main_layout.addLayout(top_layout)
+        
+        # --- Список с чекбоксами ---
+        self.list_widget = QListWidget()
+        self.list_widget.setUniformItemSizes(True) 
+        
+        for ext in self.extensions:
+            item = QListWidgetItem(ext.upper())
+            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+            item.setCheckState(Qt.CheckState.Checked)
+            self.list_widget.addItem(item)
             
-        date_layout.addWidget(QLabel("С:"))
-        date_layout.addWidget(self.date_from)
-        date_layout.addWidget(QLabel("По:"))
-        date_layout.addWidget(self.date_to)
-        layout.addLayout(date_layout)
-        
-        # 3. Кнопка применить
-        self.apply_btn = QPushButton("Применить фильтр")
-        self.apply_btn.clicked.connect(self.apply_filter)
-        layout.addWidget(self.apply_btn)
-        
-    def handle_preset_change(self, index):
-        is_custom = (self.preset_combo.currentText() == "Указать диапазон...")
-        self.date_from.setEnabled(is_custom)
-        self.date_to.setEnabled(is_custom)
-        
-        today = QDate.currentDate()
-        if not is_custom:
-            self.date_to.setDate(today)
-            if index == 0:   # Все время
-                self.date_from.setDate(QDate(1970, 1, 1)) # Или любая минимальная дата вашей галереи
-            elif index == 1: # Сегодня
-                self.date_from.setDate(today)
-            elif index == 2: # За неделю
-                self.date_from.setDate(today.addDays(-7))
-            elif index == 3: # За месяц
-                self.date_from.setDate(today.addMonths(-1))
-            elif index == 4: # За year
-                self.date_from.setDate(today.addYears(-1))
+        self.list_widget.itemChanged.connect(self._on_item_changed)
+        main_layout.addWidget(self.list_widget)
 
-    def apply_filter(self):
-        start_date = self.date_from.date().toPyDate()
-        end_date = self.date_to.date().toPyDate()
-        preset_text = self.preset_combo.currentText()
-        
-        # Получаем доступ к главному окну и передаем ему даты
-        if self.parent():
-            self.parent().on_date_filter_applied(preset_text, start_date, end_date)
-        
-        self.close() # Закрываем окошко после применения фильтра
+    def _filter_list_items(self, text: str):
+        text = text.strip().lower()
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            item.setHidden(text not in item.text().lower())
+
+    def _on_item_changed(self, item):
+        self._emit_active_filters()
+
+    def set_all_states(self, state: Qt.CheckState):
+        """Включает или выключает все чекбоксы разом"""
+        self.list_widget.blockSignals(True)
+        for i in range(self.list_widget.count()):
+            self.list_widget.item(i).setCheckState(state)
+        self.list_widget.blockSignals(False)
+        self._emit_active_filters()
+
+    def _emit_active_filters(self):
+        selected = []
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            if item.checkState() == Qt.CheckState.Checked:
+                selected.append(item.text().lower())
+                
+        if self.parent_widget and hasattr(self.parent_widget, 'on_filter_changed'):
+            self.parent_widget.on_filter_changed(selected)
 
 
-class MainWindow(QMainWindow):
-    """Пример вашего главного окна галереи"""
+# --- Демонстрационное приложение ---
+class MainApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Моя Фото Галерея")
-        self.resize(800, 600)
+        self.setWindowTitle("Активные фильтры (PyQt6)")
+        self.resize(450, 500)
         
-        # Инициализируем окно фильтра, передавая self как родителя
-        self.filter_dialog = DateFilterDialog(self)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(10)
         
-        # Интерфейс главного окна
-        central_widget = QWidget()
-        layout = QVBoxLayout(central_widget)
+        # Генерируем 100 тестовых расширений
+        many_extensions = [f".ext{i}" for i in range(1, 101)]
+        many_extensions.extend([".jpg", ".png", ".webp"])
         
-        self.open_filter_btn = QPushButton("📅 Поиск по датам")
-        self.open_filter_btn.clicked.connect(self.show_filter_dialog)
-        layout.addWidget(self.open_filter_btn)
+        # 1. Виджет фильтра
+        self.filter_widget = LargeExtensionFilterWidget(many_extensions, parent=self)
+        layout.addWidget(self.filter_widget)
         
-        # Сюда встанет ваша сетка изображений (QGridLayout)
-        self.gallery_placeholder = QLabel("Здесь находится ваша сетка с фото...", self)
-        self.gallery_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.gallery_placeholder)
+        # 2. Нативное текстовое поле для вывода списка активных фильтров
+        self.result_display = QTextEdit()
+        self.result_display.setReadOnly(True)        # Только для чтения
+        self.result_display.setMaximumHeight(80)     # Ограничиваем по высоте, чтобы не занимало много места
+        layout.addWidget(self.result_display)
         
-        self.setCentralWidget(central_widget)
+        # Инициализируем стартовый текст
+        self.on_filter_changed(many_extensions)
         
-    def show_filter_dialog(self):
-        # Магия позиционирования: открываем окно фильтра прямо под кнопкой вызова
-        btn_pos = self.open_filter_btn.mapToGlobal(self.open_filter_btn.rect().bottomLeft())
-        self.filter_dialog.move(btn_pos)
-        self.filter_dialog.show()
-        self.filter_dialog.raise_()
-        self.filter_dialog.activateWindow()
+    def on_filter_changed(self, active_extensions):
+        """Срабатывает при любом изменении чекбоксов"""
+        # Сортируем для предсказуемого отображения
+        active_extensions = sorted(active_extensions)
         
-    def on_date_filter_applied(self, preset, start_date, end_date):
-        """Этот метод ловит данные из окна фильтра"""
-        log_text = f"Фильтр: {preset} | Диапазон: с {start_date} по {end_date}"
-        self.gallery_placeholder.setText(f"Сетка обновлена!\n{log_text}")
-        print(log_text)
-        # TODO: Добавьте сюда вашу логику фильтрации элементов QGridLayout
+        if not active_extensions:
+            self.result_display.setText("Активные фильтры: (ничего не выбрано)")
+            return
+            
+        # Форматируем текст в верхний регистр (например: JPG, PNG, EXT1)
+        formatted_extensions = [ext.upper() for ext in active_extensions]
+        text_list = ", ".join(formatted_extensions)
+        
+        # Выводим в поле. Перенос строк сработает автоматически благодаря нативному QTextEdit
+        self.result_display.setText(f"Активные фильтры ({len(active_extensions)}):\n{text_list}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainApp()
     window.show()
     sys.exit(app.exec())

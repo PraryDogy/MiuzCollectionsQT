@@ -1,13 +1,13 @@
 import os
 
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QGroupBox, QVBoxLayout
+from PyQt6.QtWidgets import QGroupBox, QLabel, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (RowArrowWidget, UMainWidget, UPushButton,
+from ._base_widgets import (UMainWidget, UPushButton, UTextEdit,
                             VListSpacerItem, VListWidget, VListWidgetItem)
 
 
@@ -15,8 +15,8 @@ class WinFilters(UMainWidget):
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    ww = 300
-    hh = 300
+    ww = 400
+    hh = 450
     item_h = 25
 
     def __init__(self):
@@ -27,17 +27,11 @@ class WinFilters(UMainWidget):
         self.setFixedSize(self.ww, self.hh)
 
         self.central_layout.setSpacing(10)
-        self.central_layout.setContentsMargins(5, 5, 5, 10)
-
-        group = QGroupBox()
-        self.central_layout.addWidget(group)
-        group_lay = QVBoxLayout(group)
-        group_lay.setContentsMargins(1, 10, 1, 1)
-        group_lay.setSpacing(0)
+        self.central_layout.setContentsMargins(10, 10, 10, 13)
 
         self.list_widget = VListWidget()
         self.list_widget.itemClicked.connect(self.item_cmd)
-        group_lay.addWidget(self.list_widget)
+        self.central_layout.addWidget(self.list_widget)
 
         favs_item = VListWidgetItem(
             parent=self.list_widget,
@@ -75,18 +69,15 @@ class WinFilters(UMainWidget):
                 item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.setCurrentRow(0)
+        txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
+        self.active_filters = UTextEdit()
+        self.active_filters.setReadOnly(True)
+        self.active_filters.setText(txt)
+        self.central_layout.addWidget(self.active_filters)
 
-        reset_container = QGroupBox()
-        self.central_layout.addWidget(reset_container)
-        reset_layout = QVBoxLayout(reset_container)
-        reset_layout.setContentsMargins(5, 0, 5, 0)
-        reset_layout.setSpacing(0)
-
-        self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
-        self.reset_btn.hide_sep()
-        self.reset_btn.set_left_icon(self.reset_svg)
+        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.clicked.connect(self.reset_cmd)
-        reset_layout.addWidget(self.reset_btn)
+        self.central_layout.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):
@@ -111,6 +102,10 @@ class WinFilters(UMainWidget):
         else:
             Dynamic.filters_enabled.append(item.text())
             item.setCheckState(Qt.CheckState.Checked)
+
+        txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
+        self.active_filters.setText(txt)
+
         self.reload_thumbnails.emit()
 
     def reset_cmd(self):
@@ -126,7 +121,9 @@ class WinFilters(UMainWidget):
         Dynamic.filter_only_folder = False
         Dynamic.filters_enabled.clear()
         self.reload_thumbnails.emit()
-        # self.deleteLater()
+
+        txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
+        self.active_filters.setText(txt)
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)

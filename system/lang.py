@@ -571,3 +571,4 @@ class Lng:
     preset_month = ("За месяц", "Past month")
     preset_year = ("За год", "Past year")
     preset_custom = ("Диапазон", "Custom range")
+    active_filters = ("Активные фильтры", "Active filters")
