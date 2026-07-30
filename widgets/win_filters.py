@@ -1,15 +1,18 @@
+import os
+
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QGroupBox, QVBoxLayout
 
-from cfg import Dynamic, JsonData
+from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (SaveRowArrowWidget, UMainWidget, UPushButton,
+from ._base_widgets import (RowArrowWidget, UMainWidget, UPushButton,
                             VListSpacerItem, VListWidget, VListWidgetItem)
 
 
 class WinFilters(UMainWidget):
+    reset_svg = os.path.join(Static.common_icons, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     ww = 300
@@ -73,12 +76,24 @@ class WinFilters(UMainWidget):
 
         self.list_widget.setCurrentRow(0)
 
-        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        reset_container = QGroupBox()
+        self.central_layout.addWidget(reset_container)
+        reset_layout = QVBoxLayout(reset_container)
+        reset_layout.setContentsMargins(5, 0, 5, 0)
+        reset_layout.setSpacing(0)
+
+        self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
+        self.reset_btn.hide_sep()
+        self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.clicked.connect(self.reset_cmd)
-        self.central_layout.addWidget(
-            self.reset_btn,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        reset_layout.addWidget(self.reset_btn)
+
+        # self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        # self.reset_btn.clicked.connect(self.reset_cmd)
+        # self.central_layout.addWidget(
+        #     self.reset_btn,
+        #     alignment=Qt.AlignmentFlag.AlignCenter
+        # )
 
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):
@@ -118,7 +133,7 @@ class WinFilters(UMainWidget):
         Dynamic.filter_only_folder = False
         Dynamic.filters_enabled.clear()
         self.reload_thumbnails.emit()
-        self.deleteLater()
+        # self.deleteLater()
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)
