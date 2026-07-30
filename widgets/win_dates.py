@@ -8,19 +8,14 @@ from PyQt6.QtGui import (QAction, QBrush, QColor, QIcon, QKeyEvent,
                          QTextCharFormat)
 from PyQt6.QtWidgets import (QApplication, QCalendarWidget, QComboBox,
                              QDateEdit, QDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QMainWindow, QPushButton, QSpinBox,
-                             QToolButton, QVBoxLayout, QWidget)
+                             QLabel, QMainWindow, QPushButton, QSpacerItem,
+                             QSpinBox, QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import HSep, UMainWidget, UMenu, UPushButton
-
-
-from PyQt6.QtWidgets import QDateEdit, QToolButton, QSpinBox
-from PyQt6.QtCore import QDate, Qt, QSize
-from PyQt6.QtGui import QIcon
-import os
+from ._base_widgets import (HSep, RowArrowWidget, UMainWidget, UMenu,
+                            UPushButton)
 
 
 def style_date_edit_calendar(date_edit: QDateEdit):
@@ -89,18 +84,27 @@ class WinDates(UMainWidget):
     dates_btn_solid = pyqtSignal()
     dates_btn_normal = pyqtSignal()
     reload_thumbnails = pyqtSignal()
+    reset_svg = os.path.join(Static.common_icons, "reset.svg")
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.search_dates[JsonData.lng_index])
+        self.central_layout.setSpacing(10)
 
+        group_box = QGroupBox()
+        self.central_layout.addWidget(group_box)
+        group_layout = QVBoxLayout(group_box)
+        group_layout.setContentsMargins(5, 0, 5, 0)
+        group_layout.setSpacing(5)
+
+        # --- Блок пресетов ---
         preset_widget = QWidget()
-        self.central_layout.addWidget(preset_widget)
+        group_layout.addWidget(preset_widget)
         preset_layout = QHBoxLayout(preset_widget)
         preset_layout.setContentsMargins(0, 0, 0, 0)
-        preset_layout.setSpacing(0)
+        preset_layout.setSpacing(10)
 
         period_label = QLabel("Период")
         preset_layout.addWidget(period_label)
@@ -108,6 +112,8 @@ class WinDates(UMainWidget):
         self.preset_button = UPushButton("")
         self.preset_button.setFixedWidth(120)
         preset_layout.addWidget(self.preset_button)
+
+        preset_layout.addStretch(1)
 
         preset_menu = UMenu(None)
         self.preset_button.setMenu(preset_menu)
@@ -131,16 +137,19 @@ class WinDates(UMainWidget):
             )
             preset_menu.addAction(act)
 
+        # --- Блок ручного выбора дат ---
         date_widget = QWidget()
-        self.central_layout.addWidget(date_widget)
+        group_layout.addWidget(date_widget)
         date_layout = QHBoxLayout(date_widget)
         date_layout.setContentsMargins(0, 0, 0, 0)
-        date_layout.setSpacing(0)
+        date_layout.setSpacing(5)
 
         from_label = QLabel("С:")
         date_layout.addWidget(from_label)
         self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
         date_layout.addWidget(self.date_from)
+
+        date_layout.addSpacerItem(QSpacerItem(15, 0))
 
         to_label = QLabel("По:")
         date_layout.addWidget(to_label)
@@ -150,11 +159,15 @@ class WinDates(UMainWidget):
         for widget in [self.date_from, self.date_to]:
             widget.setEnabled(False)
             style_date_edit_calendar(widget)
-        
+
+        self.adjustSize()
+
+
         self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.apply_btn.clicked.connect(self.clear_btn_cmd) 
-        self.central_layout.addWidget(self.apply_btn)
+        self.central_layout.addWidget(self.apply_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        self.handle_preset_change(Dynamic.date_index)
         self.adjustSize()
 
 
@@ -162,7 +175,6 @@ class WinDates(UMainWidget):
         self.preset_button.setText(action.text())
         self.handle_preset_change(index)
         
-        # Если выбрали "Все время" (индекс 0) — это триггер полного сброса
         if index == 0:
             self.clear_btn_cmd()
         else:
@@ -177,8 +189,6 @@ class WinDates(UMainWidget):
         if not is_custom:
             self.date_to.setDate(today)
             if index == 0:
-                # Нам больше не нужна жесткая дата 2018 года, 
-                # но для визуального порядка в заблокированном QDateEdit поставим текущий день
                 self.date_from.setDate(today)
             elif index == 1: # Сегодня
                 self.date_from.setDate(today)
@@ -197,18 +207,15 @@ class WinDates(UMainWidget):
         self.dates_btn_solid.emit()
 
     def clear_btn_cmd(self, *args):
-        # 1. Полностью очищаем глобальное состояние фильтров
         Dynamic.loaded_thumbs = 0
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0
         
-        # 2. Сбрасываем интерфейс самого окна к начальному состоянию ("Все время")
         all_time_action = self.preset_actions[0]
         self.preset_button.setText(all_time_action.text())
         self.handle_preset_change(0)
         
-        # 3. Отправляем сигналы обновления галереи и возврата кнопки к нормальному стилю
         self.reload_thumbnails.emit()
         self.dates_btn_normal.emit()
 
