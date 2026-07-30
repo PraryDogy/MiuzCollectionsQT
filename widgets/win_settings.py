@@ -26,9 +26,10 @@ from system.utils import Utils
 
 from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
-                            SaveRowArrowWidget, SuperConfirmWindow, UMainWidget,
-                            UMenu, UPushButton, UTextEdit, VListSpacerItem,
-                            VListWidget, VListWidgetItem, WarningWindow)
+                            SaveRowArrowWidget, SuperConfirmWindow,
+                            UMainWidget, UMenu, UPushButton, UTextEdit,
+                            VListSpacerItem, VListWidget, VListWidgetItem,
+                            WarningWindow)
 
 
 def restart_app():

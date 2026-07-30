@@ -5,7 +5,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QHBoxLayout, QLabel,
                              QWidget)
 
-from cfg import JsonData, Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
 from ._base_widgets import GrayLabel, USlider

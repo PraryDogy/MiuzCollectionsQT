@@ -6,11 +6,11 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from typing_extensions import Literal
 
-from cfg import JsonData, Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import ULineEdit, UMenu, GrayLabel
+from ._base_widgets import GrayLabel, ULineEdit, UMenu
 
 
 class ClearBtn(QSvgWidget):
