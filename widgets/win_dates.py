@@ -152,11 +152,11 @@ class WinDates(UMainWidget):
             style_date_edit_calendar(widget)
         
         self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        self.apply_btn.clicked.connect(self.clear_btn_cmd)
-        self.apply_btn.clicked.connect(self.apply_filter)
+        self.apply_btn.clicked.connect(self.clear_btn_cmd) 
         self.central_layout.addWidget(self.apply_btn)
 
         self.adjustSize()
+
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
@@ -179,7 +179,7 @@ class WinDates(UMainWidget):
                 self.date_from.setDate(today.addDays(-7))
             elif index == 3: # За месяц
                 self.date_from.setDate(today.addMonths(-1))
-            elif index == 4: # За year
+            elif index == 4: # За год
                 self.date_from.setDate(today.addYears(-1))
 
     def apply_filter(self, index: int):
@@ -190,10 +190,18 @@ class WinDates(UMainWidget):
         self.dates_btn_solid.emit()
 
     def clear_btn_cmd(self, *args):
+        # 1. Полностью очищаем глобальное состояние фильтров
         Dynamic.loaded_thumbs = 0
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0
+        
+        # 2. Сбрасываем интерфейс самого окна к начальному состоянию ("Все время")
+        all_time_action = self.preset_actions[0]
+        self.preset_button.setText(all_time_action.text())
+        self.handle_preset_change(0)
+        
+        # 3. Отправляем сигналы обновления галереи и возврата кнопки к нормальному стилю
         self.reload_thumbnails.emit()
         self.dates_btn_normal.emit()
 
