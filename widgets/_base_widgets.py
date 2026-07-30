@@ -768,6 +768,8 @@ class MfPathWidget(QGroupBox):
         url = dialog.getExistingDirectory()
         if url and os.path.isdir(url):
             self.mf_path = url.rstrip(os.sep)
+            self.changed.emit()
+            self.ok_path_widget()
         return super().mouseReleaseEvent(a0)
         
     def dropEvent(self, a0):
@@ -775,6 +777,8 @@ class MfPathWidget(QGroupBox):
             url = a0.mimeData().urls()[0].toLocalFile()
             if url and os.path.isdir(url):
                 self.mf_path = url.rstrip(os.sep)
+                self.changed.emit()
+                self.ok_path_widget()
         return super().dropEvent(a0)
     
     def dragEnterEvent(self, a0):
