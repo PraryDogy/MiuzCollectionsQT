@@ -91,7 +91,6 @@ class WinDates(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.search_dates[JsonData.lng_index])
-        # self.setFixedSize(300, 120)
         self.central_layout.setSpacing(10)
 
         group_box = QGroupBox()
@@ -161,9 +160,20 @@ class WinDates(UMainWidget):
         self.date_to.setFixedWidth(110)
         date_layout.addWidget(self.date_to)
 
+        if Dynamic.date_start and Dynamic.date_end:
+            dt = Dynamic.date_start
+            dt = QDate(dt.year, dt.month, dt.day)
+            self.date_from.setDate(dt)
+
+            dt = Dynamic.date_end
+            dt = QDate(dt.year, dt.month, dt.day)
+            self.date_to.setDate(Dynamic.date_end)
+
         for widget in [self.date_from, self.date_to]:
             widget.setEnabled(False)
             style_date_edit_calendar(widget)
+            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus) 
+            widget.dateChanged.connect(self.on_custom_date_changed)
 
         date_layout.addStretch(1)
 
@@ -181,11 +191,28 @@ class WinDates(UMainWidget):
         
         if index == 0:
             self.clear_btn_cmd()
+        elif index == len(self.preset_actions) - 1:
+            # ИСПРАВЛЕНИЕ: Если выбран "Диапазон", мы НЕ отправляем фильтр сразу.
+            # Мы просто дали пользователю доступ к QDateEdit и ждем его кликов по календарю.
+            pass
         else:
             self.apply_filter(index)
+            
+    def on_custom_date_changed(self, qdate):
+        """Срабатывает каждый раз, когда пользователь выбирает дату в календаре ручного диапазона"""
+        # Проверяем, что сейчас действительно выбран режим ручного диапазона
+        custom_index = len(self.preset_actions) - 1
+        if Dynamic.date_index == custom_index or self.date_from.isEnabled():
+            self.apply_filter(custom_index)
         
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
+        
+        # Блокируем сигналы на время программной установки дат для готовых пресетов,
+        # чтобы метод on_custom_date_changed случайно не триггерился лишний раз
+        self.date_from.blockSignals(True)
+        self.date_to.blockSignals(True)
+        
         self.date_from.setEnabled(is_custom)
         self.date_to.setEnabled(is_custom)
         
@@ -202,13 +229,17 @@ class WinDates(UMainWidget):
                 self.date_from.setDate(today.addMonths(-1))
             elif index == 4: # За год
                 self.date_from.setDate(today.addYears(-1))
+                
+        # Возвращаем обработку сигналов обратно
+        self.date_from.blockSignals(False)
+        self.date_to.blockSignals(False)
 
     def apply_filter(self, index: int):
         Dynamic.date_start = self.date_from.date().toPyDate()
         Dynamic.date_end = self.date_to.date().toPyDate()
         Dynamic.date_index = index
         self.reload_thumbnails.emit()
-        self.dates_btn_solid.emit()
+        # self.dates_btn_solid.emit()
 
     def clear_btn_cmd(self, *args):
         Dynamic.loaded_thumbs = 0
@@ -223,7 +254,21 @@ class WinDates(UMainWidget):
         self.reload_thumbnails.emit()
         self.dates_btn_normal.emit()
 
+    def set_button_style(self):
+        if Dynamic.date_start and Dynamic.date_end:
+            self.dates_btn_solid.emit()
+        else:
+            self.dates_btn_normal.emit()
+
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
         return super().keyPressEvent(a0)
+
+    def deleteLater(self):
+        self.set_button_style()
+        return super().deleteLater()
+
+    def closeEvent(self, a0):
+        self.set_button_style()
+        return super().closeEvent(a0)
