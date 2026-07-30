@@ -15,7 +15,7 @@ class WinFilters(UMainWidget):
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    ww = 400
+    ww = 350
     hh = 450
     item_h = 25
 
