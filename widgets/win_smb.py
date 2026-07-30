@@ -20,7 +20,6 @@ def restart_app():
     QApplication.exit(0)
 
 
-
 class WarnWidget(QWidget):
     icon_path = os.path.join(Static.common_icons, "yellow_warning.svg")
 
@@ -50,7 +49,6 @@ class WinSmb(UMainWidget):
     def __init__(self, mf: Mf):
         super().__init__()
         self.mf = mf
-        self.mf_temp_path = ""
 
         self.set_close_only()
         self.set_always_on_top()
@@ -61,7 +59,7 @@ class WinSmb(UMainWidget):
         self.warn_widget = WarnWidget(mf)
         self.central_layout.addWidget(self.warn_widget)
 
-        self.path_widget = MfPathWidget(JsonData.lng_index, None)
+        self.path_widget = MfPathWidget(JsonData.lng_index, mf.mf_current_path)
         self.central_layout.addWidget(self.path_widget)
 
         btns_wid = QWidget()
@@ -84,13 +82,13 @@ class WinSmb(UMainWidget):
     def ok_cmd(self):
 
         def ok_clicked():
-            if self.path_widget.mf_temp_path:
-                self.mf.mf_paths = [self.path_widget.mf_temp_path, ]
-                self.mf.mf_current_path = self.path_widget.mf_temp_path
-                Mf.write_json_data()
-                restart_app()
+            self.mf.mf_paths = [mf_path, ]
+            self.mf.mf_current_path = mf_path
+            Mf.write_json_data()
+            restart_app()
 
-        if self.path_widget.mf_temp_path:
+        mf_path = self.path_widget.validate()
+        if mf_path:
             self.super_win = SuperConfirmWindow(
                 Lng.confirm_mf_path[JsonData.lng_index],
                 301, 105
