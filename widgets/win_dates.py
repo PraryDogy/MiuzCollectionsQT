@@ -91,7 +91,7 @@ class WinDates(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.search_dates[JsonData.lng_index])
-        self.setFixedSize(300, 110)
+        # self.setFixedSize(300, 120)
         self.central_layout.setSpacing(10)
 
         group_box = QGroupBox()
@@ -138,11 +138,13 @@ class WinDates(UMainWidget):
             )
             preset_menu.addAction(act)
 
+        group_layout.addWidget(HSep())
+
         # --- Блок ручного выбора дат ---
         date_widget = QWidget()
         group_layout.addWidget(date_widget)
         date_layout = QHBoxLayout(date_widget)
-        date_layout.setContentsMargins(0, 0, 0, 0)
+        date_layout.setContentsMargins(0, 5, 0, 5)
         date_layout.setSpacing(2)
 
         from_label = QLabel("С:")
@@ -171,7 +173,7 @@ class WinDates(UMainWidget):
 
         self.handle_preset_change(Dynamic.date_index)
         self.adjustSize()
-
+        self.setFixedSize(self.width(), self.height())
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
