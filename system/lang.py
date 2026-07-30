@@ -572,3 +572,4 @@ class Lng:
     preset_year = ("За год", "Past year")
     preset_custom = ("Диапазон", "Custom range")
     active_filters = ("Активные фильтры", "Active filters")
+    no = ("Нет", "None")

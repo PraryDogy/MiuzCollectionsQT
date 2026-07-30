@@ -7,7 +7,7 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (UMainWidget, UPushButton, UTextEdit,
+from ._base_widgets import (QLabel, QWidget, UMainWidget, UPushButton,
                             VListSpacerItem, VListWidget, VListWidgetItem)
 
 
@@ -15,8 +15,8 @@ class WinFilters(UMainWidget):
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    ww = 320
-    hh = 450
+    ww = 600
+    hh = 390
     item_h = 25
 
     def __init__(self):
@@ -29,22 +29,23 @@ class WinFilters(UMainWidget):
         self.central_layout.setSpacing(10)
         self.central_layout.setContentsMargins(10, 10, 10, 13)
 
-        # Создаем вертикальный сплиттер
-        self.splitter = QSplitter(Qt.Orientation.Vertical)
+        # Создаем ГОРИЗОНТАЛЬНЫЙ сплиттер
+        self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(15)
         self.central_layout.addWidget(self.splitter)
 
-        # --- Верхняя группа (Список фильтров) ---
+        # --- Левая группа (Список фильтров остается в GroupBox) ---
         self.list_group = QGroupBox()
         list_group_lay = QVBoxLayout(self.list_group)
         list_group_lay.setContentsMargins(1, 10, 1, 1)
         list_group_lay.setSpacing(0)
         
         self.list_widget = VListWidget()
+        # self.list_widget.setFixedHeight(350)
         self.list_widget.itemClicked.connect(self.item_cmd)
         list_group_lay.addWidget(self.list_widget)
         
-        # Добавляем ПЕРВУЮ ГРУППУ в сплиттер
+        # Добавляем ЛЕВУЮ ГРУППУ в сплиттер
         self.splitter.addWidget(self.list_group)
 
         # Заполнение списка элементами
@@ -85,31 +86,37 @@ class WinFilters(UMainWidget):
 
         self.list_widget.setCurrentRow(0)
         
-        # --- Нижняя группа (Активные фильтры) ---
-        self.active_group = QGroupBox()
-        active_group_lay = QVBoxLayout(self.active_group)
-        active_group_lay.setContentsMargins(1, 10, 1, 1)
-        active_group_lay.setSpacing(0)
+        # --- Правая часть (Контейнер для лейбла и кнопки) ---
+        self.right_container = QWidget()
+        right_lay = QVBoxLayout(self.right_container)
+        right_lay.setContentsMargins(0, 5, 0, 5)
+        right_lay.setSpacing(15)
 
-        txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
-        self.active_filters = UTextEdit()
-        self.active_filters.setReadOnly(True)
-        self.active_filters.setText(txt)
-        active_group_lay.addWidget(self.active_filters)
+        # Создаем лейбл
+        self.active_filters = QLabel(self.get_filters_text())
+        self.active_filters.setWordWrap(True)
+        self.active_filters.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        right_lay.addWidget(self.active_filters, stretch=1)
+
+        # Кнопка сброса теперь находится здесь
+        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        self.reset_btn.clicked.connect(self.reset_cmd)
+        right_lay.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
-        # Добавляем ВТОРУЮ ГРУППУ в сплиттер
-        self.splitter.addWidget(self.active_group)
+        # Добавляем ПРАВЫЙ КОНТЕЙНЕР в сплиттер справа
+        self.splitter.addWidget(self.right_container)
 
-        # Устанавливаем базовые пропорции и логику растяжения для групп в сплиттере
-        self.splitter.setSizes([300, 100])
+        # Устанавливаем базовые пропорции ширины (левая группа ~350px, правая ~150px)
+        self.splitter.setSizes([250, 350])
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 0)
 
-        # Кнопка сброса
-        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        self.reset_btn.clicked.connect(self.reset_cmd)
-        self.central_layout.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
+    def get_filters_text(self):
+        no_filters_text = Lng.no[JsonData.lng_index]
+        filters_str = ', '.join(Dynamic.filters_enabled) if Dynamic.filters_enabled else no_filters_text
+        txt = f"{Lng.active_filters[JsonData.lng_index]}: {filters_str}"
+        return txt
 
     def item_cmd(self, item: VListWidgetItem):
         if isinstance(item, VListSpacerItem):
@@ -135,9 +142,7 @@ class WinFilters(UMainWidget):
             Dynamic.filters_enabled.append(item.text())
             item.setCheckState(Qt.CheckState.Checked)
 
-        txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
-        self.active_filters.setText(txt)
-
+        self.active_filters.setText(self.get_filters_text())
         self.reload_thumbnails.emit()
 
     def reset_cmd(self):
@@ -153,9 +158,7 @@ class WinFilters(UMainWidget):
         Dynamic.filter_only_folder = False
         Dynamic.filters_enabled.clear()
         self.reload_thumbnails.emit()
-
-        txt = f"{Lng.active_filters[JsonData.lng_index]}: {', '.join(Dynamic.filters_enabled)}"
-        self.active_filters.setText(txt)
+        self.active_filters.setText(self.get_filters_text())
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)
