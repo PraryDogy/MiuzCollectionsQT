@@ -241,7 +241,7 @@ class DirsComparator(ScanerParent):
         ]
 
 
-class _DirsDbUpdater(ScanerParent):
+class DirsDbUpdater(ScanerParent):
     def __init__(self, scaner_item: BaseScanerItem, dirs_to_scan: list[DirItem]):
         super().__init__(scaner_item)
         self.dirs_to_scan = dirs_to_scan
@@ -410,13 +410,13 @@ class ImgComparator(ScanerParent):
         return removed_images, new_images
 
 
-class _ThumbsUpdater(ScanerParent):
+class ThumbsUpdater(ScanerParent):
 
-    def __init__(self, scaner_item: BaseScanerItem, del_images: list[ImgItem], new_images: list[ImgItem]):
+    def __init__(self, scaner_item: BaseScanerItem, removed_images: list[ImgItem], new_images: list[ImgItem]):
         # Передаем scaner_item в родительский класс
         super().__init__(scaner_item)
         # Сохраняем списки изображений как свойства экземпляра класса
-        self.del_images = del_images
+        self.removed_images = removed_images
         self.new_images = new_images
 
     def del_thumbs(self):
@@ -464,8 +464,8 @@ class _ThumbsUpdater(ScanerParent):
 
         step = 10
         chunked_del_images = [
-            self.del_images[i:i+step]
-            for i in range(0, len(self.del_images), step)
+            self.removed_images[i:i+step]
+            for i in range(0, len(self.removed_images), step)
         ]
         for chunk in chunked_del_images:
             if not os.path.exists(scaner.mf.mf_current_path):
@@ -626,9 +626,11 @@ class _DirsToScanWorker:
 
         # общий счет для отображения в GUI
         scaner_item.total_count = len(removed_images) + len(new_images)
-        _ThumbsUpdater.del_thumbs(scaner_item, removed_images)
-        _ThumbsUpdater.add_thumbs(scaner_item, new_images)
-        _DirsDbUpdater.upsert_records(scaner_item, dirs_to_scan)
+        thumbs_updater = ThumbsUpdater(scaner_item, removed_images, new_images)
+        thumbs_updater.del_thumbs()
+        thumbs_updater.add_thumbs()
+        dirs_updater = DirsDbUpdater(scaner_item, dirs_to_scan)
+        dirs_updater.upsert_records()
     
 
 class _RemovedDirsWorker:
