@@ -856,4 +856,5 @@ class ForcedScaner:
                 if item not in dir_items:
                     dir_items.append(item)
             if dir_items:
-                _DirsToScanWorker.start(dir_items, scaner_item)
+                updater = DirImagesUpdater(scaner_item, dirs_to_scan)
+                updater.start()
