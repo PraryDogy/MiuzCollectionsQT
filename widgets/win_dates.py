@@ -223,7 +223,7 @@ class WinDates(UMainWidget):
         if not is_custom:
             if index == 0:
                 self.date_to.setDate(today)
-                self.date_from.setDate(today)
+                self.date_from.setDate(QDate(2018, 1, 1))
             elif index == 1:
                 self.date_to.setDate(today)
                 self.date_from.setDate(today)
