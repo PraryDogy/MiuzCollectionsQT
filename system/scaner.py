@@ -596,9 +596,12 @@ class _DirsToScanWorker:
         - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
         - обновляются базы данных THUMBS и DIRS
         """
-        finder_images = _ImgLoader.get_finder_images(scaner_item, dirs_to_scan)
-        db_images = _ImgLoader.get_db_images(scaner_item, dirs_to_scan)
-        removed_images, new_images = _ImgCompator.start(finder_images, db_images)
+        img_loader = ImgLoader(scaner_item, dirs_to_scan)
+        finder_images = img_loader.get_finder_images()
+        db_images = img_loader.get_db_images()
+
+        img_comparator = ImgComparator(scaner_item, finder_images, db_images)
+        removed_images, new_images = img_comparator.start()
 
         # мы проверяем на удаление
         # если из каталога удаляется более Х изображений
