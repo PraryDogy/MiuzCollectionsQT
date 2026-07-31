@@ -607,7 +607,7 @@ class DirImagesUpdater(ScanerParent):
         finder_images = img_loader.get_finder_images()
         db_images = img_loader.get_db_images()
 
-        img_comparator = ImgComparator(finder_images, db_images)
+        img_comparator = ImgComparator(scaner, finder_images, db_images)
         removed_images, new_images = img_comparator.start()
 
         # мы проверяем на удаление
@@ -754,7 +754,7 @@ class BaseScaner:
             print(scaner_item.mf.mf_alias, "not changed")
             return
         dirs_loader = DirsLoader(scaner_item)
-        finder_dirs = dirs_loader.get_finder_dirs(scaner_item)
+        finder_dirs = dirs_loader.get_finder_dirs()
         if not finder_dirs:
             return
         dirs_comparator = DirsComparator(scaner_item, finder_dirs, db_dirs)
@@ -856,5 +856,5 @@ class ForcedScaner:
                 if item not in dir_items:
                     dir_items.append(item)
             if dir_items:
-                updater = DirImagesUpdater(scaner_item, dirs_to_scan)
+                updater = DirImagesUpdater(scaner_item, dir_items)
                 updater.start()
