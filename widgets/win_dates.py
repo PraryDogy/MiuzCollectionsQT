@@ -245,21 +245,15 @@ class WinDates(UMainWidget):
         self.update_readable_date_label()
 
     def update_readable_date_label(self):
-        """Форматирует выбранный период в красивую читаемую строку с названиями месяцев"""
-        text = Lng.selected_period[JsonData.lng_index]
-        if Dynamic.date_index == 0:
-            text = f"{Lng.selected_period[JsonData.lng_index]}: {Lng.preset_all_time[JsonData.lng_index]}"
+        ind = JsonData.lng_index
+        if ind == 0:
+            locale = QLocale(QLocale.Language.Russian)
         else:
-            if JsonData.lng_index == 0:
-                locale = QLocale(QLocale.Language.Russian)
-                str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
-                str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
-                text = f"{Lng.selected_period[JsonData.lng_index]}: {Lng.from_text[JsonData.lng_index]} {str_from} по {str_to}"
-            else:
-                locale = QLocale(QLocale.Language.English)
-                str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
-                str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
-                text = f"Selected period: from {str_from} to {str_to}"
+            locale = QLocale(QLocale.Language.English)
+
+        str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
+        str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
+        text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
                 
         self.readable_date_label.setText(text)
 
