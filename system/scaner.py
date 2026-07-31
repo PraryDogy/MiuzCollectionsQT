@@ -585,22 +585,29 @@ class ThumbsUpdater(ScanerParent):
         )
 
 
-class _DirsToScanWorker:   
+class DirImagesUpdater(ScanerParent):   
+    # Константу класса оставляем на уровне класса
     removed_images_count = 50
 
-    @staticmethod
-    def start(dirs_to_scan: list[DirItem], scaner_item: BaseScanerItem):
+    def __init__(self, scaner_item: BaseScanerItem, dirs_to_scan: list[DirItem]):
+        # Передаем scaner_item в родительский класс
+        super().__init__(scaner_item)
+        # Сохраняем список директорий для сканирования как свойство экземпляра
+        self.dirs_to_scan = dirs_to_scan
+
+    def start(self):
         """
-        Параметры: 
-        - dirs_to_scan список DirItem
-        - на основе этого списка добавляются и удаляются миниатюры в "hashdir"
-        - обновляются базы данных THUMBS и DIRS
+        На основе сохраненного списка добавляются и удаляются миниатюры в "hashdir",
+        а также обновляются базы данных THUMBS и DIRS.
         """
-        img_loader = ImgLoader(scaner_item, dirs_to_scan)
+        # Используем свойства экземпляра self
+        scaner = self.scaner_item
+        
+        img_loader = ImgLoader(scaner, self.dirs_to_scan)
         finder_images = img_loader.get_finder_images()
         db_images = img_loader.get_db_images()
 
-        img_comparator = ImgComparator(scaner_item, finder_images, db_images)
+        img_comparator = ImgComparator(finder_images, db_images)
         removed_images, new_images = img_comparator.start()
 
         # мы проверяем на удаление
@@ -610,46 +617,51 @@ class _DirsToScanWorker:
         # из-за чего приложение пытается все удалить из старого каталога
         # чтобы добавить все из нового
         stmt = all((
-            len(removed_images) > _DirsToScanWorker.removed_images_count,
-            scaner_item.scaner_type == "base",
+            len(removed_images) > self.removed_images_count,
+            scaner.scaner_type == "base",
         ))
         if stmt:
-            data = (scaner_item.mf.mf_alias, len(removed_images))
-            scaner_item.process_queue.put(data)
+            data = (scaner.mf.mf_alias, len(removed_images))
+            scaner.process_queue.put(data)
             while True:
-                if not scaner_item.response_queue.empty():
-                    can_continue = scaner_item.response_queue.get()
+                if not scaner.response_queue.empty():
+                    can_continue = scaner.response_queue.get()
                     if can_continue:
                         break
                     else:
                         return
 
         # общий счет для отображения в GUI
-        scaner_item.total_count = len(removed_images) + len(new_images)
-        thumbs_updater = ThumbsUpdater(scaner_item, removed_images, new_images)
+        scaner.total_count = len(removed_images) + len(new_images)
+        
+        thumbs_updater = ThumbsUpdater(scaner, removed_images, new_images)
         thumbs_updater.del_thumbs()
         thumbs_updater.add_thumbs()
-        dirs_updater = DirsDbUpdater(scaner_item, dirs_to_scan)
+        
+        dirs_updater = DirsDbUpdater(scaner, self.dirs_to_scan)
         dirs_updater.upsert_records()
-    
 
-class _RemovedDirsWorker:
 
-    @staticmethod
-    def remove_thumbs(
-        removed_dirs: list[DirItem],
-        scaner_item: BaseScanerItem
-    ):
+class RemovedDirsCleaner(ScanerParent):
+
+    def __init__(self, scaner_item: BaseScanerItem, removed_dirs: list[DirItem]):
+        # Передаем scaner_item в родительский класс
+        super().__init__(scaner_item)
+        # Сохраняем список удаленных директорий как свойство экземпляра
+        self.removed_dirs = removed_dirs
+
+    def remove_thumbs(self):
         """
         Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
         """
+        scaner = self.scaner_item
 
         def _get_thumbs(conn: sqlalchemy.Connection, dir_item: DirItem):
             one_slash = f"{dir_item.rel_path}/%"
             stmt_thumbs_to_remove = (
                 sqlalchemy.select(Thumbs.rel_thumb_path)
                 .where(Thumbs.rel_img_path.ilike(one_slash))
-                .where(Thumbs.mf_alias == scaner_item.mf.mf_alias)
+                .where(Thumbs.mf_alias == scaner.mf.mf_alias)
             )
             return conn.execute(stmt_thumbs_to_remove).scalars().all()
         
@@ -668,31 +680,32 @@ class _RemovedDirsWorker:
             del_stmt = (
                 sqlalchemy.delete(Thumbs.table)
                 .where(Thumbs.rel_thumb_path.in_(thumbs_to_remove))
-                .where(Thumbs.mf_alias==scaner_item.mf.mf_alias)
+                .where(Thumbs.mf_alias == scaner.mf.mf_alias)
             )
             conn.execute(del_stmt)
 
-        with scaner_item.engine.begin() as conn:
-            for dir_item in removed_dirs:
+        with scaner.engine.begin() as conn:
+            # Используем self.removed_dirs
+            for dir_item in self.removed_dirs:
                 thumbs_to_remove = _get_thumbs(conn, dir_item)
                 if thumbs_to_remove:
                     for rel_thumb_path in thumbs_to_remove:
                         _remove_thumb(rel_thumb_path)
                     _remove_records(conn, thumbs_to_remove)
 
-    def remove_dirs(
-            removed_dirs: list[DirItem],
-            scaner_item: BaseScanerItem
-        ):
+    def remove_dirs(self):
         """
         Удаляет записи в базе данных Dirs
         """
-        with scaner_item.engine.begin() as conn:
-            for dir_item in removed_dirs:
+        scaner = self.scaner_item
+        
+        with scaner.engine.begin() as conn:
+            # Используем self.removed_dirs
+            for dir_item in self.removed_dirs:
                 stmt = (
                     sqlalchemy.delete(Dirs.table)
                     .where(Dirs.rel_dir_path == dir_item.rel_path)
-                    .where(Dirs.mf_alias == scaner_item.mf.mf_alias)
+                    .where(Dirs.mf_alias == scaner.mf.mf_alias)
                 )
                 conn.execute(stmt)
 
@@ -753,10 +766,12 @@ class BaseScaner:
         if removed_dirs:
             BaseScaner.log_removed_dirs(scaner_item, finder_dirs, removed_dirs)
             if len(finder_dirs) != len(removed_dirs):
-                _RemovedDirsWorker.remove_thumbs(removed_dirs, scaner_item)
-                _RemovedDirsWorker.remove_dirs(removed_dirs, scaner_item)
+                cleaner = RemovedDirsCleaner(scaner_item, removed_dirs)
+                cleaner.remove_thumbs()
+                cleaner.remove_dirs()
         if dirs_to_scan:
-            _DirsToScanWorker.start(dirs_to_scan, scaner_item)
+            updater = DirImagesUpdater(scaner_item, dirs_to_scan)
+            updater.start()
     
     @staticmethod
     def log_removed_dirs(
