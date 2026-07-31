@@ -177,10 +177,6 @@ class WinDates(UMainWidget):
 
         date_layout.addStretch(1)
 
-        # self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        # self.apply_btn.clicked.connect(self.clear_btn_cmd) 
-        # self.central_layout.addWidget(self.apply_btn, alignment=Qt.AlignmentFlag.AlignCenter)
-
         self.handle_preset_change(Dynamic.date_index)
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
