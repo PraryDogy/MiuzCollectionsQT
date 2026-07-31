@@ -251,9 +251,13 @@ class WinDates(UMainWidget):
         else:
             locale = QLocale(QLocale.Language.English)
 
-        str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
-        str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
-        text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
+        if self.date_from.date() == self.date_to.date():
+            str_date = locale.toString(self.date_from.date(), "d MMMM yyyy")
+            text = f"{Lng.selected_period[ind]}: {str_date}"
+        else:
+            str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
+            str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
+            text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
                 
         self.readable_date_label.setText(text)
 
