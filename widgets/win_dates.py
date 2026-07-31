@@ -149,7 +149,7 @@ class WinDates(UMainWidget):
         date_layout.setContentsMargins(0, 5, 0, 5)
         date_layout.setSpacing(2)
 
-        from_label = QLabel(Lng.from_text[JsonData.lng_index])
+        from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         date_layout.addWidget(from_label)
         self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
         self.date_from.setFixedWidth(110)
@@ -157,7 +157,7 @@ class WinDates(UMainWidget):
 
         date_layout.addSpacerItem(QSpacerItem(10, 0))
 
-        to_label = QLabel(Lng.to_text[JsonData.lng_index])
+        to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
         date_layout.addWidget(to_label)
         self.date_to = QDateEdit(QDate.currentDate())
         self.date_to.setFixedWidth(110)
@@ -246,14 +246,15 @@ class WinDates(UMainWidget):
 
     def update_readable_date_label(self):
         """Форматирует выбранный период в красивую читаемую строку с названиями месяцев"""
+        text = Lng.selected_period[JsonData.lng_index]
         if Dynamic.date_index == 0:
-            text = "Выбранный период: все время" if JsonData.lng_index == 0 else "Selected period: all time"
+            text = f"{Lng.selected_period[JsonData.lng_index]}: {Lng.preset_all_time[JsonData.lng_index]}"
         else:
             if JsonData.lng_index == 0:
                 locale = QLocale(QLocale.Language.Russian)
                 str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
                 str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
-                text = f"Выбранный период: с {str_from} по {str_to}"
+                text = f"{Lng.selected_period[JsonData.lng_index]}: {Lng.from_text[JsonData.lng_index]} {str_from} по {str_to}"
             else:
                 locale = QLocale(QLocale.Language.English)
                 str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")

@@ -561,8 +561,8 @@ class Lng:
         "MIUZ Diamonds"
     )
     period = ("Период", "Period")
-    from_text = ("С:", "From:")
-    to_text = ("По:", "To:")
+    from_text = ("С", "From")
+    to_text = ("По", "To")
 
     # Пресеты меню
     preset_all_time = ("Все время", "All time")
@@ -574,3 +574,7 @@ class Lng:
     preset_custom = ("Диапазон", "Custom range")
     active_filters = ("Активные фильтры", "Active filters")
     no = ("Нет", "None")
+    selected_period = (
+        "Выбранный период",
+        "Selected period"
+    )
