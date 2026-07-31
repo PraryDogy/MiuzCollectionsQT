@@ -81,6 +81,12 @@ class BaseScanerItem:
     scaner_type: Literal["forced", "base"]
 
 
+class ScanerParent:
+    def __init__(self, scaner_item: BaseScanerItem):
+        super().__init__()
+        self.scaner_item = scaner_item
+
+
 class _DirsChangeWatcher:
 
     @staticmethod
