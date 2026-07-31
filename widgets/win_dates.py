@@ -167,7 +167,7 @@ class WinDates(UMainWidget):
         for widget in [self.date_from, self.date_to]:
             widget.setEnabled(True)  
             style_date_edit_calendar(widget)
-            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus) 
+            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             widget.dateChanged.connect(self.on_custom_date_changed)
 
         date_layout.addStretch(1)
