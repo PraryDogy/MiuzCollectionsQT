@@ -231,7 +231,7 @@ class ImgUtils:
         readers = (
             lambda path: tifffile.imread(path, is_ome=False),
             lambda path: np.array(Image.open(path).convert("RGB")),
-            lambda path: cv2.imread(path)
+            lambda path: cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
         )
         for loader in readers:
             try:
