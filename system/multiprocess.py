@@ -42,8 +42,11 @@ class BaseProcessWorker:
         Корректно terminate с join
         Завершает все очереди Queue
         """
-        self.process.terminate()
-        self.process.join(timeout=0.2)
+        if self.process is not None:
+            self.process.terminate()
+            self.process.join(timeout=0.2)
+        else:
+            print("process is none")
 
         for queue in self._queues:
             queue.close()
