@@ -841,7 +841,7 @@ class NewMfSettings(QWidget):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    base_folder_svg = os.path.join(Static.common_icons, "base_folder.svg")
+    image_folder_svg = os.path.join(Static.common_icons, "image_folder.svg")
     new_folder_svg = os.path.join(Static.common_icons, "new_folder.svg")
     filters_svg = os.path.join(Static.common_icons, "filters.svg")
     settings_svg = os.path.join(Static.common_icons, "settings.svg")
@@ -899,7 +899,7 @@ class WinSettings(UMainWidget):
 
         for i in Mf.items:
             new_folder = VListWidgetItem(self.left_menu, text=i.mf_alias)
-            new_folder.setIcon(QIcon(self.base_folder_svg))
+            new_folder.setIcon(QIcon(self.image_folder_svg))
             self.left_menu.addItem(new_folder)
 
         self.right_wid = QWidget()
