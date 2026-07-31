@@ -58,7 +58,7 @@ class WinFilters(UMainWidget):
 
         folder_item = VListWidgetItem(
             parent=self.list_widget,
-            text=Lng.only_this_folder[JsonData.lng_index],
+            text=Lng.without_subfolders[JsonData.lng_index],
             height=self.item_h
         )
         folder_item.set_checkable()
@@ -143,7 +143,7 @@ class WinFilters(UMainWidget):
             active_list.append(Lng.favorites[JsonData.lng_index])
 
         if Dynamic.filter_only_folder:
-            active_list.append(Lng.only_this_folder[JsonData.lng_index])
+            active_list.append(Lng.without_subfolders[JsonData.lng_index])
 
         if Dynamic.filters_enabled:
             active_list.extend(Dynamic.filters_enabled)
@@ -163,7 +163,7 @@ class WinFilters(UMainWidget):
             else:
                 Dynamic.filter_favs = True
                 item.setCheckState(Qt.CheckState.Checked)
-        elif item.text() == Lng.only_this_folder[JsonData.lng_index]:
+        elif item.text() == Lng.without_subfolders[JsonData.lng_index]:
             if Dynamic.filter_only_folder:
                 Dynamic.filter_only_folder = False
                 item.setCheckState(Qt.CheckState.Unchecked)

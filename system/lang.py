@@ -285,7 +285,7 @@ class Lng:
         "• In the app, select the \".jpg\" filter — all .jpg files will be displayed."
     )
     all_images = ("Все изображения", "All images")
-    only_this_folder = ("Показать только в этой папке", "Show only this folder")
+    without_subfolders = ("Без подпапок", "Without subfolders")
     contents = ("Содержимое", "Contents")
     hide_digits = ("Скрыть нумерацию", "Hide numbering")
     show_digits = ("Показать нумерацию", "Show numbering")
@@ -567,6 +567,7 @@ class Lng:
     # Пресеты меню
     preset_all_time = ("Все время", "All time")
     preset_today = ("Сегодня", "Today")
+    preset_yesterday = ("Вчера", "Yesterday")
     preset_week = ("За неделю", "Past week")
     preset_month = ("За месяц", "Past month")
     preset_year = ("За год", "Past year")

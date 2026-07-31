@@ -112,13 +112,15 @@ class WinDates(UMainWidget):
         preset_menu = UMenu(None)
         self.preset_button.setMenu(preset_menu)
 
+        # ДОБАВЛЕНО: Пресет Lng.preset_yesterday (не забудьте добавить в Lng: ("Вчера", "Yesterday"))
         self.preset_actions = [
             QAction(Lng.preset_all_time[JsonData.lng_index], preset_menu),
             QAction(Lng.preset_today[JsonData.lng_index], preset_menu),
-            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),
-            QAction(Lng.preset_month[JsonData.lng_index], preset_menu),
-            QAction(Lng.preset_year[JsonData.lng_index], preset_menu),
-            QAction(Lng.preset_custom[JsonData.lng_index], preset_menu),
+            QAction(Lng.preset_yesterday[JsonData.lng_index], preset_menu), # Индекс 2
+            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),      # Индекс 3
+            QAction(Lng.preset_month[JsonData.lng_index], preset_menu),     # Индекс 4
+            QAction(Lng.preset_year[JsonData.lng_index], preset_menu),      # Индекс 5
+            QAction(Lng.preset_custom[JsonData.lng_index], preset_menu),    # Индекс 6
         ]
 
         self.preset_button.setText(
@@ -159,12 +161,11 @@ class WinDates(UMainWidget):
             dt = QDate(dt.year, dt.month, dt.day)
             self.date_from.setDate(dt)
 
-            # ИСПРАВЛЕНИЕ: здесь была ошибка, передавался объект Dynamic.date_end напрямую вместо QDate
             dt_end = Dynamic.date_end
             self.date_to.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
 
         for widget in [self.date_from, self.date_to]:
-            widget.setEnabled(False)
+            widget.setEnabled(True)  
             style_date_edit_calendar(widget)
             widget.setFocusPolicy(Qt.FocusPolicy.NoFocus) 
             widget.dateChanged.connect(self.on_custom_date_changed)
@@ -186,14 +187,17 @@ class WinDates(UMainWidget):
         if index == 0:
             self.clear_btn_cmd()
         elif index == len(self.preset_actions) - 1:
-            pass
+            self.apply_filter(index)
         else:
             self.apply_filter(index)
             
     def on_custom_date_changed(self, qdate):
         custom_index = len(self.preset_actions) - 1
-        if Dynamic.date_index == custom_index or self.date_from.isEnabled():
-            self.apply_filter(custom_index)
+        if Dynamic.date_index != custom_index:
+            custom_action = self.preset_actions[custom_index]
+            self.preset_button.setText(custom_action.text())
+            
+        self.apply_filter(custom_index)
         
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
@@ -201,21 +205,25 @@ class WinDates(UMainWidget):
         self.date_from.blockSignals(True)
         self.date_to.blockSignals(True)
         
-        self.date_from.setEnabled(is_custom)
-        self.date_to.setEnabled(is_custom)
-        
         today = QDate.currentDate()
         if not is_custom:
-            self.date_to.setDate(today)
-            if index == 0:
+            if index == 0:  # Все время
+                self.date_to.setDate(today)
                 self.date_from.setDate(today)
-            elif index == 1:
+            elif index == 1:  # Сегодня
+                self.date_to.setDate(today)
                 self.date_from.setDate(today)
-            elif index == 2:
+            elif index == 2:  # ИЗМЕНЕНО: Вчера
+                self.date_to.setDate(today.addDays(-1))
+                self.date_from.setDate(today.addDays(-1))
+            elif index == 3:  # ИЗМЕНЕНО: За неделю
+                self.date_to.setDate(today)
                 self.date_from.setDate(today.addDays(-7))
-            elif index == 3:
+            elif index == 4:  # ИЗМЕНЕНО: За месяц
+                self.date_to.setDate(today)
                 self.date_from.setDate(today.addMonths(-1))
-            elif index == 4:
+            elif index == 5:  # ИЗМЕНЕНО: За год
+                self.date_to.setDate(today)
                 self.date_from.setDate(today.addYears(-1))
                 
         self.date_from.blockSignals(False)
