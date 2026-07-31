@@ -93,7 +93,7 @@ class CustomTreeView(QTreeView):
 class UploadWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
     image_file_svg = os.path.join(Static.common_icons, "image_file.svg")
-    files_svg = os.path.join(Static.common_icons, "files.svg")
+    copy_files_svg = os.path.join(Static.common_icons, "copy_files.svg")
     storage_svg = os.path.join(Static.common_icons, "storage.svg")
     base_folder_svg = os.path.join(Static.common_icons, "base_folder.svg")
 
@@ -167,7 +167,7 @@ class UploadWin(UMainWidget):
         group_one_layout.addWidget(self.list_widget)
         
         self.total_files_widget = RowArrowWidget("")
-        self.total_files_widget.set_left_icon(self.files_svg)
+        self.total_files_widget.set_left_icon(self.copy_files_svg)
         self.total_files_widget.hide_arrow()
         group_one_layout.addWidget(self.total_files_widget)
 
