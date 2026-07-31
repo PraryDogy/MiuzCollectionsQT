@@ -133,6 +133,11 @@ class WinDates(UMainWidget):
             )
             preset_menu.addAction(act)
 
+
+        self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        self.apply_btn.clicked.connect(self.clear_btn_cmd) 
+        preset_layout.addWidget(self.apply_btn)
+
         group_layout.addWidget(HSep())
 
         # --- Блок ручного выбора дат ---
@@ -172,9 +177,9 @@ class WinDates(UMainWidget):
 
         date_layout.addStretch(1)
 
-        self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        self.apply_btn.clicked.connect(self.clear_btn_cmd) 
-        self.central_layout.addWidget(self.apply_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        # self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        # self.apply_btn.clicked.connect(self.clear_btn_cmd) 
+        # self.central_layout.addWidget(self.apply_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.handle_preset_change(Dynamic.date_index)
         self.adjustSize()
