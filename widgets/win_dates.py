@@ -74,6 +74,10 @@ def style_date_edit_calendar(date_edit: QDateEdit):
     """)
 
 
+from PyQt6.QtCore import QLocale # Добавьте импорт QLocale в начало файла
+
+from PyQt6.QtCore import QLocale 
+
 class WinDates(UMainWidget):
     dates_btn_solid = pyqtSignal()
     dates_btn_normal = pyqtSignal()
@@ -112,15 +116,14 @@ class WinDates(UMainWidget):
         preset_menu = UMenu(None)
         self.preset_button.setMenu(preset_menu)
 
-        # ДОБАВЛЕНО: Пресет Lng.preset_yesterday (не забудьте добавить в Lng: ("Вчера", "Yesterday"))
         self.preset_actions = [
             QAction(Lng.preset_all_time[JsonData.lng_index], preset_menu),
             QAction(Lng.preset_today[JsonData.lng_index], preset_menu),
-            QAction(Lng.preset_yesterday[JsonData.lng_index], preset_menu), # Индекс 2
-            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),      # Индекс 3
-            QAction(Lng.preset_month[JsonData.lng_index], preset_menu),     # Индекс 4
-            QAction(Lng.preset_year[JsonData.lng_index], preset_menu),      # Индекс 5
-            QAction(Lng.preset_custom[JsonData.lng_index], preset_menu),    # Индекс 6
+            QAction(Lng.preset_yesterday[JsonData.lng_index], preset_menu), 
+            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),      
+            QAction(Lng.preset_month[JsonData.lng_index], preset_menu),     
+            QAction(Lng.preset_year[JsonData.lng_index], preset_menu),      
+            QAction(Lng.preset_custom[JsonData.lng_index], preset_menu),    
         ]
 
         self.preset_button.setText(
@@ -132,7 +135,6 @@ class WinDates(UMainWidget):
                 lambda e, ind=x, act=act: self.action_cmd(e, ind, act)
             )
             preset_menu.addAction(act)
-
 
         self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.apply_btn.clicked.connect(self.clear_btn_cmd) 
@@ -177,7 +179,19 @@ class WinDates(UMainWidget):
 
         date_layout.addStretch(1)
 
+        # --- Читаемый лейбл состояния (ИСПРАВЛЕНО: жесткая фиксация высоты) ---
+        self.readable_date_label = QLabel()
+        self.readable_date_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.readable_date_label.setWordWrap(True)
+        self.readable_date_label.setStyleSheet("color: #555555; font-weight: 500;")
+        # Фиксируем высоту на 32 пикселя, чтобы вместить 1 или 2 строки без деформации окна
+        self.readable_date_label.setFixedHeight(32) 
+        self.central_layout.addWidget(self.readable_date_label)
+
         self.handle_preset_change(Dynamic.date_index)
+        self.update_readable_date_label()
+        
+        # Вызываем один раз для стартового расчета геометрии
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
 
@@ -187,8 +201,6 @@ class WinDates(UMainWidget):
         
         if index == 0:
             self.clear_btn_cmd()
-        elif index == len(self.preset_actions) - 1:
-            self.apply_filter(index)
         else:
             self.apply_filter(index)
             
@@ -199,6 +211,7 @@ class WinDates(UMainWidget):
             self.preset_button.setText(custom_action.text())
             
         self.apply_filter(custom_index)
+        self.update_readable_date_label()
         
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
@@ -208,27 +221,46 @@ class WinDates(UMainWidget):
         
         today = QDate.currentDate()
         if not is_custom:
-            if index == 0:  # Все время
+            if index == 0:
                 self.date_to.setDate(today)
                 self.date_from.setDate(today)
-            elif index == 1:  # Сегодня
+            elif index == 1:
                 self.date_to.setDate(today)
                 self.date_from.setDate(today)
-            elif index == 2:  # ИЗМЕНЕНО: Вчера
+            elif index == 2:
                 self.date_to.setDate(today.addDays(-1))
                 self.date_from.setDate(today.addDays(-1))
-            elif index == 3:  # ИЗМЕНЕНО: За неделю
+            elif index == 3:
                 self.date_to.setDate(today)
                 self.date_from.setDate(today.addDays(-7))
-            elif index == 4:  # ИЗМЕНЕНО: За месяц
+            elif index == 4:
                 self.date_to.setDate(today)
                 self.date_from.setDate(today.addMonths(-1))
-            elif index == 5:  # ИЗМЕНЕНО: За год
+            elif index == 5:
                 self.date_to.setDate(today)
                 self.date_from.setDate(today.addYears(-1))
                 
         self.date_from.blockSignals(False)
         self.date_to.blockSignals(False)
+        self.update_readable_date_label()
+
+    def update_readable_date_label(self):
+        """Форматирует выбранный период в красивую читаемую строку с названиями месяцев"""
+        if Dynamic.date_index == 0:
+            text = "Выбранный период: все время" if JsonData.lng_index == 0 else "Selected period: all time"
+        else:
+            if JsonData.lng_index == 0:
+                locale = QLocale(QLocale.Language.Russian)
+                str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
+                str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
+                text = f"Выбранный период: с {str_from} по {str_to}"
+            else:
+                locale = QLocale(QLocale.Language.English)
+                str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
+                str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
+                text = f"Selected period: from {str_from} to {str_to}"
+                
+        self.readable_date_label.setText(text)
 
     def apply_filter(self, index: int):
         Dynamic.date_start = self.date_from.date().toPyDate()
