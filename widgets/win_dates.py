@@ -184,7 +184,6 @@ class WinDates(UMainWidget):
         self.readable_date_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.readable_date_label.setWordWrap(True)
         self.readable_date_label.setStyleSheet("color: #555555; font-weight: 500;")
-        # Фиксируем высоту на 32 пикселя, чтобы вместить 1 или 2 строки без деформации окна
         self.readable_date_label.setFixedHeight(32) 
         self.central_layout.addWidget(self.readable_date_label)
 
@@ -254,10 +253,12 @@ class WinDates(UMainWidget):
         if self.date_from.date() == self.date_to.date():
             str_date = locale.toString(self.date_from.date(), "d MMMM yyyy")
             text = f"{Lng.selected_period[ind]}: {str_date}"
+            text = f"{str_date}"
         else:
             str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
             str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
             text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
+            text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
                 
         self.readable_date_label.setText(text)
 
