@@ -102,7 +102,7 @@ class Utils:
         
     @classmethod
     def reveal_files(cls, paths: list[str]):
-        REVEAL_SCPT = os.path.join(Static.scripts, "reveal.scpt")
+        REVEAL_SCPT = os.path.join(Static.scripts, "reveal_files.scpt")
         subprocess.Popen(["osascript", REVEAL_SCPT] + paths)
         
     @classmethod
