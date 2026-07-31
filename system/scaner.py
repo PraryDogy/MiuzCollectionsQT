@@ -205,7 +205,7 @@ class DirsLoader(ScanerParent):
         return dirs
 
 
-class DirsCompator(ScanerParent):
+class DirsComparator(ScanerParent):
     def __init__(self, scaner_item: BaseScanerItem, finder_dirs: list[DirItem], db_dirs: list[DirItem]):
         super().__init__(scaner_item)
         self.finder_dirs = finder_dirs
@@ -733,15 +733,18 @@ class BaseScaner:
 
     @staticmethod
     def single_mf_scan(scaner_item: BaseScanerItem):
-        is_changed, db_dirs = _DirsChangeWatcher.is_changed(scaner_item)
+        watcher = DirsChangeWatcher(scaner_item)
+        is_changed, db_dirs = watcher.is_changed()
         if not is_changed:
             print(scaner_item.mf.mf_alias, "not changed")
             return
-        finder_dirs = _DirsLoader.get_finder_dirs(scaner_item)
+        dirs_loader = DirsLoader(scaner_item)
+        finder_dirs = dirs_loader.get_finder_dirs(scaner_item)
         if not finder_dirs:
             return
-        removed_dirs = _DirsCompator.get_dirs_to_remove(finder_dirs, db_dirs)
-        dirs_to_scan = _DirsCompator.get_dirs_to_scan(finder_dirs, db_dirs)
+        dirs_comparator = DirsComparator(scaner_item, finder_dirs, db_dirs)
+        removed_dirs = dirs_comparator.get_dirs_to_remove()
+        dirs_to_scan = dirs_comparator.get_dirs_to_scan()
         # это нужно, когда удалена вся папка "имя папки"
         # то есть не когда "имя папки" пуста, но существует,
         # а когда папка "имя папки" не существуетre
