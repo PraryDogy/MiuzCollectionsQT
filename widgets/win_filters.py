@@ -17,8 +17,6 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
 
 
 class WinDates(QWidget):
-    dates_btn_solid = pyqtSignal()
-    dates_btn_normal = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
 
@@ -215,15 +213,7 @@ class WinDates(QWidget):
         all_time_action = self.preset_actions[0]
         self.preset_button.setText(all_time_action.text())
         self.handle_preset_change(0)
-        
         self.reload_thumbnails.emit()
-        self.dates_btn_normal.emit()
-
-    def set_button_style(self):
-        if Dynamic.date_start and Dynamic.date_end:
-            self.dates_btn_solid.emit()
-        else:
-            self.dates_btn_normal.emit()
 
     def style_date_edit_calendar(self, date_edit: QDateEdit):
         date_edit.setCalendarPopup(True)
@@ -286,19 +276,6 @@ class WinDates(QWidget):
             }
         """)
 
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
-            self.deleteLater()
-        return super().keyPressEvent(a0)
-
-    def deleteLater(self):
-        self.set_button_style()
-        return super().deleteLater()
-
-    def closeEvent(self, a0):
-        self.set_button_style()
-        return super().closeEvent(a0)
-
 
 class WinFilters(UMainWidget):
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
@@ -317,6 +294,7 @@ class WinFilters(UMainWidget):
         self.setFixedSize(self.ww, self.hh)
 
         dates = WinDates()
+        dates.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.central_layout.addWidget(dates)
 
         # Создаем ГОРИЗОНТАЛЬНЫЙ сплиттер

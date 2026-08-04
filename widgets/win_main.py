@@ -327,6 +327,8 @@ class WinMain(UMainWindow):
                 Dynamic.filter_only_folder,
                 Dynamic.filter_favs,
                 *Dynamic.filters_enabled,
+                Dynamic.date_start,
+                Dynamic.date_end
             )):
                 self.bar_top.filters_btn.set_normal_style()
 
