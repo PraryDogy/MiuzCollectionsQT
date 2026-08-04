@@ -18,10 +18,11 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
 
 class DatesWidget(QWidget):
     reload_thumbnails = pyqtSignal()
-    reset_svg = os.path.join(Static.common_icons, "reset.svg")
+    hh = 85
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setFixedHeight(self.hh)
         self.central_layout = QVBoxLayout(self)
         self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.central_layout.setSpacing(10)
@@ -124,10 +125,6 @@ class DatesWidget(QWidget):
 
         self.handle_preset_change(Dynamic.date_index)
         self.update_readable_date_label()
-        
-        # Вызываем один раз для стартового расчета геометрии
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
@@ -290,7 +287,7 @@ class WinFilters(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
-        self.setFixedSize(self.ww, self.hh)
+        # self.setFixedSize(self.ww, self.hh)
         self.central_layout.setSpacing(10)
 
         dates = DatesWidget()
