@@ -16,15 +16,14 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
                             VListWidget, VListWidgetItem)
 
 
-class WinDates(QWidget):
+class DatesWidget(QWidget):
     reload_thumbnails = pyqtSignal()
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.central_layout = QVBoxLayout(self)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)  
-        self.setWindowTitle(Lng.search_dates[JsonData.lng_index])
+        self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.central_layout.setSpacing(10)
 
         group_box = QGroupBox()
@@ -121,7 +120,7 @@ class WinDates(QWidget):
         self.readable_date_label.setWordWrap(True)
         self.readable_date_label.setStyleSheet("color: #555555; font-weight: 500;")
         self.readable_date_label.setFixedHeight(32) 
-        self.central_layout.addWidget(self.readable_date_label)
+        # self.central_layout.addWidget(self.readable_date_label)
 
         self.handle_preset_change(Dynamic.date_index)
         self.update_readable_date_label()
@@ -293,7 +292,7 @@ class WinFilters(UMainWidget):
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
         self.setFixedSize(self.ww, self.hh)
 
-        dates = WinDates()
+        dates = DatesWidget()
         dates.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.central_layout.addWidget(dates)
 
