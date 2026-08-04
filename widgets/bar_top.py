@@ -89,7 +89,7 @@ class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
     svg_size = 30
 
-    def __init__(self, filename: Literal["sort", "filters", "calendar", "settings"]):
+    def __init__(self, filename: Literal["sort", "filters", "settings"]):
         super().__init__()
         self.filename = filename
         
@@ -134,20 +134,6 @@ class BarTopBtn(QWidget):
             self.set_normal_style()  # Возвращаем исходный стиль при отпускании
             self.clicked_.emit()
         super().mouseReleaseEvent(a0)  # ОБЯЗАТЕЛЬНО вызываем базовый класс
-
-
-
-class DatesBtn(BarTopBtn):
-    filename = "calendar"
-
-    def __init__(self):
-        super().__init__(self.filename)
-        self.lbl.setText(Lng.dates[JsonData.lng_index])
-
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        """Испускает сигнал и применяет сплошной стиль при клике левой кнопкой мыши."""
-        if ev and ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
 
 
 class FiltersBtn(BarTopBtn):
@@ -236,7 +222,6 @@ class ExitImgSearchBtn(QFrame):
 
 
 class BarTop(QWidget):
-    open_dates_win = pyqtSignal()
     open_settings_win = pyqtSignal(SettingsItem)
     open_filters_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
@@ -264,11 +249,6 @@ class BarTop(QWidget):
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(self.open_filters_win.emit)
         self.h_layout.addWidget(self.filters_btn, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        # --- Кнопка выбора даты ---
-        self.dates_btn = DatesBtn()
-        self.dates_btn.clicked_.connect(lambda: self.open_dates_win.emit())
-        self.h_layout.addWidget(self.dates_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")

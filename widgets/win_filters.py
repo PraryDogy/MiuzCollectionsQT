@@ -281,7 +281,7 @@ class WinFilters(UMainWidget):
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     ww = 600
-    hh = 390
+    hh = 450
     item_h = 25
     right_group_hh = 280
 

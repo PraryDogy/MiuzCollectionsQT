@@ -29,7 +29,6 @@ from .grid import Grid, GridStandart
 from .menu_left import MenuLeft
 from .win_collage import WinCollage
 from .win_copy_files import WinCopyFiles
-from .win_dates import WinDates
 from .win_filters import WinFilters
 from .win_image_view import ImgViewItem, WinImageView
 from .win_img_search import WinImgSearch
@@ -155,9 +154,6 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.open_dates_win.connect(
-            lambda: self.open_dates_win()
-        )
         self.bar_top.reload_thumbnails.connect(
             lambda: self.load_st_grid()
             )
@@ -240,11 +236,10 @@ class WinMain(UMainWindow):
         Dynamic.filters_enabled.clear()
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
-        self.bar_top.filters_btn.set_normal_style()
-
         Dynamic.date_start = None
         Dynamic.date_end = None
-        self.bar_top.dates_btn.set_normal_style()
+        Dynamic.date_index = 0
+        self.bar_top.filters_btn.set_normal_style()
 
         Dynamic.search_widget_text = None
         Dynamic.thumb_path_set.clear()
@@ -255,11 +250,10 @@ class WinMain(UMainWindow):
         Dynamic.filters_enabled.clear()
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
-        self.bar_top.filters_btn.set_normal_style()
-
         Dynamic.date_start = None
         Dynamic.date_end = None
-        self.bar_top.dates_btn.set_normal_style()
+        Dynamic.date_index = 0
+        self.bar_top.filters_btn.set_normal_style()
 
         Dynamic.thumb_path_set.clear()
 
@@ -291,11 +285,10 @@ class WinMain(UMainWindow):
         Dynamic.filters_enabled.clear()
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
-        self.bar_top.filters_btn.set_normal_style()
-
         Dynamic.date_start = None
         Dynamic.date_end = None
-        self.bar_top.dates_btn.set_normal_style()
+        Dynamic.date_index = 0  
+        self.bar_top.filters_btn.set_normal_style()
 
         Dynamic.thumb_path_set.clear()
         Dynamic.search_widget_text = None
@@ -549,20 +542,6 @@ class WinMain(UMainWindow):
         )
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
-
-    def open_dates_win(self):
-        self.dates_win = WinDates()
-        self.dates_win.dates_btn_solid.connect(
-            lambda: self.bar_top.dates_btn.set_solid_style()
-        )
-        self.dates_win.dates_btn_normal.connect(
-            lambda: self.bar_top.dates_btn.set_normal_style()
-        )
-        self.dates_win.reload_thumbnails.connect(
-            lambda: self.load_st_grid()
-        )
-        self.dates_win.center_to_parent(self)
-        self.dates_win.show()
 
     def load_st_grid(self, layout_index: int = 3):
 
