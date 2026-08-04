@@ -291,10 +291,13 @@ class WinFilters(UMainWidget):
         self.set_close_only()
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
         self.setFixedSize(self.ww, self.hh)
+        self.central_layout.setSpacing(10)
 
         dates = DatesWidget()
         dates.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.central_layout.addWidget(dates)
+
+        self.central_layout.addWidget(HSep())
 
         # Создаем ГОРИЗОНТАЛЬНЫЙ сплиттер
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
