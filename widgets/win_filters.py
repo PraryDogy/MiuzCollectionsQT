@@ -16,38 +16,29 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
                             VListWidget, VListWidgetItem)
 
 
-class DatesWidget(QWidget):
+class DatesWidget(QGroupBox):
     reload_thumbnails = pyqtSignal()
     hh = 40
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedHeight(self.hh)
-        self.central_layout = QVBoxLayout(self)
-        self.central_layout.setContentsMargins(0, 0, 0, 0)
-        self.central_layout.setSpacing(10)
+        # self.setFixedHeight(self.hh)
+        
+        # ИСПРАВЛЕНО: Явно обнуляем верхний и нижний отступы layout'а (0 по вертикали)
+        self.central_layout = QHBoxLayout(self)
+        self.central_layout.setContentsMargins(5, 10, 5, 0) 
+        self.central_layout.setSpacing(0)
+        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        group_box = QGroupBox()
-        self.central_layout.addWidget(group_box)
-        group_layout = QVBoxLayout(group_box)
-        group_layout.setContentsMargins(5, 0, 5, 0)
-        group_layout.setSpacing(5)
-
-        # --- Блок пресетов ---
-        preset_widget = QWidget()
-        group_layout.addWidget(preset_widget)
-        preset_layout = QHBoxLayout(preset_widget)
-        preset_layout.setContentsMargins(0, 0, 0, 0)
-        preset_layout.setSpacing(10)
-
+        # Элементы управления периодом
         period_label = QLabel(Lng.period[JsonData.lng_index])
-        preset_layout.addWidget(period_label)
+        self.central_layout.addWidget(period_label)
+
+        self.central_layout.addSpacing(10)
 
         self.preset_button = UPushButton("")
         self.preset_button.setFixedWidth(120)
-        preset_layout.addWidget(self.preset_button)
-
-        preset_layout.addStretch(1)
+        self.central_layout.addWidget(self.preset_button)
 
         preset_menu = UMenu(None)
         self.preset_button.setMenu(preset_menu)
@@ -72,19 +63,20 @@ class DatesWidget(QWidget):
             )
             preset_menu.addAction(act)
 
+        self.central_layout.addSpacing(15)
+
+        # Выбор дат "От" и "До"
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
-        preset_layout.addWidget(from_label)
+        self.central_layout.addWidget(from_label)
         self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
         self.date_from.setFixedWidth(110)
-        preset_layout.addWidget(self.date_from)
-
-        preset_layout.addSpacerItem(QSpacerItem(10, 0))
+        self.central_layout.addWidget(self.date_from)
 
         to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
-        preset_layout.addWidget(to_label)
+        self.central_layout.addWidget(to_label)
         self.date_to = QDateEdit(QDate.currentDate())
         self.date_to.setFixedWidth(110)
-        preset_layout.addWidget(self.date_to)
+        self.central_layout.addWidget(self.date_to)
 
         if Dynamic.date_start and Dynamic.date_end:
             dt = Dynamic.date_start
@@ -100,9 +92,9 @@ class DatesWidget(QWidget):
             widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             widget.dateChanged.connect(self.on_custom_date_changed)
 
-        preset_layout.addStretch(1)
+        self.central_layout.addStretch(1)
 
-        # --- Читаемый лейбл состояния (ИСПРАВЛЕНО: жесткая фиксация высоты) ---
+        # Текстовое состояние и кнопка сброса
         self.readable_date_label = QLabel()
         self.readable_date_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.readable_date_label.setWordWrap(True)
@@ -111,10 +103,11 @@ class DatesWidget(QWidget):
 
         self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.clicked.connect(self.clear_btn_cmd) 
-        preset_layout.addWidget(self.reset_btn)
+        self.central_layout.addWidget(self.reset_btn)
 
         self.handle_preset_change(Dynamic.date_index)
         self.update_readable_date_label()
+
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
@@ -267,8 +260,8 @@ class WinFilters(UMainWidget):
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    ww = 600
-    hh = 450
+    ww = 590
+    hh = 410
     item_h = 25
     right_group_hh = 280
 
@@ -277,7 +270,7 @@ class WinFilters(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
-        # self.setFixedSize(self.ww, self.hh)
+        self.setFixedSize(self.ww, self.hh)
         self.central_layout.setSpacing(10)
 
         dates = DatesWidget()
@@ -345,7 +338,7 @@ class WinFilters(UMainWidget):
         self.right_container = QWidget()
         right_lay = QVBoxLayout(self.right_container)
         right_lay.setContentsMargins(0, 0, 0, 0)
-        right_lay.setSpacing(10)
+        right_lay.setSpacing(0)
 
         # Групбокс для активных фильтров
         self.active_group = QGroupBox()
@@ -379,11 +372,12 @@ class WinFilters(UMainWidget):
         self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.hide_sep()
         self.reset_btn.clicked.connect(self.reset_cmd)
-        
+
+        right_lay.addSpacing(10)
         # Добавляем кнопку в слой группы, а группу — в основной правый контейнер
         reset_group_lay.addWidget(self.reset_btn)
         right_lay.addWidget(self.reset_group)
-
+        right_lay.addSpacing(10)
         right_lay.addStretch()
 
         
