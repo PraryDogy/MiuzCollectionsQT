@@ -18,7 +18,7 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
 
 class DatesWidget(QWidget):
     reload_thumbnails = pyqtSignal()
-    hh = 85
+    hh = 40
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -72,32 +72,19 @@ class DatesWidget(QWidget):
             )
             preset_menu.addAction(act)
 
-        self.apply_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        self.apply_btn.clicked.connect(self.clear_btn_cmd) 
-        preset_layout.addWidget(self.apply_btn)
-
-        group_layout.addWidget(HSep())
-
-        # --- Блок ручного выбора дат ---
-        date_widget = QWidget()
-        group_layout.addWidget(date_widget)
-        date_layout = QHBoxLayout(date_widget)
-        date_layout.setContentsMargins(0, 5, 0, 5)
-        date_layout.setSpacing(2)
-
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
-        date_layout.addWidget(from_label)
+        preset_layout.addWidget(from_label)
         self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
         self.date_from.setFixedWidth(110)
-        date_layout.addWidget(self.date_from)
+        preset_layout.addWidget(self.date_from)
 
-        date_layout.addSpacerItem(QSpacerItem(10, 0))
+        preset_layout.addSpacerItem(QSpacerItem(10, 0))
 
         to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
-        date_layout.addWidget(to_label)
+        preset_layout.addWidget(to_label)
         self.date_to = QDateEdit(QDate.currentDate())
         self.date_to.setFixedWidth(110)
-        date_layout.addWidget(self.date_to)
+        preset_layout.addWidget(self.date_to)
 
         if Dynamic.date_start and Dynamic.date_end:
             dt = Dynamic.date_start
@@ -113,7 +100,7 @@ class DatesWidget(QWidget):
             widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             widget.dateChanged.connect(self.on_custom_date_changed)
 
-        date_layout.addStretch(1)
+        preset_layout.addStretch(1)
 
         # --- Читаемый лейбл состояния (ИСПРАВЛЕНО: жесткая фиксация высоты) ---
         self.readable_date_label = QLabel()
@@ -121,7 +108,10 @@ class DatesWidget(QWidget):
         self.readable_date_label.setWordWrap(True)
         self.readable_date_label.setStyleSheet("color: #555555; font-weight: 500;")
         self.readable_date_label.setFixedHeight(32) 
-        # self.central_layout.addWidget(self.readable_date_label)
+
+        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        self.reset_btn.clicked.connect(self.clear_btn_cmd) 
+        preset_layout.addWidget(self.reset_btn)
 
         self.handle_preset_change(Dynamic.date_index)
         self.update_readable_date_label()
