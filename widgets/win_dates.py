@@ -1,6 +1,7 @@
 import os
 
-from PyQt6.QtCore import QDate, QLocale, QSize, Qt, pyqtSignal
+from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в начало файла
+from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (QDateEdit, QGroupBox, QHBoxLayout, QLabel,
                              QSpacerItem, QSpinBox, QToolButton, QVBoxLayout,
@@ -11,72 +12,6 @@ from system.lang import Lng
 
 from ._base_widgets import HSep, UMainWidget, UMenu, UPushButton
 
-
-def style_date_edit_calendar(date_edit: QDateEdit):
-    date_edit.setCalendarPopup(True)
-    calendar = date_edit.calendarWidget()
-    if JsonData.lng_index == 0:
-        calendar.setLocale(QLocale(QLocale.Language.Russian))
-    else:
-        calendar.setLocale(QLocale(QLocale.Language.English))
-
-    calendar.setFixedSize(300, 300)
-    calendar.setMaximumDate(QDate.currentDate())
-    calendar.setMinimumDate(QDate(2012, 1, 1))
-    calendar.setVerticalHeaderFormat(
-        calendar.VerticalHeaderFormat.NoVerticalHeader
-    )
-
-    widgets = calendar.findChildren(QToolButton)
-    for wid in widgets:
-        name = wid.objectName()
-        wid.setIconSize(QSize(17, 17)) # Твой icon_size
-        if name == "qt_calendar_prevmonth":
-            wid.setIcon(
-                QIcon(os.path.join(Static.common_icons, "previous.svg"))
-            )
-        elif name == "qt_calendar_nextmonth":
-            wid.setIcon(
-                QIcon(os.path.join(Static.common_icons, "next.svg"))
-            )
-
-    for child in calendar.findChildren(QSpinBox):
-        child.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
-
-    # Применяем ТВОЙ оригинальный CSS-стиль напрямую к календарю
-    calendar.setStyleSheet("""
-        #qt_calendar_monthbutton::menu-indicator {
-            image: none;
-            width: 0px;
-        }
-
-        #qt_calendar_prevmonth,
-        #qt_calendar_nextmonth,
-        #qt_calendar_monthbutton,
-        #qt_calendar_yearbutton {
-            height: 25px;
-            background: transparent;                                 
-        }
-
-        #qt_calendar_prevmonth,
-        #qt_calendar_nextmont {
-            width: 25px;
-        }
-
-        #qt_calendar_prevmonth:hover,
-        #qt_calendar_nextmonth:hover,
-        #qt_calendar_monthbutton:hover,
-        #qt_calendar_yearbutton:hover {                  
-            background: transparent;  
-            border: transparent;
-            color: white;                                 
-        }
-    """)
-
-
-from PyQt6.QtCore import QLocale # Добавьте импорт QLocale в начало файла
-
-from PyQt6.QtCore import QLocale 
 
 class WinDates(UMainWidget):
     dates_btn_solid = pyqtSignal()
@@ -173,7 +108,7 @@ class WinDates(UMainWidget):
 
         for widget in [self.date_from, self.date_to]:
             widget.setEnabled(True)  
-            style_date_edit_calendar(widget)
+            self.style_date_edit_calendar(widget)
             widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             widget.dateChanged.connect(self.on_custom_date_changed)
 
@@ -286,6 +221,67 @@ class WinDates(UMainWidget):
             self.dates_btn_solid.emit()
         else:
             self.dates_btn_normal.emit()
+
+    def style_date_edit_calendar(self, date_edit: QDateEdit):
+        date_edit.setCalendarPopup(True)
+        calendar = date_edit.calendarWidget()
+        if JsonData.lng_index == 0:
+            calendar.setLocale(QLocale(QLocale.Language.Russian))
+        else:
+            calendar.setLocale(QLocale(QLocale.Language.English))
+
+        calendar.setFixedSize(300, 300)
+        calendar.setMaximumDate(QDate.currentDate())
+        calendar.setMinimumDate(QDate(2012, 1, 1))
+        calendar.setVerticalHeaderFormat(
+            calendar.VerticalHeaderFormat.NoVerticalHeader
+        )
+
+        widgets = calendar.findChildren(QToolButton)
+        for wid in widgets:
+            name = wid.objectName()
+            wid.setIconSize(QSize(17, 17)) # Твой icon_size
+            if name == "qt_calendar_prevmonth":
+                wid.setIcon(
+                    QIcon(os.path.join(Static.common_icons, "previous.svg"))
+                )
+            elif name == "qt_calendar_nextmonth":
+                wid.setIcon(
+                    QIcon(os.path.join(Static.common_icons, "next.svg"))
+                )
+
+        for child in calendar.findChildren(QSpinBox):
+            child.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
+
+        # Применяем ТВОЙ оригинальный CSS-стиль напрямую к календарю
+        calendar.setStyleSheet("""
+            #qt_calendar_monthbutton::menu-indicator {
+                image: none;
+                width: 0px;
+            }
+
+            #qt_calendar_prevmonth,
+            #qt_calendar_nextmonth,
+            #qt_calendar_monthbutton,
+            #qt_calendar_yearbutton {
+                height: 25px;
+                background: transparent;                                 
+            }
+
+            #qt_calendar_prevmonth,
+            #qt_calendar_nextmont {
+                width: 25px;
+            }
+
+            #qt_calendar_prevmonth:hover,
+            #qt_calendar_nextmonth:hover,
+            #qt_calendar_monthbutton:hover,
+            #qt_calendar_yearbutton:hover {                  
+                background: transparent;  
+                border: transparent;
+                color: white;                                 
+            }
+        """)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
