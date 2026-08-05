@@ -162,32 +162,25 @@ class WinImgSearch(UMainWidget):
         self.group_layout = QVBoxLayout(self.group_box)
         self.group_layout.setContentsMargins(5, 0, 5, 0)
         self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
-        self.reset_btn.hide_sep()
         self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.clicked.connect(self.reset_img_search)
         self.group_layout.addWidget(self.reset_btn)
-        self.reset_btn.setFixedHeight(30)
-
-        self.central_layout.addSpacing(5)
-
         self.slider_widget = SliderWidget()
-        self.central_layout.addWidget(self.slider_widget)
+        self.group_layout.addWidget(self.slider_widget)
+        self.group_layout.addSpacing(3)
+
+        self.central_layout.addSpacing(10)
 
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
-
         btn_layout.addStretch()
-
         self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
         self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
-
-        btn_layout.addSpacing(5)
-
+        btn_layout.addSpacing(10)
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
         cancel_btn.clicked.connect(self.custom_close)
         btn_layout.addWidget(cancel_btn)
-
         btn_layout.addStretch()
 
         self.adjustSize()
