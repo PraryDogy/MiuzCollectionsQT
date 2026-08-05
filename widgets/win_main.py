@@ -264,10 +264,11 @@ class WinMain(UMainWindow):
             self.set_no_filters()
 
         def on_closed():
-            if Dynamic.thumb_path_set:
-                self.bar_top.img_search_btn.set_selected_style()
-            else:
-                self.bar_top.img_search_btn.set_base_style()
+            # if Dynamic.thumb_path_set:
+            #     self.bar_top.img_search_btn.set_selected_style()
+            # else:
+            self.bar_top.img_search_btn.set_base_style()
+            print(123)
 
         self.bar_top.img_search_btn.set_selected_style()
         self.win_img_search = WinImgSearch()
