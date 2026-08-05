@@ -277,7 +277,7 @@ class WinFilters(UMainWidget):
         dates.reload_thumbnails.connect(self.reload_thumbnails.emit)
         self.central_layout.addWidget(dates)
 
-        self.central_layout.addWidget(HSep())
+        # self.central_layout.addWidget(HSep())
 
         # Создаем ГОРИЗОНТАЛЬНЫЙ сплиттер
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
