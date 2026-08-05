@@ -237,9 +237,15 @@ class WinMain(UMainWindow):
         self.bar_top.filters_btn.set_base_style()
 
         Dynamic.search_widget_text = None
-        Dynamic.thumb_path_set.clear()
         self.bar_top.search_wid.clear()
 
+    def set_no_img_search(self):
+        Dynamic.thumb_path_set.clear()
+        self.bar_top.img_search_btn.set_base_style()
+        try:
+            self.win_img_search.deleteLater()
+        except (RuntimeError, AttributeError):
+            ...
     def base_search_start(self):
         Dynamic.filters_enabled.clear()
         Dynamic.filter_favs = False
@@ -338,6 +344,7 @@ class WinMain(UMainWindow):
 
     def on_mf_clicked(self, mf: Mf):
         self.set_no_filters()
+        self.set_no_img_search()
         Mf.current_mf = mf
         Dynamic.current_dir = os.sep
         self.path_bar_update(Dynamic.current_dir)
@@ -357,6 +364,7 @@ class WinMain(UMainWindow):
         )
         Dynamic.current_dir = rel_path
         self.set_no_filters()
+        self.set_no_img_search()
         self.load_st_grid()
         self.path_bar_update(Dynamic.current_dir)
 
