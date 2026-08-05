@@ -116,9 +116,14 @@ class WinImgSearch(UMainWidget):
         self.img_array = None
         self.img_search_task = None
         self.read_img_task = None
+
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
         self.found_image_timer.timeout.connect(self.found_image.emit)
+
+        self.poll_progress_win_timer = QTimer(self)
+        self.poll_progress_win_timer.setSingleShot(True)
+        self.poll_progress_win_timer.timeout.connect(self.poll_progress_win)
 
         self.set_always_on_top()
         self.set_close_only()
@@ -174,7 +179,7 @@ class WinImgSearch(UMainWidget):
             similarity_value=self.slider_widget.current_value
         )
         self.img_search_task.sigs.finished_.connect(
-            self.image_searcher_finished
+            self.img_search_finished
         )
         self.img_search_task.sigs.found_image.connect(
             self.found_image_cmd
@@ -197,23 +202,21 @@ class WinImgSearch(UMainWidget):
         self.progress_win.stop_img_search.connect(self.stop_img_search)
         self.progress_win.show()
 
-    def image_searcher_finished(self):
+    def img_search_finished(self):
         if not Dynamic.thumb_path_set:
             self.found_image_cmd("999999999999")
         QTimer.singleShot(1000, self.progress_win.deleteLater)
 
     def poll_progress_win(self):
-        def timeout():
-            try:
-                self.progress_win.set_text(
-                    self.img_search_task.current_count,
-                    self.total_count
-                )
-            except RuntimeError:
-                ...
-        self.poll_progress_win_timer = QTimer(self)
-        self.poll_progress_win_timer.timeout.connect(timeout)
+        self.poll_progress_win_timer.stop()
         self.poll_progress_win_timer.start(500)
+        try:
+            self.progress_win.set_text(
+                self.img_search_task.current_count,
+                self.total_count
+            )
+        except RuntimeError:
+            self.poll_progress_win_timer.stop()
 
     def get_total_thumbnails_count(self):
         with Dbase.main_engine.connect() as conn:
