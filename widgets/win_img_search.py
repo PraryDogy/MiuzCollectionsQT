@@ -99,7 +99,7 @@ class SliderWidget(QWidget):
 
 
 class WinImgSearch(UMainWidget):
-    found_image = pyqtSignal()
+    reload_thumbnails = pyqtSignal()
     reset_all_filters = pyqtSignal()
     closed = pyqtSignal()
     ww = 250
@@ -118,7 +118,7 @@ class WinImgSearch(UMainWidget):
 
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
-        self.found_image_timer.timeout.connect(self.found_image.emit)
+        self.found_image_timer.timeout.connect(self.reload_thumbnails.emit)
 
         self.poll_progress_win_timer = QTimer(self)
         self.poll_progress_win_timer.setSingleShot(True)
@@ -168,12 +168,24 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(self.start_btn)
 
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
-        cancel_btn.clicked.connect(self.deleteLater)
+        cancel_btn.clicked.connect(self.custom_close)
         btn_layout.addWidget(cancel_btn)
 
         btn_layout.addStretch()
 
+        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        self.reset_btn.clicked.connect(self.reset_img_search)
+        self.central_layout.addWidget(self.reset_btn)
+
+
         self.adjustSize()
+
+    def reset_img_search(self):
+        self.img_label.clear()
+        self.img_label.setText(self.base_text)
+        if Dynamic.thumb_path_set:
+            Dynamic.thumb_path_set.clear()
+            self.reload_thumbnails.emit()
 
     def start_img_search(self):
         if self.img_array is None:
@@ -344,6 +356,10 @@ class WinImgSearch(UMainWidget):
             
         self.cleanup_shm()
 
+    def custom_close(self):
+        self.stop_all_tasks()
+        self.closed.emit()
+
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
         return super().dragEnterEvent(a0)
@@ -359,16 +375,5 @@ class WinImgSearch(UMainWidget):
     
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            self.close()  # Используем close() вместо деструктора напрямую
+            self.custom_close()
         return super().keyPressEvent(a0)
-    
-    def deleteLater(self):
-        self.stop_all_tasks()
-        # Вызываем закрытие родительского класса без дублирования сигналов
-        self.closed.emit()
-        return super().deleteLater()
-    
-    def closeEvent(self, a0):
-        self.stop_all_tasks()
-        self.closed.emit()
-        return super().closeEvent(a0)

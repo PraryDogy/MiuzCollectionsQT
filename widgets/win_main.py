@@ -264,22 +264,21 @@ class WinMain(UMainWindow):
             self.set_no_filters()
 
         def on_closed():
-            # if Dynamic.thumb_path_set:
-            #     self.bar_top.img_search_btn.set_selected_style()
-            # else:
-            self.bar_top.img_search_btn.set_base_style()
+            if Dynamic.thumb_path_set:
+                self.bar_top.img_search_btn.set_selected_style()
+                self.win_img_search.hide()
+            else:
+                self.bar_top.img_search_btn.set_base_style()
+                self.win_img_search.deleteLater()
 
         self.bar_top.img_search_btn.set_selected_style()
-        self.win_img_search = WinImgSearch()
-        self.win_img_search.found_image.connect(self.load_st_grid)
-        self.win_img_search.reset_all_filters.connect(reset_all_filters)
-        self.win_img_search.closed.connect(on_closed)
-        self.win_img_search.center_to_parent(self)
+        if not Dynamic.thumb_path_set:
+            self.win_img_search = WinImgSearch()
+            self.win_img_search.reload_thumbnails.connect(self.load_st_grid)
+            self.win_img_search.reset_all_filters.connect(reset_all_filters)
+            self.win_img_search.closed.connect(on_closed)
+            self.win_img_search.center_to_parent(self)
         self.win_img_search.show()
-
-    def img_search_exit(self):
-        self.set_no_filters()
-        self.load_st_grid()
     
     def show_in_app(self, rel_path: str):
 
