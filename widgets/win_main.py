@@ -258,7 +258,7 @@ class WinMain(UMainWindow):
 
     def open_img_search_win(self):
 
-        def search_started():
+        def reset_all_filters():
             Dynamic.current_dir = os.sep
             self.left_menu.tree_wid.expand_to_path(os.sep)
             self.set_no_filters()
@@ -272,7 +272,7 @@ class WinMain(UMainWindow):
         self.bar_top.img_search_btn.set_selected_style()
         self.win_img_search = WinImgSearch()
         self.win_img_search.found_image.connect(self.load_st_grid)
-        self.win_img_search.search_started.connect(search_started)
+        self.win_img_search.reset_all_filters.connect(reset_all_filters)
         self.win_img_search.closed.connect(on_closed)
         self.win_img_search.center_to_parent(self)
         self.win_img_search.show()

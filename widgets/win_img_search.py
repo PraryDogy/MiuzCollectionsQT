@@ -100,7 +100,7 @@ class SliderWidget(QWidget):
 
 class WinImgSearch(UMainWidget):
     found_image = pyqtSignal()
-    search_started = pyqtSignal()
+    reset_all_filters = pyqtSignal()
     closed = pyqtSignal()
     ww = 250
     hh = 200
@@ -112,6 +112,8 @@ class WinImgSearch(UMainWidget):
         # self.pr.text_label.setText("Поиск 2999 из 100000")
         # self.pr.show()
         # return
+
+        self.img_array: None | np.ndarray = None
 
         self.set_always_on_top()
         self.set_close_only()
@@ -126,10 +128,8 @@ class WinImgSearch(UMainWidget):
         group_layout.setContentsMargins(5, 5, 5, 5)
 
         lines_base_text = (
-
             f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} "
             f"\"{Mf.current_mf.mf_alias}\".",
-
             f"{Lng.image_search_drop[JsonData.lng_index]}."
         )
         self.base_text = "\n".join(lines_base_text)
@@ -162,7 +162,7 @@ class WinImgSearch(UMainWidget):
         self.adjustSize()
 
     def start_image_searcher(self):
-        if not hasattr(self, "img_array") or self.img_array is None:
+        if self.img_array is None:
             return
         self.image_searcher = ImageSearcher(
             src_img=self.img_array,
@@ -176,10 +176,10 @@ class WinImgSearch(UMainWidget):
         )
         UThreadPool.start(self.image_searcher)
 
-        self.get_total_count()
+        self.get_total_thumbnails_count()
         self.open_progress_win()
         self.poll_progress_win()
-        self.search_started.emit()
+        self.reset_all_filters.emit()
 
     def open_progress_win(self):
         self.progress_win = ProgressWin()
@@ -212,7 +212,7 @@ class WinImgSearch(UMainWidget):
         self.progress_win_timer.timeout.connect(timeout)
         self.progress_win_timer.start(500)
 
-    def get_total_count(self):
+    def get_total_thumbnails_count(self):
         with Dbase.main_engine.connect() as conn:
             stmt = sqlalchemy.select(func.count()).select_from(Thumbs.table)
             self.total_count = conn.execute(stmt).scalar()
