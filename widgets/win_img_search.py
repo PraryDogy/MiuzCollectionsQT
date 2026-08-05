@@ -115,6 +115,10 @@ class WinImgSearch(UMainWidget):
 
         self.img_array: None | np.ndarray = None
 
+        self.found_image_timer = QTimer(self)
+        self.found_image_timer.setSingleShot(True)
+        self.found_image_timer.timeout.connect(self.found_image.emit)
+
         self.set_always_on_top()
         self.set_close_only()
         self.setAcceptDrops(True)
@@ -217,11 +221,7 @@ class WinImgSearch(UMainWidget):
 
     def found_image_cmd(self, rel_path: str):
         Dynamic.thumb_path_set.add(rel_path)
-        if hasattr(self, "found_image_timer"):
-            self.found_image_timer.stop()
-        self.found_image_timer = QTimer(self)
-        self.found_image_timer.setSingleShot(True)
-        self.found_image_timer.timeout.connect(self.found_image.emit)
+        self.found_image_timer.stop()
         self.found_image_timer.start(500)
 
     def read_img(self, url: str, ms=300):
