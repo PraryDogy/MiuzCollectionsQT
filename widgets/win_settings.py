@@ -486,6 +486,7 @@ class FiltersWid(QWidget):
         ".jpeg",
         ".png",
         ".tiff",
+        ".tif",
         ".psd",
         ".psb",
     )
