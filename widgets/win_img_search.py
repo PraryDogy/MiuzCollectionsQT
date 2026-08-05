@@ -111,8 +111,10 @@ class WinImgSearch(UMainWidget):
         self.img_array = None
         self.img_search_task = None
         self.read_img_task = None
-        self.shm = None  # Ссылка для управления SharedMemory
-        self.progress_win = None  # Инициализируем явно
+        self.shm = None
+        self.progress_win = None
+
+        self.read_img_poll_ms = 300
 
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
@@ -121,6 +123,10 @@ class WinImgSearch(UMainWidget):
         self.poll_progress_win_timer = QTimer(self)
         self.poll_progress_win_timer.setSingleShot(True)
         self.poll_progress_win_timer.timeout.connect(self.poll_progress_win)
+
+        self.read_img_timer = QTimer(self)
+        self.read_img_timer.setSingleShot(True)
+        self.read_img_timer.timeout.connect(self.poll_read_img)
 
         self.set_always_on_top()
         self.set_close_only()
@@ -140,6 +146,7 @@ class WinImgSearch(UMainWidget):
             f"{Lng.image_search_drop[JsonData.lng_index]}."
         )
         self.base_text = "\n".join(lines_base_text)
+
         self.img_label = QLabel(self.base_text)
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setFixedSize(self.ww, self.hh)
@@ -232,6 +239,59 @@ class WinImgSearch(UMainWidget):
         except RuntimeError:
             self.poll_progress_win_timer.stop()
 
+    def poll_read_img(self):
+        self.read_img_timer.stop()
+
+        if self.read_img_task is None:
+            return
+
+        if not self.read_img_task.process_queue.empty():
+            item: ReadImgItem = self.read_img_task.process_queue.get()
+
+            try:
+                self.shm = shared_memory.SharedMemory(name=item.shm_name)
+
+                self.img_array = np.ndarray(
+                    item.shape,
+                    dtype=np.dtype(item.dtype),
+                    buffer=self.shm.buf
+                )
+
+                if ImgUtils.is_grayscale(self.img_array):
+                    self.cleanup_shm()
+
+                    self.img_label.clear()
+                    self.img_label.setText(Lng.only_color[JsonData.lng_index])
+
+                    QTimer.singleShot(
+                        1500,
+                        lambda: self.img_label.setText(self.base_text)
+                    )
+                else:
+                    qimage = Utils.qimage_from_array(self.img_array)
+
+                    min_size = min(
+                        self.img_label.width(),
+                        self.img_label.height()
+                    )
+
+                    pixmap = QPixmap.fromImage(qimage)
+                    resized_qpixmap = Utils.qiconed_resize(
+                        pixmap,
+                        min_size
+                    )
+
+                    self.img_label.setPixmap(resized_qpixmap)
+
+            except Exception:
+                self.cleanup_shm()
+
+        if not self.read_img_task.is_alive():
+            self.read_img_task.terminate_join()
+            self.read_img_task = None
+        else:
+            self.read_img_timer.start(self.read_img_poll_ms)
+
     def get_total_thumbnails_count(self):
         with Dbase.main_engine.connect() as conn:
             stmt = sqlalchemy.select(func.count()).select_from(Thumbs.table)
@@ -243,59 +303,20 @@ class WinImgSearch(UMainWidget):
         self.found_image_timer.start(500)
 
     def start_read_img_task(self, url: str, ms=300):
-        # Очищаем старую SharedMemory перед созданием новой задачи
         self.cleanup_shm()
 
-        def poll():
-            if self.read_img_timer is None:
-                return
+        if self.read_img_timer.isActive():
             self.read_img_timer.stop()
-            
-            if self.read_img_task is None:
-                return
 
-            if not self.read_img_task.process_queue.empty():
-                item: ReadImgItem = self.read_img_task.process_queue.get()
-                try:
-                    self.shm = shared_memory.SharedMemory(name=item.shm_name)
-                    self.img_array = np.ndarray(
-                        item.shape,
-                        dtype=np.dtype(item.dtype),
-                        buffer=self.shm.buf
-                    )
+        if self.read_img_task is not None:
+            self.read_img_task.terminate_join()
 
-                    if ImgUtils.is_grayscale(self.img_array):
-                        self.cleanup_shm()
-                        self.img_label.clear()
-                        self.img_label.setText(Lng.only_color[JsonData.lng_index])
-                        QTimer.singleShot(
-                            1500,
-                            lambda: self.img_label.setText(self.base_text)
-                        )
-                    else:
-                        qimage = Utils.qimage_from_array(self.img_array)
-                        min_size = min(
-                            self.img_label.width(),
-                            self.img_label.height()
-                        )
-                        pixmap = QPixmap.fromImage(qimage)
-                        resized_qpixmap = Utils.qiconed_resize(pixmap, min_size)
-                        self.img_label.setPixmap(resized_qpixmap)
-                except Exception:
-                    self.cleanup_shm()
-
-            if not self.read_img_task.is_alive():
-                self.read_img_task.terminate_join()
-            else:
-                self.read_img_timer.start(ms)
+        self.read_img_poll_ms = ms
 
         self.read_img_task = ProcessWorker(
             target=ReadImg.start,
-            args=(url, Static.max_thumb_size * 2, )
+            args=(url, Static.max_thumb_size * 2)
         )
-        self.read_img_timer = QTimer(self)
-        self.read_img_timer.setSingleShot(True)
-        self.read_img_timer.timeout.connect(poll)
 
         self.read_img_task.start()
         self.read_img_timer.start(ms)
