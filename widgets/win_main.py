@@ -164,7 +164,7 @@ class WinMain(UMainWindow):
             lambda: self.open_filters_win()
         )
         self.bar_top.open_img_search_win.connect(
-            lambda: self.img_search_start()
+            lambda: self.open_img_search_win()
         )
         self.bar_top.start_text_search.connect(
             lambda: self.base_search_start()
@@ -257,7 +257,7 @@ class WinMain(UMainWindow):
 
         self.load_st_grid()
 
-    def img_search_start(self):
+    def open_img_search_win(self):
 
         def search_started():
             Dynamic.current_dir = os.sep
