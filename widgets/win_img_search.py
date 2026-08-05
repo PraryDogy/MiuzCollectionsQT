@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QVBoxLayout,
                              QWidget)
 from sqlalchemy import func
 
-from cfg import JsonData, Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 from system.database import Dbase, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
@@ -19,7 +19,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWidget, UPushButton, USlider
+from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton, USlider
 
 
 class ProgressWin(UMainWidget):
@@ -99,6 +99,7 @@ class SliderWidget(QWidget):
 
 
 class WinImgSearch(UMainWidget):
+    reset_svg = os.path.join(Static.common_icons, "reset.svg")
     reload_thumbnails = pyqtSignal()
     reset_all_filters = pyqtSignal()
     closed = pyqtSignal()
@@ -153,6 +154,16 @@ class WinImgSearch(UMainWidget):
         self.img_label.setWordWrap(True)
         group_layout.addWidget(self.img_label)
 
+        self.group_box = QGroupBox()
+        self.central_layout.addWidget(self.group_box)
+        self.group_layout = QVBoxLayout(self.group_box)
+        self.group_layout.setContentsMargins(5, 0, 5, 0)
+        self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
+        self.reset_btn.hide_sep()
+        self.reset_btn.set_left_icon(self.reset_svg)
+        self.reset_btn.clicked.connect(self.reset_img_search)
+        self.group_layout.addWidget(self.reset_btn)
+
         self.central_layout.addStretch()
 
         self.slider_widget = SliderWidget()
@@ -172,11 +183,6 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(cancel_btn)
 
         btn_layout.addStretch()
-
-        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        self.reset_btn.clicked.connect(self.reset_img_search)
-        self.central_layout.addWidget(self.reset_btn)
-
 
         self.adjustSize()
 
