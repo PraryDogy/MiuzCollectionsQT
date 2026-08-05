@@ -114,7 +114,6 @@ class WinImgSearch(UMainWidget):
         # return
 
         self.img_array: None | np.ndarray = None
-
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
         self.found_image_timer.timeout.connect(self.found_image.emit)
