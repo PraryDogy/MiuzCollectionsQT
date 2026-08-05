@@ -481,15 +481,6 @@ class GeneralSettings(QWidget):
 class FiltersWid(QWidget):
     changed = pyqtSignal()
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
-    exts = (
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".tiff",
-        ".tif",
-        ".psd",
-        ".psb",
-    )
 
     def __init__(self):
         super().__init__()
@@ -537,7 +528,7 @@ class FiltersWid(QWidget):
     def reset_filters_cmd(self):
 
         def fin():
-            Filters.items = self.exts
+            Filters.items = Static.default_filters
             Filters.write_json_data()
             restart_app()
 

@@ -57,6 +57,15 @@ class Static:
         "preview",
         "просмотр"
     ]
+    default_filters = [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".tiff",
+        ".tif",
+        ".psd",
+        ".psb"
+    ]
 
 
 class Dynamic:
