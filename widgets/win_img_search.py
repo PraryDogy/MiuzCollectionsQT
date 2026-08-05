@@ -104,8 +104,8 @@ class WinImgSearch(UMainWidget):
     reload_thumbnails = pyqtSignal()
     reset_all_filters = pyqtSignal()
     closed = pyqtSignal()
-    ww = 250
-    hh = 200
+    ww = 350
+    hh = 350
 
     def __init__(self):
         super().__init__()
@@ -135,7 +135,7 @@ class WinImgSearch(UMainWidget):
         self.setAcceptDrops(True)
         self.setWindowTitle(Lng.image_search[JsonData.lng_index])
         self.central_layout.setContentsMargins(10, 10, 10, 5)
-        self.central_layout.setSpacing(10)
+        self.central_layout.setSpacing(0)
 
         group = QGroupBox()
         self.central_layout.addWidget(group)
@@ -155,6 +155,8 @@ class WinImgSearch(UMainWidget):
         self.img_label.setWordWrap(True)
         group_layout.addWidget(self.img_label)
 
+        self.central_layout.addSpacing(10)
+
         self.group_box = QGroupBox()
         self.central_layout.addWidget(self.group_box)
         self.group_layout = QVBoxLayout(self.group_box)
@@ -164,8 +166,9 @@ class WinImgSearch(UMainWidget):
         self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.clicked.connect(self.reset_img_search)
         self.group_layout.addWidget(self.reset_btn)
+        self.reset_btn.setFixedHeight(30)
 
-        self.central_layout.addStretch()
+        self.central_layout.addSpacing(5)
 
         self.slider_widget = SliderWidget()
         self.central_layout.addWidget(self.slider_widget)
@@ -178,6 +181,8 @@ class WinImgSearch(UMainWidget):
         self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
         self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
+
+        btn_layout.addSpacing(5)
 
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
         cancel_btn.clicked.connect(self.custom_close)
@@ -385,3 +390,6 @@ class WinImgSearch(UMainWidget):
         if a0.key() == Qt.Key.Key_Escape:
             self.custom_close()
         return super().keyPressEvent(a0)
+
+    def closeEvent(self, a0):
+        self.custom_close()
