@@ -163,18 +163,13 @@ class WinMain(UMainWindow):
         self.bar_top.open_filters_win.connect(
             lambda: self.open_filters_win()
         )
-        self.bar_top.open_img_search.connect(
+        self.bar_top.open_img_search_win.connect(
             lambda: self.img_search_start()
         )
-        self.bar_top.exit_img_search.connect(
-            lambda: self.img_search_exit()
-        )
-        self.bar_top.open_base_search.connect(
+        self.bar_top.start_text_search.connect(
             lambda: self.base_search_start()
         )
         self.right_layout.addWidget(self.bar_top)
-
-        # self.right_layout.addSpacerItem(QSpacerItem(0, 5))
 
         sep_upper = HSep()
         self.right_layout.addWidget(sep_upper)

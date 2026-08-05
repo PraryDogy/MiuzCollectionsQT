@@ -209,39 +209,12 @@ class ImgSearchBtn(BarTopBtn):
         self.lbl.setText(Lng.search[JsonData.lng_index])
 
 
-class ExitImgSearchBtn(QFrame):
-    clicked_ = pyqtSignal()
-    icon_path = os.path.join(Static.common_icons, "cancel.svg")
-    icon_size = 11
-    def __init__(self):
-        super().__init__()
-        h_layout = QHBoxLayout(self)
-        h_layout.setContentsMargins(2, 0, 2, 0)
-        h_layout.setSpacing(5)
-        h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-
-        # h_layout.addStretch()
-
-        text_label = QLabel(Lng.close_search[JsonData.lng_index])
-        h_layout.addWidget(text_label, alignment=Qt.AlignmentFlag.AlignVCenter)
-
-        svg_widget = ClearBtn(self)
-        svg_widget.setFixedSize(self.icon_size, self.icon_size)
-        h_layout.addWidget(svg_widget, alignment=Qt.AlignmentFlag.AlignVCenter)
-
-    def mouseReleaseEvent(self, a0):
-        self.clicked_.emit()
-        return super().mouseReleaseEvent(a0)
-
-
 class BarTop(QWidget):
     open_settings_win = pyqtSignal(SettingsItem)
     open_filters_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
-    history_press = pyqtSignal()
-    open_img_search = pyqtSignal()
-    exit_img_search = pyqtSignal()
-    open_base_search = pyqtSignal()
+    open_img_search_win = pyqtSignal()
+    start_text_search = pyqtSignal()
     hh = 60
 
     def __init__(self):
@@ -254,7 +227,7 @@ class BarTop(QWidget):
         self.h_layout.addStretch(0)
 
         self.img_search_btn = ImgSearchBtn()
-        self.img_search_btn.clicked_.connect(self.open_img_search.emit)
+        self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
         self.h_layout.addWidget(self.img_search_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка сортировки ---
@@ -284,22 +257,8 @@ class BarTop(QWidget):
 
         # --- Виджет поиска ---
         self.search_wid = WidSearch()
-        self.search_wid.reload_thumbnails.connect(lambda: self.open_base_search.emit())
-        self.search_wid.open_img_search.connect(lambda: self.open_img_search.emit())
+        self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         right_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
-
-        self.exit_search_btn = ExitImgSearchBtn()
-        self.exit_search_btn.clicked_.connect(self.exit_img_search.emit)
-        right_layout.addWidget(self.exit_search_btn, alignment=Qt.AlignmentFlag.AlignRight)
-        self.exit_search_btn.hide()
-
-    def show_img_search(self):
-        self.search_wid.hide()
-        self.exit_search_btn.show()        
-
-    def show_base_search(self):
-        self.search_wid.show()
-        self.exit_search_btn.hide()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
