@@ -89,7 +89,7 @@ class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
     svg_size = 30
 
-    def __init__(self, filename: Literal["sort", "filters", "settings"]):
+    def __init__(self, filename: Literal["magnifier", "sort", "filters", "settings"]):
         super().__init__()
         self.filename = filename
         
@@ -196,6 +196,14 @@ class SettingsBtn(BarTopBtn):
         self.lbl.setText(Lng.settings[JsonData.lng_index])
 
 
+class ImgSearchBtn(BarTopBtn):
+    filename = "img_search"
+
+    def __init__(self):
+        super().__init__(self.filename)
+        self.lbl.setText(Lng.search[JsonData.lng_index])
+
+
 class ExitImgSearchBtn(QFrame):
     clicked_ = pyqtSignal()
     icon_path = os.path.join(Static.common_icons, "cancel.svg")
@@ -240,9 +248,13 @@ class BarTop(QWidget):
 
         self.h_layout.addStretch(0)
 
+        self.img_search_btn = ImgSearchBtn()
+        self.img_search_btn.clicked_.connect(self.open_img_search.emit)
+        self.h_layout.addWidget(self.img_search_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+
         # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()
-        self.sort_btn.clicked_.connect(lambda: self.reload_thumbnails.emit())
+        self.sort_btn.clicked_.connect(self.reload_thumbnails.emit)
         self.h_layout.addWidget(self.sort_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка фильтров ---
