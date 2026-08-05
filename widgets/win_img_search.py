@@ -23,7 +23,7 @@ from ._base_widgets import UMainWidget, UPushButton, USlider
 
 
 class ProgressWin(UMainWidget):
-    cancel_image_search = pyqtSignal()
+    stop_img_search = pyqtSignal()
     ww = 200
 
     def __init__(self):
@@ -42,7 +42,7 @@ class ProgressWin(UMainWidget):
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
-        self.cancel_btn.clicked.connect(self.cancel_image_search.emit)
+        self.cancel_btn.clicked.connect(self.stop_img_search.emit)
         self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.set_text(0, 0)
@@ -150,7 +150,7 @@ class WinImgSearch(UMainWidget):
         btn_layout.addStretch()
 
         self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
-        self.start_btn.clicked.connect(self.start_image_searcher)
+        self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
 
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
@@ -161,38 +161,36 @@ class WinImgSearch(UMainWidget):
 
         self.adjustSize()
 
-    def start_image_searcher(self):
+    def start_img_search(self):
         if self.img_array is None:
             return
-        self.image_searcher = ImageSearcher(
+        self.img_search_task = ImageSearcher(
             src_img=self.img_array,
             similarity_value=self.slider_widget.current_value
         )
-        self.image_searcher.sigs.finished_.connect(
+        self.img_search_task.sigs.finished_.connect(
             self.image_searcher_finished
         )
-        self.image_searcher.sigs.found_image.connect(
+        self.img_search_task.sigs.found_image.connect(
             self.found_image_cmd
         )
-        UThreadPool.start(self.image_searcher)
+        UThreadPool.start(self.img_search_task)
 
         self.get_total_thumbnails_count()
         self.open_progress_win()
         self.poll_progress_win()
         self.reset_all_filters.emit()
 
+    def stop_img_search(self):
+        self.progress_win_timer.stop()
+        self.img_search_task.stop_task()
+        self.progress_win.deleteLater() 
+
     def open_progress_win(self):
         self.progress_win = ProgressWin()
         self.progress_win.center_to_parent(self)
-        self.progress_win.cancel_image_search.connect(
-            self.cancel_image_search
-        )
+        self.progress_win.stop_img_search.connect(self.stop_img_search)
         self.progress_win.show()
-
-    def cancel_image_search(self):
-        self.progress_win_timer.stop()
-        self.image_searcher.stop_task()
-        self.progress_win.deleteLater() 
 
     def image_searcher_finished(self):
         if not Dynamic.thumb_path_set:
@@ -203,7 +201,7 @@ class WinImgSearch(UMainWidget):
         def timeout():
             try:
                 self.progress_win.set_text(
-                    self.image_searcher.current_count,
+                    self.img_search_task.current_count,
                     self.total_count
                 )
             except RuntimeError:
@@ -297,7 +295,7 @@ class WinImgSearch(UMainWidget):
     
     def deleteLater(self):
         if hasattr(self, "image_searcher"):
-            self.image_searcher.stop_task()
+            self.img_search_task.stop_task()
         if hasattr(self, "read_img_task"):
             self.read_img_task.terminate_join()
         self.closed.emit()
@@ -305,6 +303,6 @@ class WinImgSearch(UMainWidget):
     
     def closeEvent(self, a0):
         if hasattr(self, "image_searcher"):
-            self.image_searcher.stop_task()
+            self.img_search_task.stop_task()
         self.closed.emit()
         return super().closeEvent(a0)
