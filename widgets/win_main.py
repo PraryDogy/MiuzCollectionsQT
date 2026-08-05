@@ -767,6 +767,7 @@ class WinMain(UMainWindow):
             self.forced_scaner_dirs.clear()
             self.db_mtime = int(os.stat(Static.db_db).st_mtime)
             self.bar_bottom.progress_bar.stop_timer_text()
+            self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
             self.scaner_task.start()
             self.scaner_poll_timer.stop()
             self.scaner_poll_timer.start(ms)

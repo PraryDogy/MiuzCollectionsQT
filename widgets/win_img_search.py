@@ -47,6 +47,7 @@ class ProgressWin(UMainWidget):
 
         self.set_text(0, 0)
         self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
     def set_text(self, current_count, total_count):
         if current_count > total_count:
@@ -185,6 +186,7 @@ class WinImgSearch(UMainWidget):
         btn_layout.addStretch()
 
         self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
     def reset_img_search(self):
         self.img_label.clear()
