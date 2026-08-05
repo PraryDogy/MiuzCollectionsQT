@@ -206,7 +206,7 @@ class ImgSearchBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.lbl.setText(Lng.search[JsonData.lng_index])
+        self.lbl.setText(Lng.image_search_short[JsonData.lng_index])
 
 
 class BarTop(QWidget):
@@ -226,14 +226,14 @@ class BarTop(QWidget):
 
         self.h_layout.addStretch(0)
 
-        self.img_search_btn = ImgSearchBtn()
-        self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
-        self.h_layout.addWidget(self.img_search_btn, alignment=Qt.AlignmentFlag.AlignLeft)
-
         # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()
         self.sort_btn.clicked_.connect(self.reload_thumbnails.emit)
         self.h_layout.addWidget(self.sort_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        self.img_search_btn = ImgSearchBtn()
+        self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
+        self.h_layout.addWidget(self.img_search_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
         # --- Кнопка фильтров ---
         self.filters_btn = FiltersBtn()

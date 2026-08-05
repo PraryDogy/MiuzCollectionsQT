@@ -578,3 +578,7 @@ class Lng:
         "Выбранный период",
         "Selected period"
     )
+    image_search_short = (
+        "Поиск изобр.",
+        "Image search"
+    )
