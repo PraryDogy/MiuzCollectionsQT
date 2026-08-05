@@ -89,13 +89,11 @@ class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
     svg_size = 30
 
-    def __init__(self, filename: Literal["magnifier", "sort", "filters", "settings"]):
+    def __init__(self, base_svg: str, selected_svg: str):
         super().__init__()
-        self.filename = filename
         
-        # Загружаем данные один раз при инициализации
-        self.normal_svg_data = self._load_svg_data(f"{filename}.svg")
-        self.solid_svg_data = self._load_svg_data(f"{filename}_selected.svg")
+        self.base_svg = self._load_svg_data(base_svg)
+        self.selected_svg = self._load_svg_data(selected_svg)
 
         self.v_lay = QVBoxLayout(self)
         self.v_lay.setContentsMargins(0, 0, 0, 0)
@@ -109,51 +107,56 @@ class BarTopBtn(QWidget):
         self.lbl = GrayLabel("")
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.set_normal_style()
+        self.set_selected_style()
 
-    def _load_svg_data(self, icon_name: str):
-        path = os.path.join(Static.bar_top_icons, icon_name)
+    def _load_svg_data(self, path: str):
         with open(path, "rb") as f:
             return QByteArray(f.read())
 
-    def set_solid_style(self):
-        self.svg_btn.load(self.solid_svg_data)
+    def set_base_style(self):
+        self.svg_btn.load(self.selected_svg)
         self.svg_btn.update()  # Принудительное обновление кадра
 
-    def set_normal_style(self):
-        self.svg_btn.load(self.normal_svg_data)
+    def set_selected_style(self):
+        self.svg_btn.load(self.base_svg)
         self.svg_btn.update()  # Принудительное обновление кадра
 
     def mousePressEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.set_solid_style()
+            self.set_base_style()
         super().mousePressEvent(a0)  # Передаем событие дальше
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.set_normal_style()  # Возвращаем исходный стиль при отпускании
+            self.set_selected_style()  # Возвращаем исходный стиль при отпускании
             self.clicked_.emit()
         super().mouseReleaseEvent(a0)  # ОБЯЗАТЕЛЬНО вызываем базовый класс
 
 
 class FiltersBtn(BarTopBtn):
-    filename = "filters"
+    base_svg = os.path.join(Static.bar_top_icons, "filters.svg")
+    selected_svg = os.path.join(Static.bar_top_icons, "filters_selected.svg")
 
     def __init__(self):
-        super().__init__(self.filename)
+        super().__init__(self.base_svg, self.selected_svg)
         self.lbl.setText(Lng.filters[JsonData.lng_index])
         
 
 class SortBtn(BarTopBtn):
-    filename = "sort"
+    base_svg = os.path.join(Static.bar_top_icons, "sort.svg")
+    selected_svg = os.path.join(Static.bar_top_icons, "sort_selected.svg")
 
     def __init__(self):
-        super().__init__(self.filename)
+        super().__init__(self.base_svg, self.selected_svg)
         self.set_text()
 
     def set_text(self):
         """Устанавливает текст кнопки в зависимости от текущей сортировки."""
-        text = Lng.sort_by_mod_short[JsonData.lng_index] if Dynamic.sort_by_mod else Lng.sort_by_recent_short[JsonData.lng_index]
+        text = (
+            Lng.sort_by_mod_short[JsonData.lng_index]
+            if Dynamic.sort_by_mod
+            else Lng.sort_by_recent_short[JsonData.lng_index]
+        )
         self.lbl.setText(text)
 
     def menu_clicked(self, value: bool):
@@ -185,22 +188,24 @@ class SortBtn(BarTopBtn):
             menu.exec(pos)
 
             # --- Вернуть нормальный стиль после закрытия меню ---
-            self.set_normal_style()
+            self.set_selected_style()
 
 
 class SettingsBtn(BarTopBtn):
-    filename = "settings"
+    base_svg = os.path.join(Static.bar_top_icons, "settings.svg")
+    selected_svg = os.path.join(Static.bar_top_icons, "settings_selected.svg")
 
     def __init__(self):
-        super().__init__(self.filename)
+        super().__init__(self.base_svg, self.selected_svg)
         self.lbl.setText(Lng.settings[JsonData.lng_index])
 
 
 class ImgSearchBtn(BarTopBtn):
-    filename = "img_search"
+    base_svg = os.path.join(Static.bar_top_icons, "img_search.svg")
+    selected_svg = os.path.join(Static.bar_top_icons, "img_search_selected.svg")
 
     def __init__(self):
-        super().__init__(self.filename)
+        super().__init__(self.base_svg, self.selected_svg)
         self.lbl.setText(Lng.search[JsonData.lng_index])
 
 
