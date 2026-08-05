@@ -107,28 +107,28 @@ class BarTopBtn(QWidget):
         self.lbl = GrayLabel("")
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.set_selected_style()
+        self.set_base_style()
 
     def _load_svg_data(self, path: str):
         with open(path, "rb") as f:
             return QByteArray(f.read())
 
-    def set_base_style(self):
+    def set_selected_style(self):
         self.svg_btn.load(self.selected_svg)
         self.svg_btn.update()  # Принудительное обновление кадра
 
-    def set_selected_style(self):
+    def set_base_style(self):
         self.svg_btn.load(self.base_svg)
         self.svg_btn.update()  # Принудительное обновление кадра
 
     def mousePressEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.set_base_style()
+            self.set_selected_style()
         super().mousePressEvent(a0)  # Передаем событие дальше
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.set_selected_style()  # Возвращаем исходный стиль при отпускании
+            self.set_base_style()  # Возвращаем исходный стиль при отпускании
             self.clicked_.emit()
         super().mouseReleaseEvent(a0)  # ОБЯЗАТЕЛЬНО вызываем базовый класс
 
@@ -188,7 +188,7 @@ class SortBtn(BarTopBtn):
             menu.exec(pos)
 
             # --- Вернуть нормальный стиль после закрытия меню ---
-            self.set_selected_style()
+            self.set_base_style()
 
 
 class SettingsBtn(BarTopBtn):

@@ -101,6 +101,7 @@ class SliderWidget(QWidget):
 class WinImgSearch(UMainWidget):
     found_image = pyqtSignal()
     search_started = pyqtSignal()
+    closed = pyqtSignal()
     ww = 250
     hh = 200
 
@@ -299,10 +300,11 @@ class WinImgSearch(UMainWidget):
             self.image_searcher.stop_task()
         if hasattr(self, "read_img_task"):
             self.read_img_task.terminate_join()
-        
+        self.closed.emit()
         return super().deleteLater()
     
     def closeEvent(self, a0):
         if hasattr(self, "image_searcher"):
             self.image_searcher.stop_task()
+        self.closed.emit()
         return super().closeEvent(a0)

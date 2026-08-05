@@ -234,12 +234,11 @@ class WinMain(UMainWindow):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0
-        self.bar_top.filters_btn.set_selected_style()
+        self.bar_top.filters_btn.set_base_style()
 
         Dynamic.search_widget_text = None
         Dynamic.thumb_path_set.clear()
         self.bar_top.search_wid.clear()
-        self.bar_top.show_base_search()
 
     def base_search_start(self):
         Dynamic.filters_enabled.clear()
@@ -248,7 +247,7 @@ class WinMain(UMainWindow):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0
-        self.bar_top.filters_btn.set_selected_style()
+        self.bar_top.filters_btn.set_base_style()
 
         Dynamic.thumb_path_set.clear()
 
@@ -263,11 +262,18 @@ class WinMain(UMainWindow):
             Dynamic.current_dir = os.sep
             self.left_menu.tree_wid.expand_to_path(os.sep)
             self.set_no_filters()
-            self.bar_top.show_img_search()
 
+        def on_closed():
+            if Dynamic.thumb_path_set:
+                self.bar_top.img_search_btn.set_selected_style()
+            else:
+                self.bar_top.img_search_btn.set_base_style()
+
+        self.bar_top.img_search_btn.set_selected_style()
         self.win_img_search = WinImgSearch()
         self.win_img_search.found_image.connect(self.load_st_grid)
         self.win_img_search.search_started.connect(search_started)
+        self.win_img_search.closed.connect(on_closed)
         self.win_img_search.center_to_parent(self)
         self.win_img_search.show()
 
@@ -283,12 +289,11 @@ class WinMain(UMainWindow):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0  
-        self.bar_top.filters_btn.set_selected_style()
+        self.bar_top.filters_btn.set_base_style()
 
         Dynamic.thumb_path_set.clear()
         Dynamic.search_widget_text = None
         self.bar_top.search_wid.clear()
-        self.bar_top.show_base_search()
 
         current_dir = os.path.dirname(rel_path)
         Dynamic.current_dir = current_dir
@@ -318,16 +323,12 @@ class WinMain(UMainWindow):
                 Dynamic.date_start,
                 Dynamic.date_end
             )):
-                self.bar_top.filters_btn.set_selected_style()
+                self.bar_top.filters_btn.set_base_style()
 
-        self.bar_top.filters_btn.set_base_style()
+        self.bar_top.filters_btn.set_selected_style()
         self.filters_win = WinFilters()
-        self.filters_win.closed_.connect(
-            on_closed
-        )
-        self.filters_win.reload_thumbnails.connect(
-            self.load_st_grid
-        )
+        self.filters_win.closed_.connect(on_closed)
+        self.filters_win.reload_thumbnails.connect(self.load_st_grid)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
 
@@ -530,10 +531,10 @@ class WinMain(UMainWindow):
         self.info_win.show()
 
     def open_settings_win(self, settings_item: SettingsItem):
-        self.bar_top.settings_btn.set_base_style()
+        self.bar_top.settings_btn.set_selected_style()
         self.settings_win = WinSettings(settings_item)
         self.settings_win.closed.connect(
-            self.bar_top.settings_btn.set_selected_style
+            self.bar_top.settings_btn.set_base_style
         )
         self.settings_win.center_to_parent(self.window())
         self.settings_win.show()
