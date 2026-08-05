@@ -118,8 +118,9 @@ class App(QApplication):
             open(Static.filters_json, "w")
         data = Filters.validate_json()
         if data:
-            Filters.items = Static.default_filters
             Filters.json_to_app(data)
+        else:
+            Filters.json_to_app(Static.default_filters)
 
         # сервера
         if not os.path.exists(Static.servers_json):
