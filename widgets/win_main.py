@@ -193,7 +193,7 @@ class WinMain(UMainWindow):
         self.right_layout.addWidget(sep_bottom)
 
         self.bar_bottom = BarBottom()
-        self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
+        # self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
         self.bar_bottom.resize_thumbnails.connect(
             lambda: self.grid.resize_thumbnails()
         )
