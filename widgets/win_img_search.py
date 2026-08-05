@@ -113,7 +113,9 @@ class WinImgSearch(UMainWidget):
         # self.pr.show()
         # return
 
-        self.img_array: None | np.ndarray = None
+        self.img_array = None
+        self.img_search_task = None
+        self.read_img_task = None
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
         self.found_image_timer.timeout.connect(self.found_image.emit)
@@ -223,7 +225,7 @@ class WinImgSearch(UMainWidget):
         self.found_image_timer.stop()
         self.found_image_timer.start(500)
 
-    def read_img(self, url: str, ms=300):
+    def start_read_img_task(self, url: str, ms=300):
 
         def poll():
             self.read_img_timer.stop()
@@ -273,6 +275,12 @@ class WinImgSearch(UMainWidget):
         self.read_img_task.start()
         self.read_img_timer.start(ms)
 
+    def stop_all_tasks(self):
+        if self.img_search_task is not None:
+            self.img_search_task.stop_task()
+        if self.read_img_task is not None:
+            self.read_img_task.terminate_join()
+
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
         return super().dragEnterEvent(a0)
@@ -283,7 +291,7 @@ class WinImgSearch(UMainWidget):
             if first_url.endswith(ImgUtils.ext_all):
                 self.img_label.clear()
                 self.img_label.setText(Lng.loading[JsonData.lng_index])
-                self.read_img(first_url)
+                self.start_read_img_task(first_url)
 
         return super().dropEvent(a0)
     
@@ -293,15 +301,11 @@ class WinImgSearch(UMainWidget):
         return super().keyPressEvent(a0)
     
     def deleteLater(self):
-        if hasattr(self, "image_searcher"):
-            self.img_search_task.stop_task()
-        if hasattr(self, "read_img_task"):
-            self.read_img_task.terminate_join()
+        self.stop_all_tasks()
         self.closed.emit()
         return super().deleteLater()
     
     def closeEvent(self, a0):
-        if hasattr(self, "image_searcher"):
-            self.img_search_task.stop_task()
+        self.stop_all_tasks()
         self.closed.emit()
         return super().closeEvent(a0)
