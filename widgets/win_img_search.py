@@ -182,7 +182,7 @@ class WinImgSearch(UMainWidget):
         self.reset_all_filters.emit()
 
     def stop_img_search(self):
-        self.progress_win_timer.stop()
+        self.poll_progress_win_timer.stop()
         self.img_search_task.stop_task()
         self.progress_win.deleteLater() 
 
@@ -206,9 +206,9 @@ class WinImgSearch(UMainWidget):
                 )
             except RuntimeError:
                 ...
-        self.progress_win_timer = QTimer(self)
-        self.progress_win_timer.timeout.connect(timeout)
-        self.progress_win_timer.start(500)
+        self.poll_progress_win_timer = QTimer(self)
+        self.poll_progress_win_timer.timeout.connect(timeout)
+        self.poll_progress_win_timer.start(500)
 
     def get_total_thumbnails_count(self):
         with Dbase.main_engine.connect() as conn:
