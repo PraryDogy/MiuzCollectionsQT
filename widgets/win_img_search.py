@@ -345,9 +345,9 @@ class WinImgSearch(UMainWidget):
         self.stop_all_tasks()
         # Вызываем закрытие родительского класса без дублирования сигналов
         self.closed.emit()
-        super().deleteLater()
+        return super().deleteLater()
     
     def closeEvent(self, a0):
         self.stop_all_tasks()
         self.closed.emit()
-        a0.accept()
+        return super().closeEvent(a0)
