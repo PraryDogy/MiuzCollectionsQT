@@ -309,8 +309,8 @@ class Lng:
         "Delete the image catalog"
     )
     reset_filters = (
-        "Сбросить фильтры",
-        "Reset filters"
+        "Фильтры по умолчанию",
+        "Default filters"
     )
     reset_filters_long = (
         "Фильтры будут сброшены к значениям по умолчанию",
