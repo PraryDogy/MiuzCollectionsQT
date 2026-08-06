@@ -503,7 +503,7 @@ class ImageSearcher(URunnable):
 
     def split_by_histogram(self):
         select_hist = (
-            sqlalchemy.select(Thumbs.rel_thumb_path, Properties.histogram)
+            sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path, Properties.histogram)
             .join(Properties.table, Thumbs.id == Properties.thumb_id, isouter=True)
             .where(Thumbs.mf_alias == self.mf.mf_alias)
         )
@@ -511,10 +511,28 @@ class ImageSearcher(URunnable):
             hist_result = conn.execute(select_hist)
 
         for data in hist_result:
-            rel_thumb_path, hist = data
+            id_, rel_thumb_path, hist = data
             if hist is None:
                 self.thumbs_no_hist.append(data)
             else:
                 self.thumbs_with_hist.append(data)
 
+    def create_histogram(self):
+        result = []
 
+        for id_, rel_thumb_path, hist in self.thumbs_no_hist:
+
+            if self.stop_flag:
+                print("индексация гистограмм остановлена")
+                return
+            abs_thumb_path = Utils.get_abs_thumb_path(
+                rel_thumb_path=rel_thumb_path
+            )
+            new_hist = self.calc_hist(abs_thumb_path)
+            result.append((id_, rel_thumb_path, new_hist))
+
+    def calc_hist(self, abs_thumb_path: str):
+        hsv2 = cv2.cvtColor(abs_thumb_path, cv2.COLOR_BGR2HSV)        
+        hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
+        cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+        return hist2
