@@ -519,46 +519,49 @@ class ImageSearcher(URunnable):
             if hist is None:
                 self.thumbs_no_hist.append(data)
             else:
+
                 self.thumbs_with_hist.append(data)
 
     def set_total_count(self):
         self.total_count = len(self.thumbs_no_hist)
 
     def create_histogram(self):
-        result = []
+        db_data = []
 
-        for x, (id_, rel_thumb_path, hist) in enumerate(self.thumbs_no_hist):
+        for x, (id_, rel_thumb_path, no_hist) in enumerate(self.thumbs_no_hist):
             if self.stop_flag:
                 print("индексация гистограмм остановлена")
                 return
             self.current_count += 1
-            abs_thumb_path = Utils.get_abs_thumb_path(
-                rel_thumb_path=rel_thumb_path
-            )
-            new_hist = self.calc_hist(abs_thumb_path)
-            result.append((id_, rel_thumb_path, new_hist))
-
+            abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+            hist = self.calc_hist(abs_thumb_path)
+            bytes_hist = hist.tobytes()
+            self.thumbs_with_hist.append((id_, rel_thumb_path, hist))
+            db_data.append((id_, rel_thumb_path, bytes_hist))
             if x % self.chunk_size == 0:
-                self.write_to_db(result)
-                result.clear()
-
-        if result:
-            self.write_to_db(result)
-            result.clear()
+                self.write_to_db(db_data)
+                db_data.clear()
+        if db_data:
+            self.write_to_db(db_data)
+            db_data.clear()
 
     def calc_hist(self, abs_thumb_path: str):
         img = ImgUtils.read_img(abs_thumb_path)
         hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)        
         hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
         cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-        hist2 = hist2.tobytes()
         return hist2
+
+    def decode_hist(raw_bytes: bytes) -> np.ndarray:
+        flat_array = np.frombuffer(raw_bytes, dtype=np.float32)
+        hist = flat_array.reshape(50, 60)
+        return hist
 
     def write_to_db(sefl, new_hists: list):
         values = [
             {
                 Properties.thumb_id.name: id_,
-                Properties.histogram.name: hist,
+                Properties.histogram.name: hist.to_bytes(),
             }
             for id_, rel_thumb_path, hist in new_hists
         ]
