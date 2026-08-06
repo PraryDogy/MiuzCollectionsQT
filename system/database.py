@@ -71,7 +71,7 @@ _table_properties = sqlalchemy.Table(
         sqlalchemy.ForeignKey("thumbs.id", ondelete="CASCADE"),
         nullable=False
     ),
-    sqlalchemy.Column("histogram", sqlalchemy.BLOB)
+    sqlalchemy.Column("bytes_hist", sqlalchemy.BLOB)
 )
 
 
@@ -79,7 +79,7 @@ class Properties:
     table = _table_properties
     id = _table_properties.c.id
     thumb_id = _table_properties.c.thumb_id
-    histogram = _table_properties.c.histogram
+    bytes_hist = _table_properties.c.bytes_hist
 
 
 class Dbase:

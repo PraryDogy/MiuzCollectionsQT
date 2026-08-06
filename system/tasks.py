@@ -461,19 +461,12 @@ class ImageSearcher(URunnable):
         self.thumbs_with_hist = []
         self.thumbs_no_hist = []
 
-        # hsv1 = cv2.cvtColor(src_img, cv2.COLOR_BGR2HSV)
-        # self.hist1 = cv2.calcHist([hsv1], [0, 1], None, [50, 60], [0, 180, 0, 256])
-        # cv2.normalize(self.hist1, self.hist1, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+        hsv1 = cv2.cvtColor(src_img, cv2.COLOR_BGR2HSV)
+        self.hist1 = cv2.calcHist([hsv1], [0, 1], None, [50, 60], [0, 180, 0, 256])
+        cv2.normalize(self.hist1, self.hist1, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 
     def stop_task(self):
         self.stop_flag = True
-
-    # def compare(self, thumbnail: np.ndarray):
-    #     hsv2 = cv2.cvtColor(thumbnail, cv2.COLOR_BGR2HSV)        
-    #     hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
-    #     cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-    #     similarity = cv2.compareHist(self.hist1, hist2, cv2.HISTCMP_CORREL)
-    #     return similarity
 
     # def start(self):
     #     stack = [Static.hashdir, ]
@@ -503,29 +496,30 @@ class ImageSearcher(URunnable):
     def start(self):
         self.split_by_histogram()
         self.set_total_count()
-        self.create_histogram()
-
+        self.manage_thumbs_no_hist()
+        self.manage_thumbs_with_hist()
+        
     def split_by_histogram(self):
         select_hist = (
-            sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path, Properties.histogram)
+            sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path, Properties.bytes_hist)
             .join(Properties.table, Thumbs.id == Properties.thumb_id, isouter=True)
             .where(Thumbs.mf_alias == self.mf.mf_alias)
         )
         with Dbase.main_engine.connect() as conn:
             hist_result = conn.execute(select_hist)
 
-        for data in hist_result:
-            id_, rel_thumb_path, hist = data
-            if hist is None:
-                self.thumbs_no_hist.append(data)
+        for id_, rel_thumb_path, bytes_hist in hist_result:
+            if bytes_hist is None:
+                self.thumbs_no_hist.append((id_, rel_thumb_path, bytes_hist))
             else:
-
-                self.thumbs_with_hist.append(data)
+                decoded_hist = self.decode_hist(bytes_hist)
+                new_data = (id_, rel_thumb_path, decoded_hist)
+                self.thumbs_with_hist.append(new_data)
 
     def set_total_count(self):
         self.total_count = len(self.thumbs_no_hist)
 
-    def create_histogram(self):
+    def manage_thumbs_no_hist(self):
         db_data = []
 
         for x, (id_, rel_thumb_path, no_hist) in enumerate(self.thumbs_no_hist):
@@ -552,8 +546,8 @@ class ImageSearcher(URunnable):
         cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
         return hist2
 
-    def decode_hist(raw_bytes: bytes) -> np.ndarray:
-        flat_array = np.frombuffer(raw_bytes, dtype=np.float32)
+    def decode_hist(self, bytes_hist: bytes) -> np.ndarray:
+        flat_array = np.frombuffer(bytes_hist, dtype=np.float32)
         hist = flat_array.reshape(50, 60)
         return hist
 
@@ -561,7 +555,7 @@ class ImageSearcher(URunnable):
         values = [
             {
                 Properties.thumb_id.name: id_,
-                Properties.histogram.name: bytes_hist,
+                Properties.bytes_hist.name: bytes_hist,
             }
             for id_, rel_thumb_path, bytes_hist in db_data
         ]
@@ -572,3 +566,13 @@ class ImageSearcher(URunnable):
         with Dbase.main_engine.connect() as conn:
             conn.execute(stmt)
             conn.commit()
+
+    def manage_thumbs_with_hist(self):
+        for id_, rel_thumb_path, hist in self.thumbs_with_hist:
+            result = self.compare_hist(hist)
+            if result > self.similarity_value:
+                self.sigs.found_image.emit(rel_thumb_path)
+
+    def compare_hist(self, hist2):
+        similarity = cv2.compareHist(self.hist1, hist2, cv2.HISTCMP_CORREL)
+        return similarity
