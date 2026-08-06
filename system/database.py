@@ -65,6 +65,19 @@ class Dirs:
     mf_alias = _table_dirs.c.brand
 
 
+_table_properties = sqlalchemy.Table(
+    "properties", METADATA,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("histogram", sqlalchemy.BLOB)
+)
+
+
+class Properties:
+    table = _table_properties
+    id = _table_properties.c.id
+    histogram = _table_properties.c.histogram
+
+
 class Dbase:
     main_engine: sqlalchemy.Engine = None
     _timeout = 5
