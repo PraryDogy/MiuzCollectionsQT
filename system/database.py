@@ -27,10 +27,7 @@ _table_thumbs = sqlalchemy.Table(
 
 
 class Thumbs:
-    """
-    Класс-обёртка для колонок таблицы `thumbs` в базе данных.   
-    Предоставляет удобный доступ к колонкам через атрибуты класса.
-    """
+
     table = _table_thumbs
     id = _table_thumbs.c.id
     rel_img_path = _table_thumbs.c.short_src
@@ -68,6 +65,12 @@ class Dirs:
 _table_properties = sqlalchemy.Table(
     "properties", METADATA,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(
+        "thumb_id",
+        sqlalchemy.Integer,
+        sqlalchemy.ForeignKey("thumbs.id", ondelete="CASCADE"),
+        nullable=False
+    ),
     sqlalchemy.Column("histogram", sqlalchemy.BLOB)
 )
 
@@ -75,6 +78,7 @@ _table_properties = sqlalchemy.Table(
 class Properties:
     table = _table_properties
     id = _table_properties.c.id
+    thumb_id = _table_properties.c.thumb_id
     histogram = _table_properties.c.histogram
 
 
