@@ -557,13 +557,13 @@ class ImageSearcher(URunnable):
         hist = flat_array.reshape(50, 60)
         return hist
 
-    def write_to_db(sefl, new_hists: list):
+    def write_to_db(sefl, db_data: list):
         values = [
             {
                 Properties.thumb_id.name: id_,
-                Properties.histogram.name: hist.to_bytes(),
+                Properties.histogram.name: bytes_hist,
             }
-            for id_, rel_thumb_path, hist in new_hists
+            for id_, rel_thumb_path, bytes_hist in db_data
         ]
         stmt = (
             sqlalchemy.insert(Properties.table)
