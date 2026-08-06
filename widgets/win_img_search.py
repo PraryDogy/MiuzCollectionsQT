@@ -109,80 +109,84 @@ class WinImgSearch(UMainWidget):
 
     def __init__(self):
         super().__init__()
-
         self.img_array = None
         self.img_search_task = None
         self.read_img_task = None
         self.shm = None
         self.progress_win = None
-
         self.read_img_poll_ms = 300
-
+        
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
         self.found_image_timer.timeout.connect(self.reload_thumbnails.emit)
-
+        
         self.poll_progress_win_timer = QTimer(self)
         self.poll_progress_win_timer.setSingleShot(True)
         self.poll_progress_win_timer.timeout.connect(self.poll_progress_win)
-
+        
         self.read_img_timer = QTimer(self)
         self.read_img_timer.setSingleShot(True)
         self.read_img_timer.timeout.connect(self.poll_read_img)
-
+        
         self.set_always_on_top()
         self.set_close_only()
         self.setAcceptDrops(True)
+        
         self.setWindowTitle(Lng.image_search[JsonData.lng_index])
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(0)
-
+        
         group = QGroupBox()
         self.central_layout.addWidget(group)
         group_layout = QVBoxLayout(group)
         group_layout.setContentsMargins(5, 5, 5, 5)
-
+        
         lines_base_text = (
             f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} "
             f"\"{Mf.current_mf.mf_alias}\".",
             f"{Lng.image_search_drop[JsonData.lng_index]}."
         )
         self.base_text = "\n".join(lines_base_text)
-
+        
         self.img_label = QLabel(self.base_text)
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setFixedSize(self.ww, self.hh)
         self.img_label.setWordWrap(True)
         group_layout.addWidget(self.img_label)
-
+        
         self.central_layout.addSpacing(10)
-
+        
         self.group_box = QGroupBox()
         self.central_layout.addWidget(self.group_box)
         self.group_layout = QVBoxLayout(self.group_box)
         self.group_layout.setContentsMargins(5, 0, 5, 0)
+        
         self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
         self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.clicked.connect(self.reset_img_search)
         self.group_layout.addWidget(self.reset_btn)
+        
         self.slider_widget = SliderWidget()
         self.group_layout.addWidget(self.slider_widget)
         self.group_layout.addSpacing(3)
-
+        
         self.central_layout.addSpacing(10)
-
+        
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
         btn_layout.addStretch()
+        
         self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
         self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
         btn_layout.addSpacing(10)
+        
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
-        cancel_btn.clicked.connect(self.custom_close)
+        # Меняем привязку кнопки с полного сброса на мягкое скрытие
+        cancel_btn.clicked.connect(self.hide_window)
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
-
+        
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
 
@@ -191,7 +195,7 @@ class WinImgSearch(UMainWidget):
         self.img_label.setText(self.base_text)
         if Dynamic.thumb_path_set:
             Dynamic.thumb_path_set.clear()
-            self.reload_thumbnails.emit()
+        self.reload_thumbnails.emit()
 
     def start_img_search(self):
         if self.img_array is None:
@@ -208,7 +212,6 @@ class WinImgSearch(UMainWidget):
             self.found_image_cmd
         )
         UThreadPool.start(self.img_search_task)
-
         self.open_progress_win()
         self.poll_progress_win()
         self.reset_all_filters.emit()
@@ -222,7 +225,7 @@ class WinImgSearch(UMainWidget):
                 self.progress_win.deleteLater()
             except RuntimeError:
                 pass
-            self.progress_win = None
+        self.progress_win = None
 
     def open_progress_win(self):
         self.progress_win = ProgressWin()
@@ -234,20 +237,18 @@ class WinImgSearch(UMainWidget):
         if not Dynamic.thumb_path_set:
             self.found_image_cmd("999999999999")
         
-        # Безопасное удаление окна прогресса с проверкой на его существование
         self.poll_progress_win_timer.stop()
         if self.progress_win is not None:
             try:
                 QTimer.singleShot(1000, self.progress_win.deleteLater)
             except RuntimeError:
                 pass
-            self.progress_win = None
+        self.progress_win = None
 
     def poll_progress_win(self):
         self.poll_progress_win_timer.stop()
         if self.progress_win is None or self.img_search_task is None:
             return
-            
         try:
             self.progress_win.set_text(
                 self.img_search_task.current_count,
@@ -259,54 +260,37 @@ class WinImgSearch(UMainWidget):
 
     def poll_read_img(self):
         self.read_img_timer.stop()
-
         if self.read_img_task is None:
             return
-
         if not self.read_img_task.process_queue.empty():
             item: ReadImgItem = self.read_img_task.process_queue.get()
-
             try:
                 self.shm = shared_memory.SharedMemory(name=item.shm_name)
-
                 self.img_array = np.ndarray(
-                    item.shape,
-                    dtype=np.dtype(item.dtype),
-                    buffer=self.shm.buf
+                    item.shape, dtype=np.dtype(item.dtype), buffer=self.shm.buf
                 )
-
                 if ImgUtils.is_grayscale(self.img_array):
                     self.cleanup_shm()
-
                     self.img_label.clear()
                     self.img_label.setText(Lng.only_color[JsonData.lng_index])
-
                     QTimer.singleShot(
-                        1500,
-                        lambda: self.img_label.setText(self.base_text)
+                        1500, lambda: self.img_label.setText(self.base_text)
                     )
                 else:
                     qimage = Utils.qimage_from_array(self.img_array)
-
                     min_size = min(
-                        self.img_label.width(),
-                        self.img_label.height()
+                        self.img_label.width(), self.img_label.height()
                     )
-
                     pixmap = QPixmap.fromImage(qimage)
                     resized_qpixmap = Utils.qiconed_resize(
-                        pixmap,
-                        min_size
+                        pixmap, min_size
                     )
-
                     self.img_label.setPixmap(resized_qpixmap)
-
             except Exception:
                 self.cleanup_shm()
-
-        if not self.read_img_task.is_alive():
-            self.read_img_task.terminate_join()
-            self.read_img_task = None
+            if not self.read_img_task.is_alive():
+                self.read_img_task.terminate_join()
+                self.read_img_task = None
         else:
             self.read_img_timer.start(self.read_img_poll_ms)
 
@@ -317,26 +301,19 @@ class WinImgSearch(UMainWidget):
 
     def start_read_img_task(self, url: str, ms=300):
         self.cleanup_shm()
-
         if self.read_img_timer.isActive():
             self.read_img_timer.stop()
-
         if self.read_img_task is not None:
             self.read_img_task.terminate_join()
-
         self.read_img_poll_ms = ms
-
         self.read_img_task = ProcessWorker(
-            target=ReadImg.start,
-            args=(url, Static.max_thumb_size * 2)
+            target=ReadImg.start, args=(url, Static.max_thumb_size * 2)
         )
-
         self.read_img_task.start()
         self.read_img_timer.start(ms)
 
     def cleanup_shm(self):
         """Безопасное освобождение ресурсов SharedMemory."""
-        self.img_array = None
         if self.shm is not None:
             try:
                 self.shm.close()
@@ -345,26 +322,42 @@ class WinImgSearch(UMainWidget):
                 pass
             self.shm = None
 
-    def stop_all_tasks(self):
-        self.poll_progress_win_timer.stop()
+    def stop_timers_and_tasks(self):
+        """Вспомогательный метод остановки активных фоновых процессов и таймеров."""
+        if self.poll_progress_win_timer is not None:
+            self.poll_progress_win_timer.stop()
         if self.read_img_timer is not None:
             self.read_img_timer.stop()
-        
         if self.img_search_task is not None:
             self.img_search_task.stop_task()
         if self.read_img_task is not None:
             self.read_img_task.terminate_join()
+
+    def hide_window(self):
+        """Мягкое скрытие окна. Останавливает активные расчеты, но сохраняет картинку."""
+        self.stop_timers_and_tasks()
+        if self.progress_win is not None:
+            try:
+                self.progress_win.deleteLater()
+            except RuntimeError:
+                pass
+            self.progress_win = None
             
-        self.cleanup_shm()
+        self.closed.emit()
+        self.hide()
 
     def custom_close(self):
-        self.stop_all_tasks()
+        """Полная очистка виджета при уничтожении."""
+        self.stop_timers_and_tasks()
+        self.cleanup_shm()
+        self.img_array = None
         self.closed.emit()
+        self.hide()
 
     def dragEnterEvent(self, a0):
         a0.acceptProposedAction()
         return super().dragEnterEvent(a0)
-    
+
     def dropEvent(self, a0):
         if a0.mimeData().hasUrls():
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
@@ -373,11 +366,13 @@ class WinImgSearch(UMainWidget):
                 self.img_label.setText(Lng.loading[JsonData.lng_index])
                 self.start_read_img_task(first_url)
         return super().dropEvent(a0)
-    
+
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
-            self.custom_close()
+            self.hide_window() # На Escape теперь тоже просто скрываем
+            return
         return super().keyPressEvent(a0)
 
     def closeEvent(self, a0):
-        self.custom_close()
+        a0.ignore()         # Игнорируем уничтожение виджета при нажатии на системный крестик
+        self.hide_window()  # Перенаправляем на скрытие
