@@ -526,8 +526,7 @@ class ImageSearcher(URunnable):
     def create_histogram(self):
         result = []
 
-        for id_, rel_thumb_path, hist in self.thumbs_no_hist:
-
+        for x, (id_, rel_thumb_path, hist) in enumerate(self.thumbs_no_hist):
             if self.stop_flag:
                 print("индексация гистограмм остановлена")
                 return
@@ -538,9 +537,26 @@ class ImageSearcher(URunnable):
             new_hist = self.calc_hist(abs_thumb_path)
             result.append((id_, rel_thumb_path, new_hist))
 
+            if x % 10 == 0:
+                self.write_to_db(result)
+                result.clear()
+
     def calc_hist(self, abs_thumb_path: str):
         img = ImgUtils.read_img(abs_thumb_path)
         hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)        
         hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
         cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+        hist2 = hist2.tobytes()
         return hist2
+
+    def write_to_db(sefl, new_hists: list):
+        values = (
+            {"thumb_id": id_, "hist": hist}
+            for id_, rel_thumb_path, hist in new_hists
+        )
+        stmt = (
+            sqlalchemy.insert(Properties.table)
+            .values(values)
+        )
+        with Dbase.main_engine.connect() as conn:
+            conn.execute(stmt)
