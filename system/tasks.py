@@ -456,6 +456,7 @@ class ImageSearcher(URunnable):
         self.current_count = 0
         self.total_count = 0
         self.stop_flag = False
+        self.chunk_size = 500
 
         self.thumbs_with_hist = []
         self.thumbs_no_hist = []
@@ -525,7 +526,6 @@ class ImageSearcher(URunnable):
 
     def create_histogram(self):
         result = []
-        counter = 100
 
         for x, (id_, rel_thumb_path, hist) in enumerate(self.thumbs_no_hist):
             if self.stop_flag:
@@ -538,7 +538,7 @@ class ImageSearcher(URunnable):
             new_hist = self.calc_hist(abs_thumb_path)
             result.append((id_, rel_thumb_path, new_hist))
 
-            if x % counter == 0:
+            if x % self.chunk_size == 0:
                 self.write_to_db(result)
                 result.clear()
 
