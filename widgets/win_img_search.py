@@ -24,7 +24,7 @@ from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton, USlider
 
 class ProgressWin(UMainWidget):
     stop_img_search = pyqtSignal()
-    ww = 200
+    ww = 250
 
     def __init__(self):
         super().__init__()
@@ -38,7 +38,7 @@ class ProgressWin(UMainWidget):
 
         self.text_label = QLabel(Lng.preparing[JsonData.lng_index])
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.text_label.setFixedSize(200, 30)
+        self.text_label.setFixedSize(self.ww - 10, 30)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
@@ -56,7 +56,7 @@ class ProgressWin(UMainWidget):
             text = Lng.preparing[JsonData.lng_index]
         else:
             text = (
-                f"{Lng.search[JsonData.lng_index]} {current_count} " 
+                f"{Lng.indexing[JsonData.lng_index]} {current_count} " 
                 f"{Lng.from_[JsonData.lng_index]} {total_count}"
             )
             self.text_label.setText(text)
@@ -209,7 +209,6 @@ class WinImgSearch(UMainWidget):
         )
         UThreadPool.start(self.img_search_task)
 
-        self.get_total_thumbnails_count()
         self.open_progress_win()
         self.poll_progress_win()
         self.reset_all_filters.emit()
@@ -252,7 +251,7 @@ class WinImgSearch(UMainWidget):
         try:
             self.progress_win.set_text(
                 self.img_search_task.current_count,
-                self.total_count
+                self.img_search_task.total_count
             )
             self.poll_progress_win_timer.start(500)
         except RuntimeError:
@@ -310,11 +309,6 @@ class WinImgSearch(UMainWidget):
             self.read_img_task = None
         else:
             self.read_img_timer.start(self.read_img_poll_ms)
-
-    def get_total_thumbnails_count(self):
-        with Dbase.main_engine.connect() as conn:
-            stmt = sqlalchemy.select(func.count()).select_from(Thumbs.table)
-            self.total_count = conn.execute(stmt).scalar()
 
     def found_image_cmd(self, rel_path: str):
         Dynamic.thumb_path_set.add(rel_path)

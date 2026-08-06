@@ -454,6 +454,7 @@ class ImageSearcher(URunnable):
         self.similarity_value = similarity_value / 100
         self.mf = mf
         self.current_count = 0
+        self.total_count = 0
         self.stop_flag = False
 
         self.thumbs_with_hist = []
@@ -500,6 +501,8 @@ class ImageSearcher(URunnable):
 
     def start(self):
         self.split_by_histogram()
+        self.set_total_count()
+        self.create_histogram()
 
     def split_by_histogram(self):
         select_hist = (
@@ -517,6 +520,9 @@ class ImageSearcher(URunnable):
             else:
                 self.thumbs_with_hist.append(data)
 
+    def set_total_count(self):
+        self.total_count = len(self.thumbs_no_hist)
+
     def create_histogram(self):
         result = []
 
@@ -525,6 +531,7 @@ class ImageSearcher(URunnable):
             if self.stop_flag:
                 print("индексация гистограмм остановлена")
                 return
+            self.current_count += 1
             abs_thumb_path = Utils.get_abs_thumb_path(
                 rel_thumb_path=rel_thumb_path
             )
@@ -532,7 +539,8 @@ class ImageSearcher(URunnable):
             result.append((id_, rel_thumb_path, new_hist))
 
     def calc_hist(self, abs_thumb_path: str):
-        hsv2 = cv2.cvtColor(abs_thumb_path, cv2.COLOR_BGR2HSV)        
+        img = ImgUtils.read_img(abs_thumb_path)
+        hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)        
         hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
         cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
         return hist2
