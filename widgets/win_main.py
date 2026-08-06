@@ -215,6 +215,7 @@ class WinMain(UMainWindow):
             self.start_scaner_task()
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
+            self.bar_bottom.progress_bar.setText("noscan enabled")
 
     @staticmethod
     def with_conn(fn: callable):

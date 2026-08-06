@@ -200,6 +200,11 @@ class WinImgSearch(UMainWidget):
     def start_img_search(self):
         if self.img_array is None:
             return
+
+        if self.img_search_task is not None:
+            self.img_search_task.stop_task()
+            self.img_search_task = None
+        
         self.img_search_task = ImageSearcher(
             src_img=self.img_array,
             similarity_value=self.slider_widget.current_value,
@@ -211,6 +216,7 @@ class WinImgSearch(UMainWidget):
         self.img_search_task.sigs.found_image.connect(
             self.found_image_cmd
         )
+        Dynamic.thumb_path_set.clear()
         UThreadPool.start(self.img_search_task)
         self.open_progress_win()
         self.poll_progress_win()
