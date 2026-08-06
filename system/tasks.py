@@ -13,7 +13,7 @@ from PyQt6.QtGui import QImage
 
 from cfg import JsonData, Dynamic, Static
 
-from .database import Dbase, Dirs, Thumbs
+from .database import Dbase, Dirs, Thumbs, Properties
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
@@ -437,3 +437,84 @@ class ImageSearcher(URunnable):
         self.start()
         if not self.stop_flag:
             self.sigs.finished_.emit()
+
+
+
+
+class ImageSearcher(URunnable):
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal()
+        found_image = pyqtSignal(str)
+
+    def __init__(self, src_img: np.ndarray, similarity_value: int, mf: Mf):
+        super().__init__()
+        self.sigs = ImageSearcher.Sigs()
+        self.src_img = src_img
+        self.similarity_value = similarity_value / 100
+        self.mf = mf
+        self.current_count = 0
+        self.stop_flag = False
+
+        self.thumbs_with_hist = []
+        self.thumbs_no_hist = []
+
+        # hsv1 = cv2.cvtColor(src_img, cv2.COLOR_BGR2HSV)
+        # self.hist1 = cv2.calcHist([hsv1], [0, 1], None, [50, 60], [0, 180, 0, 256])
+        # cv2.normalize(self.hist1, self.hist1, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+
+    def stop_task(self):
+        self.stop_flag = True
+
+    # def compare(self, thumbnail: np.ndarray):
+    #     hsv2 = cv2.cvtColor(thumbnail, cv2.COLOR_BGR2HSV)        
+    #     hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
+    #     cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+    #     similarity = cv2.compareHist(self.hist1, hist2, cv2.HISTCMP_CORREL)
+    #     return similarity
+
+    # def start(self):
+    #     stack = [Static.hashdir, ]
+    #     while stack:
+    #         current_dir = stack.pop()
+    #         for i in os.scandir(current_dir):
+    #             if self.stop_flag:
+    #                 print("image search canceled")
+    #                 return
+    #             if i.is_dir():
+    #                 stack.append(i.path)
+    #             elif i.name.endswith(".jpg"):
+    #                 self.current_count += 1
+    #                 img = ImgUtils.read_img(i.path)
+    #                 if ImgUtils.is_grayscale(img):
+    #                     continue
+    #                 result = self.compare(img)
+    #                 if result > self.similarity_value:
+    #                     rel_path = Utils.get_rel_thumb_path(i.path)
+    #                     self.sigs.found_image.emit(rel_path)
+
+    def task(self):
+        self.start()
+        if not self.stop_flag:
+            self.sigs.finished_.emit()
+
+    def start(self):
+        self.split_by_histogram()
+
+    def split_by_histogram(self):
+        select_hist = (
+            sqlalchemy.select(Thumbs.rel_thumb_path, Properties.histogram)
+            .join(Properties.table, Thumbs.id == Properties.thumb_id, isouter=True)
+            .where(Thumbs.mf_alias == self.mf.mf_alias)
+        )
+        with Dbase.main_engine.connect() as conn:
+            hist_result = conn.execute(select_hist)
+
+        for data in hist_result:
+            rel_thumb_path, hist = data
+            if hist is None:
+                self.thumbs_no_hist.append(data)
+            else:
+                self.thumbs_with_hist.append(data)
+
+

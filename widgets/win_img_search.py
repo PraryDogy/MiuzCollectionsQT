@@ -198,7 +198,8 @@ class WinImgSearch(UMainWidget):
             return
         self.img_search_task = ImageSearcher(
             src_img=self.img_array,
-            similarity_value=self.slider_widget.current_value
+            similarity_value=self.slider_widget.current_value,
+            mf=Mf.current_mf,
         )
         self.img_search_task.sigs.finished_.connect(
             self.img_search_finished
