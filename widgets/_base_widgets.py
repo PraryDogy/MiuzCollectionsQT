@@ -306,53 +306,42 @@ class SelectableLabel(QLabel):
 
 
 class RowArrowWidget(QWidget):
-    hh = 35
+    hh = 26
     clicked = pyqtSignal()
     arrow_svg = os.path.join(Static.common_icons, "next.svg")
     warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
     svg_size = 16
 
     def __init__(self, text: str):
-        """
-        replace_arrow_widget (правая стрелочка на любой другой виджет)
-        hide_warning / show_warning воскл знак после текста
-        hide_sep
-        hide_arrow
-        """
-
         super().__init__()
         self.setFixedHeight(self.hh)
-        self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_layout.setSpacing(0)
-
-        self.above_wid = QWidget()
-        self.above_layout = QHBoxLayout(self.above_wid)
-        self.above_layout.setContentsMargins(0, 0, 0, 0)
-        self.above_layout.setSpacing(10)
-
-        self.sep = HSep()
-
+        
+        # Один прямой горизонтальный слой
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(10)
+        
+        # Иконка слева
         self.left_icon = QSvgWidget()
         self.left_icon.setFixedSize(self.svg_size, self.svg_size)
         self.left_icon.hide()
-
+        
+        # Текст
         self.text_widget = QLabel(text)
-
+        
+        # Стрелка справа
         self.arrow_wid = QSvgWidget()
         self.arrow_wid.setFixedSize(self.svg_size, self.svg_size)
         self.arrow_wid.load(self.arrow_svg)
-
-        self.main_layout.addWidget(self.above_wid)
-        self.main_layout.addWidget(self.sep)
-
-        self.above_layout.addWidget(self.left_icon)
-        self.above_layout.addWidget(self.text_widget)
-        self.above_layout.addStretch()
-        self.above_layout.addWidget(self.arrow_wid)
-
+        
+        # Сборка в один ряд
+        layout.addWidget(self.left_icon)
+        layout.addWidget(self.text_widget)
+        layout.addStretch()
+        layout.addWidget(self.arrow_wid)
+        
         self.adjustSize()
-    
+
     def set_left_icon(self, svg_path: str):
         self.left_icon.load(svg_path)
         self.left_icon.show()
@@ -360,11 +349,6 @@ class RowArrowWidget(QWidget):
     def replace_arrow_widget(self, widget: QWidget):
         self.arrow_wid.hide()
         self.above_layout.addWidget(widget)
-
-    def hide_sep(self):
-        self.sep.hide()
-        # spacer = QSpacerItem(0, self.sep.height())
-        # self.main_layout.addSpacerItem(spacer)
 
     def hide_arrow(self):
         self.arrow_wid.hide()

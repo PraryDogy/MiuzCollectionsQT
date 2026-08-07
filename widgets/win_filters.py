@@ -374,25 +374,23 @@ class WinFilters(UMainWidget):
         # --- Группа для кнопок с нулевыми отступами ---
         self.reset_group = QGroupBox()
         reset_group_lay = QVBoxLayout(self.reset_group)
-        reset_group_lay.setContentsMargins(5, 0, 5, 0)
+        reset_group_lay.setContentsMargins(5, 1, 5, 1)
         reset_group_lay.setSpacing(5)  # Добавлен небольшой отступ между кнопками (был 0)
 
         # Создаем кастомную кнопку редактирования фильтров
         self.edit_filters_btn = RowArrowWidget(Lng.edit[JsonData.lng_index])
-        self.edit_filters_btn.setFixedHeight(30)
         self.edit_filters_btn.set_left_icon(self.reset_svg) # Убедитесь, что self.edit_svg определен ранее
         self.edit_filters_btn.clicked.connect(self.edit_filters.emit) # Метод-обработчик клика
 
         # Создаем кастомную кнопку сброса
         self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
-        self.reset_btn.setFixedHeight(25)
         self.reset_btn.set_left_icon(self.reset_svg)
-        self.reset_btn.hide_sep()
         self.reset_btn.clicked.connect(self.reset_cmd)
 
         right_lay.addSpacing(10)
         # Добавляем сначала кнопку редактирования, затем кнопку сброса в слой группы
         reset_group_lay.addWidget(self.edit_filters_btn)
+        reset_group_lay.addWidget(HSep())
         reset_group_lay.addWidget(self.reset_btn)
 
         # Добавляем группу в основной правый контейнер
