@@ -18,6 +18,7 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
 
 class DatesWidget(QGroupBox):
     reload_thumbnails = pyqtSignal()
+    calendar_svg = os.path.join(Static.common_icons, "calendar.svg")
     hh = 40
 
     def __init__(self, parent=None):
@@ -25,9 +26,18 @@ class DatesWidget(QGroupBox):
         
         # Главный вертикальный layout для QGroupBox
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(5, 5, 5, 5)
-        self.main_layout.setSpacing(5)
+        self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        self.main_layout.setSpacing(RowArrowWidget.group_spacing)
 
+
+        title = RowArrowWidget(Lng.dates[JsonData.lng_index])
+        title.set_left_icon(self.calendar_svg)
+        # title.left_icon.setFixedSize(50, 50)
+        self.main_layout.addWidget(title)
+
+        self.main_layout.addWidget(HSep())
+        
+    
         # --- СТРОКА 1: Элементы управления (Горизонтальный layout) ---
         self.top_row_layout = QHBoxLayout()
         self.top_row_layout.setContentsMargins(0, 0, 0, 0)
