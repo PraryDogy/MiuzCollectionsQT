@@ -84,6 +84,8 @@ class RebootableSettings(QGroupBox):
         self.lng_btn.setFixedWidth(100)
         self.lng_btn.setMenu(lng_menu)
         lng_wid.replace_arrow_widget(self.lng_btn)
+        # чтобы кнопка меню не теряла стиль
+        lng_wid.setFixedHeight(RowArrowWidget.hh + 6)
 
         main_layout.addWidget(HSep())
 
@@ -842,13 +844,15 @@ class WinSettings(UMainWidget):
     filters_svg = os.path.join(Static.common_icons, "filters.svg")
     settings_svg = os.path.join(Static.common_icons, "settings.svg")
     yellow_warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
+    ww = 700
+    hh = 560
 
     def __init__(self, settings_item: SettingsItem):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.settings[JsonData.lng_index])
-        self.setFixedSize(700, 560)
+        self.setFixedSize(self.ww, self.hh)
 
         self.settings_item = settings_item
 
