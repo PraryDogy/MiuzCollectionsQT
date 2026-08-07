@@ -1,18 +1,18 @@
 import os
 import re
 
-from PyQt6.QtCore import QDir, Qt, QTimer, pyqtSignal, QSortFilterProxyModel
-from PyQt6.QtGui import QFileSystemModel, QIcon, QAction
+from PyQt6.QtCore import QDir, QSortFilterProxyModel, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QFileSystemModel, QIcon
 from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QListWidget,
-                             QListWidgetItem, QSplitter, QTreeView,
-                             QVBoxLayout, QWidget, QMenu)
+                             QListWidgetItem, QMenu, QSplitter, QTreeView,
+                             QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
-from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton
+from ._base_widgets import HSep, RowArrowWidget, UMainWidget, UPushButton
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -154,13 +154,12 @@ class UploadWin(UMainWidget):
 
         group_one = QGroupBox()
         group_one_layout = QVBoxLayout(group_one)
-        group_one_layout.setContentsMargins(5, 0, 5, 0)
-        group_one_layout.setSpacing(0)
+        group_one_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        group_one_layout.setSpacing(RowArrowWidget.group_spacing)
         right_layout.addWidget(group_one)
 
         title = RowArrowWidget(Lng.upload_list[JsonData.lng_index])
         title.hide_arrow()
-        title.hide_sep()
         group_one_layout.addWidget(title)
 
         self.list_widget = QListWidget()
@@ -171,15 +170,18 @@ class UploadWin(UMainWidget):
         self.total_files_widget.hide_arrow()
         group_one_layout.addWidget(self.total_files_widget)
 
+        group_one_layout.addWidget(HSep())
+
         self.total_size_widget = RowArrowWidget("")
         self.total_size_widget.set_left_icon(self.storage_svg)
         self.total_size_widget.hide_arrow()
         group_one_layout.addWidget(self.total_size_widget)
 
+        group_one_layout.addWidget(HSep())
+
         self.lbl_target_dir = RowArrowWidget("")
         self.lbl_target_dir.set_left_icon(self.base_folder_svg)
         self.lbl_target_dir.hide_arrow()
-        self.lbl_target_dir.hide_sep()
         self.update_target_dir_label()
         group_one_layout.addWidget(self.lbl_target_dir)
         

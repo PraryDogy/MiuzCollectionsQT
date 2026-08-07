@@ -5,21 +5,19 @@ import sys
 from zipfile import ZipFile
 
 from PyQt6.QtCore import QObject, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon, QMouseEvent
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QFileDialog, QGroupBox, QHBoxLayout,
-                             QLabel, QMenu, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel,
+                             QMenu, QVBoxLayout)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
-                            RowArrowWidget, SaveRowArrowWidget,
-                            SelectableLabel, ULineEdit, UMainWidget,
-                            UPushButton, VListWidget, VListWidgetItem,
-                            WarningWindow)
+from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
+                            RowArrowWidget, SaveRowArrowWidget, UMainWidget,
+                            UPushButton)
 
 
 def restart_app():
@@ -181,8 +179,8 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.last_block_container)
 
         last_block_layout = QVBoxLayout(self.last_block_container)
-        last_block_layout.setContentsMargins(5, 0, 5, 0)
-        last_block_layout.setSpacing(0)
+        last_block_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        last_block_layout.setSpacing(RowArrowWidget.group_spacing)
 
         if os.path.exists(Static.miuz_zip):
             self.copy_zip_widget = RowArrowWidget(
@@ -193,6 +191,8 @@ class FirstLoadWin(UMainWidget):
                 lambda: self.copy_zip_cmd(Static.miuz_zip)
             )
             last_block_layout.addWidget(self.copy_zip_widget)
+
+        last_block_layout.addWidget(HSep())
 
         self.save_widget = SaveRowArrowWidget(self.lng_index)
         self.save_widget.clicked.connect(lambda: self.save_cmd())

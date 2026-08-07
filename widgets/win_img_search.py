@@ -19,7 +19,8 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import RowArrowWidget, UMainWidget, UPushButton, USlider
+from ._base_widgets import (HSep, RowArrowWidget, UMainWidget, UPushButton,
+                            USlider)
 
 
 class ProgressWin(UMainWidget):
@@ -159,12 +160,15 @@ class WinImgSearch(UMainWidget):
         self.group_box = QGroupBox()
         self.central_layout.addWidget(self.group_box)
         self.group_layout = QVBoxLayout(self.group_box)
-        self.group_layout.setContentsMargins(5, 0, 5, 0)
+        self.group_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        self.group_layout.setSpacing(RowArrowWidget.group_spacing)
         
         self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
         self.reset_btn.set_left_icon(self.reset_svg)
         self.reset_btn.clicked.connect(self.reset_img_search)
         self.group_layout.addWidget(self.reset_btn)
+
+        self.group_layout.addWidget(HSep())
         
         self.slider_widget = SliderWidget()
         self.group_layout.addWidget(self.slider_widget)

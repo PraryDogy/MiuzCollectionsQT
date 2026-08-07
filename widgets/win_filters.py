@@ -374,8 +374,8 @@ class WinFilters(UMainWidget):
         # --- Группа для кнопок с нулевыми отступами ---
         self.reset_group = QGroupBox()
         reset_group_lay = QVBoxLayout(self.reset_group)
-        reset_group_lay.setContentsMargins(5, 1, 5, 1)
-        reset_group_lay.setSpacing(5)  # Добавлен небольшой отступ между кнопками (был 0)
+        reset_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
+        reset_group_lay.setSpacing(RowArrowWidget.group_spacing)
 
         # Создаем кастомную кнопку редактирования фильтров
         self.edit_filters_btn = RowArrowWidget(Lng.edit[JsonData.lng_index])
