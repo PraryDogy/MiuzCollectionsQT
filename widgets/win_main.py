@@ -331,10 +331,16 @@ class WinMain(UMainWindow):
             )):
                 self.bar_top.filters_btn.set_base_style()
 
+        def edit_filters():
+            settings_item = SettingsItem("filters", "")
+            self.filters_win.deleteLater()
+            self.open_settings_win(settings_item)
+
         self.bar_top.filters_btn.set_selected_style()
         self.filters_win = WinFilters()
         self.filters_win.closed_.connect(on_closed)
         self.filters_win.reload_thumbnails.connect(self.load_st_grid)
+        self.filters_win.edit_filters.connect(edit_filters)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()
 

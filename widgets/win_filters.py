@@ -270,6 +270,7 @@ class WinFilters(UMainWidget):
     reset_svg = os.path.join(Static.common_icons, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
+    edit_filters = pyqtSignal()
     ww = 590
     hh = 425
     item_h = 25
@@ -280,7 +281,7 @@ class WinFilters(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
-        self.setFixedSize(self.ww, self.hh)
+        self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(10)
 
         dates = DatesWidget()
@@ -370,11 +371,17 @@ class WinFilters(UMainWidget):
 
         right_lay.addWidget(self.active_group)
 
-        # --- Группа для кнопки сброса с нулевыми отступами ---
+        # --- Группа для кнопок с нулевыми отступами ---
         self.reset_group = QGroupBox()
         reset_group_lay = QVBoxLayout(self.reset_group)
         reset_group_lay.setContentsMargins(5, 0, 5, 0)
-        reset_group_lay.setSpacing(0)
+        reset_group_lay.setSpacing(5)  # Добавлен небольшой отступ между кнопками (был 0)
+
+        # Создаем кастомную кнопку редактирования фильтров
+        self.edit_filters_btn = RowArrowWidget(Lng.edit[JsonData.lng_index])
+        self.edit_filters_btn.setFixedHeight(30)
+        self.edit_filters_btn.set_left_icon(self.reset_svg) # Убедитесь, что self.edit_svg определен ранее
+        self.edit_filters_btn.clicked.connect(self.edit_filters.emit) # Метод-обработчик клика
 
         # Создаем кастомную кнопку сброса
         self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
@@ -384,11 +391,15 @@ class WinFilters(UMainWidget):
         self.reset_btn.clicked.connect(self.reset_cmd)
 
         right_lay.addSpacing(10)
-        # Добавляем кнопку в слой группы, а группу — в основной правый контейнер
+        # Добавляем сначала кнопку редактирования, затем кнопку сброса в слой группы
+        reset_group_lay.addWidget(self.edit_filters_btn)
         reset_group_lay.addWidget(self.reset_btn)
+
+        # Добавляем группу в основной правый контейнер
         right_lay.addWidget(self.reset_group)
         right_lay.addSpacing(10)
         right_lay.addStretch()
+
 
         
         self.splitter.addWidget(self.right_container)
@@ -397,6 +408,9 @@ class WinFilters(UMainWidget):
         self.splitter.setSizes([250, 350])
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 0)
+
+        self.adjustSize()
+        self.setFixedHeight(self.height())
 
     def get_filters_text(self):
         active_list = []
