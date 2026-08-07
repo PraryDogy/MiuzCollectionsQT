@@ -24,7 +24,7 @@ from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
+from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow,
                             UMainWidget, UMenu, UPushButton, UTextEdit,
@@ -58,8 +58,8 @@ class RebootableSettings(QGroupBox):
     def __init__(self):
         super().__init__()
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(5, 0, 5, 0)
-        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        main_layout.setSpacing(RowArrowWidget.group_spacing)
 
         self.scaner_minutes = JsonData.scaner_minutes
         self.lng_index = JsonData.lng_index
@@ -85,6 +85,8 @@ class RebootableSettings(QGroupBox):
         self.lng_btn.setMenu(lng_menu)
         lng_wid.replace_arrow_widget(self.lng_btn)
 
+        main_layout.addWidget(HSep())
+
         scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
         scaner_time_wid.set_left_icon(self.clock_svg)
         main_layout.addWidget(scaner_time_wid)
@@ -100,9 +102,10 @@ class RebootableSettings(QGroupBox):
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.replace_arrow_widget(self.spin)
 
+        main_layout.addWidget(HSep())
+
         reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
         reset_data_wid.set_left_icon(self.eraser_svg)
-        reset_data_wid.hide_sep()
         reset_data_wid.clicked.connect(self.erase_all_data)
         main_layout.addWidget(reset_data_wid)
 
@@ -231,9 +234,8 @@ class NonRebootableSettings(QGroupBox):
     def __init__(self):
         super().__init__()
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(5, 0, 5, 0)
-        main_layout.setSpacing(0)
-
+        main_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        main_layout.setSpacing(RowArrowWidget.group_spacing)
 
         self.size_items = {}
 
@@ -242,10 +244,11 @@ class NonRebootableSettings(QGroupBox):
         data_size_wid.clicked.connect(self.show_sizes_win)
         main_layout.addWidget(data_size_wid)
 
+        main_layout.addWidget(HSep())
+
         show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
         show_files_wid.set_left_icon(self.finder_svg)
         show_files_wid.clicked.connect(self.show_files_cmd)
-        show_files_wid.hide_sep()
         main_layout.addWidget(show_files_wid)
 
         self.get_sizes()
@@ -323,16 +326,16 @@ class ThemesWidget(QGroupBox):
     def __init__(self):
         super().__init__()
         main_lay = QVBoxLayout(self)
-        main_lay.setContentsMargins(5, 0, 5, 0)
-        main_lay.setSpacing(0)
+        main_lay.setContentsMargins(*RowArrowWidget.group_margings)
+        main_lay.setSpacing(RowArrowWidget.group_spacing)
 
         title_wid = RowArrowWidget(Lng.theme[JsonData.lng_index])
         title_wid.set_left_icon(self.theme_svg)
         title_wid.hide_arrow()
         main_lay.addWidget(title_wid)
 
-        spacer = QSpacerItem(0, 5)
-        main_lay.addSpacerItem(spacer)
+        main_lay.addWidget(HSep())
+        main_lay.addSpacing(5)
 
         themes_wid = QWidget()
         themes_layout = QHBoxLayout(themes_wid)
@@ -450,11 +453,10 @@ class GeneralSettings(QWidget):
         save_container = QGroupBox()
         v_lay.addWidget(save_container)
         save_container_lay = QVBoxLayout(save_container)
-        save_container_lay.setContentsMargins(5, 0, 5, 0)
-        save_container_lay.setSpacing(0)
+        save_container_lay.setContentsMargins(*RowArrowWidget.group_margings)
+        save_container_lay.setSpacing(RowArrowWidget.group_spacing)
 
         self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
-        self.save_wid.hide_sep()
         self.save_wid.clicked.connect(
             lambda: self.save_settings_cmd()
         )
@@ -510,17 +512,18 @@ class FiltersWid(QWidget):
         second_container = QGroupBox()
         main_lay.addWidget(second_container)
         second_container_layout = QVBoxLayout(second_container)
-        second_container_layout.setContentsMargins(5, 0, 5, 0)
-        second_container_layout.setSpacing(0)
+        second_container_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        second_container_layout.setSpacing(RowArrowWidget.group_spacing)
 
         erase_filters_wid = RowArrowWidget(Lng.reset_filters[JsonData.lng_index])
         erase_filters_wid.set_left_icon(self.reset_svg)
         erase_filters_wid.clicked.connect(self.reset_filters_cmd)
         second_container_layout.addWidget(erase_filters_wid)
 
+        second_container_layout.addWidget(HSep())
+
         self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
         self.save_wid.clicked.connect(lambda: self.save_filters_cmd())
-        self.save_wid.hide_sep()
         second_container_layout.addWidget(self.save_wid)
 
         main_lay.addStretch()
@@ -580,14 +583,13 @@ class MfSettings(QWidget):
         name_group = QGroupBox()
         main_lay.addWidget(name_group)
         name_group_lay = QVBoxLayout(name_group)
-        name_group_lay.setContentsMargins(5, 0, 5, 0)
-        name_group_lay.setSpacing(0)
+        name_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
+        name_group_lay.setSpacing(RowArrowWidget.group_spacing)
 
         self.name_wid = RowArrowWidget(
             text=f"{Lng.alias[JsonData.lng_index]}: {self.mf.mf_alias}"
         )
         self.name_wid.hide_arrow()
-        self.name_wid.hide_sep()
         name_group_lay.addWidget(self.name_wid)
 
         self.path_widget = MfPathWidget(
@@ -611,21 +613,24 @@ class MfSettings(QWidget):
         general_wid = QGroupBox()
         main_lay.addWidget(general_wid)
         general_wid_lay = QVBoxLayout(general_wid)
-        general_wid_lay.setContentsMargins(5, 0, 5, 0)
-        general_wid_lay.setSpacing(0)
+        general_wid_lay.setContentsMargins(*RowArrowWidget.group_margings)
+        general_wid_lay.setSpacing(RowArrowWidget.group_spacing)
 
         repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
         repair_widget.set_left_icon(self.repair_svg)
         repair_widget.clicked.connect(self.repair_mf)
         general_wid_lay.addWidget(repair_widget)
 
+        general_wid_lay.addWidget(HSep())
+
         remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
         remove_wid.set_left_icon(self.trash_svg)
         remove_wid.clicked.connect(self.remove_mf)
         general_wid_lay.addWidget(remove_wid)
 
+        general_wid_lay.addWidget(HSep())
+
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
-        self.mf_save_widget.hide_sep()
         self.mf_save_widget.clicked.connect(self.save_mf_settings)
         general_wid_lay.addWidget(self.mf_save_widget)
 
@@ -761,11 +766,10 @@ class NewMfSettings(QWidget):
         save_group = QGroupBox()
         main_lay.addWidget(save_group)
         save_group_container = QVBoxLayout(save_group)
-        save_group_container.setContentsMargins(5, 0, 5, 0)
-        save_group_container.setSpacing(0)
+        save_group_container.setContentsMargins(*RowArrowWidget.group_margings)
+        save_group_container.setSpacing(RowArrowWidget.group_spacing)
 
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
-        self.mf_save_widget.hide_sep()
         self.mf_save_widget.clicked.connect(self.save_mf_settings)
         save_group_container.addWidget(self.mf_save_widget)
 

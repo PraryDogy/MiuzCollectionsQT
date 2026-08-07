@@ -195,7 +195,6 @@ class FirstLoadWin(UMainWidget):
             last_block_layout.addWidget(self.copy_zip_widget)
 
         self.save_widget = SaveRowArrowWidget(self.lng_index)
-        self.save_widget.hide_sep()
         self.save_widget.clicked.connect(lambda: self.save_cmd())
         last_block_layout.addWidget(self.save_widget)
 

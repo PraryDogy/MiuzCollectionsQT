@@ -306,20 +306,25 @@ class SelectableLabel(QLabel):
 
 
 class RowArrowWidget(QWidget):
-    hh = 26
     clicked = pyqtSignal()
     arrow_svg = os.path.join(Static.common_icons, "next.svg")
     warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
+    hh = 26
     svg_size = 16
+
+    # обычно эти виджеты помещаются в QGroupBox
+    # Это правильные отступы чтобы все красиво смотрелось
+    group_margings = (5, 3, 5, 3)
+    group_spacing = 5
 
     def __init__(self, text: str):
         super().__init__()
         self.setFixedHeight(self.hh)
         
         # Один прямой горизонтальный слой
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(10)
+        self.main_layout = QHBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(10)
         
         # Иконка слева
         self.left_icon = QSvgWidget()
@@ -335,10 +340,10 @@ class RowArrowWidget(QWidget):
         self.arrow_wid.load(self.arrow_svg)
         
         # Сборка в один ряд
-        layout.addWidget(self.left_icon)
-        layout.addWidget(self.text_widget)
-        layout.addStretch()
-        layout.addWidget(self.arrow_wid)
+        self.main_layout.addWidget(self.left_icon)
+        self.main_layout.addWidget(self.text_widget)
+        self.main_layout.addStretch()
+        self.main_layout.addWidget(self.arrow_wid)
         
         self.adjustSize()
 
@@ -348,7 +353,7 @@ class RowArrowWidget(QWidget):
 
     def replace_arrow_widget(self, widget: QWidget):
         self.arrow_wid.hide()
-        self.above_layout.addWidget(widget)
+        self.main_layout.addWidget(widget)
 
     def hide_arrow(self):
         self.arrow_wid.hide()
