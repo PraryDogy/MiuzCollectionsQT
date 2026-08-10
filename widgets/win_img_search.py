@@ -106,10 +106,16 @@ class WinImgSearch(UMainWidget):
     reset_all_filters = pyqtSignal()
     closed = pyqtSignal()
     ww = 350
-    hh = 350
+    hh = 400
 
     def __init__(self):
         super().__init__()
+        self.set_always_on_top()
+        self.set_close_only()
+        self.setAcceptDrops(True)
+        self.setWindowTitle(Lng.image_search[JsonData.lng_index])
+        self.setMinimumSize(300, 330)
+
         self.img_array = None
         self.img_search_task = None
         self.read_img_task = None
@@ -129,11 +135,6 @@ class WinImgSearch(UMainWidget):
         self.read_img_timer.setSingleShot(True)
         self.read_img_timer.timeout.connect(self.poll_read_img)
         
-        self.set_always_on_top()
-        self.set_close_only()
-        self.setAcceptDrops(True)
-        
-        self.setWindowTitle(Lng.image_search[JsonData.lng_index])
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(0)
         
@@ -151,7 +152,6 @@ class WinImgSearch(UMainWidget):
         
         self.img_label = QLabel(self.base_text)
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.img_label.setFixedSize(self.ww, self.hh)
         self.img_label.setWordWrap(True)
         group_layout.addWidget(self.img_label)
         
@@ -172,7 +172,11 @@ class WinImgSearch(UMainWidget):
         
         self.slider_widget = SliderWidget()
         self.group_layout.addWidget(self.slider_widget)
+        self.slider_widget.setFixedHeight(self.reset_btn.height())
         self.group_layout.addSpacing(3)
+
+        self.group_box.adjustSize()
+        self.group_box.setFixedHeight(self.group_box.height())
         
         self.central_layout.addSpacing(10)
         
@@ -190,9 +194,11 @@ class WinImgSearch(UMainWidget):
         cancel_btn.clicked.connect(self.hide_window)
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
+
+        self.resize(self.ww, self.hh)
         
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
+        # self.adjustSize()
+        # self.setFixedSize(self.width(), self.height())
 
     def reset_img_search(self):
         self.img_label.clear()

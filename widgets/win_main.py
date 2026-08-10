@@ -333,7 +333,7 @@ class WinMain(UMainWindow):
 
         def edit_filters():
             settings_item = SettingsItem("filters", "")
-            self.filters_win.deleteLater()
+            # self.filters_win.deleteLater()
             self.open_settings_win(settings_item)
 
         self.bar_top.filters_btn.set_selected_style()

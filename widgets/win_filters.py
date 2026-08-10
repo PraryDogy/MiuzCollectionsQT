@@ -32,6 +32,7 @@ class DatesWidget(QGroupBox):
 
         title = RowArrowWidget(Lng.dates[JsonData.lng_index])
         title.set_left_icon(self.calendar_svg)
+        title.hide_arrow()  # Скрываем стрелку, так как она не нужна для заголовка
         # title.left_icon.setFixedSize(50, 50)
         self.main_layout.addWidget(title)
 
@@ -407,8 +408,6 @@ class WinFilters(UMainWidget):
         right_lay.addWidget(self.reset_group)
         right_lay.addSpacing(10)
         right_lay.addStretch()
-
-
         
         self.splitter.addWidget(self.right_container)
 
