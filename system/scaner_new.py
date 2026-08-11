@@ -99,7 +99,7 @@ class MfScaner:
             if entry.is_dir():
                 child_path = entry.path
                 if child_path not in self.db_dirs:
-                    fs_mod_time = entry.stat().st_mtime
+                    fs_mod_time = int(entry.stat().st_mtime)
                     records_to_insert.append((child_path, fs_mod_time))
                     self._collect_nested_new_dirs(child_path, records_to_insert)
 

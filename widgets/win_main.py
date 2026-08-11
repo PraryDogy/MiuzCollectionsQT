@@ -40,16 +40,12 @@ from .win_smb import WinSmb
 from .win_upload import UploadWin
 
 
-class TestWid(QFrame):
+class TestWid(QLabel):
     def __init__(self, parent=None):
-        super().__init__(parent=parent)
-        self.setFixedHeight(100)
+        super().__init__(parent=parent, text="TEST")
+        self.setFixedHeight(50)
         self.setStyleSheet("background: black;")
-
-        v_layout = QVBoxLayout(self)
-
-        btn = QLabel('test btn')
-        v_layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def reload(self):
         test = NewScanerWorker(
