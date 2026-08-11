@@ -16,6 +16,7 @@ from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
                            ScanerWorker)
+from system.scaner_new import NewScanerWorker, NewScanerProcess
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
@@ -52,7 +53,11 @@ class TestWid(QFrame):
         btn.clicked.connect(self.reload)
 
     def reload(self):
-        ...
+        test = NewScanerWorker(
+            target=NewScanerProcess.start,
+            args=(Mf.items, 0, )
+        )
+        test.start()
 
 
 class DangerWarn(ConfirmWindow):
@@ -92,6 +97,9 @@ class WinMain(UMainWindow):
         # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
         # self.test.center_to_parent(self)
         # self.test.show()
+
+        test_wid = TestWid()
+        self.central_layout.addWidget(test_wid)
 
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
