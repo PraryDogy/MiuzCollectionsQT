@@ -43,14 +43,13 @@ from .win_upload import UploadWin
 class TestWid(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.setFixedSize(100, 100)
+        self.setFixedHeight(100)
         self.setStyleSheet("background: black;")
 
         v_layout = QVBoxLayout(self)
 
-        btn = UPushButton('test btn')
-        v_layout.addWidget(btn)
-        btn.clicked.connect(self.reload)
+        btn = QLabel('test btn')
+        v_layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def reload(self):
         test = NewScanerWorker(
@@ -58,6 +57,10 @@ class TestWid(QFrame):
             args=(Mf.items, 0, )
         )
         test.start()
+
+    def mouseReleaseEvent(self, a0):
+        self.reload()
+        return super().mouseReleaseEvent(a0)
 
 
 class DangerWarn(ConfirmWindow):
@@ -219,11 +222,11 @@ class WinMain(UMainWindow):
 
         self.load_st_grid()
 
-        if "noscan" not in argv:
-            self.start_scaner_task()
-        else:
-            print("СКАНЕР ВЫКЛЮЧЕН")
-            self.bar_bottom.progress_bar.setText("noscan enabled")
+        # if "noscan" not in argv:
+        #     self.start_scaner_task()
+        # else:
+        #     print("СКАНЕР ВЫКЛЮЧЕН")
+        #     self.bar_bottom.progress_bar.setText("noscan enabled")
 
     @staticmethod
     def with_conn(fn: callable):

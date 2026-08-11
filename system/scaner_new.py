@@ -45,6 +45,7 @@ class MfScaner:
         self.scaner_item = scaner_item
         # Превращаем в словарь {abs_path: db_mod_time} для быстрого O(1) поиска
         self.db_dirs = dict(self.get_db_dirs())
+        self.scan_and_sync()
 
     def get_db_dirs(self):
         stmt = (
@@ -85,6 +86,8 @@ class MfScaner:
         # Здесь запускаются ваши финальные запросы:
         # 1. sqlalchemy.delete для records_to_delete
         # 2. sqlalchemy.insert для records_to_insert
+        print("del", records_to_delete)
+        print("new", records_to_insert)
 
     def _collect_nested_new_dirs(self, parent_dir: str, records_to_insert: list[str]):
         """Рекурсивно обходит только те папки, которых вообще нет в БД."""
