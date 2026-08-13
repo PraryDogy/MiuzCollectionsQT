@@ -257,7 +257,7 @@ class Grid(VScrollArea):
     finished_ = pyqtSignal()
     collage = pyqtSignal(list)
 
-    grid_spacing = 5
+    grid_spacing = 7
     resize_ms = 10
     copy_files_path = os.path.join(Static.common_icons, "copy_files.svg")
 
