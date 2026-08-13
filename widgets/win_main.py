@@ -16,7 +16,7 @@ from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
                            ScanerWorker)
-from system.scaner_new import NewScanerWorker, NewScanerProcess
+from system.scaner_new import NewScanerProcess, NewScanerWorker
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
@@ -26,7 +26,7 @@ from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
 from .bar_top import BarTop
-from .grid import Grid, GridStandart
+from .grid import Grid, GridStandart, Thumb
 from .menu_left import MenuLeft
 from .win_collage import WinCollage
 from .win_copy_files import WinCopyFiles
@@ -83,12 +83,11 @@ class DangerWarn(ConfirmWindow):
 class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
-    ww, hh = 1120, 760
+    ww, hh = 1050, 750
 
     def __init__(self, argv: list):
         super().__init__()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
-        self.resize(self.ww, self.hh)
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.app_name}")
         self.setMenuBar(BarMacos())
@@ -211,11 +210,7 @@ class WinMain(UMainWindow):
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
-        self.splitter.setSizes([
-            self.left_side_width,
-            self.width() - self.left_side_width
-        ])
-
+        self.resize(self.ww, self.hh)
         self.load_st_grid()
 
         if "noscan" not in argv:
