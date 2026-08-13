@@ -3,7 +3,8 @@ import subprocess
 from collections import defaultdict
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QCloseEvent, QGuiApplication, QIcon, QKeyEvent, QPixmap
+from PyQt6.QtGui import (QCloseEvent, QGuiApplication, QIcon, QImage,
+                         QKeyEvent, QPixmap)
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QSplitter, QVBoxLayout, QWidget)
 
@@ -387,7 +388,14 @@ class WinMain(UMainWindow):
                 for i in update_thumb_items:
                     wid = self.grid.url_to_wid.get(i.rel_img_path)
                     if wid:
-                        wid.data_item.pixmap = Utils.pixmap_from_array(i.array)
+                        qimages = []
+                        for x in Static.thumb_widget_pixmap_size:
+                            resized = ImgUtils.fit_to_thumb(i.array, x * 2)
+                            qimage = Utils.qimage_from_array(resized)
+                            pixmap = Utils.qiconed_resize(QPixmap.fromImage(qimage), x)
+                            qimages.append(QImage(pixmap))
+                        wid.data_item.qimages = qimages
+                        # wid.data_item.pixmap = Utils.pixmap_from_array(i.array)
                         wid.set_text_and_size()
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
