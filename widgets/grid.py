@@ -182,7 +182,9 @@ class Thumb(QFrame):
     def set_pixmap_with_actual_size(self):
         qimage = self.data_item.qimages[Dynamic.current_pixmap_size_index]
         pixmap = QPixmap.fromImage(qimage)
+        self.img_wid.clear()
         self.img_wid.setPixmap(pixmap)
+        print(self.data_item.filename)
 
     def set_text_and_size(self):
         if self.width() == Thumb.wid_width:

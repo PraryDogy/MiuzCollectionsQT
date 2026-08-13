@@ -395,7 +395,7 @@ class WinMain(UMainWindow):
                             pixmap = Utils.qiconed_resize(QPixmap.fromImage(qimage), x)
                             qimages.append(QImage(pixmap))
                         wid.data_item.qimages = qimages
-                        wid.set_text_and_size()
+                        wid.set_pixmap_with_actual_size()
                         wid.set_transparent_frame(1.0)
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
