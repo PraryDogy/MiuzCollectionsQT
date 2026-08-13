@@ -182,10 +182,8 @@ class Thumb(QFrame):
         Thumb.wid_width = Thumb.img_wid_size + Static.thumb_widget_extra_w
 
     def set_pixmap_with_actual_size(self):
-        pixmap = Utils.qiconed_resize(
-            self.data_item.pixmap,
-            Thumb.img_wid_pixmap_size
-        )
+        qimage = self.data_item.qimages[Dynamic.current_pixmap_size_index]
+        pixmap = QPixmap.fromImage(qimage)
         self.img_wid.setPixmap(pixmap)
 
     def set_text_and_size(self):
@@ -813,9 +811,8 @@ class GridStandart(Grid):
     def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
         Thumb.calculate_size()
         for image_item in db_images:
-            pixmap = QPixmap.fromImage(image_item.qimage)
             data_item = DataItem(
-                pixmap=pixmap,
+                qimages=image_item.qimages,
                 rel_path=image_item.rel_img_path,
                 fav=image_item.fav,
                 month_year=image_item.month_year,

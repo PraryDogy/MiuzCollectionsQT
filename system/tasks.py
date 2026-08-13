@@ -82,7 +82,7 @@ class DbImagesLoaderItem:
     rel_img_path: str
     rel_thumb_path: str
     fav: int
-    qimage: QImage
+    qimages: list[QImage]
     day_month_year: str
     month_year: str
 
@@ -127,8 +127,11 @@ class DbImagesLoader(URunnable):
             if not os.path.exists(abs_thumb_path_):
                 continue
 
-            array_ = ImgUtils.read_thumb(abs_thumb_path_)
-            qimage = Utils.qimage_from_array(array_)
+            array_ = ImgUtils.read_thumb(abs_thumb_path_)            
+            qimages = []
+            for i in Static.thumb_widget_pixmap_size:
+                img = ImgUtils.fit_to_thumb(array_, i)
+                qimages.append(Utils.qimage_from_array(img))
 
             date_ = datetime.fromtimestamp(mod).date()
             month_ = Lng.months[JsonData.lng_index][str(date_.month)]
@@ -140,7 +143,7 @@ class DbImagesLoader(URunnable):
                 rel_img_path=rel_img_path,
                 rel_thumb_path=rel_thumb_path,
                 fav=fav,
-                qimage=qimage,
+                qimages=qimages,
                 day_month_year=day_month_year,
                 month_year=month_year
             )

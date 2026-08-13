@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QImage, QPixmap
 
 
 @dataclass(slots=True)
@@ -12,7 +12,7 @@ class SettingsItem:
 
 @dataclass(slots=True)
 class DataItem:
-    pixmap: QPixmap
+    qimages: list[QImage]
     rel_path: str
     fav: bool
     month_year: str
