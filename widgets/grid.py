@@ -52,23 +52,35 @@ class ThumbImgWidget(ThumbBaseLabel):
         self.set_no_frame()
 
     def set_frame(self):
+        # self.setStyleSheet(
+        #     f"""
+        #         border-radius: {self.border_radius}px;
+        #         color: rgb(255,255,255);
+        #         background: {self.gray_color};
+        #         border: 2px solid transparent;
+        #         padding-left: 2px;
+        #         padding-right: 2px;
+        #     """
+        # )
         self.setStyleSheet(
             f"""
-                border-radius: {self.border_radius}px;
-                color: rgb(255,255,255);
                 background: {self.gray_color};
-                border: 2px solid transparent;
-                padding-left: 2px;
-                padding-right: 2px;
+                border-radius: {self.border_radius}px;
             """
         )
     
     def set_no_frame(self):
+        # self.setStyleSheet(
+        #     """
+        #         border: 2px solid transparent;
+        #         padding-left: 2px;
+        #         padding-right: 2px;
+        #     """
+        # )
         self.setStyleSheet(
-            """
-                border: 2px solid transparent;
-                padding-left: 2px;
-                padding-right: 2px;
+            f"""
+                background: transparent;
+                border-radius: {self.border_radius}px;
             """
         )
 
