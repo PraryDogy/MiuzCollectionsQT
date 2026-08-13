@@ -395,12 +395,16 @@ class WinMain(UMainWindow):
                             pixmap = Utils.qiconed_resize(QPixmap.fromImage(qimage), x)
                             qimages.append(QImage(pixmap))
                         wid.data_item.qimages = qimages
-                        # wid.data_item.pixmap = Utils.pixmap_from_array(i.array)
                         wid.set_text_and_size()
+                        wid.set_transparent_frame(1.0)
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
             else:
                 QTimer.singleShot(300, poll_task)
+
+        for url, wid in self.grid.url_to_wid.items():
+            if url in rel_paths:
+                wid.set_transparent_frame(0.3)
 
         self.update_thumb_task = ProcessWorker(
             target=UpdateThumb.start,
