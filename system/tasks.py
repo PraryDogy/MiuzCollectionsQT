@@ -129,13 +129,14 @@ class DbImagesLoader(URunnable):
                 continue
 
             qimages = []
-
             img_bgr = cv2.imread(abs_thumb_path_)
+            img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
             for i in Static.thumb_widget_pixmap_size:
-                resized = ImgUtils.fit_to_thumb(img_bgr, i)
-                resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+                resized = ImgUtils.fit_to_thumb(img_rgb, i)
                 qimage = Utils.qimage_from_array(resized)
                 qimages.append(qimage)
+            qimage_ogirinal = Utils.qimage_from_array(img_rgb)
+            qimages.append(qimage_ogirinal)
 
             date_ = datetime.fromtimestamp(mod).date()
             month_ = Lng.months[JsonData.lng_index][str(date_.month)]

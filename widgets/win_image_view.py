@@ -295,7 +295,9 @@ class WinImageView(UMainWidget):
             i.raise_()
 
     def load_thumb(self):
-        self.restart_img_wid(self.current_data_item.pixmap)
+        qimage = self.current_data_item.qimages[-1]
+        pixmap = QPixmap.fromImage(qimage)
+        self.restart_img_wid(pixmap)
 
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
