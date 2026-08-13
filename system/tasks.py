@@ -8,12 +8,13 @@ import cv2
 import numpy as np
 import sqlalchemy
 from PIL import Image
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
-from PyQt6.QtGui import QImage
+from PIL.ImageQt import ImageQt
+from PyQt6.QtCore import QObject, QRunnable, QSize, Qt, QThreadPool, pyqtSignal
+from PyQt6.QtGui import QImage, QImageReader
 
-from cfg import JsonData, Dynamic, Static
+from cfg import Dynamic, JsonData, Static
 
-from .database import Dbase, Dirs, Thumbs, Properties
+from .database import Dbase, Dirs, Properties, Thumbs
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
@@ -127,11 +128,14 @@ class DbImagesLoader(URunnable):
             if not os.path.exists(abs_thumb_path_):
                 continue
 
-            array_ = ImgUtils.read_thumb(abs_thumb_path_)            
             qimages = []
+
+            img_bgr = cv2.imread(abs_thumb_path_)
             for i in Static.thumb_widget_pixmap_size:
-                img = ImgUtils.fit_to_thumb(array_, i)
-                qimages.append(Utils.qimage_from_array(img))
+                resized = ImgUtils.fit_to_thumb(img_bgr, i)
+                resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+                qimage = Utils.qimage_from_array(resized)
+                qimages.append(qimage)
 
             date_ = datetime.fromtimestamp(mod).date()
             month_ = Lng.months[JsonData.lng_index][str(date_.month)]
