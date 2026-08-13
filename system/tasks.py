@@ -7,10 +7,8 @@ import cv2
 # import imagehash
 import numpy as np
 import sqlalchemy
-from PIL import Image
-from PIL.ImageQt import ImageQt
-from PyQt6.QtCore import QObject, QRunnable, QSize, Qt, QThreadPool, pyqtSignal
-from PyQt6.QtGui import QImage, QImageReader
+from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
+from PyQt6.QtGui import QImage, QPixmap
 
 from cfg import Dynamic, JsonData, Static
 
@@ -132,10 +130,11 @@ class DbImagesLoader(URunnable):
             img_bgr = cv2.imread(abs_thumb_path_)
             img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
             for i in Static.thumb_widget_pixmap_size:
-                i = i * 2
-                resized = ImgUtils.fit_to_thumb(img_rgb, i)
+                resized = ImgUtils.fit_to_thumb(img_rgb, i * 2)
                 qimage = Utils.qimage_from_array(resized)
-                qimages.append(qimage)
+                pixmap = QPixmap.fromImage(qimage)
+                pixmap = Utils.qiconed_resize(pixmap, i)
+                qimages.append(QImage(pixmap))
             qimage_ogirinal = Utils.qimage_from_array(img_rgb)
             qimages.append(qimage_ogirinal)
 
