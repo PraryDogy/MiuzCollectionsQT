@@ -136,7 +136,6 @@ class Thumb(QFrame):
     wid_height = 0
     img_wid_size = 0
     img_wid_height = 0
-    img_wid_pixmap_size = 0
 
     def __init__(self, data_item: DataItem):
         super().__init__()
@@ -178,7 +177,6 @@ class Thumb(QFrame):
         ind = Dynamic.current_pixmap_size_index
 
         Thumb.img_wid_size = Static.thumb_widget_pixmap_size[ind] + Static.img_wid_border
-        Thumb.img_wid_pixmap_size = Static.thumb_widget_pixmap_size[ind]
         Thumb.wid_width = Thumb.img_wid_size + Static.thumb_widget_extra_w
 
     def set_pixmap_with_actual_size(self):
