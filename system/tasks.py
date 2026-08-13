@@ -132,11 +132,11 @@ class DbImagesLoader(URunnable):
             for i in Static.thumb_widget_pixmap_size:
                 resized = ImgUtils.fit_to_thumb(img_rgb, i * 2)
                 qimage = Utils.qimage_from_array(resized)
-                pixmap = QPixmap.fromImage(qimage)
-                pixmap = Utils.qiconed_resize(pixmap, i)
+                pixmap = Utils.qiconed_resize(QPixmap.fromImage(qimage), i)
                 qimages.append(QImage(pixmap))
-            qimage_ogirinal = Utils.qimage_from_array(img_rgb)
-            qimages.append(qimage_ogirinal)
+
+            src_qimage = Utils.qimage_from_array(img_rgb)
+            qimages.append(src_qimage)
 
             date_ = datetime.fromtimestamp(mod).date()
             month_ = Lng.months[JsonData.lng_index][str(date_.month)]
