@@ -468,6 +468,11 @@ class ImgUtils:
     
     @classmethod
     def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray:
+
+        cv2.INTER_CUBIC
+        cv2.INTER_LANCZOS4
+        cv2.INTER_AREA
+
         try:
             h, w = image.shape[:2]
             if h == 0 or w == 0:
@@ -481,7 +486,7 @@ class ImgUtils:
             return cv2.resize(
                 image,
                 (new_w, new_h),
-                interpolation=cv2.INTER_AREA
+                interpolation=cv2.INTER_LANCZOS4
             )
 
         except Exception as e:
