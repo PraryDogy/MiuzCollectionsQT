@@ -46,6 +46,7 @@ class ThumbBaseLabel(QLabel):
 class ThumbImgWidget(ThumbBaseLabel):
     BORDER_RADIUS = 10
     RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
+    PADDING = 0
 
     def __init__(self):
         super().__init__()
@@ -56,6 +57,7 @@ class ThumbImgWidget(ThumbBaseLabel):
             f"""
                 background: {self.RGBA_GRAY};
                 border-radius: {self.BORDER_RADIUS}px;
+                padding: {self.PADDING}px;
             """
         )
     
@@ -64,6 +66,7 @@ class ThumbImgWidget(ThumbBaseLabel):
             f"""
                 background: transparent;
                 border-radius: {self.BORDER_RADIUS}px;
+                padding: {self.PADDING}px;
             """
         )
 
@@ -174,8 +177,8 @@ class Thumb(QFrame):
     def calculate_size(cls):
         ind = Dynamic.current_pixmap_size_index
 
+        Thumb.img_wid_size = Static.thumb_widget_pixmap_size[ind] + Static.img_wid_border
         Thumb.img_wid_pixmap_size = Static.thumb_widget_pixmap_size[ind]
-        Thumb.img_wid_size = Thumb.img_wid_pixmap_size + Static.img_wid_border
         Thumb.wid_width = Thumb.img_wid_size + Static.thumb_widget_extra_w
 
     def set_pixmap_with_actual_size(self):
