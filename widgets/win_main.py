@@ -97,8 +97,8 @@ class WinMain(UMainWindow):
         # self.test.center_to_parent(self)
         # self.test.show()
 
-        test_wid = TestWid()
-        self.central_layout.addWidget(test_wid)
+        # test_wid = TestWid()
+        # self.central_layout.addWidget(test_wid)
 
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
@@ -218,11 +218,11 @@ class WinMain(UMainWindow):
 
         self.load_st_grid()
 
-        # if "noscan" not in argv:
-        #     self.start_scaner_task()
-        # else:
-        #     print("СКАНЕР ВЫКЛЮЧЕН")
-        #     self.bar_bottom.progress_bar.setText("noscan enabled")
+        if "noscan" not in argv:
+            self.start_scaner_task()
+        else:
+            print("СКАНЕР ВЫКЛЮЧЕН")
+            self.bar_bottom.progress_bar.setText("noscan enabled")
 
     @staticmethod
     def with_conn(fn: callable):
