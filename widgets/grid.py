@@ -2,8 +2,9 @@ import os
 
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QDrag, QKeyEvent,
-                         QMouseEvent, QPixmap, QResizeEvent)
+from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QDrag,
+                         QFontMetrics, QKeyEvent, QMouseEvent, QPixmap,
+                         QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QVBoxLayout,
@@ -23,53 +24,47 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
                       WinInfoAction)
 
+# class ThumbLabel(QLabel):
+#     # длина списка соответствует cfg > static.pixmap_sizes
+#     row_limits = [20, 20, 25, 32]
+#     corner_values = [4, 8, 14, 16]
+#     font_size = 11
 
-class ULabel(QLabel):
-    # длина списка соответствует cfg > static.pixmap_sizes
-    row_limits = [20, 20, 25, 32]
-    corner_values = [4, 8, 14, 16]
-    font_size = 11
+#     def __init__(self, *args):
+#         super().__init__(*args)
+#         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#     def short_text(self, text: str) -> str:
+#         limit = self.row_limits[Dynamic.thumb_size_index]
+#         if len(text) <= limit:
+#             return text
+#         edge = (limit - 3) // 2
+#         return f"{text[:edge]}...{text[-edge:]}"
 
-    def short_text(self, text: str) -> str:
-        limit = self.row_limits[Dynamic.thumb_size_index]
-        if len(text) <= limit:
-            return text
-        edge = (limit - 3) // 2
-        return f"{text[:edge]}...{text[-edge:]}"
+#     def mouseReleaseEvent(self, ev):
+#         super().mouseReleaseEvent(ev)
 
-    def mouseReleaseEvent(self, ev):
-        super().mouseReleaseEvent(ev)
+#     def contextMenuEvent(self, ev):
+#         super().contextMenuEvent(ev)
 
-    def contextMenuEvent(self, ev):
-        super().contextMenuEvent(ev)
-
-    def mouseDoubleClickEvent(self, ev):
-        super().mouseDoubleClickEvent(ev)
+#     def mouseDoubleClickEvent(self, ev):
+#         super().mouseDoubleClickEvent(ev)
 
 
-class ImgWid(ULabel):
-    # чтобы рамка вокруг картинки была больше, но обрежется изображение
-    m = [4, 5, 7, 9]
+class ThumbImgWidget(QLabel):
+    border_radius = 10
+    gray_color = "rgba(128, 128, 128, 0.5)"
 
     def __init__(self):
         super().__init__()
         self.set_no_frame()
 
-    def set_margins(self):
-        m = self.m[Dynamic.thumb_size_index]
-        self.setContentsMargins(m, m, m, m)
-
     def set_frame(self):
-        corner = self.corner_values[Dynamic.thumb_size_index]
         self.setStyleSheet(
             f"""
-                border-radius: {corner}px;
+                border-radius: {self.border_radius}px;
                 color: rgb(255,255,255);
-                background: rgba(128, 128, 128, 0.5);
+                background: {self.gray_color};
                 border: 2px solid transparent;
                 padding-left: 2px;
                 padding-right: 2px;
@@ -86,24 +81,34 @@ class ImgWid(ULabel):
         )
 
 
-class WhiteTextWid(ULabel):
+class LabelShortText(QLabel):
+    OFFSET = 5
+    BORDER_RADIUS = 5
+    FONT_SIZE = 11
+    BLUE_TEXT = "#6199E4"
+
+    def __init__(self):
+        super().__init__()
+
+    def get_shorten_text(self, text: str, parent_width: int):
+        metrics = QFontMetrics(self.font())
+        text = metrics.elidedText(
+            text,
+            Qt.TextElideMode.ElideMiddle,
+            parent_width - self.OFFSET
+        )
+        return text
+
+
+class WhiteTextWid(LabelShortText):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
         self.set_no_frame()
 
-    def set_text(self) -> None:
-        max_row = self.row_limits[Dynamic.thumb_size_index]
-        lines: list[str] = []
-        if len(self.data_item.filename) > max_row:
-            first_line = self.data_item.filename[:max_row]
-            second_line = self.data_item.filename[max_row:]
-            if len(second_line) > max_row:
-                second_line = self.short_text(second_line)
-            lines.extend([first_line, second_line])
-        else:
-            lines.append(self.data_item.filename)
-        self.setText("\n".join(lines))
+    def set_text(self, parent_width: int):
+        text = self.get_shorten_text(self.data_item.filename, parent_width)
+        self.setText(text)
 
     def set_frame(self):
         self.setStyleSheet(
@@ -114,7 +119,7 @@ class WhiteTextWid(ULabel):
                 border: 2px solid transparent;
                 padding-left: 2px;
                 padding-right: 2px;
-                font-size: {self.font_size}px;
+                font-size: {self.FONT_SIZE}px;
             """
         )
 
@@ -122,33 +127,35 @@ class WhiteTextWid(ULabel):
         self.setStyleSheet(
         f"""
             border: 2px solid transparent;
-            font-size: {self.font_size}px;
+            font-size: {self.FONT_SIZE}px;
         """
         )
     
     
-class BlueTextWid(ULabel):
+class BlueTextWid(LabelShortText):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
         self.set_text()
         self.set_style()
 
-    def set_text(self):
+    def set_text(self, parent_width: int):
         root = self.data_item.rel_path.strip(os.sep).split(os.sep)
         if len(root) == 1:
             root = os.path.basename(Mf.current_mf.mf_alias)
         else:
             root = root[0]
-        first_row = self.short_text(root)
-        text = "\n".join((first_row, self.data_item.day_month_year))
+
+        root = self.get_shorten_text(root, parent_width)
+        day_month_year = self.data_item.day_month_year
+        text = "\n".join((root, day_month_year))
         self.setText(text)
 
     def set_style(self):
         self.setStyleSheet(
             f"""
-                font-size: {self.font_size}px;
-                color: #6199E4;
+                font-size: {self.FONT_SIZE}px;
+                color: {self.BLUE_TEXT};
             """
         )
 
@@ -176,7 +183,7 @@ class Thumb(QFrame):
         self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # --- Виджеты ---
-        self.img_wid = ImgWid()
+        self.img_wid = ThumbImgWidget()
         self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.white_text_wid = WhiteTextWid(self.data_item)
@@ -359,7 +366,7 @@ class Grid(VScrollArea):
     def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
         global_pos = QCursor.pos() 
         wid = QApplication.widgetAt(global_pos)
-        if isinstance(wid, (ImgWid, WhiteTextWid)):
+        if isinstance(wid, (ThumbImgWidget, WhiteTextWid)):
             return wid.parent()
         else:
             return None
@@ -479,7 +486,7 @@ class Grid(VScrollArea):
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
 
             for wid in self.cell_to_wid.values():
-                widgets = wid.findChildren((WhiteTextWid, ImgWid))
+                widgets = wid.findChildren((WhiteTextWid, ThumbImgWidget))
                 intersects = any(
                     rect.intersects(QRect(child.mapTo(self, QPoint(0, 0)), child.size()))
                     for child in widgets
