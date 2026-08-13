@@ -182,6 +182,10 @@ class Thumb(QFrame):
     def set_pixmap_with_actual_size(self):
         qimage = self.data_item.qimages[Dynamic.current_pixmap_size_index]
         pixmap = QPixmap.fromImage(qimage)
+
+        ind = Dynamic.current_pixmap_size_index
+        pixmap = Utils.qiconed_resize(pixmap, Static.thumb_widget_pixmap_size[ind])
+
         self.img_wid.setPixmap(pixmap)
 
     def set_text_and_size(self):
