@@ -4,7 +4,7 @@ from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
 from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QKeyEvent, QMouseEvent, QPixmap,
-                         QResizeEvent)
+                         QResizeEvent, QColor)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QVBoxLayout,

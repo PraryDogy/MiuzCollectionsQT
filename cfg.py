@@ -39,7 +39,7 @@ class Static:
     # размеры для QPixmap в виджете Thumb
     thumb_widget_pixmap_size = [65, 80, 135]
     # рамка вокруг QPixmap в виджете Thumb
-    img_wid_border = 15
+    img_wid_border = 10
     # дополнительное пространство к ширине виджета Thumb
     thumb_widget_extra_w = 40
 
