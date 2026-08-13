@@ -29,7 +29,7 @@ class WinCollage(UMainWidget):
         self.central_layout.setContentsMargins(0, 0, 0, 0)
 
         self.pixmaps: list[QPixmap] = [
-            i.pixmap
+            QPixmap.fromImage(i.qimages[-1])
             for i in data_items
         ]
         self.image_labels: list[QLabel] = []

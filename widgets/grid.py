@@ -184,7 +184,6 @@ class Thumb(QFrame):
         pixmap = QPixmap.fromImage(qimage)
         self.img_wid.clear()
         self.img_wid.setPixmap(pixmap)
-        print(self.data_item.filename)
 
     def set_text_and_size(self):
         if self.width() == Thumb.wid_width:
