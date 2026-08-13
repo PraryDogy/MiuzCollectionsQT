@@ -49,19 +49,9 @@ class ThumbImgWidget(ThumbBaseLabel):
 
     def __init__(self):
         super().__init__()
-        self.set_no_frame()
+        self.set_no_frame_style()
 
-    def set_frame(self):
-        # self.setStyleSheet(
-        #     f"""
-        #         border-radius: {self.border_radius}px;
-        #         color: rgb(255,255,255);
-        #         background: {self.gray_color};
-        #         border: 2px solid transparent;
-        #         padding-left: 2px;
-        #         padding-right: 2px;
-        #     """
-        # )
+    def set_framed_style(self):
         self.setStyleSheet(
             f"""
                 background: {self.gray_color};
@@ -69,14 +59,7 @@ class ThumbImgWidget(ThumbBaseLabel):
             """
         )
     
-    def set_no_frame(self):
-        # self.setStyleSheet(
-        #     """
-        #         border: 2px solid transparent;
-        #         padding-left: 2px;
-        #         padding-right: 2px;
-        #     """
-        # )
+    def set_no_frame_style(self):
         self.setStyleSheet(
             f"""
                 background: transparent;
@@ -89,13 +72,13 @@ class WhiteTextWid(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
-        self.set_no_frame()
+        self.set_no_frame_style()
 
     def set_text(self, parent_width: int):
         text = self.get_shorten_text(self.data_item.filename, parent_width)
         self.setText(text)
 
-    def set_frame(self):
+    def set_no_frame_style(self):
         self.setStyleSheet(
             f"""
                 border-radius: 7px;
@@ -108,7 +91,7 @@ class WhiteTextWid(ThumbBaseLabel):
             """
         )
 
-    def set_no_frame(self):
+    def set_no_frame_style(self):
         self.setStyleSheet(
         f"""
             border: 2px solid transparent;
@@ -210,12 +193,12 @@ class Thumb(QFrame):
         self.img_wid.setPixmap(resized_pixmap)
 
     def set_frame(self):
-        self.img_wid.set_frame()
-        self.white_text_wid.set_frame()
+        self.img_wid.set_framed_style()
+        self.white_text_wid.set_no_frame_style()
 
     def set_no_frame(self):
-        self.img_wid.set_no_frame()
-        self.white_text_wid.set_no_frame()
+        self.img_wid.set_no_frame_style()
+        self.white_text_wid.set_no_frame_style()
 
     def set_transparent_frame(self, value: float):
         effect = QGraphicsOpacityEffect(self)
