@@ -62,6 +62,17 @@ class Utils:
             return None
 
     @classmethod
+    def scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = 2):
+        scaled = qimage.scaled(
+            int(size * dpr),
+            int(size * dpr),
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        scaled.setDevicePixelRatio(dpr)
+        return scaled
+
+    @classmethod
     def qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
         return QIcon(pixmap).pixmap(QSize(max_side, max_side))
 
