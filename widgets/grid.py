@@ -116,8 +116,7 @@ class BlueTextWid(ThumbBaseLabel):
 
         root = self.get_shorten_text(root, parent_width)
         day_month_year = self.data_item.day_month_year
-        text = "\n".join((root, day_month_year))
-        self.setText(text)
+        self.setText("\n".join((root, day_month_year)))
 
     def set_style(self):
         self.setStyleSheet(
