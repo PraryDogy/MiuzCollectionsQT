@@ -140,7 +140,6 @@ class Thumb(QFrame):
     img_wid_height = 0
     img_wid_pixmap_size = 0
 
-
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.row, self.col = 0, 0
@@ -197,9 +196,8 @@ class Thumb(QFrame):
         self.white_text_wid.set_text(Thumb.wid_width)
         self.blue_text_wid.set_text(Thumb.wid_width)
 
-        self.img_wid.setPixmap(
-            Utils.qiconed_resize(self.data_item.pixmap, Thumb.img_wid_width)
-        )
+        resized_pixmap = Utils.qiconed_resize(self.data_item.pixmap, Thumb.img_wid_width)
+        self.img_wid.setPixmap(resized_pixmap)
 
     def set_frame(self):
         self.img_wid.set_frame()
