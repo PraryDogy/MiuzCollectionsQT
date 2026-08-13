@@ -16,7 +16,7 @@ class ThumbnailsSlider(USlider):
         super().__init__()
 
     def _on_value_changed(self, value):
-        Dynamic.thumb_size_index = value
+        Dynamic.current_pixmap_size_index = value
         super()._on_value_changed(value)
 
 
@@ -98,8 +98,8 @@ class BarBottom(QWidget):
 
         self.slider.setOrientation(Qt.Orientation.Horizontal)
         self.slider.setMinimum(0)
-        self.slider.setMaximum(len(Static.pixmap_sizes) - 1)
-        self.slider.setValue(Dynamic.thumb_size_index)
+        self.slider.setMaximum(len(Static.thumb_widget_pixmap_size) - 1)
+        self.slider.setValue(Dynamic.current_pixmap_size_index)
         self.slider.setFixedWidth(80)
 
         self.slider.clicked.connect(self.resize_thumbnails)

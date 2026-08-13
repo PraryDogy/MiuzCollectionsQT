@@ -24,34 +24,26 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
                       WinInfoAction)
 
-# class ThumbLabel(QLabel):
-#     # длина списка соответствует cfg > static.pixmap_sizes
-#     row_limits = [20, 20, 25, 32]
-#     corner_values = [4, 8, 14, 16]
-#     font_size = 11
 
-#     def __init__(self, *args):
-#         super().__init__(*args)
-#         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+class ThumbBaseLabel(QLabel):
+    FONT_SIZE = 11
+    BLUE_TEXT = "#6199E4"
 
-#     def short_text(self, text: str) -> str:
-#         limit = self.row_limits[Dynamic.thumb_size_index]
-#         if len(text) <= limit:
-#             return text
-#         edge = (limit - 3) // 2
-#         return f"{text[:edge]}...{text[-edge:]}"
+    def __init__(self):
+        super().__init__()
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-#     def mouseReleaseEvent(self, ev):
-#         super().mouseReleaseEvent(ev)
-
-#     def contextMenuEvent(self, ev):
-#         super().contextMenuEvent(ev)
-
-#     def mouseDoubleClickEvent(self, ev):
-#         super().mouseDoubleClickEvent(ev)
+    def get_shorten_text(self, text: str, parent_width: int, offset = 5):
+        metrics = QFontMetrics(self.font())
+        text = metrics.elidedText(
+            text,
+            Qt.TextElideMode.ElideMiddle,
+            parent_width - offset
+        )
+        return text
 
 
-class ThumbImgWidget(QLabel):
+class ThumbImgWidget(ThumbBaseLabel):
     border_radius = 10
     gray_color = "rgba(128, 128, 128, 0.5)"
 
@@ -81,26 +73,7 @@ class ThumbImgWidget(QLabel):
         )
 
 
-class LabelShortText(QLabel):
-    OFFSET = 5
-    BORDER_RADIUS = 5
-    FONT_SIZE = 11
-    BLUE_TEXT = "#6199E4"
-
-    def __init__(self):
-        super().__init__()
-
-    def get_shorten_text(self, text: str, parent_width: int):
-        metrics = QFontMetrics(self.font())
-        text = metrics.elidedText(
-            text,
-            Qt.TextElideMode.ElideMiddle,
-            parent_width - self.OFFSET
-        )
-        return text
-
-
-class WhiteTextWid(LabelShortText):
+class WhiteTextWid(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
@@ -132,11 +105,10 @@ class WhiteTextWid(LabelShortText):
         )
     
     
-class BlueTextWid(LabelShortText):
+class BlueTextWid(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
-        self.set_text()
         self.set_style()
 
     def set_text(self, parent_width: int):
@@ -162,12 +134,12 @@ class BlueTextWid(LabelShortText):
 
 class Thumb(QFrame):
     sym_star = "\U00002605"
-    # длина списка идентична cfg static pixmap sizes
-    thumb_heights = [130, 150, 185, 270]
-    thumb_widths = [145, 145, 180, 230]
-    img_wid_size = 0
-    thumb_width = 0
-    thumb_height = 0
+    wid_width = 0
+    wid_height = 0
+    img_wid_width = 0
+    img_wid_height = 0
+    img_wid_pixmap_size = 0
+
 
     def __init__(self, data_item: DataItem):
         super().__init__()
@@ -204,25 +176,29 @@ class Thumb(QFrame):
 
         self.setup()
 
+
     @classmethod
     def calculate_size(cls):
-        """Пересчет размеров миниатюр в зависимости от индекса размера."""
-        ind = Dynamic.thumb_size_index
-        cls.img_wid_size = Static.pixmap_sizes[ind]
-        cls.thumb_width = cls.thumb_widths[ind]
-        cls.thumb_height = cls.thumb_heights[ind]
+        ind = Dynamic.current_pixmap_size_index
+
+        Thumb.img_wid_pixmap_size = Static.thumb_widget_pixmap_size[ind]
+        Thumb.img_wid_width = Thumb.img_wid_pixmap_size + Static.img_wid_border
+        Thumb.img_wid_height = Thumb.img_wid_pixmap_size + Static.img_wid_border
+
+        Thumb.wid_width = Thumb.img_wid_width + Static.thumb_widget_extra_w
 
     def setup(self):
-        """Настройка миниатюры: текст, размеры, изображение."""
-        self.white_text_wid.set_text()
-        self.blue_text_wid.set_text()
-        self.img_wid.set_margins()
-        self.setFixedSize(self.thumb_width, self.thumb_height)
+        if self.width() == Thumb.wid_width:
+            return
 
-        self.img_wid.setFixedSize(self.img_wid_size, self.img_wid_size)
+        self.setFixedWidth(Thumb.wid_width)
+        self.img_wid.setFixedSize(Thumb.img_wid_width, Thumb.img_wid_height)
+
+        self.white_text_wid.set_text(Thumb.wid_width)
+        self.blue_text_wid.set_text(Thumb.wid_width)
 
         self.img_wid.setPixmap(
-            Utils.qiconed_resize(self.data_item.pixmap, self.img_wid_size)
+            Utils.qiconed_resize(self.data_item.pixmap, Thumb.img_wid_width)
         )
 
     def set_frame(self):
@@ -288,7 +264,8 @@ class Grid(VScrollArea):
     show_in_app = pyqtSignal(str)
     finished_ = pyqtSignal()
     collage = pyqtSignal(list)
-    
+
+    grid_spacing = 5
     resize_ms = 10
     copy_files_path = os.path.join(Static.common_icons, "copy_files.svg")
 
@@ -333,7 +310,7 @@ class Grid(VScrollArea):
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout(self.grid_wid)
-        self.grid_lay.setSpacing(1)
+        self.grid_lay.setSpacing(self.grid_spacing)
         self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
@@ -352,9 +329,21 @@ class Grid(VScrollArea):
                 wid.set_frame()
         self.rearrange()
 
+    def get_max_columns(self):
+        try:
+            # теперь виджет правильной ширины
+            # но теперь есть лишние спейсинги справа и слева в концах сетки
+            # что мы учитываем в total_w
+            thumb_w = Thumb.wid_width + self.grid_spacing
+            total_w = self.viewport().width() - (self.grid_spacing * 2)
+            return total_w // thumb_w
+        except ZeroDivisionError:
+            return 1
+
     def rearrange(self):
         self.grid_wid.hide()
-        max_col = self.width() // Thumb.thumb_widths[Dynamic.thumb_size_index]
+        # max_col = self.width() // Thumb.wid_width
+        max_col = self.get_max_columns()
         self.cell_to_wid.clear()
         for x, thumb in enumerate(self.url_to_wid.values()):
             row, col = divmod(x, max_col)

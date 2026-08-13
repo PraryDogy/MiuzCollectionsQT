@@ -36,7 +36,12 @@ class Static:
     jpeg_icons = os.path.join(icons, "jpeg_icons")
 
     max_thumb_size = 210
-    pixmap_sizes = [50, 70, 100, 170]
+    # размеры для QPixmap в виджете Thumb
+    thumb_widget_pixmap_size = [65, 80, 165]
+    # рамка вокруг QPixmap в виджете Thumb
+    img_wid_border = 10
+    # дополнительное пространство к ширине виджета Thumb
+    thumb_widget_extra_w = 40
 
     apps = [
         "preview",
@@ -74,7 +79,7 @@ class Dynamic:
     date_index: int = 0
     loaded_thumbs: int = 0
     search_widget_text: str = None
-    thumb_size_index: int = 2
+    current_pixmap_size_index: int = 1
     current_dir: str = os.sep
     sort_by_mod: bool = True
     filters_enabled: list[str] = []

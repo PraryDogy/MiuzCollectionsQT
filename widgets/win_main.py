@@ -893,15 +893,15 @@ class WinMain(UMainWindow):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.thumb_size_index < len(Static.pixmap_sizes) - 1:
-                    Dynamic.thumb_size_index += 1
-                    self.bar_bottom.slider._on_value_changed(Dynamic.thumb_size_index)
+                if Dynamic.current_pixmap_size_index < len(Static.thumb_widget_pixmap_size) - 1:
+                    Dynamic.current_pixmap_size_index += 1
+                    self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
 
         elif a0.key() == Qt.Key.Key_Minus:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.thumb_size_index > 0:
-                    Dynamic.thumb_size_index -= 1
-                    self.bar_bottom.slider._on_value_changed(Dynamic.thumb_size_index)
+                if Dynamic.current_pixmap_size_index > 0:
+                    Dynamic.current_pixmap_size_index -= 1
+                    self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
     
     def resizeEvent(self, a0):
         wid = self.splitter.widget(1)
