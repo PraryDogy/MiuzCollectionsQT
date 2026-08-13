@@ -393,7 +393,7 @@ class WinMain(UMainWindow):
                     wid = self.grid.url_to_wid.get(i.rel_img_path)
                     if wid:
                         wid.data_item.pixmap = Utils.pixmap_from_array(i.array)
-                        wid.setup()
+                        wid.set_text_and_size()
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
             else:
