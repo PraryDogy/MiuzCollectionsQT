@@ -143,20 +143,20 @@ class Thumb(QFrame):
             self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
 
         # --- Layout ---
-        self.v_layout = QVBoxLayout(self)
-        self.v_layout.setContentsMargins(0, 0, 0, 0)
-        self.v_layout.setSpacing(2)
-        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.v_lay = QVBoxLayout(self)
+        self.v_lay.setContentsMargins(0, 0, 0, 0)
+        self.v_lay.setSpacing(3)
+        self.v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # --- Виджеты ---
         self.img_wid = ThumbImgWidget()
-        self.v_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.v_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.white_text_wid = WhiteTextWid(self.data_item)
-        self.v_layout.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.blue_text_wid = BlueTextWid(self.data_item)
-        self.v_layout.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.v_lay.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = (
             f"{Lng.location[JsonData.lng_index]}: "
@@ -169,7 +169,6 @@ class Thumb(QFrame):
         self.setToolTip("\n".join([location, modified, ]))
 
         self.setup()
-
 
     @classmethod
     def calculate_size(cls):
@@ -188,7 +187,9 @@ class Thumb(QFrame):
 
         self.white_text_wid.set_text(Thumb.wid_width)
         self.blue_text_wid.set_text(Thumb.wid_width)
+        self.set_pixmap_with_actual_size()
 
+    def set_pixmap_with_actual_size(self):
         resized_pixmap = Utils.qiconed_resize(self.data_item.pixmap, Thumb.img_wid_pixmap_size)
         self.img_wid.setPixmap(resized_pixmap)
 
