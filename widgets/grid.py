@@ -27,7 +27,7 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
 
 class ThumbBaseLabel(QLabel):
     FONT_SIZE = 11
-    BLUE_TEXT = "#6199E4"
+    RGBA_BLUE = "#6199E4"
 
     def __init__(self):
         super().__init__()
@@ -44,8 +44,8 @@ class ThumbBaseLabel(QLabel):
 
 
 class ThumbImgWidget(ThumbBaseLabel):
-    border_radius = 10
-    gray_color = "rgba(128, 128, 128, 0.5)"
+    BORDER_RADIUS = 10
+    RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
 
     def __init__(self):
         super().__init__()
@@ -54,8 +54,8 @@ class ThumbImgWidget(ThumbBaseLabel):
     def set_framed_style(self):
         self.setStyleSheet(
             f"""
-                background: {self.gray_color};
-                border-radius: {self.border_radius}px;
+                background: {self.RGBA_GRAY};
+                border-radius: {self.BORDER_RADIUS}px;
             """
         )
     
@@ -63,12 +63,14 @@ class ThumbImgWidget(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 background: transparent;
-                border-radius: {self.border_radius}px;
+                border-radius: {self.BORDER_RADIUS}px;
             """
         )
 
 
 class WhiteTextWid(ThumbBaseLabel):
+    BORDER_RADIUS = 5
+
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
@@ -78,25 +80,24 @@ class WhiteTextWid(ThumbBaseLabel):
         text = self.get_shorten_text(self.data_item.filename, parent_width)
         self.setText(text)
 
-    def set_no_frame_style(self):
+    def set_framed_style(self):
         self.setStyleSheet(
             f"""
-                border-radius: 7px;
-                color: rgb(255,255,255);
-                background: palette(highlight);
-                border: 2px solid transparent;
-                padding-left: 2px;
-                padding-right: 2px;
+                background: {Static.rgba_blue};
                 font-size: {self.FONT_SIZE}px;
+                border-radius: {self.BORDER_RADIUS}px;
+                padding: 2px;
             """
         )
 
     def set_no_frame_style(self):
         self.setStyleSheet(
-        f"""
-            border: 2px solid transparent;
-            font-size: {self.FONT_SIZE}px;
-        """
+            f"""
+                background: transparent;
+                font-size: {self.FONT_SIZE}px;
+                border-radius: {self.BORDER_RADIUS}px;
+                padding: 2px;
+            """
         )
     
     
@@ -122,7 +123,7 @@ class BlueTextWid(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 font-size: {self.FONT_SIZE}px;
-                color: {self.BLUE_TEXT};
+                color: {self.RGBA_BLUE};
             """
         )
 
