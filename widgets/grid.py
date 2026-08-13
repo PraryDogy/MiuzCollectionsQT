@@ -136,7 +136,7 @@ class Thumb(QFrame):
     sym_star = "\U00002605"
     wid_width = 0
     wid_height = 0
-    img_wid_width = 0
+    img_wid_size = 0
     img_wid_height = 0
     img_wid_pixmap_size = 0
 
@@ -181,22 +181,20 @@ class Thumb(QFrame):
         ind = Dynamic.current_pixmap_size_index
 
         Thumb.img_wid_pixmap_size = Static.thumb_widget_pixmap_size[ind]
-        Thumb.img_wid_width = Thumb.img_wid_pixmap_size + Static.img_wid_border
-        Thumb.img_wid_height = Thumb.img_wid_pixmap_size + Static.img_wid_border
-
-        Thumb.wid_width = Thumb.img_wid_width + Static.thumb_widget_extra_w
+        Thumb.img_wid_size = Thumb.img_wid_pixmap_size + Static.img_wid_border
+        Thumb.wid_width = Thumb.img_wid_size + Static.thumb_widget_extra_w
 
     def setup(self):
         if self.width() == Thumb.wid_width:
             return
 
         self.setFixedWidth(Thumb.wid_width)
-        self.img_wid.setFixedSize(Thumb.img_wid_width, Thumb.img_wid_height)
+        self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
 
         self.white_text_wid.set_text(Thumb.wid_width)
         self.blue_text_wid.set_text(Thumb.wid_width)
 
-        resized_pixmap = Utils.qiconed_resize(self.data_item.pixmap, Thumb.img_wid_width)
+        resized_pixmap = Utils.qiconed_resize(self.data_item.pixmap, Thumb.img_wid_pixmap_size)
         self.img_wid.setPixmap(resized_pixmap)
 
     def set_frame(self):
