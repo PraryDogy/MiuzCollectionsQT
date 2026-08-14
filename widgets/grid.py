@@ -27,7 +27,7 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
 
 class ThumbBaseLabel(QLabel):
     FONT_SIZE = 11
-    RGBA_BLUE = "#6199E4"
+    BLUE_TEXT_WID_COLOR = "#6199E4"
 
     def __init__(self):
         super().__init__()
@@ -86,7 +86,7 @@ class WhiteTextWid(ThumbBaseLabel):
     def set_framed_style(self):
         self.setStyleSheet(
             f"""
-                background: {Static.rgba_blue};
+                background: palette(highlight);
                 font-size: {self.FONT_SIZE}px;
                 border-radius: {self.BORDER_RADIUS}px;
                 padding: 2px;
@@ -125,7 +125,7 @@ class BlueTextWid(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 font-size: {self.FONT_SIZE}px;
-                color: {self.RGBA_BLUE};
+                color: {self.BLUE_TEXT_WID_COLOR};
             """
         )
 
@@ -198,7 +198,7 @@ class Thumb(QFrame):
 
     def set_frame(self):
         self.img_wid.set_framed_style()
-        self.white_text_wid.set_no_frame_style()
+        self.white_text_wid.set_framed_style()
 
     def set_no_frame(self):
         self.img_wid.set_no_frame_style()
