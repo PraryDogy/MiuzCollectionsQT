@@ -138,7 +138,7 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
             miuz_collection_name = Mf.current_mf.mf_alias
 
         miuz_collection_name = self.get_shorten_text(miuz_collection_name, parent_width)
-        day_month_year = self.data_item.day_month_year
+        day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
         self.setText("\n".join((miuz_collection_name, day_month_year)))
 
     def set_style(self):

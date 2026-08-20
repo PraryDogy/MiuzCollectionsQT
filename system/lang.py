@@ -231,6 +231,7 @@ class Lng:
     search_in = ("Поиск в каталоге", "Search in catalog")
     indexing = ("Индексация файлов", "Indexing files")
     changed = ("Изменен", "Changed")
+    changed_short = ("Изм.", "Mod.")
     file_name = ("Имя файла", "File name")
     show_about = ("О приложении", "Аbout the app")
     alias_already_exists = (
