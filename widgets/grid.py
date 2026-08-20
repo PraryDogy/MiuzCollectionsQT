@@ -34,7 +34,7 @@ class ThumbBaseLabel(QLabel):
         # Эффект создается один раз для предотвращения утечек памяти
         self._opacity_effect = QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self._opacity_effect)
-        self.set_opacity(opacity_percent / 100)
+        self.set_opacity(opacity_percent)
 
     def get_shorten_text(self, text: str, parent_width: int, offset=5):
         metrics = QFontMetrics(self.font())
@@ -44,8 +44,8 @@ class ThumbBaseLabel(QLabel):
             max(0, parent_width - offset)
         )
 
-    def set_opacity(self, value: float):
-        self._opacity_effect.setOpacity(value)
+    def set_opacity(self, percent: int):
+        self._opacity_effect.setOpacity(percent / 100)
 
 
 class ThumbImgWidget(ThumbBaseLabel):
