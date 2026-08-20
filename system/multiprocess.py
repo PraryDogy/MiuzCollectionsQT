@@ -149,6 +149,39 @@ class OneFileInfo:
             )
         return text
 
+    @staticmethod
+    def lined_path(text: str, max_row=50) -> str:
+        if len(text) <= max_row:
+            return text
+        separator = os.sep
+        parts = text.split(separator)
+        lines = []
+        current_line = []
+
+        for part in parts:
+            # Считаем длину, которая получится, если добавить эту часть
+            # Прибавляем 1 для учета слэша (если это не первый элемент в строке)
+            potential_len = len(part) + (len(separator) if current_line else 0)
+            
+            if sum(len(p) for p in current_line) + len(current_line) - 1 + potential_len > max_row:
+                # Если превысили лимит, сохраняем текущую строку
+                if current_line:
+                    lines.append(separator.join(current_line) + separator)
+                    current_line = [part]
+                else:
+                    # Если одна папка длиннее max_row, то принудительно оставляем её на этой строке
+                    lines.append(part + separator)
+            else:
+                current_line.append(part)
+
+        # Добавляем остаток
+        if current_line:
+            lines.append(separator.join(current_line))
+
+        # Объединяем строки через стандартный перенос
+        return '\n'.join(lines)
+
+
 
 @dataclass(slots=True)
 class CopyTaskItem:

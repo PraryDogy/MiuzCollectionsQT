@@ -44,7 +44,7 @@ class WinInfo(UMainWidget):
             Lng.file_name[JsonData.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
             Lng.type_[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
             Lng.file_size[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-            Lng.location[JsonData.lng_index]: OneFileInfo.lined_text(self.path),
+            Lng.location[JsonData.lng_index]: OneFileInfo.lined_path(self.path),
             Lng.changed[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
             Lng.resol[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
         }
@@ -67,6 +67,8 @@ class WinInfo(UMainWidget):
         self.mod_label = selectable_labels[4]
         self.res_label = selectable_labels[5]
         self.load_info()
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
     def load_info(self):
 
@@ -94,7 +96,7 @@ class WinInfo(UMainWidget):
         if info_item.res:
             self.res_label.setText(info_item.res)
         else:
-            self.type_label.setText(info_item.type_)
+            self.type_label.setText(info_item.type_[1:])
             self.size_label.setText(info_item.size)
             self.mod_label.setText(info_item.mod)
 
