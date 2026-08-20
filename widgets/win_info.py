@@ -30,6 +30,12 @@ class Selectable(SelectableLabel):
         super().__init__(text)
         self.setStyleSheet("font-size: 11px;")
 
+    def contextMenuEvent(self, ev):
+        selection = self.selectedText()
+        if len(selection) == 0:
+            self.setSelection(0, len(self.text()))
+        return super().contextMenuEvent(ev)
+
 
 class WinInfo(UMainWidget):
     finished_ = pyqtSignal()
