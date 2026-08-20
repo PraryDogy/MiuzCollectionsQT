@@ -44,6 +44,16 @@ class MfScaner:
         super().__init__()
         self.scaner_item = scaner_item
         # Превращаем в словарь {abs_path: db_mod_time} для быстрого O(1) поиска
+
+
+        self.non_exist_dirs = []
+        self.changed_dirs = []
+        self.new_dirs = []
+
+        self.non_exist_images = []
+        self.changed_images = []
+        self.new_images = []
+
         self.db_dirs = dict(self.get_db_dirs())
         self.scan_and_sync()
 
@@ -61,14 +71,15 @@ class MfScaner:
         ]
 
     def scan_and_sync(self):
-        records_to_delete = []
-        records_to_insert = []
+        # records_to_delete = []
+        # records_to_insert = []
         
         # Шаг 1: Проверяем существующие в БД директории
         for dir_path, db_mod_time in self.db_dirs.items():
             if not os.path.exists(dir_path):
                 # Если папка была удалена физически
-                records_to_delete.append(dir_path)
+                # records_to_delete.append(dir_path)
+                self.non_exist_dirs.append(dir_path)
                 continue
                 
             # Получаем фактическое время из Finder (файловой системы)
@@ -76,25 +87,20 @@ class MfScaner:
             
             if fs_mod_time != db_mod_time:
                 # Директория изменилась -> пойдет под пересоздание
-                records_to_delete.append(dir_path)
-                records_to_insert.append((dir_path, fs_mod_time))
+                self.non_exist_dirs.append(dir_path)
+                self.new_dirs.append((dir_path, fs_mod_time))
                 
                 # Шаг 2: Ищем причину (новые вложенные папки)
                 # Так как папка изменилась, сканируем её уровень на наличие подпапок
-                self._collect_nested_new_dirs(dir_path, records_to_insert)
+                self._collect_nested_new_dirs(dir_path)
 
-        # Здесь запускаются ваши финальные запросы:
-        # 1. sqlalchemy.delete для records_to_delete
-        # 2. sqlalchemy.insert для records_to_insert
-        print("del", records_to_delete)
-        print("new", records_to_insert)
-
-    def _collect_nested_new_dirs(self, parent_dir: str, records_to_insert: list[str]):
+    def _collect_nested_new_dirs(self, parent_dir: str):
         """Рекурсивно обходит только те папки, которых вообще нет в БД."""
         try:
             iterator = os.scandir(parent_dir)
         except PermissionError:
             return
+        return
         for entry in iterator:
             if entry.is_dir():
                 child_path = entry.path
