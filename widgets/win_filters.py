@@ -3,9 +3,9 @@ import os
 from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в начало файла
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QDateEdit, QGroupBox, QHBoxLayout, QLabel,
-                             QSpacerItem, QSpinBox, QSplitter, QToolButton,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QDateEdit, QGraphicsOpacityEffect, QGroupBox,
+                             QHBoxLayout, QLabel, QSpacerItem, QSpinBox,
+                             QSplitter, QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -14,6 +14,35 @@ from system.lang import Lng
 from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
                             UMenu, UPushButton, UTextEdit, VListSpacerItem,
                             VListWidget, VListWidgetItem)
+
+
+class ReadableDateLabel(QLabel):
+
+    def __init__(self, opacity_percent: int = 60):
+        super().__init__()
+        self.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.setWordWrap(True)
+        self.set_style()
+        
+        # Создаем эффект один раз при инициализации
+        self._opacity_effect = QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self._opacity_effect)
+        self.set_opacity(opacity_percent)
+
+    def set_style(self):
+        self.setStyleSheet(
+            """
+                color: palette(text); 
+                font-weight: 500;
+            """
+        )
+
+    def set_opacity(self, percent: int):
+        """Изменяет прозрачность виджета (принимает значение от 0 до 100)"""
+        # Защита от выхода за границы [0, 100]
+        percent = max(0, min(100, percent))
+        self._opacity_effect.setOpacity(percent / 100.0)
+
 
 
 class DatesWidget(QGroupBox):
@@ -120,10 +149,10 @@ class DatesWidget(QGroupBox):
         self.main_layout.addWidget(HSep())
 
         # --- СТРОКА 3: Текстовое состояние ---
-        self.readable_date_label = QLabel()
-        self.readable_date_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.readable_date_label.setWordWrap(True)
-        self.readable_date_label.setStyleSheet("color: #555555; font-weight: 500;")
+        self.readable_date_label = ReadableDateLabel()
+        # self.readable_date_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # self.readable_date_label.setWordWrap(True)
+        # self.readable_date_label.setStyleSheet("color: #555555; font-weight: 500;")
         self.main_layout.addWidget(self.readable_date_label)
 
         # Инициализация логики
