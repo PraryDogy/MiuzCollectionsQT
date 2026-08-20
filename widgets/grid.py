@@ -1,10 +1,11 @@
 import os
+import re
 
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QDrag,
+from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QKeyEvent, QMouseEvent, QPixmap,
-                         QResizeEvent, QColor)
+                         QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
                              QGridLayout, QLabel, QRubberBand, QVBoxLayout,
@@ -104,7 +105,7 @@ class WhiteTextWid(ThumbBaseLabel):
         )
     
 
-class OneRowBlueText(ThumbBaseLabel):
+class BlueTextWidget(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
@@ -123,22 +124,22 @@ class OneRowBlueText(ThumbBaseLabel):
         )
 
 
-class TwoRowBlueText(ThumbBaseLabel):
+class MiuzBlueTextWidget(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
         self.set_style()
 
     def set_text(self, parent_width: int):
-        root = self.data_item.rel_path.strip(os.sep).split(os.sep)
-        if len(root) == 1:
-            root = os.path.basename(Mf.current_mf.mf_alias)
+        match = re.search(r"^/+(\d+\s+)?([^/]+)", self.data_item.rel_path)
+        if match:
+            miuz_collection_name = match.group(2)
         else:
-            root = root[0]
+            miuz_collection_name = Mf.current_mf.mf_alias
 
-        root = self.get_shorten_text(root, parent_width)
+        miuz_collection_name = self.get_shorten_text(miuz_collection_name, parent_width)
         day_month_year = self.data_item.day_month_year
-        self.setText("\n".join((root, day_month_year)))
+        self.setText("\n".join((miuz_collection_name, day_month_year)))
 
     def set_style(self):
         self.setStyleSheet(
@@ -155,7 +156,7 @@ class Thumb(QFrame):
     wid_height = 0
     img_wid_size = 0
     img_wid_height = 0
-    blue_text_class = OneRowBlueText
+    blue_text_class = BlueTextWidget
 
     def __init__(self, data_item: DataItem):
         super().__init__()
@@ -198,7 +199,7 @@ class Thumb(QFrame):
         Thumb.img_wid_size = Static.thumb_widget_pixmap_size[ind] + Static.img_wid_border
         Thumb.wid_width = Thumb.img_wid_size + Static.thumb_widget_extra_w
         if os.path.exists(Static.miuz_zip):
-            Thumb.blue_text_class = TwoRowBlueText
+            Thumb.blue_text_class = MiuzBlueTextWidget
 
     def set_pixmap_with_actual_size(self):
         qimage = self.data_item.qimages[Dynamic.current_pixmap_size_index]
