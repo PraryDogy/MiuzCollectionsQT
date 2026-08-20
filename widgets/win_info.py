@@ -13,7 +13,7 @@ from ._base_widgets import SelectableLabel, UMainWidget
 
 
 class ULabel(QLabel):
-    def __init__(self, text: str, opacity_percent=80):
+    def __init__(self, text: str, opacity_percent=70):
         super().__init__(text=text)
         self.setStyleSheet("font-size: 11px;")
 
@@ -104,7 +104,7 @@ class WinInfo(UMainWidget):
         if info_item.res:
             self.res_label.setText(info_item.res)
         else:
-            self.type_label.setText(info_item.type_[1:])
+            self.type_label.setText(f"{Lng.image[JsonData.lng_index]} {info_item.type_[1:]}")
             self.size_label.setText(info_item.size)
             self.mod_label.setText(info_item.mod)
 
