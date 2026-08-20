@@ -254,11 +254,11 @@ class WinImageView(UMainWidget):
 
         self.prev_image_btn = PrevButton()
         self.prev_image_btn.setParent(self)
-        self.prev_image_btn.clicked.connect(lambda: self.switch_image(1))
+        self.prev_image_btn.clicked.connect(lambda: self.switch_image(-1))
 
         self.next_image_btn = NextButton()
         self.next_image_btn.setParent(self)
-        self.next_image_btn.clicked.connect(lambda: self.switch_image(-1))
+        self.next_image_btn.clicked.connect(lambda: self.switch_image(1))
 
         self.zoom_btns = ZoomWidget()
         self.zoom_btns.setParent(self)
