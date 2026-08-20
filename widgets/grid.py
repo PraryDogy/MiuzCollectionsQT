@@ -228,11 +228,6 @@ class Thumb(QFrame):
         self.img_wid.set_no_frame_style()
         self.white_text_wid.set_no_frame_style()
 
-    def set_transparent_frame(self, value: float):
-        effect = QGraphicsOpacityEffect(self)
-        effect.setOpacity(value)
-        self.setGraphicsEffect(effect)
-
     def set_fav(self, value: int):
         if value == 0:
             self.data_item.fav = 0
