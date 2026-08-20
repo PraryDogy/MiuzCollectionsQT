@@ -151,7 +151,6 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
         )
 
 
-
 class Thumb(QFrame):
     sym_star = "\U00002605"
     wid_width = 0

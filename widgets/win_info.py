@@ -44,7 +44,7 @@ class WinInfo(UMainWidget):
             Lng.file_name[JsonData.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
             Lng.type_[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
             Lng.file_size[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-            Lng.place[JsonData.lng_index]: OneFileInfo.lined_text(self.path),
+            Lng.location[JsonData.lng_index]: OneFileInfo.lined_text(self.path),
             Lng.changed[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
             Lng.resol[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
         }
