@@ -26,15 +26,18 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       WinInfoAction)
 
 
-class ThumbBaseLabel(QLabel):
-    FONT_SIZE = 11
-    RGBA_BLUE = "rgba(97, 153, 228, 0.7)"
-    RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
-    RGBA_WHITE = "rgba(255, 255, 255, 0.8)"
+THUMB_FONT_SIZE = 11
+THUMB_IMG_BORDER_RADIUS = 10
+THUMB_WHITE_TEXT_BORDER_RADIUS = 5
+RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
 
-    def __init__(self):
+
+class ThumbBaseLabel(QLabel):
+
+    def __init__(self, opacity_percent: int = 100):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.set_opacity(opacity_percent / 100)
 
     def get_shorten_text(self, text: str, parent_width: int, offset = 5):
         metrics = QFontMetrics(self.font())
@@ -45,9 +48,13 @@ class ThumbBaseLabel(QLabel):
         )
         return text
 
+    def set_opacity(self, value: float):
+        effect = QGraphicsOpacityEffect(self)
+        effect.setOpacity(value)
+        self.setGraphicsEffect(effect)
+
 
 class ThumbImgWidget(ThumbBaseLabel):
-    BORDER_RADIUS = 10
 
     def __init__(self):
         super().__init__()
@@ -56,8 +63,8 @@ class ThumbImgWidget(ThumbBaseLabel):
     def set_framed_style(self):
         self.setStyleSheet(
             f"""
-                background: {self.RGBA_GRAY};
-                border-radius: {self.BORDER_RADIUS}px;
+                background: {RGBA_GRAY};
+                border-radius: {THUMB_IMG_BORDER_RADIUS}px;
             """
         )
     
@@ -65,13 +72,12 @@ class ThumbImgWidget(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 background: transparent;
-                border-radius: {self.BORDER_RADIUS}px;
+                border-radius: {THUMB_IMG_BORDER_RADIUS}px;
             """
         )
 
 
 class WhiteTextWid(ThumbBaseLabel):
-    BORDER_RADIUS = 5
 
     def __init__(self, data_item: DataItem):
         super().__init__()
@@ -86,10 +92,10 @@ class WhiteTextWid(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 background: palette(highlight);
-                font-size: {self.FONT_SIZE}px;
-                border-radius: {self.BORDER_RADIUS}px;
+                font-size: {THUMB_FONT_SIZE}px;
+                border-radius: {THUMB_WHITE_TEXT_BORDER_RADIUS}px;
                 padding: 2px;
-                color: {self.RGBA_WHITE};
+                color: palette(text);
             """
         )
 
@@ -97,17 +103,17 @@ class WhiteTextWid(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 background: transparent;
-                font-size: {self.FONT_SIZE}px;
-                border-radius: {self.BORDER_RADIUS}px;
+                font-size: {THUMB_FONT_SIZE}px;
+                border-radius: {THUMB_WHITE_TEXT_BORDER_RADIUS}px;
                 padding: 2px;
-                color: {self.RGBA_WHITE};
+                color: palette(text);
             """
         )
     
 
 class BlueTextWidget(ThumbBaseLabel):
-    def __init__(self, data_item: DataItem):
-        super().__init__()
+    def __init__(self, data_item: DataItem, opacity_percent: int = 40):
+        super().__init__(opacity_percent)
         self.data_item = data_item
         self.set_style()
 
@@ -118,17 +124,19 @@ class BlueTextWidget(ThumbBaseLabel):
     def set_style(self):
         self.setStyleSheet(
             f"""
-                font-size: {self.FONT_SIZE}px;
-                color: {self.RGBA_BLUE};
+                font-size: {THUMB_FONT_SIZE}px;
+                color: font-color: palette(text);;
             """
         )
 
 
+
 class MiuzBlueTextWidget(ThumbBaseLabel):
-    def __init__(self, data_item: DataItem):
-        super().__init__()
+    def __init__(self, data_item: DataItem, opacity_percent: int = 40):
+        super().__init__(opacity_percent)
         self.data_item = data_item
         self.set_style()
+        self.set_opacity(opacity_percent / 100)
 
     def set_text(self, parent_width: int):
         match = re.search(r"^/+(\d+\s+)?([^/]+)", self.data_item.rel_path)
@@ -144,8 +152,8 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
     def set_style(self):
         self.setStyleSheet(
             f"""
-                font-size: {self.FONT_SIZE}px;
-                color: {self.RGBA_BLUE};
+                font-size: {THUMB_FONT_SIZE}px;
+                color: palette(color);
             """
         )
 
