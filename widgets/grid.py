@@ -30,6 +30,7 @@ class ThumbBaseLabel(QLabel):
     FONT_SIZE = 11
     RGBA_BLUE = "rgba(97, 153, 228, 0.7)"
     RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
+    RGBA_WHITE = "rgba(255, 255, 255, 0.8)"
 
     def __init__(self):
         super().__init__()
@@ -88,6 +89,7 @@ class WhiteTextWid(ThumbBaseLabel):
                 font-size: {self.FONT_SIZE}px;
                 border-radius: {self.BORDER_RADIUS}px;
                 padding: 2px;
+                color: {self.RGBA_WHITE};
             """
         )
 
@@ -98,6 +100,7 @@ class WhiteTextWid(ThumbBaseLabel):
                 font-size: {self.FONT_SIZE}px;
                 border-radius: {self.BORDER_RADIUS}px;
                 padding: 2px;
+                color: {self.RGBA_WHITE};
             """
         )
     
