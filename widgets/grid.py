@@ -28,7 +28,8 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
 
 class ThumbBaseLabel(QLabel):
     FONT_SIZE = 11
-    BLUE_TEXT_WID_COLOR = "#6199E4"
+    RGBA_BLUE = "rgba(97, 153, 228, 0.7)"
+    RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
 
     def __init__(self):
         super().__init__()
@@ -46,8 +47,6 @@ class ThumbBaseLabel(QLabel):
 
 class ThumbImgWidget(ThumbBaseLabel):
     BORDER_RADIUS = 10
-    RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
-    PADDING = 0
 
     def __init__(self):
         super().__init__()
@@ -58,7 +57,6 @@ class ThumbImgWidget(ThumbBaseLabel):
             f"""
                 background: {self.RGBA_GRAY};
                 border-radius: {self.BORDER_RADIUS}px;
-                padding: {self.PADDING}px;
             """
         )
     
@@ -67,7 +65,6 @@ class ThumbImgWidget(ThumbBaseLabel):
             f"""
                 background: transparent;
                 border-radius: {self.BORDER_RADIUS}px;
-                padding: {self.PADDING}px;
             """
         )
 
@@ -112,14 +109,14 @@ class BlueTextWidget(ThumbBaseLabel):
         self.set_style()
 
     def set_text(self, parent_width: int):
-        day_month_year = self.data_item.day_month_year
+        day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
         self.setText(day_month_year)
 
     def set_style(self):
         self.setStyleSheet(
             f"""
                 font-size: {self.FONT_SIZE}px;
-                color: {self.BLUE_TEXT_WID_COLOR};
+                color: {self.RGBA_BLUE};
             """
         )
 
@@ -139,13 +136,13 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
 
         miuz_collection_name = self.get_shorten_text(miuz_collection_name, parent_width)
         day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
-        self.setText("\n".join((miuz_collection_name, day_month_year)))
+        self.setText("\n".join((day_month_year, miuz_collection_name)))
 
     def set_style(self):
         self.setStyleSheet(
             f"""
                 font-size: {self.FONT_SIZE}px;
-                color: {self.BLUE_TEXT_WID_COLOR};
+                color: {self.RGBA_BLUE};
             """
         )
 
