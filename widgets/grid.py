@@ -183,7 +183,7 @@ class Thumb(QFrame):
 
         location = (
             f"{Lng.location[JsonData.lng_index]}: "
-            f"{Mf.current_mf.mf_alias}{self.data_item.rel_path}"
+            f"{Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
         )
         modified = (
             f"{Lng.modified[JsonData.lng_index]}: "
