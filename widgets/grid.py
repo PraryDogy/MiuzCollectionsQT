@@ -103,8 +103,27 @@ class WhiteTextWid(ThumbBaseLabel):
             """
         )
     
-    
-class BlueTextWid(ThumbBaseLabel):
+
+class OneRowBlueText(ThumbBaseLabel):
+    def __init__(self, data_item: DataItem):
+        super().__init__()
+        self.data_item = data_item
+        self.set_style()
+
+    def set_text(self, parent_width: int):
+        day_month_year = self.data_item.day_month_year
+        self.setText(day_month_year)
+
+    def set_style(self):
+        self.setStyleSheet(
+            f"""
+                font-size: {self.FONT_SIZE}px;
+                color: {self.BLUE_TEXT_WID_COLOR};
+            """
+        )
+
+
+class TwoRowBlueText(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
@@ -136,6 +155,7 @@ class Thumb(QFrame):
     wid_height = 0
     img_wid_size = 0
     img_wid_height = 0
+    blue_text_class = OneRowBlueText
 
     def __init__(self, data_item: DataItem):
         super().__init__()
@@ -157,7 +177,7 @@ class Thumb(QFrame):
         self.white_text_wid = WhiteTextWid(self.data_item)
         self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.blue_text_wid = BlueTextWid(self.data_item)
+        self.blue_text_wid = self.blue_text_class(self.data_item)
         self.v_lay.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         location = (
@@ -175,9 +195,10 @@ class Thumb(QFrame):
     @classmethod
     def calculate_size(cls):
         ind = Dynamic.current_pixmap_size_index
-
         Thumb.img_wid_size = Static.thumb_widget_pixmap_size[ind] + Static.img_wid_border
         Thumb.wid_width = Thumb.img_wid_size + Static.thumb_widget_extra_w
+        if os.path.exists(Static.miuz_zip):
+            Thumb.blue_text_class = TwoRowBlueText
 
     def set_pixmap_with_actual_size(self):
         qimage = self.data_item.qimages[Dynamic.current_pixmap_size_index]
