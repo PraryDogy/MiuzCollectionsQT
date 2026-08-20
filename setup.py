@@ -68,8 +68,10 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 DATA_FILES = [
     *include_files(Static.icons),
     *include_files(Static.scripts),
-    Static.miuz_zip
     ]
+
+if os.path.exists(Static.miuz_zip):
+    DATA_FILES.append(Static.miuz_zip)
 
 
 # ****************** DON'T CHANGE IT ******************
