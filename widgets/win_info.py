@@ -2,7 +2,8 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtWidgets import QGridLayout, QLabel, QSpacerItem, QWidget
+from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QGridLayout, QLabel,
+                             QSpacerItem, QWidget)
 
 from cfg import JsonData
 from system.lang import Lng
@@ -12,9 +13,16 @@ from ._base_widgets import SelectableLabel, UMainWidget
 
 
 class ULabel(QLabel):
-    def __init__(self, text: str):
+    def __init__(self, text: str, opacity_percent=80):
         super().__init__(text=text)
         self.setStyleSheet("font-size: 11px;")
+
+        self._opacity_effect = QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self._opacity_effect)
+        self.set_opacity(opacity_percent)
+
+    def set_opacity(self, percent: int):
+        self._opacity_effect.setOpacity(percent / 100)
 
 
 class Selectable(SelectableLabel):
