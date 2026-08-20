@@ -36,6 +36,9 @@ class Selectable(SelectableLabel):
             self.setSelection(0, len(self.text()))
         return super().contextMenuEvent(ev)
 
+    # def mousePressEvent(self, ev):
+    #     self.setSelection(0, 0)
+    #     return super().mousePressEvent(ev)
 
 class WinInfo(UMainWidget):
     finished_ = pyqtSignal()
