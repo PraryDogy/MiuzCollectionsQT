@@ -25,41 +25,33 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
                       WinInfoAction)
 
-# Выносим регулярное выражение на уровень модуля, чтобы не компилировать его внутри метода
-COLLECTION_RE = re.compile(r"^/+(?:\d+\s+)?([^/]+)")
-
-THUMB_FONT_SIZE = 11
-THUMB_IMG_BORDER_RADIUS = 10
-THUMB_WHITE_TEXT_BORDER_RADIUS = 5
-RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
-
 
 class ThumbBaseLabel(QLabel):
-
     def __init__(self, opacity_percent: int = 100):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        # Оптимизация: создаем эффект ОДИН раз и сохраняем ссылку
+        # Эффект создается один раз для предотвращения утечек памяти
         self._opacity_effect = QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self._opacity_effect)
         self.set_opacity(opacity_percent / 100)
 
     def get_shorten_text(self, text: str, parent_width: int, offset=5):
-        # Оптимизация: QFontMetrics лучше кэшировать, если шрифты везде одинаковые
         metrics = QFontMetrics(self.font())
         return metrics.elidedText(
             text,
             Qt.TextElideMode.ElideMiddle,
-            max(0, parent_width - offset)  # Защита от отрицательного width
+            max(0, parent_width - offset)
         )
 
     def set_opacity(self, value: float):
-        # Переиспользуем существующий эффект вместо создания нового
         self._opacity_effect.setOpacity(value)
 
 
 class ThumbImgWidget(ThumbBaseLabel):
+    # Инкапсулированные статические переменные
+    BORDER_RADIUS = 10
+    RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
 
     def __init__(self):
         super().__init__()
@@ -67,16 +59,19 @@ class ThumbImgWidget(ThumbBaseLabel):
 
     def set_framed_style(self):
         self.setStyleSheet(
-            f"background: {RGBA_GRAY}; border-radius: {THUMB_IMG_BORDER_RADIUS}px;"
+            f"background: {self.RGBA_GRAY}; border-radius: {self.BORDER_RADIUS}px;"
         )
     
     def set_no_frame_style(self):
         self.setStyleSheet(
-            f"background: transparent; border-radius: {THUMB_IMG_BORDER_RADIUS}px;"
+            f"background: transparent; border-radius: {self.BORDER_RADIUS}px;"
         )
 
 
 class WhiteTextWid(ThumbBaseLabel):
+    # Инкапсулированные статические переменные
+    FONT_SIZE = 11
+    BORDER_RADIUS = 5
 
     def __init__(self, data_item: DataItem):
         super().__init__()
@@ -91,10 +86,10 @@ class WhiteTextWid(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 background: palette(highlight);
-                font-size: {THUMB_FONT_SIZE}px;
-                border-radius: {THUMB_WHITE_TEXT_BORDER_RADIUS}px;
+                font-size: {self.FONT_SIZE}px;
+                border-radius: {self.BORDER_RADIUS}px;
                 padding: 2px;
-                color: palette(highlighted-text); /* Исправлено: текст на выделении */
+                color: palette(highlighted-text);
             """
         )
 
@@ -102,8 +97,8 @@ class WhiteTextWid(ThumbBaseLabel):
         self.setStyleSheet(
             f"""
                 background: transparent;
-                font-size: {THUMB_FONT_SIZE}px;
-                border-radius: {THUMB_WHITE_TEXT_BORDER_RADIUS}px;
+                font-size: {self.FONT_SIZE}px;
+                border-radius: {self.BORDER_RADIUS}px;
                 padding: 2px;
                 color: palette(text);
             """
@@ -111,6 +106,9 @@ class WhiteTextWid(ThumbBaseLabel):
     
 
 class BlueTextWidget(ThumbBaseLabel):
+    # Инкапсулированная статическая переменная
+    FONT_SIZE = 11
+
     def __init__(self, data_item: DataItem, opacity_percent: int = 40):
         super().__init__(opacity_percent)
         self.data_item = data_item
@@ -121,24 +119,25 @@ class BlueTextWidget(ThumbBaseLabel):
         self.setText(day_month_year)
 
     def set_style(self):
-        # Исправлена синтаксическая ошибка 'color: font-color:'
         self.setStyleSheet(
-            f"font-size: {THUMB_FONT_SIZE}px; color: palette(text);"
+            f"font-size: {self.FONT_SIZE}px; color: palette(text);"
         )
 
 
 class MiuzBlueTextWidget(ThumbBaseLabel):
+    # Инкапсулированные статические переменные
+    FONT_SIZE = 11
+    COLLECTION_RE = re.compile(r"^/+(?:\d+\s+)?([^/]+)")
+
     def __init__(self, data_item: DataItem, opacity_percent: int = 40):
         super().__init__(opacity_percent)
         self.data_item = data_item
         self.set_style()
-        # Лишний вызов set_opacity удален (он уже отработал в super().__init__)
 
     def set_text(self, parent_width: int):
-        # Оптимизация: используем предкомпилированное регулярное выражение
-        match = COLLECTION_RE.search(self.data_item.rel_path)
+        match = self.COLLECTION_RE.search(self.data_item.rel_path)
         if match:
-            miuz_collection_name = match.group(1) # Исправлена группа захвата
+            miuz_collection_name = match.group(1)
         else:
             miuz_collection_name = Mf.current_mf.mf_alias
 
@@ -147,10 +146,10 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
         self.setText(f"{day_month_year}\n{miuz_collection_name}")
 
     def set_style(self):
-        # Исправлено: заменено несуществующее palette(color) на palette(text)
         self.setStyleSheet(
-            f"font-size: {THUMB_FONT_SIZE}px; color: palette(text);"
+            f"font-size: {self.FONT_SIZE}px; color: palette(text);"
         )
+
 
 
 class Thumb(QFrame):
