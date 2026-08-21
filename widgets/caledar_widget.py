@@ -244,16 +244,21 @@ class Calendar(UMainWidget):
         self.update_calendar()
 
     def year_menu_selected(self):
-        action = self.sender()
-        if action:
-            selected_year = action.data()
-            target_day = min(self.current_date.day(), QDate(selected_year, self.current_date.month(), 1).daysInMonth())
-            self.current_date = QDate(selected_year, self.current_date.month(), target_day)
-            self.update_calendar()
+        action: QAction = self.sender()
+        selected_year = action.data()
+        current_month = self.current_date.month()
+        current_day = self.current_date.day()
+        days_in_new_month = QDate(selected_year, current_month, 1).daysInMonth()
+        if current_day > days_in_new_month:
+            target_day = days_in_new_month
+        else:
+            target_day = current_day
+        self.current_date = QDate(selected_year, current_month, target_day)
+        self.update_calendar()
 
-    # Смена дня при клике на сетку чисел
-    def day_selected(self, day_num: int):
-        self.current_date = QDate(self.current_date.year(), self.current_date.month(), day_num)
+    def day_selected(self, day: int):
+        new_date = QDate(self.current_date.year(), self.current_date.month(), day)
+        self.current_date = new_date
         self.update_calendar()
 
     # Стрелки теперь листают месяцы вперед/назад с сохранением лимитов по годам
@@ -277,11 +282,6 @@ class Calendar(UMainWidget):
             widget = item.widget()
             if widget is not None:
                 widget.deleteLater()
-
-    def day_clicked(self, day: int):
-        new_date = QDate(self.current_date.year(), self.current_date.month(), day)
-        self.current_date = new_date
-        self.update_calendar()
 
     def update_calendar(self):
         self.update_dynamic_label()
@@ -327,7 +327,7 @@ class Calendar(UMainWidget):
             else:
                 btn_day = CalendarDay(str(current_day))
             btn_day.clicked.connect(
-                lambda d=current_day: self.day_clicked(d)
+                lambda d=current_day: self.day_selected(d)
             )
 
             btn_day.setFixedSize(*self.cell_size)
