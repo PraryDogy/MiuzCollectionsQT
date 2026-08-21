@@ -137,19 +137,17 @@ class UTextEdit(QTextEdit):
 
 
 class UGroupBox(QGroupBox):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
         self.setStyleSheet(
             """
             QGroupBox {
-                background-color: palette(window);
+                background-color: palette(tooltip-base);
                 border: 1px solid palette(mid);
                 border-radius: 5px;
-                /* Добавляем отступ сверху, чтобы рамка не пересекала текст заголовка */
                 margin-top: 12px; 
             }
             
-            /* Стилизуем сам текст заголовка, чтобы он аккуратно сидел сверху */
             QGroupBox::title {
                 subcontrol-origin: margin;
                 subcontrol-position: top left;
