@@ -271,18 +271,14 @@ CalendarBigDate {
     font-size: 30pt;
 }
 
-
 CalendarWeek {
     color: #888888;
 }
 
-
-/* Обычное число месяца */
 CalendarDay {
     color: #ffffff;
 }
 
-/* Выделенное число месяца */
 CalendarDaySelected {
     color: #FFFFFF;
     background-color: #0078D4;

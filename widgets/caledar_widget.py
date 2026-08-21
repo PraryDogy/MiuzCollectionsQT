@@ -236,8 +236,7 @@ class Calendar(UMainWidget):
                 widget.deleteLater()
 
     def day_clicked(self, day: int):
-        new_date = QDate(day, self.current_date.month(), self.current_date.year())
-        print(new_date)
+        new_date = QDate(self.current_date.year(), self.current_date.month(), day)
         self.current_date = new_date
         self.update_calendar()
 
