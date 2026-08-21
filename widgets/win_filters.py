@@ -18,31 +18,10 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UGroupBox,
 
 class ReadableDateLabel(QLabel):
 
-    def __init__(self, opacity_percent: int = 60):
+    def __init__(self):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.setWordWrap(True)
-        self.set_style()
-        
-        # Создаем эффект один раз при инициализации
-        self._opacity_effect = QGraphicsOpacityEffect(self)
-        self.setGraphicsEffect(self._opacity_effect)
-        self.set_opacity(opacity_percent)
-
-    def set_style(self):
-        self.setStyleSheet(
-            """
-                color: palette(text); 
-                font-weight: 500;
-            """
-        )
-
-    def set_opacity(self, percent: int):
-        """Изменяет прозрачность виджета (принимает значение от 0 до 100)"""
-        # Защита от выхода за границы [0, 100]
-        percent = max(0, min(100, percent))
-        self._opacity_effect.setOpacity(percent / 100.0)
-
 
 
 class DatesWidget(UGroupBox):
@@ -150,9 +129,6 @@ class DatesWidget(UGroupBox):
 
         # --- СТРОКА 3: Текстовое состояние ---
         self.readable_date_label = ReadableDateLabel()
-        # self.readable_date_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        # self.readable_date_label.setWordWrap(True)
-        # self.readable_date_label.setStyleSheet("color: #555555; font-weight: 500;")
         self.main_layout.addWidget(self.readable_date_label)
 
         # Инициализация логики

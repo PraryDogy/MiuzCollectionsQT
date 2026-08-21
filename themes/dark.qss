@@ -255,3 +255,10 @@ USpinBox::down-arrow {
     width: 9px;
     height: 9px;
 }
+
+
+
+ReadableDateLabel {
+    color: #7d7d7d; 
+    font-weight: 500;
+}
