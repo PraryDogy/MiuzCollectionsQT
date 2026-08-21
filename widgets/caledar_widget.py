@@ -201,34 +201,47 @@ class Calendar(UMainWidget):
         self.update_calendar()
 
     def update_dynamic_label(self):        
-        readable_date = self.q_locale.toString(self.current_date, "d MMMM yyyy")
+        readable_date = self.q_locale.toString(
+            self.current_date,
+            "d MMMM yyyy"
+        )
         self.dynamic_label.setText(readable_date)
 
     def populate_months(self):
         self.menu_month.clear()
-        for m in range(1, 13):
-            month_name = self.q_locale.standaloneMonthName(m, QLocale.FormatType.LongFormat).capitalize()
-            action = QAction(month_name, self)
-            action.setData(m)
+        for month in range(1, 13):
+            month_name = self.q_locale.standaloneMonthName(
+                month,
+                QLocale.FormatType.LongFormat
+            )
+            action = QAction(month_name.capitalize(), self)
+            action.setData(month)
             action.triggered.connect(self.month_menu_selected)
             self.menu_month.addAction(action)
 
     def populate_years(self):
         self.menu_year.clear()
         max_year = QDate.currentDate().year()
-        for y in range(self.min_year, max_year + 1):
-            action = QAction(str(y), self)
-            action.setData(y)
+        for year in range(self.min_year, max_year + 1):
+            action = QAction(str(year), self)
+            action.setData(year)
             action.triggered.connect(self.year_menu_selected)
             self.menu_year.addAction(action)
 
     def month_menu_selected(self):
-        action = self.sender()
-        if action:
-            selected_month = action.data()
-            target_day = min(self.current_date.day(), QDate(self.current_date.year(), selected_month, 1).daysInMonth())
-            self.current_date = QDate(self.current_date.year(), selected_month, target_day)
-            self.update_calendar()
+        action: QAction = self.sender()
+        selected_month = action.data()
+        year = self.current_date.year()
+        current_day = self.current_date.day()
+        # 1. Узнаем, сколько всего дней в выбранном месяце
+        days_in_new_month = QDate(year, selected_month, 1).daysInMonth()
+        # 2. Если текущий день больше, чем дней в новом месяце, берем максимум для этого месяца
+        if current_day > days_in_new_month:
+            target_day = days_in_new_month
+        else:
+            target_day = current_day
+        self.current_date = QDate(year, selected_month, target_day)
+        self.update_calendar()
 
     def year_menu_selected(self):
         action = self.sender()
