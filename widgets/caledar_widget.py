@@ -102,12 +102,12 @@ class Calendar(UMainWidget):
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def init_ui(self):
-        # Большая дата (теперь на обычном QWidget вместо QGroupBox)
+        # --- 1. Блок большой даты ---
         dynamic_container = QWidget()
-        self.central_layout.addWidget(dynamic_container)
+        self.central_layout.addWidget(dynamic_container) # Добавляем сразу
+        
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-
         dynamic_container_lay.addSpacing(5)
 
         calendar_icon = QSvgWidget()
@@ -117,61 +117,58 @@ class Calendar(UMainWidget):
 
         self.dynamic_label = CalendarBigDate()
         dynamic_container_lay.addWidget(self.dynamic_label)
-
         dynamic_container_lay.addStretch()
 
+        # --- Разделитель ---
         self.central_layout.addSpacing(5)
-        self.central_layout.addWidget(HSep())
+        self.central_layout.addWidget(HSep()) # Добавляем сразу
 
-        # Календарь навигация
+        # --- 2. Блок навигации календаря ---
         self.nav_widget = QWidget()
         self.nav_widget.setFixedHeight(self.cell_size[0])
+        self.central_layout.addWidget(self.nav_widget) # Добавляем сразу
+        
         self.nav_layout = QHBoxLayout(self.nav_widget)
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
+        self.nav_layout.setSpacing(0)
 
         self.btn_prev = CalendarSvgNavi(self.svg_previous)
         self.btn_prev.setFixedSize(*self.svg_nav)
         self.btn_prev.clicked.connect(self.prev_month)
+        self.nav_layout.addWidget(self.btn_prev)
+
+        self.nav_layout.addStretch()
         
         self.btn_month = UPushButton("")
         self.menu_month = QMenu(self)
         self.btn_month.setMenu(self.menu_month)
         self.populate_months()
+        self.nav_layout.addWidget(self.btn_month)
+
+        self.nav_layout.addSpacing(10)
 
         self.btn_year = UPushButton("")
         self.menu_year = QMenu(self)
         self.btn_year.setMenu(self.menu_year)
         self.populate_years()
+        self.nav_layout.addWidget(self.btn_year)
+
+        self.nav_layout.addStretch()
         
         self.btn_next = CalendarSvgNavi(self.svg_next)
         self.btn_next.setFixedSize(*self.svg_nav)
         self.btn_next.clicked.connect(self.next_month)
-        
-        self.nav_layout.addSpacing(10)
-        self.nav_layout.addWidget(self.btn_prev)
-        self.nav_layout.addStretch()
-        self.nav_layout.addWidget(self.btn_month)
-        self.nav_layout.addWidget(self.btn_year)
-        self.nav_layout.addStretch()
         self.nav_layout.addWidget(self.btn_next)
-        self.nav_layout.addSpacing(10)
-        
-        # Добавляем навигацию напрямую в главный макет
-        self.central_layout.addWidget(self.nav_widget)
 
-        # --- Сетка для дней недели и чисел ---
+        # --- 3. Сетка для дней недели и чисел ---
         self.grid_widget = QWidget()  
+        self.central_layout.addWidget(self.grid_widget) # Добавляем сразу
         
         self.grid_layout = QGridLayout(self.grid_widget)  
         self.grid_layout.setContentsMargins(0, 0, 0, 0)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        
         self.grid_layout.setHorizontalSpacing(self.grid_h_spacing)
         self.grid_layout.setVerticalSpacing(self.grid_v_spacing)
-        
-        # Добавляем сетку напрямую в главный макет
-        self.central_layout.addWidget(self.grid_widget)
-
 
         
         self.update_calendar()
