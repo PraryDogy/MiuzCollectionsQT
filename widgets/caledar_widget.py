@@ -49,30 +49,31 @@ class CalendarSvgNavi(QSvgWidget):
 
 class CalendarDayBase(QLabel):
     clicked = pyqtSignal()
-
-    def __init__(self, text: str):
+    def __init__(self, text: str, day: int):
         super().__init__(text)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.day: int = day
 
-    def mouseReleaseEvent(self, ev):
+    def mouseReleaseEvent(self, ev: QMouseEvent):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         return super().mouseReleaseEvent(ev)
 
-
+    
 class CalendarDay(CalendarDayBase):
-    def __init__(self, text):
-        super().__init__(text)
+    def __init__(self, text: str, day: int):
+        super().__init__(text, day)
 
 
 class CalendarDaySelected(CalendarDayBase):
-    def __init__(self, text):
-        super().__init__(text)
+    def __init__(self, text: str, day: int):
+        super().__init__(text, day)
 
 
-class CalendarWeek(CalendarDayBase):
+class CalendarWeek(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
 class CalendarSep(HSep):
@@ -260,7 +261,7 @@ class Calendar(UMainWidget):
 
     def day_selected(self):
         sender_button: CalendarDayBase = self.sender()
-        day = sender_button.property(self.day_property)
+        day = sender_button.day
         current_year = self.current_date.year()
         current_month = self.current_date.month()
         self.current_date = QDate(current_year, current_month, day)
@@ -318,10 +319,9 @@ class Calendar(UMainWidget):
         row = 1
         for day in range(1, days_in_month + 1):
             if day == current_day_val:
-                btn_day = CalendarDaySelected(str(day))
+                btn_day = CalendarDaySelected(str(day), day)
             else:
-                btn_day = CalendarDay(str(day))
-            btn_day.setProperty(self.day_property, day)
+                btn_day = CalendarDay(str(day), day)
             btn_day.setFixedSize(*self.cell_size)
             btn_day.clicked.connect(self.day_selected)
             self.grid_layout.addWidget(btn_day, row, col)
