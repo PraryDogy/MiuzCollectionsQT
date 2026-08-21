@@ -263,3 +263,11 @@ WinDatesDateLabel {
     color: #7d7d7d; 
     font-weight: 500;
 }
+
+
+
+PopUpFrame {
+    background: #A2A2A2;
+    border-radius: 5px;
+    border: 1px solid red;
+}

@@ -4,7 +4,7 @@ from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в н�
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSpinBox, QSplitter,
-                             QToolButton, QVBoxLayout, QWidget)
+                             QToolButton, QVBoxLayout, QWidget, QFrame)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -22,25 +22,6 @@ class WinDatesDateLabel(QLabel):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.setWordWrap(True)
-
-
-
-class Test(UPushButton):
-    dateChanged = pyqtSignal(QDate)
-
-    def __init__(self, date: QDate, parent=None):
-        super().__init__(text="")
-        self._date = None
-        self.setDate(date)
-
-    def date(self) -> QDate:
-        return self._date
-
-    def setDate(self, date: QDate):
-        self._date = date
-        self.setText(date.toString("dd.MM.yyyy"))
-        self.dateChanged.emit(date)
-
 
 
 class DatesWidget(UGroupBox):
@@ -106,12 +87,8 @@ class DatesWidget(UGroupBox):
         # Выбор дат "От" и "До"
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
-
-        self.date_from = Test(QDate.currentDate().addDays(-30))
-
-
-        # self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
-        # self.date_from.setFixedWidth(110)
+        self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
+        self.date_from.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_from)
 
         self.top_row_layout.addSpacing(10) 
@@ -154,7 +131,6 @@ class DatesWidget(UGroupBox):
         # Инициализация логики
         self.handle_preset_change(Dynamic.date_index)
         self.update_readable_date_label()
-
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
@@ -242,69 +218,73 @@ class DatesWidget(UGroupBox):
         self.reload_thumbnails.emit()
 
     def style_date_edit_calendar(self, date_edit: UDateEdit):
-
-
         date_edit.setCalendarPopup(True)
         calendar = date_edit.calendarWidget()
+        if not calendar:
+            return
+            
         if JsonData.lng_index == 0:
             calendar.setLocale(QLocale(QLocale.Language.Russian))
         else:
             calendar.setLocale(QLocale(QLocale.Language.English))
 
-        calendar.setFixedSize(300, 300)
+        calendar.setFixedSize(320, 280)
         calendar.setMaximumDate(QDate.currentDate())
         calendar.setMinimumDate(QDate(2012, 1, 1))
-        calendar.setVerticalHeaderFormat(
-            calendar.VerticalHeaderFormat.NoVerticalHeader
-        )
+        
+        # Скрываем старую вертикальную нумерацию недель
+        calendar.setVerticalHeaderFormat(calendar.VerticalHeaderFormat.NoVerticalHeader)
+        # Отключаем дефолтную сетку, будем настраивать рамки через CSS
+        calendar.setGridVisible(False)
 
-        widgets = calendar.findChildren(QToolButton)
-        for wid in widgets:
-            name = wid.objectName()
-            wid.setIconSize(QSize(17, 17)) # Твой icon_size
-            if name == "qt_calendar_prevmonth":
-                wid.setIcon(
-                    QIcon(os.path.join(Static.common_icons, "previous.svg"))
-                )
-            elif name == "qt_calendar_nextmonth":
-                wid.setIcon(
-                    QIcon(os.path.join(Static.common_icons, "next.svg"))
-                )
-
-        for child in calendar.findChildren(QSpinBox):
-            child.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
-            # child.deleteLater()
-
-        return
-
-        calendar.setStyleSheet("""
-            #qt_calendar_monthbutton::menu-indicator {
-                image: none;
-                width: 0px;
+        # Кастомный QSS-стиль для превращения календаря в Flat-дизайн
+        # Обращаемся к внутренним системным именам Qt-элементов
+        modern_qss = """
+            QCalendarWidget {
+                background-color: #2b2b2b; /* Основной фон (для темной темы) */
+                border: 1px solid #3f3f3f;
+                border-radius: 8px;
             }
-
-            #qt_calendar_prevmonth,
-            #qt_calendar_nextmonth,
-            #qt_calendar_monthbutton,
-            #qt_calendar_yearbutton {
-                height: 25px;
-                background: transparent;                                 
+            /* Навигационная панель сверху (Месяц, Год) */
+            QCalendarWidget QWidget#qt_calendar_navigationbar {
+                background-color: #232323;
+                border-bottom: 1px solid #3f3f3f;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
             }
-
-            #qt_calendar_prevmonth,
-            #qt_calendar_nextmont {
-                width: 25px;
+            /* Кнопки переключения месяцев вперед/назад */
+            QCalendarWidget QToolButton {
+                color: #ffffff;
+                background-color: transparent;
+                border: none;
+                border-radius: 4px;
+                margin: 4px;
+                padding: 4px;
             }
-
-            #qt_calendar_prevmonth:hover,
-            #qt_calendar_nextmonth:hover,
-            #qt_calendar_monthbutton:hover,
-            #qt_calendar_yearbutton:hover {                  
-                background: transparent;  
-                border: transparent;
-                color: white;                                 
+            QCalendarWidget QToolButton:hover {
+                background-color: #3a3a3a;
             }
-        """)
+            /* Выпадающие меню выбора месяца и года прямо в шапке */
+            QCalendarWidget QMenu {
+                background-color: #232323;
+                color: white;
+                border: 1px solid #3f3f3f;
+            }
+            /* Сетка самих дней (основана на QTableView) */
+            QCalendarWidget QAbstractItemView {
+                background-color: #2b2b2b;
+                color: #e0e0e0;
+                selection-background-color: #0078d4; /* Цвет выделенного дня (Синий Fluent) */
+                selection-color: #ffffff;
+                outline: 0; /* Убираем пунктирную рамку фокуса */
+            }
+            /* Дни недели (Пн, Вт...) верхняя строчка */
+            QCalendarWidget QWidget {
+                alternate-background-color: #232323;
+            }
+        """
+        calendar.setStyleSheet(modern_qss)
+
 
 
 class WinFilters(UMainWidget):
