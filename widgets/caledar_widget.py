@@ -106,7 +106,7 @@ class Calendar(UMainWidget):
         dynamic_container = QWidget()
         self.central_layout.addWidget(dynamic_container)
         dynamic_container_lay = QHBoxLayout(dynamic_container)
-        dynamic_container_lay.setContentsMargins(0, 0, 0, 5)
+        dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
 
         dynamic_container_lay.addSpacing(5)
 
@@ -120,12 +120,14 @@ class Calendar(UMainWidget):
 
         dynamic_container_lay.addStretch()
 
+        self.central_layout.addSpacing(5)
+        self.central_layout.addWidget(HSep())
+
         # Календарь навигация
         self.nav_widget = QWidget()
         self.nav_widget.setFixedHeight(self.cell_size[0])
         self.nav_layout = QHBoxLayout(self.nav_widget)
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
-        self.nav_layout.setSpacing(5)
 
         self.btn_prev = CalendarSvgNavi(self.svg_previous)
         self.btn_prev.setFixedSize(*self.svg_nav)
