@@ -91,13 +91,13 @@ class RebootableSettings(UGroupBox):
 
         scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
         scaner_time_wid.set_left_icon(self.clock_svg)
+        # регулировка высоты ради кастомного спинбокса
+        scaner_time_wid.setFixedHeight(scaner_time_wid.height() + 1)
         main_layout.addWidget(scaner_time_wid)
         self.spin = USpinBox(self)
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.spin.setMinimum(self.spin_min)
         self.spin.setMaximum(self.spin_max)
-        # self.spin.setFixedHeight(27)
-        # self.spin.setFixedWidth(100)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[JsonData.lng_index]}")
         self.spin.setValue(JsonData.scaner_minutes)

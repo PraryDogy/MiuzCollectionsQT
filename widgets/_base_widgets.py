@@ -450,7 +450,7 @@ class USlider(QSlider):
 class USpinBox(QSpinBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.setFixedHeight(26)
+        self.setFixedHeight(27)
         self.setStyleSheet(
             """
             QSpinBox {
@@ -468,10 +468,15 @@ class USpinBox(QSpinBox):
                 margin-right: 2px;
                 
                 /* Закругляем только верхние углы */
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-                border-bottom-left-radius: 0px;
-                border-bottom-right-radius: 0px;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                border-bottom-left-radius: 4px;
+                border-bottom-right-radius: 4px;
+            }
+
+            /* Фиксируем цвет верхней кнопки при клике */
+            QSpinBox::up-button:pressed {
+                background: palette(placeholder-text);
             }
 
             QSpinBox::down-button {
@@ -482,11 +487,17 @@ class USpinBox(QSpinBox):
                 margin-right: 2px;
                 
                 /* Закругляем только нижние углы */
-                border-top-left-radius: 0px;
-                border-top-right-radius: 0px;
-                border-bottom-left-radius: 5px;
-                border-bottom-right-radius: 5px;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                border-bottom-left-radius: 4px;
+                border-bottom-right-radius: 4px;
             }
+
+            /* Фиксируем цвет нижней кнопки при клике */
+            QSpinBox::down-button:pressed {
+                background: palette(placeholder-text);
+            }
+
             QSpinBox::up-arrow {
                 image: url("icons/common/arrow_up.svg");
                 width: 9px;
@@ -500,6 +511,7 @@ class USpinBox(QSpinBox):
             }
             """
         )
+
 
 
 
