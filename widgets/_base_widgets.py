@@ -7,8 +7,9 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
                              QLabel, QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSlider, QSpacerItem, QStackedWidget,
-                             QTextEdit, QTreeWidget, QVBoxLayout, QWidget)
+                             QScrollArea, QSlider, QSpacerItem, QSpinBox,
+                             QStackedWidget, QTextEdit, QTreeWidget,
+                             QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -275,7 +276,7 @@ class UTreeWidget(QTreeWidget):
 class UPushButton(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
-        self.setFixedHeight(21)
+        self.setFixedHeight(20)
         self.setStyleSheet(
             """
             font-size: 11pt;
@@ -444,6 +445,42 @@ class USlider(QSlider):
         self.setValue(value)
         self.blockSignals(False)
         self.clicked.emit(value)
+
+
+class USpinBox(QSpinBox):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.setFixedHeight(14)
+        self.setStyleSheet(
+            """
+            QSpinBox {
+                background: palette(button);
+                color: palette(text);
+                border: 1px solid palette(link-visited);
+                border-radius: 4px;
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+            QSpinBox::up-button {
+                width: 12px;
+                height: 9px;
+                border-radius: 2px;
+                background: palette(link-visited);
+                margin-top: 2px;
+                margin-right: 3px;
+            }
+            QSpinBox::down-button {
+                width: 12px;
+                height: 9px;
+                border-radius: 2px;
+                background: palette(link-visited);
+                margin-bottom: 2px;
+                margin-right: 3px;
+            }
+            """
+        )
+
+
 
 
 class WinProgressbar(UMainWidget):

@@ -7,9 +7,9 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QHBoxLayout,
-                             QLabel, QLineEdit, QSpacerItem, QSpinBox,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QVBoxLayout, QWidget)
+                             QLabel, QLineEdit, QSpacerItem, QSplitter,
+                             QTableWidget, QTableWidgetItem, QVBoxLayout,
+                             QWidget)
 from typing_extensions import Literal
 
 from cfg import JsonData, Static, Themes
@@ -27,9 +27,9 @@ from system.utils import Utils
 from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow, UGroupBox,
-                            UMainWidget, UMenu, UPushButton, UTextEdit,
-                            VListSpacerItem, VListWidget, VListWidgetItem,
-                            WarningWindow)
+                            UMainWidget, UMenu, UPushButton, USpinBox,
+                            UTextEdit, VListSpacerItem, VListWidget,
+                            VListWidgetItem, WarningWindow)
 
 
 def restart_app():
@@ -92,7 +92,7 @@ class RebootableSettings(UGroupBox):
         scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
         scaner_time_wid.set_left_icon(self.clock_svg)
         main_layout.addWidget(scaner_time_wid)
-        self.spin = QSpinBox(self)
+        self.spin = USpinBox(self)
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.spin.setMinimum(self.spin_min)
         self.spin.setMaximum(self.spin_max)
