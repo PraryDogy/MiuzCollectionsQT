@@ -271,3 +271,30 @@ WinDatesDateLabel {
     color: #7d7d7d; 
     font-weight: 500;
 }
+
+
+
+
+/* Базовый стиль для всех дней (опционально) */
+.CustomCalendar QLabel {
+    color: #ffffff;
+    background-color: transparent;
+}
+
+/* Обычный день недели (заголовок) */
+QLabel#weekday {
+    color: #888888;
+}
+
+/* Обычное число месяца */
+QLabel#day_regular {
+    color: #ffffff;
+}
+
+/* Выделенное число месяца */
+QLabel#day_selected {
+    color: #FFFFFF;
+    background-color: #0078D4;
+    font-weight: bold;
+    border-radius: 20px;
+}

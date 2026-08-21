@@ -40,7 +40,7 @@ class CustomCalendar(UMainWidget):
         self.current_date = date_val
         
         self.row_height = 40
-        self.cell_size = (50, 40)
+        self.cell_size = (40, 40)
         self.svg_size = (20, 20)
         self.month_btn_width = 75
         self.year_btn_width = 60
@@ -172,9 +172,11 @@ class CustomCalendar(UMainWidget):
                 widget.deleteLater()
 
     def update_calendar(self):
+        # 1. Получаем текущие год и месяц из QDate
         current_year = self.current_date.year()
         current_month = self.current_date.month()
 
+        # 2. Обновляем текст на кнопках навигации
         current_month_name = self.q_locale.standaloneMonthName(
             current_month,
             QLocale.FormatType.LongFormat
@@ -182,28 +184,36 @@ class CustomCalendar(UMainWidget):
         self.btn_month.setText(current_month_name.capitalize())
         self.btn_year.setText(str(current_year))
         
+        # 3. Управляем доступностью стрелок года (ограничение 2015 ... текущий год)
         self.btn_prev.setEnabled(current_year > 2015)
         
         max_year = QDate.currentDate().year()
         self.btn_next.setEnabled(current_year < max_year)
 
+        # 4. Полностью очищаем старые виджеты из сетки
         self.clear_grid()
 
-        # Отрисовка дней недели
+        # 5. Отрисовка заголовков дней недели
         for col in range(7):
             day_of_week = col + 1 
             day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
             lbl_day = QLabel(day_name)
+            
+            # Присваиваем ID селектора для дней недели (#weekday в QSS)
+            lbl_day.setObjectName("weekday") 
+            
             lbl_day.setFixedSize(*self.cell_size)
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.grid_layout.addWidget(lbl_day, 0, col)
 
-        # Отрисовка чисел текущего месяца
+        # 6. Отрисовка чисел текущего месяца
         first_day_of_month = QDate(current_year, current_month, 1)
-        # В QDate: 1 = Понедельник ... 7 = Воскресенье. Переводим в 0..6
+        
+        # Вычисляем колонку старта (0 = Понедельник ... 6 = Воскресенье)
         start_col = first_day_of_month.dayOfWeek() - 1 
         
         days_in_month = self.current_date.daysInMonth()
+        selected_day = self.current_date.day() 
 
         current_day = 1
         row = 1
@@ -213,12 +223,25 @@ class CustomCalendar(UMainWidget):
             btn_day = QLabel(str(current_day))
             btn_day.setFixedSize(*self.cell_size)
             btn_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            
+            # Меняем имя селектора в зависимости от того, выбран ли этот день
+            if current_day == selected_day:
+                btn_day.setObjectName("day_selected")  # #day_selected в QSS
+            else:
+                btn_day.setObjectName("day_regular")   # #day_regular в QSS
+                
+            # Принудительно заставляем Qt перечитать QSS для этого QLabel
+            btn_day.style().unpolish(btn_day)
+            btn_day.style().polish(btn_day)
+
+            # Добавляем в сетку и двигаемся дальше
             self.grid_layout.addWidget(btn_day, row, col)
             current_day += 1
             col += 1
             if col > 6:
                 col = 0
                 row += 1
+
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
