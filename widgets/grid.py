@@ -46,7 +46,6 @@ class ThumbBaseLabel(QLabel):
 class ThumbImgWidget(ThumbBaseLabel):
     # Инкапсулированные статические переменные
     BORDER_RADIUS = 10
-    RGBA_GRAY = "rgba(128, 128, 128, 0.5)"
 
     def __init__(self):
         super().__init__()

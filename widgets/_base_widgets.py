@@ -490,7 +490,7 @@ class GrayLabel(QLabel):
     def _update_stylesheet(self):
         self.setStyleSheet(
             f"""
-                color: rgba(128, 128, 128, 1.0);
+                color: palette(midlight);
                 font-size: {self.font_size_px}px;
             """
         )
