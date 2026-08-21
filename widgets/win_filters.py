@@ -14,7 +14,7 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
                             UGroupBox, UMainWidget, UMenu, UPushButton,
                             UTextEditDark, VListSpacerItem, VListWidget,
                             VListWidgetItem)
-from .caledar_widget import CustomCalendar
+from .caledar_widget import Calendar
 
 
 class WinDatesDateLabel(QLabel):
@@ -136,7 +136,7 @@ class DatesWidget(UGroupBox):
         # self.update_readable_date_label()
 
     def show_calendar_win(self):
-        self.calendar_win = CustomCalendar()
+        self.calendar_win = Calendar()
         self.calendar_win.center_to_parent(self.window())
         self.calendar_win.show()
 

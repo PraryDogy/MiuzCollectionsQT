@@ -267,31 +267,23 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
 
 
 
-BigDateLabel {
+CalendarBigDate {
     font-size: 30pt;
 }
 
 
-
-
-/* Базовый стиль для всех дней (опционально) */
-.CustomCalendar QLabel {
-    color: #ffffff;
-    background-color: transparent;
-}
-
-/* Обычный день недели (заголовок) */
-QLabel#weekday {
+CalendarWeek {
     color: #888888;
 }
 
+
 /* Обычное число месяца */
-QLabel#day_regular {
+CalendarDay {
     color: #ffffff;
 }
 
 /* Выделенное число месяца */
-QLabel#day_selected {
+CalendarDaySelected {
     color: #FFFFFF;
     background-color: #0078D4;
     font-weight: bold;

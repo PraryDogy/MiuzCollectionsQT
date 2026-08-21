@@ -12,51 +12,61 @@ from cfg import Static
 from widgets._base_widgets import UMainWidget, UPushButton
 
 
-class BigDateLabel(QLabel):
-
+class CalendarBigDate(QLabel):
     def __init__(self):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.setText("30 сентября 2026") 
         self.adjustSize() 
         self.setFixedWidth(self.width())
-        self.setText("") 
+        self.clear()
 
 
-class ClickableSvgWidget(QSvgWidget):
-    # Создаем сигнал, который будет срабатывать при клике
+class CalendarSvgNavi(QSvgWidget):
     clicked = pyqtSignal()
 
     def __init__(self, file_path, parent=None):
         super().__init__(file_path, parent)
-        # Устанавливаем курсор в виде руки при наведении
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-    def mousePressEvent(self, event):
-        # Проверяем, что кликнули именно левой кнопкой мыши
-        if event.button() == Qt.MouseButton.LeftButton:
+    def mousePressEvent(self, a0):
+        if a0.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
-            event.accept()
+            a0.accept()
         else:
-            super().mousePressEvent(event)
+            super().mousePressEvent(a0)
+        return super().mousePressEvent(a0)
 
 
-# Кастомный кликабельный QLabel для дней
-class ClickableLabel(QLabel):
-    def __init__(self, text, day_num, parent=None):
-        super().__init__(text, parent)
-        self.day_num = day_num
+class CalendarDayBase(QLabel):
+    clicked = pyqtSignal()
 
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.LeftButton:
-            # Получаем родительский календарь и вызываем выбор дня
-            calendar = self.window()
-            if hasattr(calendar, "day_selected"):
-                calendar.day_selected(self.day_num)
-        super().mousePressEvent(event)
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def mouseReleaseEvent(self, ev):
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        return super().mouseReleaseEvent(ev)
 
 
-class CustomCalendar(UMainWidget):
+class CalendarDay(CalendarDayBase):
+    def __init__(self, text):
+        super().__init__(text)
+
+
+class CalendarDaySelected(CalendarDayBase):
+    def __init__(self, text):
+        super().__init__(text)
+
+
+class CalendarWeek(CalendarDayBase):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class Calendar(UMainWidget):
     svg_calendar = os.path.join(Static.common_icons, "calendar.svg")
     svg_previous = os.path.join(Static.common_icons, "previous.svg")
     svg_next = os.path.join(Static.common_icons, "next.svg")
@@ -97,7 +107,7 @@ class CustomCalendar(UMainWidget):
         calendar_icon.setFixedSize(*self.svg_calendar_size)
         dynamic_container_lay.addWidget(calendar_icon)
 
-        self.dynamic_label = BigDateLabel()
+        self.dynamic_label = CalendarBigDate()
         dynamic_container_lay.addWidget(self.dynamic_label)
 
         dynamic_container_lay.addStretch()
@@ -109,7 +119,7 @@ class CustomCalendar(UMainWidget):
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
         self.nav_layout.setSpacing(5)
     
-        self.btn_prev = ClickableSvgWidget(self.svg_previous)
+        self.btn_prev = CalendarSvgNavi(self.svg_previous)
         self.btn_prev.setFixedSize(*self.svg_nav)
         self.btn_prev.clicked.connect(self.prev_month)
         
@@ -124,7 +134,7 @@ class CustomCalendar(UMainWidget):
         self.btn_year.setMenu(self.menu_year)
         self.populate_years()
         
-        self.btn_next = ClickableSvgWidget(self.svg_next)
+        self.btn_next = CalendarSvgNavi(self.svg_next)
         self.btn_next.setFixedSize(*self.svg_nav)
         self.btn_next.clicked.connect(self.next_month)
         
@@ -225,6 +235,12 @@ class CustomCalendar(UMainWidget):
             if widget is not None:
                 widget.deleteLater()
 
+    def day_clicked(self, day: int):
+        new_date = QDate(day, self.current_date.month(), self.current_date.year())
+        print(new_date)
+        self.current_date = new_date
+        self.update_calendar()
+
     def update_calendar(self):
         self.update_dynamic_label()
         current_year = self.current_date.year()
@@ -242,42 +258,32 @@ class CustomCalendar(UMainWidget):
 
         self.clear_grid()
 
-        # Рендеринг дней недели
         for col in range(7):
             day_of_week = col + 1 
             day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
-            lbl_day = QLabel(day_name)
-            lbl_day.setObjectName("weekday") 
+            lbl_day = CalendarWeek(day_name)
             lbl_day.setFixedSize(*self.cell_size)
-            lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.grid_layout.addWidget(lbl_day, 0, col)
 
-        # Рендеринг чисел месяца
         first_day_of_month = QDate(current_year, current_month, 1)
         start_col = first_day_of_month.dayOfWeek() - 1 
-        
         days_in_month = self.current_date.daysInMonth()
         selected_day = self.current_date.day() 
-
         current_day = 1
         row = 1
         col = start_col
 
         while current_day <= days_in_month:
-            # Используем кастомный кликабельный QLabel вместо обычного
-            btn_day = ClickableLabel(str(current_day), current_day)
-            btn_day.setFixedSize(*self.cell_size)
-            btn_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            
             if current_day == selected_day:
-                btn_day.setObjectName("day_selected")
+                btn_day = CalendarDaySelected(str(current_day))
             else:
-                btn_day.setObjectName("day_regular")
-                
-            btn_day.style().unpolish(btn_day)
-            
+                btn_day = CalendarDay(str(current_day))
+            btn_day.clicked.connect(
+                lambda d=current_day: self.day_clicked(d)
+            )
+
+            btn_day.setFixedSize(*self.cell_size)
             self.grid_layout.addWidget(btn_day, row, col)
-            
             col += 1
             if col > 6:
                 col = 0
