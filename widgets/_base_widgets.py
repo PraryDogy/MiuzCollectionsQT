@@ -462,8 +462,8 @@ class USpinBox(QSpinBox):
 
             QSpinBox::up-button {
                 width: 17px;
-                height: 10px;
-                background: palette(link-visited);
+                height: 8px;
+                background: palette(button);
                 margin-top: 2px;
                 margin-right: 2px;
                 
@@ -476,8 +476,8 @@ class USpinBox(QSpinBox):
 
             QSpinBox::down-button {
                 width: 17px;
-                height: 9px;
-                background: palette(link-visited);
+                height: 8px;
+                background: palette(button);
                 margin-bottom: 2px;
                 margin-right: 2px;
                 
@@ -500,6 +500,7 @@ class USpinBox(QSpinBox):
             }
             """
         )
+
 
 
 

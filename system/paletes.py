@@ -63,7 +63,7 @@ class UPallete:
         p.setColor(color.HighlightedText, QColor("#ffffff"))
 
        # --- ТЕСТОВЫЕ КРАСНЫЕ РОЛИ ---
-        p.setColor(color.AlternateBase, QColor("#ff0000"))
+        p.setColor(color.AlternateBase, QColor("#727272"))
         p.setColor(color.Dark, QColor("#ff0000"))
         p.setColor(color.Shadow, QColor("#ff0000"))
         p.setColor(color.Light, QColor("#ff0000"))
