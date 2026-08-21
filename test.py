@@ -31,7 +31,7 @@ class ClickableSvgWidget(QSvgWidget):
 class CustomCalendar(QWidget):
     def __init__(self):
         super().__init__()
-        self.locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
+        self.q_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
         self.current_date = date.today()
         self.setWindowTitle("Кастомный Календарь")
         self.setMinimumSize(400, 350)
@@ -89,22 +89,18 @@ class CustomCalendar(QWidget):
         self.update_calendar()
 
     def populate_months(self):
-        """Заполняет меню месяцев в именительном падеже с помощью QLocale."""
         self.menu_month.clear()
-        # В QLocale месяцы индексируются от 1 до 12
         for m in range(1, 13):
-            # QLocale.FormatType.LongFormat возвращает именительный падеж для месяцев отдельно
-            month_name = self.locale.monthName(m, QLocale.FormatType.LongFormat).capitalize()
+            month_name = self.q_locale.standaloneMonthName(m, QLocale.FormatType.LongFormat)
             action = QAction(month_name, self)
             action.setData(m)
             action.triggered.connect(self.month_selected)
             self.menu_month.addAction(action)
 
-    def populate_years(self):
-        """Заполняет меню лет от 2015 до текущего года."""
+    def populate_years(self, start_year: int = 2015):
         self.menu_year.clear()
         max_year = date.today().year
-        for y in range(2015, max_year + 1):
+        for y in range(start_year, max_year + 1):
             action = QAction(str(y), self)
             action.setData(y)
             action.triggered.connect(self.year_selected)
@@ -148,7 +144,7 @@ class CustomCalendar(QWidget):
     def update_calendar(self):
         """Перерисовывает кнопки навигации и сетку дней."""
         # Обновляем текст на кнопках месяцев и лет
-        current_month_name = self.locale.monthName(self.current_date.month, QLocale.FormatType.LongFormat).capitalize()
+        current_month_name = self.q_locale.monthName(self.current_date.month, QLocale.FormatType.LongFormat).capitalize()
         self.btn_month.setText(current_month_name)
         self.btn_year.setText(str(self.current_date.year))
         
@@ -169,7 +165,7 @@ class CustomCalendar(QWidget):
             # Переводим индекс колонки (0..6) в день недели (1..7)
             # В русской локали первый день недели — понедельник (1)
             day_of_week = col + 1 
-            day_name = self.locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
+            day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
             
             lbl_day = QLabel(day_name)
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
