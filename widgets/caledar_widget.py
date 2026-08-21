@@ -38,12 +38,16 @@ class CustomCalendar(UMainWidget):
         super().__init__()
         self.q_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
         self.current_date = date.today()
-        self.row_height = 30
+        self.row_height = 40
+        self.cell_size = (50, 40)
+        self.svg_size = (16, 16)
         self.setWindowTitle("Кастомный Календарь")
         self.set_close_only()
         self.set_always_on_top()
         self.init_ui()
+        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
     def init_ui(self):
         # --- Первая строка: Панель навигации (Контейнер) ---
@@ -55,7 +59,7 @@ class CustomCalendar(UMainWidget):
         
         # Стрелка влево (Предыдущий год)
         self.btn_prev = ClickableSvgWidget("./icons/common/previous.svg")
-        self.btn_prev.setFixedSize(16, 16)
+        self.btn_prev.setFixedSize(*self.svg_size)
         self.btn_prev.clicked.connect(self.prev_year)
         
         # Кнопка выбора месяца с QMenu
@@ -72,7 +76,7 @@ class CustomCalendar(UMainWidget):
         
         # Стрелка вправо (Следующий год)
         self.btn_next = ClickableSvgWidget("./icons/common/next.svg")
-        self.btn_next.setFixedSize(16, 16)
+        self.btn_next.setFixedSize(*self.svg_size)
         self.btn_next.clicked.connect(self.next_year)
         
         # Собираем навигационную панель внутри контейнера
@@ -169,7 +173,7 @@ class CustomCalendar(UMainWidget):
             day_of_week = col + 1 
             day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
             lbl_day = QLabel(day_name)
-            lbl_day.setFixedSize(self.row_height, self.row_height)
+            lbl_day.setFixedSize(*self.cell_size)
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.grid_layout.addWidget(lbl_day, 0, col)
 
@@ -191,7 +195,8 @@ class CustomCalendar(UMainWidget):
 
         while current_day <= days_in_month:
             btn_day = QLabel(str(current_day))
-            btn_day.setFixedSize(self.row_height, self.row_height)
+            btn_day.setFixedSize(*self.cell_size)
+            btn_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.grid_layout.addWidget(btn_day, row, col)
             current_day += 1
             col += 1
