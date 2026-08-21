@@ -46,38 +46,25 @@ class UPallete:
     def dark(cls):
         p = QPalette()
         color = QPalette.ColorRole
-
-        # основная заливка окон
         p.setColor(color.Window, QColor("#1e1e1e"))
-        # цвет текста везде
         p.setColor(color.Text, QColor("#ffffff"))
-        # плейсхолдер
         p.setColor(color.PlaceholderText, QColor("#565656"))
-        # выделение элементов (синий как в MacOS)
         p.setColor(color.Highlight, QColor("#0059d1"))
-        # цвет шрифта подсказок
         p.setColor(color.ToolTipText, QColor("#ffffff"))
-        # цвет подсказок
         p.setColor(color.ToolTipBase, QColor("#2a2a2a"))
-        # цвет меню списков QListWidget и подобных
         p.setColor(color.Base, QColor("#191919"))
-        # цвет шрифта GroupBox
         p.setColor(color.WindowText, QColor("#ffffff"))
-        # цвет шрифта кнопок QPushButton и выпадающего списка QMenu
         p.setColor(color.ButtonText, QColor("#ffffff"))
-        # HSep, полоска QSlider
         p.setColor(color.Mid, QColor("#353535"))
-        # серый для рамки Thumb image widget
         p.setColor(color.LinkVisited, QColor("#4C4C4C"))
-        # слабо видимый серый (серый без акцента)
-        # BarTop, PathBar, BarBottom
         p.setColor(color.Midlight, QColor("#818181"))
-        # Кружок QSlider
         p.setColor(color.Link, QColor("#A2A2A2"))
-        # UPushButton
         p.setColor(color.Button, QColor("#3E3E3E"))
-
+        p.setColor(color.HighlightedText, QColor("#ffffff"))
         return p
+
+    def get_palette_text(cls, role: str):
+        return f"palette({role})"
 
 
 class ThemeChanger:
