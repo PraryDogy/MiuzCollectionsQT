@@ -239,25 +239,12 @@ class UPushButton(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
         self.setFixedHeight(20)
-        # self.setStyleSheet(
-        #     """
-        #     font-size: 11pt;
-        #     background: palette(button);
-        #     border: 1px solid palette(link-visited);
-        #     border-radius: 4px;
-        #     """
-        # )
         self.setFixedWidth(80)
 
 
 class HSep(QFrame):
     def __init__(self):
         super().__init__()
-        # self.setStyleSheet(
-        #     """
-        #         background: palette(mid);
-        #     """
-        # )
         self.setFixedHeight(1)
 
 
