@@ -314,9 +314,9 @@ class Calendar(UMainWidget):
             lbl_day.setFixedSize(*self.cell_size)
             self.grid_layout.addWidget(lbl_day, 0, col)
         first_day = QDate(current_year, current_month, 1)
-        col = first_day.dayOfWeek() - 1
+        # Находим индекс колонки (0-6) для первого дня месяца, чтобы учесть смещение в сетке
+        start_col = first_day.dayOfWeek() - 1
         days_in_month = first_day.daysInMonth()
-        row = 1
         for day in range(1, days_in_month + 1):
             if day == current_day_val:
                 btn_day = CalendarDaySelected(str(day), day)
@@ -324,11 +324,10 @@ class Calendar(UMainWidget):
                 btn_day = CalendarDay(str(day), day)
             btn_day.setFixedSize(*self.cell_size)
             btn_day.clicked.connect(self.day_selected)
-            self.grid_layout.addWidget(btn_day, row, col)
-            col += 1
-            if col > 6:
-                col = 0
-                row += 1
+            # divmod вычисляет номер строки и колонки на основе сквозного индекса ячейки
+            row, col = divmod(start_col + day - 1, 7)
+            # Смещаем строку на +1, так как нулевую строку (row=0) занимают названия дней недели
+            self.grid_layout.addWidget(btn_day, row + 1, col)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
