@@ -74,6 +74,17 @@ class CalendarWeek(CalendarDayBase):
         super().__init__(text)
 
 
+class CalendarSep(HSep):
+    def __init__(self, margin: int):
+        super().__init__()
+        self.setStyleSheet(
+            f"""
+                margin-left: {margin}px;
+                margin-right: {margin}px;
+            """
+        )
+
+
 class Calendar(UMainWidget):
     svg_calendar = os.path.join(Static.common_icons, "calendar.svg")
     svg_previous = os.path.join(Static.common_icons, "previous.svg")
@@ -102,18 +113,23 @@ class Calendar(UMainWidget):
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def init_ui(self):
+
+        margin = 10
+
         # --- 1. Блок большой даты ---
         dynamic_container = QWidget()
         self.central_layout.addWidget(dynamic_container) # Добавляем сразу
         
         dynamic_container_lay = QHBoxLayout(dynamic_container)
-        dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-        dynamic_container_lay.addSpacing(5)
+        dynamic_container_lay.setContentsMargins(margin, 0, margin, 0)
+        dynamic_container_lay.setSpacing(0)
 
         calendar_icon = QSvgWidget()
         calendar_icon.load(self.svg_calendar)
         calendar_icon.setFixedSize(*self.svg_calendar_size)
         dynamic_container_lay.addWidget(calendar_icon)
+
+        dynamic_container_lay.addSpacing(10)
 
         self.dynamic_label = CalendarBigDate()
         dynamic_container_lay.addWidget(self.dynamic_label)
@@ -121,7 +137,9 @@ class Calendar(UMainWidget):
 
         # --- Разделитель ---
         self.central_layout.addSpacing(5)
-        self.central_layout.addWidget(HSep()) # Добавляем сразу
+
+        sep = CalendarSep(margin)
+        self.central_layout.addWidget(sep)
 
         # --- 2. Блок навигации календаря ---
         self.nav_widget = QWidget()
@@ -129,7 +147,7 @@ class Calendar(UMainWidget):
         self.central_layout.addWidget(self.nav_widget) # Добавляем сразу
         
         self.nav_layout = QHBoxLayout(self.nav_widget)
-        self.nav_layout.setContentsMargins(0, 0, 0, 0)
+        self.nav_layout.setContentsMargins(margin, 0, margin, 0)
         self.nav_layout.setSpacing(0)
 
         self.btn_prev = CalendarSvgNavi(self.svg_previous)
@@ -159,6 +177,9 @@ class Calendar(UMainWidget):
         self.btn_next.setFixedSize(*self.svg_nav)
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)
+
+        # sep = CalendarSep(margin)
+        # self.central_layout.addWidget(sep)
 
         # --- 3. Сетка для дней недели и чисел ---
         self.grid_widget = QWidget()  
