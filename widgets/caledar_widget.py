@@ -17,6 +17,10 @@ class BigDateLabel(QLabel):
     def __init__(self):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.setText("30 сентября 2026") 
+        self.adjustSize() 
+        self.setFixedWidth(self.width())
+        self.setText("") 
 
 
 class ClickableSvgWidget(QSvgWidget):
@@ -74,20 +78,17 @@ class CustomCalendar(UMainWidget):
         self.set_close_only()
         self.set_always_on_top()
         self.init_ui()
-        
-        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
 
     def init_ui(self):
+        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         dynamic_container = QWidget()
         self.central_layout.addWidget(dynamic_container)
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(15)
-        dynamic_container_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         dynamic_container_lay.addSpacing(5)
 
@@ -97,8 +98,9 @@ class CustomCalendar(UMainWidget):
         dynamic_container_lay.addWidget(calendar_icon)
 
         self.dynamic_label = BigDateLabel()
-        self.dynamic_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         dynamic_container_lay.addWidget(self.dynamic_label)
+
+        dynamic_container_lay.addStretch()
 
         # --- Первая строка: Панель навигации ---
         self.nav_widget = QWidget()

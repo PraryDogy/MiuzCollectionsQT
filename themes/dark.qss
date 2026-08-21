@@ -268,9 +268,7 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
 
 
 BigDateLabel {
-    color: #c85151; 
-    font-weight: 500;
-    font-size: 30px;
+    font-size: 30pt;
 }
 
 
