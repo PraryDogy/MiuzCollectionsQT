@@ -56,8 +56,8 @@ class CustomCalendar(UMainWidget):
         self.svg_size = (20, 20)
         
         # --- НАСТРОЙКА РАСТЯЖЕНИЯ ---
-        self.grid_h_spacing = 15  # Увеличьте это число (например, 15, 20, 25), чтобы сделать календарь шире
-        self.grid_v_spacing = 5   # Вертикальный отступ оставляем маленьким
+        self.grid_h_spacing = 15
+        self.grid_v_spacing = 5
         
         self.setWindowTitle("Кастомный Календарь")
         self.set_close_only()
@@ -70,13 +70,17 @@ class CustomCalendar(UMainWidget):
         self.setFixedSize(self.width(), self.height())
 
     def init_ui(self):
+
+        self.dynamic_label = QLabel("")
+        self.central_layout.addWidget(self.dynamic_label)
+
         # --- Первая строка: Панель навигации ---
         self.nav_widget = QWidget()
         self.nav_widget.setFixedHeight(self.row_height)
         self.nav_layout = QHBoxLayout(self.nav_widget)
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
         self.nav_layout.setSpacing(5)
-        
+    
         self.btn_prev = ClickableSvgWidget("./icons/common/previous.svg")
         self.btn_prev.setFixedSize(*self.svg_size)
         self.btn_prev.clicked.connect(self.prev_month)
@@ -97,12 +101,14 @@ class CustomCalendar(UMainWidget):
         self.btn_next.clicked.connect(self.next_month)
         
         # Распределяем верхние кнопки по ширине широкого календаря
-        self.nav_layout.addWidget(self.btn_prev, stretch=0)
-        self.nav_layout.addStretch(1)
-        self.nav_layout.addWidget(self.btn_month, stretch=4)
-        self.nav_layout.addWidget(self.btn_year, stretch=3)
-        self.nav_layout.addStretch(1)
-        self.nav_layout.addWidget(self.btn_next, stretch=0)
+        self.nav_layout.addSpacing(10)
+        self.nav_layout.addWidget(self.btn_prev)
+        self.nav_layout.addStretch()
+        self.nav_layout.addWidget(self.btn_month)
+        self.nav_layout.addWidget(self.btn_year)
+        self.nav_layout.addStretch()
+        self.nav_layout.addWidget(self.btn_next)
+        self.nav_layout.addSpacing(10)
         
         self.central_layout.addWidget(self.nav_widget)
 
@@ -125,6 +131,10 @@ class CustomCalendar(UMainWidget):
         
         self.update_calendar()
 
+    def update_dynamic_label(self):
+        russian_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
+        readable_date = russian_locale.toString(self.current_date, "d MMMM yyyy")
+        self.dynamic_label.setText(readable_date)
 
     def populate_months(self):
         self.menu_month.clear()
@@ -188,6 +198,7 @@ class CustomCalendar(UMainWidget):
                 widget.deleteLater()
 
     def update_calendar(self):
+        self.update_dynamic_label()
         current_year = self.current_date.year()
         current_month = self.current_date.month()
 
