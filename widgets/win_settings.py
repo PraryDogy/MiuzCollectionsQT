@@ -97,7 +97,7 @@ class RebootableSettings(UGroupBox):
         self.spin.setMinimum(self.spin_min)
         self.spin.setMaximum(self.spin_max)
         # self.spin.setFixedHeight(27)
-        self.spin.setFixedWidth(100)
+        # self.spin.setFixedWidth(100)
         self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[JsonData.lng_index]}")
         self.spin.setValue(JsonData.scaner_minutes)

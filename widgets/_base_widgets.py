@@ -450,7 +450,7 @@ class USlider(QSlider):
 class USpinBox(QSpinBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.setFixedHeight(26)
+        self.setFixedHeight(27)
         self.setStyleSheet(
             """
             QSpinBox {
@@ -468,8 +468,8 @@ class USpinBox(QSpinBox):
                 margin-right: 2px;
                 
                 /* Закругляем только верхние углы */
-                border-top-left-radius: 3px;
-                border-top-right-radius: 3px;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
                 border-bottom-left-radius: 0px;
                 border-bottom-right-radius: 0px;
             }
@@ -478,8 +478,8 @@ class USpinBox(QSpinBox):
                 width: 17px;
                 height: 10px;
                 background: palette(link-visited);
-                margin-bottom: 2px;
-                margin-right: 2px;
+                margin-bottom: 5px;
+                margin-right: 5px;
                 
                 /* Закругляем только нижние углы */
                 border-top-left-radius: 0px;
