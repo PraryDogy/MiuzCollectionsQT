@@ -68,8 +68,10 @@ class UPallete:
         # серый для рамки Thumb image widget
         p.setColor(color.LinkVisited, QColor("#4C4C4C"))
         # слабо видимый серый (серый без акцента)
-        # BarTop, PathBar, BarBottom, ползунок QSlider
+        # BarTop, PathBar, BarBottom
         p.setColor(color.Midlight, QColor("#818181"))
+        # Кружок QSlider
+        p.setColor(color.Link, QColor("#818181"))
 
         return p
 

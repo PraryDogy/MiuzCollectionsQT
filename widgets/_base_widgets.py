@@ -381,7 +381,7 @@ class USlider(QSlider):
                     background-color: palette(mid);
                 }
                 QSlider::handle:horizontal {
-                    background-color: palette(midlight);
+                    background-color: palette(link);
                     height: 10px;
                     width: 10px;
                     border-radius: 5px;
