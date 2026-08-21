@@ -4,10 +4,9 @@ from datetime import date
 from PyQt6.QtCore import QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
-                             QMenu, QPushButton, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QMenu
 
-from widgets._base_widgets import UDateEdit
+from widgets._base_widgets import UMainWidget, UPushButton
 
 
 class ClickableSvgWidget(QSvgWidget):
@@ -28,21 +27,18 @@ class ClickableSvgWidget(QSvgWidget):
             super().mousePressEvent(event)
 
 
-class CustomCalendar(QWidget):
+class CustomCalendar(UMainWidget):
     def __init__(self):
         super().__init__()
         self.q_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
         self.current_date = date.today()
         self.setWindowTitle("Кастомный Календарь")
         self.setMinimumSize(400, 350)
+        self.set_close_only()
+        self.set_always_on_top()
         self.init_ui()
 
     def init_ui(self):
-        # Главный вертикальный слой
-        self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(15, 15, 15, 15)
-        self.main_layout.setSpacing(10)
-
         # --- Первая строка: Панель навигации ---
         self.nav_layout = QHBoxLayout()
         
@@ -52,15 +48,15 @@ class CustomCalendar(QWidget):
         self.btn_prev.clicked.connect(self.prev_year)
         
         # Кнопка выбора месяца с QMenu
-        self.btn_month = QPushButton()
-        self.btn_month.setFixedWidth(100)
+        self.btn_month = UPushButton("")
         self.menu_month = QMenu(self)
         self.btn_month.setMenu(self.menu_month)
         self.populate_months()
+
+        self.nav_layout.addSpacing(15)
         
         # Кнопка выбора года с QMenu
-        self.btn_year = QPushButton()
-        self.btn_year.setFixedWidth(100)
+        self.btn_year = UPushButton("")
         self.menu_year = QMenu(self)
         self.btn_year.setMenu(self.menu_year)
         self.populate_years()
@@ -78,15 +74,16 @@ class CustomCalendar(QWidget):
         self.nav_layout.addStretch()
         self.nav_layout.addWidget(self.btn_next)
         
-        self.main_layout.addLayout(self.nav_layout)
+        self.central_layout.addLayout(self.nav_layout)
 
         # --- Сетка для дней недели и чисел ---
         self.grid_layout = QGridLayout()
         self.grid_layout.setSpacing(5)
-        self.main_layout.addLayout(self.grid_layout)
+        self.central_layout.addLayout(self.grid_layout)
         
         # Обновляем интерфейс под текущую дату
         self.update_calendar()
+        self.adjustSize()
 
     def populate_months(self):
         self.menu_month.clear()
@@ -194,7 +191,7 @@ class CustomCalendar(QWidget):
         col = start_col
 
         while current_day <= days_in_month:
-            btn_day = QPushButton(str(current_day))
+            btn_day = UPushButton(str(current_day))
             btn_day.setCheckable(True)
             btn_day.setMinimumSize(40, 40)
             
@@ -212,9 +209,7 @@ class CustomCalendar(QWidget):
                 col = 0
                 row += 1
 
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    calendar = CustomCalendar()
-    calendar.show()
-    sys.exit(app.exec())
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        return super().keyPressEvent(a0)

@@ -169,6 +169,8 @@ QPushButton {
     border: 1px solid #585858;
     border-radius: 4px;
     color: #ffffff;
+    /* Добавляем отступ справа, чтобы текст не наезжал на стрелочку */
+    padding-right: 20px; 
 }
 
 QPushButton:pressed {
@@ -176,6 +178,15 @@ QPushButton:pressed {
     border: 1px solid #6a6a6a;
 }
 
+/* Стилизация стрелочки меню */
+QPushButton::menu-indicator {
+    image: url("./icons/common/arrow_down.svg");
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    right: 6px; /* Отступ стрелочки от правого края */
+    width: 12px; /* Ширина иконки */
+    height: 12px; /* Высота иконки */
+}
 
 
 
@@ -262,12 +273,4 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
 WinDatesDateLabel {
     color: #7d7d7d; 
     font-weight: 500;
-}
-
-
-
-PopUpFrame {
-    background: #A2A2A2;
-    border-radius: 5px;
-    border: 1px solid red;
 }

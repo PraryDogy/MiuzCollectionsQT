@@ -3,8 +3,8 @@ import os
 from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в начало файла
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSpinBox, QSplitter,
-                             QToolButton, QVBoxLayout, QWidget, QFrame)
+from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSpinBox, QSplitter,
+                             QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -14,6 +14,7 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
                             UGroupBox, UMainWidget, UMenu, UPushButton,
                             UTextEditDark, VListSpacerItem, VListWidget,
                             VListWidgetItem)
+from .caledar_widget import CustomCalendar
 
 
 class WinDatesDateLabel(QLabel):
@@ -87,7 +88,9 @@ class DatesWidget(UGroupBox):
         # Выбор дат "От" и "До"
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
-        self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
+        # self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
+        self.date_from = UPushButton("дата")
+        self.date_from.clicked.connect(self.show_calendar_win)
         self.date_from.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_from)
 
@@ -99,16 +102,16 @@ class DatesWidget(UGroupBox):
         self.date_to.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_to)
 
-        if Dynamic.date_start and Dynamic.date_end:
-            dt = Dynamic.date_start
-            self.date_from.setDate(QDate(dt.year, dt.month, dt.day))
-            dt_end = Dynamic.date_end
-            self.date_to.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
+        # if Dynamic.date_start and Dynamic.date_end:
+        #     dt = Dynamic.date_start
+        #     self.date_from.setDate(QDate(dt.year, dt.month, dt.day))
+        #     dt_end = Dynamic.date_end
+        #     self.date_to.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
 
-        for widget in [self.date_from, self.date_to]:
-            widget.setEnabled(True)  
-            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            widget.dateChanged.connect(self.on_custom_date_changed)
+        # for widget in [self.date_from, self.date_to]:
+        #     widget.setEnabled(True)  
+        #     widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        #     widget.dateChanged.connect(self.on_custom_date_changed)
 
         # Пружина смещает кнопку сброса вправо
         self.top_row_layout.addStretch(1)
@@ -129,8 +132,13 @@ class DatesWidget(UGroupBox):
         self.main_layout.addWidget(self.readable_date_label)
 
         # Инициализация логики
-        self.handle_preset_change(Dynamic.date_index)
-        self.update_readable_date_label()
+        # self.handle_preset_change(Dynamic.date_index)
+        # self.update_readable_date_label()
+
+    def show_calendar_win(self):
+        self.calendar_win = CustomCalendar()
+        self.calendar_win.center_to_parent(self.window())
+        self.calendar_win.show()
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
