@@ -5,11 +5,12 @@ from datetime import date
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QMenu,
-                             QPushButton, QWidget)
+from PyQt6.QtWidgets import (QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+                             QMenu, QPushButton, QWidget)
 
 from cfg import Static
-from widgets._base_widgets import UMainWidget, UPushButton
+
+from ._base_widgets import HSep, UMainWidget, UPushButton
 
 
 class CalendarBigDate(QLabel):
@@ -82,8 +83,8 @@ class Calendar(UMainWidget):
 
     cell_size = (40, 40)
     svg_nav = (20, 20)
-    svg_calendar_size = (30, 30)
-    grid_h_spacing = 15
+    svg_calendar_size = (25, 25)
+    grid_h_spacing = 25
     grid_v_spacing = 5
 
     def __init__(self, date_val: QDate = QDate.currentDate()):
@@ -102,11 +103,11 @@ class Calendar(UMainWidget):
     def init_ui(self):
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
+        # Большая дата
         dynamic_container = QWidget()
         self.central_layout.addWidget(dynamic_container)
         dynamic_container_lay = QHBoxLayout(dynamic_container)
-        dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-        dynamic_container_lay.setSpacing(15)
+        dynamic_container_lay.setContentsMargins(0, 0, 0, 10)
 
         dynamic_container_lay.addSpacing(5)
 
@@ -120,7 +121,9 @@ class Calendar(UMainWidget):
 
         dynamic_container_lay.addStretch()
 
-        # --- Первая строка: Панель навигации ---
+        self.central_layout.addWidget(HSep())
+
+        # Календарь навигация
         self.nav_widget = QWidget()
         self.nav_widget.setFixedHeight(self.cell_size[0])
         self.nav_layout = QHBoxLayout(self.nav_widget)

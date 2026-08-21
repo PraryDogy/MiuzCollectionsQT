@@ -269,6 +269,7 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
 
 CalendarBigDate {
     font-size: 30pt;
+    color: #b2b2b2;
 }
 
 CalendarWeek {
