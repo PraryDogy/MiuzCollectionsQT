@@ -258,8 +258,13 @@ class UTreeWidget(QTreeWidget):
 class UPushButton(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
-        self.setFixedHeight(20)
-        self.setFixedWidth(80)
+        self.setFixedSize(80, 20)
+        self.set_font_size(11)
+
+    def set_font_size(self, value_px: int):
+        font = self.font()
+        font.setPixelSize(value_px)
+        self.setFont(font)
 
 
 class HSep(QFrame):

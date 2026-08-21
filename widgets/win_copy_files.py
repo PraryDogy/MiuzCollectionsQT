@@ -15,8 +15,8 @@ from ._base_widgets import UMainWidget, UPushButton, WinProgressbar
 class ReplaceButton(UPushButton):
     def __init__(self, text):
         super().__init__(text)
-        self.setStyleSheet("font-size: 9pt;")
-        self.setFixedWidth(75)
+        self.set_font_size(9)
+        self.setFixedSize(75, 17)
 
 
 

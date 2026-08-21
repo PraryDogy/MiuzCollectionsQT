@@ -43,9 +43,6 @@ class WinCollage(UMainWidget):
         self.scroll_area.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
-        self.scroll_area.setStyleSheet(
-            "QScrollArea { border: none; background-color: black; }"
-        )
 
         self.container = QWidget()
         self.container.setStyleSheet("background-color: black;")

@@ -148,7 +148,6 @@ QTreeWidget::item:selected:!active {
 
 
 QPushButton {
-    font-size: 11pt;
     background: #4e4e4e;
     border: 1px solid #585858;
     border-radius: 4px;
