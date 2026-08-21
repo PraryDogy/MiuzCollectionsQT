@@ -79,13 +79,6 @@ class UTextEdit(QTextEdit):
     def __init__(self):
         super().__init__()
 
-        # self.setStyleSheet(
-        #     f"""
-        #         border: 1px solid palette(tooltip-base);
-        #         border-radius: 6px;
-        #     """
-        # )
-
     def copy_selection(self):
         cur = self.textCursor()
         text = cur.selectedText().strip()
