@@ -29,13 +29,16 @@ class UPallete:
         p.setColor(color.WindowText, QColor("#000000"))
         # цвет шрифта кнопок QPushButton и выпадающего списка QMenu
         p.setColor(color.ButtonText, QColor("#000000"))
-        # только HSep
-        p.setColor(color.Mid, QColor("#d4d4d4"))
 
+        # HSep, полоска QSlider
+        p.setColor(color.Mid, QColor("#d4d4d4"))
         # серый для рамки Thumb image widget
         p.setColor(color.LinkVisited, QColor("#e0e0e0"))
         # слабо видимый серый (серый без акцента)
+        # BarTop, PathBar, BarBottom
         p.setColor(color.Midlight, QColor("#707070"))
+        # Кружок QSlider
+        p.setColor(color.Link, QColor("#7a7a7a"))
 
         return p
 
@@ -75,30 +78,13 @@ class UPallete:
 
         return p
 
-    @classmethod
-    def macintosh(cls):
-        p = QPalette()
-        color = p.ColorRole
-        p.setColor(color.Highlight, QColor("#0059d1"))
-        # серый для рамки Thumb image widget
-        p.setColor(color.LinkVisited, QColor("#6D6D6D"))
-        # слабо видимый серый (серый без акцента)
-        p.setColor(color.Midlight, QColor("#909090"))
-        # только HSep
-        p.setColor(color.Mid, QColor("#3E3E3E"))
-
-        return p
-
 
 class ThemeChanger:
 
     @classmethod
     def init(cls):
         app: QApplication = QApplication.instance()
-        if JsonData.theme == Themes.macos:
-            app.setPalette(UPallete.macintosh())
-            app.setStyle("macos")
-        elif JsonData.theme == Themes.dark:
+        if JsonData.theme == Themes.dark:
             app.setPalette(UPallete.dark())
             app.setStyle("macos")
         elif JsonData.theme == Themes.light:

@@ -133,7 +133,6 @@ class Lng:
     attention = ("Внимание!", "Warning!")
     remove_file_question = ("Удалить безвозвратно файл", "Delete forever file")
     remove_files_question = ("Удалить безвозвратно файлы", "Delete forever files")
-    macintosh_theme = ("Macintosh", "Macintosh")
     theme = ("Тема", "Theme")
     dark_theme = ("Темная", "Dark")
     light_theme = ("Светлая", "Light")

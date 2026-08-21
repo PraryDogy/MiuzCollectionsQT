@@ -6,7 +6,6 @@ from pathlib import Path
 
 
 class Themes:
-    macos = "macos"
     dark = "dark"
     light = "light"
 
@@ -92,7 +91,7 @@ class Dynamic:
 class JsonData:
     app_ver = Static.app_ver
     lng_index = 0
-    theme = Themes.macos
+    theme = Themes.dark
     scaner_minutes = 20
     hide_digits_mf_lst = []
 
@@ -113,8 +112,8 @@ class JsonData:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
-            if JsonData.theme not in (Themes.macos, Themes.dark, Themes.light):
-                JsonData.theme = Themes.macos
+            if JsonData.theme not in (Themes.dark, Themes.light):
+                JsonData.theme = Themes.dark
         except Exception as e:
             print("Cfg json to app error",e)
     

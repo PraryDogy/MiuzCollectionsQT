@@ -278,7 +278,7 @@ class ThemeBtn(QWidget):
     clicked = pyqtSignal(str)
     ww = 70
 
-    def __init__(self, theme: Literal["macintosh", "light", "dark"]):
+    def __init__(self, theme: Literal["light", "dark"]):
         super().__init__()
         self.theme = theme
         self.svg = os.path.join(
@@ -290,7 +290,6 @@ class ThemeBtn(QWidget):
             f"{theme}_theme_selected.svg"
         )
         text_mappings = {
-            Themes.macos: Lng.macintosh_theme,
             Themes.dark: Lng.dark_theme,
             Themes.light: Lng.light_theme,
         }
@@ -346,14 +345,14 @@ class ThemesWidget(QGroupBox):
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         main_lay.addWidget(themes_wid)
         
-        for i in (Themes.macos, Themes.dark, Themes.light):
+        for i in (Themes.dark, Themes.light):
             btn = ThemeBtn(i)
             btn.clicked.connect(lambda theme, btn=btn: self.on_btn_clicked(theme, btn))
             themes_layout.addWidget(btn)
             if i == JsonData.theme:
                 btn.select()
 
-    def on_btn_clicked(self, theme: Literal["macintosh", "light", "dark"], btn: ThemeBtn):
+    def on_btn_clicked(self, theme: Literal["light", "dark"], btn: ThemeBtn):
         theme_btns = self.findChildren(ThemeBtn)
         if theme != JsonData.theme:
             for i in theme_btns:
