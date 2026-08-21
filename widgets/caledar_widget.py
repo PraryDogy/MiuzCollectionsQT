@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (QGridLayout, QGroupBox, QHBoxLayout, QLabel,
 from cfg import Static
 
 from ._base_widgets import HSep, UMainWidget, UPushButton
-
+from cfg import JsonData, Static
 
 class CalendarBigDate(QLabel):
     def __init__(self):
@@ -98,11 +98,18 @@ class Calendar(UMainWidget):
     grid_h_spacing = 25
     grid_v_spacing = 5
 
-    def __init__(self, date_val: QDate = QDate.currentDate()):
+    def __init__(self, date: QDate = QDate.currentDate()):
         super().__init__()
-        self.q_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
-        
-        self.current_date = date_val
+
+        if JsonData.lng_index == 0:
+            lng = QLocale.Language.Russian
+            country = QLocale.Country.Russia
+        else:
+            lng = QLocale.Language.English
+            country = QLocale.Country.UnitedStates
+
+        self.q_locale = QLocale(lng, country)
+        self.current_date = date
         
         self.setWindowTitle("Кастомный Календарь")
         self.set_close_only()
@@ -190,13 +197,11 @@ class Calendar(UMainWidget):
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.grid_layout.setHorizontalSpacing(self.grid_h_spacing)
         self.grid_layout.setVerticalSpacing(self.grid_v_spacing)
-
         
         self.update_calendar()
 
-    def update_dynamic_label(self):
-        russian_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
-        readable_date = russian_locale.toString(self.current_date, "d MMMM yyyy")
+    def update_dynamic_label(self):        
+        readable_date = self.q_locale.toString(self.current_date, "d MMMM yyyy")
         self.dynamic_label.setText(readable_date)
 
     def populate_months(self):
