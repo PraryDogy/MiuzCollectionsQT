@@ -91,6 +91,7 @@ class Calendar(UMainWidget):
     svg_next = os.path.join(Static.common_icons, "next.svg")
 
     min_year = 2015
+    day_property = "day_value"
 
     cell_size = (40, 40)
     svg_nav = (20, 20)
@@ -256,9 +257,12 @@ class Calendar(UMainWidget):
         self.current_date = QDate(selected_year, current_month, target_day)
         self.update_calendar()
 
-    def day_selected(self, day: int):
-        new_date = QDate(self.current_date.year(), self.current_date.month(), day)
-        self.current_date = new_date
+    def day_selected(self):
+        sender_button: CalendarDayBase = self.sender()
+        day = sender_button.property(self.day_property)
+        current_year = self.current_date.year()
+        current_month = self.current_date.month()
+        self.current_date = QDate(current_year, current_month, day)
         self.update_calendar()
 
     # Стрелки теперь листают месяцы вперед/назад с сохранением лимитов по годам
@@ -279,64 +283,52 @@ class Calendar(UMainWidget):
     def clear_grid(self):
         while self.grid_layout.count():
             item = self.grid_layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
+            if (widget := item.widget()) is not None:
+                widget.setParent(None)
                 widget.deleteLater()
 
     def update_calendar(self):
         self.update_dynamic_label()
         current_year = self.current_date.year()
         current_month = self.current_date.month()
-        current_month_name = self.q_locale.standaloneMonthName(
+        current_day_val = self.current_date.day()
+        month = self.q_locale.standaloneMonthName(
             current_month,
             QLocale.FormatType.LongFormat
         )
-        self.btn_month.setText(current_month_name.capitalize())
+        self.btn_month.setText(month.capitalize())
         self.btn_year.setText(str(current_year))
         if current_year == self.min_year and current_month == 1:
             self.btn_prev.set_disabled()
         else:
             self.btn_prev.set_enabled()
-        
-        max_year = QDate.currentDate().year()
-        if current_year == max_year and current_month == 12:
+        if current_year == QDate.currentDate().year() and current_month == 12:
             self.btn_next.set_disabled()
         else:
             self.btn_next.set_enabled()
-
         self.clear_grid()
-
         for col in range(7):
-            day_of_week = col + 1 
-            day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
-            lbl_day = CalendarWeek(day_name)
+            week = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
+            lbl_day = CalendarWeek(week.capitalize())
             lbl_day.setFixedSize(*self.cell_size)
             self.grid_layout.addWidget(lbl_day, 0, col)
-
-        first_day_of_month = QDate(current_year, current_month, 1)
-        start_col = first_day_of_month.dayOfWeek() - 1 
-        days_in_month = self.current_date.daysInMonth()
-        selected_day = self.current_date.day() 
-        current_day = 1
+        first_day = QDate(current_year, current_month, 1)
+        col = first_day.dayOfWeek() - 1
+        days_in_month = first_day.daysInMonth()
         row = 1
-        col = start_col
-
-        while current_day <= days_in_month:
-            if current_day == selected_day:
-                btn_day = CalendarDaySelected(str(current_day))
+        for day in range(1, days_in_month + 1):
+            if day == current_day_val:
+                btn_day = CalendarDaySelected(str(day))
             else:
-                btn_day = CalendarDay(str(current_day))
-            btn_day.clicked.connect(
-                lambda d=current_day: self.day_selected(d)
-            )
-
+                btn_day = CalendarDay(str(day))
+            btn_day.setProperty(self.day_property, day)
             btn_day.setFixedSize(*self.cell_size)
+            btn_day.clicked.connect(self.day_selected)
             self.grid_layout.addWidget(btn_day, row, col)
             col += 1
             if col > 6:
                 col = 0
                 row += 1
-            current_day += 1
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
