@@ -171,3 +171,71 @@ HSep {
 GrayLabel {
     color: #818181;
 }
+
+
+
+
+QSlider::groove:horizontal {
+    border-radius: 1px;
+    height: 3px;
+    margin: 0px;
+    background-color: #353535;
+}
+
+QSlider::handle:horizontal {
+    background-color: #A2A2A2;
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin: -4px 0;
+    padding: -4px 0px;
+}
+
+
+
+
+
+USpinBox {
+    background: #3E3E3E;
+    color: #ffffff;
+    border: 1px solid #4C4C4C;
+    border-radius: 4px;
+}
+
+USpinBox::up-button {
+    width: 17px;
+    height: 10px;
+    background: #3E3E3E;
+    margin-top: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+}
+
+USpinBox::up-button:pressed {
+    background: #565656;
+}
+
+USpinBox::down-button {
+    width: 17px;
+    height: 10px;
+    background: #3E3E3E;
+    margin-bottom: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+}
+
+USpinBox::down-button:pressed {
+    background: #565656;
+}
+
+USpinBox::up-arrow {
+    image: url("./icons/common/arrow_up.svg");
+    width: 9px;
+    height: 9px;
+}
+
+USpinBox::down-arrow {
+    image: url("./icons/common/arrow_down.svg");
+    width: 9px;
+    height: 9px;
+}

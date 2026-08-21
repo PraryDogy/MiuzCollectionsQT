@@ -374,24 +374,6 @@ class USlider(QSlider):
 
     def __init__(self):
         super().__init__()
-        # self.setStyleSheet(
-        #     """
-        #         QSlider::groove:horizontal {
-        #             border-radius: 1px;
-        #             height: 3px;
-        #             margin: 0px;
-        #             background-color: palette(mid);
-        #         }
-        #         QSlider::handle:horizontal {
-        #             background-color: palette(link);
-        #             height: 10px;
-        #             width: 10px;
-        #             border-radius: 5px;
-        #             margin: -4px 0;
-        #             padding: -4px 0px;
-        #         }
-        #     """
-        # )
         self.valueChanged.connect(self._on_value_changed)
 
     def mousePressEvent(self, ev):
@@ -424,60 +406,6 @@ class USpinBox(QSpinBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.setFixedHeight(27)
-        # self.setStyleSheet(
-        #     f"""
-        #     QSpinBox {{
-        #         background: palette(button);
-        #         color: palette(text);
-        #         border: 1px solid palette(link-visited);
-        #         border-radius: 4px;
-        #     }}
-
-        #     QSpinBox::up-button {{
-        #         width: 17px;
-        #         height: 10px;
-        #         background: palette(link-visited);
-        #         margin-top: 2px;
-        #         margin-right: 2px;
-                
-        #         /* Закругляем только верхние углы */
-        #         border-radius: 4px;
-        #     }}
-
-        #     /* Фиксируем цвет верхней кнопки при клике */
-        #     QSpinBox::up-button:pressed {{
-        #         background: palette(placeholder-text);
-        #     }}
-
-        #     QSpinBox::down-button {{
-        #         width: 17px;
-        #         height: 10px;
-        #         background: palette(link-visited);
-        #         margin-bottom: 2px;
-        #         margin-right: 2px;
-                
-        #         /* Закругляем только нижние углы */
-        #         border-radius: 4px;
-        #     }}
-
-        #     /* Фиксируем цвет нижней кнопки при клике */
-        #     QSpinBox::down-button:pressed {{
-        #         background: palette(placeholder-text);
-        #     }}
-
-        #     QSpinBox::up-arrow {{
-        #         image: url("{self.ICON_UP}");
-        #         width: 9px;
-        #         height: 9px;
-        #     }}
-
-        #     QSpinBox::down-arrow {{
-        #         image: url("{self.ICON_DOWN}");
-        #         width: 9px;
-        #         height: 9px;
-        #     }}
-        #     """
-        # )
 
 
 class WinProgressbar(UMainWidget):
