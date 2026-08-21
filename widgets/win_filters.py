@@ -38,7 +38,7 @@ class DatesWidget(UGroupBox):
         self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setSpacing(RowArrowWidget.group_spacing)
 
-        title = RowArrowWidget(Lng.dates[JsonData.lng_index])
+        title = RowArrowWidget(Lng.calendar[JsonData.lng_index])
         title.set_left_icon(self.calendar_svg)
         title.hide_arrow()  
         self.main_layout.addWidget(title)

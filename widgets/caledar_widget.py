@@ -6,12 +6,13 @@ from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGridLayout, QGroupBox, QHBoxLayout, QLabel,
-                             QMenu, QPushButton, QWidget, QVBoxLayout)
+                             QMenu, QPushButton, QVBoxLayout, QWidget)
 
-from cfg import Static
+from cfg import JsonData, Static
+from system.lang import Lng
 
 from ._base_widgets import HSep, UMainWidget, UPushButton
-from cfg import JsonData, Static
+
 
 class CalendarBigDate(QLabel):
     def __init__(self):
@@ -112,7 +113,7 @@ class Calendar(UMainWidget):
         self.q_locale = QLocale(lng, country)
         self.current_date = date
         
-        self.setWindowTitle("Кастомный Календарь")
+        self.setWindowTitle(Lng.calendar[JsonData.lng_index])
         self.set_close_only()
         self.set_always_on_top()
         self.init_ui()

@@ -171,7 +171,7 @@ class Lng:
     )
     images = ("Изображения", "Images")
     menu = ("Меню", "Menu")
-    dates = ("Календарь", "Calendar")
+    calendar = ("Календарь", "Calendar")
     favorites = ("Избранное", "Favorites")
     cancel = ("Отмена", "Cancel")
     no_connection = ("Нет подключения", "No connection")
