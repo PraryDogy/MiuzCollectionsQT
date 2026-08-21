@@ -267,9 +267,10 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
 
 
 
-WinDatesDateLabel {
-    color: #7d7d7d; 
+BigDateLabel {
+    color: #c85151; 
     font-weight: 500;
+    font-size: 30px;
 }
 
 

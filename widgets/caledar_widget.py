@@ -1,3 +1,4 @@
+import os
 import sys
 from datetime import date
 
@@ -7,7 +8,15 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QMenu,
                              QPushButton, QWidget)
 
+from cfg import Static
 from widgets._base_widgets import UMainWidget, UPushButton
+
+
+class BigDateLabel(QLabel):
+
+    def __init__(self):
+        super().__init__()
+        self.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
 
 class ClickableSvgWidget(QSvgWidget):
@@ -44,20 +53,22 @@ class ClickableLabel(QLabel):
 
 
 class CustomCalendar(UMainWidget):
+    svg_calendar = os.path.join(Static.common_icons, "calendar.svg")
+    svg_previous = os.path.join(Static.common_icons, "previous.svg")
+    svg_next = os.path.join(Static.common_icons, "next.svg")
+
+    row_height = 40
+    cell_size = (40, 40)
+    svg_nav = (20, 20)
+    svg_calendar_size = (30, 30)
+    grid_h_spacing = 15
+    grid_v_spacing = 5
+
     def __init__(self, date_val: QDate = QDate.currentDate()):
         super().__init__()
         self.q_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
         
         self.current_date = date_val
-        
-        # Оставляем ячейки строго 40х40, чтобы они не были крупными
-        self.row_height = 40
-        self.cell_size = (40, 40)
-        self.svg_size = (20, 20)
-        
-        # --- НАСТРОЙКА РАСТЯЖЕНИЯ ---
-        self.grid_h_spacing = 15
-        self.grid_v_spacing = 5
         
         self.setWindowTitle("Кастомный Календарь")
         self.set_close_only()
@@ -71,8 +82,23 @@ class CustomCalendar(UMainWidget):
 
     def init_ui(self):
 
-        self.dynamic_label = QLabel("")
-        self.central_layout.addWidget(self.dynamic_label)
+        dynamic_container = QWidget()
+        self.central_layout.addWidget(dynamic_container)
+        dynamic_container_lay = QHBoxLayout(dynamic_container)
+        dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
+        dynamic_container_lay.setSpacing(15)
+        dynamic_container_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        dynamic_container_lay.addSpacing(5)
+
+        calendar_icon = QSvgWidget()
+        calendar_icon.load(self.svg_calendar)
+        calendar_icon.setFixedSize(*self.svg_calendar_size)
+        dynamic_container_lay.addWidget(calendar_icon)
+
+        self.dynamic_label = BigDateLabel()
+        self.dynamic_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        dynamic_container_lay.addWidget(self.dynamic_label)
 
         # --- Первая строка: Панель навигации ---
         self.nav_widget = QWidget()
@@ -81,8 +107,8 @@ class CustomCalendar(UMainWidget):
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
         self.nav_layout.setSpacing(5)
     
-        self.btn_prev = ClickableSvgWidget("./icons/common/previous.svg")
-        self.btn_prev.setFixedSize(*self.svg_size)
+        self.btn_prev = ClickableSvgWidget(self.svg_previous)
+        self.btn_prev.setFixedSize(*self.svg_nav)
         self.btn_prev.clicked.connect(self.prev_month)
         
         # Убираем fixedWidth, чтобы кнопки подстраивались под новую ширину
@@ -96,8 +122,8 @@ class CustomCalendar(UMainWidget):
         self.btn_year.setMenu(self.menu_year)
         self.populate_years()
         
-        self.btn_next = ClickableSvgWidget("./icons/common/next.svg")
-        self.btn_next.setFixedSize(*self.svg_size)
+        self.btn_next = ClickableSvgWidget(self.svg_next)
+        self.btn_next.setFixedSize(*self.svg_nav)
         self.btn_next.clicked.connect(self.next_month)
         
         # Распределяем верхние кнопки по ширине широкого календаря
