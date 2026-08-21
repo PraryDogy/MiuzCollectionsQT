@@ -105,6 +105,7 @@ class BarTopBtn(QWidget):
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.lbl = GrayLabel("")
+        self.lbl.set_font_size(9)
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.set_base_style()

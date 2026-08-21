@@ -166,3 +166,8 @@ QPushButton:pressed {
 HSep {
     background: #353535;
 }
+
+
+GrayLabel {
+    color: #818181;
+}

@@ -550,21 +550,12 @@ class WinProgressbar(UMainWidget):
 class GrayLabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
-        self.font_size_px = 9
-        self._update_stylesheet()
+        self.set_font_size(11)
 
-    def _update_stylesheet(self):
-        pass
-        # self.setStyleSheet(
-        #     f"""
-        #         color: palette(midlight);
-        #         font-size: {self.font_size_px}px;
-        #     """
-        # )
-
-    def set_text_size(self, size_px: int = 9):
-        self.font_size_px = size_px
-        self._update_stylesheet()
+    def set_font_size(self, value_px: int):
+        font = self.font()
+        font.setPixelSize(value_px)
+        self.setFont(font)
 
 
 # class HoverGrayLabel(GrayLabel):

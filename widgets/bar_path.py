@@ -39,7 +39,6 @@ class PathItem(QWidget):
         item_layout.addWidget(self.img_wid)
         
         self.text_wid = GrayLabel(text=name)
-        self.text_wid.set_text_size(11)
         self.collapse()
         item_layout.addWidget(self.text_wid)
 
