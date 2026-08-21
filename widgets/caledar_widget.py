@@ -104,10 +104,10 @@ class Calendar(UMainWidget):
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # Большая дата
-        dynamic_container = QWidget()
+        dynamic_container = QGroupBox()
         self.central_layout.addWidget(dynamic_container)
         dynamic_container_lay = QHBoxLayout(dynamic_container)
-        dynamic_container_lay.setContentsMargins(0, 0, 0, 10)
+        dynamic_container_lay.setContentsMargins(0, 0, 0, 5)
 
         dynamic_container_lay.addSpacing(5)
 
@@ -120,8 +120,6 @@ class Calendar(UMainWidget):
         dynamic_container_lay.addWidget(self.dynamic_label)
 
         dynamic_container_lay.addStretch()
-
-        self.central_layout.addWidget(HSep())
 
         # Календарь навигация
         self.nav_widget = QWidget()
