@@ -558,24 +558,6 @@ class GrayLabel(QLabel):
         self.setFont(font)
 
 
-# class HoverGrayLabel(GrayLabel):
-#     def __init__(self, text: str):
-#         super().__init__(text)
-
-#     def _update_stylesheet(self):
-#         self.setStyleSheet(
-#             f"""
-#                 HoverGrayLabel {{
-#                     color: rgba(128, 128, 128, 1.0);
-#                     font-size: {self.font_size_px}px;
-#                 }}
-#                 HoverGrayLabel:hover {{
-#                     color: rgba(255, 255, 255, 1.0);
-#                 }}
-#             """
-#         )
-
-
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
