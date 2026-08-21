@@ -450,7 +450,7 @@ class USlider(QSlider):
 class USpinBox(QSpinBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.setFixedHeight(27)
+        self.setFixedHeight(26)
         self.setStyleSheet(
             """
             QSpinBox {
@@ -476,16 +476,16 @@ class USpinBox(QSpinBox):
 
             QSpinBox::down-button {
                 width: 17px;
-                height: 10px;
+                height: 9px;
                 background: palette(link-visited);
-                margin-bottom: 5px;
-                margin-right: 5px;
+                margin-bottom: 2px;
+                margin-right: 2px;
                 
                 /* Закругляем только нижние углы */
                 border-top-left-radius: 0px;
                 border-top-right-radius: 0px;
-                border-bottom-left-radius: 3px;
-                border-bottom-right-radius: 3px;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
             }
             QSpinBox::up-arrow {
                 image: url("icons/common/arrow_up.svg");
