@@ -27,6 +27,12 @@ class ClickableSvgWidget(QSvgWidget):
             super().mousePressEvent(event)
 
 
+class MonthYearBtn(UPushButton):
+    def __init__(self, text):
+        super().__init__(text)
+        self.setFixedWidth(90)
+
+
 class CustomCalendar(UMainWidget):
     def __init__(self):
         super().__init__()
@@ -48,15 +54,14 @@ class CustomCalendar(UMainWidget):
         self.btn_prev.clicked.connect(self.prev_year)
         
         # Кнопка выбора месяца с QMenu
-        self.btn_month = UPushButton("")
+        self.btn_month = MonthYearBtn("")
         self.menu_month = QMenu(self)
         self.btn_month.setMenu(self.menu_month)
         self.populate_months()
 
-        self.nav_layout.addSpacing(15)
         
         # Кнопка выбора года с QMenu
-        self.btn_year = UPushButton("")
+        self.btn_year = MonthYearBtn("")
         self.menu_year = QMenu(self)
         self.btn_year.setMenu(self.menu_year)
         self.populate_years()
@@ -70,6 +75,7 @@ class CustomCalendar(UMainWidget):
         self.nav_layout.addWidget(self.btn_prev)
         self.nav_layout.addStretch()
         self.nav_layout.addWidget(self.btn_month)
+        self.nav_layout.addSpacing(5)
         self.nav_layout.addWidget(self.btn_year)
         self.nav_layout.addStretch()
         self.nav_layout.addWidget(self.btn_next)
@@ -139,34 +145,29 @@ class CustomCalendar(UMainWidget):
                 widget.deleteLater()
 
     def update_calendar(self):
-        """Перерисовывает кнопки навигации и сетку дней."""
-        # Обновляем текст на кнопках месяцев и лет
-        current_month_name = self.q_locale.standaloneMonthName(self.current_date.month, QLocale.FormatType.LongFormat).capitalize()
-        self.btn_month.setText(current_month_name)
+        current_month_name = self.q_locale.standaloneMonthName(
+            self.current_date.month,
+            QLocale.FormatType.LongFormat
+        )
+        self.btn_month.setText(current_month_name.capitalize())
         self.btn_year.setText(str(self.current_date.year))
         
-        # Блокируем стрелки, если вышли за границы 2015 — текущий год
         self.btn_prev.setEnabled(self.current_date.year > 2015)
-        self.btn_prev.setStyleSheet("" if self.current_date.year > 2015 else "opacity: 0.5;")
         
         max_year = date.today().year
         self.btn_next.setEnabled(self.current_date.year < max_year)
-        self.btn_next.setStyleSheet("" if self.current_date.year < max_year else "opacity: 0.5;")
 
         # Очищаем старую сетку
         self.clear_grid()
 
-        # --- 1. Отрисовка дней недели ---
-        # Дни недели в QLocale: 1 = Понедельник, 7 = Воскресенье (для большинства локалей)
         for col in range(7):
             # Переводим индекс колонки (0..6) в день недели (1..7)
             # В русской локали первый день недели — понедельник (1)
             day_of_week = col + 1 
             day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
-            
             lbl_day = QLabel(day_name)
+            lbl_day.setFixedSize(40, 40)
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            lbl_day.setStyleSheet("font-weight: bold; color: #555555; padding-bottom: 5px;")
             self.grid_layout.addWidget(lbl_day, 0, col)
 
         # --- 2. Отрисовка дней текущего месяца ---
@@ -191,18 +192,9 @@ class CustomCalendar(UMainWidget):
         col = start_col
 
         while current_day <= days_in_month:
-            btn_day = UPushButton(str(current_day))
-            btn_day.setCheckable(True)
-            btn_day.setMinimumSize(40, 40)
-            
-            # Стилизация кнопок (подсветка сегодняшнего дня)
-            if year == date.today().year and month == date.today().month and current_day == date.today().day:
-                btn_day.setStyleSheet("font-weight: bold; background-color: #e1f5fe; border: 1px solid #0288d1;")
-            else:
-                btn_day.setStyleSheet("background-color: #ffffff; border: 1px solid #e0e0e0;")
-
+            btn_day = QLabel(str(current_day))
+            btn_day.setFixedSize(40, 40)
             self.grid_layout.addWidget(btn_day, row, col)
-            
             current_day += 1
             col += 1
             if col > 6:
