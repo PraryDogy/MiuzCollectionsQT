@@ -23,7 +23,8 @@ class UMenuStyle(QMenu):
         self.setStyleSheet(
             """
             UMenuStyle {
-                border-radius: 0px;
+                border-radius: 8px;
+                background: palette(tooltip-base);
             }
             """
         )
