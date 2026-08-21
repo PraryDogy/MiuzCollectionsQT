@@ -157,7 +157,7 @@ class WindowMixin:
 class UMainWindow(WindowMixin, QMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-        central_widget = QWidget(self)
+        central_widget = QFrame(self)
         self.setCentralWidget(central_widget)
         self.central_layout = QVBoxLayout(central_widget)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -165,12 +165,22 @@ class UMainWindow(WindowMixin, QMainWindow):
         self.register_window()
 
 
+# стилизованное простое окно
 class UMainWidget(WindowMixin, QWidget):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-        self.central_layout = QVBoxLayout(self)
+
+        central_layout = QVBoxLayout(self)
+        central_layout.setContentsMargins(0, 0, 0, 0)
+        central_layout.setSpacing(0)
+
+        frame = QFrame()
+        central_layout.addWidget(frame)
+
+        self.central_layout = QVBoxLayout(frame)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(0)
+
         self.register_window()
 
 

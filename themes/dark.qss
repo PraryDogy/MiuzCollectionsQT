@@ -15,12 +15,10 @@
 
 
 
-QFrame {
+.QFrame {
     background: #1e1e1e;
     border: none;
 }
-
-
 
 
 QMenu {
