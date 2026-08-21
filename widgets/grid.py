@@ -109,8 +109,8 @@ class BlueTextWidget(ThumbBaseLabel):
     # Инкапсулированная статическая переменная
     FONT_SIZE = 11
 
-    def __init__(self, data_item: DataItem, opacity_percent: int = 40):
-        super().__init__(opacity_percent)
+    def __init__(self, data_item: DataItem):
+        super().__init__()
         self.data_item = data_item
         self.set_style()
 
