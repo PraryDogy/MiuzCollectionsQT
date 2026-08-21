@@ -448,19 +448,23 @@ class USlider(QSlider):
 
 
 class USpinBox(QSpinBox):
+    # Инкапсулированные статические переменные для путей к иконкам
+    ICON_UP = "icons/common/arrow_up.svg"
+    ICON_DOWN = "icons/common/arrow_down.svg"
+
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.setFixedHeight(27)
         self.setStyleSheet(
-            """
-            QSpinBox {
+            f"""
+            QSpinBox {{
                 background: palette(button);
                 color: palette(text);
                 border: 1px solid palette(link-visited);
                 border-radius: 4px;
-            }
+            }}
 
-            QSpinBox::up-button {
+            QSpinBox::up-button {{
                 width: 17px;
                 height: 10px;
                 background: palette(link-visited);
@@ -468,18 +472,15 @@ class USpinBox(QSpinBox):
                 margin-right: 2px;
                 
                 /* Закругляем только верхние углы */
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-                border-bottom-left-radius: 4px;
-                border-bottom-right-radius: 4px;
-            }
+                border-radius: 4px;
+            }}
 
             /* Фиксируем цвет верхней кнопки при клике */
-            QSpinBox::up-button:pressed {
+            QSpinBox::up-button:pressed {{
                 background: palette(placeholder-text);
-            }
+            }}
 
-            QSpinBox::down-button {
+            QSpinBox::down-button {{
                 width: 17px;
                 height: 10px;
                 background: palette(link-visited);
@@ -487,35 +488,27 @@ class USpinBox(QSpinBox):
                 margin-right: 2px;
                 
                 /* Закругляем только нижние углы */
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-                border-bottom-left-radius: 4px;
-                border-bottom-right-radius: 4px;
-            }
+                border-radius: 4px;
+            }}
 
             /* Фиксируем цвет нижней кнопки при клике */
-            QSpinBox::down-button:pressed {
+            QSpinBox::down-button:pressed {{
                 background: palette(placeholder-text);
-            }
+            }}
 
-            QSpinBox::up-arrow {
-                image: url("icons/common/arrow_up.svg");
+            QSpinBox::up-arrow {{
+                image: url("{self.ICON_UP}");
                 width: 9px;
                 height: 9px;
-            }
+            }}
 
-            QSpinBox::down-arrow {
-                image: url("icons/common/arrow_down.svg");
+            QSpinBox::down-arrow {{
+                image: url("{self.ICON_DOWN}");
                 width: 9px;
                 height: 9px;
-            }
+            }}
             """
         )
-
-
-
-
-
 
 
 class WinProgressbar(UMainWidget):
