@@ -146,6 +146,23 @@ QTreeWidget::item:selected:!active {
 
 
 
+QTreeView {
+    background: #171717;
+    color: #ffffff;
+}
+
+QTreeView::item:selected {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+QTreeView::item:selected:!active {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+
+
 
 QPushButton {
     background: #4e4e4e;
