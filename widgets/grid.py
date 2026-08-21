@@ -27,14 +27,9 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
 
 
 class ThumbBaseLabel(QLabel):
-    def __init__(self, opacity_percent: int = 100):
+    def __init__(self):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        # Эффект создается один раз для предотвращения утечек памяти
-        self._opacity_effect = QGraphicsOpacityEffect(self)
-        self.setGraphicsEffect(self._opacity_effect)
-        self.set_opacity(opacity_percent)
 
     def get_shorten_text(self, text: str, parent_width: int, offset=5):
         metrics = QFontMetrics(self.font())
@@ -45,7 +40,7 @@ class ThumbBaseLabel(QLabel):
         )
 
     def set_opacity(self, percent: int):
-        self._opacity_effect.setOpacity(percent / 100)
+        return
 
 
 class ThumbImgWidget(ThumbBaseLabel):
@@ -59,12 +54,18 @@ class ThumbImgWidget(ThumbBaseLabel):
 
     def set_framed_style(self):
         self.setStyleSheet(
-            f"background: {self.RGBA_GRAY}; border-radius: {self.BORDER_RADIUS}px;"
+            f"""
+                background-color: palette(link-visited);
+                border-radius: {self.BORDER_RADIUS}px;
+            """
         )
     
     def set_no_frame_style(self):
         self.setStyleSheet(
-            f"background: transparent; border-radius: {self.BORDER_RADIUS}px;"
+            f"""
+                background: transparent;
+                border-radius: {self.BORDER_RADIUS}px;
+            """
         )
 
 
@@ -120,7 +121,7 @@ class BlueTextWidget(ThumbBaseLabel):
 
     def set_style(self):
         self.setStyleSheet(
-            f"font-size: {self.FONT_SIZE}px; color: palette(text);"
+            f"font-size: {self.FONT_SIZE}px; color: palette(midlight);"
         )
 
 
@@ -129,8 +130,8 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
     FONT_SIZE = 11
     COLLECTION_RE = re.compile(r"^/+(?:\d+\s+)?([^/]+)")
 
-    def __init__(self, data_item: DataItem, opacity_percent: int = 40):
-        super().__init__(opacity_percent)
+    def __init__(self, data_item: DataItem):
+        super().__init__()
         self.data_item = data_item
         self.set_style()
 
@@ -147,7 +148,7 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
 
     def set_style(self):
         self.setStyleSheet(
-            f"font-size: {self.FONT_SIZE}px; color: palette(text);"
+            f"font-size: {self.FONT_SIZE}px; color: palette(midlight);"
         )
 
 
