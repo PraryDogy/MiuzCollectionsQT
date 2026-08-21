@@ -20,32 +20,32 @@ from system.utils import Utils
 class UMenuStyle(QMenu):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setStyleSheet(
-            """
-            UMenuStyle {
-                background: palette(tool-tip-base);
-                border: 1px solid palette(link-visited);
-                border-radius: 8px;
-                padding: 3px; /* компактный внутренний отступ самого меню */
-            }
+        # self.setStyleSheet(
+        #     """
+        #     UMenuStyle {
+        #         background: palette(tool-tip-base);
+        #         border: 1px solid palette(link-visited);
+        #         border-radius: 8px;
+        #         padding: 3px; /* компактный внутренний отступ самого меню */
+        #     }
 
-            UMenuStyle::item {
-                background: transparent;
-                color: palette(text);
-                /* 3px сверху/снизу (вместо 6px) и 16px слева/справа (вместо 20px) */
-                padding: 3px 16px; 
-                margin: 0px; /* убираем лишнее расстояние между строками */
-                border-radius: 4px; /* чуть уменьшили радиус под компактный размер */
-            }
+        #     UMenuStyle::item {
+        #         background: transparent;
+        #         color: palette(text);
+        #         /* 3px сверху/снизу (вместо 6px) и 16px слева/справа (вместо 20px) */
+        #         padding: 3px 16px; 
+        #         margin: 0px; /* убираем лишнее расстояние между строками */
+        #         border-radius: 4px; /* чуть уменьшили радиус под компактный размер */
+        #     }
 
-            /* Стиль выделенного (активного) пункта меню */
-            UMenuStyle::item:selected {
-                background: palette(highlight);
-                color: palette(highlighted-text);
-                border-radius: 4px;
-            }
-            """
-        )
+        #     /* Стиль выделенного (активного) пункта меню */
+        #     UMenuStyle::item:selected {
+        #         background: palette(highlight);
+        #         color: palette(highlighted-text);
+        #         border-radius: 4px;
+        #     }
+        #     """
+        # )
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.RightButton:
@@ -79,13 +79,14 @@ class ULineEdit(QLineEdit):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(self.hh)
-        self.setStyleSheet(
-            f"""
-                padding-left: 2px;
-                padding-right: 28px;
-                border: 1px solid palette(button);
-            """
-        )
+        # self.setStyleSheet(
+        #     f"""
+        #         padding-left: 2px;
+        #         padding-right: 28px;
+        #         border: 1px solid palette(tooltip-base);
+        #         border-radius: 6px;
+        #     """
+        # )
 
     def cut_selection(self, *args):
         text = self.selectedText()
@@ -119,11 +120,12 @@ class UTextEdit(QTextEdit):
     def __init__(self):
         super().__init__()
 
-        self.setStyleSheet(
-            f"""
-                border: 1px solid palette(button);
-            """
-        )
+        # self.setStyleSheet(
+        #     f"""
+        #         border: 1px solid palette(tooltip-base);
+        #         border-radius: 6px;
+        #     """
+        # )
 
     def copy_selection(self):
         cur = self.textCursor()
@@ -161,23 +163,23 @@ class UTextEdit(QTextEdit):
 class UGroupBox(QGroupBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.setStyleSheet(
-            """
-            QGroupBox {
-                background-color: palette(tooltip-base);
-                border: 1px solid palette(mid);
-                border-radius: 5px;
-                margin-top: 12px; 
-            }
+        # self.setStyleSheet(
+        #     """
+        #     QGroupBox {
+        #         background-color: palette(tooltip-base);
+        #         border: 1px solid palette(mid);
+        #         border-radius: 5px;
+        #         margin-top: 12px; 
+        #     }
             
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                subcontrol-position: top left;
-                left: 10px;
-                padding: 0 3px;
-            }
-            """
-        )
+        #     QGroupBox::title {
+        #         subcontrol-origin: margin;
+        #         subcontrol-position: top left;
+        #         left: 10px;
+        #         padding: 0 3px;
+        #     }
+        #     """
+        # )
 
 class WindowMixin:
     win_list: list[QMainWindow] = []
@@ -243,13 +245,13 @@ class VScrollArea(QScrollArea):
         self.setAcceptDrops(True)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setStyleSheet(
-            """
-            VScrollArea { 
-                border: none; 
-            }
-            """
-        )
+        # self.setStyleSheet(
+        #     """
+        #     VScrollArea { 
+        #         border: none; 
+        #     }
+        #     """
+        # )
 
 
 class VListWidgetItem(QListWidgetItem):
@@ -298,25 +300,25 @@ class UPushButton(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
         self.setFixedHeight(20)
-        self.setStyleSheet(
-            """
-            font-size: 11pt;
-            background: palette(button);
-            border: 1px solid palette(link-visited);
-            border-radius: 4px;
-            """
-        )
+        # self.setStyleSheet(
+        #     """
+        #     font-size: 11pt;
+        #     background: palette(button);
+        #     border: 1px solid palette(link-visited);
+        #     border-radius: 4px;
+        #     """
+        # )
         self.setFixedWidth(80)
 
 
 class HSep(QFrame):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(
-            """
-                background: palette(mid);
-            """
-        )
+        # self.setStyleSheet(
+        #     """
+        #         background: palette(mid);
+        #     """
+        # )
         self.setFixedHeight(1)
 
 
@@ -426,24 +428,24 @@ class USlider(QSlider):
 
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(
-            """
-                QSlider::groove:horizontal {
-                    border-radius: 1px;
-                    height: 3px;
-                    margin: 0px;
-                    background-color: palette(mid);
-                }
-                QSlider::handle:horizontal {
-                    background-color: palette(link);
-                    height: 10px;
-                    width: 10px;
-                    border-radius: 5px;
-                    margin: -4px 0;
-                    padding: -4px 0px;
-                }
-            """
-        )
+        # self.setStyleSheet(
+        #     """
+        #         QSlider::groove:horizontal {
+        #             border-radius: 1px;
+        #             height: 3px;
+        #             margin: 0px;
+        #             background-color: palette(mid);
+        #         }
+        #         QSlider::handle:horizontal {
+        #             background-color: palette(link);
+        #             height: 10px;
+        #             width: 10px;
+        #             border-radius: 5px;
+        #             margin: -4px 0;
+        #             padding: -4px 0px;
+        #         }
+        #     """
+        # )
         self.valueChanged.connect(self._on_value_changed)
 
     def mousePressEvent(self, ev):
@@ -476,60 +478,60 @@ class USpinBox(QSpinBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.setFixedHeight(27)
-        self.setStyleSheet(
-            f"""
-            QSpinBox {{
-                background: palette(button);
-                color: palette(text);
-                border: 1px solid palette(link-visited);
-                border-radius: 4px;
-            }}
+        # self.setStyleSheet(
+        #     f"""
+        #     QSpinBox {{
+        #         background: palette(button);
+        #         color: palette(text);
+        #         border: 1px solid palette(link-visited);
+        #         border-radius: 4px;
+        #     }}
 
-            QSpinBox::up-button {{
-                width: 17px;
-                height: 10px;
-                background: palette(link-visited);
-                margin-top: 2px;
-                margin-right: 2px;
+        #     QSpinBox::up-button {{
+        #         width: 17px;
+        #         height: 10px;
+        #         background: palette(link-visited);
+        #         margin-top: 2px;
+        #         margin-right: 2px;
                 
-                /* Закругляем только верхние углы */
-                border-radius: 4px;
-            }}
+        #         /* Закругляем только верхние углы */
+        #         border-radius: 4px;
+        #     }}
 
-            /* Фиксируем цвет верхней кнопки при клике */
-            QSpinBox::up-button:pressed {{
-                background: palette(placeholder-text);
-            }}
+        #     /* Фиксируем цвет верхней кнопки при клике */
+        #     QSpinBox::up-button:pressed {{
+        #         background: palette(placeholder-text);
+        #     }}
 
-            QSpinBox::down-button {{
-                width: 17px;
-                height: 10px;
-                background: palette(link-visited);
-                margin-bottom: 2px;
-                margin-right: 2px;
+        #     QSpinBox::down-button {{
+        #         width: 17px;
+        #         height: 10px;
+        #         background: palette(link-visited);
+        #         margin-bottom: 2px;
+        #         margin-right: 2px;
                 
-                /* Закругляем только нижние углы */
-                border-radius: 4px;
-            }}
+        #         /* Закругляем только нижние углы */
+        #         border-radius: 4px;
+        #     }}
 
-            /* Фиксируем цвет нижней кнопки при клике */
-            QSpinBox::down-button:pressed {{
-                background: palette(placeholder-text);
-            }}
+        #     /* Фиксируем цвет нижней кнопки при клике */
+        #     QSpinBox::down-button:pressed {{
+        #         background: palette(placeholder-text);
+        #     }}
 
-            QSpinBox::up-arrow {{
-                image: url("{self.ICON_UP}");
-                width: 9px;
-                height: 9px;
-            }}
+        #     QSpinBox::up-arrow {{
+        #         image: url("{self.ICON_UP}");
+        #         width: 9px;
+        #         height: 9px;
+        #     }}
 
-            QSpinBox::down-arrow {{
-                image: url("{self.ICON_DOWN}");
-                width: 9px;
-                height: 9px;
-            }}
-            """
-        )
+        #     QSpinBox::down-arrow {{
+        #         image: url("{self.ICON_DOWN}");
+        #         width: 9px;
+        #         height: 9px;
+        #     }}
+        #     """
+        # )
 
 
 class WinProgressbar(UMainWidget):
@@ -606,12 +608,13 @@ class GrayLabel(QLabel):
         self._update_stylesheet()
 
     def _update_stylesheet(self):
-        self.setStyleSheet(
-            f"""
-                color: palette(midlight);
-                font-size: {self.font_size_px}px;
-            """
-        )
+        pass
+        # self.setStyleSheet(
+        #     f"""
+        #         color: palette(midlight);
+        #         font-size: {self.font_size_px}px;
+        #     """
+        # )
 
     def set_text_size(self, size_px: int = 9):
         self.font_size_px = size_px

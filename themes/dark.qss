@@ -1,0 +1,23 @@
+/* styles.qss */
+
+QMenu {
+    background: #2a2a2a;
+    border: 1px solid #4C4C4C;
+    border-radius: 8px;
+    padding: 3px;
+}
+
+QMenu::item {
+    background: transparent;
+    color: #ffffff;
+    padding: 3px 16px; /* 3px сверху/снизу и 16px слева/справа */
+    margin: 0px; /* убираем лишнее расстояние между строками */
+    border-radius: 4px; /* чуть уменьшили радиус под компактный размер */
+}
+
+/* Стиль выделенного (активного) пункта меню */
+QMenu::item:selected {
+    color: #ffffff;
+    background: #0059d1;
+    border-radius: 4px;
+}
