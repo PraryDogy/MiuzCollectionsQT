@@ -4,11 +4,11 @@ import re
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QCloseEvent, QContextMenuEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
-                             QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSlider, QSpacerItem, QSpinBox,
-                             QStackedWidget, QTextEdit, QTreeWidget,
+from PyQt6.QtWidgets import (QDateEdit, QFileDialog, QFrame, QGroupBox,
+                             QHBoxLayout, QLabel, QLineEdit, QListWidget,
+                             QListWidgetItem, QMainWindow, QMenu, QProgressBar,
+                             QPushButton, QScrollArea, QSlider, QSpacerItem,
+                             QSpinBox, QStackedWidget, QTextEdit, QTreeWidget,
                              QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
@@ -404,10 +404,12 @@ class USlider(QSlider):
 
 
 class USpinBox(QSpinBox):
-    # Инкапсулированные статические переменные для путей к иконкам
-    ICON_UP = "icons/common/arrow_up.svg"
-    ICON_DOWN = "icons/common/arrow_down.svg"
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.setFixedHeight(27)
 
+
+class UDateEdit(QDateEdit):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.setFixedHeight(27)

@@ -3,17 +3,17 @@ import os
 from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в начало файла
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QDateEdit, QGraphicsOpacityEffect, QHBoxLayout,
-                             QLabel, QSpinBox, QSplitter, QToolButton,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSpinBox, QSplitter,
+                             QToolButton, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UGroupBox,
-                            UMainWidget, UMenu, UPushButton, UTextEditDark,
-                            VListSpacerItem, VListWidget, VListWidgetItem)
+from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
+                            UGroupBox, UMainWidget, UMenu, UPushButton,
+                            UTextEditDark, VListSpacerItem, VListWidget,
+                            VListWidgetItem)
 
 
 class WinDatesDateLabel(QLabel):
@@ -37,18 +37,16 @@ class DatesWidget(UGroupBox):
         self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setSpacing(RowArrowWidget.group_spacing)
 
-
         title = RowArrowWidget(Lng.dates[JsonData.lng_index])
         title.set_left_icon(self.calendar_svg)
-        title.hide_arrow()  # Скрываем стрелку, так как она не нужна для заголовка
-        # title.left_icon.setFixedSize(50, 50)
+        title.hide_arrow()  
         self.main_layout.addWidget(title)
 
         self.main_layout.addWidget(HSep())
         
-    
-        # --- СТРОКА 1: Элементы управления (Горизонтальный layout) ---
-        self.top_row_layout = QHBoxLayout()
+        # --- СТРОКА 1: Виджет панели управления (Вместо вложенного layout) ---
+        self.top_row_widget = QWidget()
+        self.top_row_layout = QHBoxLayout(self.top_row_widget)
         self.top_row_layout.setContentsMargins(0, 0, 0, 0)
         self.top_row_layout.setSpacing(0)
         self.top_row_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
@@ -89,15 +87,15 @@ class DatesWidget(UGroupBox):
         # Выбор дат "От" и "До"
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
-        self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
+        self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
         self.date_from.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_from)
 
-        self.top_row_layout.addSpacing(10) # Небольшой отступ между датами
+        self.top_row_layout.addSpacing(10) 
 
         to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(to_label)
-        self.date_to = QDateEdit(QDate.currentDate())
+        self.date_to = UDateEdit(QDate.currentDate())
         self.date_to.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_to)
 
@@ -109,11 +107,10 @@ class DatesWidget(UGroupBox):
 
         for widget in [self.date_from, self.date_to]:
             widget.setEnabled(True)  
-            self.style_date_edit_calendar(widget)
             widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             widget.dateChanged.connect(self.on_custom_date_changed)
 
-        # Пружина смещает кнопку сброса вправо в первой строке
+        # Пружина смещает кнопку сброса вправо
         self.top_row_layout.addStretch(1)
 
         # Кнопка сброса
@@ -121,8 +118,8 @@ class DatesWidget(UGroupBox):
         self.reset_btn.clicked.connect(self.clear_btn_cmd) 
         self.top_row_layout.addWidget(self.reset_btn)
 
-        # Добавляем первую строку в главный вертикальный layout
-        self.main_layout.addLayout(self.top_row_layout)
+        # Добавляем созданную строку-виджет в главный вертикальный layout
+        self.main_layout.addWidget(self.top_row_widget)
 
         # --- СТРОКА 2: Разделитель HSep ---
         self.main_layout.addWidget(HSep())
@@ -134,6 +131,7 @@ class DatesWidget(UGroupBox):
         # Инициализация логики
         self.handle_preset_change(Dynamic.date_index)
         self.update_readable_date_label()
+
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
@@ -220,7 +218,9 @@ class DatesWidget(UGroupBox):
         self.handle_preset_change(0)
         self.reload_thumbnails.emit()
 
-    def style_date_edit_calendar(self, date_edit: QDateEdit):
+    def style_date_edit_calendar(self, date_edit: UDateEdit):
+
+
         date_edit.setCalendarPopup(True)
         calendar = date_edit.calendarWidget()
         if JsonData.lng_index == 0:
