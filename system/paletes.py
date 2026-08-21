@@ -71,7 +71,7 @@ class UPallete:
         # BarTop, PathBar, BarBottom
         p.setColor(color.Midlight, QColor("#818181"))
         # Кружок QSlider
-        p.setColor(color.Link, QColor("#818181"))
+        p.setColor(color.Link, QColor("#A2A2A2"))
 
         return p
 
