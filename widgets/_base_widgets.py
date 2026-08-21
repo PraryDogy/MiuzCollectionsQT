@@ -461,21 +461,31 @@ class USpinBox(QSpinBox):
             }
 
             QSpinBox::up-button {
-                width: 15px;
-                height: 9px;
-                border-radius: 2px;
+                width: 17px;
+                height: 10px;
                 background: palette(link-visited);
                 margin-top: 2px;
                 margin-right: 2px;
+                
+                /* Закругляем только верхние углы */
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+                border-bottom-left-radius: 0px;
+                border-bottom-right-radius: 0px;
             }
 
             QSpinBox::down-button {
-                width: 15px;
-                height: 9px;
-                border-radius: 2px;
+                width: 17px;
+                height: 10px;
                 background: palette(link-visited);
                 margin-bottom: 2px;
                 margin-right: 2px;
+                
+                /* Закругляем только нижние углы */
+                border-top-left-radius: 0px;
+                border-top-right-radius: 0px;
+                border-bottom-left-radius: 3px;
+                border-bottom-right-radius: 3px;
             }
             QSpinBox::up-arrow {
                 image: url("icons/common/arrow_up.svg");
@@ -488,9 +498,9 @@ class USpinBox(QSpinBox):
                 width: 9px;
                 height: 9px;
             }
-
             """
         )
+
 
 
 
