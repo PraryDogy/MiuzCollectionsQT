@@ -450,7 +450,7 @@ class USlider(QSlider):
 class USpinBox(QSpinBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.setFixedHeight(14)
+        self.setFixedHeight(26)
         self.setStyleSheet(
             """
             QSpinBox {
@@ -458,25 +458,37 @@ class USpinBox(QSpinBox):
                 color: palette(text);
                 border: 1px solid palette(link-visited);
                 border-radius: 4px;
-                padding-left: 2px;
-                padding-right: 2px;
             }
+
             QSpinBox::up-button {
-                width: 12px;
+                width: 15px;
                 height: 9px;
                 border-radius: 2px;
                 background: palette(link-visited);
                 margin-top: 2px;
-                margin-right: 3px;
+                margin-right: 2px;
             }
+
             QSpinBox::down-button {
-                width: 12px;
+                width: 15px;
                 height: 9px;
                 border-radius: 2px;
                 background: palette(link-visited);
                 margin-bottom: 2px;
-                margin-right: 3px;
+                margin-right: 2px;
             }
+            QSpinBox::up-arrow {
+                image: url("icons/common/arrow_up.svg");
+                width: 9px;
+                height: 9px;
+            }
+
+            QSpinBox::down-arrow {
+                image: url("icons/common/arrow_down.svg");
+                width: 9px;
+                height: 9px;
+            }
+
             """
         )
 
