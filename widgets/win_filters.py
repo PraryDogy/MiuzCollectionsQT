@@ -12,7 +12,7 @@ from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UGroupBox,
-                            UMainWidget, UMenu, UPushButton, UTextEdit,
+                            UMainWidget, UMenu, UPushButton, UTextEditDark,
                             VListSpacerItem, VListWidget, VListWidgetItem)
 
 
@@ -404,7 +404,7 @@ class WinFilters(UMainWidget):
         active_group_lay.addWidget(self.active_label)
 
         # Текстовое поле для вывода списка
-        self.active_filters = UTextEdit()
+        self.active_filters = UTextEditDark()
         self.active_filters.setReadOnly(True)
         self.active_filters.setText(self.get_filters_text())
         active_group_lay.addWidget(self.active_filters)

@@ -10,7 +10,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import GrayLabel, ULineEdit, UMenu
+from ._base_widgets import GrayLabel, ULineEditLight, UMenu
 
 
 class ClearBtn(QSvgWidget):
@@ -18,7 +18,7 @@ class ClearBtn(QSvgWidget):
     icon_path = os.path.join(Static.common_icons, "cancel.svg")
     icon_size = 11
 
-    def __init__(self, parent: ULineEdit):
+    def __init__(self, parent: ULineEditLight):
         super().__init__(parent=parent)
         self.setFixedSize(self.icon_size, self.icon_size)
         self.load(self.icon_path)
@@ -38,7 +38,7 @@ class ClearBtn(QSvgWidget):
         self.setCursor(Qt.CursorShape.ArrowCursor)
 
 
-class WidSearch(ULineEdit):
+class WidSearch(ULineEditLight):
     reload_thumbnails = pyqtSignal()
     open_img_search = pyqtSignal()
     ww = 162

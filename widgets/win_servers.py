@@ -12,7 +12,7 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (ConfirmWindow, UGroupBox, ULineEdit, UMainWidget,
+from ._base_widgets import (ConfirmWindow, UGroupBox, ULineEditDark, UMainWidget,
                             UMenu, UPushButton, VListWidget, VListWidgetItem)
 
 
@@ -128,21 +128,21 @@ class LoginWin(UMainWidget):
         alias_label = ServerLabel(text=Lng.alias[JsonData.lng_index].capitalize())
         grop_lay.addWidget(alias_label)
 
-        self.alias = ULineEdit()
+        self.alias = ULineEditDark()
         self.alias.setPlaceholderText(Lng.alias[JsonData.lng_index].capitalize())
         grop_lay.addWidget(self.alias)
 
         server_label = ServerLabel(text=Lng.server[JsonData.lng_index].capitalize())
         grop_lay.addWidget(server_label)
 
-        self.server = ULineEdit()
+        self.server = ULineEditDark()
         self.server.setPlaceholderText(Lng.server[JsonData.lng_index].capitalize())
         grop_lay.addWidget(self.server)
 
         login_label = ServerLabel(text=Lng.login[JsonData.lng_index].capitalize())
         grop_lay.addWidget(login_label)
 
-        self.login = ULineEdit()
+        self.login = ULineEditDark()
         self.login.setPlaceholderText(Lng.login[JsonData.lng_index].capitalize())
         grop_lay.addWidget(self.login)
 
@@ -151,8 +151,8 @@ class LoginWin(UMainWidget):
         pass_label = ServerLabel(text=Lng.password[JsonData.lng_index].capitalize())
         grop_lay.addWidget(pass_label)
 
-        self.pass_ = ULineEdit()
-        self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
+        self.pass_ = ULineEditDark()
+        self.pass_.setEchoMode(ULineEditDark.EchoMode.Password)
         self.pass_.setPlaceholderText(f"{Lng.password[JsonData.lng_index].capitalize()}")
         grop_lay.addWidget(self.pass_)
 
@@ -192,11 +192,11 @@ class LoginWin(UMainWidget):
         self.eye_svg.mouseReleaseEvent = self.show_hide_pass
 
     def show_hide_pass(self, *args):
-        if self.pass_.echoMode() == ULineEdit.EchoMode.Password:
-            self.pass_.setEchoMode(ULineEdit.EchoMode.Normal)
+        if self.pass_.echoMode() == ULineEditDark.EchoMode.Password:
+            self.pass_.setEchoMode(ULineEditDark.EchoMode.Normal)
             self.eye_svg.load(self.eye_svg.eye_on)
         else:
-            self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
+            self.pass_.setEchoMode(ULineEditDark.EchoMode.Password)
             self.eye_svg.load(self.eye_svg.eye_off)
 
     def ok_cmd(self):

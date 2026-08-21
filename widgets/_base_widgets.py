@@ -75,6 +75,16 @@ class ULineEdit(QLineEdit):
         self.menu_.show_menu()
 
 
+class ULineEditDark(ULineEdit):
+    def __init__(self):
+        super().__init__()
+
+
+class ULineEditLight(ULineEdit):
+    def __init__(self):
+        super().__init__()
+
+
 class UTextEdit(QTextEdit):
     def __init__(self):
         super().__init__()
@@ -110,6 +120,16 @@ class UTextEdit(QTextEdit):
             menu_.addAction(act)
 
         menu_.show_menu()
+
+
+class UTextEditDark(UTextEdit):
+    def __init__(self):
+        super().__init__()
+
+
+class UTextEditLight(UTextEdit):
+    def __init__(self):
+        super().__init__()
 
 
 class UGroupBox(QGroupBox):
@@ -661,7 +681,7 @@ class MfAliasWidget(UGroupBox):
         name_text = QLabel(Lng.folder_name[lng_index])
         v_layout.addWidget(name_text)
 
-        self.line_edit = ULineEdit()
+        self.line_edit = ULineEditDark()
         self.line_edit.textChanged.connect(self.changed.emit)
         self.line_edit.setPlaceholderText(Lng.alias_immutable[lng_index])
         v_layout.addWidget(self.line_edit)
@@ -844,7 +864,7 @@ class MfStopListWidget(UGroupBox):
         name_text = QLabel(Lng.ignore_list_descr[lng_index])
         v_layout.addWidget(name_text)
 
-        self.text_edit = UTextEdit()
+        self.text_edit = UTextEditDark()
         self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
         self.text_edit.textChanged.connect(self.changed.emit)
         v_layout.addWidget(self.text_edit)
