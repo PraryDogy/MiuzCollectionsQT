@@ -69,10 +69,15 @@ class UPallete:
         return p
 
     @classmethod
-    def macinthosh(cls):
+    def macintosh(cls):
         p = QPalette()
         color = p.ColorRole
         p.setColor(color.Highlight, QColor("#0059d1"))
+        # серый для рамки Thumb image widget
+        p.setColor(color.LinkVisited, QColor("#6D6D6D"))
+        # серый для дополнительного текста Thumb (дата изменения, коллекция)
+        p.setColor(color.Midlight, QColor("#909090"))
+
         return p
 
 
@@ -82,7 +87,7 @@ class ThemeChanger:
     def init(cls):
         app: QApplication = QApplication.instance()
         if JsonData.theme == Themes.macos:
-            app.setPalette(UPallete.macinthosh())
+            app.setPalette(UPallete.macintosh())
             app.setStyle("macos")
         elif JsonData.theme == Themes.dark:
             app.setPalette(UPallete.dark())
