@@ -24,6 +24,25 @@ class WinDatesDateLabel(QLabel):
         self.setWordWrap(True)
 
 
+
+class Test(UPushButton):
+    dateChanged = pyqtSignal(QDate)
+
+    def __init__(self, date: QDate, parent=None):
+        super().__init__(text="")
+        self._date = None
+        self.setDate(date)
+
+    def date(self) -> QDate:
+        return self._date
+
+    def setDate(self, date: QDate):
+        self._date = date
+        self.setText(date.toString("dd.MM.yyyy"))
+        self.dateChanged.emit(date)
+
+
+
 class DatesWidget(UGroupBox):
     reload_thumbnails = pyqtSignal()
     calendar_svg = os.path.join(Static.common_icons, "calendar.svg")
@@ -87,8 +106,12 @@ class DatesWidget(UGroupBox):
         # Выбор дат "От" и "До"
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
-        self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
-        self.date_from.setFixedWidth(110)
+
+        self.date_from = Test(QDate.currentDate().addDays(-30))
+
+
+        # self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
+        # self.date_from.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_from)
 
         self.top_row_layout.addSpacing(10) 
