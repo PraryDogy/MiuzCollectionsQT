@@ -161,17 +161,12 @@ class Calendar(UMainWidget):
         # --- Сетка для дней недели и чисел ---
         self.grid_widget = QWidget()  
         
-        # Точный пересчет максимальной высоты с учетом раздельных отступов (7 строк и 6 вертикальных промежутков)
-        max_grid_height = (7 * self.cell_size[0]) + (6 * self.grid_v_spacing)
-        self.grid_widget.setFixedHeight(max_grid_height)
-        
         self.grid_layout = QGridLayout(self.grid_widget)  
         self.grid_layout.setContentsMargins(0, 0, 0, 0)
         self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         
-        # --- РАЗДЕЛЯЕМ ОТСТУПЫ ---
-        self.grid_layout.setHorizontalSpacing(self.grid_h_spacing) # Растягивает по горизонтали
-        self.grid_layout.setVerticalSpacing(self.grid_v_spacing)     # Сохраняет компактность по вертикали
+        self.grid_layout.setHorizontalSpacing(self.grid_h_spacing)
+        self.grid_layout.setVerticalSpacing(self.grid_v_spacing)
         
         self.central_layout.addWidget(self.grid_widget)
         
