@@ -27,15 +27,22 @@ class CalendarSvgNavi(QSvgWidget):
 
     def __init__(self, file_path, parent=None):
         super().__init__(file_path, parent)
+        self._is_active = True
+        self.set_enabled()
+
+    def set_enabled(self):
+        self._is_active = True
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-    def mousePressEvent(self, a0):
-        if a0.button() == Qt.MouseButton.LeftButton:
+    def set_disabled(self):
+        self._is_active = False
+        self.setCursor(Qt.CursorShape.ForbiddenCursor)
+
+    def mouseReleaseEvent(self, a0):
+        # Если флаг False, клик просто игнорируется
+        if self._is_active and a0.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
-            a0.accept()
-        else:
-            super().mousePressEvent(a0)
-        return super().mousePressEvent(a0)
+        return super().mouseReleaseEvent(a0)
 
 
 class CalendarDayBase(QLabel):
@@ -71,7 +78,8 @@ class Calendar(UMainWidget):
     svg_previous = os.path.join(Static.common_icons, "previous.svg")
     svg_next = os.path.join(Static.common_icons, "next.svg")
 
-    row_height = 40
+    min_year = 2015
+
     cell_size = (40, 40)
     svg_nav = (20, 20)
     svg_calendar_size = (30, 30)
@@ -114,7 +122,7 @@ class Calendar(UMainWidget):
 
         # --- Первая строка: Панель навигации ---
         self.nav_widget = QWidget()
-        self.nav_widget.setFixedHeight(self.row_height)
+        self.nav_widget.setFixedHeight(self.cell_size[0])
         self.nav_layout = QHBoxLayout(self.nav_widget)
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
         self.nav_layout.setSpacing(5)
@@ -183,10 +191,10 @@ class Calendar(UMainWidget):
             action.triggered.connect(self.month_menu_selected)
             self.menu_month.addAction(action)
 
-    def populate_years(self, start_year: int = 2015):
+    def populate_years(self):
         self.menu_year.clear()
         max_year = QDate.currentDate().year()
-        for y in range(start_year, max_year + 1):
+        for y in range(self.min_year, max_year + 1):
             action = QAction(str(y), self)
             action.setData(y)
             action.triggered.connect(self.year_menu_selected)
@@ -215,7 +223,7 @@ class Calendar(UMainWidget):
 
     # Стрелки теперь листают месяцы вперед/назад с сохранением лимитов по годам
     def prev_month(self):
-        min_date = QDate(2015, 1, 1)
+        min_date = QDate(self.min_year, 1, 1)
         new_date = self.current_date.addMonths(-1)
         if new_date >= min_date:
             self.current_date = new_date
@@ -244,16 +252,22 @@ class Calendar(UMainWidget):
         self.update_dynamic_label()
         current_year = self.current_date.year()
         current_month = self.current_date.month()
-
-        current_month_name = self.q_locale.standaloneMonthName(current_month, QLocale.FormatType.LongFormat)
+        current_month_name = self.q_locale.standaloneMonthName(
+            current_month,
+            QLocale.FormatType.LongFormat
+        )
         self.btn_month.setText(current_month_name.capitalize())
         self.btn_year.setText(str(current_year))
-        
-        # Проверка доступности стрелок по лимитам дат (2015.01.01 ... текущий_год.12.31)
-        self.btn_prev.setEnabled(not (current_year == 2015 and current_month == 1))
+        if current_year == self.min_year and current_month == 1:
+            self.btn_prev.set_disabled()
+        else:
+            self.btn_prev.set_enabled()
         
         max_year = QDate.currentDate().year()
-        self.btn_next.setEnabled(not (current_year == max_year and current_month == 12))
+        if current_year == max_year and current_month == 12:
+            self.btn_next.set_disabled()
+        else:
+            self.btn_next.set_enabled()
 
         self.clear_grid()
 
