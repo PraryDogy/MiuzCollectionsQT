@@ -61,6 +61,14 @@ class UPallete:
         p.setColor(color.Link, QColor("#A2A2A2"))
         p.setColor(color.Button, QColor("#3E3E3E"))
         p.setColor(color.HighlightedText, QColor("#ffffff"))
+
+       # --- ТЕСТОВЫЕ КРАСНЫЕ РОЛИ ---
+        p.setColor(color.AlternateBase, QColor("#ff0000"))
+        p.setColor(color.Dark, QColor("#ff0000"))
+        p.setColor(color.Shadow, QColor("#ff0000"))
+        p.setColor(color.Light, QColor("#ff0000"))
+        p.setColor(color.BrightText, QColor("#ff0000"))
+
         return p
 
     def get_palette_text(cls, role: str):

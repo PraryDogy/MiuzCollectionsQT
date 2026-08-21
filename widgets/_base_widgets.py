@@ -61,6 +61,7 @@ class ULineEdit(QLineEdit):
             f"""
                 padding-left: 2px;
                 padding-right: 28px;
+                border: 1px solid palette(button);
             """
         )
 
@@ -95,6 +96,12 @@ class ULineEdit(QLineEdit):
 class UTextEdit(QTextEdit):
     def __init__(self):
         super().__init__()
+
+        self.setStyleSheet(
+            f"""
+                border: 1px solid palette(button);
+            """
+        )
 
     def copy_selection(self):
         cur = self.textCursor()
