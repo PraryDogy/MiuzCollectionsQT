@@ -27,23 +27,42 @@ class ClickableSvgWidget(QSvgWidget):
             super().mousePressEvent(event)
 
 
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QLabel, QMenu
+
+
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QLabel, QMenu, QPushButton
 from PyQt6.QtCore import QDate, QLocale, Qt
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QMouseEvent
+
+# Кастомный кликабельный QLabel для дней
+class ClickableLabel(QLabel):
+    def __init__(self, text, day_num, parent=None):
+        super().__init__(text, parent)
+        self.day_num = day_num
+
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.button() == Qt.MouseButton.LeftButton:
+            # Получаем родительский календарь и вызываем выбор дня
+            calendar = self.window()
+            if hasattr(calendar, "day_selected"):
+                calendar.day_selected(self.day_num)
+        super().mousePressEvent(event)
+
 
 class CustomCalendar(UMainWidget):
     def __init__(self, date_val: QDate = QDate.currentDate()):
         super().__init__()
         self.q_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
         
-        # Полностью переходим на QDate
         self.current_date = date_val
         
+        # Оставляем ячейки строго 40х40, чтобы они не были крупными
         self.row_height = 40
         self.cell_size = (40, 40)
         self.svg_size = (20, 20)
-        self.month_btn_width = 75
-        self.year_btn_width = 60
+        
+        # --- НАСТРОЙКА РАСТЯЖЕНИЯ ---
+        self.grid_h_spacing = 15  # Увеличьте это число (например, 15, 20, 25), чтобы сделать календарь шире
+        self.grid_v_spacing = 5   # Вертикальный отступ оставляем маленьким
         
         self.setWindowTitle("Кастомный Календарь")
         self.set_close_only()
@@ -52,70 +71,65 @@ class CustomCalendar(UMainWidget):
         
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         
-        # Подгоняем размер под контент и жестко фиксируем его
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
 
     def init_ui(self):
-        # --- Первая строка: Панель навигации (Контейнер) ---
+        # --- Первая строка: Панель навигации ---
         self.nav_widget = QWidget()
         self.nav_widget.setFixedHeight(self.row_height)
         self.nav_layout = QHBoxLayout(self.nav_widget)
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
-        self.nav_layout.setSpacing(0)
+        self.nav_layout.setSpacing(5)
         
-        # Стрелка влево (Предыдущий год)
         self.btn_prev = ClickableSvgWidget("./icons/common/previous.svg")
         self.btn_prev.setFixedSize(*self.svg_size)
-        self.btn_prev.clicked.connect(self.prev_year)
+        self.btn_prev.clicked.connect(self.prev_month)
         
-        # Кнопка выбора месяца с QMenu
+        # Убираем fixedWidth, чтобы кнопки подстраивались под новую ширину
         self.btn_month = UPushButton("")
-        self.btn_month.setFixedWidth(self.month_btn_width)
         self.menu_month = QMenu(self)
         self.btn_month.setMenu(self.menu_month)
         self.populate_months()
 
-        # Кнопка выбора года с QMenu
         self.btn_year = UPushButton("")
-        self.btn_year.setFixedWidth(self.year_btn_width)
         self.menu_year = QMenu(self)
         self.btn_year.setMenu(self.menu_year)
         self.populate_years()
         
-        # Стрелка вправо (Следующий год)
         self.btn_next = ClickableSvgWidget("./icons/common/next.svg")
         self.btn_next.setFixedSize(*self.svg_size)
-        self.btn_next.clicked.connect(self.next_year)
+        self.btn_next.clicked.connect(self.next_month)
         
-        # Собираем навигационную панель внутри контейнера
-        self.nav_layout.addWidget(self.btn_prev)
-        self.nav_layout.addStretch()
-        self.nav_layout.addWidget(self.btn_month)
-        self.nav_layout.addSpacing(5)
-        self.nav_layout.addWidget(self.btn_year)
-        self.nav_layout.addStretch()
-        self.nav_layout.addWidget(self.btn_next)
+        # Распределяем верхние кнопки по ширине широкого календаря
+        self.nav_layout.addWidget(self.btn_prev, stretch=0)
+        self.nav_layout.addStretch(1)
+        self.nav_layout.addWidget(self.btn_month, stretch=4)
+        self.nav_layout.addWidget(self.btn_year, stretch=3)
+        self.nav_layout.addStretch(1)
+        self.nav_layout.addWidget(self.btn_next, stretch=0)
         
         self.central_layout.addWidget(self.nav_widget)
 
-        # --- Сетка для дней недели и чисел (Контейнер) ---
+        # --- Сетка для дней недели и чисел ---
         self.grid_widget = QWidget()  
         
-        # Важно: Фиксируем высоту контейнера сетки на максимум (7 строк по 40px + spacing)
-        # Это гарантирует, что adjustSize() сразу выделит место под 6 недель, и ничего не съедет
-        max_grid_height = (7 * self.cell_size[1]) + (6 * 5)
+        # Точный пересчет максимальной высоты с учетом раздельных отступов (7 строк и 6 вертикальных промежутков)
+        max_grid_height = (7 * self.cell_size[0]) + (6 * self.grid_v_spacing)
         self.grid_widget.setFixedHeight(max_grid_height)
         
         self.grid_layout = QGridLayout(self.grid_widget)  
-        self.grid_layout.setSpacing(5)
         self.grid_layout.setContentsMargins(0, 0, 0, 0)
-        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop) # Прижимаем дни к верху
+        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        
+        # --- РАЗДЕЛЯЕМ ОТСТУПЫ ---
+        self.grid_layout.setHorizontalSpacing(self.grid_h_spacing) # Растягивает по горизонтали
+        self.grid_layout.setVerticalSpacing(self.grid_v_spacing)     # Сохраняет компактность по вертикали
         
         self.central_layout.addWidget(self.grid_widget)
         
-        # Обновляем интерфейс под текущую дату
         self.update_calendar()
+
 
     def populate_months(self):
         self.menu_month.clear()
@@ -123,45 +137,52 @@ class CustomCalendar(UMainWidget):
             month_name = self.q_locale.standaloneMonthName(m, QLocale.FormatType.LongFormat).capitalize()
             action = QAction(month_name, self)
             action.setData(m)
-            action.triggered.connect(self.month_selected)
+            action.triggered.connect(self.month_menu_selected)
             self.menu_month.addAction(action)
 
     def populate_years(self, start_year: int = 2015):
         self.menu_year.clear()
-        max_year = QDate.currentDate().year() # Заменили date.today().year
+        max_year = QDate.currentDate().year()
         for y in range(start_year, max_year + 1):
             action = QAction(str(y), self)
             action.setData(y)
-            action.triggered.connect(self.year_selected)
+            action.triggered.connect(self.year_menu_selected)
             self.menu_year.addAction(action)
 
-    def month_selected(self):
+    def month_menu_selected(self):
         action = self.sender()
         if action:
             selected_month = action.data()
-            # Пересоздаем QDate с новым месяцем (защита от падения, если текущий день 31, а в новом месяце всего 30 дней)
             target_day = min(self.current_date.day(), QDate(self.current_date.year(), selected_month, 1).daysInMonth())
             self.current_date = QDate(self.current_date.year(), selected_month, target_day)
             self.update_calendar()
 
-    def year_selected(self):
+    def year_menu_selected(self):
         action = self.sender()
         if action:
             selected_year = action.data()
-            # Пересоздаем QDate с новым годом (учитываем високосные года и 29 февраля)
             target_day = min(self.current_date.day(), QDate(selected_year, self.current_date.month(), 1).daysInMonth())
             self.current_date = QDate(selected_year, self.current_date.month(), target_day)
             self.update_calendar()
 
-    def prev_year(self):
-        if self.current_date.year() > 2015:
-            self.current_date = self.current_date.addYears(-1)
+    # Смена дня при клике на сетку чисел
+    def day_selected(self, day_num: int):
+        self.current_date = QDate(self.current_date.year(), self.current_date.month(), day_num)
+        self.update_calendar()
+
+    # Стрелки теперь листают месяцы вперед/назад с сохранением лимитов по годам
+    def prev_month(self):
+        min_date = QDate(2015, 1, 1)
+        new_date = self.current_date.addMonths(-1)
+        if new_date >= min_date:
+            self.current_date = new_date
             self.update_calendar()
 
-    def next_year(self):
-        max_year = QDate.currentDate().year()
-        if self.current_date.year() < max_year:
-            self.current_date = self.current_date.addYears(1)
+    def next_month(self):
+        max_date = QDate(QDate.currentDate().year(), 12, 31)
+        new_date = self.current_date.addMonths(1)
+        if new_date <= max_date:
+            self.current_date = new_date
             self.update_calendar()
 
     def clear_grid(self):
@@ -172,44 +193,33 @@ class CustomCalendar(UMainWidget):
                 widget.deleteLater()
 
     def update_calendar(self):
-        # 1. Получаем текущие год и месяц из QDate
         current_year = self.current_date.year()
         current_month = self.current_date.month()
 
-        # 2. Обновляем текст на кнопках навигации
-        current_month_name = self.q_locale.standaloneMonthName(
-            current_month,
-            QLocale.FormatType.LongFormat
-        )
+        current_month_name = self.q_locale.standaloneMonthName(current_month, QLocale.FormatType.LongFormat)
         self.btn_month.setText(current_month_name.capitalize())
         self.btn_year.setText(str(current_year))
         
-        # 3. Управляем доступностью стрелок года (ограничение 2015 ... текущий год)
-        self.btn_prev.setEnabled(current_year > 2015)
+        # Проверка доступности стрелок по лимитам дат (2015.01.01 ... текущий_год.12.31)
+        self.btn_prev.setEnabled(not (current_year == 2015 and current_month == 1))
         
         max_year = QDate.currentDate().year()
-        self.btn_next.setEnabled(current_year < max_year)
+        self.btn_next.setEnabled(not (current_year == max_year and current_month == 12))
 
-        # 4. Полностью очищаем старые виджеты из сетки
         self.clear_grid()
 
-        # 5. Отрисовка заголовков дней недели
+        # Рендеринг дней недели
         for col in range(7):
             day_of_week = col + 1 
             day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
             lbl_day = QLabel(day_name)
-            
-            # Присваиваем ID селектора для дней недели (#weekday в QSS)
             lbl_day.setObjectName("weekday") 
-            
             lbl_day.setFixedSize(*self.cell_size)
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.grid_layout.addWidget(lbl_day, 0, col)
 
-        # 6. Отрисовка чисел текущего месяца
+        # Рендеринг чисел месяца
         first_day_of_month = QDate(current_year, current_month, 1)
-        
-        # Вычисляем колонку старта (0 = Понедельник ... 6 = Воскресенье)
         start_col = first_day_of_month.dayOfWeek() - 1 
         
         days_in_month = self.current_date.daysInMonth()
@@ -220,28 +230,25 @@ class CustomCalendar(UMainWidget):
         col = start_col
 
         while current_day <= days_in_month:
-            btn_day = QLabel(str(current_day))
+            # Используем кастомный кликабельный QLabel вместо обычного
+            btn_day = ClickableLabel(str(current_day), current_day)
             btn_day.setFixedSize(*self.cell_size)
             btn_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             
-            # Меняем имя селектора в зависимости от того, выбран ли этот день
             if current_day == selected_day:
-                btn_day.setObjectName("day_selected")  # #day_selected в QSS
+                btn_day.setObjectName("day_selected")
             else:
-                btn_day.setObjectName("day_regular")   # #day_regular в QSS
+                btn_day.setObjectName("day_regular")
                 
-            # Принудительно заставляем Qt перечитать QSS для этого QLabel
             btn_day.style().unpolish(btn_day)
-            btn_day.style().polish(btn_day)
-
-            # Добавляем в сетку и двигаемся дальше
+            
             self.grid_layout.addWidget(btn_day, row, col)
-            current_day += 1
+            
             col += 1
             if col > 6:
                 col = 0
                 row += 1
-
+            current_day += 1
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
