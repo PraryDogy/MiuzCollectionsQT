@@ -378,10 +378,10 @@ class USlider(QSlider):
                     border-radius: 1px;
                     height: 3px;
                     margin: 0px;
-                    background-color: rgba(111, 111, 111, 0.5);
+                    background-color: palette(mid);
                 }
                 QSlider::handle:horizontal {
-                    background-color: rgba(199, 199, 199, 1);
+                    background-color: palette(midlight);
                     height: 10px;
                     width: 10px;
                     border-radius: 5px;
