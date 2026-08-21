@@ -65,7 +65,6 @@ class UPallete:
         p.setColor(color.WindowText, QColor("#ffffff"))
         # цвет шрифта кнопок QPushButton и выпадающего списка QMenu
         p.setColor(color.ButtonText, QColor("#ffffff"))
-
         # HSep, полоска QSlider
         p.setColor(color.Mid, QColor("#353535"))
         # серый для рамки Thumb image widget
@@ -75,6 +74,8 @@ class UPallete:
         p.setColor(color.Midlight, QColor("#818181"))
         # Кружок QSlider
         p.setColor(color.Link, QColor("#A2A2A2"))
+        # UPushButton
+        p.setColor(color.Button, QColor("#3E3E3E"))
 
         return p
 

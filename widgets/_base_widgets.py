@@ -247,9 +247,12 @@ class UTreeWidget(QTreeWidget):
 class UPushButton(QPushButton):
     def __init__(self, text: str):
         super().__init__(text)
+        self.setFixedHeight(20)
         self.setStyleSheet(
             """
             font-size: 11pt;
+            background: palette(button);
+            border-radius: 4px;
             """
         )
         self.setFixedWidth(80)
