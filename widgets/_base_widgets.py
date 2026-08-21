@@ -260,7 +260,7 @@ class HSep(QFrame):
         super().__init__()
         self.setStyleSheet(
             """
-                background: rgba(128, 128, 128, 0.2);
+                background: palette(mid);
             """
         )
         self.setFixedHeight(1)
@@ -500,22 +500,22 @@ class GrayLabel(QLabel):
         self._update_stylesheet()
 
 
-class HoverGrayLabel(GrayLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
+# class HoverGrayLabel(GrayLabel):
+#     def __init__(self, text: str):
+#         super().__init__(text)
 
-    def _update_stylesheet(self):
-        self.setStyleSheet(
-            f"""
-                HoverGrayLabel {{
-                    color: rgba(128, 128, 128, 1.0);
-                    font-size: {self.font_size_px}px;
-                }}
-                HoverGrayLabel:hover {{
-                    color: rgba(255, 255, 255, 1.0);
-                }}
-            """
-        )
+#     def _update_stylesheet(self):
+#         self.setStyleSheet(
+#             f"""
+#                 HoverGrayLabel {{
+#                     color: rgba(128, 128, 128, 1.0);
+#                     font-size: {self.font_size_px}px;
+#                 }}
+#                 HoverGrayLabel:hover {{
+#                     color: rgba(255, 255, 255, 1.0);
+#                 }}
+#             """
+#         )
 
 
 class ConfirmWindow(UMainWidget):

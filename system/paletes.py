@@ -29,10 +29,12 @@ class UPallete:
         p.setColor(color.WindowText, QColor("#000000"))
         # цвет шрифта кнопок QPushButton и выпадающего списка QMenu
         p.setColor(color.ButtonText, QColor("#000000"))
+        # только HSep
+        p.setColor(color.Mid, QColor("#d4d4d4"))
 
         # серый для рамки Thumb image widget
         p.setColor(color.LinkVisited, QColor("#e0e0e0"))
-        # серый для дополнительного текста Thumb (дата изменения, коллекция)
+        # слабо видимый серый (серый без акцента)
         p.setColor(color.Midlight, QColor("#707070"))
 
         return p
@@ -60,10 +62,12 @@ class UPallete:
         p.setColor(color.WindowText, QColor("#ffffff"))
         # цвет шрифта кнопок QPushButton и выпадающего списка QMenu
         p.setColor(color.ButtonText, QColor("#ffffff"))
+        # только HSep
+        p.setColor(color.Mid, QColor("#353535"))
 
         # серый для рамки Thumb image widget
         p.setColor(color.LinkVisited, QColor("#4C4C4C"))
-        # серый для дополнительного текста Thumb (дата изменения, коллекция)
+        # слабо видимый серый (серый без акцента)
         p.setColor(color.Midlight, QColor("#818181"))
 
         return p
@@ -75,8 +79,10 @@ class UPallete:
         p.setColor(color.Highlight, QColor("#0059d1"))
         # серый для рамки Thumb image widget
         p.setColor(color.LinkVisited, QColor("#6D6D6D"))
-        # серый для дополнительного текста Thumb (дата изменения, коллекция)
+        # слабо видимый серый (серый без акцента)
         p.setColor(color.Midlight, QColor("#909090"))
+        # только HSep
+        p.setColor(color.Mid, QColor("#3E3E3E"))
 
         return p
 
