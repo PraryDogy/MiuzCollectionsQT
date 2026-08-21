@@ -2,9 +2,10 @@ import sys
 from datetime import date
 
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QMenu, QWidget
+from PyQt6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QMenu,
+                             QPushButton, QWidget)
 
 from widgets._base_widgets import UMainWidget, UPushButton
 
@@ -26,12 +27,6 @@ class ClickableSvgWidget(QSvgWidget):
         else:
             super().mousePressEvent(event)
 
-
-
-
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QGridLayout, QLabel, QMenu, QPushButton
-from PyQt6.QtCore import QDate, QLocale, Qt
-from PyQt6.QtGui import QAction, QMouseEvent
 
 # Кастомный кликабельный QLabel для дней
 class ClickableLabel(QLabel):
