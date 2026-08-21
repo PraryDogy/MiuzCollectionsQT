@@ -6,7 +6,7 @@ from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGridLayout, QGroupBox, QHBoxLayout, QLabel,
-                             QMenu, QPushButton, QWidget)
+                             QMenu, QPushButton, QWidget, QVBoxLayout)
 
 from cfg import Static
 
@@ -99,12 +99,11 @@ class Calendar(UMainWidget):
         self.init_ui()
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
-
-    def init_ui(self):
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # Большая дата
-        dynamic_container = QGroupBox()
+    def init_ui(self):
+        # Большая дата (теперь на обычном QWidget вместо QGroupBox)
+        dynamic_container = QWidget()
         self.central_layout.addWidget(dynamic_container)
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 5)
@@ -127,12 +126,11 @@ class Calendar(UMainWidget):
         self.nav_layout = QHBoxLayout(self.nav_widget)
         self.nav_layout.setContentsMargins(0, 0, 0, 0)
         self.nav_layout.setSpacing(5)
-    
+
         self.btn_prev = CalendarSvgNavi(self.svg_previous)
         self.btn_prev.setFixedSize(*self.svg_nav)
         self.btn_prev.clicked.connect(self.prev_month)
         
-        # Убираем fixedWidth, чтобы кнопки подстраивались под новую ширину
         self.btn_month = UPushButton("")
         self.menu_month = QMenu(self)
         self.btn_month.setMenu(self.menu_month)
@@ -147,7 +145,6 @@ class Calendar(UMainWidget):
         self.btn_next.setFixedSize(*self.svg_nav)
         self.btn_next.clicked.connect(self.next_month)
         
-        # Распределяем верхние кнопки по ширине широкого календаря
         self.nav_layout.addSpacing(10)
         self.nav_layout.addWidget(self.btn_prev)
         self.nav_layout.addStretch()
@@ -157,6 +154,7 @@ class Calendar(UMainWidget):
         self.nav_layout.addWidget(self.btn_next)
         self.nav_layout.addSpacing(10)
         
+        # Добавляем навигацию напрямую в главный макет
         self.central_layout.addWidget(self.nav_widget)
 
         # --- Сетка для дней недели и чисел ---
@@ -169,7 +167,10 @@ class Calendar(UMainWidget):
         self.grid_layout.setHorizontalSpacing(self.grid_h_spacing)
         self.grid_layout.setVerticalSpacing(self.grid_v_spacing)
         
+        # Добавляем сетку напрямую в главный макет
         self.central_layout.addWidget(self.grid_widget)
+
+
         
         self.update_calendar()
 
