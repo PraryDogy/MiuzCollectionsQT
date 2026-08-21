@@ -10,28 +10,37 @@ class UPallete:
     def light(cls):
         p = QPalette()
         color = QPalette.ColorRole
+
+        # основная заливка окон (чистый белый)
         p.setColor(color.Window, QColor("#ffffff"))
-        p.setColor(color.WindowText, QColor("#000000"))
-        p.setColor(color.Base, QColor("#f5f5f5"))
-        p.setColor(color.AlternateBase, QColor("#ffffff"))
-        p.setColor(color.ToolTipBase, QColor("#ffffff"))   
-        p.setColor(color.ToolTipText, QColor("#000000"))   
+        # цвет текста везде (чистый черный)
         p.setColor(color.Text, QColor("#000000"))
-        p.setColor(color.Button, QColor("#f0f0f0"))
-        p.setColor(color.ButtonText, QColor("#000000"))
-        p.setColor(color.BrightText, QColor("#ff0000"))
-        p.setColor(color.Link, QColor("#0059d1"))
+        # плейсхолдер (светло-серый, стандартный для светлых тем)
+        p.setColor(color.PlaceholderText, QColor("#b0b0b0"))
+        # выделение элементов (тот же синий для единообразия интерфейса)
         p.setColor(color.Highlight, QColor("#0059d1"))
-        p.setColor(color.HighlightedText, QColor("#ffffff"))
-        # полупрозрачный серый
-        p.setColor(color.LinkVisited, QColor("#ffffff"))
+        # цвет шрифта подсказок
+        p.setColor(color.ToolTipText, QColor("#000000"))
+        # цвет подсказок
+        p.setColor(color.ToolTipBase, QColor("#ffffff"))
+        # цвет меню списков QListWidget и подобных
+        p.setColor(color.Base, QColor("#f1f0f0"))
+        # цвет шрифта GroupBox
+        p.setColor(color.WindowText, QColor("#000000"))
+        # цвет шрифта кнопок QPushButton и выпадающего списка QMenu
+        p.setColor(color.ButtonText, QColor("#000000"))
+
+        # серый для рамки Thumb image widget
+        p.setColor(color.LinkVisited, QColor("#e0e0e0"))
+        # серый для дополнительного текста Thumb (дата изменения, коллекция)
+        p.setColor(color.Midlight, QColor("#707070"))
+
         return p
 
     @classmethod
     def dark(cls):
         p = QPalette()
         color = QPalette.ColorRole
-
 
         # основная заливка окон
         p.setColor(color.Window, QColor("#1e1e1e"))
@@ -45,22 +54,18 @@ class UPallete:
         p.setColor(color.ToolTipText, QColor("#ffffff"))
         # цвет подсказок
         p.setColor(color.ToolTipBase, QColor("#2a2a2a"))
+        # цвет меню списков QListWidget и подобных
+        p.setColor(color.Base, QColor("#191919"))
+        # цвет шрифта GroupBox
+        p.setColor(color.WindowText, QColor("#ffffff"))
+        # цвет шрифта кнопок QPushButton и выпадающего списка QMenu
+        p.setColor(color.ButtonText, QColor("#ffffff"))
 
         # серый для рамки Thumb image widget
         p.setColor(color.LinkVisited, QColor("#4C4C4C"))
-
         # серый для дополнительного текста Thumb (дата изменения, коллекция)
         p.setColor(color.Midlight, QColor("#818181"))
 
-        # неиспользуемые роли
-        # p.setColor(color.WindowText, QColor("#ffffff"))
-        # p.setColor(color.Base, QColor("#191919"))
-        # p.setColor(color.AlternateBase, QColor("#2a2a2a"))
-        # p.setColor(color.Button, QColor("#2d2d2d"))
-        # p.setColor(color.ButtonText, QColor("#ffffff"))
-        # p.setColor(color.BrightText, QColor("#ff453a"))
-        # p.setColor(color.Link, QColor("#0059d1"))
-        # p.setColor(color.HighlightedText, QColor("#000000"))
         return p
 
     @classmethod
