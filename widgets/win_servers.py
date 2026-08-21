@@ -5,16 +5,15 @@ from dataclasses import dataclass
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QSpacerItem,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSpacerItem, QVBoxLayout,
+                             QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (ULineEdit, UMainWidget, UMenu, UPushButton,
-                            VListWidget, VListWidgetItem)
-from ._base_widgets import ConfirmWindow
+from ._base_widgets import (ConfirmWindow, UGroupBox, ULineEdit, UMainWidget,
+                            UMenu, UPushButton, VListWidget, VListWidgetItem)
 
 
 @dataclass(slots=True)
@@ -120,7 +119,7 @@ class LoginWin(UMainWidget):
         self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(10)
 
-        group = QGroupBox()
+        group = UGroupBox()
         grop_lay = QVBoxLayout(group)
         grop_lay.setContentsMargins(0, 0, 0, 5)
         grop_lay.setSpacing(5)
@@ -236,7 +235,7 @@ class ServersWin(UMainWidget):
         self.central_layout.setContentsMargins(5, 5, 5, 10)
         self.central_layout.setSpacing(10)
 
-        group = QGroupBox()
+        group = UGroupBox()
         group_lay = QVBoxLayout(group)
         group_lay.setContentsMargins(1, 1, 1, 1)
         group_lay.setSpacing(5)

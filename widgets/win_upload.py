@@ -3,16 +3,15 @@ import re
 
 from PyQt6.QtCore import QDir, QSortFilterProxyModel, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QFileSystemModel, QIcon
-from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QListWidget,
-                             QListWidgetItem, QMenu, QSplitter, QTreeView,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QHBoxLayout, QListWidget, QListWidgetItem, QMenu,
+                             QSplitter, QTreeView, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
-from ._base_widgets import HSep, RowArrowWidget, UMainWidget, UPushButton
+from ._base_widgets import HSep, RowArrowWidget, UMainWidget, UPushButton, UGroupBox
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -122,7 +121,7 @@ class UploadWin(UMainWidget):
         self.proxy_model = LetterFirstProxyModel()
         self.proxy_model.setSourceModel(self.file_model)
 
-        left_wid = QGroupBox()
+        left_wid = UGroupBox()
         splitter.addWidget(left_wid)
         left_layout = QVBoxLayout(left_wid)
         left_layout.setContentsMargins(1, 10, 1, 1)
@@ -152,7 +151,7 @@ class UploadWin(UMainWidget):
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(10)
 
-        group_one = QGroupBox()
+        group_one = UGroupBox()
         group_one_layout = QVBoxLayout(group_one)
         group_one_layout.setContentsMargins(*RowArrowWidget.group_margings)
         group_one_layout.setSpacing(RowArrowWidget.group_spacing)

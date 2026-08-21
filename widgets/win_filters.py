@@ -3,17 +3,17 @@ import os
 from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в начало файла
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QDateEdit, QGraphicsOpacityEffect, QGroupBox,
-                             QHBoxLayout, QLabel, QSpacerItem, QSpinBox,
-                             QSplitter, QToolButton, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QDateEdit, QGraphicsOpacityEffect, QHBoxLayout,
+                             QLabel, QSpinBox, QSplitter, QToolButton,
+                             QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UMainWidget,
-                            UMenu, UPushButton, UTextEdit, VListSpacerItem,
-                            VListWidget, VListWidgetItem)
+from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UGroupBox,
+                            UMainWidget, UMenu, UPushButton, UTextEdit,
+                            VListSpacerItem, VListWidget, VListWidgetItem)
 
 
 class ReadableDateLabel(QLabel):
@@ -45,7 +45,7 @@ class ReadableDateLabel(QLabel):
 
 
 
-class DatesWidget(QGroupBox):
+class DatesWidget(UGroupBox):
     reload_thumbnails = pyqtSignal()
     calendar_svg = os.path.join(Static.common_icons, "calendar.svg")
     hh = 40
@@ -53,7 +53,7 @@ class DatesWidget(QGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
         
-        # Главный вертикальный layout для QGroupBox
+        # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setSpacing(RowArrowWidget.group_spacing)
@@ -336,7 +336,7 @@ class WinFilters(UMainWidget):
         self.central_layout.addWidget(self.splitter)
 
         # --- Левая группа (Список фильтров) ---
-        self.list_group = QGroupBox()
+        self.list_group = UGroupBox()
         list_group_lay = QVBoxLayout(self.list_group)
         list_group_lay.setContentsMargins(1, 10, 1, 1)
         list_group_lay.setSpacing(0)
@@ -392,7 +392,7 @@ class WinFilters(UMainWidget):
         right_lay.setSpacing(0)
 
         # Групбокс для активных фильтров
-        self.active_group = QGroupBox()
+        self.active_group = UGroupBox()
         active_group_lay = QVBoxLayout(self.active_group)
         active_group_lay.setContentsMargins(1, 5, 2, 1)
         active_group_lay.setSpacing(10)
@@ -412,7 +412,7 @@ class WinFilters(UMainWidget):
         right_lay.addWidget(self.active_group)
 
         # --- Группа для кнопок с нулевыми отступами ---
-        self.reset_group = QGroupBox()
+        self.reset_group = UGroupBox()
         reset_group_lay = QVBoxLayout(self.reset_group)
         reset_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
         reset_group_lay.setSpacing(RowArrowWidget.group_spacing)

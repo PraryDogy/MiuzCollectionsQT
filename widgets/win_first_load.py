@@ -7,8 +7,8 @@ from zipfile import ZipFile
 from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel,
-                             QMenu, QVBoxLayout)
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMenu,
+                             QVBoxLayout)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -16,8 +16,8 @@ from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
-                            RowArrowWidget, SaveRowArrowWidget, UMainWidget,
-                            UPushButton)
+                            RowArrowWidget, SaveRowArrowWidget, UGroupBox,
+                            UMainWidget, UPushButton)
 
 
 def restart_app():
@@ -114,7 +114,7 @@ class FirstLoadWin(UMainWidget):
             lng_btn_icon  = QIcon(self.eng_flag)
 
         # Сохраняем ссылку в self.lng_container
-        self.lng_container = QGroupBox()
+        self.lng_container = UGroupBox()
         self.central_layout.addWidget(self.lng_container)
         
         lng_layout = QHBoxLayout(self.lng_container)
@@ -175,7 +175,7 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.path_widget)
 
     def init_last_block(self):
-        self.last_block_container = QGroupBox()
+        self.last_block_container = UGroupBox()
         self.central_layout.addWidget(self.last_block_container)
 
         last_block_layout = QVBoxLayout(self.last_block_container)

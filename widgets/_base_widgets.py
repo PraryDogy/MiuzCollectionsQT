@@ -136,6 +136,29 @@ class UTextEdit(QTextEdit):
         menu_.show_menu()
 
 
+class UGroupBox(QGroupBox):
+    def __init__(self):
+        super().__init__()
+        self.setStyleSheet(
+            """
+            QGroupBox {
+                background-color: palette(window);
+                border: 1px solid palette(mid);
+                border-radius: 5px;
+                /* Добавляем отступ сверху, чтобы рамка не пересекала текст заголовка */
+                margin-top: 12px; 
+            }
+            
+            /* Стилизуем сам текст заголовка, чтобы он аккуратно сидел сверху */
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                left: 10px;
+                padding: 0 3px;
+            }
+            """
+        )
+
 class WindowMixin:
     win_list: list[QMainWindow] = []
 
@@ -611,7 +634,7 @@ class SaveRowArrowWidget(RowArrowWidget):
         self.set_left_icon(self.save_svg)
 
 
-class MfAliasWidget(QGroupBox):
+class MfAliasWidget(UGroupBox):
     changed = pyqtSignal()
 
     def __init__(self, lng_index: int):
@@ -653,7 +676,7 @@ class MfAliasWidget(QGroupBox):
         return result
 
 
-class MfPathWidget(QGroupBox):
+class MfPathWidget(UGroupBox):
     changed = pyqtSignal()
     magnifier = os.path.join(Static.common_icons, "magnifier.svg")
     green_checkmark = os.path.join(Static.common_icons, "green_checkmark.svg")
@@ -794,7 +817,7 @@ class MfPathWidget(QGroupBox):
         return super().dragEnterEvent(a0)
 
 
-class MfStopListWidget(QGroupBox):
+class MfStopListWidget(UGroupBox):
     changed = pyqtSignal()
 
     def __init__(self, lng_index: int, mf_stop_list: list[str]):

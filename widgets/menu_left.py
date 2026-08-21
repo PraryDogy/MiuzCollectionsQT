@@ -4,7 +4,7 @@ import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QSplitter, QTreeWidget,
+from PyQt6.QtWidgets import (QHBoxLayout, QSplitter, QTreeWidget,
                              QTreeWidgetItem, QWidget)
 
 from cfg import JsonData, Static
@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMenu, UTreeWidget, VListWidget, VListWidgetItem
+from ._base_widgets import UMenu, UTreeWidget, VListWidget, VListWidgetItem, UGroupBox
 
 ITEM_HEIGHT = 25
 
@@ -325,7 +325,7 @@ class MenuLeft(QWidget):
         self.splitter.setOrientation(Qt.Orientation.Vertical)
         v_lay.addWidget(self.splitter)
 
-        tree_parent = QGroupBox()
+        tree_parent = UGroupBox()
         self.splitter.addWidget(tree_parent)
         tree_layout = QHBoxLayout(tree_parent)
         tree_layout.setContentsMargins(1, 10, 1, 1)
@@ -347,7 +347,7 @@ class MenuLeft(QWidget):
         )
         self.tree_wid.init_ui()
 
-        mf_list_parent = QGroupBox()
+        mf_list_parent = UGroupBox()
         self.splitter.addWidget(mf_list_parent)
         mf_list_layout = QHBoxLayout(mf_list_parent)
         mf_list_layout.setContentsMargins(1, 10, 1, 1)

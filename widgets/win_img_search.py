@@ -6,8 +6,7 @@ import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QImage, QPixmap
-from PyQt6.QtWidgets import (QGroupBox, QHBoxLayout, QLabel, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from sqlalchemy import func
 
 from cfg import Dynamic, JsonData, Static
@@ -19,8 +18,8 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, RowArrowWidget, UMainWidget, UPushButton,
-                            USlider)
+from ._base_widgets import (HSep, RowArrowWidget, UGroupBox, UMainWidget,
+                            UPushButton, USlider)
 
 
 class ProgressWin(UMainWidget):
@@ -138,7 +137,7 @@ class WinImgSearch(UMainWidget):
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(0)
         
-        group = QGroupBox()
+        group = UGroupBox()
         self.central_layout.addWidget(group)
         group_layout = QVBoxLayout(group)
         group_layout.setContentsMargins(5, 5, 5, 5)
@@ -157,7 +156,7 @@ class WinImgSearch(UMainWidget):
         
         self.central_layout.addSpacing(10)
         
-        self.group_box = QGroupBox()
+        self.group_box = UGroupBox()
         self.central_layout.addWidget(self.group_box)
         self.group_layout = QVBoxLayout(self.group_box)
         self.group_layout.setContentsMargins(*RowArrowWidget.group_margings)

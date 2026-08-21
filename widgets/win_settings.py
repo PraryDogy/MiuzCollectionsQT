@@ -6,10 +6,10 @@ import sys
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGroupBox,
-                             QHBoxLayout, QLabel, QLineEdit, QSpacerItem,
-                             QSpinBox, QSplitter, QTableWidget,
-                             QTableWidgetItem, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QHBoxLayout,
+                             QLabel, QLineEdit, QSpacerItem, QSpinBox,
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QVBoxLayout, QWidget)
 from typing_extensions import Literal
 
 from cfg import JsonData, Static, Themes
@@ -26,7 +26,7 @@ from system.utils import Utils
 
 from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
-                            SaveRowArrowWidget, SuperConfirmWindow,
+                            SaveRowArrowWidget, SuperConfirmWindow, UGroupBox,
                             UMainWidget, UMenu, UPushButton, UTextEdit,
                             VListSpacerItem, VListWidget, VListWidgetItem,
                             WarningWindow)
@@ -44,7 +44,7 @@ class LabelMinWidth(QLabel):
         self.setMinimumWidth(30)
 
 
-class RebootableSettings(QGroupBox):
+class RebootableSettings(UGroupBox):
     changed = pyqtSignal()
     lang_changed = pyqtSignal()
     spin_max = 60
@@ -229,7 +229,7 @@ class SizesWin(UMainWidget):
         return super().keyPressEvent(a0)
 
 
-class NonRebootableSettings(QGroupBox):
+class NonRebootableSettings(UGroupBox):
     finder_svg = os.path.join(Static.common_icons, "finder.svg")
     hdd_svg = os.path.join(Static.common_icons, "hdd.svg")
 
@@ -321,7 +321,7 @@ class ThemeBtn(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class ThemesWidget(QGroupBox):
+class ThemesWidget(UGroupBox):
     theme_svg = os.path.join(Static.common_icons, "theme.svg")
 
     def __init__(self):
@@ -395,7 +395,7 @@ class AboutWidLabel(LabelMinWidth):
         Utils.copy_text(self.selectedText())
 
 
-class AboutWid(QGroupBox):
+class AboutWid(UGroupBox):
     icon_path = os.path.join(Static.app_icons, "icon.png")
     icon_size = 85
     opacity = 0.85
@@ -451,7 +451,7 @@ class GeneralSettings(QWidget):
         about = AboutWid()
         v_lay.addWidget(about)
 
-        save_container = QGroupBox()
+        save_container = UGroupBox()
         v_lay.addWidget(save_container)
         save_container_lay = QVBoxLayout(save_container)
         save_container_lay.setContentsMargins(*RowArrowWidget.group_margings)
@@ -491,7 +491,7 @@ class FiltersWid(QWidget):
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(10)
 
-        first_container = QGroupBox()
+        first_container = UGroupBox()
         main_lay.addWidget(first_container)
         first_container_layout = QVBoxLayout(first_container)
         first_container_layout.setContentsMargins(5, 2, 5, 2)
@@ -510,7 +510,7 @@ class FiltersWid(QWidget):
         )
         first_container_layout.addWidget(self.filters_edit)
 
-        second_container = QGroupBox()
+        second_container = UGroupBox()
         main_lay.addWidget(second_container)
         second_container_layout = QVBoxLayout(second_container)
         second_container_layout.setContentsMargins(*RowArrowWidget.group_margings)
@@ -581,7 +581,7 @@ class MfSettings(QWidget):
         main_lay.setSpacing(10)
 
         # Верхний ряд с названием
-        name_group = QGroupBox()
+        name_group = UGroupBox()
         main_lay.addWidget(name_group)
         name_group_lay = QVBoxLayout(name_group)
         name_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
@@ -611,7 +611,7 @@ class MfSettings(QWidget):
         )
         main_lay.addWidget(self.mf_stop_list)
 
-        general_wid = QGroupBox()
+        general_wid = UGroupBox()
         main_lay.addWidget(general_wid)
         general_wid_lay = QVBoxLayout(general_wid)
         general_wid_lay.setContentsMargins(*RowArrowWidget.group_margings)
@@ -764,7 +764,7 @@ class NewMfSettings(QWidget):
         )
         main_lay.addWidget(self.mf_stop_list)
 
-        save_group = QGroupBox()
+        save_group = UGroupBox()
         main_lay.addWidget(save_group)
         save_group_container = QVBoxLayout(save_group)
         save_group_container.setContentsMargins(*RowArrowWidget.group_margings)
@@ -862,7 +862,7 @@ class WinSettings(UMainWidget):
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.central_layout.addWidget(self.splitter)
 
-        left_group = QGroupBox()
+        left_group = UGroupBox()
         self.splitter.addWidget(left_group)
         left_layout = QVBoxLayout(left_group)
         left_layout.setContentsMargins(1, 10, 1, 1)

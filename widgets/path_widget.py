@@ -4,8 +4,8 @@ import sqlalchemy
 from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QFileDialog, QGroupBox, QHBoxLayout, QLabel,
-                             QSizePolicy, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QFileDialog, QHBoxLayout, QLabel, QSizePolicy,
+                             QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -13,10 +13,10 @@ from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, SmbChecker
 from system.utils import Utils
 
-from ._base_widgets import SelectableLabel
+from ._base_widgets import SelectableLabel, UGroupBox
 
 
-class PathWidget(QGroupBox):
+class PathWidget(UGroupBox):
     mf_path_avaiable = pyqtSignal()
     magnifier = os.path.join(Static.common_icons, "magnifier.svg")
     green_checkmark = os.path.join(Static.common_icons, "green_checkmark.svg")
