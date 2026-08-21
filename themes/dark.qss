@@ -170,7 +170,7 @@ QPushButton {
     border-radius: 4px;
     color: #ffffff;
     /* Добавляем отступ справа, чтобы текст не наезжал на стрелочку */
-    padding-right: 20px; 
+    padding-right: 1px; 
 }
 
 QPushButton:pressed {
@@ -181,9 +181,6 @@ QPushButton:pressed {
 /* Стилизация стрелочки меню */
 QPushButton::menu-indicator {
     image: url("./icons/common/arrow_down.svg");
-    subcontrol-origin: padding;
-    subcontrol-position: center right;
-    right: 6px; /* Отступ стрелочки от правого края */
     width: 12px; /* Ширина иконки */
     height: 12px; /* Высота иконки */
 }
