@@ -23,8 +23,26 @@ class UMenuStyle(QMenu):
         self.setStyleSheet(
             """
             UMenuStyle {
+                background: palette(tool-tip-base);
+                border: 1px solid palette(link-visited);
                 border-radius: 8px;
-                background: palette(tooltip-base);
+                padding: 3px; /* компактный внутренний отступ самого меню */
+            }
+
+            UMenuStyle::item {
+                background: transparent;
+                color: palette(text);
+                /* 3px сверху/снизу (вместо 6px) и 16px слева/справа (вместо 20px) */
+                padding: 3px 16px; 
+                margin: 0px; /* убираем лишнее расстояние между строками */
+                border-radius: 4px; /* чуть уменьшили радиус под компактный размер */
+            }
+
+            /* Стиль выделенного (активного) пункта меню */
+            UMenuStyle::item:selected {
+                background: palette(highlight);
+                color: palette(highlighted-text);
+                border-radius: 4px;
             }
             """
         )
@@ -34,6 +52,8 @@ class UMenuStyle(QMenu):
             a0.ignore()
         else:
             super().mouseReleaseEvent(a0)
+
+
 
 
 class UMenu(UMenuStyle):
