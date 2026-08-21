@@ -4,7 +4,7 @@ from datetime import date
 from PyQt6.QtCore import QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QMenu
+from PyQt6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QMenu, QWidget
 
 from widgets._base_widgets import UMainWidget, UPushButton
 
@@ -38,15 +38,20 @@ class CustomCalendar(UMainWidget):
         super().__init__()
         self.q_locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
         self.current_date = date.today()
+        self.row_height = 30
         self.setWindowTitle("Кастомный Календарь")
-        self.setMinimumSize(400, 350)
         self.set_close_only()
         self.set_always_on_top()
         self.init_ui()
+        self.adjustSize()
 
     def init_ui(self):
-        # --- Первая строка: Панель навигации ---
-        self.nav_layout = QHBoxLayout()
+        # --- Первая строка: Панель навигации (Контейнер) ---
+        self.nav_widget = QWidget()
+        self.nav_widget.setFixedHeight(self.row_height)
+        self.nav_layout = QHBoxLayout(self.nav_widget)
+        self.nav_layout.setContentsMargins(0, 0, 0, 0)
+        self.nav_layout.setSpacing(0)
         
         # Стрелка влево (Предыдущий год)
         self.btn_prev = ClickableSvgWidget("./icons/common/previous.svg")
@@ -59,7 +64,6 @@ class CustomCalendar(UMainWidget):
         self.btn_month.setMenu(self.menu_month)
         self.populate_months()
 
-        
         # Кнопка выбора года с QMenu
         self.btn_year = MonthYearBtn("")
         self.menu_year = QMenu(self)
@@ -71,7 +75,7 @@ class CustomCalendar(UMainWidget):
         self.btn_next.setFixedSize(16, 16)
         self.btn_next.clicked.connect(self.next_year)
         
-        # Собираем навигационную панель
+        # Собираем навигационную панель внутри контейнера
         self.nav_layout.addWidget(self.btn_prev)
         self.nav_layout.addStretch()
         self.nav_layout.addWidget(self.btn_month)
@@ -80,16 +84,21 @@ class CustomCalendar(UMainWidget):
         self.nav_layout.addStretch()
         self.nav_layout.addWidget(self.btn_next)
         
-        self.central_layout.addLayout(self.nav_layout)
+        # Добавляем контейнер навигации как виджет
+        self.central_layout.addWidget(self.nav_widget)
 
-        # --- Сетка для дней недели и чисел ---
-        self.grid_layout = QGridLayout()
+        # --- Сетка для дней недели и чисел (Контейнер) ---
+        self.grid_widget = QWidget()  # Создаем виджет-контейнер для сетки
+        self.grid_layout = QGridLayout(self.grid_widget)  # Привязываем сетку к виджету
         self.grid_layout.setSpacing(5)
-        self.central_layout.addLayout(self.grid_layout)
+        self.grid_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Добавляем контейнер сетки как виджет
+        self.central_layout.addWidget(self.grid_widget)
         
         # Обновляем интерфейс под текущую дату
         self.update_calendar()
-        self.adjustSize()
+        # self.adjustSize()
 
     def populate_months(self):
         self.menu_month.clear()
@@ -124,20 +133,17 @@ class CustomCalendar(UMainWidget):
             self.update_calendar()
 
     def prev_year(self):
-        """Листает на один год назад (ограничение до 2015)."""
         if self.current_date.year > 2015:
             self.current_date = self.current_date.replace(year=self.current_date.year - 1)
             self.update_calendar()
 
     def next_year(self):
-        """Листает на один год вперед (ограничение до текущего года)."""
         max_year = date.today().year
         if self.current_date.year < max_year:
             self.current_date = self.current_date.replace(year=self.current_date.year + 1)
             self.update_calendar()
 
     def clear_grid(self):
-        """Очищает сетку от старых виджетов."""
         while self.grid_layout.count():
             item = self.grid_layout.takeAt(0)
             widget = item.widget()
@@ -157,43 +163,35 @@ class CustomCalendar(UMainWidget):
         max_year = date.today().year
         self.btn_next.setEnabled(self.current_date.year < max_year)
 
-        # Очищаем старую сетку
         self.clear_grid()
 
         for col in range(7):
-            # Переводим индекс колонки (0..6) в день недели (1..7)
-            # В русской локали первый день недели — понедельник (1)
             day_of_week = col + 1 
             day_name = self.q_locale.dayName(day_of_week, QLocale.FormatType.ShortFormat).capitalize()
             lbl_day = QLabel(day_name)
-            lbl_day.setFixedSize(40, 40)
+            lbl_day.setFixedSize(self.row_height, self.row_height)
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.grid_layout.addWidget(lbl_day, 0, col)
 
-        # --- 2. Отрисовка дней текущего месяца ---
         year = self.current_date.year
         month = self.current_date.month
         
-        # Определяем первый день месяца и его день недели
         first_day_of_month = date(year, month, 1)
-        # weekday() возвращает: 0 = Понедельник, ..., 6 = Воскресенье
         start_col = first_day_of_month.weekday() 
         
-        # Определяем количество дней в текущем месяце
         if month == 12:
             next_month_boundary = date(year + 1, 1, 1)
         else:
             next_month_boundary = date(year, month + 1, 1)
         days_in_month = (next_month_boundary - first_day_of_month).days
 
-        # Заполняем сетку кнопками дней
         current_day = 1
         row = 1
         col = start_col
 
         while current_day <= days_in_month:
             btn_day = QLabel(str(current_day))
-            btn_day.setFixedSize(40, 40)
+            btn_day.setFixedSize(self.row_height, self.row_height)
             self.grid_layout.addWidget(btn_day, row, col)
             current_day += 1
             col += 1
