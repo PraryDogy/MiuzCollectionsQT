@@ -480,7 +480,7 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
-class GrayLabel(QLabel):
+class GrayTextLabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
         self.set_font_size(11)

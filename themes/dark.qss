@@ -184,7 +184,7 @@ HSep {
 }
 
 
-GrayLabel {
+GrayTextLabel {
     color: #818181;
 }
 
@@ -258,7 +258,7 @@ USpinBox::down-arrow {
 
 
 
-ReadableDateLabel {
+WinDatesDateLabel {
     color: #7d7d7d; 
     font-weight: 500;
 }

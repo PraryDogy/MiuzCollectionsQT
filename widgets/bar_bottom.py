@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QHBoxLayout, QLabel,
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import GrayLabel, USlider
+from ._base_widgets import GrayTextLabel, USlider
 
 
 class ThumbnailsSlider(USlider):
@@ -20,7 +20,7 @@ class ThumbnailsSlider(USlider):
         super()._on_value_changed(value)
 
 
-class ProgressWidget(GrayLabel):
+class ProgressWidget(GrayTextLabel):
     interval_ms = 1000  # 1 секунда
 
     def __init__(self, parent=None):

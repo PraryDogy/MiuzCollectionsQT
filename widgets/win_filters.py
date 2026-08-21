@@ -16,7 +16,7 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UGroupBox,
                             VListSpacerItem, VListWidget, VListWidgetItem)
 
 
-class ReadableDateLabel(QLabel):
+class WinDatesDateLabel(QLabel):
 
     def __init__(self):
         super().__init__()
@@ -128,7 +128,7 @@ class DatesWidget(UGroupBox):
         self.main_layout.addWidget(HSep())
 
         # --- СТРОКА 3: Текстовое состояние ---
-        self.readable_date_label = ReadableDateLabel()
+        self.readable_date_label = WinDatesDateLabel()
         self.main_layout.addWidget(self.readable_date_label)
 
         # Инициализация логики
@@ -250,8 +250,10 @@ class DatesWidget(UGroupBox):
 
         for child in calendar.findChildren(QSpinBox):
             child.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
+            # child.deleteLater()
 
-        # Применяем ТВОЙ оригинальный CSS-стиль напрямую к календарю
+        return
+
         calendar.setStyleSheet("""
             #qt_calendar_monthbutton::menu-indicator {
                 image: none;

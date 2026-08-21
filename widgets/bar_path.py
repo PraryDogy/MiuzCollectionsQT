@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 from cfg import Static
 from system.shared_utils import ImgUtils
 
-from ._base_widgets import GrayLabel
+from ._base_widgets import GrayTextLabel
 
 
 class PathItem(QWidget):
@@ -38,7 +38,7 @@ class PathItem(QWidget):
         self.img_wid.setFixedSize(self.item_height, self.item_height)
         item_layout.addWidget(self.img_wid)
         
-        self.text_wid = GrayLabel(text=name)
+        self.text_wid = GrayTextLabel(text=name)
         self.collapse()
         item_layout.addWidget(self.text_wid)
 

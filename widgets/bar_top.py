@@ -10,7 +10,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import GrayLabel, ULineEditLight, UMenu
+from ._base_widgets import GrayTextLabel, ULineEditLight, UMenu
 
 
 class ClearBtn(QSvgWidget):
@@ -104,7 +104,7 @@ class BarTopBtn(QWidget):
         self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.lbl = GrayLabel("")
+        self.lbl = GrayTextLabel("")
         self.lbl.set_font_size(9)
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
