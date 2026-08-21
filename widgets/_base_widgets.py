@@ -17,46 +17,7 @@ from system.lang import Lng
 from system.utils import Utils
 
 
-class UMenuStyle(QMenu):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.setStyleSheet(
-        #     """
-        #     UMenuStyle {
-        #         background: palette(tool-tip-base);
-        #         border: 1px solid palette(link-visited);
-        #         border-radius: 8px;
-        #         padding: 3px; /* компактный внутренний отступ самого меню */
-        #     }
-
-        #     UMenuStyle::item {
-        #         background: transparent;
-        #         color: palette(text);
-        #         /* 3px сверху/снизу (вместо 6px) и 16px слева/справа (вместо 20px) */
-        #         padding: 3px 16px; 
-        #         margin: 0px; /* убираем лишнее расстояние между строками */
-        #         border-radius: 4px; /* чуть уменьшили радиус под компактный размер */
-        #     }
-
-        #     /* Стиль выделенного (активного) пункта меню */
-        #     UMenuStyle::item:selected {
-        #         background: palette(highlight);
-        #         color: palette(highlighted-text);
-        #         border-radius: 4px;
-        #     }
-        #     """
-        # )
-
-    def mouseReleaseEvent(self, a0):
-        if a0.button() == Qt.MouseButton.RightButton:
-            a0.ignore()
-        else:
-            super().mouseReleaseEvent(a0)
-
-
-
-
-class UMenu(UMenuStyle):
+class UMenu(QMenu):
     def __init__(self, event: Optional[QContextMenuEvent]):
         super().__init__()
         self.event_ = event
@@ -67,8 +28,14 @@ class UMenu(UMenuStyle):
         else:
             self.exec()
 
+    def mouseReleaseEvent(self, a0):
+        if a0.button() == Qt.MouseButton.RightButton:
+            a0.ignore()
+        else:
+            super().mouseReleaseEvent(a0)
 
-class USubMenu(UMenuStyle):
+
+class USubMenu(QMenu):
     def __init__(self, title: str, parent: QMenu):
         super().__init__(title, parent)
 
@@ -79,14 +46,6 @@ class ULineEdit(QLineEdit):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(self.hh)
-        # self.setStyleSheet(
-        #     f"""
-        #         padding-left: 2px;
-        #         padding-right: 28px;
-        #         border: 1px solid palette(tooltip-base);
-        #         border-radius: 6px;
-        #     """
-        # )
 
     def cut_selection(self, *args):
         text = self.selectedText()
@@ -245,13 +204,6 @@ class VScrollArea(QScrollArea):
         self.setAcceptDrops(True)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.setStyleSheet(
-        #     """
-        #     VScrollArea { 
-        #         border: none; 
-        #     }
-        #     """
-        # )
 
 
 class VListWidgetItem(QListWidgetItem):

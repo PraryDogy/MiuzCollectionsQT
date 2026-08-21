@@ -1,23 +1,52 @@
-/* styles.qss */
+/* СИНИЙ */
+/* #0059d1 */
 
-QMenu {
-    background: #2a2a2a;
-    border: 1px solid #4C4C4C;
+/* ФОН line edit, text edit, menu */
+/* #2b2b2b */
+
+/* БОРДЕР line edit, text edit, menu */
+/* #353535 */
+
+
+
+UMenu {
+    background: #2b2b2b;
+    border: 1px solid #353535;
     border-radius: 8px;
     padding: 3px;
 }
 
-QMenu::item {
+UMenu::item {
     background: transparent;
+    padding: 3px 16px;
+    margin: 0px;
+    border-radius: 4px;
     color: #ffffff;
-    padding: 3px 16px; /* 3px сверху/снизу и 16px слева/справа */
-    margin: 0px; /* убираем лишнее расстояние между строками */
-    border-radius: 4px; /* чуть уменьшили радиус под компактный размер */
 }
 
 /* Стиль выделенного (активного) пункта меню */
-QMenu::item:selected {
-    color: #ffffff;
+UMenu::item:selected {
     background: #0059d1;
+    color: #ffffff;
     border-radius: 4px;
+}
+
+VScrollArea {
+    border: none;
+}
+
+ULineEdit {
+    background: #2b2b2b;
+    color: #ffffff;
+    border: 1px solid #353535;
+    border-radius: 6px;
+    padding-left: 2px;
+    padding-right: 28px;
+}
+
+
+/* Если в вашем приложении используются обычные диалоговые окна (QDialog), 
+   их фон тоже можно объединить в это правило через запятую: */
+QMainWindow, QDialog, .QWidget {
+    background: #1e1e1e;
 }
