@@ -309,7 +309,7 @@ class Grid(VScrollArea):
         self.date_timer.setSingleShot(True)
 
         # --- Вкладка прокрутки ---
-        self.scroll_wid = QWidget()
+        self.scroll_wid = QFrame()
         self.setWidget(self.scroll_wid)
         self.scroll_layout = QVBoxLayout(self.scroll_wid)
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)

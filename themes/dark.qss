@@ -1,30 +1,36 @@
 /* СИНИЙ */
-/* #0059d1 */
+/* background: #0059d1; */
 
-/* ФОН line edit, text edit, menu */
-/* #2b2b2b */
+/* ФОН ПОСВЕТЛЕЕ */
+/* background: #2b2b2b; */
 
-/* БОРДЕР line edit, text edit, menu */
-/* #353535 */
+/* ФОН ПОСВЕТЛЕЕ БОРДЕР */
+/* border: 1px solid #353535; */
 
-/* ФОН окно, скролл ареа */
-/* #1e1e1e */
+/* ФОН */
+/* background: #1e1e1e; */
+
+/* ФОН ПОТЕМНЕЕ */
+/* background: #171717; */
 
 
 
-/* БАЗА */
-.QWidget {
+QFrame {
     background: #1e1e1e;
+    border: none;
 }
 
-UMenu {
+
+
+
+QMenu {
     background: #2b2b2b;
     border: 1px solid #353535;
     border-radius: 8px;
     padding: 3px;
 }
 
-UMenu::item {
+QMenu::item {
     background: transparent;
     padding: 3px 16px;
     margin: 0px;
@@ -32,19 +38,25 @@ UMenu::item {
     color: #ffffff;
 }
 
-/* Стиль выделенного (активного) пункта меню */
-UMenu::item:selected {
+QMenu::item:selected {
     background: #0059d1;
     color: #ffffff;
     border-radius: 4px;
 }
 
-VScrollArea {
+
+
+
+QScrollArea {
     border: none;
-    background: #1e1e1e;
 }
 
-ULineEdit {
+
+
+
+
+
+QLineEdit {
     background: #2b2b2b;
     color: #ffffff;
     border: 1px solid #353535;
@@ -53,7 +65,61 @@ ULineEdit {
     padding-right: 28px;
 }
 
-ULineEdit::placeholder {
+QLineEdit::placeholder {
     color: #9a3636;
 }
 
+
+
+
+
+
+QGroupBox {
+    background-color: #2b2b2b;
+    border: 1px solid #353535;
+    border-radius: 6px;
+}
+
+
+
+
+QListWidget {
+    background: #171717;
+    color: #ffffff;
+}
+
+QListWidget::item:selected {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+QListWidget::item:selected:!active {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+
+
+
+QTreeWidget {
+    background: #171717;
+    color: #ffffff;
+}
+
+QTreeWidget::item:selected {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+QTreeWidget::item:selected:!active {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+QPushButton {
+    font-size: 11pt;
+    background: #2b2b2b;
+    border: 1px solid #353535;
+    border-radius: 4px;
+    color: #ffffff;
+}

@@ -115,23 +115,7 @@ class UTextEdit(QTextEdit):
 class UGroupBox(QGroupBox):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        # self.setStyleSheet(
-        #     """
-        #     QGroupBox {
-        #         background-color: palette(tooltip-base);
-        #         border: 1px solid palette(mid);
-        #         border-radius: 5px;
-        #         margin-top: 12px; 
-        #     }
-            
-        #     QGroupBox::title {
-        #         subcontrol-origin: margin;
-        #         subcontrol-position: top left;
-        #         left: 10px;
-        #         padding: 0 3px;
-        #     }
-        #     """
-        # )
+
 
 class WindowMixin:
     win_list: list[QMainWindow] = []
