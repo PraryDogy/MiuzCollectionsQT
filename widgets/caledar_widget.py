@@ -265,7 +265,6 @@ class Calendar(UMainWidget):
         self.current_date = QDate(current_year, current_month, day)
         self.update_calendar()
 
-    # Стрелки теперь листают месяцы вперед/назад с сохранением лимитов по годам
     def prev_month(self):
         min_date = QDate(self.min_year, 1, 1)
         new_date = self.current_date.addMonths(-1)
