@@ -28,11 +28,11 @@ def remove_trash():
 
 
 def move_app_to_desktop(appname: str):
-    desktop = os.path.expanduser("~/Desktop")
-    dest = os.path.join(desktop, f"{appname}.app")
-    src = os.path.join("dist", f"{appname}.app")
+    desktop = Path.home() / "Desktop"
+    dest = desktop / f"{appname}.app"
+    src = Path("dist") / f"{appname}.app"
     try:
-        if os.path.exists(dest):
+        if dest.exists():
             shutil.rmtree(dest)
     except Exception as e:
         print(e)
