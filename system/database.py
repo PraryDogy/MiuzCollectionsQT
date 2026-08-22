@@ -96,20 +96,20 @@ class Dbase:
 
     @classmethod
     def create_engine(cls):
-        if os.path.exists(Static.DB_FILE):
-            engine = sqlalchemy.create_engine(
-                f"sqlite:///{Static.DB_FILE}",
-                echo=cls._echo,
-                connect_args={
-                    "check_same_thread": cls._same_thread,
-                    "timeout": cls._timeout
-                    }
-                    )
-            METADATA.create_all(engine)
-            return engine
-        else:
+        if not Static.DB_FILE.exists():
             t = "Нет пользовательского файла DB_FILE"
             raise Exception(t)
+
+        engine = sqlalchemy.create_engine(
+            f"sqlite:///{Static.DB_FILE}",
+            echo=cls._echo,
+            connect_args={
+                "check_same_thread": cls._same_thread,
+                "timeout": cls._timeout
+                }
+                )
+        METADATA.create_all(engine)
+        return engine
         
     @classmethod
     def toggle_wal(cls, value: bool):
