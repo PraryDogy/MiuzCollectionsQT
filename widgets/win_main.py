@@ -391,7 +391,7 @@ class WinMain(UMainWindow):
                         qimages = []
                         for x in Static.thumb_widget_pixmap_size:
                             resized = ImgUtils.fit_to_thumb(i.array, x * 2)
-                            qimage = Utils.qimage_from_array(resized)
+                            qimage = Utils.pyqt_qimage_from_array(resized)
                             pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), x)
                             qimages.append(QImage(pixmap))
                         wid.data_item.qimages = qimages

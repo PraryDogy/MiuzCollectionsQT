@@ -131,11 +131,11 @@ class DbImagesLoader(URunnable):
             img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
             for i in Static.thumb_widget_pixmap_size:
                 resized = ImgUtils.fit_to_thumb(img_rgb, i * 2)
-                qimage = Utils.qimage_from_array(resized)
+                qimage = Utils.pyqt_qimage_from_array(resized)
                 pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), i)
                 qimages.append(QImage(pixmap))
 
-            src_qimage = Utils.qimage_from_array(img_rgb)
+            src_qimage = Utils.pyqt_qimage_from_array(img_rgb)
             qimages.append(src_qimage)
 
             date_ = datetime.fromtimestamp(mod).date()
@@ -388,7 +388,7 @@ class ImgArrayQImage(URunnable):
 
     def task(self):
         self.sigs.finished_.emit(
-            Utils.qimage_from_array(self.img_array)
+            Utils.pyqt_qimage_from_array(self.img_array)
         )
 
 

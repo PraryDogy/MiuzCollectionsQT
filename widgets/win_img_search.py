@@ -292,7 +292,7 @@ class WinImgSearch(UMainWidget):
                         1500, lambda: self.img_label.setText(self.base_text)
                     )
                 else:
-                    qimage = Utils.qimage_from_array(self.img_array)
+                    qimage = Utils.pyqt_qimage_from_array(self.img_array)
                     min_size = min(
                         self.img_label.width(), self.img_label.height()
                     )

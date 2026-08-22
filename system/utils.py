@@ -15,7 +15,7 @@ from cfg import Static
 class Utils:
 
     @classmethod
-    def qimage_from_array(cls, image: np.ndarray) -> QImage | None:
+    def pyqt_qimage_from_array(cls, image: np.ndarray) -> QImage | None:
         try:
             image = np.ascontiguousarray(image)
             if image.ndim == 2:  # grayscale
@@ -36,7 +36,7 @@ class Utils:
             return None
 
     @classmethod
-    def pixmap_from_array(cls, image: np.ndarray) -> QPixmap | None:
+    def pyqt_pixmap_from_array(cls, image: np.ndarray):
         try:
             height, width, channel = image.shape
             bytes_per_line = channel * width
@@ -53,7 +53,7 @@ class Utils:
             return None
 
     @classmethod
-    def pixmap_scale(cls, pixmap: QPixmap, w: int, h: int) -> QPixmap | None:
+    def pyqt_pixmap_scale(cls, pixmap: QPixmap, w: int, h: int):
         try:
             aspect = Qt.AspectRatioMode.KeepAspectRatio
             transf = Qt.TransformationMode.SmoothTransformation
@@ -63,7 +63,7 @@ class Utils:
             return None
 
     @classmethod
-    def scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = 2):
+    def pyqt_scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = 2):
         scaled = qimage.scaled(
             int(size * dpr),
             int(size * dpr),
