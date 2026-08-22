@@ -142,16 +142,27 @@ QListWidget::item:selected:!active {
 QTreeWidget {
     background: #171717;
     color: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #2d2d2d;
+    padding: 4px;
+}
+
+QTreeWidget::item {
+    background: transparent;
+    color: #ffffff;
+    border-radius: 5px;
 }
 
 QTreeWidget::item:selected {
     background: #0059d1;
     color: #ffffff;
+    border-radius: 5px;
 }
 
 QTreeWidget::item:selected:!active {
     background: #0059d1;
     color: #ffffff;
+    border-radius: 5px;
 }
 
 
