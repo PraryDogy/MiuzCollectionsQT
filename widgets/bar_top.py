@@ -15,7 +15,7 @@ from pathlib import Path
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
-    icon_path = os.path.join(Static.COMMON_ICONS, "cancel.svg")
+    icon_path = Static.COMMON_ICONS / "cancel.svg"
     icon_size = 11
 
     def __init__(self, parent: ULineEditLight):

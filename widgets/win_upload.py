@@ -91,10 +91,10 @@ class CustomTreeView(QTreeView):
 
 class UploadWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
-    image_file_svg = os.path.join(Static.COMMON_ICONS, "image_file.svg")
-    copy_files_svg = os.path.join(Static.COMMON_ICONS, "copy_files.svg")
-    storage_svg = os.path.join(Static.COMMON_ICONS, "storage.svg")
-    base_folder_svg = os.path.join(Static.COMMON_ICONS, "base_folder.svg")
+    image_file_svg = Static.COMMON_ICONS / "image_file.svg"
+    copy_files_svg = Static.COMMON_ICONS / "copy_files.svg"
+    storage_svg = Static.COMMON_ICONS / "storage.svg"
+    base_folder_svg = Static.COMMON_ICONS / "base_folder.svg"
 
     def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
         super().__init__()

@@ -18,8 +18,9 @@ from ._base_widgets import SelectableLabel, UGroupBox
 
 class PathWidget(UGroupBox):
     mf_path_avaiable = pyqtSignal()
-    magnifier = os.path.join(Static.COMMON_ICONS, "magnifier.svg")
-    green_checkmark = os.path.join(Static.COMMON_ICONS, "green_checkmark.svg")
+    magnifier = Static.COMMON_ICONS / "magnifier.svg"
+    green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
+
     hh = 70
     icon_size = 35
 

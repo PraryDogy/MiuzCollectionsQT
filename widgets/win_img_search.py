@@ -100,7 +100,7 @@ class SliderWidget(QWidget):
 
 
 class WinImgSearch(UMainWidget):
-    reset_svg = os.path.join(Static.COMMON_ICONS, "reset.svg")
+    reset_svg = Static.COMMON_ICONS / "reset.svg"
     reload_thumbnails = pyqtSignal()
     reset_all_filters = pyqtSignal()
     closed = pyqtSignal()

@@ -53,10 +53,10 @@ class ZipTask(URunnable):
 
 
 class FirstLoadWin(UMainWidget):
-    rus_flag = os.path.join(Static.COMMON_ICONS, "rus_flag.svg")
-    eng_flag = os.path.join(Static.COMMON_ICONS, "eng_flag.svg")
-    language_svg = os.path.join(Static.COMMON_ICONS, "language.svg")
-    miuz_svg = os.path.join(Static.COMMON_ICONS, "miuz.svg")
+    rus_flag = Static.COMMON_ICONS / "rus_flag.svg"
+    eng_flag = Static.COMMON_ICONS / "eng_flag.svg"
+    language_svg = Static.COMMON_ICONS / "language.svg"
+    miuz_svg = Static.COMMON_ICONS / "miuz.svg"
     svg_size = 16
     ww = 440
 

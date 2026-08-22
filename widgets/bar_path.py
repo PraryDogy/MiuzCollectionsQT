@@ -20,9 +20,9 @@ class PathItem(QWidget):
     add_fav = pyqtSignal(str)
     del_fav = pyqtSignal(str)
     type_to_pixmap: dict = {}
-    base_folder_svg = os.path.join(Static.COMMON_ICONS, "base_folder.svg")
-    image_folder_svg = os.path.join(Static.COMMON_ICONS, "image_folder.svg")
-    img_svg = os.path.join(Static.COMMON_ICONS, "image_file.svg")
+    base_folder_svg = Static.COMMON_ICONS / "base_folder.svg"
+    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+    img_svg = Static.COMMON_ICONS / "image_file.svg"
 
     def __init__(self, dir: str, name: str):
         super().__init__()

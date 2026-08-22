@@ -1,5 +1,6 @@
 import os
 import re
+from pathlib import Path
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QCloseEvent, QContextMenuEvent, QMouseEvent
@@ -314,8 +315,8 @@ class SelectableLabel(QLabel):
 
 class RowArrowWidget(QWidget):
     clicked = pyqtSignal()
-    arrow_svg = os.path.join(Static.COMMON_ICONS, "next.svg")
-    warning_svg = os.path.join(Static.COMMON_ICONS, "yellow_warning.svg")
+    arrow_svg = Static.COMMON_ICONS / "next.svg"
+    warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
     hh = 26
     svg_size = 16
 
@@ -417,8 +418,8 @@ class UDateEdit(QDateEdit):
 
 class WinProgressbar(UMainWidget):
     cancel = pyqtSignal()
-    files_icon_path = os.path.join(Static.COMMON_ICONS, "copy_files.svg")
-    images_icon_path = os.path.join(Static.COMMON_ICONS, "cancel.svg")
+    files_icon_path = Static.COMMON_ICONS / "copy_files.svg"
+    cancel_icon_path = Static.COMMON_ICONS / "cancel.svg"
     ww = 370
 
     def __init__(self, title: str):
@@ -463,7 +464,7 @@ class WinProgressbar(UMainWidget):
         self.progressbar.adjustSize()
         progressbar_lay.addWidget(self.progressbar)
 
-        self.cancel_btn = QSvgWidget(self.images_icon_path)
+        self.cancel_btn = QSvgWidget(self.cancel_icon_path)
         self.cancel_btn.setFixedSize(13, 13)
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         progressbar_lay.addWidget(self.cancel_btn)
@@ -496,7 +497,7 @@ class GrayTextLabel(QLabel):
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
-    icon_path = os.path.join(Static.COMMON_ICONS, "yellow_warning.svg")
+    icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
     icon_size = 40
 
     def __init__(self, text: str, w: int, h: int):
@@ -554,7 +555,7 @@ class ConfirmWindow(UMainWidget):
     
 
 class SuperConfirmWindow(ConfirmWindow):
-    icon_path = os.path.join(Static.COMMON_ICONS, "red_warning.svg")
+    icon_path = Static.COMMON_ICONS / "red_warning.svg"
 
     def __init__(self, text: str, w: int, h: int):
         super().__init__(text, w, h)
@@ -568,7 +569,7 @@ class WarningWindow(ConfirmWindow):
 
 
 class SaveRowArrowWidget(RowArrowWidget):
-    save_svg = os.path.join(Static.COMMON_ICONS, "save.svg")
+    save_svg = Static.COMMON_ICONS / "save.svg"
 
     def __init__(self, lng_index: int):
         super().__init__(Lng.save[lng_index])
@@ -619,8 +620,8 @@ class MfAliasWidget(UGroupBox):
 
 class MfPathWidget(UGroupBox):
     changed = pyqtSignal()
-    magnifier = os.path.join(Static.COMMON_ICONS, "magnifier.svg")
-    green_checkmark = os.path.join(Static.COMMON_ICONS, "green_checkmark.svg")
+    magnifier = Static.COMMON_ICONS / "magnifier.svg"
+    green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
     hh = 70
     icon_size = 35
 

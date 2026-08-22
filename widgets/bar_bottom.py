@@ -65,7 +65,7 @@ class ProgressWidget(GrayTextLabel):
 
 class BarBottom(QWidget):
     resize_thumbnails = pyqtSignal()
-    icon_path = os.path.join(Static.COMMON_ICONS, "next.svg")
+    icon_path = Static.COMMON_ICONS / "next.svg"
     icon_size = 15
 
     def __init__(self):

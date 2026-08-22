@@ -49,11 +49,11 @@ class RebootableSettings(UGroupBox):
     lang_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
-    rus_flag = os.path.join(Static.COMMON_ICONS, "rus_flag.svg")
-    eng_flag = os.path.join(Static.COMMON_ICONS, "eng_flag.svg")
-    eraser_svg = os.path.join(Static.COMMON_ICONS, "eraser.svg")
-    clock_svg = os.path.join(Static.COMMON_ICONS, "clock.svg")
-    language_svg = os.path.join(Static.COMMON_ICONS, "language.svg")
+    rus_flag = Static.COMMON_ICONS / "rus_flag.svg"
+    eng_flag = Static.COMMON_ICONS / "eng_flag.svg"
+    eraser_svg = Static.COMMON_ICONS / "eraser.svg"
+    clock_svg = Static.COMMON_ICONS / "clock.svg"
+    language_svg = Static.COMMON_ICONS / "language.svg"
 
     def __init__(self):
         super().__init__()
@@ -230,8 +230,8 @@ class SizesWin(UMainWidget):
 
 
 class NonRebootableSettings(UGroupBox):
-    finder_svg = os.path.join(Static.COMMON_ICONS, "finder.svg")
-    hdd_svg = os.path.join(Static.COMMON_ICONS, "hdd.svg")
+    finder_svg = Static.COMMON_ICONS / "finder.svg"
+    hdd_svg = Static.COMMON_ICONS / "hdd.svg"
 
     def __init__(self):
         super().__init__()
@@ -322,7 +322,7 @@ class ThemeBtn(QWidget):
 
 
 class ThemesWidget(UGroupBox):
-    theme_svg = os.path.join(Static.COMMON_ICONS, "theme.svg")
+    theme_svg = Static.COMMON_ICONS / "theme.svg"
 
     def __init__(self):
         super().__init__()
@@ -486,7 +486,7 @@ class GeneralSettings(QWidget):
 
 class FiltersWid(QWidget):
     changed = pyqtSignal()
-    reset_svg = os.path.join(Static.COMMON_ICONS, "reset.svg")
+    reset_svg = Static.COMMON_ICONS / "reset.svg"
 
     def __init__(self):
         super().__init__()
@@ -570,8 +570,8 @@ class FiltersWid(QWidget):
 
 
 class MfSettings(QWidget):
-    repair_svg = os.path.join(Static.COMMON_ICONS, "repair.svg")
-    trash_svg = os.path.join(Static.COMMON_ICONS, "trash.svg")
+    repair_svg = Static.COMMON_ICONS / "repair.svg"
+    trash_svg = Static.COMMON_ICONS / "trash.svg"
 
     def __init__(self, mf_index: int):
         super().__init__()
@@ -735,7 +735,7 @@ class MfSettings(QWidget):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewMfSettings(QWidget):
-    yellow_warning_svg = os.path.join(Static.COMMON_ICONS, "yellow_warning.svg")
+    yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
     def __init__(self, mf_path: str = None):
         super().__init__()
@@ -841,11 +841,13 @@ class NewMfSettings(QWidget):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    image_folder_svg = os.path.join(Static.COMMON_ICONS, "image_folder.svg")
-    new_folder_svg = os.path.join(Static.COMMON_ICONS, "new_folder.svg")
-    filters_svg = os.path.join(Static.COMMON_ICONS, "filters.svg")
-    settings_svg = os.path.join(Static.COMMON_ICONS, "settings.svg")
-    yellow_warning_svg = os.path.join(Static.COMMON_ICONS, "yellow_warning.svg")
+    
+    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
+    filters_svg = Static.COMMON_ICONS / "filters.svg"
+    settings_svg = Static.COMMON_ICONS / "settings.svg"
+    yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
+
     ww = 700
     hh = 560
 

@@ -61,7 +61,7 @@ class TestWid(QLabel):
 
 
 class DangerWarn(ConfirmWindow):
-    icon_path = os.path.join(Static.COMMON_ICONS, "red_warning.svg")
+    icon_path = Static.COMMON_ICONS / "red_warning.svg"
     hh = 215
     ww = 400
 
