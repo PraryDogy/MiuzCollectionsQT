@@ -126,7 +126,7 @@ class OneFileInfo:
                 info_item.res = resol
             process_queue.put(info_item)
         except Exception as e:
-            Utils.print_error()
+            print("multiprocess One file info error", e)
 
     @staticmethod
     def _gather_info(path: str) -> OneFileInfoItem:

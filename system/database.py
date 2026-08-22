@@ -125,11 +125,9 @@ class Dbase:
     @classmethod
     def vacuum(cls):
         conn = cls.main_engine.connect()
-
         try:
             conn.execute(sqlalchemy.text("VACUUM"))
             conn.commit()
         except Exception as e:
-            Utils.print_error()
-
+            print("database vacuum error", e)
         conn.close()

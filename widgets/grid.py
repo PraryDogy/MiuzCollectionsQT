@@ -750,8 +750,8 @@ class Grid(VScrollArea):
     def mouseMoveEvent(self, a0):
         try:
             distance = (a0.pos() - self.origin_pos).manhattanLength()
-        except AttributeError:
-            Utils.print_error()
+        except AttributeError as e:
+            print("Grid mousemove attr error", e)
             return
 
         if distance < QApplication.startDragDistance():
