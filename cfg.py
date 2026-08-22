@@ -15,26 +15,29 @@ class Static:
     app_name = "Collections"
     thumbs_load_limit = 100
     
-    APP_DATA_DIR = os.path.expanduser(
-        os.path.join("~", "Library", "Application Support", app_name)
-    )
+    # 1. Базовая папка данных приложения
+    APP_DATA_DIR = Path(os.path.expanduser("~")) / "Library" / "Application Support" / app_name
 
+    # 2. Файлы и папки внутри APP_DATA_DIR
+    CFG_JSON = APP_DATA_DIR / "cfg.json"
+    DB_DB = APP_DATA_DIR / "db.db"
+    HASHDIR = APP_DATA_DIR / "hashdir"
+    MF_JSON = APP_DATA_DIR / "mf.json"
+    FILTERS_JSON = APP_DATA_DIR / "filters.json"
+    SERVERS_JSON = APP_DATA_DIR / "servers.json"
 
-    cfg_json = os.path.join(APP_DATA_DIR, "cfg.json")
-    db_db = os.path.join(APP_DATA_DIR, "db.db")
-    HASHDIR = os.path.join(APP_DATA_DIR, "hashdir")
-    mf_json = os.path.join(APP_DATA_DIR, "mf.json")
-    filters_json = os.path.join(APP_DATA_DIR, "filters.json")
-    servers_json = os.path.join(APP_DATA_DIR, "servers.json")
+    # 3. Локальные ресурсы приложения
+    SCRIPTS = Path("./scripts")
+    ICONS = Path("./icons")
+    MIUZ_ZIP = Path("./_miuz.zip")
+    
+    # 4. Подпапки с иконками (собираются от базовой папки ICONS)
+    APP_ICONS = ICONS / "app_icons"
+    BAR_TOP_ICONS = ICONS / "bar_top"
+    COMMON_ICONS = ICONS / "common"
+    JPEG_ICONS = ICONS / "jpeg_icons"
 
-    scripts = "./scripts"
-    icons = "./icons"
-    miuz_zip = "./_miuz.zip"
-    app_icons = os.path.join(icons, "app_icons")
-    bar_top_icons = os.path.join(icons, "bar_top")
-    common_icons = os.path.join(icons, "common")
-    jpeg_icons = os.path.join(icons, "jpeg_icons")
-
+    # максимально возможный размер миниатюры в HASHDIR
     THUMB_MAX_SIZE = 210
     # размеры для QPixmap в виджете Thumb
     THUMB_WID_PIXMAP_SIZE = [65, 80, 135]
