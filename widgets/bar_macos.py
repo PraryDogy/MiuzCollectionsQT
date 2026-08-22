@@ -33,13 +33,13 @@ class SelectableLabel(QLabel):
         context_menu = UMenu(ev)
         copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng_index])
         copy_text.triggered.connect(
-            lambda: Utils.copy_text_pyqt(self.selectedText())
+            lambda: Utils.pyqt_copy_text(self.selectedText())
         )
         context_menu.addAction(copy_text)
         context_menu.addSeparator()
         select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lng_index])
         select_all.triggered.connect(
-            lambda: Utils.copy_text_pyqt(self.text())
+            lambda: Utils.pyqt_copy_text(self.text())
         )
         context_menu.addAction(select_all)
         context_menu.show_menu()
@@ -61,7 +61,7 @@ class AboutWin(UMainWidget):
 
         icon = QLabel()
         pixmap = QPixmap(self.icon_path)
-        pixmap = Utils.qiconed_resize(pixmap, self.icon_size)
+        pixmap = Utils.pyqt_qiconed_resize(pixmap, self.icon_size)
         icon.setPixmap(pixmap)
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(self.opacity) 

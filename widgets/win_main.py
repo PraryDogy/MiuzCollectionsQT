@@ -392,7 +392,7 @@ class WinMain(UMainWindow):
                         for x in Static.thumb_widget_pixmap_size:
                             resized = ImgUtils.fit_to_thumb(i.array, x * 2)
                             qimage = Utils.qimage_from_array(resized)
-                            pixmap = Utils.qiconed_resize(QPixmap.fromImage(qimage), x)
+                            pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), x)
                             qimages.append(QImage(pixmap))
                         wid.data_item.qimages = qimages
                         wid.set_pixmap_with_actual_size()
@@ -427,7 +427,7 @@ class WinMain(UMainWindow):
             dest=downloads
         )
         copy_files_win.finished_.connect(
-            Utils.reveal_files_macos
+            Utils.macos_reveal_files
         )
 
     @with_conn
@@ -472,7 +472,7 @@ class WinMain(UMainWindow):
         if os.path.isdir(abs_paths[0]):
             subprocess.Popen(["open", abs_paths[0]])
         else:
-            Utils.reveal_files_macos(abs_paths)
+            Utils.macos_reveal_files(abs_paths)
 
     @with_conn
     def copy_path(self, rel_paths: list[str]):
@@ -480,7 +480,7 @@ class WinMain(UMainWindow):
             Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
-        Utils.copy_text_pyqt("\n".join(abs_paths))
+        Utils.pyqt_copy_text("\n".join(abs_paths))
 
     @with_conn
     def remove_files(self, rel_paths: list, ms = 300):

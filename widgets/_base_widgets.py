@@ -49,13 +49,13 @@ class ULineEdit(QLineEdit):
 
     def cut_selection(self, *args):
         text = self.selectedText()
-        Utils.copy_text_pyqt(text)
+        Utils.pyqt_copy_text(text)
 
         new_text = self.text().replace(text, "")
         self.setText(new_text)
 
     def paste_text(self, *args):
-        text = Utils.paste_text_pyqt()
+        text = Utils.pyqt_paste_text()
         self.insert(text)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
@@ -63,7 +63,7 @@ class ULineEdit(QLineEdit):
 
         actions = [
             (Lng.cut[JsonData.lng_index], self.cut_selection),
-            (Lng.copy[JsonData.lng_index], lambda: Utils.copy_text_pyqt(self.selectedText())),
+            (Lng.copy[JsonData.lng_index], lambda: Utils.pyqt_copy_text(self.selectedText())),
             (Lng.paste[JsonData.lng_index], self.paste_text),
         ]
 
@@ -92,16 +92,16 @@ class UTextEdit(QTextEdit):
     def copy_selection(self):
         cur = self.textCursor()
         text = cur.selectedText().strip()
-        Utils.copy_text_pyqt(text)
+        Utils.pyqt_copy_text(text)
 
     def cut_selection(self):
         cur = self.textCursor()
         text = cur.selectedText().strip()
-        Utils.copy_text_pyqt(text)
+        Utils.pyqt_copy_text(text)
         cur.removeSelectedText()
 
     def paste_text(self):
-        text = Utils.paste_text_pyqt()
+        text = Utils.pyqt_paste_text()
         new_text = self.toPlainText() + text
         self.setPlainText(new_text)
 
@@ -298,12 +298,12 @@ class SelectableLabel(QLabel):
 
         label_text = Lng.copy[JsonData.lng_index]
         sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(lambda: Utils.copy_text_pyqt(text))
+        sel.triggered.connect(lambda: Utils.pyqt_copy_text(text))
         menu_.addAction(sel)
 
         reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[JsonData.lng_index])
         reveal.triggered.connect(
-            lambda: Utils.reveal_files_macos([full_text])
+            lambda: Utils.macos_reveal_files([full_text])
         )
         
         if is_path:

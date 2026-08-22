@@ -285,7 +285,7 @@ class Grid(VScrollArea):
     def __init__(self):
         super().__init__()
         _copy_files_icon = QPixmap(self.copy_files_path)
-        self.copy_files_icon = Utils.qiconed_resize(_copy_files_icon, 80)
+        self.copy_files_icon = Utils.pyqt_qiconed_resize(_copy_files_icon, 80)
 
         # --- Состояние и данные ---
         self.wid_under_mouse: Thumb = None

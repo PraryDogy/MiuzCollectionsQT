@@ -74,7 +74,7 @@ class Utils:
         return scaled
 
     @classmethod
-    def qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
+    def pyqt_qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
         return QIcon(pixmap).pixmap(QSize(max_side, max_side))
 
     @classmethod
@@ -102,16 +102,16 @@ class Utils:
         return app_data_dir / rel_thumb_path
 
     @classmethod
-    def copy_text_pyqt(cls, text: str):
+    def pyqt_copy_text(cls, text: str):
         QApplication.clipboard().setText(text)
         return True
 
     @classmethod
-    def paste_text_pyqt(cls) -> str:
+    def pyqt_paste_text(cls) -> str:
         return QApplication.clipboard().text()
         
     @classmethod
-    def reveal_files_macos(cls, paths: list[str], scpt = "reveal_files.scpt"):
+    def macos_reveal_files(cls, paths: list[str], scpt = "reveal_files.scpt"):
         script_path = os.path.join(Static.scripts, scpt)
         subprocess.Popen(["osascript", script_path] + paths)
 
