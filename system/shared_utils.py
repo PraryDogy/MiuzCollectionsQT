@@ -205,7 +205,11 @@ class ImgUtils:
 
     @classmethod
     def _get_broken_image(cls):
-        path = Path(os.path.join(Static.JPEG_ICONS, "broken_image.jpg"))
+        path = Static.JPEG_ICONS / "broken_image.jpg"
+
+        if not path.exists():
+            raise Exception (f"Img Utils {path} not exists")
+
         img = Image.open(path)
         array_img = np.array(img)
         img.close()
