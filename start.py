@@ -138,6 +138,7 @@ class App(QApplication):
             Mf.current_mf = Mf.items[0]
             # инициация приложения
             Dbase.init()
+            Dbase.vacuum()
             ThemeChanger.init()
             UThreadPool.init()
             self.create_app()
