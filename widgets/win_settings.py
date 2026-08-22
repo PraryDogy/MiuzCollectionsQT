@@ -396,7 +396,7 @@ class AboutWidLabel(LabelMinWidth):
 
 
 class AboutWid(UGroupBox):
-    icon_path = os.path.join(Static.APP_ICONS, "icon.png")
+    icon_path = Static.APP_ICONS / "icon.png"
     icon_size = 85
     opacity = 0.85
 
@@ -421,6 +421,9 @@ class AboutWid(UGroupBox):
         h_lay.addWidget(lbl)
 
         h_lay.addStretch()
+
+        if not self.icon_path.exists():
+            print("win settings about wid, icon.png not exists")
 
 
 class GeneralSettings(QWidget):

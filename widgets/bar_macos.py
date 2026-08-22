@@ -47,7 +47,7 @@ class SelectableLabel(QLabel):
 
 class AboutWin(UMainWidget):
     ww = 280
-    icon_path = os.path.join(Static.APP_ICONS, "icon.png")
+    icon_path = Static.APP_ICONS / "icon.png"
     icon_size = 150
     opacity = 0.85
 
@@ -73,6 +73,9 @@ class AboutWin(UMainWidget):
         self.central_layout.addWidget(lbl)
 
         self.adjustSize()
+
+        if not self.icon_path.exists():
+            print("bar macos icon png not exists")
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         """Закрывает окно по Escape или Enter."""

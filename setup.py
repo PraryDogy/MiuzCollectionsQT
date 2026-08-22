@@ -62,8 +62,11 @@ SHORT_AUTHOR_NAME = "Evlosh" # "Evlosh"
 COMPANY = "MIUZ Diamonds" # "MIUZ Diamonds"
 APP_NAME = Static.APP_NAME
 APP_VER = str(Static.APP_VERSION)
-ICON_PATH = os.path.join(Static.APP_ICONS, "icon.icns")
+ICON_PATH = Static.APP_ICONS / "icon.icns"
 MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
+
+if not ICON_PATH.exists():
+    raise Exception ("setup py, icon icns not exists")
 
 
 DATA_FILES = [
@@ -83,7 +86,7 @@ BUNDLE_ID = f"com.{SHORT_AUTHOR_NAME}.{APP_NAME}" # DON'T CHANGE IT
 PY2APP = "py2app" # DON'T CHANGE IT
 
 OPTIONS = {
-    "iconfile": ICON_PATH,
+    "iconfile": str(ICON_PATH),
     "excludes": ["setuptools"],
     'includes': ['numpy', 'cv2'],
     "packages": ['numpy', 'cv2'],
