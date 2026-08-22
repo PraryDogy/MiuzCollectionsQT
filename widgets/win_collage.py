@@ -1,7 +1,8 @@
-import io
+import io  # Встроенный модуль Python для BytesIO
 
 from PIL import Image, ImageEnhance
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import (QBuffer, QIODevice,  # QBuffer импортируется отсюда
+                          Qt, QTimer)
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QGridLayout, QLabel, QScrollArea, QWidget
 
@@ -9,12 +10,7 @@ from cfg import JsonData, Static
 from system.items import DataItem
 from system.lang import Lng
 
-from ._base_widgets import UMainWidget
-
-import io  # Встроенный модуль Python для BytesIO
-from PIL import Image, ImageEnhance
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import QBuffer, QIODevice  # QBuffer импортируется отсюда
+from ._base_widgets import BlackBgFrame, UMainWidget
 
 
 class WinCollage(UMainWidget):
@@ -44,8 +40,7 @@ class WinCollage(UMainWidget):
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
 
-        self.container = QWidget()
-        self.container.setStyleSheet("background-color: black;")
+        self.container = BlackBgFrame()
         self.grid_layout = QGridLayout(self.container)
         
         self.grid_layout.setSpacing(10)

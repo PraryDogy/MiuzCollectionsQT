@@ -104,7 +104,6 @@ class ServerList(VListWidget):
 class ServerLabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text=text)
-        self.setStyleSheet("padding-left: 1px;")
 
 
 class LoginWin(UMainWidget):

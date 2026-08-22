@@ -286,3 +286,16 @@ CalendarDaySelected {
     font-weight: bold;
     border-radius: 20px;
 }
+
+
+WinImgViewGraphics, BlackBgFrame {
+    background: #000000;
+}
+
+WinInfoLeftLabel, WinInfoSelectableLabel {
+    font-size: 11pt;
+}
+
+ServerLabel {
+    padding-left: 1px;
+}

@@ -12,10 +12,10 @@ from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 from ._base_widgets import SelectableLabel, UMainWidget
 
 
-class ULabel(QLabel):
+
+class WinInfoLeftLabel(QLabel):
     def __init__(self, text: str, opacity_percent=70):
         super().__init__(text=text)
-        self.setStyleSheet("font-size: 11px;")
 
         self._opacity_effect = QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self._opacity_effect)
@@ -25,10 +25,9 @@ class ULabel(QLabel):
         self._opacity_effect.setOpacity(percent / 100)
 
 
-class Selectable(SelectableLabel):
+class WinInfoSelectableLabel(SelectableLabel):
     def __init__(self, text: str):
         super().__init__(text)
-        self.setStyleSheet("font-size: 11px;")
 
     def contextMenuEvent(self, ev):
         selection = self.selectedText()
@@ -36,9 +35,6 @@ class Selectable(SelectableLabel):
             self.setSelection(0, len(self.text()))
         return super().contextMenuEvent(ev)
 
-    # def mousePressEvent(self, ev):
-    #     self.setSelection(0, 0)
-    #     return super().mousePressEvent(ev)
 
 class WinInfo(UMainWidget):
     finished_ = pyqtSignal()
@@ -66,13 +62,13 @@ class WinInfo(UMainWidget):
             Lng.resol[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
         }
 
-        selectable_labels: list[Selectable] = []
+        selectable_labels: list[WinInfoSelectableLabel] = []
         row = 0
         l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         for left_t, right_t in self.data.items():
-            left_lbl = ULabel(left_t + ":")
-            right_lbl = Selectable(right_t)
+            left_lbl = WinInfoLeftLabel(left_t + ":")
+            right_lbl = WinInfoSelectableLabel(right_t)
             selectable_labels.append(right_lbl)
             self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
             self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)

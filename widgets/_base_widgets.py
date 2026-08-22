@@ -494,6 +494,11 @@ class GrayTextLabel(QLabel):
         self.setFont(font)
 
 
+class BlackBgFrame(QFrame):
+    def __init__(self):
+        super().__init__()
+
+
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()

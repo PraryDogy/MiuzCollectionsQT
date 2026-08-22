@@ -45,7 +45,6 @@ class TestWid(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent=parent, text="TEST")
         self.setFixedHeight(50)
-        self.setStyleSheet("background: black;")
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def reload(self):

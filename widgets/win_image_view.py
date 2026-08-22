@@ -34,14 +34,13 @@ class ImgViewItem:
     is_selection: bool
 
 
-class ImgWid(QGraphicsView):
+class WinImgViewGraphics(QGraphicsView):
     mouse_moved = pyqtSignal()
 
     def __init__(self, pixmap: QPixmap = None):
         super().__init__()
 
         self.setMouseTracking(True)
-        self.setStyleSheet("background: black")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
@@ -237,7 +236,6 @@ class WinImageView(UMainWidget):
         self.img_view_item = img_view_item
         self.current_data_item = img_view_item.start_data_item
 
-        self.setStyleSheet("background: black;")
         self.setMinimumSize(QSize(self.min_w, self.min_h))
         self.installEventFilter(self)
         self.central_layout.setContentsMargins(0, 0, 0, 0)
@@ -249,7 +247,7 @@ class WinImageView(UMainWidget):
 
         pixmap = QPixmap(10, 10)
         pixmap.fill(Qt.GlobalColor.black)
-        self.img_wid = ImgWid(pixmap)
+        self.img_wid = WinImgViewGraphics(pixmap)
         self.central_layout.addWidget(self.img_wid)
 
         self.prev_image_btn = PrevButton()
@@ -282,7 +280,7 @@ class WinImageView(UMainWidget):
 
     def restart_img_wid(self, pixmap: QPixmap):
         self.img_wid.hide()  # скрываем старый
-        new_wid = ImgWid(pixmap)
+        new_wid = WinImgViewGraphics(pixmap)
         new_wid.mouse_moved.connect(self.show_all_buttons)
         self.central_layout.addWidget(new_wid)
 
