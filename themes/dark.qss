@@ -110,7 +110,8 @@ QGroupBox {
 
 
 
-QListWidget {
+/* Общий стиль для самих виджетов списка и деревьев */
+QListWidget, QTreeView, QTreeWidget {
     background: #171717;
     color: #ffffff;
     border-radius: 10px;
@@ -118,72 +119,20 @@ QListWidget {
     padding: 4px;
 }
 
-QListWidget::item {
+/* Общий стиль для элементов (строк) */
+QListWidget::item, QTreeView::item, QTreeWidget::item {
     background: transparent;
     color: #ffffff;
     border-radius: 5px;
 }
 
-QListWidget::item:selected {
+/* Общий стиль для выделенных элементов (активных и неактивных) */
+QListWidget::item:selected, QTreeView::item:selected, QTreeWidget::item:selected,
+QListWidget::item:selected:!active, QTreeView::item:selected:!active, QTreeWidget::item:selected:!active {
     background: #0059d1;
     color: #ffffff;
     border-radius: 5px;
 }
-
-QListWidget::item:selected:!active {
-    background: #0059d1;
-    color: #ffffff;
-    border-radius: 5px;
-}
-
-
-
-
-QTreeWidget {
-    background: #171717;
-    color: #ffffff;
-    border-radius: 10px;
-    border: 1px solid #2d2d2d;
-    padding: 4px;
-}
-
-QTreeWidget::item {
-    background: transparent;
-    color: #ffffff;
-    border-radius: 5px;
-}
-
-QTreeWidget::item:selected {
-    background: #0059d1;
-    color: #ffffff;
-    border-radius: 5px;
-}
-
-QTreeWidget::item:selected:!active {
-    background: #0059d1;
-    color: #ffffff;
-    border-radius: 5px;
-}
-
-
-
-
-QTreeView {
-    background: #171717;
-    color: #ffffff;
-}
-
-QTreeView::item:selected {
-    background: #0059d1;
-    color: #ffffff;
-}
-
-QTreeView::item:selected:!active {
-    background: #0059d1;
-    color: #ffffff;
-}
-
-
 
 
 QPushButton {
