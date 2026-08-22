@@ -21,7 +21,7 @@ class Static:
 
     cfg_json = os.path.join(APP_DATA_DIR, "cfg.json")
     db_db = os.path.join(APP_DATA_DIR, "db.db")
-    hashdir = os.path.join(APP_DATA_DIR, "hashdir")
+    HASHDIR = os.path.join(APP_DATA_DIR, "hashdir")
     mf_json = os.path.join(APP_DATA_DIR, "mf.json")
     filters_json = os.path.join(APP_DATA_DIR, "filters.json")
     servers_json = os.path.join(APP_DATA_DIR, "servers.json")

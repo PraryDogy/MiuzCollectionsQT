@@ -98,8 +98,8 @@ class App(QApplication):
         if not os.path.exists(Static.APP_DATA_DIR):
             os.makedirs(Static.APP_DATA_DIR)
 
-        if not os.path.exists(Static.hashdir):
-            os.makedirs(Static.hashdir)
+        if not os.path.exists(Static.HASHDIR):
+            os.makedirs(Static.HASHDIR)
 
         if not os.path.exists(Static.db_db):
             open(Static.db_db, "w")

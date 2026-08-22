@@ -78,10 +78,11 @@ class Utils:
         return QIcon(pixmap).pixmap(QSize(max_side, max_side))
 
     @classmethod
-    def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str | None:
-        filename = hashlib.md5(rel_img_path.encode('utf-8')).hexdigest() + ".jpg"
+    def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str):
+        encoded = rel_img_path.encode('utf-8')
+        filename = hashlib.md5(encoded).hexdigest() + ".jpg"
         new_folder = os.path.join(
-            Static.hashdir,
+            Static.HASHDIR,
             f"{mf_alias}-{filename[:2]}"
         )
         os.makedirs(new_folder, exist_ok=True)
