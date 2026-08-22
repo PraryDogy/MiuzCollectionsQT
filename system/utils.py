@@ -2,11 +2,12 @@ import hashlib
 import os
 import subprocess
 import traceback
+from pathlib import Path
 
 import numpy as np
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon, QImage, QPixmap
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QVBoxLayout
 
 from cfg import Static
 
@@ -112,23 +113,37 @@ class Utils:
         return QApplication.clipboard().text()
         
     @classmethod
-    def reveal_files(cls, paths: list[str]):
-        REVEAL_SCPT = os.path.join(Static.scripts, "reveal_files.scpt")
-        subprocess.Popen(["osascript", REVEAL_SCPT] + paths)
-        
+    def reveal_files_macos(cls, paths: list[str], scpt = "reveal_files.scpt"):
+        script_path = os.path.join(Static.scripts, scpt)
+        subprocess.Popen(["osascript", script_path] + paths)
+
     @classmethod
-    def get_abs_any_path(cls, mf_path: str, rel_path: str) -> str:
-        if mf_path in rel_path:
-            return rel_path
-        else:
-            return mf_path + rel_path
+    def add_mf_path(cls, mf_path: str, rel_path: str) -> str:
+        p_mf = Path(mf_path.strip(os.sep))
+        p_abs = Path(rel_path.strip(os.sep))
+        if p_abs.is_relative_to(p_mf):
+            return os.sep + str(p_abs)
+        combined_path = p_mf / p_abs
+        return os.sep + str(combined_path)
     
     @classmethod
-    def get_rel_any_path(cls, mf_path: str, abs_img_path: str) -> str:
-        res = abs_img_path.replace(mf_path, "")
-        if not res:
+    def remove_mf_path(cls, mf_path: str, abs_path: str) -> str:
+        p_mf = Path(mf_path.strip(os.sep))
+        p_abs = Path(abs_path.strip(os.sep))
+        if p_abs == p_mf:
             return os.sep
-        return res
+        if p_abs.is_relative_to(p_mf):
+            return os.sep + str(p_abs.relative_to(p_mf))
+        return abs_path
+
+    @classmethod
+    def clear_layout(cls, layout: QVBoxLayout | QHBoxLayout | QGridLayout):
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.setParent(None)
+                widget.deleteLater()
 
     @classmethod
     def print_error(cls):

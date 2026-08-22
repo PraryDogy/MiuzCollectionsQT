@@ -101,7 +101,7 @@ class Calendar(UMainWidget):
     grid_h_spacing = 25
     grid_v_spacing = 5
 
-    def __init__(self, date: QDate = QDate.currentDate()):
+    def __init__(self, date: QDate):
         super().__init__()
 
         if JsonData.lng_index == 0:
@@ -113,6 +113,7 @@ class Calendar(UMainWidget):
 
         self.q_locale = QLocale(lng, country)
         self.current_date = date
+        self.date_now = QDate.currentDate()
         
         self.setWindowTitle(Lng.calendar[JsonData.lng_index])
         self.set_close_only()
@@ -224,7 +225,7 @@ class Calendar(UMainWidget):
 
     def populate_years(self):
         self.menu_year.clear()
-        max_year = QDate.currentDate().year()
+        max_year = self.date_now.year()
         for year in range(self.min_year, max_year + 1):
             action = QAction(str(year), self)
             action.setData(year)
@@ -275,7 +276,7 @@ class Calendar(UMainWidget):
             self.update_calendar()
 
     def next_month(self):
-        max_date = QDate(QDate.currentDate().year(), 12, 31)
+        max_date = QDate(self.date_now.year(), 12, 31)
         new_date = self.current_date.addMonths(1)
         if new_date <= max_date:
             self.current_date = new_date
@@ -284,7 +285,8 @@ class Calendar(UMainWidget):
     def clear_grid(self):
         while self.grid_layout.count():
             item = self.grid_layout.takeAt(0)
-            if (widget := item.widget()) is not None:
+            widget = item.widget()
+            if widget is not None:
                 widget.setParent(None)
                 widget.deleteLater()
 

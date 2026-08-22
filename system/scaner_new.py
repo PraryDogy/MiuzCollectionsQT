@@ -66,7 +66,7 @@ class MfScaner:
             result = conn.execute(stmt)
         mf_path = self.scaner_item.mf.mf_paths[0]
         return [
-            (Utils.get_abs_any_path(mf_path, rel_dir_path), mod)
+            (Utils.add_mf_path(mf_path, rel_dir_path), mod)
             for rel_dir_path, mod in result
         ]
 

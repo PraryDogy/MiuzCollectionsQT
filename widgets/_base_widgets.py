@@ -303,7 +303,7 @@ class SelectableLabel(QLabel):
 
         reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[JsonData.lng_index])
         reveal.triggered.connect(
-            lambda: Utils.reveal_files([full_text])
+            lambda: Utils.reveal_files_macos([full_text])
         )
         
         if is_path:

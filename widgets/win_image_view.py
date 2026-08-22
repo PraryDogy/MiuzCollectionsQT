@@ -302,7 +302,7 @@ class WinImageView(UMainWidget):
         avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
         if avaiable_mf_path:
             Mf.current_mf.set_mf_current_path(avaiable_mf_path)
-            abs_path = Utils.get_abs_any_path(
+            abs_path = Utils.add_mf_path(
                 avaiable_mf_path,
                 self.current_data_item.rel_path
             )
@@ -353,7 +353,7 @@ class WinImageView(UMainWidget):
             self.restart_img_wid(self.url_to_pixmap[self.current_data_item.rel_path])
         else:
 
-            abs_path = Utils.get_abs_any_path(
+            abs_path = Utils.add_mf_path(
                 mf_path=Mf.current_mf.mf_current_path,
                 rel_path=self.current_data_item.rel_path
             )

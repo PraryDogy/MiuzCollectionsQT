@@ -368,9 +368,9 @@ class WinMain(UMainWindow):
  
     @with_conn
     def on_tree_clicked(self, abs_path: str):
-        rel_path = Utils.get_rel_any_path(
+        rel_path = Utils.remove_mf_path(
             mf_path=Mf.current_mf.mf_current_path,
-            abs_img_path=abs_path
+            abs_path=abs_path
         )
         Dynamic.current_dir = rel_path
         self.set_no_filters()
@@ -419,7 +419,7 @@ class WinMain(UMainWindow):
     def save_to_downloads(self, rel_paths: list[str]):
         downloads = os.path.expanduser("~/Downloads")
         abs_paths = [
-            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         copy_files_win = self.copy_files_win(
@@ -427,13 +427,13 @@ class WinMain(UMainWindow):
             dest=downloads
         )
         copy_files_win.finished_.connect(
-            Utils.reveal_files
+            Utils.reveal_files_macos
         )
 
     @with_conn
     def set_files_to_copy(self, rel_paths: tuple):
         abs_files_to_copy = set(
-            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         )
 
@@ -457,7 +457,7 @@ class WinMain(UMainWindow):
     @with_conn
     def open_in_app(self, rel_paths: list[str], app_path: str):
         for i in rel_paths:
-            abs_path = Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            abs_path = Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             if app_path:
                 subprocess.Popen(["open", "-a", app_path, abs_path])
             else:
@@ -466,18 +466,18 @@ class WinMain(UMainWindow):
     @with_conn
     def reveal_in_finder(self, rel_paths: list):
         abs_paths = [
-            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         if os.path.isdir(abs_paths[0]):
             subprocess.Popen(["open", abs_paths[0]])
         else:
-            Utils.reveal_files(abs_paths)
+            Utils.reveal_files_macos(abs_paths)
 
     @with_conn
     def copy_path(self, rel_paths: list[str]):
         abs_paths = [
-            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         Utils.copy_text("\n".join(abs_paths))
@@ -502,7 +502,7 @@ class WinMain(UMainWindow):
             QTimer.singleShot(ms, poll_file_remover)
 
         abs_paths = [
-            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
@@ -552,7 +552,7 @@ class WinMain(UMainWindow):
     def open_info_win(self, rel_paths: list[str]):
         
         abs_paths = [
-            Utils.get_abs_any_path(Mf.current_mf.mf_current_path, i)
+            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
         self.info_win = WinInfo(abs_paths)

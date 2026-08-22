@@ -168,7 +168,7 @@ class TreeWid(UTreeWidget):
         abs_path = os.sep
         if item:
             abs_path = item.data(0, Qt.ItemDataRole.UserRole)
-            rel_path = Utils.get_rel_any_path(Mf.current_mf.mf_current_path, abs_path)
+            rel_path = Utils.remove_mf_path(Mf.current_mf.mf_current_path, abs_path)
             self.abs_selected_path = abs_path
             view = QAction(Lng.open[JsonData.lng_index], menu)
             view.triggered.connect(lambda: self.on_tree_clicked.emit(self.abs_selected_path))

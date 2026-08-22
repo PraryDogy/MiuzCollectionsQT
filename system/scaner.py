@@ -181,9 +181,9 @@ class DirsLoader(ScanerParent):
                     
                 if stmt:
                     stack.append(entry.path)
-                    rel_path = Utils.get_rel_any_path(
+                    rel_path = Utils.remove_mf_path(
                         mf_path=scaner.mf.mf_current_path,
-                        abs_img_path=entry.path
+                        abs_path=entry.path
                     )
                     stats = entry.stat()
                     mod = int(stats.st_mtime)
@@ -356,7 +356,7 @@ class ImgLoader(ScanerParent):
                 )
                 
             for rel_thumb_path, rel_path, size, mod in conn.execute(stmt):
-                abs_img_path = Utils.get_abs_any_path(
+                abs_img_path = Utils.add_mf_path(
                     mf_path=scaner.mf.mf_current_path,
                     rel_path=rel_path
                 )
@@ -503,9 +503,9 @@ class ThumbsUpdater(ScanerParent):
 
                 values_list = []
                 for img_item in good_chunk:
-                    rel_img_path = Utils.get_rel_any_path(
+                    rel_img_path = Utils.remove_mf_path(
                         mf_path=scaner.mf.mf_current_path,
-                        abs_img_path=img_item.abs_img_path
+                        abs_path=img_item.abs_img_path
                     )
                     abs_thumb_path = Utils.create_abs_thumb_path(
                         rel_img_path=rel_img_path,
@@ -548,9 +548,9 @@ class ThumbsUpdater(ScanerParent):
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
             img = ImgUtils.fit_to_thumb(img, Static.max_thumb_size)
-            rel_img_path = Utils.get_rel_any_path(
+            rel_img_path = Utils.remove_mf_path(
                 mf_path=scaner.mf.mf_current_path,
-                abs_img_path=img_item.abs_img_path
+                abs_path=img_item.abs_img_path
             )
             thumb_path = Utils.create_abs_thumb_path(
                 rel_img_path=rel_img_path,
@@ -850,7 +850,7 @@ class ForcedScaner:
                     continue
                 item = DirItem(
                     abs_path=i,
-                    rel_path=Utils.get_rel_any_path(mf.mf_current_path, i),
+                    rel_path=Utils.remove_mf_path(mf.mf_current_path, i),
                     mod=mod
                 )
                 if item not in dir_items:

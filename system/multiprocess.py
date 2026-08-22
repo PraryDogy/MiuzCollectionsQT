@@ -458,7 +458,7 @@ class UpdateThumb:
         for chunk_rel_img_paths in chunked_rel_img_paths:
             values_list: list[dict] = []
             for rel_img_path in chunk_rel_img_paths:
-                abs_img_path = Utils.get_abs_any_path(
+                abs_img_path = Utils.add_mf_path(
                     mf.mf_current_path,
                     rel_img_path
                 )

@@ -778,7 +778,7 @@ class Grid(VScrollArea):
             if avaiable_mf_path:
                 Mf.current_mf.set_mf_current_path(avaiable_mf_path)
                 paths = [
-                    Utils.get_abs_any_path(Mf.current_mf.mf_current_path, wid.data_item.rel_path)
+                    Utils.add_mf_path(Mf.current_mf.mf_current_path, wid.data_item.rel_path)
                     for wid in self.selected_widgets
                 ]
 
