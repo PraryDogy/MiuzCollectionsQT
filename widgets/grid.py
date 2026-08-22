@@ -198,7 +198,7 @@ class Thumb(QFrame):
     def calculate_size(cls):
         ind = Dynamic.current_pixmap_size_index
         Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind] + Static.THUMB_IMG_WID_BORDER
-        Thumb.wid_width = Thumb.img_wid_size + Static.THUMB_WIDGET_EXTRA_W
+        Thumb.wid_width = Thumb.img_wid_size + Static.THUMB_WID_EXTRA_W
         if os.path.exists(Static.miuz_zip):
             Thumb.blue_text_class = MiuzBlueTextWidget
 
