@@ -129,7 +129,7 @@ class DbImagesLoader(URunnable):
             qimages = []
             img_bgr = cv2.imread(abs_thumb_path_)
             img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-            for i in Static.thumb_widget_pixmap_size:
+            for i in Static.THUMB_WIDGET_PIXMAP_SIZE:
                 resized = ImgUtils.fit_to_thumb(img_rgb, i * 2)
                 qimage = Utils.pyqt_qimage_from_array(resized)
                 pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), i)

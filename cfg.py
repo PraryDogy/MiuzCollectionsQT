@@ -35,15 +35,15 @@ class Static:
     common_icons = os.path.join(icons, "common")
     jpeg_icons = os.path.join(icons, "jpeg_icons")
 
-    max_thumb_size = 210
+    MAX_THUMB_SIZE = 210
     # размеры для QPixmap в виджете Thumb
-    thumb_widget_pixmap_size = [65, 80, 135]
+    THUMB_WIDGET_PIXMAP_SIZE = [65, 80, 135]
     # рамка вокруг QPixmap в виджете Thumb
-    img_wid_border = 15
+    IMG_WID_BORDER = 15
     # дополнительное пространство к ширине виджета Thumb
-    thumb_widget_extra_w = 40
+    THUMB_WIDGET_EXTRA_W = 40
 
-    apps = [
+    IMAGE_APPS = [
         "preview",
         "photos",
         "photoshop",
@@ -62,7 +62,7 @@ class Static:
         "preview",
         "просмотр"
     ]
-    default_filters = [
+    DEFAULT_FILTERS = [
         ".jpg",
         ".jpeg",
         ".png",

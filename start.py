@@ -120,7 +120,7 @@ class App(QApplication):
         if data:
             Filters.json_to_app(data)
         else:
-            Filters.json_to_app(Static.default_filters)
+            Filters.json_to_app(Static.DEFAULT_FILTERS)
 
         # сервера
         if not os.path.exists(Static.servers_json):

@@ -232,7 +232,7 @@ class WinImageView(UMainWidget):
     def __init__(self, img_view_item: ImgViewItem):
         super().__init__()
 
-        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Static.apps)}
+        self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Static.IMAGE_APPS)}
         self.url_to_pixmap: dict[str, QPixmap] = {}
         self.img_view_item = img_view_item
         self.current_data_item = img_view_item.start_data_item

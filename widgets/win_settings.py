@@ -532,7 +532,7 @@ class FiltersWid(QWidget):
     def reset_filters_cmd(self):
 
         def fin():
-            Filters.items = Static.default_filters
+            Filters.items = Static.DEFAULT_FILTERS
             Filters.write_json_data()
             restart_app()
 

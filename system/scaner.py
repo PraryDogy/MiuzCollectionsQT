@@ -547,7 +547,7 @@ class ThumbsUpdater(ScanerParent):
                 self.get_gui_text()
             )
             img = ImgUtils.read_img(img_item.abs_img_path)
-            img = ImgUtils.fit_to_thumb(img, Static.max_thumb_size)
+            img = ImgUtils.fit_to_thumb(img, Static.MAX_THUMB_SIZE)
             rel_img_path = Utils.remove_mf_path(
                 mf_path=scaner.mf.mf_current_path,
                 abs_path=img_item.abs_img_path
