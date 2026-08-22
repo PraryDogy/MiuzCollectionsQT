@@ -1,38 +1,23 @@
 import os
-
-
-def remove_mf_path():
-    mf_path = "/root/volumes"
-    abs_path = "/root/volumes/test/adfsd/dsfsdf"
-
-
 from pathlib import Path
-
-def remove_mf_path(mf_path: str, abs_path: str) -> str:
-    mf_path = os.path.join(os.sep, mf_path.strip(os.sep))
-    abs_path = os.path.join(os.sep, abs_path.strip(os.sep))
-    return os.path.join(os.sep, abs_path.removeprefix(mf_path))
-
+from cfg import Static
 
 
 import os
 from pathlib import Path
+from typing import Optional
 
-
-def add_mf_path(mf_path: str, rel_path: str) -> str:
-    p_mf = Path(mf_path.strip(os.sep))
-    p_abs = Path(rel_path.strip(os.sep))
-    if p_abs.is_relative_to(p_mf):
-        return os.sep + str(p_abs)
-    combined_path = p_mf / p_abs
-    return os.sep + str(combined_path)
-
+def get_rel_thumb_path(abs_thumb_path: str, app_data_dir = Static.APP_DATA_DIR):
+    p_base = Path(app_data_dir.strip(os.sep))
+    p_abs = Path(abs_thumb_path.strip(os.sep))
+    if p_abs.is_relative_to(p_base):
+        return os.sep + str(p_abs.relative_to(p_base))
 
 
 
 
-mf_path = "root/volumes/"
-abs_path = "/test/adfsd/dsfsdf/1.jpg"
-result = add_mf_path(mf_path, abs_path)
+rel_thumb_path = "/Users/evlosh/Library/Application Support/Collections/hashdir/Мамия-38/38b5878a5b560086d23ba49451ed61c4.jpg"
 
+
+result = get_rel_thumb_path(rel_thumb_path)
 print(result)

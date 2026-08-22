@@ -33,13 +33,13 @@ class SelectableLabel(QLabel):
         context_menu = UMenu(ev)
         copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng_index])
         copy_text.triggered.connect(
-            lambda: Utils.copy_text(self.selectedText())
+            lambda: Utils.copy_text_pyqt(self.selectedText())
         )
         context_menu.addAction(copy_text)
         context_menu.addSeparator()
         select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lng_index])
         select_all.triggered.connect(
-            lambda: Utils.copy_text(self.text())
+            lambda: Utils.copy_text_pyqt(self.text())
         )
         context_menu.addAction(select_all)
         context_menu.show_menu()

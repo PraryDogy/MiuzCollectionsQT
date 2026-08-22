@@ -15,16 +15,16 @@ class Static:
     app_name = "Collections"
     thumbs_load_limit = 100
     
-    external_dir = os.path.expanduser(
+    APP_DATA_DIR = os.path.expanduser(
         os.path.join("~", "Library", "Application Support", app_name)
     )
 
-    cfg_json = os.path.join(external_dir, "cfg.json")
-    db_db = os.path.join(external_dir, "db.db")
-    hashdir = os.path.join(external_dir, "hashdir")
-    mf_json = os.path.join(external_dir, "mf.json")
-    filters_json = os.path.join(external_dir, "filters.json")
-    servers_json = os.path.join(external_dir, "servers.json")
+    cfg_json = os.path.join(APP_DATA_DIR, "cfg.json")
+    db_db = os.path.join(APP_DATA_DIR, "db.db")
+    hashdir = os.path.join(APP_DATA_DIR, "hashdir")
+    mf_json = os.path.join(APP_DATA_DIR, "mf.json")
+    filters_json = os.path.join(APP_DATA_DIR, "filters.json")
+    servers_json = os.path.join(APP_DATA_DIR, "servers.json")
 
     scripts = "./scripts"
     icons = "./icons"

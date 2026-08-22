@@ -88,28 +88,25 @@ class Utils:
         return os.path.join(new_folder, filename)
 
     @classmethod
-    def get_rel_thumb_path(cls, thumb_path: str) -> str | None:
-        try:
-            return thumb_path.replace(Static.external_dir, "")
-        except Exception as e:
-            print(f"get_rel_hash: {e}")
-            return None
+    def get_rel_thumb_path(cls, abs_thumb_path: str, app_data_dir = Static.APP_DATA_DIR):
+        p_base = Path(app_data_dir.strip(os.sep))
+        p_abs = Path(abs_thumb_path.strip(os.sep))
+        if p_abs.is_relative_to(p_base):
+            return os.sep + str(p_abs.relative_to(p_base))
 
     @classmethod
-    def get_abs_thumb_path(cls, rel_thumb_path: str) -> str | None:
-        try:
-            return Static.external_dir + rel_thumb_path
-        except Exception as e:
-            print(f"get_abs_hash: {e}")
-            return None
+    def get_abs_thumb_path(cls, rel_thumb_path: str, app_data_dir = Static.APP_DATA_DIR):
+        app_data_dir = Path(app_data_dir)
+        rel_thumb_path = Path(rel_thumb_path.strip(os.sep))
+        return app_data_dir / rel_thumb_path
 
     @classmethod
-    def copy_text(cls, text: str):
+    def copy_text_pyqt(cls, text: str):
         QApplication.clipboard().setText(text)
         return True
 
     @classmethod
-    def paste_text(cls) -> str:
+    def paste_text_pyqt(cls) -> str:
         return QApplication.clipboard().text()
         
     @classmethod

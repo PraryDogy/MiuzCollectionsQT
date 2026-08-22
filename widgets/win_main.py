@@ -480,7 +480,7 @@ class WinMain(UMainWindow):
             Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
             for i in rel_paths
         ]
-        Utils.copy_text("\n".join(abs_paths))
+        Utils.copy_text_pyqt("\n".join(abs_paths))
 
     @with_conn
     def remove_files(self, rel_paths: list, ms = 300):

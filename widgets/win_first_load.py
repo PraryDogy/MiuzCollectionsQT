@@ -38,15 +38,15 @@ class ZipTask(URunnable):
 
     def task(self):
         try:
-            shutil.rmtree(Static.external_dir)
+            shutil.rmtree(Static.APP_DATA_DIR)
         except Exception as e:
             self.sigs.error.emit()
             return
-        os.makedirs(Static.external_dir, exist_ok=True)
-        dest = shutil.copy(self.zip_path, Static.external_dir)
+        os.makedirs(Static.APP_DATA_DIR, exist_ok=True)
+        dest = shutil.copy(self.zip_path, Static.APP_DATA_DIR)
 
         with ZipFile(dest, "r") as zip_ref:
-            zip_ref.extractall(Static.external_dir)
+            zip_ref.extractall(Static.APP_DATA_DIR)
 
         try:
             os.remove(dest)

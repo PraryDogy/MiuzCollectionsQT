@@ -19,7 +19,7 @@ from system.utils import Utils
 
 class Tools:    
     def log(text: str):
-        filepath = os.path.join(Static.external_dir, "log.txt")
+        filepath = os.path.join(Static.APP_DATA_DIR, "log.txt")
         with open(filepath, "a") as f:
             f.write(text)
 

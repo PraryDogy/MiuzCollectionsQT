@@ -95,8 +95,8 @@ class App(QApplication):
 
     def validate(self):
         # валидация путей
-        if not os.path.exists(Static.external_dir):
-            os.makedirs(Static.external_dir)
+        if not os.path.exists(Static.APP_DATA_DIR):
+            os.makedirs(Static.APP_DATA_DIR)
 
         if not os.path.exists(Static.hashdir):
             os.makedirs(Static.hashdir)
