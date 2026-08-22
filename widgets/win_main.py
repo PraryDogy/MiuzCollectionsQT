@@ -389,7 +389,7 @@ class WinMain(UMainWindow):
                     wid = self.grid.url_to_wid.get(i.rel_img_path)
                     if wid:
                         qimages = []
-                        for x in Static.THUMB_WIDGET_PIXMAP_SIZE:
+                        for x in Static.THUMB_WID_PIXMAP_SIZE:
                             resized = ImgUtils.fit_to_thumb(i.array, x * 2)
                             qimage = Utils.pyqt_qimage_from_array(resized)
                             pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), x)
@@ -901,7 +901,7 @@ class WinMain(UMainWindow):
 
         elif a0.key() == Qt.Key.Key_Equal:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.current_pixmap_size_index < len(Static.THUMB_WIDGET_PIXMAP_SIZE) - 1:
+                if Dynamic.current_pixmap_size_index < len(Static.THUMB_WID_PIXMAP_SIZE) - 1:
                     Dynamic.current_pixmap_size_index += 1
                     self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
 

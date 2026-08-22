@@ -322,7 +322,7 @@ class WinImgSearch(UMainWidget):
             self.read_img_task.terminate_join()
         self.read_img_poll_ms = ms
         self.read_img_task = ProcessWorker(
-            target=ReadImg.start, args=(url, Static.MAX_THUMB_SIZE * 2)
+            target=ReadImg.start, args=(url, Static.THUMB_MAX_SIZE * 2)
         )
         self.read_img_task.start()
         self.read_img_timer.start(ms)

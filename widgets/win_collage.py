@@ -70,14 +70,14 @@ class WinCollage(UMainWidget):
             widget.deleteLater()
         self.image_labels.clear()
 
-        columns = self.width() // Static.MAX_THUMB_SIZE
+        columns = self.width() // Static.THUMB_MAX_SIZE
 
         for index, orig_pixmap in enumerate(self.pixmaps):
             row, col = divmod(index, columns)
             label = QLabel()
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setPixmap(orig_pixmap)
-            label.setFixedSize(Static.MAX_THUMB_SIZE, Static.MAX_THUMB_SIZE)
+            label.setFixedSize(Static.THUMB_MAX_SIZE, Static.THUMB_MAX_SIZE)
             self.grid_layout.addWidget(label, row, col)
             self.image_labels.append(label)
 

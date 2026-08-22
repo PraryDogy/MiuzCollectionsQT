@@ -35,11 +35,11 @@ class Static:
     common_icons = os.path.join(icons, "common")
     jpeg_icons = os.path.join(icons, "jpeg_icons")
 
-    MAX_THUMB_SIZE = 210
+    THUMB_MAX_SIZE = 210
     # размеры для QPixmap в виджете Thumb
-    THUMB_WIDGET_PIXMAP_SIZE = [65, 80, 135]
+    THUMB_WID_PIXMAP_SIZE = [65, 80, 135]
     # рамка вокруг QPixmap в виджете Thumb
-    IMG_WID_BORDER = 15
+    THUMB_IMG_WID_BORDER = 15
     # дополнительное пространство к ширине виджета Thumb
     THUMB_WIDGET_EXTRA_W = 40
 
