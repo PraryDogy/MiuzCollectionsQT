@@ -347,19 +347,20 @@ class MenuLeft(QWidget):
         )
         self.tree_wid.init_ui()
 
-        mf_list_parent = UGroupBox()
-        self.splitter.addWidget(mf_list_parent)
-        mf_list_layout = QHBoxLayout(mf_list_parent)
-        mf_list_layout.setContentsMargins(1, 10, 1, 1)
-        mf_list_layout.setSpacing(0)
+        # mf_list_parent = UGroupBox()
+        # self.splitter.addWidget(mf_list_parent)
+        # mf_list_layout = QHBoxLayout(mf_list_parent)
+        # mf_list_layout.setContentsMargins(1, 10, 1, 1)
+        # mf_list_layout.setSpacing(0)
 
-        self.mf_list_widget = MfList(mf_list_parent)
+        self.mf_list_widget = MfList(self)
         self.mf_list_widget.mf_open.connect(
             lambda mf: self.on_mf_clicked.emit(mf)
         )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        mf_list_layout.addWidget(self.mf_list_widget)
+        # mf_list_layout.addWidget(self.mf_list_widget)
+        self.splitter.addWidget(self.mf_list_widget)
 
         self.splitter.setSizes([
             self.height() - self.mf_list_hh,
