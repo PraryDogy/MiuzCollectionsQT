@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 from datetime import datetime
+from pathlib import Path
 
 from setuptools import setup
 
@@ -44,7 +45,7 @@ def move_app_to_desktop(appname: str):
     except Exception as e:
         print(e)
 
-def include_files(source_dir):
+def include_files(source_dir: Path):
     data_files = []
     for root, dirs, files in os.walk(source_dir):
         if files:
@@ -68,9 +69,10 @@ MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 DATA_FILES = [
     *include_files(Static.ICONS),
     *include_files(Static.SCRIPTS),
+    *include_files(Static.THEMES),
     ]
 
-if os.path.exists(Static.MIUZ_ZIP):
+if Static.MIUZ_ZIP.exists():
     DATA_FILES.append(Static.MIUZ_ZIP)
 
 

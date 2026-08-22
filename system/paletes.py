@@ -1,7 +1,7 @@
 from PyQt6.QtGui import QColor, QPalette
 from PyQt6.QtWidgets import QApplication
 
-from cfg import JsonData, Themes
+from cfg import JsonData, Static, Themes
 
 
 class UPallete:
@@ -81,7 +81,7 @@ class ThemeChanger:
     def init(cls):
         app: QApplication = QApplication.instance()
 
-        with open("./themes/dark.qss", "r", encoding="utf-8") as f:
+        with open(Static.THEMES_DARK, "r", encoding="utf-8") as f:
             qss_content = f.read()
             app.setStyleSheet(qss_content) # Применяем стиль глобально
 

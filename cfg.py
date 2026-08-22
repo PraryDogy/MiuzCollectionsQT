@@ -30,7 +30,10 @@ class Static:
     SCRIPTS = Path("./scripts")
     ICONS = Path("./icons")
     MIUZ_ZIP = Path("./_miuz.zip")
-    
+
+    THEMES = Path("./themes")
+    THEMES_DARK = THEMES / "dark.qss"
+
     # Подпапки для иконок (красиво собираются от базовой папки icons)
     APP_ICONS = ICONS / "app_icons"
     BAR_TOP_ICONS = ICONS / "bar_top"

@@ -82,9 +82,8 @@ class Utils:
         clean_rel_path = rel_img_path.strip(os.sep)
         encoded = clean_rel_path.encode('utf-8')
         filename = hashlib.md5(encoded).hexdigest() + ".jpg"
-        base_hash_dir = Path(Static.HASHDIR)
         folder_name = f"{mf_alias}-{filename[:2]}"
-        new_folder = base_hash_dir / folder_name
+        new_folder = Static.HASHDIR / folder_name
         new_folder.mkdir(parents=True, exist_ok=True)
         return str(new_folder / filename)
 
