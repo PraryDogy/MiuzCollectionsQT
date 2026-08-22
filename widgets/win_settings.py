@@ -136,7 +136,7 @@ class RebootableSettings(UGroupBox):
 
         def fin():
             self.hide()
-            shutil.rmtree(Static.APP_DATA_DIR)
+            shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
             restart_app()
 
         reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index], 320, 110)

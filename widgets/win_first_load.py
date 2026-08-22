@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import sys
+from pathlib import Path
 from zipfile import ZipFile
 
 from PyQt6.QtCore import QObject, Qt, pyqtSignal
@@ -37,23 +38,19 @@ class ZipTask(URunnable):
         self.zip_path: str = zip_path
 
     def task(self):
+        shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
         try:
-            shutil.rmtree(Static.APP_DATA_DIR)
+            Static.APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
+            dest = Path(shutil.copy(self.zip_path, Static.APP_DATA_DIR))
+            with ZipFile(dest, "r") as zip_ref:
+                zip_ref.extractall(Static.APP_DATA_DIR)
+            dest.unlink(missing_ok=True)
         except Exception as e:
+            print(f"ZipTask critical error: {e}")
             self.sigs.error.emit()
             return
-        os.makedirs(Static.APP_DATA_DIR, exist_ok=True)
-        dest = shutil.copy(self.zip_path, Static.APP_DATA_DIR)
-
-        with ZipFile(dest, "r") as zip_ref:
-            zip_ref.extractall(Static.APP_DATA_DIR)
-
-        try:
-            os.remove(dest)
-        except Exception as e:
-            print("ZipTask remove zip file error", e)
-            
         self.sigs.finished.emit()
+
 
 
 class FirstLoadWin(UMainWidget):

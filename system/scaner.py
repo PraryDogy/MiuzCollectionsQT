@@ -3,6 +3,7 @@ import traceback
 from dataclasses import dataclass
 from datetime import datetime
 from multiprocessing import Queue
+from pathlib import Path
 from time import sleep
 
 import sqlalchemy
@@ -18,10 +19,12 @@ from system.utils import Utils
 
 
 class Tools:    
-    def log(text: str):
-        filepath = os.path.join(Static.APP_DATA_DIR, "log.txt")
-        with open(filepath, "a") as f:
-            f.write(text)
+    @staticmethod
+    def log(text: str) -> None:
+        filepath = Static.APP_DATA_DIR / "log.txt"
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] {text}\n"
+        filepath.write_text(log_entry, encoding="utf-8", mode="a")
 
 
 class ScanerWorker(BaseProcessWorker):
@@ -135,6 +138,7 @@ class DirsChangeWatcher(ScanerParent):
 
 import os
 import traceback
+
 
 class ScanerParent:
     def __init__(self, scaner_item: BaseScanerItem):
