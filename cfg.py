@@ -19,6 +19,7 @@ class Static:
         os.path.join("~", "Library", "Application Support", app_name)
     )
 
+
     cfg_json = os.path.join(APP_DATA_DIR, "cfg.json")
     db_db = os.path.join(APP_DATA_DIR, "db.db")
     HASHDIR = os.path.join(APP_DATA_DIR, "hashdir")
