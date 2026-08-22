@@ -11,7 +11,7 @@ from system.items import SettingsItem
 from system.lang import Lng
 
 from ._base_widgets import GrayTextLabel, ULineEditLight, UMenu
-
+from pathlib import Path
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
@@ -89,7 +89,7 @@ class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
     svg_size = 30
 
-    def __init__(self, base_svg: str, selected_svg: str):
+    def __init__(self, base_svg: Path, selected_svg: Path):
         super().__init__()
         
         self.base_svg = self._load_svg_data(base_svg)
@@ -109,6 +109,10 @@ class BarTopBtn(QWidget):
         self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.set_base_style()
+
+        for i in (base_svg, selected_svg):
+            if not i.exists():
+                print(" bar top btn icon not exists", i)
 
     def _load_svg_data(self, path: str):
         with open(path, "rb") as f:
@@ -135,8 +139,8 @@ class BarTopBtn(QWidget):
 
 
 class FiltersBtn(BarTopBtn):
-    base_svg = os.path.join(Static.BAR_TOP_ICONS, "filters.svg")
-    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "filters_selected.svg")
+    base_svg = Static.BAR_TOP_ICONS / "filters.svg"
+    selected_svg = Static.BAR_TOP_ICONS / "filters_selected.svg"
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
@@ -144,8 +148,8 @@ class FiltersBtn(BarTopBtn):
         
 
 class SortBtn(BarTopBtn):
-    base_svg = os.path.join(Static.BAR_TOP_ICONS, "sort.svg")
-    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "sort_selected.svg")
+    base_svg = Static.BAR_TOP_ICONS / "sort.svg"
+    selected_svg = Static.BAR_TOP_ICONS / "sort_selected.svg"
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
@@ -193,8 +197,8 @@ class SortBtn(BarTopBtn):
 
 
 class SettingsBtn(BarTopBtn):
-    base_svg = os.path.join(Static.BAR_TOP_ICONS, "settings.svg")
-    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "settings_selected.svg")
+    base_svg = Static.BAR_TOP_ICONS / "settings.svg"
+    selected_svg = Static.BAR_TOP_ICONS / "settings_selected.svg"
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
@@ -202,8 +206,8 @@ class SettingsBtn(BarTopBtn):
 
 
 class ImgSearchBtn(BarTopBtn):
-    base_svg = os.path.join(Static.BAR_TOP_ICONS, "img_search.svg")
-    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "img_search_selected.svg")
+    base_svg = Static.BAR_TOP_ICONS / "img_search.svg"
+    selected_svg = Static.BAR_TOP_ICONS / "img_search_selected.svg"
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
