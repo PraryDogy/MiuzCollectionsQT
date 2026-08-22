@@ -28,6 +28,8 @@ class Static:
 
     # 3. Ресурсы самого приложения (относительные пути)
     SCRIPTS = Path("./scripts")
+    SCRIPTS_REVEAL_FILES = SCRIPTS / "reveal_files.scpt"
+
     ICONS = Path("./icons")
     MIUZ_ZIP = Path("./_miuz.zip")
 

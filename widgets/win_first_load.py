@@ -32,16 +32,15 @@ class ZipTask(URunnable):
         error = pyqtSignal()
         finished = pyqtSignal()
 
-    def __init__(self, zip_path: str):
+    def __init__(self):
         super().__init__()
         self.sigs = self.Sigs()
-        self.zip_path: str = zip_path
 
     def task(self):
         shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
         try:
             Static.APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
-            dest = Path(shutil.copy(self.zip_path, Static.APP_DATA_DIR))
+            dest = Path(shutil.copy(Static.MIUZ_ZIP, Static.APP_DATA_DIR))
             with ZipFile(dest, "r") as zip_ref:
                 zip_ref.extractall(Static.APP_DATA_DIR)
             dest.unlink(missing_ok=True)
@@ -179,13 +178,13 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setContentsMargins(*RowArrowWidget.group_margings)
         last_block_layout.setSpacing(RowArrowWidget.group_spacing)
 
-        if os.path.exists(Static.MIUZ_ZIP):
+        if Static.MIUZ_ZIP.exists():
             self.copy_zip_widget = RowArrowWidget(
                 Lng.miuz_diamonds[self.lng_index]
             )
             self.copy_zip_widget.set_left_icon(self.miuz_svg)
             self.copy_zip_widget.clicked.connect(
-                lambda: self.copy_zip_cmd(Static.MIUZ_ZIP)
+                lambda: self.copy_zip_cmd()
             )
             last_block_layout.addWidget(self.copy_zip_widget)
 
@@ -195,14 +194,14 @@ class FirstLoadWin(UMainWidget):
         self.save_widget.clicked.connect(lambda: self.save_cmd())
         last_block_layout.addWidget(self.save_widget)
 
-    def copy_zip_cmd(self, path: str):
+    def copy_zip_cmd(self):
 
         def fin():
             JsonData.lng_index = self.lng_index
             JsonData.write_json_data()
             restart_app()
 
-        self.copy_task = ZipTask(path)
+        self.copy_task = ZipTask()
         self.copy_task.sigs.finished.connect(fin)
         self.hide()
         UThreadPool.start(self.copy_task)

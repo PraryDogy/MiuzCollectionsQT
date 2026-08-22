@@ -73,7 +73,7 @@ DATA_FILES = [
     ]
 
 if Static.MIUZ_ZIP.exists():
-    DATA_FILES.append(Static.MIUZ_ZIP)
+    DATA_FILES.append(str(Static.MIUZ_ZIP))
 
 
 # ****************** DON'T CHANGE IT ******************

@@ -110,9 +110,8 @@ class Utils:
         return QApplication.clipboard().text()
         
     @classmethod
-    def macos_reveal_files(cls, paths: list[str], scpt = "reveal_files.scpt"):
-        script_path = os.path.join(Static.SCRIPTS, scpt)
-        subprocess.Popen(["osascript", script_path] + paths)
+    def macos_reveal_files(cls, paths: list[str], scpt = Static.SCRIPTS_REVEAL_FILES):
+        subprocess.Popen(["osascript", scpt] + paths)
 
     @classmethod
     def add_mf_path(cls, mf_path: str, rel_path: str) -> str:
