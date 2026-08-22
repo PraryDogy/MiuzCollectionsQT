@@ -34,7 +34,7 @@ class PathItem(QWidget):
         item_layout.setSpacing(5)
 
         self.img_wid = QSvgWidget()
-        self.img_wid.load(self.base_folder_svg)
+        self.img_wid.load(str(self.base_folder_svg))
         self.img_wid.setFixedSize(self.item_height, self.item_height)
         item_layout.addWidget(self.img_wid)
         
@@ -103,11 +103,15 @@ class PathBar(QWidget):
             path_items[x] = path_item
             self.main_lay.addWidget(path_item)
 
-        path_items[1].img_wid.load(path_items[1].image_folder_svg)
+        path_items[1].img_wid.load(
+            str(path_items[1].image_folder_svg)
+        )
 
         last_item = path_items.get(len(root))
         if dir.endswith(ImgUtils.ext_all):
-            last_item.img_wid.load(last_item.img_svg)
+            last_item.img_wid.load(
+                str(last_item.img_svg)
+            )
 
         text_ = last_item.text_wid.text()
         if len(text_) > PathBar.last_item_limit:

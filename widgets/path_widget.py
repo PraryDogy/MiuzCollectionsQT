@@ -57,7 +57,7 @@ class PathWidget(UGroupBox):
         h_lay.setSpacing(10)
 
         right_btn = QSvgWidget()
-        right_btn.load(self.magnifier)
+        right_btn.load(str(self.magnifier))
         right_btn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(right_btn)
         
@@ -81,7 +81,7 @@ class PathWidget(UGroupBox):
         h_lay.setSpacing(10)
 
         right_btn = QSvgWidget()
-        right_btn.load(self.green_checkmark)
+        right_btn.load(str(self.green_checkmark))
         right_btn.setFixedSize(35, 35)
         h_lay.addWidget(right_btn)
 

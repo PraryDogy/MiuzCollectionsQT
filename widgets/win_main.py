@@ -70,7 +70,7 @@ class DangerWarn(ConfirmWindow):
             f"{Lng.dangerous_text[JsonData.lng_index]}".format(removed_images_count)
         )
         super().__init__(text, self.ww, self.hh)
-        self.svg_widget.load(self.icon_path)
+        self.svg_widget.load(str(self.icon_path))
         self.ok_btn.setText(Lng.allow[JsonData.lng_index])
         self.cancel_btn.setText(Lng.deny[JsonData.lng_index])
 

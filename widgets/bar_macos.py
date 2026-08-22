@@ -60,7 +60,7 @@ class AboutWin(UMainWidget):
         self.central_layout.setContentsMargins(10, 0, 10, 10)
 
         icon = QLabel()
-        pixmap = QPixmap(self.icon_path)
+        pixmap = QPixmap(str(self.icon_path))
         pixmap = Utils.pyqt_qiconed_resize(pixmap, self.icon_size)
         icon.setPixmap(pixmap)
         opacity_effect = QGraphicsOpacityEffect()

@@ -31,7 +31,7 @@ class WarnWidget(QWidget):
         h_lay.setSpacing(10)
 
         warn_wid = QSvgWidget()
-        warn_wid.load(self.icon_path)
+        warn_wid.load(str(self.icon_path))
         warn_wid.setFixedSize(30, 30)
         h_lay.addWidget(warn_wid)
 

@@ -21,7 +21,7 @@ class ClearBtn(QSvgWidget):
     def __init__(self, parent: ULineEditLight):
         super().__init__(parent=parent)
         self.setFixedSize(self.icon_size, self.icon_size)
-        self.load(self.icon_path)
+        self.load(str(self.icon_path))
 
     def disable(self):
         self.hide()

@@ -64,8 +64,8 @@ class RebootableSettings(UGroupBox):
         self.scaner_minutes = JsonData.scaner_minutes
         self.lng_index = JsonData.lng_index
         self.lng_icons = (
-            QIcon(self.rus_flag),
-            QIcon(self.eng_flag)
+            QIcon(str(self.rus_flag)),
+            QIcon(str(self.eng_flag))
         )
 
         lng_menu = UMenu(None)
@@ -281,14 +281,8 @@ class ThemeBtn(QWidget):
     def __init__(self, theme: Literal["light", "dark"]):
         super().__init__()
         self.theme = theme
-        self.svg = os.path.join(
-            Static.COMMON_ICONS,
-            f"{theme}_theme.svg"
-        )
-        self.svg_selected = os.path.join(
-            Static.COMMON_ICONS,
-            f"{theme}_theme_selected.svg"
-        )
+        self.svg = Static.COMMON_ICONS / f"{theme}_theme.svg"
+        self.svg_selected = Static.COMMON_ICONS / f"{theme}_theme_selected.svg"
         text_mappings = {
             Themes.dark: Lng.dark_theme,
             Themes.light: Lng.light_theme,
@@ -310,10 +304,10 @@ class ThemeBtn(QWidget):
         self.clear_selection()
 
     def select(self):
-        self.svg_widget.load(self.svg_selected)
+        self.svg_widget.load(str(self.svg_selected))
 
     def clear_selection(self):
-        self.svg_widget.load(self.svg)
+        self.svg_widget.load(str(self.svg))
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
@@ -407,7 +401,7 @@ class AboutWid(UGroupBox):
         h_lay.setSpacing(0)
 
         icon = QLabel()
-        pixmap = QPixmap(self.icon_path)
+        pixmap = QPixmap(str(self.icon_path))
         pixmap = Utils.pyqt_qiconed_resize(pixmap, self.icon_size)
         icon.setPixmap(pixmap)
         opacity_effect = QGraphicsOpacityEffect()
@@ -881,21 +875,21 @@ class WinSettings(UMainWidget):
             parent=self.left_menu,
             text=Lng.general[JsonData.lng_index]
         )
-        main_settings_item.setIcon(QIcon(self.settings_svg))
+        main_settings_item.setIcon(QIcon(str(self.settings_svg)))
         self.left_menu.addItem(main_settings_item)
         
         filter_settings = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.filters[JsonData.lng_index]
         )
-        filter_settings.setIcon(QIcon(self.filters_svg))
+        filter_settings.setIcon(QIcon(str(self.filters_svg)))
         self.left_menu.addItem(filter_settings)
 
         new_folder = VListWidgetItem(
             parent=self.left_menu,
             text=Lng.new_folder[JsonData.lng_index]
         )
-        new_folder.setIcon(QIcon(self.new_folder_svg))
+        new_folder.setIcon(QIcon(str(self.new_folder_svg)))
         self.left_menu.addItem(new_folder)
         
         spacer = VListSpacerItem(self.left_menu)
@@ -903,7 +897,7 @@ class WinSettings(UMainWidget):
 
         for i in Mf.items:
             new_folder = VListWidgetItem(self.left_menu, text=i.mf_alias)
-            new_folder.setIcon(QIcon(self.image_folder_svg))
+            new_folder.setIcon(QIcon(str(self.image_folder_svg)))
             self.left_menu.addItem(new_folder)
 
         self.right_wid = QWidget()

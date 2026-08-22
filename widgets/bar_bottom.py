@@ -78,7 +78,7 @@ class BarBottom(QWidget):
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.svg_wid = QSvgWidget()
-        self.svg_wid.load(self.icon_path)
+        self.svg_wid.load(str(self.icon_path))
         self.svg_wid.setFixedSize(self.icon_size, self.icon_size)
         self.h_layout.addWidget(self.svg_wid)
 

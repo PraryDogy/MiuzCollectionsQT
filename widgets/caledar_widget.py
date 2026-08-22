@@ -136,7 +136,7 @@ class Calendar(UMainWidget):
         dynamic_container_lay.setSpacing(0)
 
         calendar_icon = QSvgWidget()
-        calendar_icon.load(self.svg_calendar)
+        calendar_icon.load(str(self.svg_calendar))
         calendar_icon.setFixedSize(*self.svg_calendar_size)
         dynamic_container_lay.addWidget(calendar_icon)
 

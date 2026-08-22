@@ -37,7 +37,7 @@ class EyeSvg(QSvgWidget):
     def __init__(self):
         super().__init__()
         self.setFixedSize(18, 18)
-        self.load(self.eye_off)
+        self.load(str(self.eye_off))
 
     def enterEvent(self, a0):
         self.setCursor(
@@ -194,10 +194,10 @@ class LoginWin(UMainWidget):
     def show_hide_pass(self, *args):
         if self.pass_.echoMode() == ULineEditDark.EchoMode.Password:
             self.pass_.setEchoMode(ULineEditDark.EchoMode.Normal)
-            self.eye_svg.load(self.eye_svg.eye_on)
+            self.eye_svg.load(str(self.eye_svg.eye_on))
         else:
             self.pass_.setEchoMode(ULineEditDark.EchoMode.Password)
-            self.eye_svg.load(self.eye_svg.eye_off)
+            self.eye_svg.load(str(self.eye_svg.eye_off))
 
     def ok_cmd(self):
         stmt = all((

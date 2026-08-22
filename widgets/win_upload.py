@@ -217,7 +217,7 @@ class UploadWin(UMainWidget):
         for file_path in self.files_to_copy:
             file_name = os.path.basename(file_path)
             item = QListWidgetItem(file_name)
-            item.setIcon(QIcon(self.image_file_svg))
+            item.setIcon(QIcon(str(self.image_file_svg)))
             item.setToolTip(file_path)
             self.list_widget.addItem(item)
             total_size += os.path.getsize(file_path)    

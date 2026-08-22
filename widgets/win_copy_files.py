@@ -45,7 +45,7 @@ class ReplaceFilesWin(UMainWidget):
         h_lay.setSpacing(10)
 
         warn = QSvgWidget()
-        warn.load(self.icon_path)
+        warn.load(str(self.icon_path))
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
@@ -107,7 +107,7 @@ class ErrorWin(UMainWidget):
         h_lay.setSpacing(10)
 
         warn = QSvgWidget()
-        warn.load(self.icon_path)
+        warn.load(str(self.icon_path))
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 

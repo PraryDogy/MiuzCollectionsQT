@@ -250,7 +250,7 @@ class UpBtn(QSvgWidget):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
-        self.load(self.icon_path)
+        self.load(str(self.icon_path))
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
@@ -284,7 +284,7 @@ class Grid(VScrollArea):
 
     def __init__(self):
         super().__init__()
-        _copy_files_icon = QPixmap(self.copy_files_path)
+        _copy_files_icon = QPixmap(str(self.copy_files_path))
         self.copy_files_icon = Utils.pyqt_qiconed_resize(_copy_files_icon, 80)
 
         # --- Состояние и данные ---

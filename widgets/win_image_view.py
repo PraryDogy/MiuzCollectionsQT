@@ -156,7 +156,7 @@ class ZoomWidget(CustomSvg):
 
     def __init__(self):
         super().__init__()
-        self.load(self.svg_path)
+        self.load(str(self.svg_path))
         self.zone_width = self.width() / 4
         self.start_pos = None
         self.is_move = False
@@ -204,7 +204,7 @@ class PrevButton(CustomSvg):
 
     def __init__(self) -> None:
         super().__init__()
-        self.load(self.svg_path)
+        self.load(str(self.svg_path))
 
 
 class NextButton(CustomSvg):
@@ -212,7 +212,7 @@ class NextButton(CustomSvg):
 
     def __init__(self) -> None:
         super().__init__()
-        self.load(self.svg_path)
+        self.load(str(self.svg_path))
 
 
 class WinImageView(UMainWidget):

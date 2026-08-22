@@ -70,7 +70,7 @@ class TreeWid(UTreeWidget):
         root_item = UTreeWidgetItem(os.sep, [Mf.current_mf.mf_alias])
         root_item.setSizeHint(0, QSize(0, ITEM_HEIGHT))
         root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
-        root_item.setIcon(0, QIcon(self.icon_path))
+        root_item.setIcon(0, QIcon(str(self.icon_path)))
         self.addTopLevelItem(root_item)
 
         task = DbDirsLoader(Mf.current_mf)
@@ -96,7 +96,7 @@ class TreeWid(UTreeWidget):
                 continue
 
             child = UTreeWidgetItem(path, [name])
-            child.setIcon(0, QIcon(self.icon_path))
+            child.setIcon(0, QIcon(str(self.icon_path)))
             child.setSizeHint(0, QSize(0, ITEM_HEIGHT))
             child.setData(0, Qt.ItemDataRole.UserRole, path)
             child.setToolTip(1, os.path.basename(path))
@@ -245,7 +245,7 @@ class MfList(VListWidget):
     def init_ui(self):
         for i in Mf.items:
             item = MfListItem(parent=self, text=i.mf_alias)
-            item.setIcon(QIcon(self.icon_path))
+            item.setIcon(QIcon(str(self.icon_path)))
             item.mf = i
             self.addItem(item)
 

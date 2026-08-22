@@ -345,7 +345,7 @@ class RowArrowWidget(QWidget):
         # Стрелка справа
         self.arrow_wid = QSvgWidget()
         self.arrow_wid.setFixedSize(self.svg_size, self.svg_size)
-        self.arrow_wid.load(self.arrow_svg)
+        self.arrow_wid.load(str(self.arrow_svg))
         
         # Сборка в один ряд
         self.main_layout.addWidget(self.left_icon)
@@ -355,8 +355,8 @@ class RowArrowWidget(QWidget):
         
         self.adjustSize()
 
-    def set_left_icon(self, svg_path: str):
-        self.left_icon.load(svg_path)
+    def set_left_icon(self, svg_path: Path):
+        self.left_icon.load(str(svg_path))
         self.left_icon.show()
 
     def replace_arrow_widget(self, widget: QWidget):
@@ -517,7 +517,7 @@ class ConfirmWindow(UMainWidget):
         text_layout.setSpacing(15)
 
         self.svg_widget = QSvgWidget()
-        self.svg_widget.load(self.icon_path)
+        self.svg_widget.load(str(self.icon_path))
         self.svg_widget.setFixedSize(self.icon_size, self.icon_size)
         text_layout.addWidget(self.svg_widget)
 
@@ -559,7 +559,7 @@ class SuperConfirmWindow(ConfirmWindow):
 
     def __init__(self, text: str, w: int, h: int):
         super().__init__(text, w, h)
-        self.svg_widget.load(self.icon_path)
+        self.svg_widget.load(str(self.icon_path))
 
 
 class WarningWindow(ConfirmWindow):
@@ -662,7 +662,7 @@ class MfPathWidget(UGroupBox):
         h_lay.setSpacing(10)
 
         right_btn = QSvgWidget()
-        right_btn.load(self.magnifier)
+        right_btn.load(str(self.magnifier))
         right_btn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(right_btn)
         
@@ -685,7 +685,7 @@ class MfPathWidget(UGroupBox):
         h_lay.setSpacing(10)
 
         right_btn = QSvgWidget()
-        right_btn.load(self.green_checkmark)
+        right_btn.load(str(self.green_checkmark))
         right_btn.setFixedSize(35, 35)
         h_lay.addWidget(right_btn)
 

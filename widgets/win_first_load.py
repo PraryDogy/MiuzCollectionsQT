@@ -103,11 +103,11 @@ class FirstLoadWin(UMainWidget):
         if self.lng_index == 0:
             lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
             lng_btn_text = rus_action_text
-            lng_btn_icon = QIcon(self.rus_flag)
+            lng_btn_icon = QIcon(str(self.rus_flag))
         else:
             lng_label_text = f"{Lng.app_lang[1]} ({Lng.app_lang[0]})"
             lng_btn_text = eng_action_text
-            lng_btn_icon  = QIcon(self.eng_flag)
+            lng_btn_icon  = QIcon(str(self.eng_flag))
 
         # Сохраняем ссылку в self.lng_container
         self.lng_container = UGroupBox()
@@ -118,7 +118,7 @@ class FirstLoadWin(UMainWidget):
         lng_layout.setSpacing(10)
 
         lng_icon = QSvgWidget()
-        lng_icon.load(self.language_svg)
+        lng_icon.load(str(self.language_svg))
         lng_icon.setFixedSize(self.svg_size, self.svg_size)
         lng_layout.addWidget(lng_icon)
 
@@ -134,13 +134,13 @@ class FirstLoadWin(UMainWidget):
         lng_menu = QMenu(lng_btn)
         lng_btn.setMenu(lng_menu)
 
-        rus_icon = QIcon(self.rus_flag)
+        rus_icon = QIcon(str(self.rus_flag))
         rus_action = QAction(rus_icon, rus_action_text, lng_menu)
         rus_action.setIconVisibleInMenu(True)
         rus_action.triggered.connect(lambda e, val=0: self.lng_action(val))
         lng_menu.addAction(rus_action)
 
-        eng_icon = QIcon(self.eng_flag)
+        eng_icon = QIcon(str(self.eng_flag))
         eng_action = QAction(eng_icon, eng_action_text, lng_menu)
         eng_action.setIconVisibleInMenu(True)
         eng_action.triggered.connect(lambda e, val=1: self.lng_action(val))
