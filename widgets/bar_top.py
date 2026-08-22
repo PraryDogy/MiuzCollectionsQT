@@ -15,7 +15,7 @@ from ._base_widgets import GrayTextLabel, ULineEditLight, UMenu
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
-    icon_path = os.path.join(Static.common_icons, "cancel.svg")
+    icon_path = os.path.join(Static.COMMON_ICONS, "cancel.svg")
     icon_size = 11
 
     def __init__(self, parent: ULineEditLight):
@@ -135,8 +135,8 @@ class BarTopBtn(QWidget):
 
 
 class FiltersBtn(BarTopBtn):
-    base_svg = os.path.join(Static.bar_top_icons, "filters.svg")
-    selected_svg = os.path.join(Static.bar_top_icons, "filters_selected.svg")
+    base_svg = os.path.join(Static.BAR_TOP_ICONS, "filters.svg")
+    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "filters_selected.svg")
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
@@ -144,8 +144,8 @@ class FiltersBtn(BarTopBtn):
         
 
 class SortBtn(BarTopBtn):
-    base_svg = os.path.join(Static.bar_top_icons, "sort.svg")
-    selected_svg = os.path.join(Static.bar_top_icons, "sort_selected.svg")
+    base_svg = os.path.join(Static.BAR_TOP_ICONS, "sort.svg")
+    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "sort_selected.svg")
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
@@ -193,8 +193,8 @@ class SortBtn(BarTopBtn):
 
 
 class SettingsBtn(BarTopBtn):
-    base_svg = os.path.join(Static.bar_top_icons, "settings.svg")
-    selected_svg = os.path.join(Static.bar_top_icons, "settings_selected.svg")
+    base_svg = os.path.join(Static.BAR_TOP_ICONS, "settings.svg")
+    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "settings_selected.svg")
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
@@ -202,8 +202,8 @@ class SettingsBtn(BarTopBtn):
 
 
 class ImgSearchBtn(BarTopBtn):
-    base_svg = os.path.join(Static.bar_top_icons, "img_search.svg")
-    selected_svg = os.path.join(Static.bar_top_icons, "img_search_selected.svg")
+    base_svg = os.path.join(Static.BAR_TOP_ICONS, "img_search.svg")
+    selected_svg = os.path.join(Static.BAR_TOP_ICONS, "img_search_selected.svg")
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)

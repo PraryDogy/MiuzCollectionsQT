@@ -88,9 +88,9 @@ class CalendarSep(HSep):
 
 
 class Calendar(UMainWidget):
-    svg_calendar = os.path.join(Static.common_icons, "calendar.svg")
-    svg_previous = os.path.join(Static.common_icons, "previous.svg")
-    svg_next = os.path.join(Static.common_icons, "next.svg")
+    svg_calendar = os.path.join(Static.COMMON_ICONS, "calendar.svg")
+    svg_previous = os.path.join(Static.COMMON_ICONS, "previous.svg")
+    svg_next = os.path.join(Static.COMMON_ICONS, "next.svg")
 
     min_year = 2015
     day_property = "day_value"

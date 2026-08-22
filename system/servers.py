@@ -11,7 +11,7 @@ class Servers:
     @classmethod
     def validate_json(cls):
         try:
-            with open(Static.servers_json, "r", encoding="utf-8") as file:
+            with open(Static.SERVERS_JSON, "r", encoding="utf-8") as file:
                 data: list[list[str]] = json.load(file)
         except Exception as e:
             print("Servers, error reading file", e)
@@ -42,5 +42,5 @@ class Servers:
 
     @classmethod
     def write_json_data(cls):
-        with open(Static.servers_json, "w", encoding="utf-8") as file:
+        with open(Static.SERVERS_JSON, "w", encoding="utf-8") as file:
             json.dump(cls.items, file, indent=4, ensure_ascii=False)

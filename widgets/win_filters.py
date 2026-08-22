@@ -27,7 +27,7 @@ class WinDatesDateLabel(QLabel):
 
 class DatesWidget(UGroupBox):
     reload_thumbnails = pyqtSignal()
-    calendar_svg = os.path.join(Static.common_icons, "calendar.svg")
+    calendar_svg = os.path.join(Static.COMMON_ICONS, "calendar.svg")
     hh = 40
 
     def __init__(self, parent=None):
@@ -296,7 +296,7 @@ class DatesWidget(UGroupBox):
 
 
 class WinFilters(UMainWidget):
-    reset_svg = os.path.join(Static.common_icons, "reset.svg")
+    reset_svg = os.path.join(Static.COMMON_ICONS, "reset.svg")
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     edit_filters = pyqtSignal()

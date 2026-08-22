@@ -112,7 +112,7 @@ class Utils:
         
     @classmethod
     def macos_reveal_files(cls, paths: list[str], scpt = "reveal_files.scpt"):
-        script_path = os.path.join(Static.scripts, scpt)
+        script_path = os.path.join(Static.SCRIPTS, scpt)
         subprocess.Popen(["osascript", script_path] + paths)
 
     @classmethod

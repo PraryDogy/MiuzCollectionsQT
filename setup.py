@@ -61,17 +61,17 @@ SHORT_AUTHOR_NAME = "Evlosh" # "Evlosh"
 COMPANY = "MIUZ Diamonds" # "MIUZ Diamonds"
 APP_NAME = Static.app_name
 APP_VER = str(Static.app_ver)
-ICON_PATH = os.path.join(Static.app_icons, "icon.icns")
+ICON_PATH = os.path.join(Static.APP_ICONS, "icon.icns")
 MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 
 
 DATA_FILES = [
-    *include_files(Static.icons),
-    *include_files(Static.scripts),
+    *include_files(Static.ICONS),
+    *include_files(Static.SCRIPTS),
     ]
 
-if os.path.exists(Static.miuz_zip):
-    DATA_FILES.append(Static.miuz_zip)
+if os.path.exists(Static.MIUZ_ZIP):
+    DATA_FILES.append(Static.MIUZ_ZIP)
 
 
 # ****************** DON'T CHANGE IT ******************

@@ -199,7 +199,7 @@ class Thumb(QFrame):
         ind = Dynamic.current_pixmap_size_index
         Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind] + Static.THUMB_IMG_WID_BORDER
         Thumb.wid_width = Thumb.img_wid_size + Static.THUMB_WID_EXTRA_W
-        if os.path.exists(Static.miuz_zip):
+        if os.path.exists(Static.MIUZ_ZIP):
             Thumb.blue_text_class = MiuzBlueTextWidget
 
     def set_pixmap_with_actual_size(self):
@@ -244,7 +244,7 @@ class Thumb(QFrame):
 
 class UpBtn(QSvgWidget):
     scroll_to_top = pyqtSignal()
-    icon_path = os.path.join(Static.common_icons, "scroll_up.svg")
+    icon_path = os.path.join(Static.COMMON_ICONS, "scroll_up.svg")
     icon_size = 45
 
     def __init__(self, parent: QWidget = None):
@@ -280,7 +280,7 @@ class Grid(VScrollArea):
 
     grid_spacing = 7
     resize_ms = 10
-    copy_files_path = os.path.join(Static.common_icons, "copy_files.svg")
+    copy_files_path = os.path.join(Static.COMMON_ICONS, "copy_files.svg")
 
     def __init__(self):
         super().__init__()

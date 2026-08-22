@@ -95,27 +95,21 @@ class App(QApplication):
 
     def validate(self):
         # валидация путей
-        if not os.path.exists(Static.APP_DATA_DIR):
-            os.makedirs(Static.APP_DATA_DIR)
-
-        if not os.path.exists(Static.HASHDIR):
-            os.makedirs(Static.HASHDIR)
-
-        if not os.path.exists(Static.db_db):
-            open(Static.db_db, "w")
+        Static.APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        Static.HASHDIR.mkdir(parents=True, exist_ok=True)
+        Static.DB_FILE.touch(exist_ok=True)
 
         # конфиг
-        if not os.path.exists(Static.cfg_json):
+        if not Static.CFG_JSON.exists():
             JsonData.write_json_data()
-            # валидация cfg
+        # валидация cfg
         # data = JsonData.validate()
         # if data:
         #     JsonData.json_to_app(data)
         JsonData.json_to_app()
 
         # фильтры
-        if not os.path.exists(Static.filters_json):
-            open(Static.filters_json, "w")
+        Static.FILTERS_JSON.touch(exist_ok=True)
         data = Filters.validate_json()
         if data:
             Filters.json_to_app(data)
@@ -123,15 +117,13 @@ class App(QApplication):
             Filters.json_to_app(Static.DEFAULT_FILTERS)
 
         # сервера
-        if not os.path.exists(Static.servers_json):
-            open(Static.servers_json, "w")
+        Static.SERVERS_JSON.touch(exist_ok=True)
         data = Servers.validate_json()
         if data:
             Servers.json_to_app(data)
 
         # mf,самое важное
-        if not os.path.exists(Static.mf_json):
-            open(Static.mf_json, "w")
+        Static.MF_JSON.touch(exist_ok=True)
         data = Mf.validate_json()
         if data:
             Mf.json_to_app(data)

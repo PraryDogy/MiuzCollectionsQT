@@ -61,7 +61,7 @@ class TestWid(QLabel):
 
 
 class DangerWarn(ConfirmWindow):
-    icon_path = os.path.join(Static.common_icons, "red_warning.svg")
+    icon_path = os.path.join(Static.COMMON_ICONS, "red_warning.svg")
     hh = 215
     ww = 400
 
@@ -736,7 +736,7 @@ class WinMain(UMainWindow):
             self.scaner_task.terminate_join()
             self.bar_bottom.progress_bar.setText("")
             self.bar_bottom.progress_bar.start_timer_text()
-            new_db_time = int(os.stat(Static.db_db).st_mtime)
+            new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
             if self.db_mtime != new_db_time:
                 self.load_st_grid()
                 self.left_menu.tree_wid.init_ui()
@@ -787,7 +787,7 @@ class WinMain(UMainWindow):
                     args=(Mf.items, JsonData.lng_index, )
                 )
             self.forced_scaner_dirs.clear()
-            self.db_mtime = int(os.stat(Static.db_db).st_mtime)
+            self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
             self.bar_bottom.progress_bar.stop_timer_text()
             self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
             self.scaner_task.start()

@@ -15,27 +15,28 @@ class Static:
     app_name = "Collections"
     thumbs_load_limit = 100
     
-    # 1. Базовая папка данных приложения
+    # 1. Базовая папка приложения (сразу делаем объектом Path)
     APP_DATA_DIR = Path(os.path.expanduser("~")) / "Library" / "Application Support" / app_name
 
-    # 2. Файлы и папки внутри APP_DATA_DIR
+    # 2. Файлы и папки внутри APP_DATA_DIR (используем оператор /)
     CFG_JSON = APP_DATA_DIR / "cfg.json"
-    DB_DB = APP_DATA_DIR / "db.db"
+    DB_FILE = APP_DATA_DIR / "db.db"
     HASHDIR = APP_DATA_DIR / "hashdir"
     MF_JSON = APP_DATA_DIR / "mf.json"
     FILTERS_JSON = APP_DATA_DIR / "filters.json"
     SERVERS_JSON = APP_DATA_DIR / "servers.json"
 
-    # 3. Локальные ресурсы приложения
+    # 3. Ресурсы самого приложения (относительные пути)
     SCRIPTS = Path("./scripts")
     ICONS = Path("./icons")
     MIUZ_ZIP = Path("./_miuz.zip")
     
-    # 4. Подпапки с иконками (собираются от базовой папки ICONS)
+    # Подпапки для иконок (красиво собираются от базовой папки icons)
     APP_ICONS = ICONS / "app_icons"
     BAR_TOP_ICONS = ICONS / "bar_top"
     COMMON_ICONS = ICONS / "common"
     JPEG_ICONS = ICONS / "jpeg_icons"
+
 
     # максимально возможный размер миниатюры в HASHDIR
     THUMB_MAX_SIZE = 210
@@ -112,7 +113,7 @@ class JsonData:
     @classmethod
     def json_to_app(cls):
         try:
-            with open(Static.cfg_json, "r", encoding="utf-8") as file:
+            with open(Static.CFG_JSON, "r", encoding="utf-8") as file:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
@@ -123,5 +124,5 @@ class JsonData:
     
     @classmethod
     def write_json_data(cls):
-        with open(Static.cfg_json, "w", encoding="utf-8") as file:
+        with open(Static.CFG_JSON, "w", encoding="utf-8") as file:
             json.dump(cls.get_data(), file, ensure_ascii=False, indent=4)

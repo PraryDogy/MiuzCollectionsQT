@@ -33,7 +33,7 @@ class Mf:
     @classmethod
     def validate_json(cls):
         try:
-            with open(Static.mf_json, "r", encoding="utf-8") as file:
+            with open(Static.MF_JSON, "r", encoding="utf-8") as file:
                 data: list[dict] = json.load(file)
         except Exception as e:
             print("Mf, error reading file", e)
@@ -119,6 +119,6 @@ class Mf:
 
     @classmethod
     def write_json_data(cls):
-        with open(Static.mf_json, "w", encoding="utf-8") as file:
+        with open(Static.MF_JSON, "w", encoding="utf-8") as file:
             data = [i.get_data() for i in cls.items]
             json.dump(data, file, ensure_ascii=False, indent=4)

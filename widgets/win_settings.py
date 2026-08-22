@@ -49,11 +49,11 @@ class RebootableSettings(UGroupBox):
     lang_changed = pyqtSignal()
     spin_max = 60
     spin_min = 0
-    rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
-    eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
-    eraser_svg = os.path.join(Static.common_icons, "eraser.svg")
-    clock_svg = os.path.join(Static.common_icons, "clock.svg")
-    language_svg = os.path.join(Static.common_icons, "language.svg")
+    rus_flag = os.path.join(Static.COMMON_ICONS, "rus_flag.svg")
+    eng_flag = os.path.join(Static.COMMON_ICONS, "eng_flag.svg")
+    eraser_svg = os.path.join(Static.COMMON_ICONS, "eraser.svg")
+    clock_svg = os.path.join(Static.COMMON_ICONS, "clock.svg")
+    language_svg = os.path.join(Static.COMMON_ICONS, "language.svg")
 
     def __init__(self):
         super().__init__()
@@ -230,8 +230,8 @@ class SizesWin(UMainWidget):
 
 
 class NonRebootableSettings(UGroupBox):
-    finder_svg = os.path.join(Static.common_icons, "finder.svg")
-    hdd_svg = os.path.join(Static.common_icons, "hdd.svg")
+    finder_svg = os.path.join(Static.COMMON_ICONS, "finder.svg")
+    hdd_svg = os.path.join(Static.COMMON_ICONS, "hdd.svg")
 
     def __init__(self):
         super().__init__()
@@ -282,11 +282,11 @@ class ThemeBtn(QWidget):
         super().__init__()
         self.theme = theme
         self.svg = os.path.join(
-            Static.common_icons,
+            Static.COMMON_ICONS,
             f"{theme}_theme.svg"
         )
         self.svg_selected = os.path.join(
-            Static.common_icons,
+            Static.COMMON_ICONS,
             f"{theme}_theme_selected.svg"
         )
         text_mappings = {
@@ -322,7 +322,7 @@ class ThemeBtn(QWidget):
 
 
 class ThemesWidget(UGroupBox):
-    theme_svg = os.path.join(Static.common_icons, "theme.svg")
+    theme_svg = os.path.join(Static.COMMON_ICONS, "theme.svg")
 
     def __init__(self):
         super().__init__()
@@ -396,7 +396,7 @@ class AboutWidLabel(LabelMinWidth):
 
 
 class AboutWid(UGroupBox):
-    icon_path = os.path.join(Static.app_icons, "icon.png")
+    icon_path = os.path.join(Static.APP_ICONS, "icon.png")
     icon_size = 85
     opacity = 0.85
 
@@ -483,7 +483,7 @@ class GeneralSettings(QWidget):
 
 class FiltersWid(QWidget):
     changed = pyqtSignal()
-    reset_svg = os.path.join(Static.common_icons, "reset.svg")
+    reset_svg = os.path.join(Static.COMMON_ICONS, "reset.svg")
 
     def __init__(self):
         super().__init__()
@@ -567,8 +567,8 @@ class FiltersWid(QWidget):
 
 
 class MfSettings(QWidget):
-    repair_svg = os.path.join(Static.common_icons, "repair.svg")
-    trash_svg = os.path.join(Static.common_icons, "trash.svg")
+    repair_svg = os.path.join(Static.COMMON_ICONS, "repair.svg")
+    trash_svg = os.path.join(Static.COMMON_ICONS, "trash.svg")
 
     def __init__(self, mf_index: int):
         super().__init__()
@@ -732,7 +732,7 @@ class MfSettings(QWidget):
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
 class NewMfSettings(QWidget):
-    yellow_warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
+    yellow_warning_svg = os.path.join(Static.COMMON_ICONS, "yellow_warning.svg")
 
     def __init__(self, mf_path: str = None):
         super().__init__()
@@ -838,11 +838,11 @@ class NewMfSettings(QWidget):
 
 class WinSettings(UMainWidget):
     closed = pyqtSignal()
-    image_folder_svg = os.path.join(Static.common_icons, "image_folder.svg")
-    new_folder_svg = os.path.join(Static.common_icons, "new_folder.svg")
-    filters_svg = os.path.join(Static.common_icons, "filters.svg")
-    settings_svg = os.path.join(Static.common_icons, "settings.svg")
-    yellow_warning_svg = os.path.join(Static.common_icons, "yellow_warning.svg")
+    image_folder_svg = os.path.join(Static.COMMON_ICONS, "image_folder.svg")
+    new_folder_svg = os.path.join(Static.COMMON_ICONS, "new_folder.svg")
+    filters_svg = os.path.join(Static.COMMON_ICONS, "filters.svg")
+    settings_svg = os.path.join(Static.COMMON_ICONS, "settings.svg")
+    yellow_warning_svg = os.path.join(Static.COMMON_ICONS, "yellow_warning.svg")
     ww = 700
     hh = 560
 

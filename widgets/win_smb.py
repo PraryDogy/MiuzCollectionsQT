@@ -21,7 +21,7 @@ def restart_app():
 
 
 class WarnWidget(QWidget):
-    icon_path = os.path.join(Static.common_icons, "yellow_warning.svg")
+    icon_path = os.path.join(Static.COMMON_ICONS, "yellow_warning.svg")
 
     def __init__(self, mf: Mf):
         super().__init__()

@@ -57,10 +57,10 @@ class ZipTask(URunnable):
 
 
 class FirstLoadWin(UMainWidget):
-    rus_flag = os.path.join(Static.common_icons, "rus_flag.svg")
-    eng_flag = os.path.join(Static.common_icons, "eng_flag.svg")
-    language_svg = os.path.join(Static.common_icons, "language.svg")
-    miuz_svg = os.path.join(Static.common_icons, "miuz.svg")
+    rus_flag = os.path.join(Static.COMMON_ICONS, "rus_flag.svg")
+    eng_flag = os.path.join(Static.COMMON_ICONS, "eng_flag.svg")
+    language_svg = os.path.join(Static.COMMON_ICONS, "language.svg")
+    miuz_svg = os.path.join(Static.COMMON_ICONS, "miuz.svg")
     svg_size = 16
     ww = 440
 
@@ -182,13 +182,13 @@ class FirstLoadWin(UMainWidget):
         last_block_layout.setContentsMargins(*RowArrowWidget.group_margings)
         last_block_layout.setSpacing(RowArrowWidget.group_spacing)
 
-        if os.path.exists(Static.miuz_zip):
+        if os.path.exists(Static.MIUZ_ZIP):
             self.copy_zip_widget = RowArrowWidget(
                 Lng.miuz_diamonds[self.lng_index]
             )
             self.copy_zip_widget.set_left_icon(self.miuz_svg)
             self.copy_zip_widget.clicked.connect(
-                lambda: self.copy_zip_cmd(Static.miuz_zip)
+                lambda: self.copy_zip_cmd(Static.MIUZ_ZIP)
             )
             last_block_layout.addWidget(self.copy_zip_widget)
 
