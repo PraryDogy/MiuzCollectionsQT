@@ -364,7 +364,7 @@ class ThemesWidget(UGroupBox):
 
 class AboutWidLabel(LabelMinWidth):
     txt = "\n".join([
-        f"Version {Static.app_ver}",
+        f"Version {Static.APP_VERSION}",
         "Developed by Evlosh",
         "email: evlosh@gmail.com",
         "telegram: evlosh",

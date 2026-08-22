@@ -817,7 +817,7 @@ class GridStandart(Grid):
         self.load_db_images_task()
 
     def load_more_thumbnails(self):
-        Dynamic.loaded_thumbs += Static.thumbs_load_limit
+        Dynamic.loaded_thumbs += Static.THUMBS_LOAD_LIMIT
         self.load_db_images_task()
 
     def load_db_images_task(self):

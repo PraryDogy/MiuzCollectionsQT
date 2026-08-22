@@ -169,7 +169,7 @@ class DbImagesLoader(URunnable):
             .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
             .where(Thumbs.rel_img_path.ilike(f"{rel_path}/%"))
             .order_by(-Thumbs.mod if Dynamic.sort_by_mod else -Thumbs.id)
-            .limit(Static.thumbs_load_limit)
+            .limit(Static.THUMBS_LOAD_LIMIT)
             .offset(Dynamic.loaded_thumbs)
         )
 

@@ -17,7 +17,7 @@ from .win_settings import WinSettings
 
 class SelectableLabel(QLabel):
     INFO_TEXT = "\n".join([
-        f"Version {Static.app_ver}",
+        f"Version {Static.APP_VERSION}",
         "Developed by Evlosh",
         "email: evlosh@gmail.com",
         "telegram: evlosh",
@@ -55,7 +55,7 @@ class AboutWin(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Static.app_name)
+        self.setWindowTitle(Static.APP_NAME)
         self.setFixedWidth(self.ww)
         self.central_layout.setContentsMargins(10, 0, 10, 10)
 

@@ -90,7 +90,7 @@ class WinMain(UMainWindow):
         super().__init__()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.setMinimumWidth(self.min_w)
-        self.setWindowTitle(f"{Static.app_name}")
+        self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
 
         # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)

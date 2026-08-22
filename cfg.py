@@ -11,12 +11,12 @@ class Themes:
 
 
 class Static:
-    app_ver = 5.7
-    app_name = "Collections"
-    thumbs_load_limit = 100
+    APP_VERSION = 5.7
+    APP_NAME = "Collections"
+    THUMBS_LOAD_LIMIT = 100
     
     # 1. Базовая папка приложения (сразу делаем объектом Path)
-    APP_DATA_DIR = Path(os.path.expanduser("~")) / "Library" / "Application Support" / app_name
+    APP_DATA_DIR = Path(os.path.expanduser("~")) / "Library" / "Application Support" / APP_NAME
 
     # 2. Файлы и папки внутри APP_DATA_DIR (используем оператор /)
     CFG_JSON = APP_DATA_DIR / "cfg.json"
@@ -94,7 +94,7 @@ class Dynamic:
 
 
 class JsonData:
-    app_ver = Static.app_ver
+    app_ver = Static.APP_VERSION
     lng_index = 0
     theme = Themes.dark
     scaner_minutes = 20

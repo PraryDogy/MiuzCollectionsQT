@@ -59,8 +59,8 @@ def include_files(source_dir):
 AUTHOR = "Evgeny Loshkarev"  # "Evgeny Loshkarev"
 SHORT_AUTHOR_NAME = "Evlosh" # "Evlosh"
 COMPANY = "MIUZ Diamonds" # "MIUZ Diamonds"
-APP_NAME = Static.app_name
-APP_VER = str(Static.app_ver)
+APP_NAME = Static.APP_NAME
+APP_VER = str(Static.APP_VERSION)
 ICON_PATH = os.path.join(Static.APP_ICONS, "icon.icns")
 MAIN_FILES = ["start.py"] # SINGLE OR MULTIPLE PYTHON FILES
 
