@@ -20,8 +20,6 @@ from ._base_widgets import UMenu, VListWidget, VListWidgetItem
 ITEM_HEIGHT = 25
 
 
-
-
 class UTreeWidgetItem(QTreeWidgetItem):
     def __init__(self, abs_path: str, other):
         super().__init__(other)

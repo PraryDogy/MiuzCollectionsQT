@@ -109,60 +109,19 @@ QGroupBox {
 
 
 
-QTreeView, QListWidget {
+QTreeWidget {
     background: #171717;
     color: #ffffff;
     border: 1px solid #2d2d2d;
     border-radius: 10px;
-    padding: 10 2 10 2;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
-QTreeView::item {
-    background: transparent;
-    color: #ffffff;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    padding-left: 5px;
-}
-
-QTreeView::item:selected,
-QTreeView::item:selected:!active {
-    background: #0059d1;
-    color: #ffffff;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    padding-left: 5px;
-
-}
-
-QTreeView::branch {
-    background: transparent;
-    color: #ffffff;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-
-QTreeView::branch:selected {
-    background: #0059d1;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-
-QTreeView::branch:selected:!active {
-    background: #0059d1;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-
-
-QListWidget::item {
-    background: transparent;
-    color: #ffffff;
-    padding: 4px;
-}
-
-QListWidget::item:selected,
-QListWidget::item:selected:!active {
+QTreeWidget::item:selected,
+QTreeWidget::item:selected:!active {
     background: #0059d1;
     color: #ffffff;
 }
