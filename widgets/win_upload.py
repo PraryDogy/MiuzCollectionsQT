@@ -211,7 +211,7 @@ class UploadWin(UMainWidget):
 
         for file_path in self.files_to_copy:
             file_name = os.path.basename(file_path)
-            item = VListWidgetItem(file_name)
+            item = VListWidgetItem(self.list_widget, text=file_name)
             item.setIcon(QIcon(str(self.image_file_svg)))
             item.setToolTip(file_path)
             self.list_widget.addItem(item)
