@@ -861,15 +861,9 @@ class WinSettings(UMainWidget):
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.central_layout.addWidget(self.splitter)
 
-        left_group = UGroupBox()
-        self.splitter.addWidget(left_group)
-        left_layout = QVBoxLayout(left_group)
-        left_layout.setContentsMargins(1, 10, 1, 1)
-        left_layout.setSpacing(0)
-
         self.left_menu = VListWidget()
         self.left_menu.clicked.connect(self.left_menu_click)
-        left_layout.addWidget(self.left_menu)
+        self.splitter.addWidget(self.left_menu)
 
         main_settings_item = VListWidgetItem(
             parent=self.left_menu,

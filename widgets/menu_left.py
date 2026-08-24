@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMenu, UTreeWidget, VListWidget, VListWidgetItem, UGroupBox
+from ._base_widgets import UMenu, UTreeWidget, VListWidget, VListWidgetItem
 
 ITEM_HEIGHT = 25
 

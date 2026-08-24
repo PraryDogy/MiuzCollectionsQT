@@ -11,7 +11,8 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
-from ._base_widgets import HSep, RowArrowWidget, UMainWidget, UPushButton, UGroupBox
+from ._base_widgets import (HSep, RowArrowWidget, UGroupBox, UMainWidget,
+                            UPushButton)
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -121,12 +122,6 @@ class UploadWin(UMainWidget):
         self.proxy_model = LetterFirstProxyModel()
         self.proxy_model.setSourceModel(self.file_model)
 
-        left_wid = UGroupBox()
-        splitter.addWidget(left_wid)
-        left_layout = QVBoxLayout(left_wid)
-        left_layout.setContentsMargins(1, 10, 1, 1)
-        left_layout.setSpacing(0)
-
         # Используем наш кастомный TreeView вместо стандартного
         self.tree_view = CustomTreeView(self.proxy_model)
         self.proxy_model.sort(0, Qt.SortOrder.AscendingOrder)
@@ -144,7 +139,7 @@ class UploadWin(UMainWidget):
         for i in range(1, 4):
             self.tree_view.setColumnHidden(i, True)
 
-        left_layout.addWidget(self.tree_view)
+        splitter.addWidget(self.tree_view)
 
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
