@@ -109,30 +109,39 @@ QGroupBox {
 
 
 
-
-/* Общий стиль для самих виджетов списка и деревьев */
-QListWidget, QTreeView, QTreeWidget {
+QTreeView, QListWidget {
     background: #171717;
     color: #ffffff;
-    border-radius: 10px;
     border: 1px solid #2d2d2d;
+    border-radius: 10px;
+    padding: 10 2 10 2;
+}
+
+QTreeView::item {
+    background: transparent;
+    color: #ffffff;
     padding: 4px;
 }
 
-/* Общий стиль для элементов (строк) */
-QListWidget::item, QTreeView::item, QTreeWidget::item {
-    background: transparent;
-    color: #ffffff;
-    border-radius: 5px;
-}
-
-/* Общий стиль для выделенных элементов (активных и неактивных) */
-QListWidget::item:selected, QTreeView::item:selected, QTreeWidget::item:selected,
-QListWidget::item:selected:!active, QTreeView::item:selected:!active, QTreeWidget::item:selected:!active {
+QTreeView::item:selected,
+QTreeView::item:selected:!active {
     background: #0059d1;
     color: #ffffff;
-    border-radius: 5px;
 }
+
+QListWidget::item {
+    background: transparent;
+    color: #ffffff;
+    padding: 4px;
+}
+
+QListWidget::item:selected,
+QListWidget::item:selected:!active {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+
 
 
 QPushButton {

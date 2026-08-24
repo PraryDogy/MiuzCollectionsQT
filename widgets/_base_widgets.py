@@ -3,13 +3,15 @@ import re
 from pathlib import Path
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QCloseEvent, QContextMenuEvent, QMouseEvent
+from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
+                         QMouseEvent, QPainter)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QDateEdit, QFileDialog, QFrame, QGroupBox,
                              QHBoxLayout, QLabel, QLineEdit, QListWidget,
                              QListWidgetItem, QMainWindow, QMenu, QProgressBar,
                              QPushButton, QScrollArea, QSlider, QSpacerItem,
-                             QSpinBox, QStackedWidget, QTextEdit, QTreeWidget,
+                             QSpinBox, QStackedWidget, QStyle,
+                             QStyledItemDelegate, QTextEdit, QTreeWidget,
                              QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
