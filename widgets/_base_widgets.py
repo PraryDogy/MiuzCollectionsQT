@@ -251,11 +251,7 @@ class VListWidget(QListWidget):
         self.setIconSize(QSize(self.icon_size, self.icon_size))
 
 
-class UTreeWidget(QTreeWidget):
-    icon_size = 16
-    def __init__(self):
-        super().__init__()
-        self.setIconSize(QSize(self.icon_size, self.icon_size))
+
 
 
 class UPushButton(QPushButton):

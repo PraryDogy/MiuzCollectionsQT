@@ -120,14 +120,40 @@ QTreeView, QListWidget {
 QTreeView::item {
     background: transparent;
     color: #ffffff;
-    padding: 4px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding-left: 5px;
 }
 
 QTreeView::item:selected,
 QTreeView::item:selected:!active {
     background: #0059d1;
     color: #ffffff;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding-left: 5px;
+
 }
+
+QTreeView::branch {
+    background: transparent;
+    color: #ffffff;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+QTreeView::branch:selected {
+    background: #0059d1;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+QTreeView::branch:selected:!active {
+    background: #0059d1;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
 
 QListWidget::item {
     background: transparent;
