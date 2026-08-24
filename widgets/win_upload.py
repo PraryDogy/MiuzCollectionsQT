@@ -3,8 +3,8 @@ import re
 
 from PyQt6.QtCore import QDir, QSortFilterProxyModel, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QFileSystemModel, QIcon
-from PyQt6.QtWidgets import (QHBoxLayout, QListWidget, QListWidgetItem, QMenu,
-                             QSplitter, QTreeView, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QHBoxLayout, QMenu, QSplitter, QTreeView,
+                             QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -12,7 +12,7 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
 from ._base_widgets import (HSep, RowArrowWidget, UGroupBox, UMainWidget,
-                            UPushButton)
+                            UPushButton, VListWidget, VListWidgetItem)
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -156,7 +156,7 @@ class UploadWin(UMainWidget):
         title.hide_arrow()
         group_one_layout.addWidget(title)
 
-        self.list_widget = QListWidget()
+        self.list_widget = VListWidget()
         group_one_layout.addWidget(self.list_widget)
         
         self.total_files_widget = RowArrowWidget("")
@@ -211,7 +211,7 @@ class UploadWin(UMainWidget):
 
         for file_path in self.files_to_copy:
             file_name = os.path.basename(file_path)
-            item = QListWidgetItem(file_name)
+            item = VListWidgetItem(file_name)
             item.setIcon(QIcon(str(self.image_file_svg)))
             item.setToolTip(file_path)
             self.list_widget.addItem(item)
