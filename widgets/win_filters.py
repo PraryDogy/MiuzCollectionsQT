@@ -51,10 +51,10 @@ class DatesWidget(UGroupBox):
         self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setSpacing(RowArrowWidget.group_spacing)
 
-        title = RowArrowWidget(Lng.calendar[JsonData.lng_index])
-        title.set_left_icon(self.calendar_svg)
-        title.hide_arrow()  
-        self.main_layout.addWidget(title)
+        self.title_widget = RowArrowWidget("")
+        self.title_widget.set_left_icon(self.calendar_svg)
+        self.title_widget.hide_arrow()  
+        self.main_layout.addWidget(self.title_widget)
 
         self.main_layout.addWidget(HSep())
         
@@ -115,12 +115,6 @@ class DatesWidget(UGroupBox):
         self.date_end_btn.clicked.connect(lambda: self.show_calendar_win("end"))
         self.top_row_layout.addWidget(self.date_end_btn)
 
-        # if Dynamic.date_start and Dynamic.date_end:
-        #     dt = Dynamic.date_start
-        #     self.date_start_btn.setDate(QDate(dt.year, dt.month, dt.day))
-        #     dt_end = Dynamic.date_end
-        #     self.date_end_btn.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
-
         # Пружина смещает кнопку сброса вправо
         self.top_row_layout.addStretch(1)
 
@@ -138,7 +132,8 @@ class DatesWidget(UGroupBox):
         # --- СТРОКА 3: Текстовое состояние ---
         self.readable_date_label = WinDatesDateLabel()
         self.main_layout.addWidget(self.readable_date_label)
-        # self.update_readable_date_label()
+
+        self.update_readable_date_label()
 
     def date_digits(self, q_date: QDate):
         return q_date.toString("dd.MM.yyyy")
@@ -221,15 +216,15 @@ class DatesWidget(UGroupBox):
 
         if self.q_date_start == self.q_date_end:
             str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
-            text = f"{Lng.selected_period[ind]}: {str_date}"
+            # text = f"{Lng.selected_period[ind]}: {str_date}"
             text = f"{str_date}"
         else:
             str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
             str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-            text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
+            # text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
             text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
-                
-        self.readable_date_label.setText(text)
+
+        self.title_widget.text_widget.setText(text)
 
     def apply_filter(self, index: int):
         Dynamic.date_start = self.q_date_start.toPyDate()
