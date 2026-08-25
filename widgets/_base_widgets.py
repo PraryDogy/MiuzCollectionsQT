@@ -240,35 +240,49 @@ class UListWidgetItem(QListWidgetItem):
 class UTreeWidgetItem(QTreeWidgetItem):
     ICON_SIZE = (16, 16)
     CUSTOM_HEIGHT = 30
+    INDENT_STEP = 20  # Шаг отступа в пикселях на каждый уровень
 
     def __init__(self, parent: QTreeWidget, icon_path: str, text: str, level: int):
-       
-        super().__init__(parent, [text, ])
-        self.setSizeHint(0, QSize(parent.width(), self.CUSTOM_HEIGHT))
-        self.setIcon(0, QIcon(icon_path))
-
-        self.icon_path = icon_path
+        # Важно: инициализируем суперкласс, передавая родителя
+        super().__init__(parent, [text])
+        
         self.level = level
-        # self.set_level_indentation()
+        self.icon_path = icon_path
+        
+        # Устанавливаем высоту строки (первый аргумент 0 — это индекс колонки)
+        self.setSizeHint(0, QSize(parent.width(), self.CUSTOM_HEIGHT))
+        
+        # Сначала устанавливаем оригинальную иконку
+        if icon_path:
+            self.setIcon(0, QIcon(icon_path))
+            
+        # Применяем отступ (теперь метод берет оригинальную иконку и расширяет её)
+        self.set_level_indentation()
 
     def set_level_indentation(self):
-        return
-        indent_step = 20
         base_w, base_h = self.ICON_SIZE
-        left_padding = self.level * indent_step
+        left_padding = self.level * self.INDENT_STEP
         total_width = left_padding + base_w
         
+        # 1. Создаем прозрачный холст увеличенной ширины
         extended_pixmap = QPixmap(total_width, base_h)
         extended_pixmap.fill(Qt.GlobalColor.transparent)
 
+        # 2. Получаем оригинальную иконку, которую мы установили в __init__
         original_icon = self.icon(0)
-        original_pixmap = original_icon.pixmap(base_w, base_h)
-        painter = QPainter(extended_pixmap)
-        painter.drawPixmap(QPoint(left_padding, 0), original_pixmap)
-        painter.end()
-
-        self.setIcon(0, QIcon(extended_pixmap))
         
+        if not original_icon.isNull():
+            # Извлекаем чистую картинку 16x16
+            original_pixmap = original_icon.pixmap(base_w, base_h)
+            
+            # Рисуем её со сдвигом вправо на left_padding
+            painter = QPainter(extended_pixmap)
+            painter.drawPixmap(QPoint(left_padding, 0), original_pixmap)
+            painter.end()
+
+        # 3. Перезаписываем иконку айтема на новую, широкую
+        self.setIcon(0, QIcon(extended_pixmap))
+
 
 class UListWidget(QListWidget):
     ICON_SIZE = (16, 16)
@@ -280,18 +294,30 @@ class UListWidget(QListWidget):
         self.setIconSize(QSize(*self.ICON_SIZE))
 
 
+
+
 class UTreeWidget(QTreeWidget):
     ICON_SIZE = (16, 16)
+    MAX_LEVELS = 5  # Задаем максимальный ожидаемый уровень вложенности для запаса ширины
 
     def __init__(self):
         super().__init__()
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setIconSize(QSize(*self.ICON_SIZE))
-
+        
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
         self.setIndentation(0)
+        self.setRootIsDecorated(False) # Гарантируем скрытие стандартных стрелочек
+
+        # Рассчитываем максимальную прямоугольную ширину для иконок виджета:
+        # (Макс_Уровней * Шаг_Отступа) + Базовая_Ширина_Иконки
+        # 5 * 20 + 16 = 116 пикселей. Возьмем с запасом 150, чтобы иконки точно не сжимались.
+        max_icon_width = (self.MAX_LEVELS * UTreeWidgetItem.INDENT_STEP) + self.ICON_SIZE[0]
+        
+        # Задаем ПРЯМОУГОЛЬНЫЙ размер иконок для всего виджета
+        self.setIconSize(QSize(max_icon_width, self.ICON_SIZE[1]))
+
 
 
 class UPushButton(QPushButton):
