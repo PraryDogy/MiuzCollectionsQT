@@ -161,7 +161,7 @@ class Calendar(UMainWidget):
         self.nav_layout.setContentsMargins(margin, 0, margin, 0)
         self.nav_layout.setSpacing(0)
 
-        self.btn_prev = CalendarSvgNavi(self.svg_previous)
+        self.btn_prev = CalendarSvgNavi(str(self.svg_previous))
         self.btn_prev.setFixedSize(*self.svg_nav)
         self.btn_prev.clicked.connect(self.prev_month)
         self.nav_layout.addWidget(self.btn_prev)
@@ -184,7 +184,7 @@ class Calendar(UMainWidget):
 
         self.nav_layout.addStretch()
         
-        self.btn_next = CalendarSvgNavi(self.svg_next)
+        self.btn_next = CalendarSvgNavi(str(self.svg_next))
         self.btn_next.setFixedSize(*self.svg_nav)
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)

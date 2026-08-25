@@ -32,6 +32,20 @@ class DatesWidget(UGroupBox):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        if Dynamic.date_start:
+            dt = Dynamic.date_start
+            self.q_date_start = QDate(dt.year, dt.month, dt.day)
+        else:
+            self.q_date_start = QDate(Calendar.min_year, 1, 1)
+
+        if Dynamic.date_end:
+            dt = Dynamic.date_end
+            self.q_date_end = QDate(dt.year, dt.month, dt.day)
+        else:
+            dt = QDate.currentDate()
+            self.q_date_end = QDate(dt)
+
         
         # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
@@ -88,25 +102,29 @@ class DatesWidget(UGroupBox):
         # Выбор дат "От" и "До"
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
-        # self.date_from = UDateEdit(QDate.currentDate().addDays(-30))
-        self.date_from = UPushButton("дата")
-        self.date_from.clicked.connect(self.show_calendar_win)
-        self.date_from.setFixedWidth(110)
+        self.date_from = UPushButton(self.q_date_start.toString("dd.MM.yyyy"))
+        self.date_from.clicked.connect(lambda: self.show_calendar_win(self.q_date_start))
+        # self.date_from.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_from)
 
         self.top_row_layout.addSpacing(10) 
 
         to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(to_label)
-        self.date_to = UDateEdit(QDate.currentDate())
-        self.date_to.setFixedWidth(110)
+        self.date_to = UPushButton(self.q_date_end.toString("dd.MM.yyyy"))
+        self.date_to.clicked.connect(lambda: self.show_calendar_win(self.q_date_end))
+        # self.date_to.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_to)
 
-        # if Dynamic.date_start and Dynamic.date_end:
-        #     dt = Dynamic.date_start
-        #     self.date_from.setDate(QDate(dt.year, dt.month, dt.day))
-        #     dt_end = Dynamic.date_end
-        #     self.date_to.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
+        text = self.q_date_end.toString("dd.MM.yyyy")
+        print(text)
+
+
+        if Dynamic.date_start and Dynamic.date_end:
+            dt = Dynamic.date_start
+            self.date_from.setDate(QDate(dt.year, dt.month, dt.day))
+            dt_end = Dynamic.date_end
+            self.date_to.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
 
         # for widget in [self.date_from, self.date_to]:
         #     widget.setEnabled(True)  
@@ -135,8 +153,8 @@ class DatesWidget(UGroupBox):
         # self.handle_preset_change(Dynamic.date_index)
         # self.update_readable_date_label()
 
-    def show_calendar_win(self):
-        self.calendar_win = Calendar()
+    def show_calendar_win(self, q_date: QDate):
+        self.calendar_win = Calendar(q_date)
         self.calendar_win.center_to_parent(self.window())
         self.calendar_win.show()
 
@@ -254,24 +272,17 @@ class WinFilters(UMainWidget):
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(15)
         self.central_layout.addWidget(self.splitter)
-
-        # --- Левая группа (Список фильтров) ---
-        self.list_group = UGroupBox()
-        list_group_lay = QVBoxLayout(self.list_group)
-        list_group_lay.setContentsMargins(1, 10, 1, 1)
-        list_group_lay.setSpacing(0)
         
         self.list_widget = UListWidget()
         self.list_widget.itemClicked.connect(self.item_cmd)
-        list_group_lay.addWidget(self.list_widget)
+        self.splitter.addWidget(self.list_widget)
         
-        self.splitter.addWidget(self.list_group)
+        self.splitter.addWidget(self.list_widget)
 
         # Заполнение списка элементами
         favs_item = UListWidgetItem(
             parent=self.list_widget,
-            text=Lng.favorites[JsonData.lng_index],
-            height=self.item_h
+            text=Lng.favorites[JsonData.lng_index]
         )
         favs_item.set_checkable()
         self.list_widget.addItem(favs_item)
@@ -280,8 +291,7 @@ class WinFilters(UMainWidget):
 
         folder_item = UListWidgetItem(
             parent=self.list_widget,
-            text=Lng.without_subfolders[JsonData.lng_index],
-            height=self.item_h
+            text=Lng.without_subfolders[JsonData.lng_index]
         )
         folder_item.set_checkable()
         self.list_widget.addItem(folder_item)
@@ -295,8 +305,7 @@ class WinFilters(UMainWidget):
         for i in Filters.items:
             item = UListWidgetItem(
                 parent=self.list_widget,
-                text=i,
-                height=self.item_h
+                text=i
             )
             item.set_checkable()
             self.list_widget.addItem(item)
