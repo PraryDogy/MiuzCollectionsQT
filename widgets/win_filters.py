@@ -14,15 +14,13 @@ from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
                             UGroupBox, UMainWidget, UMenu, UPushButton,
                             UTextEditDark, UListSpacerItem, UListWidget,
                             UListWidgetItem)
-from .caledar_widget import Calendar
+from .caledar_widget import Calendar, CalendarBigDate
 
 
 class WinDatesDateLabel(QLabel):
 
     def __init__(self):
         super().__init__()
-        self.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.setWordWrap(True)
 
 
 class DatesWidget(UGroupBox):
@@ -72,7 +70,7 @@ class DatesWidget(UGroupBox):
 
         # Кнопка пресетов
         self.preset_button = UPushButton("")
-        self.preset_button.setFixedWidth(120)
+        self.preset_button.setFixedWidth(100)
         self.top_row_layout.addWidget(self.preset_button)
 
         preset_menu = UMenu(None)
@@ -126,12 +124,7 @@ class DatesWidget(UGroupBox):
         # Добавляем созданную строку-виджет в главный вертикальный layout
         self.main_layout.addWidget(self.top_row_widget)
 
-        # --- СТРОКА 2: Разделитель HSep ---
-        self.main_layout.addWidget(HSep())
-
-        # --- СТРОКА 3: Текстовое состояние ---
-        self.readable_date_label = WinDatesDateLabel()
-        self.main_layout.addWidget(self.readable_date_label)
+        self.main_layout.addSpacing(5)
 
         self.update_readable_date_label()
 
@@ -207,7 +200,6 @@ class DatesWidget(UGroupBox):
         self.date_end_btn.blockSignals(False)
 
     def update_readable_date_label(self):
-        self.readable_date_label.setText("TEST")
         ind = JsonData.lng_index
         if ind == 0:
             locale = QLocale(QLocale.Language.Russian)
