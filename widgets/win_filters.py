@@ -102,29 +102,24 @@ class DatesWidget(UGroupBox):
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
-        self.date_from = UPushButton(self.date_digits(self.q_date_start))
-        self.date_from.clicked.connect(lambda: self.show_calendar_win(self.q_date_start))
-        self.top_row_layout.addWidget(self.date_from)
+        self.date_start_btn = UPushButton(self.date_digits(self.q_date_start))
+        self.date_start_btn.clicked.connect(lambda: self.show_calendar_win(self.q_date_start))
+        self.top_row_layout.addWidget(self.date_start_btn)
 
         self.top_row_layout.addSpacing(10) 
 
         to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(to_label)
         self.top_row_layout.addSpacing(5)
-        self.date_to = UPushButton(self.date_digits(self.q_date_end))
-        self.date_to.clicked.connect(lambda: self.show_calendar_win(self.q_date_end))
-        self.top_row_layout.addWidget(self.date_to)
+        self.date_end_btn = UPushButton(self.date_digits(self.q_date_end))
+        self.date_end_btn.clicked.connect(lambda: self.show_calendar_win(self.q_date_end))
+        self.top_row_layout.addWidget(self.date_end_btn)
 
         if Dynamic.date_start and Dynamic.date_end:
             dt = Dynamic.date_start
-            self.date_from.setDate(QDate(dt.year, dt.month, dt.day))
+            self.date_start_btn.setDate(QDate(dt.year, dt.month, dt.day))
             dt_end = Dynamic.date_end
-            self.date_to.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
-
-        # for widget in [self.date_from, self.date_to]:
-        #     widget.setEnabled(True)  
-        #     widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        #     widget.dateChanged.connect(self.on_custom_date_changed)
+            self.date_end_btn.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
 
         # Пружина смещает кнопку сброса вправо
         self.top_row_layout.addStretch(1)
@@ -177,56 +172,64 @@ class DatesWidget(UGroupBox):
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
         
-        self.date_from.blockSignals(True)
-        self.date_to.blockSignals(True)
+        self.date_start_btn.blockSignals(True)
+        self.date_end_btn.blockSignals(True)
         
         today = QDate.currentDate()
         if not is_custom:
-            if index == 0:
-                self.date_to.setDate(today)
-                self.date_from.setDate(QDate(2012, 1, 1))
-            elif index == 1:
-                self.date_to.setDate(today)
-                self.date_from.setDate(today)
-            elif index == 2:
-                self.date_to.setDate(today.addDays(-1))
-                self.date_from.setDate(today.addDays(-1))
-            elif index == 3:
-                self.date_to.setDate(today)
-                self.date_from.setDate(today.addDays(-7))
-            elif index == 4:
-                self.date_to.setDate(today)
-                self.date_from.setDate(today.addMonths(-1))
-            elif index == 5:
-                self.date_to.setDate(today)
-                self.date_from.setDate(today.addYears(-1))
+            if index == 0:  # Все время
+                self.q_date_start = QDate(Calendar.min_year, 1, 1)
+                self.q_date_end = today
+            elif index == 1:  # Сегодня
+                self.q_date_start = today
+                self.q_date_end = today
+            elif index == 2:  # Вчера
+                self.q_date_start = today.addDays(-1)
+                self.q_date_end = today.addDays(-1)
+            elif index == 3:  # Последняя неделя
+                self.q_date_start = today.addDays(-7)
+                self.q_date_end = today
+            elif index == 4:  # Последний месяц
+                self.q_date_start = today.addMonths(-1)
+                self.q_date_end = today
+            elif index == 5:  # Последний год
+                self.q_date_start = today.addYears(-1)
+                self.q_date_end = today
                 
-        self.date_from.blockSignals(False)
-        self.date_to.blockSignals(False)
+        self.date_start_btn.setText(self.date_digits(self.q_date_start))
+        self.date_end_btn.setText(self.date_digits(self.q_date_end))
         self.update_readable_date_label()
+        
+        # Не забудьте разблокировать сигналы кнопок
+        self.date_start_btn.blockSignals(False)
+        self.date_end_btn.blockSignals(False)
+
 
     def update_readable_date_label(self):
+        print("update readable label")
+        self.readable_date_label.setText("TEST")
+        return
         ind = JsonData.lng_index
         if ind == 0:
             locale = QLocale(QLocale.Language.Russian)
         else:
             locale = QLocale(QLocale.Language.English)
 
-        if self.date_from.date() == self.date_to.date():
-            str_date = locale.toString(self.date_from.date(), "d MMMM yyyy")
+        if self.date_start_btn.date() == self.date_end_btn.date():
+            str_date = locale.toString(self.date_start_btn.date(), "d MMMM yyyy")
             text = f"{Lng.selected_period[ind]}: {str_date}"
             text = f"{str_date}"
         else:
-            str_from = locale.toString(self.date_from.date(), "d MMMM yyyy")
-            str_to = locale.toString(self.date_to.date(), "d MMMM yyyy")
+            str_from = locale.toString(self.date_start_btn.date(), "d MMMM yyyy")
+            str_to = locale.toString(self.date_end_btn.date(), "d MMMM yyyy")
             text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
             text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
                 
         self.readable_date_label.setText(text)
 
     def apply_filter(self, index: int):
-        Dynamic.date_start = self.date_from.date().toPyDate()
-        Dynamic.date_end = self.date_to.date().toPyDate()
+        Dynamic.date_start = self.q_date_start.toPyDate()
+        Dynamic.date_end = self.q_date_end.toPyDate()
         Dynamic.date_index = index
         self.reload_thumbnails.emit()
 
