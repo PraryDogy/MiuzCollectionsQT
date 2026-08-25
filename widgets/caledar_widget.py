@@ -88,6 +88,8 @@ class CalendarSep(HSep):
 
 
 class Calendar(UMainWidget):
+    date_selected = pyqtSignal(QDate)
+
     svg_calendar = Static.COMMON_ICONS / "calendar.svg"
     svg_previous = Static.COMMON_ICONS / "previous.svg"
     svg_next = Static.COMMON_ICONS / "next.svg"
@@ -246,6 +248,7 @@ class Calendar(UMainWidget):
             target_day = current_day
         self.current_date = QDate(year, selected_month, target_day)
         self.update_calendar()
+        self.date_selected.emit(self.current_date)
 
     def year_menu_selected(self):
         action: QAction = self.sender()
@@ -259,6 +262,7 @@ class Calendar(UMainWidget):
             target_day = current_day
         self.current_date = QDate(selected_year, current_month, target_day)
         self.update_calendar()
+        self.date_selected.emit(self.current_date)
 
     def day_selected(self):
         sender_button: CalendarDayBase = self.sender()
@@ -267,6 +271,7 @@ class Calendar(UMainWidget):
         current_month = self.current_date.month()
         self.current_date = QDate(current_year, current_month, day)
         self.update_calendar()
+        self.date_selected.emit(self.current_date)
 
     def prev_month(self):
         min_date = QDate(self.min_year, 1, 1)
@@ -274,6 +279,7 @@ class Calendar(UMainWidget):
         if new_date >= min_date:
             self.current_date = new_date
             self.update_calendar()
+            self.date_selected.emit(self.current_date)
 
     def next_month(self):
         max_date = QDate(self.date_now.year(), 12, 31)
@@ -281,6 +287,7 @@ class Calendar(UMainWidget):
         if new_date <= max_date:
             self.current_date = new_date
             self.update_calendar()
+            self.date_selected.emit(self.current_date)
 
     def clear_grid(self):
         while self.grid_layout.count():

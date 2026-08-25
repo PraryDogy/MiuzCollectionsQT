@@ -149,6 +149,7 @@ class DatesWidget(UGroupBox):
     def show_calendar_win(self, q_date: QDate):
         self.calendar_win = Calendar(q_date)
         self.calendar_win.center_to_parent(self.window())
+        self.calendar_win.date_selected.connect(self.on_custom_date_changed)
         self.calendar_win.show()
 
     def action_cmd(self, e, index: int, action: QAction):
