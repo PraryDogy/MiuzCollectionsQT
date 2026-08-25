@@ -45,7 +45,6 @@ class DatesWidget(UGroupBox):
         else:
             dt = QDate.currentDate()
             self.q_date_end = QDate(dt)
-
         
         # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
@@ -102,23 +101,19 @@ class DatesWidget(UGroupBox):
         # Выбор дат "От" и "До"
         from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
-        self.date_from = UPushButton(self.q_date_start.toString("dd.MM.yyyy"))
+        self.top_row_layout.addSpacing(5)
+        self.date_from = UPushButton(self.date_digits(self.q_date_start))
         self.date_from.clicked.connect(lambda: self.show_calendar_win(self.q_date_start))
-        # self.date_from.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_from)
 
         self.top_row_layout.addSpacing(10) 
 
         to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(to_label)
-        self.date_to = UPushButton(self.q_date_end.toString("dd.MM.yyyy"))
+        self.top_row_layout.addSpacing(5)
+        self.date_to = UPushButton(self.date_digits(self.q_date_end))
         self.date_to.clicked.connect(lambda: self.show_calendar_win(self.q_date_end))
-        # self.date_to.setFixedWidth(110)
         self.top_row_layout.addWidget(self.date_to)
-
-        text = self.q_date_end.toString("dd.MM.yyyy")
-        print(text)
-
 
         if Dynamic.date_start and Dynamic.date_end:
             dt = Dynamic.date_start
@@ -152,6 +147,9 @@ class DatesWidget(UGroupBox):
         # Инициализация логики
         # self.handle_preset_change(Dynamic.date_index)
         # self.update_readable_date_label()
+
+    def date_digits(self, q_date: QDate):
+        return q_date.toString("dd.MM.yyyy")
 
     def show_calendar_win(self, q_date: QDate):
         self.calendar_win = Calendar(q_date)
