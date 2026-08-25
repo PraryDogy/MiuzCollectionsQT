@@ -175,10 +175,7 @@ class DatesWidget(UGroupBox):
         self.preset_button.setText(action.text())
         self.handle_preset_change(index)
         self.apply_filter(index)
-            
-    def on_custom_date_changed(self, qdate: QDate):
-        ...
-        
+
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
         
@@ -214,24 +211,21 @@ class DatesWidget(UGroupBox):
         self.date_start_btn.blockSignals(False)
         self.date_end_btn.blockSignals(False)
 
-
     def update_readable_date_label(self):
-        print("update readable label")
         self.readable_date_label.setText("TEST")
-        return
         ind = JsonData.lng_index
         if ind == 0:
             locale = QLocale(QLocale.Language.Russian)
         else:
             locale = QLocale(QLocale.Language.English)
 
-        if self.date_start_btn.date() == self.date_end_btn.date():
-            str_date = locale.toString(self.date_start_btn.date(), "d MMMM yyyy")
+        if self.q_date_start == self.q_date_end:
+            str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
             text = f"{Lng.selected_period[ind]}: {str_date}"
             text = f"{str_date}"
         else:
-            str_from = locale.toString(self.date_start_btn.date(), "d MMMM yyyy")
-            str_to = locale.toString(self.date_end_btn.date(), "d MMMM yyyy")
+            str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+            str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
             text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
             text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
                 
