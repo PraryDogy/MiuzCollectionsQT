@@ -47,14 +47,10 @@ QMenu::item:selected {
 }
 
 
-
-
 QScrollArea {
     border: none;
     background: transparent;
 }
-
-
 
 
 QLineEdit {
