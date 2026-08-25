@@ -267,8 +267,8 @@ class UTreeWidgetItem(QTreeWidgetItem):
 class UListWidget(QListWidget):
     ICON_SIZE = 16
 
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setIconSize(QSize(*self.ICON_SIZE))
