@@ -216,6 +216,17 @@ class VScrollArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 
+class UListSpacerItem(QListWidgetItem):
+    CUSTOM_HEIGHT = (30, 30)
+
+    def __init__(self, parent: QListWidget):
+        super().__init__()
+        self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
+        self.setFlags(
+            Qt.ItemFlag.NoItemFlags
+        )
+
+
 class UListWidgetItem(QListWidgetItem):
     CUSTOM_HEIGHT = 30
 
@@ -232,18 +243,6 @@ class UListWidgetItem(QListWidgetItem):
         self.setCheckState(
             Qt.CheckState.Unchecked
         )
-
-
-class UListSpacerItem(QListWidgetItem):
-    CUSTOM_HEIGHT = (30, 30)
-
-    def __init__(self, parent: QListWidget):
-        super().__init__()
-        self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
-        self.setFlags(
-            Qt.ItemFlag.NoItemFlags
-        )
-
 
 
 class UTreeWidgetItem(QTreeWidgetItem):
