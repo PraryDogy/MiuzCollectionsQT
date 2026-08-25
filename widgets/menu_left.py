@@ -64,6 +64,7 @@ class LTreeWidget(UTreeWidget):
         self.clear()
 
         root_item = LTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
+        root_item.setIcon(0, QIcon(str(self.icon_path)))
         self.addTopLevelItem(root_item)
 
         task = DbDirsLoader(Mf.current_mf)
@@ -89,6 +90,7 @@ class LTreeWidget(UTreeWidget):
                 continue
 
             child = LTreeWidgetItem(parent_item, name, path)
+            child.setIcon(0, QIcon(str(self.icon_path)))
             parent_item.addChild(child)
             self.items[path] = child
 

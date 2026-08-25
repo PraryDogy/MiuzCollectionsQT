@@ -110,7 +110,7 @@ QGroupBox {
 
 
 QTreeView,
-VListWidget {
+QListWidget {
     color: #ffffff;
     background: #171717;
     border-radius: 10px;
@@ -119,14 +119,14 @@ VListWidget {
 }
 
 
-QTreeWidget::item,
+QTreeView::item,
 QListWidget::item {
     background: transparent;
     height: 30px;
 }
 
-QTreeWidget::item:selected,
-QTreeWidget::item:selected:!active,
+QTreeView::item:selected,
+QTreeView::item:selected:!active,
 QListWidget::item:selected,
 QListWidget::item:selected:!active {
     background: #2b2b2b;

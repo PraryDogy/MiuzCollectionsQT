@@ -234,7 +234,6 @@ class UListWidgetItem(QListWidgetItem):
 
 
 class UTreeWidgetItem(QTreeWidgetItem):
-    ITEM_HEIGHT = 30
 
     def __init__(self, parent: QTreeWidget | QTreeWidgetItem, text: str):
         # Важно: инициализируем суперкласс, передавая родителя
