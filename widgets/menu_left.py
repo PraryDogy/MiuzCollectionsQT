@@ -4,9 +4,7 @@ import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QHBoxLayout, QSplitter, QStyle,
-                             QStyledItemDelegate, QTreeWidget, QTreeWidgetItem,
-                             QWidget)
+from PyQt6.QtWidgets import QHBoxLayout, QSplitter, QWidget
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
@@ -114,7 +112,7 @@ class TreeWid(UTreeWidget):
             parent = parent.parent()
         item.setExpanded(True)
         self.setCurrentItem(item)
-        self.scrollToItem(item, QTreeWidget.ScrollHint.PositionAtCenter)
+        self.scrollToItem(item, UTreeWidget.ScrollHint.PositionAtCenter)
 
     def on_item_click(self, item: UTreeWidgetItem, col: int):
         abs_path = item.data(0, Qt.ItemDataRole.UserRole)
