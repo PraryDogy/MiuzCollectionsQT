@@ -221,7 +221,7 @@ class UListSpacerItem(QListWidgetItem):
 
     def __init__(self, parent: QListWidget):
         super().__init__()
-        self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
+        self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT[0]))
         self.setFlags(Qt.ItemFlag.NoItemFlags)
 
 
@@ -239,7 +239,7 @@ class UListWidgetItem(QListWidgetItem):
 
 
 class UTreeWidgetItem(QTreeWidgetItem):
-    ICON_SIZE = 16
+    ICON_SIZE = (16, 16)
     CUSTOM_HEIGHT = 30
 
     def __init__(self, parent: QTreeWidget, text: str, level: int):
@@ -258,7 +258,7 @@ class UTreeWidgetItem(QTreeWidgetItem):
 
 
 class UListWidget(QListWidget):
-    ICON_SIZE = 16
+    ICON_SIZE = (16, 16)
 
     def __init__(self):
         super().__init__()
@@ -268,7 +268,7 @@ class UListWidget(QListWidget):
 
 
 class UTreeWidget(QTreeWidget):
-    ICON_SIZE = 16
+    ICON_SIZE = (16, 16)
 
     def __init__(self):
         super().__init__()

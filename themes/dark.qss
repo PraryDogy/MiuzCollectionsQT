@@ -119,26 +119,18 @@ VListWidget {
 }
 
 
-QTreeView::item,
+UTreeWidget::item,
 VListWidget::item {
     background: transparent;
     border-radius: 5px;
 }
 
-QTreeView::item:selected,
-QTreeView::item:selected:!active,
+UTreeWidget::item:selected,
+UTreeWidget::item:selected:!active,
 VListWidget::item:selected,
 VListWidget::item:selected:!active {
     background: #2b2b2b;
     border-radius: 5px;
-}
-
-
-
-QTreeView::item:has-children,
-QTreeView::item:has-children:!active {
-    font-weight: bold;
-    color: #e0e0e0;
 }
 
 
