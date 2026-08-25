@@ -222,39 +222,33 @@ class UListSpacerItem(QListWidgetItem):
     def __init__(self, parent: QListWidget):
         super().__init__()
         self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
-        self.setFlags(
-            Qt.ItemFlag.NoItemFlags
-        )
+        self.setFlags(Qt.ItemFlag.NoItemFlags)
 
 
 class UListWidgetItem(QListWidgetItem):
     CUSTOM_HEIGHT = 30
 
-    def __init__(self, parent: QListWidget, text: str | None = None):
+    def __init__(self, parent: QListWidget, text: str):
         super().__init__(parent)
         self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
-        if text:
-            self.setText(text)
+        self.setText(text)
 
     def set_checkable(self):
-        self.setFlags(
-            self.flags() | Qt.ItemFlag.ItemIsUserCheckable
-        )
-        self.setCheckState(
-            Qt.CheckState.Unchecked
-        )
+        self.setFlags(self.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+        self.setCheckState(Qt.CheckState.Unchecked)
 
 
 class UTreeWidgetItem(QTreeWidgetItem):
     ICON_SIZE = 16
+    CUSTOM_HEIGHT = 30
 
-    def __init__(self, text: str, level: int):
+    def __init__(self, parent: QTreeWidget, text: str, level: int):
        
         super().__init__([text, ])
         self.level = level
         self.set_level_indentation(column=0)
 
-    def set_level_indentation(self, column):
+    def set_level_indentation(self, column: int):
         indent_step = 20  
         base_w, base_h = self.ICON_SIZE
         total_width = base_w + (self.level * indent_step)
@@ -274,6 +268,8 @@ class UListWidget(QListWidget):
 
 
 class UTreeWidget(QTreeWidget):
+    ICON_SIZE = 16
+
     def __init__(self):
         super().__init__()
         self.horizontalScrollBar().setDisabled(True)
