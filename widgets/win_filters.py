@@ -103,7 +103,7 @@ class DatesWidget(UGroupBox):
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
         self.date_start_btn = UPushButton(self.date_digits(self.q_date_start))
-        self.date_start_btn.clicked.connect(lambda: self.show_calendar_win(self.q_date_start))
+        self.date_start_btn.clicked.connect(lambda: self.show_calendar_win("start"))
         self.top_row_layout.addWidget(self.date_start_btn)
 
         self.top_row_layout.addSpacing(10) 
@@ -112,14 +112,14 @@ class DatesWidget(UGroupBox):
         self.top_row_layout.addWidget(to_label)
         self.top_row_layout.addSpacing(5)
         self.date_end_btn = UPushButton(self.date_digits(self.q_date_end))
-        self.date_end_btn.clicked.connect(lambda: self.show_calendar_win(self.q_date_end))
+        self.date_end_btn.clicked.connect(lambda: self.show_calendar_win("end"))
         self.top_row_layout.addWidget(self.date_end_btn)
 
-        if Dynamic.date_start and Dynamic.date_end:
-            dt = Dynamic.date_start
-            self.date_start_btn.setDate(QDate(dt.year, dt.month, dt.day))
-            dt_end = Dynamic.date_end
-            self.date_end_btn.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
+        # if Dynamic.date_start and Dynamic.date_end:
+        #     dt = Dynamic.date_start
+        #     self.date_start_btn.setDate(QDate(dt.year, dt.month, dt.day))
+        #     dt_end = Dynamic.date_end
+        #     self.date_end_btn.setDate(QDate(dt_end.year, dt_end.month, dt_end.day))
 
         # Пружина смещает кнопку сброса вправо
         self.top_row_layout.addStretch(1)
@@ -138,37 +138,46 @@ class DatesWidget(UGroupBox):
         # --- СТРОКА 3: Текстовое состояние ---
         self.readable_date_label = WinDatesDateLabel()
         self.main_layout.addWidget(self.readable_date_label)
-
-        # Инициализация логики
-        # self.handle_preset_change(Dynamic.date_index)
         # self.update_readable_date_label()
 
     def date_digits(self, q_date: QDate):
         return q_date.toString("dd.MM.yyyy")
 
-    def show_calendar_win(self, q_date: QDate):
-        self.calendar_win = Calendar(q_date)
+    def show_calendar_win(self, flag: str):
+
+        def set_date_end(date: QDate):
+            self.date_end_btn.setText(self.date_digits(date))
+            self.q_date_end = date
+            index = len(self.preset_actions) - 1
+            self.handle_preset_change(index)
+            self.apply_filter(index)
+
+        def set_date_start(date: QDate):
+            self.date_start_btn.setText(self.date_digits(date))
+            self.q_date_start = date
+            index = len(self.preset_actions) - 1
+            self.handle_preset_change(index)
+            self.apply_filter(index)
+
+        if flag == "start":
+            qdate = self.q_date_start
+            callback = lambda qdate: set_date_start(qdate)
+        elif flag == "end":
+            qdate = self.q_date_end
+            callback = lambda qdate: set_date_end(qdate)
+
+        self.calendar_win = Calendar(qdate)
         self.calendar_win.center_to_parent(self.window())
-        self.calendar_win.date_selected.connect(self.on_custom_date_changed)
+        self.calendar_win.date_selected.connect(callback)
         self.calendar_win.show()
 
     def action_cmd(self, e, index: int, action: QAction):
         self.preset_button.setText(action.text())
         self.handle_preset_change(index)
-        
-        if index == 0:
-            self.clear_btn_cmd()
-        else:
-            self.apply_filter(index)
+        self.apply_filter(index)
             
-    def on_custom_date_changed(self, qdate):
-        custom_index = len(self.preset_actions) - 1
-        if Dynamic.date_index != custom_index:
-            custom_action = self.preset_actions[custom_index]
-            self.preset_button.setText(custom_action.text())
-            
-        self.apply_filter(custom_index)
-        self.update_readable_date_label()
+    def on_custom_date_changed(self, qdate: QDate):
+        ...
         
     def handle_preset_change(self, index):
         is_custom = (index == len(self.preset_actions) - 1)
