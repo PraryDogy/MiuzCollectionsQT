@@ -20,8 +20,8 @@ ITEM_HEIGHT = 25
 
 
 class LTreeWidgetItem(UTreeWidgetItem):
-    def __init__(self, parent, icon_path, text, level, path):
-        super().__init__(parent, icon_path, text, level)
+    def __init__(self, parent, text, path):
+        super().__init__(parent, text)
         self.path = path
 
 
@@ -63,7 +63,7 @@ class LTreeWidget(UTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = LTreeWidgetItem(self, str(self.icon_path), Mf.current_mf.mf_alias, 0, os.sep)
+        root_item = LTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
         self.addTopLevelItem(root_item)
 
         task = DbDirsLoader(Mf.current_mf)
@@ -88,7 +88,7 @@ class LTreeWidget(UTreeWidget):
             if parent_item is None:
                 continue
 
-            child = LTreeWidgetItem(self, str(self.icon_path), name, 5, path)
+            child = LTreeWidgetItem(self, name, path)
             child.set_level_indentation()
             parent_item.addChild(child)
             self.items[path] = child
