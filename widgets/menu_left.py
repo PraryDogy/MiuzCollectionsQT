@@ -44,6 +44,9 @@ class TreeWid(QTreeWidget):
         self.abs_selected_path: str = os.sep
         self.items: dict[str, UTreeWidgetItem] = {}
 
+        self.setAllColumnsShowFocus(True)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
     def need_hide_digits(self):
         if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
             return False

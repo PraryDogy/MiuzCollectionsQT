@@ -109,21 +109,21 @@ QGroupBox {
 
 
 
-QTreeWidget {
-    background: #171717;
+QTreeView,
+QListWidget {
     color: #ffffff;
-    border: 1px solid #2d2d2d;
+    background: #171717;
     border-radius: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 2px;
-    padding-right: 2px;
+    padding: 10 2 10 2;
+    border: 1px solid #353535;
 }
 
-QTreeWidget::item:selected,
-QTreeWidget::item:selected:!active {
+
+QTreeView::item:selected,
+QTreeView::item:selected:!active,
+QListWidget::item:selected,
+QListWidget::item:selected:!active {
     background: #0059d1;
-    color: #ffffff;
 }
 
 
