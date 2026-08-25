@@ -19,8 +19,13 @@ from ._base_widgets import (UListWidget, UListWidgetItem, UMenu, UTreeWidget,
 ITEM_HEIGHT = 25
 
 
+class LTreeWidgetItem(UTreeWidgetItem):
+    def __init__(self, parent, icon_path, text, level, path):
+        super().__init__(parent, icon_path, text, level)
+        self.path = path
 
-class TreeWid(UTreeWidget):
+
+class LTreeWidget(UTreeWidget):
     reveal = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
@@ -32,7 +37,7 @@ class TreeWid(UTreeWidget):
         super().__init__()
         self.itemClicked.connect(self.on_item_click)
         self.abs_selected_path: str = os.sep
-        self.items: dict[str, UTreeWidgetItem] = {}
+        self.items: dict[str, LTreeWidgetItem] = {}
 
     def need_hide_digits(self):
         if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
@@ -44,7 +49,7 @@ class TreeWid(UTreeWidget):
         """Удаляет начальные символы, которые не являются буквами, для сортировки."""
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
-    def sort_children(self, parent_item: UTreeWidgetItem):
+    def sort_children(self, parent_item: LTreeWidgetItem):
         """Сортировка детей рекурсивно по strip_to_first_letter."""
         children = [parent_item.child(i) for i in range(parent_item.childCount())]
         children.sort(key=lambda it: self.strip_to_first_letter(it.text(0)).lower())
@@ -58,18 +63,15 @@ class TreeWid(UTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = UTreeWidgetItem(os.sep, [Mf.current_mf.mf_alias])
-        root_item.setSizeHint(0, QSize(0, ITEM_HEIGHT))
-        root_item.setData(0, Qt.ItemDataRole.UserRole, os.sep)
-        root_item.setIcon(0, QIcon(str(self.icon_path)))
+        root_item = LTreeWidgetItem(self, str(self.icon_path), Mf.current_mf.mf_alias, 0, os.sep)
         self.addTopLevelItem(root_item)
 
         task = DbDirsLoader(Mf.current_mf)
         task.sigs.finished_.connect(lambda lst: self.build_tree(root_item, lst))
         UThreadPool.start(task)
 
-    def build_tree(self, root_item: UTreeWidgetItem, paths: list[str]) -> None:
-        self.items: dict[str, UTreeWidgetItem] = {os.sep: root_item}
+    def build_tree(self, root_item: LTreeWidgetItem, paths: list[str]) -> None:
+        self.items: dict[str, LTreeWidgetItem] = {os.sep: root_item}
         hide_digits = self.need_hide_digits()
 
         for path in sorted(paths):
@@ -86,13 +88,9 @@ class TreeWid(UTreeWidget):
             if parent_item is None:
                 continue
 
-            child = UTreeWidgetItem(path, [name])
-            child.setIcon(0, QIcon(str(self.icon_path)))
-            child.setSizeHint(0, QSize(0, ITEM_HEIGHT))
-            child.setData(0, Qt.ItemDataRole.UserRole, path)
-            child.setToolTip(1, os.path.basename(path))
+            child = LTreeWidgetItem(self, str(self.icon_path), name, 5, path)
+            child.set_level_indentation()
             parent_item.addChild(child)
-
             self.items[path] = child
 
         # сортировка после построения
@@ -114,8 +112,8 @@ class TreeWid(UTreeWidget):
         self.setCurrentItem(item)
         self.scrollToItem(item, UTreeWidget.ScrollHint.PositionAtCenter)
 
-    def on_item_click(self, item: UTreeWidgetItem, col: int):
-        abs_path = item.data(0, Qt.ItemDataRole.UserRole)
+    def on_item_click(self, item: LTreeWidgetItem, col: int):
+        abs_path = item.path
         if abs_path == self.abs_selected_path:
             return
         self.abs_selected_path = abs_path
@@ -153,12 +151,12 @@ class TreeWid(UTreeWidget):
             first_item.setExpanded(True)
             self.setCurrentItem(first_item)
 
-        item: UTreeWidgetItem = self.itemAt(a0.pos())
+        item: LTreeWidgetItem = self.itemAt(a0.pos())
         menu = UMenu(a0)
 
         abs_path = os.sep
         if item:
-            abs_path = item.data(0, Qt.ItemDataRole.UserRole)
+            abs_path = item.path
             rel_path = Utils.remove_mf_path(Mf.current_mf.mf_current_path, abs_path)
             self.abs_selected_path = abs_path
             view = QAction(Lng.open[JsonData.lng_index], menu)
@@ -213,8 +211,8 @@ class TreeWid(UTreeWidget):
 
 
 class MfListItem(UListWidgetItem):
-    def __init__(self, parent, text = None):
-        super().__init__(parent, ITEM_HEIGHT, text)
+    def __init__(self, parent, text: str):
+        super().__init__(parent, text)
         self.mf: Mf = None
 
 
@@ -225,7 +223,7 @@ class MfList(UListWidget):
     icon_path = Static.COMMON_ICONS / "image_folder.svg"
 
     def __init__(self, parent: QWidget):
-        super().__init__(parent=parent)
+        super().__init__()
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
@@ -316,7 +314,7 @@ class MenuLeft(QWidget):
         self.splitter.setOrientation(Qt.Orientation.Vertical)
         v_lay.addWidget(self.splitter)
 
-        self.tree_wid = TreeWid()
+        self.tree_wid = LTreeWidget()
         self.splitter.addWidget(self.tree_wid)
         self.tree_wid.reveal.connect(
             lambda rel_paths: self.reveal.emit(rel_paths)

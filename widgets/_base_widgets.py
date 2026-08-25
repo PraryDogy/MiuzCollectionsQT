@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QPoint, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
                          QIcon, QMouseEvent, QPainter, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
@@ -229,9 +229,8 @@ class UListWidgetItem(QListWidgetItem):
     CUSTOM_HEIGHT = 30
 
     def __init__(self, parent: QListWidget, text: str):
-        super().__init__(parent)
-        self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
-        self.setText(text)
+        super().__init__(text, parent)
+        # self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
 
     def set_checkable(self):
         self.setFlags(self.flags() | Qt.ItemFlag.ItemIsUserCheckable)
@@ -242,20 +241,34 @@ class UTreeWidgetItem(QTreeWidgetItem):
     ICON_SIZE = (16, 16)
     CUSTOM_HEIGHT = 30
 
-    def __init__(self, parent: QTreeWidget, text: str, level: int):
+    def __init__(self, parent: QTreeWidget, icon_path: str, text: str, level: int):
        
-        super().__init__([text, ])
+        super().__init__(parent, [text, ])
+        self.setSizeHint(0, QSize(parent.width(), self.CUSTOM_HEIGHT))
+        self.setIcon(0, QIcon(icon_path))
+
+        self.icon_path = icon_path
         self.level = level
-        self.set_level_indentation(column=0)
+        # self.set_level_indentation()
 
-    def set_level_indentation(self, column: int):
-        indent_step = 20  
+    def set_level_indentation(self):
+        return
+        indent_step = 20
         base_w, base_h = self.ICON_SIZE
-        total_width = base_w + (self.level * indent_step)
-        pixmap = QPixmap(total_width, base_h)
-        pixmap.fill(Qt.GlobalColor.transparent)
-        self.setIcon(column, QIcon(pixmap))
+        left_padding = self.level * indent_step
+        total_width = left_padding + base_w
+        
+        extended_pixmap = QPixmap(total_width, base_h)
+        extended_pixmap.fill(Qt.GlobalColor.transparent)
 
+        original_icon = self.icon(0)
+        original_pixmap = original_icon.pixmap(base_w, base_h)
+        painter = QPainter(extended_pixmap)
+        painter.drawPixmap(QPoint(left_padding, 0), original_pixmap)
+        painter.end()
+
+        self.setIcon(0, QIcon(extended_pixmap))
+        
 
 class UListWidget(QListWidget):
     ICON_SIZE = (16, 16)
