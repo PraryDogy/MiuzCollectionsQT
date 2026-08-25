@@ -89,7 +89,6 @@ class LTreeWidget(UTreeWidget):
                 continue
 
             child = LTreeWidgetItem(self, name, path)
-            child.set_level_indentation()
             parent_item.addChild(child)
             self.items[path] = child
 
