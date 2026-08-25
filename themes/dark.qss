@@ -135,6 +135,13 @@ VListWidget::item:selected:!active {
 
 
 
+QTreeView::item:has-children,
+QTreeView::item:has-children:!active {
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+
 
 QPushButton {
     background: #4e4e4e;

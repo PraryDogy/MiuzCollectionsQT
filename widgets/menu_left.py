@@ -15,38 +15,26 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMenu, VListWidget, VListWidgetItem
+from ._base_widgets import (UListWidget, UListWidgetItem, UMenu, UTreeWidget,
+                            UTreeWidgetItem)
 
 ITEM_HEIGHT = 25
 
 
-class UTreeWidgetItem(QTreeWidgetItem):
-    def __init__(self, abs_path: str, other):
-        super().__init__(other)
 
-
-class TreeWid(QTreeWidget):
+class TreeWid(UTreeWidget):
     reveal = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
     on_hide_digits_clicked = pyqtSignal()
     
-    icon_size = (16, 16)
     icon_path = Static.COMMON_ICONS / "base_folder.svg"
 
     def __init__(self):
         super().__init__()
-        self.setIconSize(QSize(*self.icon_size))
-        self.setHeaderHidden(True)
-        self.setAutoScroll(False)
         self.itemClicked.connect(self.on_item_click)
         self.abs_selected_path: str = os.sep
         self.items: dict[str, UTreeWidgetItem] = {}
-
-        # self.setAllColumnsShowFocus(True)
-        # self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.setIndentation(0)
-
 
     def need_hide_digits(self):
         if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
@@ -226,13 +214,13 @@ class TreeWid(QTreeWidget):
         return super().contextMenuEvent(a0)
 
 
-class MfListItem(VListWidgetItem):
+class MfListItem(UListWidgetItem):
     def __init__(self, parent, text = None):
         super().__init__(parent, ITEM_HEIGHT, text)
         self.mf: Mf = None
 
 
-class MfList(VListWidget):
+class MfList(UListWidget):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
@@ -243,7 +231,7 @@ class MfList(VListWidget):
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
-        self.setDragDropMode(VListWidget.DragDropMode.InternalMove)
+        self.setDragDropMode(UListWidget.DragDropMode.InternalMove)
         self.init_ui()
         self.setCurrentRow(0)
 

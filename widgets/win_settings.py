@@ -28,8 +28,8 @@ from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow, UGroupBox,
                             UMainWidget, UMenu, UPushButton, USpinBox,
-                            UTextEditDark, VListSpacerItem, VListWidget,
-                            VListWidgetItem, WarningWindow)
+                            UTextEditDark, UListSpacerItem, UListWidget,
+                            UListWidgetItem, WarningWindow)
 
 
 def restart_app():
@@ -861,36 +861,36 @@ class WinSettings(UMainWidget):
         self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.central_layout.addWidget(self.splitter)
 
-        self.left_menu = VListWidget()
+        self.left_menu = UListWidget()
         self.left_menu.clicked.connect(self.left_menu_click)
         self.splitter.addWidget(self.left_menu)
 
-        main_settings_item = VListWidgetItem(
+        main_settings_item = UListWidgetItem(
             parent=self.left_menu,
             text=Lng.general[JsonData.lng_index]
         )
         main_settings_item.setIcon(QIcon(str(self.settings_svg)))
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = VListWidgetItem(
+        filter_settings = UListWidgetItem(
             parent=self.left_menu,
             text=Lng.filters[JsonData.lng_index]
         )
         filter_settings.setIcon(QIcon(str(self.filters_svg)))
         self.left_menu.addItem(filter_settings)
 
-        new_folder = VListWidgetItem(
+        new_folder = UListWidgetItem(
             parent=self.left_menu,
             text=Lng.new_folder[JsonData.lng_index]
         )
         new_folder.setIcon(QIcon(str(self.new_folder_svg)))
         self.left_menu.addItem(new_folder)
         
-        spacer = VListSpacerItem(self.left_menu)
+        spacer = UListSpacerItem(self.left_menu)
         self.left_menu.addItem(spacer)
 
         for i in Mf.items:
-            new_folder = VListWidgetItem(self.left_menu, text=i.mf_alias)
+            new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
             new_folder.setIcon(QIcon(str(self.image_folder_svg)))
             self.left_menu.addItem(new_folder)
 
@@ -934,7 +934,7 @@ class WinSettings(UMainWidget):
             else:
                 r_wid = NewMfSettings()
         elif idx > 3:
-            item: VListWidgetItem = self.left_menu.item(idx)
+            item: UListWidgetItem = self.left_menu.item(idx)
             for index, mf in enumerate(Mf.items):
                 if mf.mf_alias == item.text():
                     r_wid = MfSettings(index)

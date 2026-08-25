@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-                         QMouseEvent, QPainter)
+                         QIcon, QMouseEvent, QPainter, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QDateEdit, QFileDialog, QFrame, QGroupBox,
                              QHBoxLayout, QLabel, QLineEdit, QListWidget,
@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (QDateEdit, QFileDialog, QFrame, QGroupBox,
                              QPushButton, QScrollArea, QSlider, QSpacerItem,
                              QSpinBox, QStackedWidget, QStyle,
                              QStyledItemDelegate, QTextEdit, QTreeWidget,
-                             QVBoxLayout, QWidget)
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -216,10 +216,12 @@ class VScrollArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 
-class VListWidgetItem(QListWidgetItem):
-    def __init__(self, parent: QListWidget, height: int = 30, text: str | None = None):
+class UListWidgetItem(QListWidgetItem):
+    CUSTOM_HEIGHT = 30
+
+    def __init__(self, parent: QListWidget, text: str | None = None):
         super().__init__(parent)
-        self.setSizeHint(QSize(parent.width(), height))
+        self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
         if text:
             self.setText(text)
 
@@ -232,26 +234,56 @@ class VListWidgetItem(QListWidgetItem):
         )
 
 
-class VListSpacerItem(QListWidgetItem):
-    def __init__(self, parent: QListWidget, height: int = 15):
+class UListSpacerItem(QListWidgetItem):
+    CUSTOM_HEIGHT = (30, 30)
+
+    def __init__(self, parent: QListWidget):
         super().__init__()
-        self.setSizeHint(QSize(parent.width(), height))
+        self.setSizeHint(QSize(parent.width(), self.CUSTOM_HEIGHT))
         self.setFlags(
             Qt.ItemFlag.NoItemFlags
         )
 
 
-class VListWidget(QListWidget):
-    icon_size = 16
+
+class UTreeWidgetItem(QTreeWidgetItem):
+    ICON_SIZE = 16
+
+    def __init__(self, text: str, level: int):
+       
+        super().__init__([text, ])
+        self.level = level
+        self.set_level_indentation(column=0)
+
+    def set_level_indentation(self, column):
+        indent_step = 20  
+        base_w, base_h = self.ICON_SIZE
+        total_width = base_w + (self.level * indent_step)
+        pixmap = QPixmap(total_width, base_h)
+        pixmap.fill(Qt.GlobalColor.transparent)
+        self.setIcon(column, QIcon(pixmap))
+
+
+class UListWidget(QListWidget):
+    ICON_SIZE = 16
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.horizontalScrollBar().setDisabled(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setIconSize(QSize(self.icon_size, self.icon_size))
+        self.setIconSize(QSize(*self.ICON_SIZE))
 
 
+class UTreeWidget(QTreeWidget):
+    def __init__(self):
+        super().__init__()
+        self.horizontalScrollBar().setDisabled(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setIconSize(QSize(*self.ICON_SIZE))
 
+        self.setHeaderHidden(True)
+        self.setAutoScroll(False)
+        self.setIndentation(0)
 
 
 class UPushButton(QPushButton):

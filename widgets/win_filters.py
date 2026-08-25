@@ -12,8 +12,8 @@ from system.lang import Lng
 
 from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
                             UGroupBox, UMainWidget, UMenu, UPushButton,
-                            UTextEditDark, VListSpacerItem, VListWidget,
-                            VListWidgetItem)
+                            UTextEditDark, UListSpacerItem, UListWidget,
+                            UListWidgetItem)
 from .caledar_widget import Calendar
 
 
@@ -261,14 +261,14 @@ class WinFilters(UMainWidget):
         list_group_lay.setContentsMargins(1, 10, 1, 1)
         list_group_lay.setSpacing(0)
         
-        self.list_widget = VListWidget()
+        self.list_widget = UListWidget()
         self.list_widget.itemClicked.connect(self.item_cmd)
         list_group_lay.addWidget(self.list_widget)
         
         self.splitter.addWidget(self.list_group)
 
         # Заполнение списка элементами
-        favs_item = VListWidgetItem(
+        favs_item = UListWidgetItem(
             parent=self.list_widget,
             text=Lng.favorites[JsonData.lng_index],
             height=self.item_h
@@ -278,7 +278,7 @@ class WinFilters(UMainWidget):
         if Dynamic.filter_favs:
             favs_item.setCheckState(Qt.CheckState.Checked)
 
-        folder_item = VListWidgetItem(
+        folder_item = UListWidgetItem(
             parent=self.list_widget,
             text=Lng.without_subfolders[JsonData.lng_index],
             height=self.item_h
@@ -289,11 +289,11 @@ class WinFilters(UMainWidget):
             folder_item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.addItem(
-            VListSpacerItem(parent=self.list_widget)
+            UListSpacerItem(parent=self.list_widget)
         )
 
         for i in Filters.items:
-            item = VListWidgetItem(
+            item = UListWidgetItem(
                 parent=self.list_widget,
                 text=i,
                 height=self.item_h
@@ -385,8 +385,8 @@ class WinFilters(UMainWidget):
         
         return ', '.join(active_list)
 
-    def item_cmd(self, item: VListWidgetItem):
-        if isinstance(item, VListSpacerItem):
+    def item_cmd(self, item: UListWidgetItem):
+        if isinstance(item, UListSpacerItem):
             return
         if item.text() == Lng.favorites[JsonData.lng_index]:
             if Dynamic.filter_favs:

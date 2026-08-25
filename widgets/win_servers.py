@@ -13,7 +13,7 @@ from system.lang import Lng
 from system.servers import Servers
 
 from ._base_widgets import (ConfirmWindow, UGroupBox, ULineEditDark, UMainWidget,
-                            UMenu, UPushButton, VListWidget, VListWidgetItem)
+                            UMenu, UPushButton, UListWidget, UListWidgetItem)
 
 
 @dataclass(slots=True)
@@ -24,8 +24,8 @@ class ServerItem:
     password: str
 
 
-class ServerListItem(VListWidgetItem):
-    def __init__(self, parent: VListWidget, text: str, server_item: ServerItem):
+class ServerListItem(UListWidgetItem):
+    def __init__(self, parent: UListWidget, text: str, server_item: ServerItem):
         super().__init__(parent=parent, text=text)
         self.server_item = server_item
 
@@ -46,7 +46,7 @@ class EyeSvg(QSvgWidget):
         return super().enterEvent(a0)
     
 
-class ServerList(VListWidget):
+class ServerList(UListWidget):
     edit_server = pyqtSignal(ServerItem)
     remove_server = pyqtSignal(ServerItem)
     connect_server = pyqtSignal()
