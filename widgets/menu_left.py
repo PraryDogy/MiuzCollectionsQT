@@ -39,13 +39,14 @@ class TreeWid(QTreeWidget):
         self.setIconSize(QSize(*self.icon_size))
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
-        self.setIndentation(15)
         self.itemClicked.connect(self.on_item_click)
         self.abs_selected_path: str = os.sep
         self.items: dict[str, UTreeWidgetItem] = {}
 
-        self.setAllColumnsShowFocus(True)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        # self.setAllColumnsShowFocus(True)
+        # self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setIndentation(0)
+
 
     def need_hide_digits(self):
         if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:

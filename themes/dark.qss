@@ -119,11 +119,18 @@ QListWidget {
 }
 
 
+QTreeView::item,
+QListWidget::item {
+    background: transparent;
+    border-radius: 5px;
+}
+
 QTreeView::item:selected,
 QTreeView::item:selected:!active,
 QListWidget::item:selected,
 QListWidget::item:selected:!active {
     background: #2b2b2b;
+    border-radius: 5px;
 }
 
 
