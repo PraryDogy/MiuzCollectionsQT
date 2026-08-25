@@ -31,18 +31,18 @@ QMenu {
     background: #2b2b2b;
     border: 1px solid #353535;
     border-radius: 10px;
-    padding: 10px 2px 10px 2px;
+    padding: 5px 5px 5px 5px;
 }
 
 QMenu::item {
     background: transparent;
-    padding: 3px 16px;
+    padding: 5px 15px 5px 15px;
     color: #ffffff;
 }
 
 QMenu::item:selected {
     background: #0059d1;
-    padding: 3px 16px;
+    padding: 5px 15px 5px 15px;
     color: #ffffff;
 }
 
@@ -108,7 +108,7 @@ QListWidget {
     color: #ffffff;
     background: #171717;
     border-radius: 10px;
-    padding: 10 5 10 5;
+    padding: 5px 5px 5px 5px;
     border: 1px solid #353535;
 }
 
