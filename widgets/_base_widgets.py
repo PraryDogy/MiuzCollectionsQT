@@ -217,20 +217,16 @@ class VScrollArea(QScrollArea):
 
 
 class UListSpacerItem(QListWidgetItem):
-    ITEM_HEIGHT = 30
 
     def __init__(self, parent: QListWidget):
         super().__init__()
-        self.setSizeHint(QSize(parent.width(), self.ITEM_HEIGHT))
         self.setFlags(Qt.ItemFlag.NoItemFlags)
 
 
 class UListWidgetItem(QListWidgetItem):
-    ITEM_HEIGHT = 30
 
     def __init__(self, parent: QListWidget, text: str):
         super().__init__(text, parent)
-        self.setSizeHint(QSize(parent.width(), self.ITEM_HEIGHT))
 
     def set_checkable(self):
         self.setFlags(self.flags() | Qt.ItemFlag.ItemIsUserCheckable)
@@ -240,10 +236,9 @@ class UListWidgetItem(QListWidgetItem):
 class UTreeWidgetItem(QTreeWidgetItem):
     ITEM_HEIGHT = 30
 
-    def __init__(self, parent: QTreeWidget, text: str):
+    def __init__(self, parent: QTreeWidget | QTreeWidgetItem, text: str):
         # Важно: инициализируем суперкласс, передавая родителя
         super().__init__(parent, [text])
-        self.setSizeHint(0, QSize(parent.width(), self.ITEM_HEIGHT))
 
 
 class UListWidget(QListWidget):
@@ -267,7 +262,7 @@ class UTreeWidget(QTreeWidget):
 
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
-        self.setIndentation(0)
+        self.setIndentation(15)
 
 
 class UPushButton(QPushButton):

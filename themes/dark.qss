@@ -114,23 +114,23 @@ VListWidget {
     color: #ffffff;
     background: #171717;
     border-radius: 10px;
-    padding: 10 2 10 2;
+    padding: 10 5 10 5;
     border: 1px solid #353535;
 }
 
 
-UTreeWidget::item,
-VListWidget::item {
+QTreeWidget::item,
+QListWidget::item {
     background: transparent;
-    border-radius: 5px;
+    height: 30px;
 }
 
-UTreeWidget::item:selected,
-UTreeWidget::item:selected:!active,
-VListWidget::item:selected,
-VListWidget::item:selected:!active {
+QTreeWidget::item:selected,
+QTreeWidget::item:selected:!active,
+QListWidget::item:selected,
+QListWidget::item:selected:!active {
     background: #2b2b2b;
-    border-radius: 5px;
+    height: 30px;
 }
 
 

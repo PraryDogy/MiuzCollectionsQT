@@ -88,7 +88,7 @@ class LTreeWidget(UTreeWidget):
             if parent_item is None:
                 continue
 
-            child = LTreeWidgetItem(self, name, path)
+            child = LTreeWidgetItem(parent_item, name, path)
             parent_item.addChild(child)
             self.items[path] = child
 
