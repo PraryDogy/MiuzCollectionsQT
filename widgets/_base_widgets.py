@@ -600,7 +600,7 @@ class SaveRowArrowWidget(RowArrowWidget):
         self.set_left_icon(self.save_svg)
 
 
-class MfAliasWidget(UGroupBox):
+class MfAliasWidget(QWidget):
     changed = pyqtSignal()
 
     def __init__(self, lng_index: int):
@@ -608,11 +608,14 @@ class MfAliasWidget(UGroupBox):
         self.lng_index = lng_index
 
         v_layout = QVBoxLayout(self)
-        v_layout.setContentsMargins(5, 2, 5, 2)
-        v_layout.setSpacing(5)
+        v_layout.setContentsMargins(0, 0, 0, 0)
+        v_layout.setSpacing(0)
 
         name_text = QLabel(Lng.folder_name[lng_index])
+        name_text.setContentsMargins(2, 0, 2, 0)
         v_layout.addWidget(name_text)
+
+        v_layout.addSpacing(10)
 
         self.line_edit = ULineEditDark()
         self.line_edit.textChanged.connect(self.changed.emit)
@@ -783,7 +786,7 @@ class MfPathWidget(UGroupBox):
         return super().dragEnterEvent(a0)
 
 
-class MfStopListWidget(UGroupBox):
+class MfStopListWidget(QWidget):
     changed = pyqtSignal()
 
     def __init__(self, lng_index: int, mf_stop_list: list[str]):
@@ -791,11 +794,14 @@ class MfStopListWidget(UGroupBox):
         self.lng_index = lng_index
 
         v_layout = QVBoxLayout(self)
-        v_layout.setContentsMargins(5, 2, 5, 2)
-        v_layout.setSpacing(5)
+        v_layout.setContentsMargins(0, 0, 0, 0)
+        v_layout.setSpacing(0)
 
         name_text = QLabel(Lng.ignore_list_descr[lng_index])
+        name_text.setContentsMargins(2, 0, 2, 0)
         v_layout.addWidget(name_text)
+
+        v_layout.addSpacing(10)
 
         self.text_edit = UTextEditDark()
         self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
