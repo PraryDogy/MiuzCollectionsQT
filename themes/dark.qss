@@ -143,6 +143,24 @@ QListWidget::branch:selected:!active {
 }
 
 
+/* Общий стиль для чекбокса (не отмечен) */
+QListWidget::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #353535;
+    border-radius: 4px;
+}
+
+
+QListWidget::indicator:checked {
+    image: url(./icons/common/arrow_down.svg); 
+}
+
+QListWidget::indicator:disabled {
+    background-color: #101010;
+    border-color: #222222;
+}
+
 
 
 QPushButton {
