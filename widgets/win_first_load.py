@@ -72,7 +72,7 @@ class FirstLoadWin(UMainWidget):
         self.margins = 3
         self.init_ui()
         self.adjustSize()
-        self.setFixedHeight(self.height())
+        # self.setFixedHeight(self.height())
 
     def remove_ui(self):
         while self.central_layout.count():
@@ -113,18 +113,13 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.lng_container)
         
         lng_layout = QHBoxLayout(self.lng_container)
-        lng_layout.setContentsMargins(5, 7, 5, 0)
+        lng_layout.setContentsMargins(*RowArrowWidget.group_margings)
         lng_layout.setSpacing(10)
 
-        lng_icon = QSvgWidget()
-        lng_icon.load(str(self.language_svg))
-        lng_icon.setFixedSize(self.svg_size, self.svg_size)
-        lng_layout.addWidget(lng_icon)
-
-        lng_label = QLabel(lng_label_text)
-        lng_layout.addWidget(lng_label)
-        lng_layout.addStretch()
-
+        lng_wid = RowArrowWidget(lng_label_text)
+        lng_wid.set_left_icon(str(self.language_svg))
+        lng_wid.hide_arrow()
+        lng_layout.addWidget(lng_wid)
 
         lng_icons = (
             QIcon(str(self.rus_flag)),
@@ -186,8 +181,6 @@ class FirstLoadWin(UMainWidget):
                 lambda: self.copy_zip_cmd()
             )
             last_block_layout.addWidget(self.copy_zip_widget)
-
-        last_block_layout.addWidget(HSep())
 
         self.save_widget = SaveRowArrowWidget(self.lng_index)
         self.save_widget.clicked.connect(lambda: self.save_cmd())

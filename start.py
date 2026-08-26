@@ -135,6 +135,7 @@ class App(QApplication):
             UThreadPool.init()
             self.create_app()
         else:
+            ThemeChanger.init()
             self.first_load_win = FirstLoadWin()
             self.first_load_win.show()
 
