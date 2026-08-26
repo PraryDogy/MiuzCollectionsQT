@@ -309,8 +309,9 @@ CalendarDaySelected {
     color: #ffffff;
     background-color: #0078D4;
     font-weight: bold;
-    border-radius: 20px;
+    margin: 5px;
     border: none;
+    border-radius: 20px;
 }
 
 
