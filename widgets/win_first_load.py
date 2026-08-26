@@ -8,8 +8,7 @@ from zipfile import ZipFile
 from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMenu,
-                             QVBoxLayout)
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLabel, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -18,7 +17,7 @@ from system.tasks import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
                             RowArrowWidget, SaveRowArrowWidget, UGroupBox,
-                            UMainWidget, UPushButton)
+                            UMainWidget, UMenu, UPushButton)
 
 
 def restart_app():
@@ -89,7 +88,7 @@ class FirstLoadWin(UMainWidget):
         self.init_path_widget()
         self.init_last_block()
 
-    def lng_action(self, value: int):
+    def change_language(self, value: int):
         if self.lng_index == value:
             return
         self.remove_ui()
@@ -126,27 +125,27 @@ class FirstLoadWin(UMainWidget):
         lng_layout.addWidget(lng_label)
         lng_layout.addStretch()
 
+
+        lng_icons = (
+            QIcon(str(self.rus_flag)),
+            QIcon(str(self.eng_flag))
+        )
+
+        lng_menu = UMenu(None)
+        for value in (0, 1):
+            action = QAction(Lng.russian[value], lng_menu)
+            action.setIcon(lng_icons[value])
+            action.setIconVisibleInMenu(True)
+            action.triggered.connect(lambda e, v=value: self.change_language(v))
+            lng_menu.addAction(action)
+
         lng_btn = UPushButton(lng_btn_text)
         lng_btn.setFixedWidth(100)
+        lng_btn.setMenu(lng_menu)
         lng_btn.setIcon(lng_btn_icon)
         lng_layout.addWidget(lng_btn)
 
-        lng_menu = QMenu(lng_btn)
-        lng_btn.setMenu(lng_menu)
-
-        rus_icon = QIcon(str(self.rus_flag))
-        rus_action = QAction(rus_icon, rus_action_text, lng_menu)
-        rus_action.setIconVisibleInMenu(True)
-        rus_action.triggered.connect(lambda e, val=0: self.lng_action(val))
-        lng_menu.addAction(rus_action)
-
-        eng_icon = QIcon(str(self.eng_flag))
-        eng_action = QAction(eng_icon, eng_action_text, lng_menu)
-        eng_action.setIconVisibleInMenu(True)
-        eng_action.triggered.connect(lambda e, val=1: self.lng_action(val))
-        lng_menu.addAction(eng_action)
-
-        self.lng_container.adjustSize()
+        # self.lng_container.adjustSize()
 
     def init_mf_alias_widget(self):
         self.mf_alias_widget = MfAliasWidget(self.lng_index)
