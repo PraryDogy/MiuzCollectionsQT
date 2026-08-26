@@ -377,6 +377,10 @@ class RowArrowWidget(QWidget):
     def show_warning(self):
         self.set_left_icon(self.warning_svg)
 
+    def set_disabled(self):
+        self.blockSignals(True)
+        
+
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
