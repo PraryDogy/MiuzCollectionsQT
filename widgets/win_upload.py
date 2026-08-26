@@ -146,11 +146,11 @@ class UploadWin(UMainWidget):
         right_layout.setContentsMargins(0, 0, 0, 5)
         right_layout.setSpacing(0)
 
-        title = QLabel(Lng.upload_list[JsonData.lng_index])
+        title = QLabel(Lng.upload_list[JsonData.lng_index] + ":")
         title.setContentsMargins(2, 0, 2, 0)
-        right_layout.addWidget(title)
+        # right_layout.addWidget(title)
 
-        right_layout.addSpacing(5)
+        # right_layout.addSpacing(10)
 
         self.list_widget = UListWidget()
         right_layout.addWidget(self.list_widget)

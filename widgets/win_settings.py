@@ -594,7 +594,7 @@ class MfSettings(QWidget):
         text = f"{self.mf.mf_alias}"
         self.name_wid = MfAliasTitle(text)
         
-        header_lay.addWidget(self.icon_wid)
+        # header_lay.addWidget(self.icon_wid)
         header_lay.addWidget(self.name_wid)
         header_lay.addStretch()
 
