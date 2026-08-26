@@ -309,18 +309,19 @@ CalendarDay {
 CalendarDaySelected {
     color: #ffffff;
     background-color: #0078D4;
+    font-weight: bold;
     border: none;
-    /* ХАК ДЛЯ ИДЕАЛЬНОГО КРУГА (При размере виджета 70x60):
-       Вычитаем маргины из общего размера, чтобы получить квадрат 40x40 в центре:
-       Ширина: 70px - 15px (слева) - 15px (справа) = 40px
-       Высота: 60px - 10px (сверху) - 10px (снизу) = 40px
-       Бордер радиус 20 + 20 = 4px */
-    border-radius: 20px;
-    margin-left: 15px;
-    margin-right: 15px;
+    border-radius: 15px; /* Половина от полученного размера (30px) делает квадрат кругом */
+    /* ХАК ДЛЯ ИДЕАЛЬНОГО КРУГА (При размере виджета 65x50):
+       Вычитаем маргины, чтобы получить квадрат 30x30 в центре:
+       Ширина: 65px - 17px - 18px = 30px
+       Высота: 50px - 10px - 10px = 30px */
+    margin-left: 17px;
+    margin-right: 18px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
 
 
 WinImgViewGraphics, BlackBgFrame {
