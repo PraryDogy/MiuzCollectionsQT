@@ -133,13 +133,15 @@ QListWidget::item:selected:!active {
     height: 30px;
 }
 
-QTreeView::branch,
-QTreeView::branch:selected,
-QTreeView::branch:selected:!active,
-QListWidget::branch,
-QListWidget::branch:selected:!focus,
-QListWidget::branch:selected:!active {
-    color: #ffffff;
+QTreeView::branch:has-children:closed {
+    background: transparent;
+    image: url(./icons/common/arrow_right.svg); 
+}
+
+
+QTreeView::branch:has-children:open {
+    background: transparent;
+    image: url(./icons/common/arrow_down.svg); 
 }
 
 
