@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 class Themes:
+    auto = "auto"
     dark = "dark"
     light = "light"
 
