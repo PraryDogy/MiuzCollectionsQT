@@ -755,11 +755,13 @@ class MfPathWidget(UGroupBox):
             win_warn.center_to_parent(self.window())
             win_warn.show()
 
+        print(self.mf_path)
+
         if not self.mf_path:
-            show_warn(Lng.select_folder_path[self.lng_index], 260, 90)
+            show_warn(Lng.select_folder_path[self.lng_index], 260, 80)
             return None
         if not os.path.exists(self.mf_path):
-            show_warn(Lng.path_not_exists[self.lng_index], 260, 90)
+            show_warn(Lng.select_folder_path[self.lng_index], 260, 80)
             return None
         return self.mf_path
 
