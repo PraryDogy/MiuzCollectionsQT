@@ -337,7 +337,7 @@ class RowArrowWidget(QWidget):
 
     # обычно эти виджеты помещаются в QGroupBox
     # Это правильные отступы чтобы все красиво смотрелось
-    group_margings = (5, 5, 5, 5)
+    group_margings = (10, 5, 5, 5)
     group_spacing = 5
 
     def __init__(self, text: str):
