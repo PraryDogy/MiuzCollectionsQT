@@ -134,14 +134,16 @@ QListWidget::item:selected:!active {
 }
 
 QTreeView::branch:has-children:closed {
-    background: transparent;
     image: url(./icons/common/arrow_right.svg); 
 }
 
 
 QTreeView::branch:has-children:open {
-    background: transparent;
     image: url(./icons/common/arrow_down.svg); 
+}
+
+QTreeView::branch:selected {
+    background: #2b2b2b;
 }
 
 
