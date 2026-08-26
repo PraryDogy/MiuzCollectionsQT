@@ -1,121 +1,30 @@
-/* СИНИЙ */
-/* background: #0059d1; */
+/* ==========================================================================
+   1. ПАЛИТРА И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (Справочник цветов)
+   ========================================================================== */
+/* 
+   СИНИЙ (Акцент):            #0059d1 / #0078D4
+   ФОН ТЕМНЫЙ:                #1e1e1e (Основной) / #171717 (Потемнее)
+   ФОН СВЕТЛЫЙ (Панели):      #2b2b2b
+   ГРАНИЦЫ / СЕТКИ:           #353535
+   ТЕКСТ:                     #ffffff (Белый) / #818181 / #888888 (Серый)
+*/
 
-/* ФОН ПОСВЕТЛЕЕ */
-/* background: #2b2b2b; */
-
-/* ФОН ПОСВЕТЛЕЕ БОРДЕР */
-/* border: 1px solid #353535; */
-
-/* ФОН */
-/* background: #1e1e1e; */
-
-/* ФОН ПОТЕМНЕЕ */
-/* background: #171717; */
-
-
-
+/* ==========================================================================
+   2. БАЗОВЫЕ ЭЛЕМЕНТЫ QT (Глобальные стили)
+   ========================================================================== */
 .QFrame {
     background: #1e1e1e;
     border: none;
 }
 
-
 QLabel {
     color: #ffffff;
 }
 
-
-
-QMenu {
-    background: #2b2b2b;
-    border: 1px solid #353535;
-    border-radius: 10px;
-    padding: 5px;
-}
-
-QMenu::item {
-    background: transparent;
-    color: #ffffff;
-    padding: 5px 30px 5px 5px; 
-}
-
-QMenu::item:selected {
-    background: #0059d1;
-    color: #ffffff;
-    padding: 5px 30px 5px 5px; 
-}
-
-QMenu::icon {
-    padding-left: 5px;
-}
-
-
-QMenu::indicator {
-    width: 16px;
-    height: 16px;
-    padding-left: 5px; /* Отступ от левого края меню */
-}
-
-QMenu::indicator:checked {
-    image: url(./icons/common/arrow_down.svg);
-}
-
-QMenu::indicator:unchecked {
-    image: none; 
-}
-
-
-
-
 QScrollArea {
-    border: none;
     background: transparent;
+    border: none;
 }
-
-
-QLineEdit {
-    color: #ffffff;
-    border: 1px solid #353535;
-    border-radius: 6px;
-    padding-left: 2px;
-    padding-right: 28px;
-}
-
-ULineEditLight {
-    background: #2b2b2b;
-}
-
-
-ULineEditDark {
-    background: #171717;
-}
-
-
-MfAliasTitle {
-    color: #ffffff;
-    font-size: 23px;
-    font-weight: bold;
-}
-
-
-QTextEdit {
-    color: #ffffff;
-    border: 1px solid #353535;
-    border-radius: 6px;
-    padding-left: 2px;
-    padding-right: 2px;
-}
-
-UTextEditLight {
-    background: #2b2b2b;
-}
-
-UTextEditDark {
-    background: #171717;
-}
-
-
 
 QGroupBox {
     background-color: transparent;
@@ -123,75 +32,23 @@ QGroupBox {
     border-radius: 6px;
 }
 
-
-
-QTreeView,
-QListWidget {
-    color: #ffffff;
-    background: #171717;
-    border-radius: 10px;
-    padding: 5px 5px 5px 5px;
-    border: 1px solid #353535;
+HSep {
+    background: #353535;
 }
 
-
-QTreeView::item,
-QListWidget::item {
-    color: #ffffff;
-    background: transparent;
-    height: 30px;
+GrayTextLabel {
+    color: #818181;
 }
 
-QTreeView::item:selected,
-QTreeView::item:selected:!active,
-QListWidget::item:selected,
-QListWidget::item:selected:!active {
-    color: #ffffff;
-    background: #2b2b2b;
-    height: 30px;
-}
-
-QTreeView::branch:has-children:closed {
-    image: url(./icons/common/arrow_right.svg); 
-}
-
-
-QTreeView::branch:has-children:open {
-    image: url(./icons/common/arrow_down.svg); 
-}
-
-QTreeView::branch:selected {
-    background: #2b2b2b;
-}
-
-
-/* Общий стиль для чекбокса (не отмечен) */
-QListWidget::indicator {
-    width: 16px;
-    height: 16px;
-    border: 1px solid #353535;
-    border-radius: 4px;
-}
-
-
-QListWidget::indicator:checked {
-    image: url(./icons/common/arrow_down.svg); 
-}
-
-QListWidget::indicator:disabled {
-    background-color: #101010;
-    border-color: #222222;
-}
-
-
-
+/* ==========================================================================
+   3. КНОПКИ И СЛАЙДЕРЫ (Элементы управления)
+   ========================================================================== */
 QPushButton {
     background: #4e4e4e;
     border: 1px solid #585858;
     border-radius: 4px;
     color: #ffffff;
-    /* Добавляем отступ справа, чтобы текст не наезжал на стрелочку */
-    padding-right: 1px; 
+    padding-right: 1px; /* Отступ справа, чтобы текст не наезжал на стрелочку */
 }
 
 QPushButton:pressed {
@@ -199,32 +56,17 @@ QPushButton:pressed {
     border: 1px solid #6a6a6a;
 }
 
-/* Стилизация стрелочки меню */
 QPushButton::menu-indicator {
     image: url("./icons/common/arrow_down.svg");
-    width: 12px; /* Ширина иконки */
-    height: 12px; /* Высота иконки */
+    width: 12px;
+    height: 12px;
 }
-
-
-
-HSep {
-    background: #353535;
-}
-
-
-GrayTextLabel {
-    color: #818181;
-}
-
-
-
 
 QSlider::groove:horizontal {
-    border-radius: 1px;
-    height: 3px;
-    margin: 0px;
     background-color: #353535;
+    height: 3px;
+    border-radius: 1px;
+    margin: 0px;
 }
 
 QSlider::handle:horizontal {
@@ -236,9 +78,30 @@ QSlider::handle:horizontal {
     padding: -4px 0px;
 }
 
+/* ==========================================================================
+   4. ПОЛЯ ВВОДА И СПИНБОКСЫ (Формы)
+   ========================================================================== */
+QLineEdit {
+    color: #ffffff;
+    border: 1px solid #353535;
+    border-radius: 6px;
+    padding-left: 2px;
+    padding-right: 28px;
+}
 
+ULineEditLight { background: #2b2b2b; }
+ULineEditDark  { background: #171717; }
 
+QTextEdit {
+    color: #ffffff;
+    border: 1px solid #353535;
+    border-radius: 6px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
 
+UTextEditLight { background: #2b2b2b; }
+UTextEditDark  { background: #171717; }
 
 USpinBox, QDateEdit {
     background: #3E3E3E;
@@ -248,9 +111,9 @@ USpinBox, QDateEdit {
 }
 
 USpinBox::up-button, QDateEdit::up-button {
+    background: #3E3E3E;
     width: 17px;
     height: 10px;
-    background: #3E3E3E;
     margin-top: 2px;
     margin-right: 2px;
     border-radius: 3px;
@@ -261,9 +124,9 @@ USpinBox::up-button:pressed, QDateEdit::up-button:pressed {
 }
 
 USpinBox::down-button, QDateEdit::down-button {
+    background: #3E3E3E;
     width: 17px;
     height: 10px;
-    background: #3E3E3E;
     margin-bottom: 2px;
     margin-right: 2px;
     border-radius: 3px;
@@ -285,9 +148,87 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
     height: 9px;
 }
 
+/* ==========================================================================
+   5. ВСПЛЫВАЮЩИЕ МЕНЮ (QMenu)
+   ========================================================================== */
+QMenu {
+    background: #2b2b2b;
+    border: 1px solid #353535;
+    border-radius: 10px;
+    padding: 5px;
+}
 
+QMenu::item {
+    background: transparent;
+    color: #ffffff;
+    padding: 5px 30px 5px 5px; 
+}
 
+QMenu::item:selected {
+    background: #0059d1;
+    color: #ffffff;
+}
 
+QMenu::icon {
+    padding-left: 5px;
+}
+
+QMenu::indicator {
+    width: 16px;
+    height: 16px;
+    padding-left: 5px; /* Отступ от левого края меню */
+}
+
+QMenu::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+QMenu::indicator:unchecked {
+    image: none; 
+}
+
+/* ==========================================================================
+   6. СПИСКИ И ДЕРЕВЬЯ (Дерево элементов)
+   ========================================================================== */
+QTreeView, QListWidget {
+    color: #ffffff;
+    background: #171717;
+    border: 1px solid #353535;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+QTreeView::item, QListWidget::item {
+    color: #ffffff;
+    background: transparent;
+    height: 30px;
+}
+
+QTreeView::item:selected, QTreeView::item:selected:!active,
+QListWidget::item:selected, QListWidget::item:selected:!active {
+    color: #ffffff;
+    background: #2b2b2b;
+}
+
+QTreeView::branch:has-children:closed { image: url(./icons/common/arrow_right.svg); }
+QTreeView::branch:has-children:open   { image: url(./icons/common/arrow_down.svg); }
+QTreeView::branch:selected            { background: #2b2b2b; }
+
+QListWidget::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #353535;
+    border-radius: 4px;
+}
+
+QListWidget::indicator:checked  { image: url(./icons/common/arrow_down.svg); }
+QListWidget::indicator:disabled { background-color: #101010; border-color: #222222; }
+
+/* ==========================================================================
+   7. КАСТОМНЫЕ КОМПОНЕНТЫ И ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
+   ========================================================================== */
+
+/* --- Модуль: Календарь --- */
 CalendarBigDate {
     font-size: 30pt;
     color: #b2b2b2;
@@ -305,13 +246,13 @@ CalendarDay {
     border-bottom: 1px solid #353535;
 }
 
-
 CalendarDaySelected {
     color: #ffffff;
     background-color: #0078D4;
     font-weight: bold;
     border: none;
     border-radius: 15px; /* Половина от полученного размера (30px) делает квадрат кругом */
+    
     /* ХАК ДЛЯ ИДЕАЛЬНОГО КРУГА (При размере виджета 65x50):
        Вычитаем маргины, чтобы получить квадрат 30x30 в центре:
        Ширина: 65px - 17px - 18px = 30px
@@ -322,7 +263,30 @@ CalendarDaySelected {
     margin-bottom: 10px;
 }
 
+/* --- Модуль: Плитки / Карточки (Thumbnails) --- */
+ThumbImgWidget { border-radius: 10px; }
+ThumbImgWidget[framed="false"] { background: transparent; }
+ThumbImgWidget[framed="true"]  { background-color: #3a3a3a; }
 
+WhiteTextWid {
+    font-size: 11px;
+    border-radius: 5px;
+    padding: 2px;
+}
+WhiteTextWid[framed="false"] { background: transparent; color: #ffffff; }
+WhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
+
+BlueTextWidget {
+    font-size: 11px;
+    color: #767676;
+}
+
+/* --- Модуль: Окна просмотра и заголовки --- */
+MfAliasTitle {
+    color: #ffffff;
+    font-size: 23px;
+    font-weight: bold;
+}
 
 WinImgViewGraphics, BlackBgFrame {
     background: #000000;
@@ -334,46 +298,4 @@ WinInfoLeftLabel, WinInfoSelectableLabel {
 
 ServerLabel {
     padding-left: 1px;
-}
-
-
-/* Базовый стиль для вашего виджета (скругление применяется всегда) */
-ThumbImgWidget {
-    border-radius: 10px;
-}
-
-/* Стиль, когда свойство framed=false (без рамки) */
-ThumbImgWidget[framed="false"] {
-    background: transparent;
-}
-
-/* Стиль, когда свойство framed=true (с рамкой) */
-ThumbImgWidget[framed="true"] {
-    background-color: #3a3a3a;
-}
-
-
-/* Базовые стили для виджета, общие для обоих состояний */
-WhiteTextWid {
-    font-size: 11px;
-    border-radius: 5px;
-    padding: 2px;
-}
-
-/* Состояние: Без рамки (framed = false) */
-WhiteTextWid[framed="false"] {
-    background: transparent;
-    color: #ffffff;
-}
-
-/* Состояние: С рамкой (framed = true) */
-WhiteTextWid[framed="true"] {
-    background: #0059d1;
-    color: #ffffff;
-}
-
-
-BlueTextWidget {
-    font-size: 11px;
-    color: #767676;
 }
