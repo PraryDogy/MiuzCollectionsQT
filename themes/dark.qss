@@ -155,7 +155,7 @@ QMenu {
     background: #2b2b2b;
     border: 1px solid #353535;
     border-radius: 10px;
-    padding: 5px;
+    padding: 5px 5px 5px 5px; /* верх | право | низ | лево */
 }
 
 QMenu::item {
@@ -195,7 +195,7 @@ QTreeView, QListWidget {
     background: #171717;
     border: 1px solid #353535;
     border-radius: 10px;
-    padding: 5px;
+    padding: 10px 5px 10px 5px; /* верх | право | низ | лево */
 }
 
 QTreeView::item, QListWidget::item {
