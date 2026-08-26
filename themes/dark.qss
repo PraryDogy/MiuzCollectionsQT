@@ -238,6 +238,7 @@ QListWidget::indicator {
 QListWidget::indicator:checked  { image: url(./icons/common/arrow_down.svg); }
 QListWidget::indicator:disabled { background-color: #101010; border-color: #222222; }
 
+
 /* ==========================================================================
    7. КАСТОМНЫЕ КОМПОНЕНТЫ И ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
    ========================================================================== */
@@ -312,4 +313,11 @@ WinInfoLeftLabel, WinInfoSelectableLabel {
 
 ServerLabel {
     padding-left: 1px;
+}
+
+QToolTip {
+    color: #FFFFFF;
+    background-color: #2B2B2B;
+    border: 1px solid #454545;
+    padding: 2px;
 }
