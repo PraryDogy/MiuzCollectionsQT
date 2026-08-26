@@ -566,6 +566,8 @@ class MfAliasTitle(QLabel):
 class MfSettings(QWidget):
     repair_svg = Static.COMMON_ICONS / "repair.svg"
     trash_svg = Static.COMMON_ICONS / "trash.svg"
+    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+    image_folder_size = (23, 23)
 
     def __init__(self, mf_index: int):
         super().__init__()
@@ -577,12 +579,26 @@ class MfSettings(QWidget):
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(10)
 
-        self.name_wid = MfAliasTitle(
-            text=f"{self.mf.mf_alias}"
-        )
-        # self.name_wid.hide_arrow()
-        self.name_wid.setContentsMargins(2, 0, 2, 0)
-        main_lay.addWidget(self.name_wid)
+        header_container = QWidget()
+        header_lay = QHBoxLayout(header_container)
+        header_lay.setAlignment(Qt.AlignmentFlag.AlignBottom)
+        header_lay.setContentsMargins(2, 0, 2, 0)
+        header_lay.setSpacing(10)
+
+        # header_container.setStyleSheet("background: red;")
+
+        self.icon_wid = QSvgWidget(str(self.image_folder_svg))
+        self.icon_wid.setFixedSize(*self.image_folder_size)
+
+        text = f"{Lng.alias[JsonData.lng_index]}: {self.mf.mf_alias}"
+        text = f"{self.mf.mf_alias}"
+        self.name_wid = MfAliasTitle(text)
+        
+        header_lay.addWidget(self.icon_wid)
+        header_lay.addWidget(self.name_wid)
+        header_lay.addStretch()
+
+        main_lay.addWidget(header_container)
 
         self.path_widget = MfPathWidget(
             lng_index=JsonData.lng_index,
