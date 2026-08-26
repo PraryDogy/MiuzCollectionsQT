@@ -56,11 +56,6 @@ QPushButton {
     padding-right: 1px;
 }
 
-QPushButton:hover {
-    background: #E2E2E2;
-    border-color: #C5C5C5;
-}
-
 QPushButton:pressed {
     background: #D8D8D8;
     border: 1px solid #BDBDBD;
@@ -215,8 +210,8 @@ QMenu::item {
 }
 
 QMenu::item:selected {
-    background: #0067D9;
-    color: #FFFFFF;
+    background: #E7E7E7;
+    color: #1F1F1F;
 }
 
 QMenu::icon {
@@ -268,10 +263,6 @@ QListWidget::item {
     height: 30px;
 }
 
-QTreeView::item:hover,
-QListWidget::item:hover {
-    background: #F0F0F0;
-}
 
 QTreeView::item:selected,
 QTreeView::item:selected:!active,
