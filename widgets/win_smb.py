@@ -53,7 +53,7 @@ class WinSmb(UMainWidget):
         self.set_close_only()
         self.set_always_on_top()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
-        self.central_layout.setContentsMargins(10, 10, 10, 5)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
 
         self.warn_widget = WarnWidget(mf)
