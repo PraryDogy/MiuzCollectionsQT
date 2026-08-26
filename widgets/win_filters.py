@@ -55,6 +55,7 @@ class DatesWidget(UGroupBox):
         self.main_layout.addWidget(self.title_widget)
 
         self.main_layout.addWidget(HSep())
+        self.main_layout.addSpacing(5)
         
         # --- СТРОКА 1: Виджет панели управления (Вместо вложенного layout) ---
         self.top_row_widget = QWidget()
@@ -322,6 +323,7 @@ class WinFilters(UMainWidget):
         self.active_filters = UTextEditDark()
         self.active_filters.setReadOnly(True)
         self.active_filters.setText(self.get_filters_text())
+        self.active_filters.setFixedHeight(self.right_group_hh)
         right_lay.addWidget(self.active_filters)
 
         # --- Группа для кнопок с нулевыми отступами ---
