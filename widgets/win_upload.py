@@ -4,7 +4,7 @@ import re
 from PyQt6.QtCore import QDir, QSortFilterProxyModel, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QFileSystemModel, QIcon
 from PyQt6.QtWidgets import (QHBoxLayout, QMenu, QSplitter, QTreeView,
-                             QVBoxLayout, QWidget)
+                             QVBoxLayout, QWidget, QLabel)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -144,21 +144,25 @@ class UploadWin(UMainWidget):
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 5)
-        right_layout.setSpacing(10)
+        right_layout.setSpacing(0)
+
+        title = QLabel(Lng.upload_list[JsonData.lng_index])
+        title.setContentsMargins(2, 0, 2, 0)
+        right_layout.addWidget(title)
+
+        right_layout.addSpacing(5)
+
+        self.list_widget = UListWidget()
+        right_layout.addWidget(self.list_widget)
+
+        right_layout.addSpacing(10)
 
         group_one = UGroupBox()
         group_one_layout = QVBoxLayout(group_one)
         group_one_layout.setContentsMargins(*RowArrowWidget.group_margings)
         group_one_layout.setSpacing(RowArrowWidget.group_spacing)
         right_layout.addWidget(group_one)
-
-        title = RowArrowWidget(Lng.upload_list[JsonData.lng_index])
-        title.hide_arrow()
-        group_one_layout.addWidget(title)
-
-        self.list_widget = UListWidget()
-        group_one_layout.addWidget(self.list_widget)
-        
+  
         self.total_files_widget = RowArrowWidget("")
         self.total_files_widget.set_left_icon(self.copy_files_svg)
         self.total_files_widget.hide_arrow()
