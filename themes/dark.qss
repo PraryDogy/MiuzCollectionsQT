@@ -320,3 +320,45 @@ WinInfoLeftLabel, WinInfoSelectableLabel {
 ServerLabel {
     padding-left: 1px;
 }
+
+
+/* Базовый стиль для вашего виджета (скругление применяется всегда) */
+ThumbImgWidget {
+    border-radius: 10px;
+}
+
+/* Стиль, когда свойство framed=false (без рамки) */
+ThumbImgWidget[framed="false"] {
+    background: transparent;
+}
+
+/* Стиль, когда свойство framed=true (с рамкой) */
+ThumbImgWidget[framed="true"] {
+    background-color: #3a3a3a;
+}
+
+
+/* Базовые стили для виджета, общие для обоих состояний */
+WhiteTextWid {
+    font-size: 11px;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+/* Состояние: Без рамки (framed = false) */
+WhiteTextWid[framed="false"] {
+    background: transparent;
+    color: #ffffff;
+}
+
+/* Состояние: С рамкой (framed = true) */
+WhiteTextWid[framed="true"] {
+    background: #0059d1;
+    color: #ffffff;
+}
+
+
+BlueTextWidget {
+    font-size: 11px;
+    color: #767676;
+}

@@ -44,35 +44,28 @@ class ThumbBaseLabel(QLabel):
 
 
 class ThumbImgWidget(ThumbBaseLabel):
-    # Инкапсулированные статические переменные
-    BORDER_RADIUS = 10
-
     def __init__(self):
         super().__init__()
         self.set_no_frame_style()
 
+    def _update_style(self):
+        # Метод для принудительного обновления QSS стиля у виджета
+        self.style().unpolish(self)
+        self.style().polish(self)
+
     def set_framed_style(self):
-        self.setStyleSheet(
-            f"""
-                background-color: palette(link-visited);
-                border-radius: {self.BORDER_RADIUS}px;
-            """
-        )
+        # Устанавливаем свойство framed в True
+        self.setProperty("framed", True)
+        self._update_style()
     
     def set_no_frame_style(self):
-        self.setStyleSheet(
-            f"""
-                background: transparent;
-                border-radius: {self.BORDER_RADIUS}px;
-            """
-        )
+        # Устанавливаем свойство framed в False
+        self.setProperty("framed", False)
+        self._update_style()
+
 
 
 class WhiteTextWid(ThumbBaseLabel):
-    # Инкапсулированные статические переменные
-    FONT_SIZE = 11
-    BORDER_RADIUS = 5
-
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
@@ -83,45 +76,31 @@ class WhiteTextWid(ThumbBaseLabel):
         self.setText(text)
 
     def set_framed_style(self):
-        self.setStyleSheet(
-            f"""
-                background: palette(highlight);
-                font-size: {self.FONT_SIZE}px;
-                border-radius: {self.BORDER_RADIUS}px;
-                padding: 2px;
-                color: palette(highlighted-text);
-            """
-        )
+        """Включает стиль с рамкой через QSS свойство."""
+        self.setProperty("framed", True)
+        self._update_style()
 
     def set_no_frame_style(self):
-        self.setStyleSheet(
-            f"""
-                background: transparent;
-                font-size: {self.FONT_SIZE}px;
-                border-radius: {self.BORDER_RADIUS}px;
-                padding: 2px;
-                color: palette(text);
-            """
-        )
+        """Отключает стиль с рамкой через QSS свойство."""
+        self.setProperty("framed", False)
+        self._update_style()
+
+    def _update_style(self):
+        """Принудительно обновляет QSS стиль виджета."""
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.update()
+
     
 
 class BlueTextWidget(ThumbBaseLabel):
-    # Инкапсулированная статическая переменная
-    FONT_SIZE = 11
-
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
-        self.set_style()
 
     def set_text(self, parent_width: int):
         day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
         self.setText(day_month_year)
-
-    def set_style(self):
-        self.setStyleSheet(
-            f"font-size: {self.FONT_SIZE}px; color: palette(midlight);"
-        )
 
 
 class MiuzBlueTextWidget(ThumbBaseLabel):
