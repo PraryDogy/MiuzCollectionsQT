@@ -379,7 +379,7 @@ class RowArrowWidget(QWidget):
 
     def set_disabled(self):
         self.blockSignals(True)
-        
+        self.setDisabled(True)
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
