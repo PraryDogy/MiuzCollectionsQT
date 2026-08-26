@@ -488,15 +488,10 @@ class FiltersWid(QWidget):
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(10)
 
-        first_container = UGroupBox()
-        main_lay.addWidget(first_container)
-        first_container_layout = QVBoxLayout(first_container)
-        first_container_layout.setContentsMargins(5, 2, 5, 2)
-        first_container_layout.setSpacing(10)
-        
         filters_text = LabelMinWidth(Lng.filters_descr[JsonData.lng_index])
+        filters_text.setContentsMargins(2, 0, 0, 0)
         filters_text.setWordWrap(True)
-        first_container_layout.addWidget(filters_text)
+        main_lay.addWidget(filters_text)
 
         self.filters_edit = UTextEditDark()
         self.filters_edit.setFixedHeight(220)
@@ -505,7 +500,7 @@ class FiltersWid(QWidget):
         self.filters_edit.textChanged.connect(
             lambda: self.save_wid.show_warning()
         )
-        first_container_layout.addWidget(self.filters_edit)
+        main_lay.addWidget(self.filters_edit)
 
         second_container = UGroupBox()
         main_lay.addWidget(second_container)
