@@ -35,7 +35,7 @@ class ReplaceFilesWin(UMainWidget):
         self.set_close_only()
         self.setWindowTitle(Lng.replace[JsonData.lng_index])
         self.setFixedWidth(self.ww)
-        self.central_layout.setContentsMargins(15, 5, 10, 5)
+        self.central_layout.setContentsMargins(15, 5, 10, 10)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -85,7 +85,12 @@ class ReplaceFilesWin(UMainWidget):
         self.stop_pressed.emit()
 
     def closeEvent(self, a0):
-        a0.ignore()
+        self.stop_cmd()
+        return super().closeEvent(a0)
+
+    def deleteLater(self):
+        self.stop_cmd
+        return super().deleteLater()
     
 
 class ErrorWin(UMainWidget):
@@ -147,10 +152,9 @@ class WinCopyFiles(WinProgressbar):
         # self.er.show()
         # self.above_label.setText("above label above label above label")
         # self.below_label.setText("below label below label below label below label")
-        # return
 
-        self.cancel.connect(self.stop_task)
-        self.cancel.connect(self.deleteLater)
+        # self.cancel.connect(self.stop_task)
+        # self.cancel.connect(self.deleteLater)
 
         dst_text = os.path.basename(target_dir)
         if not dst_text:
