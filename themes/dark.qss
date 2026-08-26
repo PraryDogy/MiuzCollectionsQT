@@ -74,6 +74,13 @@ ULineEditDark {
 }
 
 
+MfAliasTitle {
+    color: #a5a5a5;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+
 QTextEdit {
     color: #ffffff;
     border: 1px solid #353535;
