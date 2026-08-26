@@ -50,6 +50,24 @@ QMenu::icon {
     padding-left: 5px;
 }
 
+
+QMenu::indicator {
+    width: 16px;
+    height: 16px;
+    padding-left: 5px; /* Отступ от левого края меню */
+}
+
+QMenu::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+QMenu::indicator:unchecked {
+    image: none; 
+}
+
+
+
+
 QScrollArea {
     border: none;
     background: transparent;
