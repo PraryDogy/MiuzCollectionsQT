@@ -573,17 +573,18 @@ class MfSettings(QWidget):
         main_lay.setSpacing(10)
 
         # Верхний ряд с названием
-        name_group = UGroupBox()
-        main_lay.addWidget(name_group)
-        name_group_lay = QVBoxLayout(name_group)
-        name_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
-        name_group_lay.setSpacing(RowArrowWidget.group_spacing)
+        # name_group = UGroupBox()
+        # main_lay.addWidget(name_group)
+        # name_group_lay = QVBoxLayout(name_group)
+        # name_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
+        # name_group_lay.setSpacing(RowArrowWidget.group_spacing)
 
-        self.name_wid = RowArrowWidget(
+        self.name_wid = QLabel(
             text=f"{Lng.alias[JsonData.lng_index]}: {self.mf.mf_alias}"
         )
-        self.name_wid.hide_arrow()
-        name_group_lay.addWidget(self.name_wid)
+        # self.name_wid.hide_arrow()
+        self.name_wid.setContentsMargins(2, 0, 2, 0)
+        main_lay.addWidget(self.name_wid)
 
         self.path_widget = MfPathWidget(
             lng_index=JsonData.lng_index,
