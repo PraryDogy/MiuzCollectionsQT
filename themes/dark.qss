@@ -74,27 +74,21 @@ ULineEditDark {
 }
 
 
-
-
-
 QTextEdit {
     color: #ffffff;
     border: 1px solid #353535;
     border-radius: 6px;
     padding-left: 2px;
-    padding-right: 28px;
+    padding-right: 2px;
 }
-
 
 UTextEditLight {
     background: #2b2b2b;
 }
 
-
 UTextEditDark {
     background: #232323;
 }
-
 
 
 
