@@ -100,11 +100,9 @@ class ThemeChanger:
         elif JsonData.theme == Themes.light:
             cls._apply_theme(Static.THEMES_LIGHT)
 
-
     @classmethod
     def _on_system_theme_changed(cls):
         cls._apply_system_theme()
-
 
     @classmethod
     def _apply_system_theme(cls):
@@ -114,7 +112,6 @@ class ThemeChanger:
             cls._apply_theme(Static.THEMES_DARK)
         else:
             cls._apply_theme(Static.THEMES_LIGHT)
-
 
     @classmethod
     def _apply_theme(cls, path):
