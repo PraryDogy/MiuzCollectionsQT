@@ -103,7 +103,7 @@ class Dynamic:
 class JsonData:
     app_ver = Static.APP_VERSION
     lng_index = 0
-    theme = Themes.dark
+    theme = Themes.auto
     scaner_minutes = 20
     hide_digits_mf_lst = []
 
@@ -124,8 +124,8 @@ class JsonData:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
-            if JsonData.theme not in (Themes.dark, Themes.light):
-                JsonData.theme = Themes.dark
+            if JsonData.theme not in (Themes.auto, Themes.dark, Themes.light):
+                JsonData.theme = Themes.auto
         except Exception as e:
             print("Cfg json to app error",e)
     

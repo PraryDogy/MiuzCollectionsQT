@@ -278,12 +278,13 @@ class ThemeBtn(QWidget):
     clicked = pyqtSignal(str)
     ww = 70
 
-    def __init__(self, theme: Literal["light", "dark"]):
+    def __init__(self, theme: Literal["auto", "light", "dark"]):
         super().__init__()
         self.theme = theme
         self.svg = Static.COMMON_ICONS / f"{theme}_theme.svg"
         self.svg_selected = Static.COMMON_ICONS / f"{theme}_theme_selected.svg"
         text_mappings = {
+            Themes.auto: Lng.auto_theme,
             Themes.dark: Lng.dark_theme,
             Themes.light: Lng.light_theme,
         }
@@ -339,7 +340,7 @@ class ThemesWidget(UGroupBox):
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         main_lay.addWidget(themes_wid)
         
-        for i in (Themes.dark, Themes.light):
+        for i in (Themes.auto, Themes.dark, Themes.light):
             btn = ThemeBtn(i)
             btn.clicked.connect(lambda theme, btn=btn: self.on_btn_clicked(theme, btn))
             themes_layout.addWidget(btn)

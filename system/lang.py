@@ -136,6 +136,7 @@ class Lng:
     theme = ("Тема", "Theme")
     dark_theme = ("Темная", "Dark")
     light_theme = ("Светлая", "Light")
+    auto_theme = ("Авто", "Auto")
     start_date = ("Дата начала", "Start date")
     end_date = ("Дата окончания", "End date")
     cut = ("Вырезать (⌘ + X)", "Cut (⌘ + X)")
