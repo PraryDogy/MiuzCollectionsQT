@@ -635,11 +635,11 @@ class MfAliasWidget(QWidget):
         mf_alias = self.line_edit.text()
         result = None
         if not mf_alias:
-            show_warn(Lng.enter_alias_warning[self.lng_index], 260, 90)
+            show_warn(Lng.enter_alias_warning[self.lng_index], 260, 80)
         elif len(mf_alias) < 5 or len(mf_alias) > 50:
-            show_warn(f'{Lng.string_limit[self.lng_index]}', 280, 90)
+            show_warn(f'{Lng.string_limit[self.lng_index]}', 280, 80)
         elif not re.fullmatch(pattern, mf_alias):
-            show_warn(f'{Lng.valid_message[self.lng_index]}', 310, 90)
+            show_warn(f'{Lng.valid_message[self.lng_index]}', 310, 80)
         else:
             result = mf_alias
         return result
