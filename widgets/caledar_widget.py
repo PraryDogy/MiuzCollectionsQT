@@ -97,7 +97,7 @@ class Calendar(UMainWidget):
     min_year = 2015
     day_property = "day_value"
 
-    cell_size = (50, 50)
+    cell_size = (70, 60)
     svg_nav = (20, 20)
     svg_calendar_size = (25, 25)
     grid_h_spacing = 0
