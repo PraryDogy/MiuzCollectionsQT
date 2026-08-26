@@ -1,0 +1,407 @@
+/* ==========================================================================
+   1. ПАЛИТРА И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+   ========================================================================== */
+/*
+   СИНИЙ (Акцент):            #0067D9 / #0078D4
+   ФОН ОСНОВНОЙ:              #F5F5F5
+   ФОН ПАНЕЛЕЙ:               #FFFFFF
+   ФОН ПОТЕМНЕЕ:              #EEEEEE
+   ГРАНИЦЫ / СЕТКИ:           #D6D6D6
+   ТЕКСТ:                     #1F1F1F
+   ТЕКСТ ВТОРИЧНЫЙ:           #707070
+   DISABLED:                  #A5A5A5
+*/
+
+/* ==========================================================================
+   2. БАЗОВЫЕ ЭЛЕМЕНТЫ QT
+   ========================================================================== */
+
+.QFrame {
+    background: #F5F5F5;
+    border: none;
+}
+
+QLabel {
+    color: #1F1F1F;
+}
+
+QScrollArea {
+    background: transparent;
+    border: none;
+}
+
+QGroupBox {
+    background-color: transparent;
+    border: 1px solid #D6D6D6;
+    border-radius: 6px;
+}
+
+HSep {
+    background: #D6D6D6;
+}
+
+GrayTextLabel {
+    color: #707070;
+}
+
+/* ==========================================================================
+   3. КНОПКИ И СЛАЙДЕРЫ
+   ========================================================================== */
+
+QPushButton {
+    background: #E9E9E9;
+    border: 1px solid #CFCFCF;
+    border-radius: 4px;
+    color: #1F1F1F;
+    padding-right: 1px;
+}
+
+QPushButton:hover {
+    background: #E2E2E2;
+    border-color: #C5C5C5;
+}
+
+QPushButton:pressed {
+    background: #D8D8D8;
+    border: 1px solid #BDBDBD;
+}
+
+QPushButton:disabled {
+    background: #EEEEEE;
+    color: #A5A5A5;
+    border-color: #DEDEDE;
+}
+
+QPushButton::menu-indicator {
+    image: url("./icons/common/arrow_down.svg");
+    width: 12px;
+    height: 12px;
+}
+
+QSlider::groove:horizontal {
+    background-color: #D6D6D6;
+    height: 3px;
+    border-radius: 1px;
+    margin: 0px;
+}
+
+QSlider::handle:horizontal {
+    background-color: #858585;
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin: -4px 0;
+    padding: -4px 0px;
+}
+
+/* ==========================================================================
+   4. ПОЛЯ ВВОДА И СПИНБОКСЫ
+   ========================================================================== */
+
+QLineEdit {
+    color: #1F1F1F;
+    background: #FFFFFF;
+    border: 1px solid #D0D0D0;
+    border-radius: 6px;
+    padding-left: 2px;
+    padding-right: 28px;
+}
+
+QLineEdit:focus {
+    border: 1px solid #0078D4;
+}
+
+ULineEditLight {
+    background: #FFFFFF;
+}
+
+ULineEditDark {
+    background: #EEEEEE;
+}
+
+QTextEdit {
+    color: #1F1F1F;
+    background: #FFFFFF;
+    border: 1px solid #D0D0D0;
+    border-radius: 6px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+QTextEdit:focus {
+    border: 1px solid #0078D4;
+}
+
+UTextEditLight {
+    background: #FFFFFF;
+}
+
+UTextEditDark {
+    background: #EEEEEE;
+}
+
+USpinBox,
+QDateEdit {
+    background: #FFFFFF;
+    color: #1F1F1F;
+    border: 1px solid #CFCFCF;
+    border-radius: 4px;
+}
+
+USpinBox:focus,
+QDateEdit:focus {
+    border: 1px solid #0078D4;
+}
+
+USpinBox::up-button,
+QDateEdit::up-button {
+    background: #F2F2F2;
+    width: 17px;
+    height: 10px;
+    margin-top: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+}
+
+USpinBox::up-button:pressed,
+QDateEdit::up-button:pressed {
+    background: #E2E2E2;
+}
+
+USpinBox::down-button,
+QDateEdit::down-button {
+    background: #F2F2F2;
+    width: 17px;
+    height: 10px;
+    margin-bottom: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+}
+
+USpinBox::down-button:pressed,
+QDateEdit::down-button:pressed {
+    background: #E2E2E2;
+}
+
+USpinBox::up-arrow,
+QDateEdit::up-arrow {
+    image: url("./icons/common/arrow_up.svg");
+    width: 9px;
+    height: 9px;
+}
+
+USpinBox::down-arrow,
+QDateEdit::down-arrow {
+    image: url("./icons/common/arrow_down.svg");
+    width: 9px;
+    height: 9px;
+}
+
+/* ==========================================================================
+   5. ВСПЛЫВАЮЩИЕ МЕНЮ
+   ========================================================================== */
+
+QMenu {
+    background: #FFFFFF;
+    border: 1px solid #D6D6D6;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+QMenu::item {
+    background: transparent;
+    color: #1F1F1F;
+    padding: 5px 30px 5px 5px;
+}
+
+QMenu::item:selected {
+    background: #0067D9;
+    color: #FFFFFF;
+}
+
+QMenu::icon {
+    padding-left: 5px;
+}
+
+QMenu::indicator {
+    width: 16px;
+    height: 16px;
+    padding-left: 5px;
+}
+
+QMenu::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+QMenu::indicator:unchecked {
+    image: none;
+}
+
+QMenu::right-arrow {
+    image: url("./icons/common/arrow_right.svg");
+    width: 12px;
+    height: 12px;
+    padding-right: 5px;
+}
+
+QMenu::right-arrow:selected {
+    image: url("./icons/common/arrow_right.svg");
+}
+
+/* ==========================================================================
+   6. СПИСКИ И ДЕРЕВЬЯ
+   ========================================================================== */
+
+QTreeView,
+QListWidget {
+    color: #1F1F1F;
+    background: #FFFFFF;
+    border: 1px solid #D6D6D6;
+    border-radius: 10px;
+    padding: 10px 5px 10px 5px;
+}
+
+QTreeView::item,
+QListWidget::item {
+    color: #1F1F1F;
+    background: transparent;
+    height: 30px;
+}
+
+QTreeView::item:hover,
+QListWidget::item:hover {
+    background: #F0F0F0;
+}
+
+QTreeView::item:selected,
+QTreeView::item:selected:!active,
+QListWidget::item:selected,
+QListWidget::item:selected:!active {
+    color: #1F1F1F;
+    background: #E7E7E7;
+}
+
+QTreeView::branch:has-children:closed {
+    image: url(./icons/common/arrow_right.svg);
+}
+
+QTreeView::branch:has-children:open {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+QTreeView::branch:selected {
+    background: #E7E7E7;
+}
+
+QListWidget::indicator {
+    width: 16px;
+    height: 16px;
+    background: #FFFFFF;
+    border: 1px solid #C8C8C8;
+    border-radius: 4px;
+}
+
+QListWidget::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+QListWidget::indicator:disabled {
+    background-color: #EEEEEE;
+    border-color: #D5D5D5;
+}
+
+/* ==========================================================================
+   7. КАЛЕНДАРЬ
+   ========================================================================== */
+
+CalendarBigDate {
+    font-size: 30pt;
+    color: #555555;
+}
+
+CalendarWeek {
+    color: #707070;
+    border: none;
+    border-bottom: 1px solid #D6D6D6;
+}
+
+CalendarDay {
+    color: #1F1F1F;
+    border: none;
+    border-bottom: 1px solid #D6D6D6;
+}
+
+CalendarDaySelected {
+    color: #FFFFFF;
+    background-color: #0078D4;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+
+    margin-left: 17px;
+    margin-right: 18px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   8. ПЛИТКИ / КАРТОЧКИ
+   ========================================================================== */
+
+ThumbImgWidget {
+    border-radius: 10px;
+}
+
+ThumbImgWidget[framed="false"] {
+    background: transparent;
+}
+
+ThumbImgWidget[framed="true"] {
+    background-color: #E8E8E8;
+}
+
+WhiteTextWid {
+    font-size: 11px;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+WhiteTextWid[framed="false"] {
+    background: transparent;
+    color: #1F1F1F;
+}
+
+WhiteTextWid[framed="true"] {
+    background: #0067D9;
+    color: #FFFFFF;
+}
+
+BlueTextWidget {
+    font-size: 11px;
+    color: #707070;
+}
+
+/* ==========================================================================
+   9. ОКНА ПРОСМОТРА И ЗАГОЛОВКИ
+   ========================================================================== */
+
+MfAliasTitle {
+    color: #1F1F1F;
+    font-size: 23px;
+    font-weight: bold;
+}
+
+WinImgViewGraphics,
+BlackBgFrame {
+    background: #000000;
+}
+
+WinInfoLeftLabel,
+WinInfoSelectableLabel {
+    font-size: 11pt;
+    color: #1F1F1F;
+}
+
+ServerLabel {
+    padding-left: 1px;
+}

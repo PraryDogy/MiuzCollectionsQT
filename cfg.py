@@ -35,6 +35,7 @@ class Static:
 
     THEMES = Path("./themes")
     THEMES_DARK = THEMES / "dark.qss"
+    THEMES_LIGHT = THEMES / "light.qss"
 
     # Подпапки для иконок (красиво собираются от базовой папки icons)
     APP_ICONS = ICONS / "app_icons"

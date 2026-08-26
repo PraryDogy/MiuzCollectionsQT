@@ -81,13 +81,12 @@ class ThemeChanger:
     def init(cls):
         app: QApplication = QApplication.instance()
 
-        with open(Static.THEMES_DARK, "r", encoding="utf-8") as f:
+        if JsonData.theme == Themes.dark:
+            path = Static.THEMES_DARK
+        elif JsonData.theme == Themes.light:
+            path = Static.THEMES_LIGHT
+
+        with open(path, "r", encoding="utf-8") as f:
             qss_content = f.read()
             app.setStyleSheet(qss_content) # Применяем стиль глобально
-
-        # if JsonData.theme == Themes.dark:
-        #     app.setPalette(UPallete.dark())
-        #     app.setStyle("macos")
-        # elif JsonData.theme == Themes.light:
-        #     app.setPalette(UPallete.light())
-        #     app.setStyle("macos")
+        
