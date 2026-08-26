@@ -143,7 +143,7 @@ class UploadWin(UMainWidget):
 
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
-        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setContentsMargins(0, 0, 0, 5)
         right_layout.setSpacing(10)
 
         group_one = UGroupBox()
