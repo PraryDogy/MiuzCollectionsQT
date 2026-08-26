@@ -337,7 +337,7 @@ class RowArrowWidget(QWidget):
 
     # обычно эти виджеты помещаются в QGroupBox
     # Это правильные отступы чтобы все красиво смотрелось
-    group_margings = (5, 3, 5, 3)
+    group_margings = (5, 5, 5, 5)
     group_spacing = 5
 
     def __init__(self, text: str):
@@ -457,7 +457,7 @@ class WinProgressbar(UMainWidget):
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(10)
 
-        left_side_icon = QSvgWidget(self.files_icon_path)
+        left_side_icon = QSvgWidget(str(self.files_icon_path))
         left_side_icon.setFixedSize(50, 50)
         h_lay.addWidget(left_side_icon)
 
@@ -483,7 +483,7 @@ class WinProgressbar(UMainWidget):
         self.progressbar.adjustSize()
         progressbar_lay.addWidget(self.progressbar)
 
-        self.cancel_btn = QSvgWidget(self.cancel_icon_path)
+        self.cancel_btn = QSvgWidget(str(self.cancel_icon_path))
         self.cancel_btn.setFixedSize(13, 13)
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         progressbar_lay.addWidget(self.cancel_btn)

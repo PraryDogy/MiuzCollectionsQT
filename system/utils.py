@@ -89,14 +89,13 @@ class Utils:
 
     @classmethod
     def get_rel_thumb_path(cls, abs_thumb_path: str, app_data_dir = Static.APP_DATA_DIR):
-        p_base = Path(app_data_dir.strip(os.sep))
+        p_base = Path(str(app_data_dir).strip(os.sep))
         p_abs = Path(abs_thumb_path.strip(os.sep))
         if p_abs.is_relative_to(p_base):
             return os.sep + str(p_abs.relative_to(p_base))
 
     @classmethod
     def get_abs_thumb_path(cls, rel_thumb_path: str, app_data_dir = Static.APP_DATA_DIR):
-        app_data_dir = Path(app_data_dir)
         rel_thumb_path = Path(rel_thumb_path.strip(os.sep))
         return app_data_dir / rel_thumb_path
 
