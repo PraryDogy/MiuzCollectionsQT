@@ -87,7 +87,7 @@ UTextEditLight {
 }
 
 UTextEditDark {
-    background: #232323;
+    background: #171717;
 }
 
 
