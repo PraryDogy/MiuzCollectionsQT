@@ -295,17 +295,22 @@ CalendarBigDate {
 
 CalendarWeek {
     color: #888888;
+    border: none;
+    border-bottom: 1px solid #353535;
 }
 
 CalendarDay {
     color: #ffffff;
+    border: none;
+    border-bottom: 1px solid #353535;
 }
 
 CalendarDaySelected {
-    color: #FFFFFF;
+    color: #ffffff;
     background-color: #0078D4;
     font-weight: bold;
     border-radius: 20px;
+    border: none;
 }
 
 

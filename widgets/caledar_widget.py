@@ -100,7 +100,7 @@ class Calendar(UMainWidget):
     cell_size = (40, 40)
     svg_nav = (20, 20)
     svg_calendar_size = (25, 25)
-    grid_h_spacing = 25
+    grid_h_spacing = 0
     grid_v_spacing = 5
 
     def __init__(self, date: QDate):
