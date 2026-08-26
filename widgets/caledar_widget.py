@@ -156,11 +156,10 @@ class Calendar(UMainWidget):
 
         # --- 2. Блок навигации календаря ---
         self.nav_widget = QWidget()
-        self.nav_widget.setFixedHeight(self.cell_size[0])
         self.central_layout.addWidget(self.nav_widget) # Добавляем сразу
         
         self.nav_layout = QHBoxLayout(self.nav_widget)
-        self.nav_layout.setContentsMargins(margin, 0, margin, 0)
+        self.nav_layout.setContentsMargins(margin, 15, margin, 15)
         self.nav_layout.setSpacing(0)
 
         self.btn_prev = CalendarSvgNavi(str(self.svg_previous))
@@ -191,8 +190,8 @@ class Calendar(UMainWidget):
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)
 
-        # sep = CalendarSep(margin)
-        # self.central_layout.addWidget(sep)
+        sep = CalendarSep(margin)
+        self.central_layout.addWidget(HSep())
 
         # --- 3. Сетка для дней недели и чисел ---
         self.grid_widget = QWidget()  

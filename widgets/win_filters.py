@@ -140,6 +140,7 @@ class DatesWidget(UGroupBox):
             index = len(self.preset_actions) - 1
             self.handle_preset_change(index)
             self.apply_filter(index)
+            self.preset_button.setText(Lng.period[JsonData.lng_index])
 
         def set_date_start(date: QDate):
             self.date_start_btn.setText(self.date_digits(date))
@@ -147,6 +148,7 @@ class DatesWidget(UGroupBox):
             index = len(self.preset_actions) - 1
             self.handle_preset_change(index)
             self.apply_filter(index)
+            self.preset_button.setText(Lng.period[JsonData.lng_index])
 
         if flag == "start":
             qdate = self.q_date_start
