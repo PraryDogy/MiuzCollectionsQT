@@ -312,25 +312,17 @@ class WinFilters(UMainWidget):
         right_lay.setContentsMargins(0, 0, 0, 0)
         right_lay.setSpacing(0)
 
-        # Групбокс для активных фильтров
-        self.active_group = UGroupBox()
-        active_group_lay = QVBoxLayout(self.active_group)
-        active_group_lay.setContentsMargins(1, 5, 2, 1)
-        active_group_lay.setSpacing(10)
-
-        self.active_group.setFixedHeight(self.right_group_hh)
-
         # Шапка групбокса: статичный лейбл
         self.active_label = QLabel(f" {Lng.active_filters[JsonData.lng_index]}:")
-        active_group_lay.addWidget(self.active_label)
+        right_lay.addWidget(self.active_label)
+
+        right_lay.addSpacing(5)
 
         # Текстовое поле для вывода списка
         self.active_filters = UTextEditDark()
         self.active_filters.setReadOnly(True)
         self.active_filters.setText(self.get_filters_text())
-        active_group_lay.addWidget(self.active_filters)
-
-        right_lay.addWidget(self.active_group)
+        right_lay.addWidget(self.active_filters)
 
         # --- Группа для кнопок с нулевыми отступами ---
         self.reset_group = UGroupBox()
