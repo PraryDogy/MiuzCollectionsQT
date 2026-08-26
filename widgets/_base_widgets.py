@@ -275,6 +275,13 @@ class UPushButton(QPushButton):
         font.setPixelSize(value_px)
         self.setFont(font)
 
+    def setIcon(self, icon):
+        self.setText(" " + self.text())
+        return super().setIcon(icon)
+
+    def text(self):
+        return super().text().strip()
+
 
 class HSep(QFrame):
     def __init__(self):
