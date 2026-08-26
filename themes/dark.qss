@@ -309,7 +309,6 @@ CalendarDay {
 CalendarDaySelected {
     color: #ffffff;
     background-color: #0078D4;
-    font-weight: bold;
     border: none;
     /* ХАК ДЛЯ ИДЕАЛЬНОГО КРУГА (При размере виджета 70x60):
        Вычитаем маргины из общего размера, чтобы получить квадрат 40x40 в центре:
