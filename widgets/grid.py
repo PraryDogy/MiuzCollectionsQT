@@ -218,7 +218,7 @@ class Thumb(QFrame):
             )
 
         self.white_text_wid.data_item.filename = self.data_item.filename
-        self.white_text_wid.set_text()
+        self.white_text_wid.set_text(Thumb.wid_width)
 
 
 class UpBtn(QSvgWidget):
