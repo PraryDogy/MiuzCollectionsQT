@@ -293,7 +293,7 @@ WhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
 
 BlueTextWidget, MiuzBlueTextWidget {
     font-size: 11px;
-    color: #782d2d;
+    color: #6e6e6e;
 }
 
 /* --- Модуль: Окна просмотра и заголовки --- */
