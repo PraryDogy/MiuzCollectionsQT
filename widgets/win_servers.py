@@ -254,24 +254,20 @@ class ServersWin(UMainWidget):
         self.setWindowTitle(Lng.connect_to_server[JsonData.lng_index])
         self.setFixedWidth(350)
 
-        self.central_layout.setContentsMargins(5, 5, 5, 10)
-        self.central_layout.setSpacing(10)
-
-        group = UGroupBox()
-        group_lay = QVBoxLayout(group)
-        group_lay.setContentsMargins(1, 1, 1, 1)
-        group_lay.setSpacing(5)
-        self.central_layout.addWidget(group)
-
         favs = ServerLabel(Lng.favorites[JsonData.lng_index])
-        group_lay.addWidget(favs)
+        favs.setContentsMargins(2, 0, 0, 0)
+        self.central_layout.addWidget(favs)
+
+        self.central_layout.addSpacing(5)
 
         self.v_list = ServerList()
         self.v_list.edit_server.connect(self.show_login_win)
         self.v_list.remove_server.connect(self.remove_cmd)
         self.v_list.connect_server.connect(self.connect_cmd)
         self.v_list.evlosh_data_loaded.connect(self.evlosh_data_added)
-        group_lay.addWidget(self.v_list)
+        self.central_layout.addWidget(self.v_list)
+
+        self.central_layout.addSpacing(10)
 
         # Кнопки
         btn_widget = QWidget()
@@ -279,6 +275,8 @@ class ServersWin(UMainWidget):
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)
         self.central_layout.addWidget(btn_widget)
+
+        self.central_layout.addSpacing(5)
 
         btn_layout.addStretch()
 
