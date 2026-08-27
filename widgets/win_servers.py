@@ -52,7 +52,7 @@ class ServerList(UListWidget):
     connect_server = pyqtSignal()
 
     def __init__(self, parent = None):
-        super().__init__(parent)
+        super().__init__()
 
     def remove_cmd(self, server_item: ServerItem):
         self.win_warn = ConfirmWindow(

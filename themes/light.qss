@@ -367,7 +367,7 @@ WhiteTextWid[framed="true"] {
     color: #FFFFFF;
 }
 
-BlueTextWidget {
+BlueTextWidget, MiuzBlueTextWidget {
     font-size: 11px;
     color: #707070;
 }
