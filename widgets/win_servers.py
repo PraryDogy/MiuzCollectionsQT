@@ -1,6 +1,7 @@
 import os
 import subprocess
 from dataclasses import dataclass
+from pathlib import Path
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QAction
@@ -12,9 +13,10 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (ConfirmWindow, UGroupBox, ULineEditDark, UMainWidget,
-                            UMenu, UPushButton, UListWidget, UListWidgetItem)
-
+from ._base_widgets import (ConfirmWindow, UGroupBox, ULineEditDark,
+                            UListWidget, UListWidgetItem, UMainWidget, UMenu,
+                            UPushButton)
+import json
 
 @dataclass(slots=True)
 class ServerItem:
@@ -50,9 +52,11 @@ class ServerList(UListWidget):
     edit_server = pyqtSignal(ServerItem)
     remove_server = pyqtSignal(ServerItem)
     connect_server = pyqtSignal()
+    evlosh_data_loaded = pyqtSignal(list)
 
     def __init__(self, parent = None):
         super().__init__()
+        self.evlosh_servers_path = Path("./_miuz_servers.json")
 
     def remove_cmd(self, server_item: ServerItem):
         self.win_warn = ConfirmWindow(
@@ -67,6 +71,11 @@ class ServerList(UListWidget):
         self.win_warn.center_to_parent(self.window())
         self.win_warn.show()
 
+    def add_evlosh_servers(self):
+        with open(self.evlosh_servers_path) as file:
+            server_list = json.load(file)
+            self.evlosh_data_loaded.emit(server_list)
+
     def mouseDoubleClickEvent(self, e):
         list_item: ServerListItem = self.itemAt(e.pos())
         if list_item:
@@ -74,31 +83,45 @@ class ServerList(UListWidget):
         return super().mouseDoubleClickEvent(e)
 
     def contextMenuEvent(self, a0):
-        list_item: ServerListItem = self.itemAt(a0.pos())
-        if not list_item:
-            return
-
         self.menu_ = UMenu(a0)
 
-        connect = QAction(Lng.connect[JsonData.lng_index], self.menu_)
-        connect.triggered.connect(self.connect_server.emit)
-        self.menu_.addAction(connect)
+        # Получаем элемент под курсором
+        list_item: ServerListItem = self.itemAt(a0.pos())
 
-        self.menu_.addSeparator()
+        # Если кликнули по существующему элементу, добавляем управление сервером
+        if list_item:
+            connect = QAction(Lng.connect[JsonData.lng_index], self.menu_)
+            connect.triggered.connect(self.connect_server.emit)
+            self.menu_.addAction(connect)
 
-        edit = QAction(Lng.edit[JsonData.lng_index], self.menu_)
-        edit.triggered.connect(
-            lambda: self.edit_server.emit(list_item.server_item)
-        )
-        self.menu_.addAction(edit)
+            self.menu_.addSeparator()
 
-        rem = QAction(Lng.delete[JsonData.lng_index], self.menu_)
-        rem.triggered.connect(
-            lambda: self.remove_cmd(list_item.server_item)
-        )
-        self.menu_.addAction(rem)
+            edit = QAction(Lng.edit[JsonData.lng_index], self.menu_)
+            edit.triggered.connect(
+                lambda: self.edit_server.emit(list_item.server_item)
+            )
+            self.menu_.addAction(edit)
 
-        self.menu_.show_menu()
+            rem = QAction(Lng.delete[JsonData.lng_index], self.menu_)
+            rem.triggered.connect(
+                lambda: self.remove_cmd(list_item.server_item)
+            )
+            self.menu_.addAction(rem)
+
+            # Если файл evlosh существует, добавляем разделитель перед общей кнопкой
+            if self.evlosh_servers_path.exists():
+                self.menu_.addSeparator()
+
+        # Это действие показывается ВСЕГДА (и на айтеме, и на пустом месте), если есть файл
+        if self.evlosh_servers_path.exists():
+            evlosh_action = QAction("Добавить данные evlosh", self.menu_) # добавил self.menu_ в предка
+            evlosh_action.triggered.connect(self.add_evlosh_servers) # не забудьте привязать метод
+            self.menu_.addAction(evlosh_action)
+
+        # Отображаем меню, только если в нём есть хотя бы одно действие
+        if self.menu_.actions():
+            self.menu_.show_menu()
+
 
 
 class ServerLabel(QLabel):
@@ -247,6 +270,7 @@ class ServersWin(UMainWidget):
         self.v_list.edit_server.connect(self.show_login_win)
         self.v_list.remove_server.connect(self.remove_cmd)
         self.v_list.connect_server.connect(self.connect_cmd)
+        self.v_list.evlosh_data_loaded.connect(self.evlosh_data_added)
         group_lay.addWidget(self.v_list)
 
         # Кнопки
@@ -293,6 +317,31 @@ class ServersWin(UMainWidget):
         if Servers.items:
             self.v_list.setCurrentRow(0)
 
+    def evlosh_data_added(self, server_list: list):
+
+        for alias, server, login, pass_ in server_list:
+
+            if [alias, server, login, pass_] in Servers.items:
+                print("evlosh server already in server list")
+                continue
+            else:
+                Servers.items.append([alias, server, login, pass_])
+
+            server_item = ServerItem(
+                alias=alias,
+                server=server,
+                login=login,
+                password=pass_
+            )
+            list_item = ServerListItem(
+                parent=self.v_list,
+                text=f"{server} ({alias})",
+                server_item=server_item
+            )
+            self.v_list.addItem(list_item)
+            
+        self.v_list.setCurrentRow(0)
+        Servers.write_json_data()
 
     def show_login_win(self, server_item: ServerItem = None):
 
