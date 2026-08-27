@@ -185,10 +185,6 @@ class LoginWin(UMainWidget):
         self.central_layout.addWidget(self.pass_)
         self.central_layout.addSpacing(10)
 
-
-
-        # grop_lay.addSpacerItem(QSpacerItem(0, 10))
-
         self.btn_layout = QHBoxLayout()
         self.btn_layout.setSpacing(10)
         self.central_layout.addLayout(self.btn_layout)

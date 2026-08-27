@@ -241,6 +241,7 @@ class DatesWidget(UGroupBox):
 
 class WinFilters(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
+    edit_svg = Static.COMMON_ICONS / "edit.svg"
     closed_ = pyqtSignal()
     reload_thumbnails = pyqtSignal()
     edit_filters = pyqtSignal()
@@ -335,7 +336,7 @@ class WinFilters(UMainWidget):
 
         # Создаем кастомную кнопку редактирования фильтров
         self.edit_filters_btn = RowArrowWidget(Lng.edit[JsonData.lng_index])
-        self.edit_filters_btn.set_left_icon(self.reset_svg) # Убедитесь, что self.edit_svg определен ранее
+        self.edit_filters_btn.set_left_icon(self.edit_svg) # Убедитесь, что self.edit_svg определен ранее
         self.edit_filters_btn.clicked.connect(self.edit_filters.emit) # Метод-обработчик клика
 
         # Создаем кастомную кнопку сброса
