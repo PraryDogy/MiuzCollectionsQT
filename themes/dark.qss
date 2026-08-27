@@ -291,9 +291,9 @@ WhiteTextWid {
 WhiteTextWid[framed="false"] { background: transparent; color: #ffffff; }
 WhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
 
-BlueTextWidget {
+BlueTextWidget, MiuzBlueTextWidget {
     font-size: 11px;
-    color: #767676;
+    color: #782d2d;
 }
 
 /* --- Модуль: Окна просмотра и заголовки --- */

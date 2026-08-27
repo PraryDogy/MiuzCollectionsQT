@@ -111,7 +111,6 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
-        self.set_style()
 
     def set_text(self, parent_width: int):
         match = self.COLLECTION_RE.search(self.data_item.rel_path)
@@ -123,11 +122,6 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
         miuz_collection_name = self.get_shorten_text(miuz_collection_name, parent_width)
         day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
         self.setText(f"{day_month_year}\n{miuz_collection_name}")
-
-    def set_style(self):
-        self.setStyleSheet(
-            f"font-size: {self.FONT_SIZE}px; color: palette(midlight);"
-        )
 
 
 class Thumb(QFrame):
