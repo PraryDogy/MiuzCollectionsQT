@@ -127,6 +127,7 @@ class ServerList(UListWidget):
 class ServerLabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text=text)
+        self.setContentsMargins(2, 0, 0, 0)
 
 
 class LoginWin(UMainWidget):
@@ -139,44 +140,52 @@ class LoginWin(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setFixedWidth(self.ww)
-        self.central_layout.setSpacing(10)
-
-        group = UGroupBox()
-        grop_lay = QVBoxLayout(group)
-        grop_lay.setContentsMargins(0, 0, 0, 5)
-        grop_lay.setSpacing(5)
-        self.central_layout.addWidget(group)
 
         alias_label = ServerLabel(text=Lng.alias[JsonData.lng_index].capitalize())
-        grop_lay.addWidget(alias_label)
+        self.central_layout.addWidget(alias_label)
+        self.central_layout.addSpacing(5)
 
         self.alias = ULineEditDark()
         self.alias.setPlaceholderText(Lng.alias[JsonData.lng_index].capitalize())
-        grop_lay.addWidget(self.alias)
+        self.central_layout.addWidget(self.alias)
+        self.central_layout.addSpacing(10)
+
+
 
         server_label = ServerLabel(text=Lng.server[JsonData.lng_index].capitalize())
-        grop_lay.addWidget(server_label)
+        self.central_layout.addWidget(server_label)
+        self.central_layout.addSpacing(5)
 
         self.server = ULineEditDark()
         self.server.setPlaceholderText(Lng.server[JsonData.lng_index].capitalize())
-        grop_lay.addWidget(self.server)
+        self.central_layout.addWidget(self.server)
+        self.central_layout.addSpacing(10)
+
+
 
         login_label = ServerLabel(text=Lng.login[JsonData.lng_index].capitalize())
-        grop_lay.addWidget(login_label)
+        self.central_layout.addWidget(login_label)
+        self.central_layout.addSpacing(5)
+        
 
         self.login = ULineEditDark()
         self.login.setPlaceholderText(Lng.login[JsonData.lng_index].capitalize())
-        grop_lay.addWidget(self.login)
+        self.central_layout.addWidget(self.login)
+        self.central_layout.addSpacing(10)
 
-        # grop_lay.addSpacerItem(QSpacerItem(0, 10))
+
 
         pass_label = ServerLabel(text=Lng.password[JsonData.lng_index].capitalize())
-        grop_lay.addWidget(pass_label)
+        self.central_layout.addWidget(pass_label)
+        self.central_layout.addSpacing(5)
 
         self.pass_ = ULineEditDark()
         self.pass_.setEchoMode(ULineEditDark.EchoMode.Password)
         self.pass_.setPlaceholderText(f"{Lng.password[JsonData.lng_index].capitalize()}")
-        grop_lay.addWidget(self.pass_)
+        self.central_layout.addWidget(self.pass_)
+        self.central_layout.addSpacing(10)
+
+
 
         # grop_lay.addSpacerItem(QSpacerItem(0, 10))
 
@@ -195,6 +204,8 @@ class LoginWin(UMainWidget):
         self.btn_layout.addWidget(self.cancel_btn)
 
         self.btn_layout.addStretch()
+
+        self.central_layout.addSpacing(5)
 
         if server_item:
             self.alias.setText(server_item.alias)
@@ -255,7 +266,6 @@ class ServersWin(UMainWidget):
         self.setFixedWidth(350)
 
         favs = ServerLabel(Lng.favorites[JsonData.lng_index])
-        favs.setContentsMargins(2, 0, 0, 0)
         self.central_layout.addWidget(favs)
 
         self.central_layout.addSpacing(5)
