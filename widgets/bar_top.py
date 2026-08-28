@@ -227,7 +227,7 @@ class BarTop(QFrame):
         # self.setFixedHeight(self.hh)
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setContentsMargins(0, 3, 0, 5)
-        self.h_layout.setSpacing(15)
+        self.h_layout.setSpacing(20)
 
         self.h_layout.addStretch(0)
 
