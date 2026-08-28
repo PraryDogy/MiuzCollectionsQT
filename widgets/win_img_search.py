@@ -194,6 +194,8 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
 
+        self.central_layout.addSpacing(5)
+
         self.resize(self.ww, self.hh)
         
         # self.adjustSize()
