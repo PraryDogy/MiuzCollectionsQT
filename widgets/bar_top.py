@@ -266,7 +266,7 @@ class BarTop(UFrame):
         right_widget.setFixedWidth(WidSearch.ww)
         self.h_layout.addWidget(right_widget)
         right_layout = QHBoxLayout(right_widget)
-        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setContentsMargins(0, 3, 0, 0)
         right_layout.setSpacing(0)
 
         # --- Виджет поиска ---
