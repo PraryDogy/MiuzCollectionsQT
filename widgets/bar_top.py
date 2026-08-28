@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
@@ -10,8 +11,8 @@ from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import GrayTextLabel, ULineEditLight, UMenu, UFrame
-from pathlib import Path
+from ._base_widgets import GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu
+
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
@@ -85,6 +86,7 @@ class WidSearch(ULineEditLight):
         return super().mouseDoubleClickEvent(a0)
 
 
+
 class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
     svg_size = 32
@@ -104,9 +106,10 @@ class BarTopBtn(QWidget):
         self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        # 1. АКТИВИРУЕМ МЕТКУ И ДОБАВЛЯЕМ В LAYOUT
         self.lbl = GrayTextLabel("")
         self.lbl.set_font_size(9)
-        # self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.set_base_style()
 
@@ -114,28 +117,33 @@ class BarTopBtn(QWidget):
             if not i.exists():
                 print(" bar top btn icon not exists", i)
 
-    def _load_svg_data(self, path: str):
+    def set_text(self, text: str):
+        """Новый метод для одновременной установки подсказки и текста под иконкой."""
+        self.setToolTip(text)
+        self.lbl.setText(text)
+
+    def _load_svg_data(self, path: Path):  # Исправил аннотацию типа со str на Path, так как вы передаете Path
         with open(path, "rb") as f:
             return QByteArray(f.read())
 
     def set_selected_style(self):
         self.svg_btn.load(self.selected_svg)
-        self.svg_btn.update()  # Принудительное обновление кадра
+        self.svg_btn.update()
 
     def set_base_style(self):
         self.svg_btn.load(self.base_svg)
-        self.svg_btn.update()  # Принудительное обновление кадра
+        self.svg_btn.update()
 
     def mousePressEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
             self.set_selected_style()
-        super().mousePressEvent(a0)  # Передаем событие дальше
+        super().mousePressEvent(a0)
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.set_base_style()  # Возвращаем исходный стиль при отпускании
+            self.set_base_style()
             self.clicked_.emit()
-        super().mouseReleaseEvent(a0)  # ОБЯЗАТЕЛЬНО вызываем базовый класс
+        super().mouseReleaseEvent(a0)
 
 
 class FiltersBtn(BarTopBtn):
@@ -144,7 +152,8 @@ class FiltersBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.setToolTip(Lng.filters[JsonData.lng_index])
+        # 2. Используем новый метод вместо setToolTip
+        self.set_text(Lng.filters[JsonData.lng_index])
         
 
 class SortBtn(BarTopBtn):
@@ -153,21 +162,22 @@ class SortBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.set_text()
+        self.update_sort_text() # Переименовал, чтобы не конфликтовать с базовым методом сета текста
 
-    def set_text(self):
+    def update_sort_text(self):
         """Устанавливает текст кнопки в зависимости от текущей сортировки."""
         text = (
             Lng.sort_by_mod_short[JsonData.lng_index]
             if Dynamic.sort_by_mod
             else Lng.sort_by_recent_short[JsonData.lng_index]
         )
-        self.setToolTip(text)
+        # Используем унаследованный метод для обновления и тултипа, и лейбла
+        self.set_text(text)
 
     def menu_clicked(self, value: bool):
         """Обрабатывает выбор сортировки из меню."""
         Dynamic.sort_by_mod = value
-        self.set_text()
+        self.update_sort_text()
         self.clicked_.emit()
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
@@ -175,7 +185,6 @@ class SortBtn(BarTopBtn):
         if ev and ev.button() == Qt.MouseButton.LeftButton:
             menu = UMenu(ev)
 
-            # --- Создаем пункты меню ---
             act_mod = QAction(Lng.sort_by_mod[JsonData.lng_index], self, checkable=True)
             act_recent = QAction(Lng.sort_by_recent[JsonData.lng_index], self, checkable=True)
 
@@ -188,11 +197,9 @@ class SortBtn(BarTopBtn):
             menu.addAction(act_mod)
             menu.addAction(act_recent)
 
-            # --- Показ меню под кнопкой ---
             pos = self.mapToGlobal(self.rect().bottomLeft())
             menu.exec(pos)
 
-            # --- Вернуть нормальный стиль после закрытия меню ---
             self.set_base_style()
 
 
@@ -202,7 +209,8 @@ class SettingsBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.setToolTip(Lng.settings[JsonData.lng_index])
+        # 3. Используем новый метод вместо setToolTip
+        self.set_text(Lng.settings[JsonData.lng_index])
 
 
 class ImgSearchBtn(BarTopBtn):
@@ -211,7 +219,8 @@ class ImgSearchBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.setToolTip(Lng.image_search_short[JsonData.lng_index])
+        # 4. Используем новый метод вместо setToolTip
+        self.set_text(Lng.image_search_short[JsonData.lng_index])
 
 
 class BarTop(UFrame):
@@ -235,24 +244,15 @@ class BarTop(UFrame):
         self.sort_btn.clicked_.connect(self.reload_thumbnails.emit)
         self.h_layout.addWidget(self.sort_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        # Сепаратор 1
-        self.h_layout.addWidget(self.create_separator())
-
         # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchBtn()
         self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
         self.h_layout.addWidget(self.img_search_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        # Сепаратор 2
-        self.h_layout.addWidget(self.create_separator())
-
         # --- Кнопка фильтров ---
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(self.open_filters_win.emit)
         self.h_layout.addWidget(self.filters_btn, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        # Сепаратор 3
-        self.h_layout.addWidget(self.create_separator())
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")
@@ -276,12 +276,6 @@ class BarTop(UFrame):
 
         # Флаг для отслеживания состояния скролла (заглушка от спама)
         self._is_scrolled = False 
-
-    def create_separator(self):
-        sep = QFrame()
-        sep.setFrameShape(QFrame.Shape.VLine) # Вертикальная линия
-        sep.setFrameShadow(QFrame.Shadow.Sunken) # Эффект вдавленности (опционально)
-        return sep
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
