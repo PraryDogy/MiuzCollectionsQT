@@ -87,7 +87,7 @@ class WidSearch(ULineEditLight):
 
 class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
-    svg_size = 35
+    svg_size = 32
 
     def __init__(self, base_svg: Path, selected_svg: Path):
         super().__init__()
