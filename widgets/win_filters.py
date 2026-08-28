@@ -127,7 +127,7 @@ class DatesWidget(UGroupBox):
 
         self.main_layout.addSpacing(5)
 
-        self.update_readable_date_label()
+        self.update_readable_date_label(index=0)
 
     def date_digits(self, q_date: QDate):
         return q_date.toString("dd.MM.yyyy")
@@ -196,28 +196,28 @@ class DatesWidget(UGroupBox):
                 
         self.date_start_btn.setText(self.date_digits(self.q_date_start))
         self.date_end_btn.setText(self.date_digits(self.q_date_end))
-        self.update_readable_date_label()
+        self.update_readable_date_label(index)
         
         # Не забудьте разблокировать сигналы кнопок
         self.date_start_btn.blockSignals(False)
         self.date_end_btn.blockSignals(False)
 
-    def update_readable_date_label(self):
+    def update_readable_date_label(self, index: int):
         ind = JsonData.lng_index
         if ind == 0:
             locale = QLocale(QLocale.Language.Russian)
         else:
             locale = QLocale(QLocale.Language.English)
 
-        if self.q_date_start == self.q_date_end:
-            str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
-            # text = f"{Lng.selected_period[ind]}: {str_date}"
-            text = f"{str_date}"
-        else:
-            str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
-            str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-            # text = f"{Lng.selected_period[ind]}: {Lng.from_text[ind]} {str_from} по {str_to}"
-            text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
+        text = self.preset_actions[index].text()
+        if index == len(self.preset_actions) - 1:
+            if self.q_date_start == self.q_date_end:
+                str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
+                text = f"{str_date}"
+            else:
+                str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+                str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+                text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
 
         self.title_widget.text_widget.setText(text)
 
