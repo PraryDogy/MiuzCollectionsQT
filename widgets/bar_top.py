@@ -87,7 +87,7 @@ class WidSearch(ULineEditLight):
 
 class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
-    svg_size = 30
+    svg_size = 35
 
     def __init__(self, base_svg: Path, selected_svg: Path):
         super().__init__()
@@ -106,7 +106,7 @@ class BarTopBtn(QWidget):
 
         self.lbl = GrayTextLabel("")
         self.lbl.set_font_size(9)
-        self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
+        # self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.set_base_style()
 
@@ -144,7 +144,7 @@ class FiltersBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.lbl.setText(Lng.filters[JsonData.lng_index])
+        self.setToolTip(Lng.filters[JsonData.lng_index])
         
 
 class SortBtn(BarTopBtn):
@@ -162,7 +162,7 @@ class SortBtn(BarTopBtn):
             if Dynamic.sort_by_mod
             else Lng.sort_by_recent_short[JsonData.lng_index]
         )
-        self.lbl.setText(text)
+        self.setToolTip(text)
 
     def menu_clicked(self, value: bool):
         """Обрабатывает выбор сортировки из меню."""
@@ -202,7 +202,7 @@ class SettingsBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.lbl.setText(Lng.settings[JsonData.lng_index])
+        self.setToolTip(Lng.settings[JsonData.lng_index])
 
 
 class ImgSearchBtn(BarTopBtn):
@@ -211,7 +211,7 @@ class ImgSearchBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        self.lbl.setText(Lng.image_search_short[JsonData.lng_index])
+        self.setToolTip(Lng.image_search_short[JsonData.lng_index])
 
 
 class BarTop(QFrame):
