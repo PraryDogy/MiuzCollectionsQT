@@ -214,7 +214,7 @@ class ImgSearchBtn(BarTopBtn):
         self.lbl.setText(Lng.image_search_short[JsonData.lng_index])
 
 
-class BarTop(QWidget):
+class BarTop(QFrame):
     open_settings_win = pyqtSignal(SettingsItem)
     open_filters_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
@@ -264,6 +264,29 @@ class BarTop(QWidget):
         self.search_wid = WidSearch()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         right_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
+
+        # Флаг для отслеживания состояния скролла (заглушка от спама)
+        self._is_scrolled = False 
+
+    def _update_style(self):
+        """Принудительно обновляет QSS стили у виджета"""
+        self.style().unpolish(self)
+        self.style().polish(self)
+
+    def handle_scroll_value(self, value: int):
+        """
+        Принимает позицию скролла и переключает динамическое свойство 'scrolled'.
+        Обновление стиля срабатывает только при фактическом изменении состояния.
+        """
+        is_currently_scrolled = value > 0
+        
+        # Защита от спама: если состояние не изменилось, выходим
+        if self._is_scrolled == is_currently_scrolled:
+            return
+
+        self._is_scrolled = is_currently_scrolled
+        self.setProperty("scrolled", is_currently_scrolled)
+        self._update_style()
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()

@@ -84,6 +84,7 @@ class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
     ww, hh = 1050, 750
+    GRID_INDEX = 2
 
     def __init__(self, argv: list):
         super().__init__()
@@ -103,6 +104,7 @@ class WinMain(UMainWindow):
         self.go_to_url: str | None = None
         self.files_to_copy = set()
         self.stop_scaner = True
+        self.grid_scroll_value = 0
 
         h_wid_main = QWidget()
         h_lay_main = QHBoxLayout(h_wid_main)
@@ -177,8 +179,9 @@ class WinMain(UMainWindow):
         )
         self.right_layout.addWidget(self.bar_top)
 
-        sep_upper = HSep()
-        self.right_layout.addWidget(sep_upper)
+        self.sep_above_grid = HSep()
+        self.right_layout.addWidget(self.sep_above_grid)
+        self.sep_above_grid.hide()
 
         self.grid = Grid()
         self.load_st_grid()
@@ -229,6 +232,12 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(Mf.current_mf)
         return wrapper
+
+    def handle_grid_scroll_value(self, value: int):
+        if value > 0 and self.sep_above_grid.isHidden():
+            self.sep_above_grid.show()
+        elif value == 0:
+            self.sep_above_grid.hide()
 
     def set_no_filters(self):
         Dynamic.filters_enabled.clear()
@@ -647,8 +656,10 @@ class WinMain(UMainWindow):
         self.grid.collage.connect(
             lambda data_items: self.open_collage_win(data_items)
         )
-
-        self.right_layout.insertWidget(layout_index-1, self.grid)
+        self.grid.grid_is_scrolling.connect(
+            lambda value: self.handle_grid_scroll_value(value)
+        )
+        self.right_layout.insertWidget(self.GRID_INDEX, self.grid)
 
     @with_conn
     def open_view_win(self, mf: Mf):
