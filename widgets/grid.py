@@ -218,7 +218,7 @@ class Thumb(QFrame):
 class UpBtn(QSvgWidget):
     scroll_to_top = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "scroll_up.svg"
-    icon_size = 45
+    icon_size = 35
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
@@ -701,8 +701,7 @@ class Grid(VScrollArea):
         self.menu_.show_menu()
 
     def checkScrollValue(self, value: int):
-        if value > 0:
-            self.up_btn.setVisible(value)
+        self.up_btn.setVisible(value > 0)
         self.grid_is_scrolling.emit(value)
 
     def mouseDoubleClickEvent(self, a0):
