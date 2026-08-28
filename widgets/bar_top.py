@@ -10,7 +10,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import GrayTextLabel, ULineEditLight, UMenu
+from ._base_widgets import GrayTextLabel, ULineEditLight, UMenu, UFrame
 from pathlib import Path
 
 class ClearBtn(QSvgWidget):
@@ -214,7 +214,7 @@ class ImgSearchBtn(BarTopBtn):
         self.setToolTip(Lng.image_search_short[JsonData.lng_index])
 
 
-class BarTop(QFrame):
+class BarTop(UFrame):
     open_settings_win = pyqtSignal(SettingsItem)
     open_filters_win = pyqtSignal()
     reload_thumbnails = pyqtSignal()
@@ -224,10 +224,9 @@ class BarTop(QFrame):
 
     def __init__(self):
         super().__init__()
-        # self.setFixedHeight(self.hh)
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setContentsMargins(0, 3, 0, 5)
-        self.h_layout.setSpacing(20)
+        self.h_layout.setSpacing(10)
 
         self.h_layout.addStretch(0)
 
@@ -236,14 +235,24 @@ class BarTop(QFrame):
         self.sort_btn.clicked_.connect(self.reload_thumbnails.emit)
         self.h_layout.addWidget(self.sort_btn, alignment=Qt.AlignmentFlag.AlignLeft)
 
+        # Сепаратор 1
+        self.h_layout.addWidget(self.create_separator())
+
+        # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchBtn()
         self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
         self.h_layout.addWidget(self.img_search_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        # Сепаратор 2
+        self.h_layout.addWidget(self.create_separator())
 
         # --- Кнопка фильтров ---
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(self.open_filters_win.emit)
         self.h_layout.addWidget(self.filters_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        # Сепаратор 3
+        self.h_layout.addWidget(self.create_separator())
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")
@@ -268,25 +277,11 @@ class BarTop(QFrame):
         # Флаг для отслеживания состояния скролла (заглушка от спама)
         self._is_scrolled = False 
 
-    def _update_style(self):
-        """Принудительно обновляет QSS стили у виджета"""
-        self.style().unpolish(self)
-        self.style().polish(self)
-
-    def handle_scroll_value(self, value: int):
-        """
-        Принимает позицию скролла и переключает динамическое свойство 'scrolled'.
-        Обновление стиля срабатывает только при фактическом изменении состояния.
-        """
-        is_currently_scrolled = value > 0
-        
-        # Защита от спама: если состояние не изменилось, выходим
-        if self._is_scrolled == is_currently_scrolled:
-            return
-
-        self._is_scrolled = is_currently_scrolled
-        self.setProperty("scrolled", is_currently_scrolled)
-        self._update_style()
+    def create_separator(self):
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.VLine) # Вертикальная линия
+        sep.setFrameShadow(QFrame.Shadow.Sunken) # Эффект вдавленности (опционально)
+        return sep
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()

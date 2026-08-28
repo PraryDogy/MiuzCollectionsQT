@@ -4,8 +4,8 @@ from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в н�
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSpinBox, QSplitter,
-                             QToolButton, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSplitter, QVBoxLayout,
+                             QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters

@@ -19,7 +19,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMenu, USubMenu, VScrollArea
+from ._base_widgets import UFrame, UMenu, USubMenu, VScrollArea
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -124,7 +124,7 @@ class MiuzBlueTextWidget(ThumbBaseLabel):
         self.setText(f"{day_month_year}\n{miuz_collection_name}")
 
 
-class Thumb(QFrame):
+class Thumb(UFrame):
     sym_star = "\U00002605"
     wid_width = 0
     wid_height = 0
@@ -283,7 +283,7 @@ class Grid(VScrollArea):
         self.date_timer.setSingleShot(True)
 
         # --- Вкладка прокрутки ---
-        self.scroll_wid = QFrame()
+        self.scroll_wid = UFrame()
         self.setWidget(self.scroll_wid)
         self.scroll_layout = QVBoxLayout(self.scroll_wid)
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)

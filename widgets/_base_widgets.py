@@ -140,6 +140,11 @@ class UGroupBox(QGroupBox):
         super().__init__(*args, **kw)
 
 
+class UFrame(QFrame):
+    def __init__(self):
+        super().__init__()
+
+
 class WindowMixin:
     win_list: list[QMainWindow] = []
 
@@ -180,7 +185,7 @@ class WindowMixin:
 class UMainWindow(WindowMixin, QMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-        central_widget = QFrame(self)
+        central_widget = UFrame()
         self.setCentralWidget(central_widget)
         self.central_layout = QVBoxLayout(central_widget)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -197,7 +202,7 @@ class UMainWidget(WindowMixin, QWidget):
         central_layout.setContentsMargins(0, 0, 0, 0)
         central_layout.setSpacing(0)
 
-        frame = QFrame()
+        frame = UFrame()
         central_layout.addWidget(frame)
 
         self.central_layout = QVBoxLayout(frame)
@@ -283,7 +288,7 @@ class UPushButton(QPushButton):
         return super().text().strip()
 
 
-class HSep(QFrame):
+class HSep(UFrame):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(1)
@@ -513,7 +518,7 @@ class GrayTextLabel(QLabel):
         self.setFont(font)
 
 
-class BlackBgFrame(QFrame):
+class BlackBgFrame(UFrame):
     def __init__(self):
         super().__init__()
 

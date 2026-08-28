@@ -5,8 +5,8 @@ from collections import defaultdict
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import (QCloseEvent, QGuiApplication, QIcon, QImage,
                          QKeyEvent, QPixmap)
-from PyQt6.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
-                             QSplitter, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSplitter, QVBoxLayout,
+                             QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
