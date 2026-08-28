@@ -306,7 +306,7 @@ QListWidget::indicator:disabled {
    ========================================================================== */
 
 CalendarBigDate {
-    font-size: 30pt;
+    font-size: 25pt;
     color: #555555;
 }
 

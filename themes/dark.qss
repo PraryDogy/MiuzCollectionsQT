@@ -245,7 +245,7 @@ QListWidget::indicator:disabled { background-color: #101010; border-color: #2222
 
 /* --- Модуль: Календарь --- */
 CalendarBigDate {
-    font-size: 30pt;
+    font-size: 25pt;
     color: #b2b2b2;
 }
 

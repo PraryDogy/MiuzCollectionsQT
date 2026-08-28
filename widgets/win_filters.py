@@ -3,6 +3,7 @@ import os
 from PyQt6.QtCore import QLocale  # Добавьте импорт QLocale в начало файла
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSpinBox, QSplitter,
                              QToolButton, QVBoxLayout, QWidget)
 
@@ -11,9 +12,9 @@ from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
-                            UGroupBox, UMainWidget, UMenu, UPushButton,
-                            UTextEditDark, UListSpacerItem, UListWidget,
-                            UListWidgetItem)
+                            UGroupBox, UListSpacerItem, UListWidget,
+                            UListWidgetItem, UMainWidget, UMenu, UPushButton,
+                            UTextEditDark)
 from .caledar_widget import Calendar, CalendarBigDate
 
 
@@ -26,7 +27,7 @@ class WinDatesDateLabel(QLabel):
 class DatesWidget(UGroupBox):
     reload_thumbnails = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
-    hh = 40
+    svg_calendar_size = (25, 25)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -49,10 +50,25 @@ class DatesWidget(UGroupBox):
         self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setSpacing(RowArrowWidget.group_spacing)
 
-        self.title_widget = RowArrowWidget("")
-        self.title_widget.set_left_icon(self.calendar_svg)
-        self.title_widget.hide_arrow()  
-        self.main_layout.addWidget(self.title_widget)
+        # --- 1. Блок большой даты ---
+        dynamic_container = QWidget()
+        self.main_layout.addWidget(dynamic_container) # Добавляем сразу
+        
+        dynamic_container_lay = QHBoxLayout(dynamic_container)
+        dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
+        dynamic_container_lay.setSpacing(0)
+
+        calendar_icon = QSvgWidget()
+        calendar_icon.load(str(self.calendar_svg))
+        calendar_icon.setFixedSize(*self.svg_calendar_size)
+        dynamic_container_lay.addWidget(calendar_icon)
+
+        dynamic_container_lay.addSpacing(10)
+
+        self.dynamic_label = CalendarBigDate()
+        self.dynamic_label.setFixedWidth(self.width())
+        dynamic_container_lay.addWidget(self.dynamic_label)
+        dynamic_container_lay.addStretch()
 
         self.main_layout.addWidget(HSep())
         self.main_layout.addSpacing(5)
@@ -211,15 +227,15 @@ class DatesWidget(UGroupBox):
 
         text = self.preset_actions[index].text()
         if index == len(self.preset_actions) - 1:
-            if self.q_date_start == self.q_date_end:
-                str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
-                text = f"{str_date}"
-            else:
-                str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
-                str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-                text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
+            # if self.q_date_start == self.q_date_end:
+            #     str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
+            #     text = f"{str_date}"
+            # else:
+            str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+            str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+            text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
 
-        self.title_widget.text_widget.setText(text)
+        self.dynamic_label.setText(text)
 
     def apply_filter(self, index: int):
         Dynamic.date_start = self.q_date_start.toPyDate()
