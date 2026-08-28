@@ -104,7 +104,6 @@ class WinMain(UMainWindow):
         self.go_to_url: str | None = None
         self.files_to_copy = set()
         self.stop_scaner = True
-        self.grid_scroll_value = 0
 
         h_wid_main = QWidget()
         h_lay_main = QHBoxLayout(h_wid_main)
