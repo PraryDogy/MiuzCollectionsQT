@@ -3,8 +3,8 @@ import re
 import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import QHBoxLayout, QSplitter, QWidget
+from PyQt6.QtGui import QAction, QIcon, QAction
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
@@ -13,8 +13,8 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UListWidget, UListWidgetItem, UMenu, UTreeWidget,
-                            UTreeWidgetItem)
+from ._base_widgets import (UListWidget, UListWidgetItem, UMenu, UPushButton,
+                            UTreeWidget, UTreeWidgetItem)
 
 ITEM_HEIGHT = 25
 
@@ -297,6 +297,35 @@ class MfList(UListWidget):
                 Mf.write_json_data()
 
 
+class MfList(UPushButton):
+    mf_open = pyqtSignal(Mf)
+    mf_edit = pyqtSignal(Mf)
+    mf_new = pyqtSignal(str)
+    icon_path = Static.COMMON_ICONS / "image_folder.svg"
+    hh = 20
+
+    def __init__(self):
+        super().__init__("")
+        self.setText(Mf.current_mf.mf_alias)
+        self.setMinimumWidth(0)
+        self.setMaximumWidth(16777215)
+        self.setFixedHeight(self.hh)
+
+        self.menu_ = UMenu(None)
+        self.setMenu(self.menu_)
+
+        for mf in Mf.items:
+            action = QAction(mf.mf_alias, self.menu_)
+            action.triggered.connect(lambda e, mf=mf: self.action_cmd(e, mf))
+            self.menu_.addAction(action)
+
+    def action_cmd(self, e, mf: Mf):
+        self.mf_open.emit(mf)
+        self.setText(mf.mf_alias)
+
+
+
+
 class MenuLeft(QWidget):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
@@ -309,16 +338,27 @@ class MenuLeft(QWidget):
 
     def __init__(self):
         super().__init__()
-        v_lay = QHBoxLayout(self)
+        v_lay = QVBoxLayout(self)
         v_lay.setContentsMargins(0, 5, 0, 0)
         v_lay.setSpacing(0)
-        self.splitter = QSplitter()
-        self.splitter.setHandleWidth(12)
-        self.splitter.setOrientation(Qt.Orientation.Vertical)
-        v_lay.addWidget(self.splitter)
+        # self.splitter = QSplitter()
+        # self.splitter.setHandleWidth(12)
+        # self.splitter.setOrientation(Qt.Orientation.Vertical)
+        # v_lay.addWidget(self.splitter)
+
+        self.mf_list_widget = MfList()
+        self.mf_list_widget.mf_open.connect(
+            lambda mf: self.on_mf_clicked.emit(mf)
+        )
+        self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
+        self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
+        v_lay.addWidget(self.mf_list_widget)
+
+        v_lay.addSpacing(10)
+
 
         self.tree_wid = LTreeWidget()
-        self.splitter.addWidget(self.tree_wid)
+        v_lay.addWidget(self.tree_wid)
         self.tree_wid.reveal.connect(
             lambda rel_paths: self.reveal.emit(rel_paths)
         )
@@ -333,19 +373,11 @@ class MenuLeft(QWidget):
         )
         self.tree_wid.init_ui()
 
-        self.mf_list_widget = MfList(self)
-        self.mf_list_widget.mf_open.connect(
-            lambda mf: self.on_mf_clicked.emit(mf)
-        )
-        self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
-        self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        self.splitter.addWidget(self.mf_list_widget)
-
-        self.splitter.setSizes([
-            self.height() - MfList.min_hh,
-            MfList.min_hh
-        ])
-        self.splitter.setCollapsible(1, False)
+        # self.splitter.setSizes([
+        #     self.height() - MfList.min_hh,
+        #     MfList.min_hh
+        # ])
+        # self.splitter.setCollapsible(1, False)
 
 
     def mf_edit_cmd(self, mf: Mf):

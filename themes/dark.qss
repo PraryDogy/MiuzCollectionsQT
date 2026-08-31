@@ -321,16 +321,3 @@ QToolTip {
     border: 1px solid #454545;
     padding: 2px;
 }
-
-
-LTreeWidget {
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    padding-bottom: 4px;
-}
-
-MfList {
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-    padding-top: 4px;
-}
