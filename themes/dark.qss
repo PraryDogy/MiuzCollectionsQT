@@ -94,7 +94,7 @@ ULineEditDark  { background: #171717; }
 
 QTextEdit {
     color: #ffffff;
-    border: 1px solid #353535;
+    border: 1px solid #2d2d2d;
     border-radius: 6px;
     padding-left: 2px;
     padding-right: 2px;
@@ -207,7 +207,7 @@ QMenu::right-arrow:selected {
 QTreeView, QListWidget {
     color: #ffffff;
     background: #171717;
-    border: 1px solid #353535;
+    border: 1px solid #2d2d2d;
     border-radius: 10px;
     padding: 10px 2px 10px 2px; /* верх | право | низ | лево */
 }
