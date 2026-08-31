@@ -251,7 +251,7 @@ QTreeView,
 QListWidget {
     color: #1F1F1F;
     background: #FFFFFF;
-    border: 1px solid #D6D6D6;
+    border: 0px solid #D6D6D6;
     border-radius: 10px;
     padding: 10px 2px 10px 2px;
 }
@@ -402,4 +402,16 @@ QToolTip {
     background-color: #FFFFFF;
     border: 1px solid #D6D6D6;
     padding: 2px;
+}
+
+LTreeWidget {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding-bottom: 4px;
+}
+
+MfList {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    padding-top: 4px;
 }
