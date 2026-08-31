@@ -311,7 +311,7 @@ class MenuLeft(QWidget):
         v_lay.setContentsMargins(0, 5, 0, 0)
         v_lay.setSpacing(0)
         self.splitter = QSplitter()
-        self.splitter.setHandleWidth(15)
+        self.splitter.setHandleWidth(12)
         self.splitter.setOrientation(Qt.Orientation.Vertical)
         v_lay.addWidget(self.splitter)
 
