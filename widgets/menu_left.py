@@ -222,6 +222,7 @@ class MfList(UListWidget):
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
     icon_path = Static.COMMON_ICONS / "image_folder.svg"
+    min_hh = 120
 
     def __init__(self, parent: QWidget):
         super().__init__()
@@ -231,6 +232,7 @@ class MfList(UListWidget):
         self.setDragDropMode(UListWidget.DragDropMode.InternalMove)
         self.init_ui()
         self.setCurrentRow(0)
+        self.setMinimumHeight(self.min_hh)
 
     def init_ui(self):
         for i in Mf.items:
@@ -303,7 +305,7 @@ class MenuLeft(QWidget):
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
     on_hide_digits_clicked = pyqtSignal()
-    mf_list_hh = 130
+    mf_list_hh = 100
 
     def __init__(self):
         super().__init__()
@@ -340,9 +342,11 @@ class MenuLeft(QWidget):
         self.splitter.addWidget(self.mf_list_widget)
 
         self.splitter.setSizes([
-            self.height() - self.mf_list_hh,
-            self.mf_list_hh
+            self.height() - MfList.min_hh,
+            MfList.min_hh
         ])
+        self.splitter.setCollapsible(1, False)
+
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
