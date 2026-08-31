@@ -301,8 +301,9 @@ class MfList(UPushButton):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
-    icon_path = Static.COMMON_ICONS / "image_folder.svg"
-    hh = 20
+    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
+    hh = 25
 
     def __init__(self):
         super().__init__("")
@@ -310,6 +311,8 @@ class MfList(UPushButton):
         self.setMinimumWidth(0)
         self.setMaximumWidth(16777215)
         self.setFixedHeight(self.hh)
+        self.mf_folder_icon = QIcon(str(self.image_folder_svg))
+        self.setIcon(self.mf_folder_icon)
 
         self.menu_ = UMenu(None)
         self.setMenu(self.menu_)
@@ -319,9 +322,22 @@ class MfList(UPushButton):
             action.triggered.connect(lambda e, mf=mf: self.action_cmd(e, mf))
             self.menu_.addAction(action)
 
+            action.setIcon(self.mf_folder_icon)
+            action.setIconVisibleInMenu(True)
+
+        add_new = QAction("Добавить", self.menu_)
+        add_new_icon = QIcon(str(self.new_folder_svg))
+        add_new.setIcon(add_new_icon)
+        add_new.setIconVisibleInMenu(True)
+        add_new.triggered.connect(self.add_cmd)
+        self.menu_.addAction(add_new)
+
     def action_cmd(self, e, mf: Mf):
         self.mf_open.emit(mf)
         self.setText(mf.mf_alias)
+
+    def add_cmd(self, e):
+        self.mf_new.emit("")
 
 
 
