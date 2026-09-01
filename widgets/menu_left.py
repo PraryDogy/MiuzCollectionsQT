@@ -357,10 +357,6 @@ class MenuLeft(QWidget):
         v_lay = QVBoxLayout(self)
         v_lay.setContentsMargins(0, 5, 0, 0)
         v_lay.setSpacing(0)
-        # self.splitter = QSplitter()
-        # self.splitter.setHandleWidth(12)
-        # self.splitter.setOrientation(Qt.Orientation.Vertical)
-        # v_lay.addWidget(self.splitter)
 
         self.mf_list_widget = MfList()
         self.mf_list_widget.mf_open.connect(
@@ -389,12 +385,8 @@ class MenuLeft(QWidget):
         )
         self.tree_wid.init_ui()
 
-        # self.splitter.setSizes([
-        #     self.height() - MfList.min_hh,
-        #     MfList.min_hh
-        # ])
-        # self.splitter.setCollapsible(1, False)
-
+    def set_mf_list_widget_height(self, value: int):
+        self.mf_list_widget.setFixedHeight(value)
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(

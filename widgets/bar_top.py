@@ -229,7 +229,6 @@ class BarTop(UFrame):
     reload_thumbnails = pyqtSignal()
     open_img_search_win = pyqtSignal()
     start_text_search = pyqtSignal()
-    hh = 60
 
     def __init__(self):
         super().__init__()
