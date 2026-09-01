@@ -312,7 +312,7 @@ class MfList(UPushButton):
         self.setMaximumWidth(16777215)
         self.setFixedHeight(self.hh)
         self.mf_folder_icon = QIcon(str(self.image_folder_svg))
-        self.setIcon(self.mf_folder_icon)
+        # self.setIcon(self.mf_folder_icon)
 
         self.set_text(Mf.current_mf)
 
@@ -368,7 +368,7 @@ class MenuLeft(QWidget):
         )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        # v_lay.addWidget(self.mf_list_widget)
+        v_lay.addWidget(self.mf_list_widget)
 
         v_lay.addSpacing(5)
 
