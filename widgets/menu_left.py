@@ -4,7 +4,7 @@ import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QAction
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QSizePolicy
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
@@ -318,6 +318,8 @@ class MfList(UPushButton):
 
         self.menu_ = UMenu(None)
         self.setMenu(self.menu_)
+
+        self.menu_.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
 
         for mf in Mf.items:
             action = QAction(mf.mf_alias, self.menu_)
