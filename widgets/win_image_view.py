@@ -80,6 +80,12 @@ class WinImgViewGraphics(QGraphicsView):
         effect.setOpacity(value)
         self.pixmap_item.setGraphicsEffect(effect)
 
+    def get_pixmap(self) -> QPixmap | None:
+        """Возвращает текущий QPixmap или None, если изображение не загружено"""
+        if self.pixmap_item:
+            return self.pixmap_item.pixmap()
+        return None
+
     # ---------------------- Drag через мышь ----------------------
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -368,7 +374,7 @@ class WinImageView(UMainWidget):
             self.read_img_timer.start(ms)
 
     def rotate(self, value: int):
-        pixmap = self.img_wid.pixmap()
+        pixmap = self.img_wid.get_pixmap()
         transform = QTransform().rotate(value)
         pixmap = pixmap.transformed(transform)
         self.restart_img_wid(pixmap)
