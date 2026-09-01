@@ -326,13 +326,19 @@ QToolTip {
 MfList {
     background: #1e1e1e;
     color: #ffffff;
-    border: 1px solid #2a2a2a;
+    /* border: 1px solid #2a2a2a; */
+    border: none;
     border-radius: 8px;
+    /* font-weight: bold; */
+    font-size: 15px;
 }
 
 MfList:pressed {
     background: #1e1e1e;
     color: #ffffff;
-    border: 1px solid #2a2a2a;
+    /* border: 1px solid #2a2a2a; */
+    border: none;
     border-radius: 8px;
+    /* font-weight: bold; */
+    font-size: 15px;
 }

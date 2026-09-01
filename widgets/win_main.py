@@ -5,8 +5,8 @@ from collections import defaultdict
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import (QCloseEvent, QGuiApplication, QIcon, QImage,
                          QKeyEvent, QPixmap)
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSplitter, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QSplitter,
+                             QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -105,26 +105,12 @@ class WinMain(UMainWindow):
         self.files_to_copy = set()
         self.stop_scaner = True
 
-        h_wid_main = QWidget()
-        h_lay_main = QHBoxLayout(h_wid_main)
-        h_lay_main.setContentsMargins(5, 0, 5, 0)
-        h_lay_main.setSpacing(0)
-        self.central_layout.addWidget(h_wid_main)
-
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(15)
 
-        # Левый виджет (MenuLeft) в контейнере QWidget
-        self.left_menu_container = QWidget()
-        self.left_menu_layout = QVBoxLayout(self.left_menu_container)
-        
-        # Убираем внешние отступы, чтобы меню прилегало к границам сплиттера
-        self.left_menu_layout.setContentsMargins(0, 0, 0, 5)
-        self.left_menu_layout.setSpacing(0)
-
         self.left_menu = MenuLeft()
-        self.left_menu_layout.addWidget(self.left_menu)
+        self.splitter.addWidget(self.left_menu)
 
         # Подключение сигналов
         self.left_menu.mf_edit.connect(
@@ -150,7 +136,7 @@ class WinMain(UMainWindow):
         )
         
         # Добавляем контейнер вместо самого меню в сплиттер
-        self.splitter.addWidget(self.left_menu_container)
+        self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Правый виджет
         right_wid = QWidget()
@@ -208,7 +194,7 @@ class WinMain(UMainWindow):
         self.right_layout.addWidget(self.bar_bottom)
 
         # Добавляем splitter в основной layout
-        h_lay_main.addWidget(self.splitter)
+        self.central_layout.addWidget(self.splitter)
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)

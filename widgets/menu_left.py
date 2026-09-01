@@ -303,7 +303,7 @@ class MfList(UPushButton):
     mf_new = pyqtSignal(str)
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-    hh = 25
+    hh = 30
 
     def __init__(self):
         super().__init__("")
@@ -313,6 +313,8 @@ class MfList(UPushButton):
         self.setFixedHeight(self.hh)
         self.mf_folder_icon = QIcon(str(self.image_folder_svg))
         self.setIcon(self.mf_folder_icon)
+
+        self.set_text(Mf.current_mf)
 
         self.menu_ = UMenu(None)
         self.setMenu(self.menu_)
@@ -334,12 +336,14 @@ class MfList(UPushButton):
 
     def action_cmd(self, e, mf: Mf):
         self.mf_open.emit(mf)
-        self.setText(mf.mf_alias)
+        self.set_text(mf)
+
+    def set_text(self, mf: Mf):
+        text = f" {Lng.catalog[JsonData.lng_index]}: {mf.mf_alias}"
+        self.setText(text)
 
     def add_cmd(self, e):
         self.mf_new.emit("")
-
-
 
 
 class MenuLeft(QWidget):
@@ -364,7 +368,7 @@ class MenuLeft(QWidget):
         )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        v_lay.addWidget(self.mf_list_widget)
+        # v_lay.addWidget(self.mf_list_widget)
 
         v_lay.addSpacing(5)
 
@@ -384,9 +388,6 @@ class MenuLeft(QWidget):
             lambda rel_paths: self.copy_path.emit(rel_paths)
         )
         self.tree_wid.init_ui()
-
-    def set_mf_list_widget_height(self, value: int):
-        self.mf_list_widget.setFixedHeight(value)
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(

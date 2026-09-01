@@ -61,50 +61,6 @@ class PathItem(QWidget):
             self.text_wid.setMinimumWidth(self.min_wid)
 
 
-
-class MfList(UPushButton):
-    mf_open = pyqtSignal(Mf)
-    mf_edit = pyqtSignal(Mf)
-    mf_new = pyqtSignal(str)
-    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-    hh = 25
-
-    def __init__(self):
-        super().__init__("")
-        self.setText(Mf.current_mf.mf_alias)
-        self.setMinimumWidth(0)
-        self.setMaximumWidth(16777215)
-        self.setFixedHeight(self.hh)
-        self.mf_folder_icon = QIcon(str(self.image_folder_svg))
-        self.setIcon(self.mf_folder_icon)
-
-        self.menu_ = UMenu(None)
-        self.setMenu(self.menu_)
-
-        for mf in Mf.items:
-            action = QAction(mf.mf_alias, self.menu_)
-            action.triggered.connect(lambda e, mf=mf: self.action_cmd(e, mf))
-            self.menu_.addAction(action)
-
-            action.setIcon(self.mf_folder_icon)
-            action.setIconVisibleInMenu(True)
-
-        add_new = QAction("Добавить", self.menu_)
-        add_new_icon = QIcon(str(self.new_folder_svg))
-        add_new.setIcon(add_new_icon)
-        add_new.setIconVisibleInMenu(True)
-        add_new.triggered.connect(self.add_cmd)
-        self.menu_.addAction(add_new)
-
-    def action_cmd(self, e, mf: Mf):
-        self.mf_open.emit(mf)
-        self.setText(mf.mf_alias)
-
-    def add_cmd(self, e):
-        self.mf_new.emit("")
-
-
 class PathBar(QWidget):
     new_history_item = pyqtSignal(str)
     load_st_grid = pyqtSignal()
@@ -121,10 +77,6 @@ class PathBar(QWidget):
         self.main_lay.setContentsMargins(0, 5, 0, 5)
         self.main_lay.setSpacing(5)
         self.main_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-        self.mf_list = MfList()
-        self.main_lay.addWidget(self.mf_list)
-
 
     def update(self, dir: str):
         """

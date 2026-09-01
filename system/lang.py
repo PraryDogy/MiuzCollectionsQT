@@ -146,6 +146,7 @@ class Lng:
     next_ = ("Далее", "Next")
     read_file_error = ("Ошибка чтения файла", "Error file read")
     catalogs = ("Каталоги", "Catalogs")
+    catalog = ("Каталог", "Catalog")
     folder = ("Каталог изображений", "Image catalog")
     open_default = ("Открыть по умолчанию", "Open by default")
     open_in = ("Открыть в приложении", "Open in application")
