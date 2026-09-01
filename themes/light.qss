@@ -403,3 +403,13 @@ QToolTip {
     border: 1px solid #D6D6D6;
     padding: 2px;
 }
+
+
+MfList {
+    background: #1e1e1e;
+    color: #ffffff;
+}
+
+MfList:pressed {
+    background: #1e1e1e;
+}

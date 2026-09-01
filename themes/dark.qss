@@ -321,3 +321,18 @@ QToolTip {
     border: 1px solid #454545;
     padding: 2px;
 }
+
+
+MfList {
+    background: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+}
+
+MfList:pressed {
+    background: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+}

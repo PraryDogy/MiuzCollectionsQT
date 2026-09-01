@@ -370,7 +370,7 @@ class MenuLeft(QWidget):
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         v_lay.addWidget(self.mf_list_widget)
 
-        v_lay.addSpacing(10)
+        v_lay.addSpacing(5)
 
 
         self.tree_wid = LTreeWidget()
