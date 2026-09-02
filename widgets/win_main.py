@@ -91,8 +91,8 @@ class RightLayoutSeparator(QWidget):
         layout.setContentsMargins(0, 0, RIGHT_MARGIN, 0)
         layout.setSpacing(0)
 
-        self.separator = HSep()
-        layout.addWidget(self.separator)
+        self.sep = HSep()
+        layout.addWidget(self.sep)
 
         self.setFixedHeight(1)
 
@@ -117,7 +117,12 @@ class WinMain(UMainWindow):
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
-        self.scroll_value = 0
+
+        self.grid_scroll_value = 0
+        self.sep_timer = QTimer()
+        self.sep_timer.setSingleShot(True)
+        self.sep_timer.setInterval(500) # 1 секунда
+        self.sep_timer.timeout.connect(lambda: self.bar_top_sep.sep.show())
 
         # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
         # self.test.center_to_parent(self)
@@ -196,7 +201,7 @@ class WinMain(UMainWindow):
 
         self.bar_top_sep = RightLayoutSeparator()
         self.right_layout.addWidget(self.bar_top_sep)
-        self.bar_top_sep.separator.hide()
+        self.bar_top_sep.sep.hide()
 
         self.grid = Grid()
         self.load_st_grid()
@@ -249,19 +254,33 @@ class WinMain(UMainWindow):
         return wrapper
 
     def bar_top_entered(self):
-        if self.bar_top_sep.separator.isHidden():
-            self.bar_top_sep.separator.show()
+        # Если сепаратор уже виден, ничего не делаем
+        if self.bar_top_sep.sep.isVisible():
+            return
+        # Запускаем таймер на 1 секунду для плавного показа при наведении
+        self.sep_timer.start()
 
     def bar_top_leaved(self):
-        if self.scroll_value == 0:
-            self.bar_top_sep.separator.hide()
+        # Если мышь ушла до истечения секунды — отменяем показ
+        self.sep_timer.stop() 
+        
+        # Скрываем только в том случае, если скролл находится в самом верху
+        if self.grid_scroll_value == 0 and self.bar_top_sep.sep.isVisible():
+            self.bar_top_sep.sep.hide()
 
     def handle_grid_scroll_value(self, value: int):
-        if value > 0 and self.bar_top_sep.separator.isHidden():
-            self.bar_top_sep.separator.show()
-        elif value == 0:
-            self.bar_top_sep.separator.hide()
-        self.scroll_value = 0
+        self.grid_scroll_value = value # Запоминаем текущую позицию скролла
+
+        if value > 0:
+            # Если скроллим вниз — отменяем таймер мыши и показываем МОМЕНТАЛЬНО
+            self.sep_timer.stop()
+            if self.bar_top_sep.sep.isHidden():
+                self.bar_top_sep.sep.show()
+        else:
+            # Если вернулись в самый верх (value == 0) — скрываем разделитель
+            if self.bar_top_sep.sep.isVisible():
+                self.bar_top_sep.sep.hide()
+
 
     def set_no_filters(self):
         Dynamic.filters_enabled.clear()
