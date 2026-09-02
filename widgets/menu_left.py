@@ -224,8 +224,6 @@ class LeftMenuCatalogButton(UPushButton):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
-    entered = pyqtSignal()
-    leaved = pyqtSignal()
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
     hh = 30
@@ -280,14 +278,6 @@ class LeftMenuCatalogButton(UPushButton):
 
     def add_cmd(self, e):
         self.mf_new.emit("")
-
-    def enterEvent(self, event):
-        self.entered.emit()
-        return super().enterEvent(event)
-
-    def leaveEvent(self, a0):
-        self.leaved.emit()
-        return super().leaveEvent(a0)
 
 
 class LeftMenuSep(HSep):
