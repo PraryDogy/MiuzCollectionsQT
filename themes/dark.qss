@@ -336,6 +336,20 @@ LeftMenuCatalogButton:pressed {
     border: none;
 }
 
+
+LeftMenuCatalogButton::menu-indicator {
+    image: none;
+}
+
+/* LeftMenuCatalogButton:hover {
+    background: #2b2b2b;
+    border: none;
+    border-radius: 9px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+} */
+
+
 LeftMenuSep {
     margin-left: 5px;
     margin-right: 5px;
