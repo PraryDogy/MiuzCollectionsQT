@@ -252,7 +252,7 @@ class LeftMenuCatalogButton(UPushButton):
 
         self.menu_.addSeparator()
 
-        add_new = QAction("Добавить", self.menu_)
+        add_new = QAction(Lng.add[JsonData.lng_index], self.menu_)
         add_new_icon = QIcon(str(self.new_folder_svg))
         add_new.setIcon(add_new_icon)
         add_new.setIconVisibleInMenu(True)
