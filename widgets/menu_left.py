@@ -318,8 +318,6 @@ class MenuLeft(UFrame):
         )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        self.mf_list_widget.entered.connect(self.mf_list_entered)
-        self.mf_list_widget.leaved.connect(self.mf_list_leaved)
         v_lay.addWidget(self.mf_list_widget)
 
         self.sep_above_grid = LeftMenuSep()
@@ -345,14 +343,9 @@ class MenuLeft(UFrame):
         self.tree_wid.init_ui()
 
     def handle_tree_scroll_value(self, value: int):
+        # Если скролл равен 0 -> hidden=True. Если больше 0 -> hidden=False.
         self.sep_above_grid.set_hidden(value == 0)
         self.scroll_value = value
-
-    def mf_list_leaved(self):
-        self.sep_above_grid.set_hidden(self.scroll_value == 0)
-
-    def mf_list_entered(self):
-        self.sep_above_grid.set_hidden(False)
     
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
