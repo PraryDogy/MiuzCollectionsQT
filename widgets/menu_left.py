@@ -272,6 +272,11 @@ class LeftMenuCatalogButton(UPushButton):
         self.mf_new.emit("")
 
 
+class LeftMenuSep(HSep):
+    def __init__(self):
+        super().__init__()
+
+
 class MenuLeft(QWidget):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
@@ -296,14 +301,9 @@ class MenuLeft(QWidget):
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         v_lay.addWidget(self.mf_list_widget)
 
-        self.sep_container = QWidget()
-        container_layout = QVBoxLayout(self.sep_container)
-        container_layout.setContentsMargins(10, 0, 10, 0)
-        container_layout.setSpacing(0)
-        self.sep_above_grid = HSep()
-        container_layout.addWidget(self.sep_above_grid)
-        v_lay.addWidget(self.sep_container)
-        self.sep_container.hide()
+        self.sep_above_grid = LeftMenuSep()
+        v_lay.addWidget(self.sep_above_grid)
+        self.sep_above_grid.hide()
 
         self.tree_wid = LeftMenuTreeWidget()
         v_lay.addWidget(self.tree_wid)
@@ -320,15 +320,15 @@ class MenuLeft(QWidget):
             lambda rel_paths: self.copy_path.emit(rel_paths)
         )
         self.tree_wid.on_scroll_changed.connect(
-            lambda value: self.handle_grid_scroll_value(value)
+            lambda value: self.handle_tree_scroll_value(value)
         )
         self.tree_wid.init_ui()
 
-    def handle_grid_scroll_value(self, value: int):
-        if value > 0 and self.sep_container.isHidden():
-            self.sep_container.show()
+    def handle_tree_scroll_value(self, value: int):
+        if value > 0 and self.sep_above_grid.isHidden():
+            self.sep_above_grid.show()
         elif value == 0:
-            self.sep_container.hide()
+            self.sep_above_grid.hide()
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
