@@ -362,13 +362,9 @@ BarTopLineEdit:focus {
     background: #2b2b2b;
 }
 
-/* LeftMenuCatalogButton:pressed {
-    background: #2b2b2b;
-    border: none;
-    border-radius: 9px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-} */
+LeftMenuCatalogButton:pressed {
+    font-weight: bold;
+}
 
 
 /* LeftMenuCatalogButtonMenu {
