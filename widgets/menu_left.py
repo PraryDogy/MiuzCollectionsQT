@@ -214,6 +214,12 @@ class LeftMenuTreeWidget(UTreeWidget):
         return super().contextMenuEvent(a0)
 
 
+class LeftMenuCatalogButtonMenu(UMenu):
+    def __init__(self, event):
+        super().__init__(event)
+
+
+
 class LeftMenuCatalogButton(UPushButton):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
@@ -235,7 +241,7 @@ class LeftMenuCatalogButton(UPushButton):
 
         self.set_text(Mf.current_mf)
 
-        self.menu_ = UMenu(None)
+        self.menu_ = LeftMenuCatalogButtonMenu(None)
         self.menu_.aboutToShow.connect(self.adjust_menu_geometry)
 
         self.setMenu(self.menu_)
@@ -262,6 +268,7 @@ class LeftMenuCatalogButton(UPushButton):
     def adjust_menu_geometry(self):
         self.menu_.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.menu_.setMinimumWidth(self.width())
+        self.menu_.move(self.menu_.x() + 30, self.menu_.y())
 
     def action_cmd(self, e, mf: Mf):
         self.mf_open.emit(mf)
