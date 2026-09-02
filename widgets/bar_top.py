@@ -233,8 +233,7 @@ class BarTop(UFrame):
     def __init__(self):
         super().__init__()
         self.h_layout = QHBoxLayout(self)
-        right_margin = 10
-        self.h_layout.setContentsMargins(0, 3, right_margin, 5)
+        self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
         self.h_layout.addStretch(0)

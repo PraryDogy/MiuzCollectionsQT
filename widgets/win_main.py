@@ -41,6 +41,9 @@ from .win_smb import WinSmb
 from .win_upload import UploadWin
 
 
+RIGHT_MARGIN = 10
+
+
 class TestWid(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent=parent, text="TEST")
@@ -78,6 +81,18 @@ class DangerWarn(ConfirmWindow):
 
     def keyPressEvent(self, a0):
         return
+
+
+class RightLayoutSeparator(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, RIGHT_MARGIN, 0)
+        layout.setSpacing(0)
+
+        self.separator = HSep()
+        layout.addWidget(self.separator)
 
 
 class WinMain(UMainWindow):
@@ -147,6 +162,8 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
+        self.bar_top.h_layout.setContentsMargins(2, 2, RIGHT_MARGIN, 2)
+
         self.bar_top.reload_thumbnails.connect(
             lambda: self.load_st_grid()
             )
@@ -164,20 +181,15 @@ class WinMain(UMainWindow):
         )
         self.right_layout.addWidget(self.bar_top)
 
-        self.sep_container = QWidget()
-        container_layout = QVBoxLayout(self.sep_container)
-        container_layout.setContentsMargins(0, 0, 10, 0)
-        container_layout.setSpacing(0)
-        self.sep_above_grid = HSep()
-        container_layout.addWidget(self.sep_above_grid)
-        self.right_layout.addWidget(self.sep_container)
-        self.sep_container.hide()
+        self.bar_top_sep = RightLayoutSeparator()
+        self.right_layout.addWidget(self.bar_top_sep)
+        self.bar_top_sep.hide()
 
         self.grid = Grid()
         self.load_st_grid()
 
-        sep_bottom = HSep()
-        self.right_layout.addWidget(sep_bottom)
+        bar_bottom_sep = RightLayoutSeparator()
+        self.right_layout.addWidget(bar_bottom_sep)
 
         self.bar_path = PathBar()
         self.path_bar_update("")
@@ -188,8 +200,8 @@ class WinMain(UMainWindow):
             lambda: self.bar_path.setMaximumWidth(wid.width())
         )
 
-        sep_bottom = HSep()
-        self.right_layout.addWidget(sep_bottom)
+        bar_path_sep = RightLayoutSeparator()
+        self.right_layout.addWidget(bar_path_sep)
 
         self.bar_bottom = BarBottom()
         # self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
@@ -224,10 +236,10 @@ class WinMain(UMainWindow):
         return wrapper
 
     def handle_grid_scroll_value(self, value: int):
-        if value > 0 and self.sep_container.isHidden():
-            self.sep_container.show()
+        if value > 0 and self.bar_top_sep.isHidden():
+            self.bar_top_sep.show()
         elif value == 0:
-            self.sep_container.hide()
+            self.bar_top_sep.hide()
 
     def set_no_filters(self):
         Dynamic.filters_enabled.clear()
