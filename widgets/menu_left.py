@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UListWidget, UListWidgetItem, UMenu, UPushButton,
+from ._base_widgets import (UListWidget, HSep, UMenu, UPushButton,
                             UTreeWidget, UTreeWidgetItem)
 
 ITEM_HEIGHT = 25
@@ -31,12 +31,14 @@ class LeftMenuTreeWidget(UTreeWidget):
     copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
     on_hide_digits_clicked = pyqtSignal()
+    on_scroll_changed = pyqtSignal(int)
     
     icon_path = Static.COMMON_ICONS / "base_folder.svg"
 
     def __init__(self):
         super().__init__()
         self.itemClicked.connect(self.on_item_click)
+        self.verticalScrollBar().valueChanged.connect(self.on_scroll_changed)
         self.abs_selected_path: str = os.sep
         self.items: dict[str, LeftMenuTreeWidgetItem] = {}
 
@@ -294,8 +296,14 @@ class MenuLeft(QWidget):
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         v_lay.addWidget(self.mf_list_widget)
 
-        # v_lay.addSpacing(5)
-
+        self.sep_container = QWidget()
+        container_layout = QVBoxLayout(self.sep_container)
+        container_layout.setContentsMargins(10, 0, 10, 0)
+        container_layout.setSpacing(0)
+        self.sep_above_grid = HSep()
+        container_layout.addWidget(self.sep_above_grid)
+        v_lay.addWidget(self.sep_container)
+        self.sep_container.hide()
 
         self.tree_wid = LeftMenuTreeWidget()
         v_lay.addWidget(self.tree_wid)
@@ -311,7 +319,16 @@ class MenuLeft(QWidget):
         self.tree_wid.copy_path.connect(
             lambda rel_paths: self.copy_path.emit(rel_paths)
         )
+        self.tree_wid.on_scroll_changed.connect(
+            lambda value: self.handle_grid_scroll_value(value)
+        )
         self.tree_wid.init_ui()
+
+    def handle_grid_scroll_value(self, value: int):
+        if value > 0 and self.sep_container.isHidden():
+            self.sep_container.show()
+        elif value == 0:
+            self.sep_container.hide()
 
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
