@@ -322,23 +322,18 @@ QToolTip {
     padding: 2px;
 }
 
-
-LeftMenuTreeWidget {
-    background: transparent;
-    border: none;
-}
-
-
-LeftMenuCatalogButton, LeftMenuCatalogButton:pressed {
-    background: transparent;
-    border: none;
-}
-
 MenuLeft {
     background: #171717;
     border: 1px solid #2d2d2d;
     border-radius: 10px;
     margin: 5px;
+}
+
+LeftMenuTreeWidget,
+LeftMenuCatalogButton,
+LeftMenuCatalogButton:pressed {
+    background: transparent;
+    border: none;
 }
 
 LeftMenuSep {

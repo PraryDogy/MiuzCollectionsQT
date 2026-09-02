@@ -369,26 +369,22 @@ QToolTip {
     padding: 2px;
 }
 
-
-LeftMenuTreeWidget {
-    background: transparent;
-    border: none;
-}
-
-
-LeftMenuCatalogButton, LeftMenuCatalogButton:pressed {
-    background: transparent;
-    border: none;
-}
-
 MenuLeft {
-    background: #171717;
-    border: 1px solid #2d2d2d;
+    background: #FFFFFF;        /* Белый фон панелей из палитры */
+    border: 1px solid #D6D6D6;  /* Светло-серая граница */
     border-radius: 10px;
     margin: 5px;
 }
 
+LeftMenuTreeWidget,
+LeftMenuCatalogButton,
+LeftMenuCatalogButton:pressed {
+    background: transparent;
+    border: none;
+}
+
 LeftMenuSep {
+    background: #D6D6D6;   
     margin-left: 5px;
     margin-right: 5px;
 }
