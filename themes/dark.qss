@@ -283,15 +283,15 @@ ThumbImgWidget { border-radius: 10px; }
 ThumbImgWidget[framed="false"] { background: transparent; }
 ThumbImgWidget[framed="true"]  { background-color: #3a3a3a; }
 
-WhiteTextWid {
+ThumbWhiteTextWid {
     font-size: 11px;
     border-radius: 5px;
     padding: 2px;
 }
-WhiteTextWid[framed="false"] { background: transparent; color: #ffffff; }
-WhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
+ThumbWhiteTextWid[framed="false"] { background: transparent; color: #ffffff; }
+ThumbWhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
 
-BlueTextWidget, MiuzBlueTextWidget {
+ThumbBlueTextWidget, ThumbMiuzBlueTextWidget {
     font-size: 11px;
     color: #6e6e6e;
 }

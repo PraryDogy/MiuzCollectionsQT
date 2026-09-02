@@ -65,7 +65,7 @@ class ThumbImgWidget(ThumbBaseLabel):
 
 
 
-class WhiteTextWid(ThumbBaseLabel):
+class ThumbWhiteTextWid(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
@@ -93,7 +93,7 @@ class WhiteTextWid(ThumbBaseLabel):
 
     
 
-class BlueTextWidget(ThumbBaseLabel):
+class ThumbBlueTextWidget(ThumbBaseLabel):
     def __init__(self, data_item: DataItem):
         super().__init__()
         self.data_item = data_item
@@ -103,7 +103,7 @@ class BlueTextWidget(ThumbBaseLabel):
         self.setText(day_month_year)
 
 
-class MiuzBlueTextWidget(ThumbBaseLabel):
+class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
     # Инкапсулированные статические переменные
     FONT_SIZE = 11
     COLLECTION_RE = re.compile(r"^/+(?:\d+\s+)?([^/]+)")
@@ -130,7 +130,7 @@ class Thumb(UFrame):
     wid_height = 0
     img_wid_size = 0
     img_wid_height = 0
-    blue_text_class = BlueTextWidget
+    blue_text_class = ThumbBlueTextWidget
 
     def __init__(self, data_item: DataItem):
         super().__init__()
@@ -149,7 +149,7 @@ class Thumb(UFrame):
         self.img_wid = ThumbImgWidget()
         self.v_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.white_text_wid = WhiteTextWid(self.data_item)
+        self.white_text_wid = ThumbWhiteTextWid(self.data_item)
         self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.blue_text_wid = self.blue_text_class(self.data_item)
@@ -173,7 +173,7 @@ class Thumb(UFrame):
         Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind] + Static.THUMB_IMG_WID_BORDER
         Thumb.wid_width = Thumb.img_wid_size + Static.THUMB_WID_EXTRA_W
         if Static.MIUZ_ZIP.exists():
-            Thumb.blue_text_class = MiuzBlueTextWidget
+            Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
     def set_pixmap_with_actual_size(self):
         qimage = self.data_item.qimages[Dynamic.current_pixmap_size_index]
@@ -342,7 +342,7 @@ class Grid(VScrollArea):
     def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
         global_pos = QCursor.pos() 
         wid = QApplication.widgetAt(global_pos)
-        if isinstance(wid, (ThumbImgWidget, WhiteTextWid)):
+        if isinstance(wid, (ThumbImgWidget, ThumbWhiteTextWid)):
             return wid.parent()
         else:
             return None
@@ -462,7 +462,7 @@ class Grid(VScrollArea):
             ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
 
             for wid in self.cell_to_wid.values():
-                widgets = wid.findChildren((WhiteTextWid, ThumbImgWidget))
+                widgets = wid.findChildren((ThumbWhiteTextWid, ThumbImgWidget))
                 intersects = any(
                     rect.intersects(QRect(child.mapTo(self, QPoint(0, 0)), child.size()))
                     for child in widgets
