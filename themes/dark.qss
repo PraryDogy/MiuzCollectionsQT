@@ -297,7 +297,7 @@ BlueTextWidget, MiuzBlueTextWidget {
 }
 
 /* --- Модуль: Окна просмотра и заголовки --- */
-MfAliasTitle {
+WinSettingsMfAliasTitle {
     color: #ffffff;
     font-size: 23px;
     font-weight: bold;
@@ -323,7 +323,7 @@ QToolTip {
 }
 
 
-MfList, MfList:pressed {
+LeftMenuCatalogButton, LeftMenuCatalogButton:pressed {
     color: #cecece;
     background: #171717;
     border: 1px solid #2d2d2d;
@@ -336,7 +336,7 @@ MfList, MfList:pressed {
 }
 
 
-LTreeWidget {
+LeftMenuTreeWidget {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     border-top: none;

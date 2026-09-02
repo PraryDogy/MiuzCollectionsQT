@@ -559,7 +559,7 @@ class FiltersWid(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class MfAliasTitle(QLabel):
+class WinSettingsMfAliasTitle(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
 
@@ -593,7 +593,7 @@ class MfSettings(QWidget):
 
         text = f"{Lng.alias[JsonData.lng_index]}: {self.mf.mf_alias}"
         text = f"{self.mf.mf_alias}"
-        self.name_wid = MfAliasTitle(text)
+        self.name_wid = WinSettingsMfAliasTitle(text)
         
         # header_lay.addWidget(self.icon_wid)
         header_lay.addWidget(self.name_wid)

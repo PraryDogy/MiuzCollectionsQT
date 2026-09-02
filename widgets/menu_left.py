@@ -20,13 +20,13 @@ from ._base_widgets import (UListWidget, UListWidgetItem, UMenu, UPushButton,
 ITEM_HEIGHT = 25
 
 
-class LTreeWidgetItem(UTreeWidgetItem):
+class LeftMenuTreeWidgetItem(UTreeWidgetItem):
     def __init__(self, parent, text, path):
         super().__init__(parent, text)
         self.path = path
 
 
-class LTreeWidget(UTreeWidget):
+class LeftMenuTreeWidget(UTreeWidget):
     reveal = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
@@ -38,7 +38,7 @@ class LTreeWidget(UTreeWidget):
         super().__init__()
         self.itemClicked.connect(self.on_item_click)
         self.abs_selected_path: str = os.sep
-        self.items: dict[str, LTreeWidgetItem] = {}
+        self.items: dict[str, LeftMenuTreeWidgetItem] = {}
 
     def need_hide_digits(self):
         if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
@@ -50,7 +50,7 @@ class LTreeWidget(UTreeWidget):
         """Удаляет начальные символы, которые не являются буквами, для сортировки."""
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
-    def sort_children(self, parent_item: LTreeWidgetItem):
+    def sort_children(self, parent_item: LeftMenuTreeWidgetItem):
         """Сортировка детей рекурсивно по strip_to_first_letter."""
         children = [parent_item.child(i) for i in range(parent_item.childCount())]
         children.sort(key=lambda it: self.strip_to_first_letter(it.text(0)).lower())
@@ -64,7 +64,7 @@ class LTreeWidget(UTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = LTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
+        root_item = LeftMenuTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
         root_item.setIcon(0, QIcon(str(self.icon_path)))
         self.addTopLevelItem(root_item)
 
@@ -72,8 +72,8 @@ class LTreeWidget(UTreeWidget):
         task.sigs.finished_.connect(lambda lst: self.build_tree(root_item, lst))
         UThreadPool.start(task)
 
-    def build_tree(self, root_item: LTreeWidgetItem, paths: list[str]) -> None:
-        self.items: dict[str, LTreeWidgetItem] = {os.sep: root_item}
+    def build_tree(self, root_item: LeftMenuTreeWidgetItem, paths: list[str]) -> None:
+        self.items: dict[str, LeftMenuTreeWidgetItem] = {os.sep: root_item}
         hide_digits = self.need_hide_digits()
 
         for path in sorted(paths):
@@ -90,7 +90,7 @@ class LTreeWidget(UTreeWidget):
             if parent_item is None:
                 continue
 
-            child = LTreeWidgetItem(parent_item, name, path)
+            child = LeftMenuTreeWidgetItem(parent_item, name, path)
             child.setIcon(0, QIcon(str(self.icon_path)))
             parent_item.addChild(child)
             self.items[path] = child
@@ -114,7 +114,7 @@ class LTreeWidget(UTreeWidget):
         self.setCurrentItem(item)
         self.scrollToItem(item, UTreeWidget.ScrollHint.PositionAtCenter)
 
-    def on_item_click(self, item: LTreeWidgetItem, col: int):
+    def on_item_click(self, item: LeftMenuTreeWidgetItem, col: int):
         abs_path = item.path
         if abs_path == self.abs_selected_path:
             return
@@ -153,7 +153,7 @@ class LTreeWidget(UTreeWidget):
             first_item.setExpanded(True)
             self.setCurrentItem(first_item)
 
-        item: LTreeWidgetItem = self.itemAt(a0.pos())
+        item: LeftMenuTreeWidgetItem = self.itemAt(a0.pos())
         menu = UMenu(a0)
 
         abs_path = os.sep
@@ -212,93 +212,7 @@ class LTreeWidget(UTreeWidget):
         return super().contextMenuEvent(a0)
 
 
-class MfListItem(UListWidgetItem):
-    def __init__(self, parent, text: str):
-        super().__init__(parent, text)
-        self.mf: Mf = None
-
-
-class MfList(UListWidget):
-    mf_open = pyqtSignal(Mf)
-    mf_edit = pyqtSignal(Mf)
-    mf_new = pyqtSignal(str)
-    icon_path = Static.COMMON_ICONS / "image_folder.svg"
-    min_hh = 120
-
-    def __init__(self, parent: QWidget):
-        super().__init__()
-        self.setDragEnabled(True)
-        self.setAcceptDrops(True)
-        self.setDefaultDropAction(Qt.DropAction.MoveAction)
-        self.setDragDropMode(UListWidget.DragDropMode.InternalMove)
-        self.init_ui()
-        self.setCurrentRow(0)
-        self.setMinimumHeight(self.min_hh)
-
-    def init_ui(self):
-        for i in Mf.items:
-            item = MfListItem(parent=self, text=i.mf_alias)
-            item.setIcon(QIcon(str(self.icon_path)))
-            item.mf = i
-            self.addItem(item)
-
-    def mouseReleaseEvent(self, e):
-        item: MfListItem = self.itemAt(e.pos())
-        if not item:
-            self.clearSelection()
-            return
-        if e.button() == Qt.MouseButton.LeftButton:
-            self.mf_open.emit(item.mf)
-        return super().mouseReleaseEvent(e)
-
-    def contextMenuEvent(self, a0):
-        menu = UMenu(a0)
-        item: MfListItem = self.itemAt(a0.pos())
-        if item:
-            mf_open = QAction(Lng.open[JsonData.lng_index], menu)
-            mf_open.triggered.connect(lambda: self.mf_open.emit(item.mf))
-            menu.addAction(mf_open)
-            menu.addSeparator()
-            mf_edit = QAction(Lng.setup[JsonData.lng_index], menu)
-            mf_edit.triggered.connect(lambda: self.mf_edit.emit(item.mf))
-            menu.addAction(mf_edit)
-        else:
-            new_folder = QAction(Lng.new_folder[JsonData.lng_index], menu)
-            new_folder.triggered.connect(lambda: self.mf_new.emit(""))
-            menu.addAction(new_folder)
-        menu.show_menu()
-
-    def dragEnterEvent(self, e):
-        if e.mimeData().hasUrls():
-            e.acceptProposedAction()
-        else:
-            super().dragEnterEvent(e)
-
-    def dragMoveEvent(self, e):
-        if e.mimeData().hasUrls():
-            e.acceptProposedAction()
-        else:
-            super().dragMoveEvent(e)
-
-    def dropEvent(self, event):
-        if event.mimeData().hasUrls():
-            urls = event.mimeData().urls()
-            url = urls[0].toLocalFile().rstrip(os.sep)
-            if os.path.isdir(url):
-                self.mf_new.emit(url)
-        else:
-            super().dropEvent(event)
-            new_order = []
-            for i in range(self.count()):
-                item = self.item(i)
-                if isinstance(item, MfListItem):
-                    new_order.append(item.mf)
-            if new_order:
-                Mf.items = new_order
-                Mf.write_json_data()
-
-
-class MfList(UPushButton):
+class LeftMenuCatalogButton(UPushButton):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
@@ -365,7 +279,7 @@ class MenuLeft(QWidget):
         v_lay.setContentsMargins(5, 5, 0, 5)
         v_lay.setSpacing(0)
 
-        self.mf_list_widget = MfList()
+        self.mf_list_widget = LeftMenuCatalogButton()
         self.mf_list_widget.mf_open.connect(
             lambda mf: self.on_mf_clicked.emit(mf)
         )
@@ -376,7 +290,7 @@ class MenuLeft(QWidget):
         # v_lay.addSpacing(5)
 
 
-        self.tree_wid = LTreeWidget()
+        self.tree_wid = LeftMenuTreeWidget()
         v_lay.addWidget(self.tree_wid)
         self.tree_wid.reveal.connect(
             lambda rel_paths: self.reveal.emit(rel_paths)
