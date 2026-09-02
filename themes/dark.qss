@@ -323,22 +323,23 @@ QToolTip {
 }
 
 
-MfList {
-    background: #1e1e1e;
-    color: #818181;
-    border: 1px solid #2a2a2a;
-    /* border: none; */
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 15px;
+MfList, MfList:pressed {
+    color: #cecece;
+    background: #171717;
+    border: 1px solid #2d2d2d;
+    border-radius: 10px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    /* font-size: 15px; */
+    /* font-weight: bold; */
+    padding-left: 5px;
 }
 
-MfList:pressed {
-    background: #1e1e1e;
-    color: #818181;
-    border: 1px solid #2a2a2a;
-    /* border: none; */
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 15px;
+
+LTreeWidget {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top: none;
 }
+
+

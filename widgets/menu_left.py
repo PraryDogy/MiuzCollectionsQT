@@ -3,8 +3,9 @@ import re
 import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon, QAction
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QSizePolicy
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import (QComboBox, QHBoxLayout, QSizePolicy, QVBoxLayout,
+                             QWidget)
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
@@ -372,7 +373,7 @@ class MenuLeft(QWidget):
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         v_lay.addWidget(self.mf_list_widget)
 
-        v_lay.addSpacing(5)
+        # v_lay.addSpacing(5)
 
 
         self.tree_wid = LTreeWidget()
