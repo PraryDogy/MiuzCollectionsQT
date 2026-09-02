@@ -171,7 +171,7 @@ QDateEdit::down-arrow {
    ========================================================================== */
 QMenu {
     background: #FFFFFF;
-    border: 1px solid #D6D6D6;
+    border: 0px solid #111111;
     border-radius: 10px;
     padding: 5px 2px 5px 2px;
 }
