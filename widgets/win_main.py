@@ -164,9 +164,14 @@ class WinMain(UMainWindow):
         )
         self.right_layout.addWidget(self.bar_top)
 
+        self.sep_container = QWidget()
+        container_layout = QVBoxLayout(self.sep_container)
+        container_layout.setContentsMargins(0, 0, 10, 0)
+        container_layout.setSpacing(0)
         self.sep_above_grid = HSep()
-        self.right_layout.addWidget(self.sep_above_grid)
-        self.sep_above_grid.hide()
+        container_layout.addWidget(self.sep_above_grid)
+        self.right_layout.addWidget(self.sep_container)
+        self.sep_container.hide()
 
         self.grid = Grid()
         self.load_st_grid()
@@ -219,10 +224,10 @@ class WinMain(UMainWindow):
         return wrapper
 
     def handle_grid_scroll_value(self, value: int):
-        if value > 0 and self.sep_above_grid.isHidden():
-            self.sep_above_grid.show()
+        if value > 0 and self.sep_container.isHidden():
+            self.sep_container.show()
         elif value == 0:
-            self.sep_above_grid.hide()
+            self.sep_container.hide()
 
     def set_no_filters(self):
         Dynamic.filters_enabled.clear()
