@@ -229,6 +229,8 @@ class BarTop(UFrame):
     reload_thumbnails = pyqtSignal()
     open_img_search_win = pyqtSignal()
     start_text_search = pyqtSignal()
+    entered = pyqtSignal()
+    leaved = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -279,3 +281,11 @@ class BarTop(UFrame):
     def mouseReleaseEvent(self, a0):
         self.setFocus()
         return super().mouseReleaseEvent(a0)
+
+    def enterEvent(self, event):
+        self.entered.emit()
+        return super().enterEvent(event)
+
+    def leaveEvent(self, a0):
+        self.leaved.emit()
+        return super().leaveEvent(a0)

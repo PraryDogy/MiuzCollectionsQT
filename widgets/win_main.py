@@ -94,6 +94,16 @@ class RightLayoutSeparator(QWidget):
         self.separator = HSep()
         layout.addWidget(self.separator)
 
+        self.setFixedHeight(1)
+
+    #     self.setProperty("hidden", True)
+
+    # def set_hidden(self, hidden: bool):
+    #     self.setProperty("hidden", hidden)
+    #     self.style().unpolish(self)
+    #     self.style().polish(self)
+    #     self.update()
+
 
 class WinMain(UMainWindow):
     min_w = 750
@@ -107,6 +117,7 @@ class WinMain(UMainWindow):
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
+        self.scroll_value = 0
 
         # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
         # self.test.center_to_parent(self)
@@ -179,11 +190,13 @@ class WinMain(UMainWindow):
         self.bar_top.start_text_search.connect(
             lambda: self.base_search_start()
         )
+        self.bar_top.entered.connect(self.bar_top_entered)
+        self.bar_top.leaved.connect(self.bar_top_leaved)
         self.right_layout.addWidget(self.bar_top)
 
         self.bar_top_sep = RightLayoutSeparator()
         self.right_layout.addWidget(self.bar_top_sep)
-        self.bar_top_sep.hide()
+        self.bar_top_sep.separator.hide()
 
         self.grid = Grid()
         self.load_st_grid()
@@ -235,11 +248,20 @@ class WinMain(UMainWindow):
                 self.open_win_smb(Mf.current_mf)
         return wrapper
 
+    def bar_top_entered(self):
+        if self.bar_top_sep.separator.isHidden():
+            self.bar_top_sep.separator.show()
+
+    def bar_top_leaved(self):
+        if self.scroll_value == 0:
+            self.bar_top_sep.separator.hide()
+
     def handle_grid_scroll_value(self, value: int):
-        if value > 0 and self.bar_top_sep.isHidden():
-            self.bar_top_sep.show()
+        if value > 0 and self.bar_top_sep.separator.isHidden():
+            self.bar_top_sep.separator.show()
         elif value == 0:
-            self.bar_top_sep.hide()
+            self.bar_top_sep.separator.hide()
+        self.scroll_value = 0
 
     def set_no_filters(self):
         Dynamic.filters_enabled.clear()
