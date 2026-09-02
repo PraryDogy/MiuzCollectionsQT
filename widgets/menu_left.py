@@ -218,6 +218,8 @@ class LeftMenuCatalogButton(UPushButton):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
+    entered = pyqtSignal()
+    leaved = pyqtSignal()
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
     hh = 30
@@ -261,7 +263,6 @@ class LeftMenuCatalogButton(UPushButton):
         self.menu_.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.menu_.setMinimumWidth(self.width())
 
-
     def action_cmd(self, e, mf: Mf):
         self.mf_open.emit(mf)
         self.set_text(mf)
@@ -272,6 +273,14 @@ class LeftMenuCatalogButton(UPushButton):
 
     def add_cmd(self, e):
         self.mf_new.emit("")
+
+    def enterEvent(self, event):
+        self.entered.emit()
+        return super().enterEvent(event)
+
+    def leaveEvent(self, a0):
+        self.leaved.emit()
+        return super().leaveEvent(a0)
 
 
 class LeftMenuSep(HSep):
@@ -290,6 +299,8 @@ class MenuLeft(UFrame):
 
     def __init__(self):
         super().__init__()
+        self.scroll_value = 0
+
         v_lay = QVBoxLayout(self)
         v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
@@ -300,6 +311,8 @@ class MenuLeft(UFrame):
         )
         self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
+        self.mf_list_widget.entered.connect(self.mf_list_entered)
+        self.mf_list_widget.leaved.connect(self.mf_list_leaved)
         v_lay.addWidget(self.mf_list_widget)
 
         self.sep_above_grid = LeftMenuSep()
@@ -330,7 +343,17 @@ class MenuLeft(UFrame):
             self.sep_above_grid.show()
         elif value == 0:
             self.sep_above_grid.hide()
+        self.scroll_value = value
 
+    def mf_list_leaved(self):
+        print(self.scroll_value)
+        if self.scroll_value == 0:
+            self.sep_above_grid.hide()
+
+    def mf_list_entered(self):
+        if self.sep_above_grid.isHidden():
+            self.sep_above_grid.show()
+    
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
             type_="edit_folder",
