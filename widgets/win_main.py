@@ -107,7 +107,7 @@ class WinMain(UMainWindow):
 
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.splitter.setHandleWidth(15)
+        self.splitter.setHandleWidth(7)
 
         self.left_menu = MenuLeft()
         self.splitter.addWidget(self.left_menu)

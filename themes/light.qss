@@ -370,21 +370,25 @@ QToolTip {
 }
 
 
-LeftMenuCatalogButton,
-LeftMenuCatalogButton:pressed {
-    color: #555555;
-    background: #FFFFFF;
-    border: 1px solid #D6D6D6;
-    border-radius: 10px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    padding-left: 5px;
-    border-bottom: none;
+LeftMenuTreeWidget {
+    background: transparent;
+    border: none;
 }
 
 
-LeftMenuTreeWidget {
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-top: none;
+LeftMenuCatalogButton, LeftMenuCatalogButton:pressed {
+    background: transparent;
+    border: none;
+}
+
+MenuLeft {
+    background: #171717;
+    border: 1px solid #2d2d2d;
+    border-radius: 10px;
+    margin: 5px;
+}
+
+LeftMenuSep {
+    margin-left: 5px;
+    margin-right: 5px;
 }
