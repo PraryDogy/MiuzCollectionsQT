@@ -286,6 +286,13 @@ class LeftMenuCatalogButton(UPushButton):
 class LeftMenuSep(HSep):
     def __init__(self):
         super().__init__()
+        self.setProperty("hidden", True)
+
+    def set_hidden(self, hidden: bool):
+        self.setProperty("hidden", hidden)
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.update()
 
 
 class MenuLeft(UFrame):
@@ -317,7 +324,6 @@ class MenuLeft(UFrame):
 
         self.sep_above_grid = LeftMenuSep()
         v_lay.addWidget(self.sep_above_grid)
-        self.sep_above_grid.hide()
 
         self.tree_wid = LeftMenuTreeWidget()
         v_lay.addWidget(self.tree_wid)
@@ -339,20 +345,14 @@ class MenuLeft(UFrame):
         self.tree_wid.init_ui()
 
     def handle_tree_scroll_value(self, value: int):
-        if value > 0 and self.sep_above_grid.isHidden():
-            self.sep_above_grid.show()
-        elif value == 0:
-            self.sep_above_grid.hide()
+        self.sep_above_grid.set_hidden(value == 0)
         self.scroll_value = value
 
     def mf_list_leaved(self):
-        print(self.scroll_value)
-        if self.scroll_value == 0:
-            self.sep_above_grid.hide()
+        self.sep_above_grid.set_hidden(self.scroll_value == 0)
 
     def mf_list_entered(self):
-        if self.sep_above_grid.isHidden():
-            self.sep_above_grid.show()
+        self.sep_above_grid.set_hidden(False)
     
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
