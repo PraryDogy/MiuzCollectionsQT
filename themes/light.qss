@@ -406,3 +406,11 @@ LeftMenuSep[hidden="true"] {
 LeftMenuSep[hidden="false"]  {
     background: #D6D6D6;
 }
+
+BarTopLineEdit {
+    background: transparent;
+}
+
+BarTopLineEdit:focus {
+    background: #EEEEEE;
+}

@@ -341,15 +341,6 @@ LeftMenuCatalogButton::menu-indicator {
     image: none;
 }
 
-/* LeftMenuCatalogButton:hover {
-    background: #2b2b2b;
-    border: none;
-    border-radius: 9px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-} */
-
-
 LeftMenuSep {
     margin-left: 5px;
     margin-right: 5px;
@@ -361,4 +352,19 @@ LeftMenuSep[hidden="true"] {
 
 LeftMenuSep[hidden="false"]  {
     background: #2d2d2d;
+}
+
+BarTopLineEdit {
+    background: transparent;
+}
+
+BarTopLineEdit:focus {
+    background: #2b2b2b;
+}
+
+LeftMenuCatalogButton:pressed {
+    background: #2b2b2b;
+    border: none;
+    border-radius: 9px;
+    height:100px;
 }

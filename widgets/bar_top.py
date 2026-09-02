@@ -39,7 +39,7 @@ class ClearBtn(QSvgWidget):
         self.setCursor(Qt.CursorShape.ArrowCursor)
 
 
-class WidSearch(ULineEditLight):
+class BarTopLineEdit(ULineEditLight):
     reload_thumbnails = pyqtSignal()
     open_img_search = pyqtSignal()
     ww = 162
@@ -264,14 +264,14 @@ class BarTop(UFrame):
         self.h_layout.addStretch(0)
 
         right_widget = QWidget()
-        right_widget.setFixedWidth(WidSearch.ww)
+        right_widget.setFixedWidth(BarTopLineEdit.ww)
         self.h_layout.addWidget(right_widget)
         right_layout = QHBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 3, 0, 0)
         right_layout.setSpacing(0)
 
         # --- Виджет поиска ---
-        self.search_wid = WidSearch()
+        self.search_wid = BarTopLineEdit()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         right_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
