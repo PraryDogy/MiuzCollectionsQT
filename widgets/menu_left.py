@@ -232,6 +232,8 @@ class LeftMenuCatalogButton(UPushButton):
         self.set_text(Mf.current_mf)
 
         self.menu_ = UMenu(None)
+        self.menu_.aboutToShow.connect(self.adjust_menu_geometry)
+
         self.setMenu(self.menu_)
 
         self.menu_.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
@@ -250,6 +252,13 @@ class LeftMenuCatalogButton(UPushButton):
         add_new.setIconVisibleInMenu(True)
         add_new.triggered.connect(self.add_cmd)
         self.menu_.addAction(add_new)
+
+    def adjust_menu_geometry(self):
+        # Убираем ограничение Maximum, которое сжимало меню
+        self.menu_.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        # Делаем ширину меню точно такой же, как у кнопки переключения
+        self.menu_.setMinimumWidth(self.width() - 20)
+
 
     def action_cmd(self, e, mf: Mf):
         self.mf_open.emit(mf)
