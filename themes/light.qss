@@ -414,3 +414,14 @@ BarTopLineEdit {
 BarTopLineEdit:focus {
     background: #EEEEEE;
 }
+
+LeftMenuCatalogButton:pressed {
+    font-weight: bold;
+}
+
+
+/* LeftMenuCatalogButtonMenu {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top: 0px solid red;
+} */
