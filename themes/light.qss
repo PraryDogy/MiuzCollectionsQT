@@ -1,21 +1,18 @@
 /* ==========================================================================
-   1. ПАЛИТРА И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+   1. ПАЛИТРА И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (Справочник цветов)
    ========================================================================== */
 /*
    СИНИЙ (Акцент):            #0067D9 / #0078D4
-   ФОН ОСНОВНОЙ:              #F5F5F5
+   ФОН СВЕТЛЫЙ:               #F5F5F5 (Основной) / #EEEEEE (Потемнее)
    ФОН ПАНЕЛЕЙ:               #FFFFFF
-   ФОН ПОТЕМНЕЕ:              #EEEEEE
    ГРАНИЦЫ / СЕТКИ:           #D6D6D6
-   ТЕКСТ:                     #1F1F1F
-   ТЕКСТ ВТОРИЧНЫЙ:           #707070
+   ТЕКСТ:                     #1F1F1F (Основной) / #707070 (Серый)
    DISABLED:                  #A5A5A5
 */
 
 /* ==========================================================================
-   2. БАЗОВЫЕ ЭЛЕМЕНТЫ QT
+   2. БАЗОВЫЕ ЭЛЕМЕНТЫ QT (Глобальные стили)
    ========================================================================== */
-
 .UFrame {
     background: #F5F5F5;
     border: none;
@@ -45,9 +42,8 @@ GrayTextLabel {
 }
 
 /* ==========================================================================
-   3. КНОПКИ И СЛАЙДЕРЫ
+   3. КНОПКИ И СЛАЙДЕРЫ (Элементы управления)
    ========================================================================== */
-
 QPushButton {
     background: #E9E9E9;
     border: 1px solid #CFCFCF;
@@ -59,12 +55,6 @@ QPushButton {
 QPushButton:pressed {
     background: #D8D8D8;
     border: 1px solid #BDBDBD;
-}
-
-QPushButton:disabled {
-    background: #EEEEEE;
-    color: #A5A5A5;
-    border-color: #DEDEDE;
 }
 
 QPushButton::menu-indicator {
@@ -90,20 +80,14 @@ QSlider::handle:horizontal {
 }
 
 /* ==========================================================================
-   4. ПОЛЯ ВВОДА И СПИНБОКСЫ
+   4. ПОЛЯ ВВОДА И СПИНБОКСЫ (Формы)
    ========================================================================== */
-
 QLineEdit {
     color: #1F1F1F;
-    background: #FFFFFF;
     border: 1px solid #D0D0D0;
     border-radius: 6px;
     padding-left: 2px;
     padding-right: 28px;
-}
-
-QLineEdit:focus {
-    border: 1px solid #0078D4;
 }
 
 ULineEditLight {
@@ -116,15 +100,10 @@ ULineEditDark {
 
 QTextEdit {
     color: #1F1F1F;
-    background: #FFFFFF;
     border: 1px solid #D0D0D0;
     border-radius: 6px;
     padding-left: 2px;
     padding-right: 2px;
-}
-
-QTextEdit:focus {
-    border: 1px solid #0078D4;
 }
 
 UTextEditLight {
@@ -141,11 +120,6 @@ QDateEdit {
     color: #1F1F1F;
     border: 1px solid #CFCFCF;
     border-radius: 4px;
-}
-
-USpinBox:focus,
-QDateEdit:focus {
-    border: 1px solid #0078D4;
 }
 
 USpinBox::up-button,
@@ -193,20 +167,19 @@ QDateEdit::down-arrow {
 }
 
 /* ==========================================================================
-   5. ВСПЛЫВАЮЩИЕ МЕНЮ
+   5. ВСПЛЫВАЮЩИЕ МЕНЮ (QMenu)
    ========================================================================== */
-
 QMenu {
     background: #FFFFFF;
     border: 1px solid #D6D6D6;
     border-radius: 10px;
-    padding: 5px 2px 5px 2px; /* верх | право | низ | лево */
+    padding: 5px 2px 5px 2px;
 }
 
 QMenu::item {
     background: transparent;
     color: #1F1F1F;
-    padding: 5px 30px 5px 10px; /* верх | право | низ | лево */
+    padding: 5px 30px 5px 10px;
 }
 
 QMenu::item:selected {
@@ -244,14 +217,13 @@ QMenu::right-arrow:selected {
 }
 
 /* ==========================================================================
-   6. СПИСКИ И ДЕРЕВЬЯ
+   6. СПИСКИ И ДЕРЕВЬЯ (Дерево элементов)
    ========================================================================== */
-
 QTreeView,
 QListWidget {
     color: #1F1F1F;
     background: #FFFFFF;
-    border: 0px solid #D6D6D6;
+    border: 1px solid #D6D6D6;
     border-radius: 10px;
     padding: 10px 2px 10px 2px;
 }
@@ -262,7 +234,6 @@ QListWidget::item {
     background: transparent;
     height: 30px;
 }
-
 
 QTreeView::item:selected,
 QTreeView::item:selected:!active,
@@ -287,7 +258,6 @@ QTreeView::branch:selected {
 QListWidget::indicator {
     width: 16px;
     height: 16px;
-    background: #FFFFFF;
     border: 1px solid #C8C8C8;
     border-radius: 4px;
 }
@@ -302,9 +272,10 @@ QListWidget::indicator:disabled {
 }
 
 /* ==========================================================================
-   7. КАЛЕНДАРЬ
+   7. КАСТОМНЫЕ КОМПОНЕНТЫ И ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
    ========================================================================== */
 
+/* --- Модуль: Календарь --- */
 CalendarBigDate {
     font-size: 25pt;
     color: #555555;
@@ -335,10 +306,7 @@ CalendarDaySelected {
     margin-bottom: 10px;
 }
 
-/* ==========================================================================
-   8. ПЛИТКИ / КАРТОЧКИ
-   ========================================================================== */
-
+/* --- Модуль: Плитки / Карточки (Thumbnails) --- */
 ThumbImgWidget {
     border-radius: 10px;
 }
@@ -351,32 +319,30 @@ ThumbImgWidget[framed="true"] {
     background-color: #E8E8E8;
 }
 
-WhiteTextWid {
+ThumbWhiteTextWid {
     font-size: 11px;
     border-radius: 5px;
     padding: 2px;
 }
 
-WhiteTextWid[framed="false"] {
+ThumbWhiteTextWid[framed="false"] {
     background: transparent;
     color: #1F1F1F;
 }
 
-WhiteTextWid[framed="true"] {
+ThumbWhiteTextWid[framed="true"] {
     background: #0067D9;
     color: #FFFFFF;
 }
 
-BlueTextWidget, MiuzBlueTextWidget {
+ThumbBlueTextWidget,
+ThumbMiuzBlueTextWidget {
     font-size: 11px;
     color: #707070;
 }
 
-/* ==========================================================================
-   9. ОКНА ПРОСМОТРА И ЗАГОЛОВКИ
-   ========================================================================== */
-
-MfAliasTitle {
+/* --- Модуль: Окна просмотра и заголовки --- */
+WinSettingsMfAliasTitle {
     color: #1F1F1F;
     font-size: 23px;
     font-weight: bold;
@@ -390,7 +356,6 @@ BlackBgFrame {
 WinInfoLeftLabel,
 WinInfoSelectableLabel {
     font-size: 11pt;
-    color: #1F1F1F;
 }
 
 ServerLabel {
@@ -405,16 +370,21 @@ QToolTip {
 }
 
 
-MfList {
-    background: #1e1e1e;
-    color: #ffffff;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
+LeftMenuCatalogButton,
+LeftMenuCatalogButton:pressed {
+    color: #555555;
+    background: #FFFFFF;
+    border: 1px solid #D6D6D6;
+    border-radius: 10px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding-left: 5px;
+    border-bottom: none;
 }
 
-MfList:pressed {
-    background: #1e1e1e;
-    color: #ffffff;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
+
+LeftMenuTreeWidget {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top: none;
 }
