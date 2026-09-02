@@ -7,9 +7,8 @@ from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QKeyEvent, QMouseEvent, QPixmap,
                          QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QFrame, QGraphicsOpacityEffect,
-                             QGridLayout, QLabel, QRubberBand, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout,
+                             QLabel, QRubberBand, QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem

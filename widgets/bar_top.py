@@ -4,7 +4,7 @@ from pathlib import Path
 from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from typing_extensions import Literal
 
 from cfg import Dynamic, JsonData, Static

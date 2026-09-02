@@ -342,12 +342,3 @@ LeftMenuTreeWidget {
     border-top-right-radius: 0px;
     border-top: none;
 }
-
-
-
-
-LeftMenuSep {
-    background: #353535;
-    margin-left: 10px;
-    margin-right: 10px;
-}

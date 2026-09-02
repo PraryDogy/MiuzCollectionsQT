@@ -15,7 +15,7 @@ from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (UListWidget, HSep, UMenu, UPushButton,
-                            UTreeWidget, UTreeWidgetItem)
+                            UTreeWidget, UTreeWidgetItem, UFrame)
 
 ITEM_HEIGHT = 25
 
@@ -274,12 +274,13 @@ class LeftMenuCatalogButton(UPushButton):
         self.mf_new.emit("")
 
 
-class LeftMenuSep(HSep):
+class Test(UFrame):
     def __init__(self):
         super().__init__()
+        self.setFixedHeight(1)
 
 
-class MenuLeft(QWidget):
+class MenuLeft(UFrame):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
     reveal = pyqtSignal(list)
@@ -287,7 +288,6 @@ class MenuLeft(QWidget):
     mf_edit = pyqtSignal(SettingsItem)
     mf_new = pyqtSignal(SettingsItem)
     on_hide_digits_clicked = pyqtSignal()
-    mf_list_hh = 100
 
     def __init__(self):
         super().__init__()
@@ -303,7 +303,7 @@ class MenuLeft(QWidget):
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         v_lay.addWidget(self.mf_list_widget)
 
-        self.sep_above_grid = LeftMenuSep()
+        self.sep_above_grid = Test()
         v_lay.addWidget(self.sep_above_grid)
         self.sep_above_grid.hide()
 
