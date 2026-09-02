@@ -274,10 +274,9 @@ class LeftMenuCatalogButton(UPushButton):
         self.mf_new.emit("")
 
 
-class Test(UFrame):
+class LeftMenuSep(HSep):
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(1)
 
 
 class MenuLeft(UFrame):
@@ -292,7 +291,7 @@ class MenuLeft(UFrame):
     def __init__(self):
         super().__init__()
         v_lay = QVBoxLayout(self)
-        v_lay.setContentsMargins(5, 5, 0, 5)
+        v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
 
         self.mf_list_widget = LeftMenuCatalogButton()
@@ -303,7 +302,7 @@ class MenuLeft(UFrame):
         self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
         v_lay.addWidget(self.mf_list_widget)
 
-        self.sep_above_grid = Test()
+        self.sep_above_grid = LeftMenuSep()
         v_lay.addWidget(self.sep_above_grid)
         self.sep_above_grid.hide()
 
