@@ -383,8 +383,26 @@ LeftMenuCatalogButton:pressed {
     border: none;
 }
 
+LeftMenuCatalogButton::menu-indicator {
+    image: none;
+}
+
 LeftMenuSep {
     background: #D6D6D6;   
     margin-left: 5px;
     margin-right: 5px;
+}
+
+
+LeftMenuSep {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+LeftMenuSep[hidden="true"] {
+    background: transparent;
+}
+
+LeftMenuSep[hidden="false"]  {
+    background: #D6D6D6;
 }
