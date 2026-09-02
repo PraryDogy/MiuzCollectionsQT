@@ -361,7 +361,7 @@ class MenuLeft(QWidget):
     def __init__(self):
         super().__init__()
         v_lay = QVBoxLayout(self)
-        v_lay.setContentsMargins(0, 5, 0, 0)
+        v_lay.setContentsMargins(5, 5, 0, 5)
         v_lay.setSpacing(0)
 
         self.mf_list_widget = MfList()
