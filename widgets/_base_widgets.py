@@ -288,7 +288,7 @@ class UPushButton(QPushButton):
         return super().text().strip()
 
 
-class HSep(UFrame):
+class BaseSep(UFrame):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(1)
@@ -507,7 +507,7 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
-class GrayTextLabel(QLabel):
+class BaseGrayLabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
         self.set_font_size(11)

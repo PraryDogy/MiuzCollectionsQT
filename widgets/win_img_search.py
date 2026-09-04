@@ -18,7 +18,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, RowArrowWidget, UGroupBox, UMainWidget,
+from ._base_widgets import (BaseSep, RowArrowWidget, UGroupBox, UMainWidget,
                             UPushButton, USlider)
 
 
@@ -167,7 +167,7 @@ class WinImgSearch(UMainWidget):
         self.reset_btn.clicked.connect(self.reset_img_search)
         self.group_layout.addWidget(self.reset_btn)
 
-        self.group_layout.addWidget(HSep())
+        self.group_layout.addWidget(BaseSep())
         
         self.slider_widget = SliderWidget()
         self.group_layout.addWidget(self.slider_widget)

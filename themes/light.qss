@@ -371,7 +371,7 @@ QToolTip {
 
 MenuLeft {
     background: #FFFFFF;        /* Белый фон панелей из палитры */
-    border: 1px solid #D6D6D6;  /* Светло-серая граница */
+    border: 1px solid #D6D6D6;  Светло-серая граница
     border-radius: 10px;
     margin: 5px;
 }

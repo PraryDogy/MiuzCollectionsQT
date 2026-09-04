@@ -15,7 +15,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
+from ._base_widgets import (ConfirmWindow, BaseSep, MfAliasWidget, MfPathWidget,
                             RowArrowWidget, SaveRowArrowWidget, UGroupBox,
                             UMainWidget, UMenu, UPushButton)
 

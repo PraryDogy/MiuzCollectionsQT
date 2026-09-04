@@ -9,7 +9,7 @@ from cfg import Static
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 
-from ._base_widgets import GrayTextLabel, UMenu, UPushButton
+from ._base_widgets import BaseGrayLabel, UMenu, UPushButton
 
 
 class PathItem(QWidget):
@@ -40,7 +40,7 @@ class PathItem(QWidget):
         self.img_wid.setFixedSize(self.item_height, self.item_height)
         item_layout.addWidget(self.img_wid)
         
-        self.text_wid = GrayTextLabel(text=name)
+        self.text_wid = BaseGrayLabel(text=name)
         self.collapse()
         item_layout.addWidget(self.text_wid)
 

@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (QGridLayout, QGroupBox, QHBoxLayout, QLabel,
 from cfg import JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import HSep, UMainWidget, UPushButton
+from ._base_widgets import BaseSep, UMainWidget, UPushButton
 
 
 class CalendarBigDate(QLabel):
@@ -76,7 +76,7 @@ class CalendarWeek(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
-class CalendarSep(HSep):
+class CalendarSep(BaseSep):
     def __init__(self, margin: int):
         super().__init__()
         self.setStyleSheet(
@@ -191,7 +191,7 @@ class Calendar(UMainWidget):
         self.nav_layout.addWidget(self.btn_next)
 
         sep = CalendarSep(margin)
-        self.central_layout.addWidget(HSep())
+        self.central_layout.addWidget(BaseSep())
 
         # --- 3. Сетка для дней недели и чисел ---
         self.grid_widget = QWidget()  

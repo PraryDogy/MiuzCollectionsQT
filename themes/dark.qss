@@ -21,24 +21,13 @@ QLabel {
     color: #ffffff;
 }
 
-QScrollArea {
-    background: transparent;
-    border: none;
-}
-
 QGroupBox {
     background-color: transparent;
     border: 1px solid #353535;
     border-radius: 6px;
 }
 
-HSep {
-    background: #353535;
-}
 
-GrayTextLabel {
-    color: #818181;
-}
 
 /* ==========================================================================
    3. КНОПКИ И СЛАЙДЕРЫ (Элементы управления)
@@ -100,53 +89,6 @@ QTextEdit {
     padding-right: 2px;
 }
 
-UTextEditLight { background: #2b2b2b; }
-UTextEditDark  { background: #171717; }
-
-USpinBox, QDateEdit {
-    background: #3E3E3E;
-    color: #ffffff;
-    border: 1px solid #4C4C4C;
-    border-radius: 4px;
-}
-
-USpinBox::up-button, QDateEdit::up-button {
-    background: #3E3E3E;
-    width: 17px;
-    height: 10px;
-    margin-top: 2px;
-    margin-right: 2px;
-    border-radius: 3px;
-}
-
-USpinBox::up-button:pressed, QDateEdit::up-button:pressed {
-    background: #565656;
-}
-
-USpinBox::down-button, QDateEdit::down-button {
-    background: #3E3E3E;
-    width: 17px;
-    height: 10px;
-    margin-bottom: 2px;
-    margin-right: 2px;
-    border-radius: 3px;
-}
-
-USpinBox::down-button:pressed, QDateEdit::down-button:pressed {
-    background: #565656;
-}
-
-USpinBox::up-arrow, QDateEdit::up-arrow {
-    image: url("./icons/common/arrow_up.svg");
-    width: 9px;
-    height: 9px;
-}
-
-USpinBox::down-arrow, QDateEdit::down-arrow {
-    image: url("./icons/common/arrow_down.svg");
-    width: 9px;
-    height: 9px;
-}
 
 /* ==========================================================================
    5. ВСПЛЫВАЮЩИЕ МЕНЮ (QMenu)
@@ -294,6 +236,7 @@ ThumbWhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
 ThumbBlueTextWidget, ThumbMiuzBlueTextWidget {
     font-size: 11px;
     color: #6e6e6e;
+    background: none;
 }
 
 /* --- Модуль: Окна просмотра и заголовки --- */
@@ -323,35 +266,15 @@ QToolTip {
 }
 
 MenuLeft {
-    background: #171717;
-    border: 1px solid #2d2d2d;
+    background: #282828;
+    border: 0px solid #2d2d2d;
     border-radius: 10px;
-    margin: 5px;
 }
 
 LeftMenuTreeWidget,
-LeftMenuCatalogButton,
-LeftMenuCatalogButton:pressed {
+LeftMenuTitle {
     background: transparent;
     border: none;
-}
-
-
-LeftMenuCatalogButton::menu-indicator {
-    image: none;
-}
-
-LeftMenuSep {
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-LeftMenuSep[hidden="true"] {
-    background: transparent;
-}
-
-LeftMenuSep[hidden="false"]  {
-    background: #2d2d2d;
 }
 
 BarTopLineEdit {
@@ -362,13 +285,113 @@ BarTopLineEdit:focus {
     background: #2b2b2b;
 }
 
-LeftMenuCatalogButton:pressed {
-    font-weight: bold;
+ThumbFrame {
+    background: none;
 }
 
 
-/* LeftMenuCatalogButtonMenu {
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-top: 0px solid red;
-} */
+UTextEditLight { background: #2b2b2b; }
+UTextEditDark  { background: #171717; }
+
+USpinBox, QDateEdit {
+    background: #3E3E3E;
+    color: #ffffff;
+    border: 1px solid #4C4C4C;
+    border-radius: 4px;
+}
+
+USpinBox::up-button, QDateEdit::up-button {
+    background: #3E3E3E;
+    width: 17px;
+    height: 10px;
+    margin-top: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+}
+
+USpinBox::up-button:pressed, QDateEdit::up-button:pressed {
+    background: #565656;
+}
+
+USpinBox::down-button, QDateEdit::down-button {
+    background: #3E3E3E;
+    width: 17px;
+    height: 10px;
+    margin-bottom: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+}
+
+USpinBox::down-button:pressed, QDateEdit::down-button:pressed {
+    background: #565656;
+}
+
+USpinBox::up-arrow, QDateEdit::up-arrow {
+    image: url("./icons/common/arrow_up.svg");
+    width: 9px;
+    height: 9px;
+}
+
+USpinBox::down-arrow, QDateEdit::down-arrow {
+    image: url("./icons/common/arrow_down.svg");
+    width: 9px;
+    height: 9px;
+}
+
+
+/* нужно чтобы frame вокруг grid имел свой стиль */
+/* Общий стиль для всех элементов с прозрачным фоном */
+QScrollArea, 
+GridInnerFrame, 
+GridSortFrame, 
+GridSortBtn, 
+GridSortBtn:pressed, 
+GridSortLabel {
+    background: transparent;
+}
+
+/* Уникальное свойство, которое было только у кнопок */
+GridSortBtn, 
+GridSortBtn:pressed {
+    border: none;
+}
+
+GridSortLabel {
+    color: #979797;
+}
+
+
+MainWinGridFrame {
+    background: #282828;
+    border-radius: 10px;
+}
+
+/* конец */
+
+
+BaseSep {
+    background: #353535;
+}
+
+BaseGrayLabel {
+    color: #818181;
+}
+
+BarTopCatalogBtn, BarTopCatalogBtn:pressed {
+    border-radius: 7px;
+}
+
+BarTopCatalogBtn {
+    background: #383838;
+    border: 1px solid #484848;
+}
+
+BarTopCatalogBtn:pressed {
+    background: #585858;
+}
+
+BarTopTitle {
+    background: transparent;
+    font-weight: bold;
+    color: #8c8c8c;
+}

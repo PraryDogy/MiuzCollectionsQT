@@ -24,7 +24,7 @@ from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
+from ._base_widgets import (ConfirmWindow, BaseSep, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow, UGroupBox,
                             UMainWidget, UMenu, UPushButton, USpinBox,
@@ -87,7 +87,7 @@ class RebootableSettings(UGroupBox):
         # чтобы кнопка меню не теряла стиль
         lng_wid.setFixedHeight(RowArrowWidget.hh + 6)
 
-        main_layout.addWidget(HSep())
+        main_layout.addWidget(BaseSep())
 
         scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
         scaner_time_wid.set_left_icon(self.clock_svg)
@@ -104,7 +104,7 @@ class RebootableSettings(UGroupBox):
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.replace_arrow_widget(self.spin)
 
-        main_layout.addWidget(HSep())
+        main_layout.addWidget(BaseSep())
 
         reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
         reset_data_wid.set_left_icon(self.eraser_svg)
@@ -246,7 +246,7 @@ class NonRebootableSettings(UGroupBox):
         data_size_wid.clicked.connect(self.show_sizes_win)
         main_layout.addWidget(data_size_wid)
 
-        main_layout.addWidget(HSep())
+        main_layout.addWidget(BaseSep())
 
         show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
         show_files_wid.set_left_icon(self.finder_svg)
@@ -330,7 +330,7 @@ class ThemesWidget(UGroupBox):
         title_wid.hide_arrow()
         main_lay.addWidget(title_wid)
 
-        main_lay.addWidget(HSep())
+        main_lay.addWidget(BaseSep())
         main_lay.addSpacing(5)
 
         themes_wid = QWidget()
@@ -514,7 +514,7 @@ class FiltersWid(QWidget):
         erase_filters_wid.clicked.connect(self.reset_filters_cmd)
         second_container_layout.addWidget(erase_filters_wid)
 
-        second_container_layout.addWidget(HSep())
+        second_container_layout.addWidget(BaseSep())
 
         self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
         self.save_wid.clicked.connect(lambda: self.save_filters_cmd())
@@ -630,7 +630,7 @@ class MfSettings(QWidget):
         repair_widget.clicked.connect(self.repair_mf)
         general_wid_lay.addWidget(repair_widget)
 
-        general_wid_lay.addWidget(HSep())
+        general_wid_lay.addWidget(BaseSep())
 
 
         if len(Mf.items) > 1:
@@ -640,7 +640,7 @@ class MfSettings(QWidget):
             remove_wid.clicked.connect(self.remove_mf)
             general_wid_lay.addWidget(remove_wid)
 
-            general_wid_lay.addWidget(HSep())
+            general_wid_lay.addWidget(BaseSep())
 
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
         self.mf_save_widget.clicked.connect(self.save_mf_settings)

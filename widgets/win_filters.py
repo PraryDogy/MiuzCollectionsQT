@@ -11,7 +11,7 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
+from ._base_widgets import (BaseSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
                             UGroupBox, UListSpacerItem, UListWidget,
                             UListWidgetItem, UMainWidget, UMenu, UPushButton,
                             UTextEditDark)
@@ -70,7 +70,7 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.addWidget(self.dynamic_label)
         dynamic_container_lay.addStretch()
 
-        self.main_layout.addWidget(HSep())
+        self.main_layout.addWidget(BaseSep())
         self.main_layout.addSpacing(5)
         
         # --- СТРОКА 1: Виджет панели управления (Вместо вложенного layout) ---
@@ -363,7 +363,7 @@ class WinFilters(UMainWidget):
         right_lay.addSpacing(10)
         # Добавляем сначала кнопку редактирования, затем кнопку сброса в слой группы
         reset_group_lay.addWidget(self.edit_filters_btn)
-        reset_group_lay.addWidget(HSep())
+        reset_group_lay.addWidget(BaseSep())
         reset_group_lay.addWidget(self.reset_btn)
 
         # Добавляем группу в основной правый контейнер

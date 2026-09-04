@@ -21,13 +21,13 @@ from system.scaner_new import NewScanerProcess, NewScanerWorker
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import (ConfirmWindow, HSep, UMainWindow, UPushButton,
-                            WarningWindow)
+from ._base_widgets import (BaseSep, ConfirmWindow, UFrame, UMainWindow,
+                            UPushButton, WarningWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
 from .bar_top import BarTop
-from .grid import Grid, GridStandart, Thumb
+from .grid import Grid, GridSortFrame, GridStandart
 from .menu_left import MenuLeft
 from .win_collage import WinCollage
 from .win_copy_files import WinCopyFiles
@@ -39,7 +39,6 @@ from .win_servers import ServersWin
 from .win_settings import WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
-
 
 RIGHT_MARGIN = 10
 
@@ -91,142 +90,111 @@ class RightLayoutSeparator(QWidget):
         layout.setContentsMargins(0, 0, RIGHT_MARGIN, 0)
         layout.setSpacing(0)
 
-        self.sep = HSep()
+        self.sep = BaseSep()
         layout.addWidget(self.sep)
 
         self.setFixedHeight(1)
+
+
+class MainWinGridFrame(UFrame):
+    def __init__(self):
+        super().__init__()
+
 
 
 class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
     ww, hh = 1050, 750
-    GRID_INDEX = 2
 
     def __init__(self, argv: list):
         super().__init__()
-        self.central_layout.setContentsMargins(0, 0, 0, 0)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
 
         self.grid_scroll_value = 0
-
-        # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
-        # self.test.center_to_parent(self)
-        # self.test.show()
-
-        # test_wid = TestWid()
-        # self.central_layout.addWidget(test_wid)
-
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
         self.files_to_copy = set()
         self.stop_scaner = True
 
-        # Создаем QSplitter
-        self.splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.splitter.setHandleWidth(7)
+        # ==========================================
+        # 1. СОЗДАНИЕ КОМПОНЕНТОВ И ИХ СИГНАЛОВ
+        # ==========================================
+
+        # Верхняя панель
+        self.bar_top = BarTop()
+        self.bar_top.reload_thumbnails.connect(lambda: self.load_st_grid())
+        self.bar_top.open_settings_win.connect(lambda settings_item: self.open_settings_win(settings_item))
+        self.bar_top.open_filters_win.connect(lambda: self.open_filters_win())
+        self.bar_top.open_img_search_win.connect(lambda: self.open_img_search_win())
+        self.bar_top.start_text_search.connect(lambda: self.base_search_start())
+        self.bar_top.mf_new.connect(lambda settings_item: self.open_settings_win(settings_item))
+        self.bar_top.on_mf_clicked.connect(lambda mf: self.on_mf_clicked(mf))
+
+        # Сплиттер и левое меню
+        self.left_menu_grid_splitter = QSplitter(Qt.Orientation.Horizontal)
+        self.left_menu_grid_splitter.setHandleWidth(15)
+        self.left_menu_grid_splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.left_menu = MenuLeft()
-        self.splitter.addWidget(self.left_menu)
+        self.left_menu.reveal.connect(lambda rel_paths: self.reveal_in_finder(rel_paths))
+        self.left_menu.on_tree_clicked.connect(lambda abs_path: self.on_tree_clicked(abs_path))
+        self.left_menu.on_hide_digits_clicked.connect(lambda: self.on_hide_digits_clicked())
+        self.left_menu.copy_path.connect(lambda rel_paths: self.copy_path(rel_paths))
 
-        # Подключение сигналов
-        self.left_menu.mf_edit.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.left_menu.mf_new.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.left_menu.reveal.connect(
-            lambda rel_paths: self.reveal_in_finder(rel_paths)
-        )
-        self.left_menu.on_tree_clicked.connect(
-            lambda abs_path: self.on_tree_clicked(abs_path)
-        )
-        self.left_menu.on_mf_clicked.connect(
-            lambda mf: self.on_mf_clicked(mf)
-        )
-        self.left_menu.on_hide_digits_clicked.connect(
-            lambda: self.on_hide_digits_clicked()
-        )
-        self.left_menu.copy_path.connect(
-            lambda rel_paths: self.copy_path(rel_paths)
-        )
-        
-        # Добавляем контейнер вместо самого меню в сплиттер
-        self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-        # Правый виджет
-        right_wid = QWidget()
-        self.splitter.addWidget(right_wid)
-        self.right_layout = QVBoxLayout(right_wid)
-        self.right_layout.setContentsMargins(0, 0, 0, 0)
-        self.right_layout.setSpacing(0)
-
-        # Добавляем элементы в правую панель
-        self.bar_top = BarTop()
-        self.bar_top.h_layout.setContentsMargins(2, 2, RIGHT_MARGIN, 2)
-
-        self.bar_top.reload_thumbnails.connect(
-            lambda: self.load_st_grid()
-            )
-        self.bar_top.open_settings_win.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.bar_top.open_filters_win.connect(
-            lambda: self.open_filters_win()
-        )
-        self.bar_top.open_img_search_win.connect(
-            lambda: self.open_img_search_win()
-        )
-        self.bar_top.start_text_search.connect(
-            lambda: self.base_search_start()
-        )
-        self.right_layout.addWidget(self.bar_top)
-
-        self.bar_top_sep = RightLayoutSeparator()
-        self.right_layout.addWidget(self.bar_top_sep)
-        self.bar_top_sep.sep.hide()
+        self.grid_frame = MainWinGridFrame()
+        self.grid_frame_layout = QVBoxLayout(self.grid_frame)
+        self.grid_frame_layout.setContentsMargins(0, 0, 0, 0)
+        self.grid_frame_layout.setSpacing(0)
 
         self.grid = Grid()
-        self.load_st_grid()
 
-        bar_bottom_sep = RightLayoutSeparator()
-        self.right_layout.addWidget(bar_bottom_sep)
-
+        # bar_bottom_sep = RightLayoutSeparator()
         self.bar_path = PathBar()
-        self.path_bar_update("")
-        self.right_layout.addWidget(self.bar_path)
-        wid = self.splitter.widget(1)
-        QTimer.singleShot(
-            100,
-            lambda: self.bar_path.setMaximumWidth(wid.width())
-        )
-
-        bar_path_sep = RightLayoutSeparator()
-        self.right_layout.addWidget(bar_path_sep)
-
         self.bar_bottom = BarBottom()
-        # self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
-        self.bar_bottom.resize_thumbnails.connect(
-            lambda: self.grid.resize_thumbnails()
-        )
-        self.right_layout.addWidget(self.bar_bottom)
+        self.bar_bottom.resize_thumbnails.connect(lambda: self.grid.resize_thumbnails())
 
-        # Добавляем splitter в основной layout
-        self.central_layout.addWidget(self.splitter)
+        # ==========================================
+        # 2. ГРУППИРОВКА И СБОРКА ИНТЕРФЕЙСА (addWidget)
+        # ==========================================
 
-        self.splitter.setStretchFactor(0, 0)
-        self.splitter.setStretchFactor(1, 1)
+        # Наполнение QSplitter
+
+        self.left_menu_grid_splitter.addWidget(self.left_menu)
+        self.left_menu_grid_splitter.addWidget(self.grid_frame)
+
+        # Сборка главного лейаута (строго по вертикали сверху вниз)
+        self.central_layout.addWidget(self.bar_top)
+        self.central_layout.addWidget(self.left_menu_grid_splitter)
+        self.central_layout.addWidget(self.bar_bottom)
+        self.central_layout.addWidget(self.bar_path)
+
+        # ==========================================
+        # 3. ФИНАЛЬНАЯ НАСТРОЙКА И ЗАПУСК
+        # ==========================================
+        self.left_menu_grid_splitter.setStretchFactor(0, 0)
+        self.left_menu_grid_splitter.setStretchFactor(1, 1)
         self.resize(self.ww, self.hh)
+        
         self.load_st_grid()
+        self.path_bar_update("")
+
+        # wid = self.left_menu_grid_splitter.widget(1)
+        # QTimer.singleShot(
+        #     100,
+        #     lambda: self.bar_path.setMaximumWidth(wid.width())
+        # )
 
         if "noscan" not in argv:
             self.start_scaner_task()
         else:
             print("СКАНЕР ВЫКЛЮЧЕН")
             self.bar_bottom.progress_bar.setText("noscan enabled")
+
 
     @staticmethod
     def with_conn(fn: callable):
@@ -238,11 +206,6 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(Mf.current_mf)
         return wrapper
-
-    def handle_grid_scroll_value(self, value: int):
-        # Показываем, если скролл больше нуля, иначе скрываем
-        self.bar_top_sep.sep.setVisible(value > 0)
-        self.grid_scroll_value = value
 
     def set_no_filters(self):
         Dynamic.filters_enabled.clear()
@@ -661,10 +624,7 @@ class WinMain(UMainWindow):
         self.grid.collage.connect(
             lambda data_items: self.open_collage_win(data_items)
         )
-        self.grid.grid_is_scrolling.connect(
-            lambda value: self.handle_grid_scroll_value(value)
-        )
-        self.right_layout.insertWidget(self.GRID_INDEX, self.grid)
+        self.grid_frame_layout.addWidget(self.grid)
 
     @with_conn
     def open_view_win(self, mf: Mf):
@@ -927,7 +887,7 @@ class WinMain(UMainWindow):
                     self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
     
     def resizeEvent(self, a0):
-        wid = self.splitter.widget(1)
+        wid = self.left_menu_grid_splitter.widget(1)
         self.bar_path.setMaximumWidth(wid.width())
         return super().resizeEvent(a0)
     

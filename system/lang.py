@@ -244,8 +244,8 @@ class Lng:
         "A directory with this name already exists. The name must be unique"
     )
     image = ("Изображение", "Image")
-    sort_by_mod = ("По дате изменения", "Date modification")
-    sort_by_recent = ("По дате добавления", "Date added")
+    sort_by_mod = ("Дата изменения", "Date modified")
+    sort_by_recent = ("Дата добавления", "Date added")
     sort_by_mod_short = ("Дата изм.", "Date mod.")
     sort_by_recent_short = ("Дата доб.", "Date add.")
     reset_data = ("Сбросить данные", "Reset data")
@@ -525,6 +525,10 @@ class Lng:
         "Стандартная сортировка",
         "Default sorting"
     )
+    sort = (
+        "Сортировка",
+        "Sort"
+    )
     sort_alphabet = (
         "Сортировка по алфавиту",
         "Alphabetical sorting"
@@ -583,4 +587,8 @@ class Lng:
     image_search_short = (
         "Поиск изобр.",
         "Image search"
+    )
+    folders = (
+        "Папки",
+        "Folders"
     )

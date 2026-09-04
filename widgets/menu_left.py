@@ -4,8 +4,8 @@ import subprocess
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QComboBox, QHBoxLayout, QSizePolicy, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import (QComboBox, QHBoxLayout, QLabel, QSizePolicy,
+                             QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
@@ -14,8 +14,8 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UListWidget, HSep, UMenu, UPushButton,
-                            UTreeWidget, UTreeWidgetItem, UFrame)
+from ._base_widgets import (BaseGrayLabel, BaseSep, UFrame, UListWidget, UMenu,
+                            UPushButton, UTreeWidget, UTreeWidgetItem)
 
 ITEM_HEIGHT = 25
 
@@ -31,14 +31,12 @@ class LeftMenuTreeWidget(UTreeWidget):
     copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
     on_hide_digits_clicked = pyqtSignal()
-    on_scroll_changed = pyqtSignal(int)
     
     icon_path = Static.COMMON_ICONS / "base_folder.svg"
 
     def __init__(self):
         super().__init__()
         self.itemClicked.connect(self.on_item_click)
-        self.verticalScrollBar().valueChanged.connect(self.on_scroll_changed)
         self.abs_selected_path: str = os.sep
         self.items: dict[str, LeftMenuTreeWidgetItem] = {}
 
@@ -214,91 +212,16 @@ class LeftMenuTreeWidget(UTreeWidget):
         return super().contextMenuEvent(a0)
 
 
-class LeftMenuCatalogButtonMenu(UMenu):
-    def __init__(self, event):
-        super().__init__(event)
-
-
-
-class LeftMenuCatalogButton(UPushButton):
-    mf_open = pyqtSignal(Mf)
-    mf_edit = pyqtSignal(Mf)
-    mf_new = pyqtSignal(str)
-    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-    hh = 30
-
+class LeftMenuTitle(BaseGrayLabel):
     def __init__(self):
-        super().__init__("")
-        self.setText(Mf.current_mf.mf_alias)
-        self.setMinimumWidth(0)
-        self.setMaximumWidth(16777215)
-        self.setFixedHeight(self.hh)
-        self.mf_folder_icon = QIcon(str(self.image_folder_svg))
-        # self.setIcon(self.mf_folder_icon)
-
-        self.set_text(Mf.current_mf)
-
-        self.menu_ = LeftMenuCatalogButtonMenu(None)
-        self.menu_.aboutToShow.connect(self.adjust_menu_geometry)
-
-        self.setMenu(self.menu_)
-
-        self.menu_.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
-
-        for mf in Mf.items:
-            action = QAction(mf.mf_alias, self.menu_)
-            action.triggered.connect(lambda e, mf=mf: self.action_cmd(e, mf))
-            self.menu_.addAction(action)
-
-            action.setIcon(self.mf_folder_icon)
-            action.setIconVisibleInMenu(True)
-
-        self.menu_.addSeparator()
-
-        add_new = QAction(Lng.add[JsonData.lng_index], self.menu_)
-        add_new_icon = QIcon(str(self.new_folder_svg))
-        add_new.setIcon(add_new_icon)
-        add_new.setIconVisibleInMenu(True)
-        add_new.triggered.connect(self.add_cmd)
-        self.menu_.addAction(add_new)
-
-    def adjust_menu_geometry(self):
-        self.menu_.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        self.menu_.setMinimumWidth(self.width())
-        self.menu_.move(self.menu_.x() + 30, self.menu_.y())
-
-    def action_cmd(self, e, mf: Mf):
-        self.mf_open.emit(mf)
-        self.set_text(mf)
-
-    def set_text(self, mf: Mf):
-        text = f" {Lng.catalog[JsonData.lng_index]}: {mf.mf_alias}"
-        self.setText(text)
-
-    def add_cmd(self, e):
-        self.mf_new.emit("")
-
-
-class LeftMenuSep(HSep):
-    def __init__(self):
-        super().__init__()
-        self.setProperty("hidden", True)
-
-    def set_hidden(self, hidden: bool):
-        self.setProperty("hidden", hidden)
-        self.style().unpolish(self)
-        self.style().polish(self)
-        self.update()
+        super().__init__(text=Lng.folders[JsonData.lng_index])
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
 class MenuLeft(UFrame):
     on_tree_clicked = pyqtSignal(str)
-    on_mf_clicked = pyqtSignal(Mf)
     reveal = pyqtSignal(list)
     copy_path = pyqtSignal(list)
-    mf_edit = pyqtSignal(SettingsItem)
-    mf_new = pyqtSignal(SettingsItem)
     on_hide_digits_clicked = pyqtSignal()
 
     def __init__(self):
@@ -309,16 +232,12 @@ class MenuLeft(UFrame):
         v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
 
-        self.mf_list_widget = LeftMenuCatalogButton()
-        self.mf_list_widget.mf_open.connect(
-            lambda mf: self.on_mf_clicked.emit(mf)
-        )
-        self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
-        self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        v_lay.addWidget(self.mf_list_widget)
+        v_lay.addSpacing(5)
 
-        self.sep_above_grid = LeftMenuSep()
-        v_lay.addWidget(self.sep_above_grid)
+        self.left_menu_title = LeftMenuTitle()
+        v_lay.addWidget(self.left_menu_title)
+
+        v_lay.addSpacing(5)
 
         self.tree_wid = LeftMenuTreeWidget()
         v_lay.addWidget(self.tree_wid)
@@ -334,26 +253,4 @@ class MenuLeft(UFrame):
         self.tree_wid.copy_path.connect(
             lambda rel_paths: self.copy_path.emit(rel_paths)
         )
-        self.tree_wid.on_scroll_changed.connect(
-            lambda value: self.handle_tree_scroll_value(value)
-        )
         self.tree_wid.init_ui()
-
-    def handle_tree_scroll_value(self, value: int):
-        # Если скролл равен 0 -> hidden=True. Если больше 0 -> hidden=False.
-        self.sep_above_grid.set_hidden(value == 0)
-        self.scroll_value = value
-    
-    def mf_edit_cmd(self, mf: Mf):
-        item = SettingsItem(
-            type_="edit_folder",
-            content=mf.mf_alias
-        )
-        self.mf_edit.emit(item)
-
-    def mf_new_cmd(self, path: str):
-        item = SettingsItem(
-            type_="new_folder",
-            content=path
-        )
-        self.mf_new.emit(item)

@@ -4,11 +4,12 @@ import re
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
-                         QFontMetrics, QKeyEvent, QMouseEvent, QPixmap,
+                         QFontMetrics, QIcon, QKeyEvent, QMouseEvent, QPixmap,
                          QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout,
-                             QLabel, QRubberBand, QVBoxLayout, QWidget)
+                             QHBoxLayout, QLabel, QRubberBand, QVBoxLayout,
+                             QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
@@ -18,7 +19,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UFrame, UMenu, USubMenu, VScrollArea
+from ._base_widgets import UFrame, UMenu, UPushButton, USubMenu, VScrollArea
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -123,7 +124,12 @@ class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
         self.setText(f"{day_month_year}\n{miuz_collection_name}")
 
 
-class Thumb(UFrame):
+class ThumbFrame(UFrame):
+    def __init__(self):
+        super().__init__()
+
+
+class Thumb(ThumbFrame):
     sym_star = "\U00002605"
     wid_width = 0
     wid_height = 0
@@ -214,6 +220,91 @@ class Thumb(UFrame):
         self.white_text_wid.set_text(Thumb.wid_width)
 
 
+class GridSortBtn(QLabel):  # Меняем базовый класс на QLabel
+    load_st_grid = pyqtSignal()
+
+    def __init__(self):
+        super().__init__("")
+        self.update_sort_text()
+        # Если нужно, чтобы курсор менялся на "руку" при наведении (как у кнопки):
+        self.setCursor(Qt.CursorShape.PointingHandCursor) 
+
+    def update_sort_text(self):
+        text = (
+            Lng.sort_by_mod[JsonData.lng_index]
+            if Dynamic.sort_by_mod
+            else Lng.sort_by_recent[JsonData.lng_index]
+        )
+        self.setText(text)
+
+    def menu_clicked(self, value: bool):
+        Dynamic.sort_by_mod = value
+        self.update_sort_text()
+        self.load_st_grid.emit()
+
+    def mousePressEvent(self, ev: QMouseEvent | None) -> None:
+        """Показывает меню выбора сортировки сразу при нажатии левой кнопкой мыши."""
+        if ev and ev.button() == Qt.MouseButton.LeftButton:
+            menu = UMenu(ev)
+
+            act_mod = QAction(Lng.sort_by_mod[JsonData.lng_index], self, checkable=True)
+            act_recent = QAction(Lng.sort_by_recent[JsonData.lng_index], self, checkable=True)
+
+            act_mod.setChecked(Dynamic.sort_by_mod)
+            act_recent.setChecked(not Dynamic.sort_by_mod)
+
+            act_mod.triggered.connect(lambda: self.menu_clicked(True))
+            act_recent.triggered.connect(lambda: self.menu_clicked(False))
+
+            menu.addAction(act_mod)
+            menu.addAction(act_recent)
+
+            pos = self.mapToGlobal(self.rect().bottomLeft())
+            menu.exec(pos)
+
+
+class GridSortLabel(QLabel):
+    def __init__(self, text):
+        super().__init__(text)
+
+
+class GridSortFrame(UFrame):
+    load_st_grid = pyqtSignal()
+    sort_icon_svg = Static.BAR_TOP_ICONS / "sort.svg"
+    arrow_down_svg = Static.COMMON_ICONS / "arrow_down.svg"
+    sort_icon_size = (20, 20)
+    arrow_down_size = (20, 20)
+
+    def __init__(self):
+        super().__init__()
+        self.h_layout = QHBoxLayout(self)
+        self.h_layout.setContentsMargins(15, 15, 15, 15)
+        self.h_layout.setSpacing(0)
+        self.h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        self.sort_icon = QSvgWidget()
+        self.sort_icon.load(str(self.sort_icon_svg))
+        self.sort_icon.setFixedSize(*self.sort_icon_size)
+        self.h_layout.addWidget(self.sort_icon)
+        self.h_layout.addSpacing(5)
+
+        self.sort_label = GridSortLabel(Lng.sort[JsonData.lng_index] + ":")
+        self.h_layout.addWidget(self.sort_label)
+
+        self.h_layout.addSpacing(10)
+
+        self.sort_btn = GridSortBtn()
+        self.sort_btn.load_st_grid.connect(self.load_st_grid.emit)
+        self.h_layout.addWidget(self.sort_btn)
+
+        self.h_layout.addSpacing(5)
+
+        self.arrow_down_icon = QSvgWidget()
+        self.arrow_down_icon.load(str(self.arrow_down_svg))
+        self.arrow_down_icon.setFixedSize(*self.arrow_down_size)
+        self.h_layout.addWidget(self.arrow_down_icon)
+
+
 class UpBtn(QSvgWidget):
     scroll_to_top = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "scroll_up.svg"
@@ -228,6 +319,11 @@ class UpBtn(QSvgWidget):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.scroll_to_top.emit()
         super().mouseReleaseEvent(ev)
+
+
+class GridInnerFrame(UFrame):
+    def __init__(self):
+        super().__init__()
 
 
 class Grid(VScrollArea):
@@ -249,7 +345,6 @@ class Grid(VScrollArea):
     show_in_app = pyqtSignal(str)
     finished_ = pyqtSignal()
     collage = pyqtSignal(list)
-    grid_is_scrolling = pyqtSignal(int)
 
     grid_spacing = 7
     resize_ms = 10
@@ -282,21 +377,26 @@ class Grid(VScrollArea):
         self.date_timer.setSingleShot(True)
 
         # --- Вкладка прокрутки ---
-        self.scroll_wid = UFrame()
+        self.scroll_wid = GridInnerFrame()
         self.setWidget(self.scroll_wid)
         self.scroll_layout = QVBoxLayout(self.scroll_wid)
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)
         self.scroll_layout.setSpacing(0)
         self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
+        self.sort_widget = GridSortFrame()
+        self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
+        self.scroll_layout.addWidget(self.sort_widget)
+
         self.up_btn = UpBtn(self.viewport())
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
 
-        self.grid_wid = QWidget()
+        self.grid_wid = GridInnerFrame()
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout(self.grid_wid)
         self.grid_lay.setSpacing(self.grid_spacing)
+        self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
 
         self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
@@ -701,7 +801,6 @@ class Grid(VScrollArea):
 
     def checkScrollValue(self, value: int):
         self.up_btn.setVisible(value > 0)
-        self.grid_is_scrolling.emit(value)
 
     def mouseDoubleClickEvent(self, a0):
 
