@@ -375,6 +375,7 @@ class ImgUtils:
 
     @classmethod
     def read_img(cls, path: str):
+        print("read img convert posix to str")
         path = str(path)
         _, ext = os.path.splitext(path)
         ext = ext.lower()
