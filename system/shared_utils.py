@@ -375,6 +375,7 @@ class ImgUtils:
 
     @classmethod
     def read_img(cls, path: str):
+        path = str(path)
         _, ext = os.path.splitext(path)
         ext = ext.lower()
         read_any_dict: dict[str, callable] = {}

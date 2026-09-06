@@ -16,6 +16,7 @@ from system.servers import Servers
 from system.tasks import UThreadPool
 from widgets._base_widgets import UMainWindow
 from widgets.win_first_load import FirstLoadWin
+from widgets.win_img_search import WinImgSearch
 from widgets.win_main import WinMain
 
 
@@ -150,7 +151,12 @@ class App(QApplication):
 
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
-            for i in UMainWindow.win_list:
+            win_list = [
+                i
+                for i in UMainWindow.win_list
+                if not isinstance(i, WinImgSearch)
+            ]
+            for i in win_list:
                 i.raise_()
                 i.show()
         return super().eventFilter(a0, a1)
