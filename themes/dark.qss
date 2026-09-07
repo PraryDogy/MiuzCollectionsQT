@@ -362,9 +362,9 @@ BarTopLineEdit:focus {
     background: #2b2b2b;
 }
 
-LeftMenuCatalogButton:pressed {
+/* LeftMenuCatalogButton:pressed {
     font-weight: bold;
-}
+} */
 
 
 /* LeftMenuCatalogButtonMenu {
