@@ -556,6 +556,7 @@ class ImgUtils:
     def is_grayscale(img: np.ndarray, saturation_threshold=3):
         if len(img.shape) < 3 or img.shape[2] == 1:
             return True
+        return False
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         _, s, _ = cv2.split(hsv)
         mean_saturation = np.mean(s)
