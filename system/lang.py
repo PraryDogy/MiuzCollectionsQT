@@ -584,3 +584,11 @@ class Lng:
         "Поиск изобр.",
         "Image search"
     )
+    folders = (
+        "Папки",
+        "Folders"
+    )
+    sort = (
+        "Сортировка",
+        "Sort"
+    )
