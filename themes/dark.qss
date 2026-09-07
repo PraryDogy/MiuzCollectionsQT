@@ -390,7 +390,7 @@ BarTopCatalogBtn:pressed {
     background: #585858;
 }
 
-BarTopTitle {
+BarTopGrayLabel {
     background: transparent;
     font-weight: bold;
     color: #8c8c8c;

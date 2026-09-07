@@ -93,7 +93,7 @@ class BarTopLineEdit(ULineEditLight):
         return super().mouseDoubleClickEvent(a0)
 
 
-class BarTopTitle(QLabel):
+class BarTopGrayLabel(QLabel):
     def __init__(self, text: str):
         super().__init__(text)
 
@@ -245,7 +245,7 @@ class BarTopCatalogBtn(UPushButton):
         self.setText(text)
 
 
-class CatalogFrame(UFrame):
+class BarTopCatalogFrame(UFrame):
     on_mf_clicked = pyqtSignal(Mf)
     mf_new = pyqtSignal(SettingsItem)
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
@@ -257,7 +257,7 @@ class CatalogFrame(UFrame):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(0)
 
-        self.catalog_title = BarTopTitle(Lng.catalog[JsonData.lng_index] + ":")
+        self.catalog_title = BarTopGrayLabel(Lng.catalog[JsonData.lng_index] + ":")
         self.h_layout.addWidget(self.catalog_title)
 
         self.h_layout.addSpacing(10)
@@ -283,7 +283,7 @@ class BarTop(UFrame):
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.catalog_frame = CatalogFrame()
+        self.catalog_frame = BarTopCatalogFrame()
         self.catalog_frame.on_mf_clicked.connect(self.on_mf_clicked.emit)
         self.catalog_frame.mf_new.connect(self.mf_new.emit)
         self.h_layout.addWidget(self.catalog_frame)
