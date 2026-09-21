@@ -244,11 +244,11 @@ QListWidget::item:selected:!active {
 }
 
 QTreeView::branch:has-children:closed {
-    image: url(./icons/common/arrow_right.svg);
+    image: url(./icons/common/plus.svg);
 }
 
 QTreeView::branch:has-children:open {
-    image: url(./icons/common/arrow_down.svg);
+    image: url(./icons/common/minus.svg);
 }
 
 QTreeView::branch:selected {
