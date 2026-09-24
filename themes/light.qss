@@ -380,6 +380,7 @@ LeftMenuTreeWidget,
 LeftMenuCatalogButton {
     background: transparent;
     border: none;
+    color: #8d8d8d;
 }
 
 LeftMenuSep {
