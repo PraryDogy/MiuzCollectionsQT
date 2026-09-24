@@ -2,10 +2,10 @@ import os
 import re
 import subprocess
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal, QPoint
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (QComboBox, QHBoxLayout, QSizePolicy, QVBoxLayout,
-                             QWidget)
+                             QWidget, QLabel)
 from PyQt6.QtSvgWidgets import QSvgWidget
 
 from cfg import JsonData, Static
@@ -220,65 +220,9 @@ class LeftMenuCatalogButtonMenu(UMenu):
         super().__init__(event)
 
 
-
-class LeftMenuCatalogButton(UPushButton):
-    mf_open = pyqtSignal(Mf)
-    mf_edit = pyqtSignal(Mf)
-    mf_new = pyqtSignal(str)
-    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-    hh = 30
-
+class LeftMenuCatalogButton(QLabel):
     def __init__(self):
-        super().__init__("")
-        self.setText(Mf.current_mf.mf_alias)
-        self.setMinimumWidth(0)
-        self.setMaximumWidth(16777215)
-        self.setFixedHeight(self.hh)
-        self.mf_folder_icon = QIcon(str(self.image_folder_svg))
-        # self.setIcon(self.mf_folder_icon)
-
-        self.set_text(Mf.current_mf)
-
-        self.menu_ = LeftMenuCatalogButtonMenu(None)
-        self.menu_.aboutToShow.connect(self.adjust_menu_geometry)
-
-        self.setMenu(self.menu_)
-
-        self.menu_.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
-
-        for mf in Mf.items:
-            action = QAction(mf.mf_alias, self.menu_)
-            action.triggered.connect(lambda e, mf=mf: self.action_cmd(e, mf))
-            self.menu_.addAction(action)
-
-            action.setIcon(self.mf_folder_icon)
-            action.setIconVisibleInMenu(True)
-
-        self.menu_.addSeparator()
-
-        add_new = QAction(Lng.add[JsonData.lng_index], self.menu_)
-        add_new_icon = QIcon(str(self.new_folder_svg))
-        add_new.setIcon(add_new_icon)
-        add_new.setIconVisibleInMenu(True)
-        add_new.triggered.connect(self.add_cmd)
-        self.menu_.addAction(add_new)
-
-    def adjust_menu_geometry(self):
-        self.menu_.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        self.menu_.setMinimumWidth(self.width())
-        self.menu_.move(self.menu_.x() + 30, self.menu_.y())
-
-    def action_cmd(self, e, mf: Mf):
-        self.mf_open.emit(mf)
-        self.set_text(mf)
-
-    def set_text(self, mf: Mf):
-        text = f" {Lng.catalog[JsonData.lng_index]}: {mf.mf_alias}"
-        self.setText(text)
-
-    def add_cmd(self, e):
-        self.mf_new.emit("")
+        super().__init__()
 
 
 class LeftMenuCatalogWidget(QWidget):
@@ -286,21 +230,119 @@ class LeftMenuCatalogWidget(QWidget):
     mf_edit = pyqtSignal(Mf)
     mf_new = pyqtSignal(str)
 
+    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
+
+    hh = 30
+
     def __init__(self):
         super().__init__()
+
+        self.setFixedHeight(self.hh)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(5, 0, 5, 0)
         self.h_lay.setSpacing(0)
 
-        self.btn = LeftMenuCatalogButton()
-        self.h_lay.addWidget(self.btn)
+        self.label = LeftMenuCatalogButton()
+        self.label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.NoTextInteraction
+        )
 
-        arrow = QSvgWidget()
-        arrow.load(str(Static.COMMON_ICONS / "arrow_down.svg"))
-        arrow.setFixedSize(15, 15)
-        self.h_lay.addWidget(arrow)
-
+        self.h_lay.addWidget(self.label)
         self.h_lay.addStretch(1)
+
+
+        self.arrow = QSvgWidget()
+        self.arrow.load(
+            str(Static.COMMON_ICONS / "arrow_down.svg")
+        )
+        self.arrow.setFixedSize(15, 15)
+
+        self.h_lay.addWidget(self.arrow)
+
+        self.mf_folder_icon = QIcon(str(self.image_folder_svg))
+
+        self.menu_ = LeftMenuCatalogButtonMenu(None)
+        self.menu_.aboutToShow.connect(self.adjust_menu_geometry)
+
+        self.menu_.setSizePolicy(
+            QSizePolicy.Policy.Maximum,
+            QSizePolicy.Policy.Maximum
+        )
+
+        for mf in Mf.items:
+            action = QAction(mf.mf_alias, self.menu_)
+            action.setIcon(self.mf_folder_icon)
+            action.setIconVisibleInMenu(True)
+
+            action.triggered.connect(
+                lambda e, mf=mf: self.action_cmd(e, mf)
+            )
+
+            self.menu_.addAction(action)
+
+        self.menu_.addSeparator()
+
+        add_new = QAction(
+            Lng.add[JsonData.lng_index],
+            self.menu_
+        )
+
+        add_new_icon = QIcon(str(self.new_folder_svg))
+        add_new.setIcon(add_new_icon)
+        add_new.setIconVisibleInMenu(True)
+
+        add_new.triggered.connect(self.add_cmd)
+
+        self.menu_.addAction(add_new)
+
+        self.set_text(Mf.current_mf)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.show_menu()
+
+        super().mousePressEvent(event)
+
+    def show_menu(self):
+        self.menu_.setMinimumWidth(self.width())
+
+        pos = self.mapToGlobal(
+            QPoint(0, self.height())
+        )
+
+        self.menu_.move(pos)
+        self.menu_.show()
+
+    def adjust_menu_geometry(self):
+        self.menu_.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred
+        )
+
+        self.menu_.setMinimumWidth(self.width())
+
+        pos = self.mapToGlobal(
+            QPoint(0, self.height())
+        )
+
+        self.menu_.move(pos)
+
+    def action_cmd(self, e, mf: Mf):
+        self.mf_open.emit(mf)
+        self.set_text(mf)
+
+    def set_text(self, mf: Mf):
+        text = (
+            f" {Lng.catalog[JsonData.lng_index]}: "
+            f"{mf.mf_alias}"
+        )
+        self.label.setText(text)
+
+    def add_cmd(self, e):
+        self.mf_new.emit("")
 
 
 
