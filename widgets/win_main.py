@@ -395,21 +395,21 @@ class WinMain(UMainWindow):
     def start_update_thumb(self, rel_paths: list[str]):
 
         def poll_task():
+            print("poll")
             queue = self.update_thumb_task.process_queue
             if not queue.empty():
-                update_thumb_items: list[UpdateThumbItem] = queue.get()
-                for i in update_thumb_items:
-                    wid = self.grid.url_to_wid.get(i.rel_img_path)
-                    if wid:
-                        qimages = []
-                        for x in Static.THUMB_WID_PIXMAP_SIZE:
-                            resized = ImgUtils.fit_to_thumb(i.array, x * 2)
-                            qimage = Utils.pyqt_qimage_from_array(resized)
-                            pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), x)
-                            qimages.append(QImage(pixmap))
-                        wid.data_item.qimages = qimages
-                        wid.set_pixmap_with_actual_size()
-                        wid.img_wid.restore_image()
+                update_thumb_item: UpdateThumbItem = queue.get()
+                wid = self.grid.url_to_wid.get(update_thumb_item.rel_img_path)
+                if wid:
+                    qimages = []
+                    for x in Static.THUMB_WID_PIXMAP_SIZE:
+                        resized = ImgUtils.fit_to_thumb(update_thumb_item.array, x * 2)
+                        qimage = Utils.pyqt_qimage_from_array(resized)
+                        pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), x)
+                        qimages.append(QImage(pixmap))
+                    wid.data_item.qimages = qimages
+                    wid.set_pixmap_with_actual_size()
+                    wid.img_wid.restore_image()   
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
             else:

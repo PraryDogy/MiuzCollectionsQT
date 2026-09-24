@@ -479,7 +479,7 @@ class UpdateThumb:
                     if result:
                         values_list.append(result)
                         item = UpdateThumbItem(rel_img_path, thumb)
-                        update_thumb_items.append(item)
+                        queue.put(item)
 
             engine = Dbase.create_engine()
             with engine.begin() as conn:
@@ -497,8 +497,6 @@ class UpdateThumb:
                         values_list
                     )
                     conn.execute(stmt)
-
-        queue.put(update_thumb_items)
 
 
 class SmbChecker:
