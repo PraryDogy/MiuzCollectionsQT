@@ -7,7 +7,7 @@ import cv2
 # import imagehash
 import numpy as np
 import sqlalchemy
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
+from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, Qt
 from PyQt6.QtGui import QImage, QPixmap
 
 from cfg import Dynamic, JsonData, Static
@@ -132,7 +132,7 @@ class DbImagesLoader(URunnable):
             for i in Static.THUMB_WID_PIXMAP_SIZE:
                 resized = ImgUtils.fit_to_thumb(img_rgb, i * 2)
                 qimage = Utils.pyqt_qimage_from_array(resized)
-                pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), i)
+                pixmap = Utils.pyqt_scaled_high_dpi(qimage, i)
                 qimages.append(QImage(pixmap))
 
             src_qimage = Utils.pyqt_qimage_from_array(img_rgb)
