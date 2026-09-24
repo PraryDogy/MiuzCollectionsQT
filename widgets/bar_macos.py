@@ -1,7 +1,7 @@
 import os
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap
+from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap, QImage
 from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QLabel, QMenu, QMenuBar,
                              QSpacerItem, QWidget)
 
@@ -60,9 +60,9 @@ class AboutWin(UMainWidget):
         self.central_layout.setContentsMargins(10, 0, 10, 10)
 
         icon = QLabel()
-        pixmap = QPixmap(str(self.icon_path))
-        pixmap = Utils.pyqt_qiconed_resize(pixmap, self.icon_size)
-        icon.setPixmap(pixmap)
+        qimage = QImage(str(self.icon_path))
+        qimage_saled = Utils.pyqt_scaled_high_dpi(qimage, self.icon_size)
+        icon.setPixmap(QPixmap.fromImage(qimage_saled))
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(self.opacity) 
         icon.setGraphicsEffect(opacity_effect)

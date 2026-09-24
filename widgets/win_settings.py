@@ -4,7 +4,7 @@ import subprocess
 import sys
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap
+from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap, QImage
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QHBoxLayout,
                              QLabel, QLineEdit, QSpacerItem, QSplitter,
@@ -393,7 +393,6 @@ class AboutWidLabel(LabelMinWidth):
 class AboutWid(UGroupBox):
     icon_path = Static.APP_ICONS / "icon.png"
     icon_size = 85
-    opacity = 0.85
 
     def __init__(self):
         super().__init__()
@@ -402,12 +401,10 @@ class AboutWid(UGroupBox):
         h_lay.setSpacing(0)
 
         icon = QLabel()
-        pixmap = QPixmap(str(self.icon_path))
-        pixmap = Utils.pyqt_qiconed_resize(pixmap, self.icon_size)
+        qimage = QImage(str(self.icon_path))
+        qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, self.icon_size)
+        pixmap = QPixmap.fromImage(qimage_scaled)
         icon.setPixmap(pixmap)
-        opacity_effect = QGraphicsOpacityEffect()
-        opacity_effect.setOpacity(self.opacity) 
-        icon.setGraphicsEffect(opacity_effect)
         h_lay.addWidget(icon)
 
         h_lay.addSpacerItem(QSpacerItem(0, 20))
