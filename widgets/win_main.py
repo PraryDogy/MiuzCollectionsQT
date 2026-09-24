@@ -412,7 +412,7 @@ class WinMain(UMainWindow):
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
             else:
-                QTimer.singleShot(300, poll_task)
+                QTimer.singleShot(700, poll_task)
 
         for url, wid in self.grid.url_to_wid.items():
             if url in rel_paths:
