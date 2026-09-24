@@ -309,6 +309,7 @@ CalendarDaySelected {
 /* --- Модуль: Плитки / Карточки (Thumbnails) --- */
 ThumbImgWidget {
     border-radius: 10px;
+    color: #8d8d8d;
 }
 
 ThumbImgWidget[framed="false"] {
