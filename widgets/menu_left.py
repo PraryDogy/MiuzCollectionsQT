@@ -6,6 +6,7 @@ from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (QComboBox, QHBoxLayout, QSizePolicy, QVBoxLayout,
                              QWidget)
+from PyQt6.QtSvgWidgets import QSvgWidget
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
@@ -280,6 +281,29 @@ class LeftMenuCatalogButton(UPushButton):
         self.mf_new.emit("")
 
 
+class LeftMenuCatalogWidget(QWidget):
+    mf_open = pyqtSignal(Mf)
+    mf_edit = pyqtSignal(Mf)
+    mf_new = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(5, 0, 5, 0)
+        self.h_lay.setSpacing(0)
+
+        self.btn = LeftMenuCatalogButton()
+        self.h_lay.addWidget(self.btn)
+
+        arrow = QSvgWidget()
+        arrow.load(str(Static.COMMON_ICONS / "arrow_down.svg"))
+        arrow.setFixedSize(15, 15)
+        self.h_lay.addWidget(arrow)
+
+        self.h_lay.addStretch(1)
+
+
+
 class LeftMenuSep(HSep):
     def __init__(self):
         super().__init__()
@@ -309,7 +333,7 @@ class MenuLeft(UFrame):
         v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
 
-        self.mf_list_widget = LeftMenuCatalogButton()
+        self.mf_list_widget = LeftMenuCatalogWidget()
         self.mf_list_widget.mf_open.connect(
             lambda mf: self.on_mf_clicked.emit(mf)
         )
