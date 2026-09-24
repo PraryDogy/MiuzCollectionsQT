@@ -225,6 +225,27 @@ class LeftMenuCatalogButton(QLabel):
         super().__init__()
 
 
+class CatalogArrowWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setFixedSize(15, 30)
+
+        self.arrow = QSvgWidget(self)
+        self.arrow.load(
+            str(Static.COMMON_ICONS / "arrow_down.svg")
+        )
+        self.arrow.setFixedSize(15, 15)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 2, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(
+            self.arrow,
+            alignment=Qt.AlignmentFlag.AlignHCenter
+        )
+
+
 class LeftMenuCatalogWidget(QWidget):
     mf_open = pyqtSignal(Mf)
     mf_edit = pyqtSignal(Mf)
@@ -253,13 +274,7 @@ class LeftMenuCatalogWidget(QWidget):
         self.h_lay.addWidget(self.label)
         self.h_lay.addStretch(1)
 
-
-        self.arrow = QSvgWidget()
-        self.arrow.load(
-            str(Static.COMMON_ICONS / "arrow_down.svg")
-        )
-        self.arrow.setFixedSize(15, 15)
-
+        self.arrow = CatalogArrowWidget()
         self.h_lay.addWidget(self.arrow)
 
         self.mf_folder_icon = QIcon(str(self.image_folder_svg))
