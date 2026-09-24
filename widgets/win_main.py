@@ -404,8 +404,8 @@ class WinMain(UMainWindow):
                     for x in Static.THUMB_WID_PIXMAP_SIZE:
                         resized = ImgUtils.fit_to_thumb(update_thumb_item.array, x * 2)
                         qimage = Utils.pyqt_qimage_from_array(resized)
-                        pixmap = Utils.pyqt_qiconed_resize(QPixmap.fromImage(qimage), x)
-                        qimages.append(QImage(pixmap))
+                        qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, x)
+                        qimages.append(qimage_scaled)
                     wid.data_item.qimages = qimages
                     wid.set_pixmap_with_actual_size()
                     wid.img_wid.restore_image()   
