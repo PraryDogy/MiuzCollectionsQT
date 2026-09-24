@@ -395,7 +395,6 @@ class WinMain(UMainWindow):
     def start_update_thumb(self, rel_paths: list[str]):
 
         def poll_task():
-            print("poll")
             queue = self.update_thumb_task.process_queue
             if not queue.empty():
                 update_thumb_item: UpdateThumbItem = queue.get()
