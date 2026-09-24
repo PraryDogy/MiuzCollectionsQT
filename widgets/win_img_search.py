@@ -298,11 +298,9 @@ class WinImgSearch(UMainWidget):
                     min_size = min(
                         self.img_label.width(), self.img_label.height()
                     )
-                    pixmap = QPixmap.fromImage(qimage)
-                    resized_qpixmap = Utils.pyqt_qiconed_resize(
-                        pixmap, min_size
-                    )
-                    self.img_label.setPixmap(resized_qpixmap)
+                    qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, min_size)
+                    pixmap = QPixmap.fromImage(qimage_scaled)
+                    self.img_label.setPixmap(pixmap)
             except Exception:
                 self.cleanup_shm()
             if not self.read_img_task.is_alive():

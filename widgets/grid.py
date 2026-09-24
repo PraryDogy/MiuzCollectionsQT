@@ -4,7 +4,7 @@ import re
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
-                         QFontMetrics, QKeyEvent, QMouseEvent, QPixmap,
+                         QFontMetrics, QImage, QKeyEvent, QMouseEvent, QPixmap,
                          QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout,
@@ -269,8 +269,9 @@ class Grid(VScrollArea):
 
     def __init__(self):
         super().__init__()
-        _copy_files_icon = QPixmap(str(self.copy_files_path))
-        self.copy_files_icon = Utils.pyqt_qiconed_resize(_copy_files_icon, 80)
+        qimage = QImage(str(self.copy_files_path))
+        qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, 80)
+        self.copy_files_icon = QPixmap.fromImage(qimage_scaled)
 
         # --- Состояние и данные ---
         self.wid_under_mouse: Thumb = None
