@@ -280,8 +280,8 @@ CalendarDaySelected {
 
 /* --- Модуль: Плитки / Карточки (Thumbnails) --- */
 ThumbImgWidget { border-radius: 10px; }
-ThumbImgWidget[framed="false"] { background: transparent; }
-ThumbImgWidget[framed="true"]  { background-color: #3a3a3a; }
+ThumbImgWidget[framed="false"] { background: transparent; color: #AAAAAA;}
+ThumbImgWidget[framed="true"]  { background-color: #3a3a3a; color: #AAAAAA;}
 
 ThumbWhiteTextWid {
     font-size: 11px;
