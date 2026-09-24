@@ -62,6 +62,18 @@ class ThumbImgWidget(ThumbBaseLabel):
         self.setProperty("framed", False)
         self._update_style()
 
+    def show_updating(self):
+        """Показывает текст 'обновление' вместо изображения."""
+        self._saved_pixmap = self.pixmap()
+        self.setPixmap(QPixmap())
+        self.setText(Lng.updating[JsonData.lng_index])
+
+    def restore_image(self):
+        """Удаляет текст и возвращает исходное изображение."""
+        self.setText("")
+        if self._saved_pixmap:
+            self.setPixmap(self._saved_pixmap)
+
 
 
 class ThumbWhiteTextWid(ThumbBaseLabel):

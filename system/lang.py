@@ -592,3 +592,7 @@ class Lng:
         "Сортировка",
         "Sort"
     )
+    updating = (
+        "Обновление",
+        "Updating"
+    )

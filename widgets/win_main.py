@@ -409,8 +409,7 @@ class WinMain(UMainWindow):
                             qimages.append(QImage(pixmap))
                         wid.data_item.qimages = qimages
                         wid.set_pixmap_with_actual_size()
-                        wid.img_wid.set_opacity(100)
-                        wid.white_text_wid.set_opacity(100)
+                        wid.img_wid.restore_image()
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
             else:
@@ -418,8 +417,7 @@ class WinMain(UMainWindow):
 
         for url, wid in self.grid.url_to_wid.items():
             if url in rel_paths:
-                wid.img_wid.set_opacity(40)
-                wid.white_text_wid.set_opacity(40)
+                wid.img_wid.show_updating()
 
         self.update_thumb_task = ProcessWorker(
             target=UpdateThumb.start,
