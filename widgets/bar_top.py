@@ -158,53 +158,6 @@ class FiltersBtn(BarTopBtn):
         self.set_text(Lng.filters[JsonData.lng_index])
         
 
-class SortBtn(BarTopBtn):
-    base_svg = Static.BAR_TOP_ICONS / "sort.svg"
-    selected_svg = Static.BAR_TOP_ICONS / "sort_selected.svg"
-
-    def __init__(self):
-        super().__init__(self.base_svg, self.selected_svg)
-        self.update_sort_text() # Переименовал, чтобы не конфликтовать с базовым методом сета текста
-
-    def update_sort_text(self):
-        """Устанавливает текст кнопки в зависимости от текущей сортировки."""
-        text = (
-            Lng.sort_by_mod_short[JsonData.lng_index]
-            if Dynamic.sort_by_mod
-            else Lng.sort_by_recent_short[JsonData.lng_index]
-        )
-        # Используем унаследованный метод для обновления и тултипа, и лейбла
-        self.set_text(text)
-
-    def menu_clicked(self, value: bool):
-        """Обрабатывает выбор сортировки из меню."""
-        Dynamic.sort_by_mod = value
-        self.update_sort_text()
-        self.clicked_.emit()
-
-    def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-        """Показывает меню выбора сортировки при клике левой кнопкой мыши."""
-        if ev and ev.button() == Qt.MouseButton.LeftButton:
-            menu = UMenu(ev)
-
-            act_mod = QAction(Lng.sort_by_mod[JsonData.lng_index], self, checkable=True)
-            act_recent = QAction(Lng.sort_by_recent[JsonData.lng_index], self, checkable=True)
-
-            act_mod.setChecked(Dynamic.sort_by_mod)
-            act_recent.setChecked(not Dynamic.sort_by_mod)
-
-            act_mod.triggered.connect(lambda: self.menu_clicked(True))
-            act_recent.triggered.connect(lambda: self.menu_clicked(False))
-
-            menu.addAction(act_mod)
-            menu.addAction(act_recent)
-
-            pos = self.mapToGlobal(self.rect().bottomLeft())
-            menu.exec(pos)
-
-            self.set_base_style()
-
-
 class SettingsBtn(BarTopBtn):
     base_svg = Static.BAR_TOP_ICONS / "settings.svg"
     selected_svg = Static.BAR_TOP_ICONS / "settings_selected.svg"
@@ -301,7 +254,6 @@ class BarTopCatalogWidget(QWidget):
 class BarTop(UFrame):
     open_settings_win = pyqtSignal(SettingsItem)
     open_filters_win = pyqtSignal()
-    reload_thumbnails = pyqtSignal()
     open_img_search_win = pyqtSignal()
     start_text_search = pyqtSignal()
     entered = pyqtSignal()
@@ -321,11 +273,6 @@ class BarTop(UFrame):
         self.h_layout.addWidget(self.catalog_btn)
 
         self.h_layout.addStretch(0)
-
-        # --- Кнопка сортировки ---
-        self.sort_btn = SortBtn()
-        self.sort_btn.clicked_.connect(self.reload_thumbnails.emit)
-        self.h_layout.addWidget(self.sort_btn)
 
         # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchBtn()

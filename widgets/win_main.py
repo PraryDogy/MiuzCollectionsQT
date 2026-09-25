@@ -111,9 +111,6 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.reload_thumbnails.connect(
-            lambda: self.load_st_grid()
-            )
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
