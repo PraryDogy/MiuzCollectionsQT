@@ -16,6 +16,9 @@ from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
                             UPushButton)
 
 
+BTN_H = 23
+
+
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "cancel.svg"
@@ -210,7 +213,7 @@ class BarTopCatalogWidget(QWidget):
 
         self.button = BarTopCatalogBtn("")
         self.set_btn_text(Mf.current_mf)
-        self.button.setFixedSize(120, 23)
+        self.button.setFixedSize(120, BTN_H)
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
@@ -292,17 +295,17 @@ class BarTop(UFrame):
 
         self.h_layout.addStretch(0)
 
-        right_widget = QWidget()
-        right_widget.setFixedWidth(BarTopLineEdit.ww)
-        self.h_layout.addWidget(right_widget)
-        right_layout = QHBoxLayout(right_widget)
-        right_layout.setContentsMargins(0, 3, 0, 0)
-        right_layout.setSpacing(0)
+        # right_widget = QWidget()
+        # right_widget.setFixedWidth(BarTopLineEdit.ww)
+        # self.h_layout.addWidget(right_widget)
+        # right_layout = QHBoxLayout(right_widget)
+        # right_layout.setContentsMargins(0, 0, 0, 0)
+        # right_layout.setSpacing(0)
 
         # --- Виджет поиска ---
         self.search_wid = BarTopLineEdit()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
-        right_layout.addWidget(self.search_wid)
+        self.h_layout.addWidget(self.search_wid)
 
         # Флаг для отслеживания состояния скролла (заглушка от спама)
         self._is_scrolled = False 
