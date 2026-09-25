@@ -363,12 +363,16 @@ BarTopLineEdit:focus {
 }
 
 
-/* GridWid { */
-    /* background: #272727;
+MainWinRightWidget {
+    background: #272727;
     border: 1px solid #2d2d2d;
     border-radius: 10px;
-} */
+}
 
 Thumb {
+    background: transparent;
+}
+
+GridStyledWidget {
     background: transparent;
 }

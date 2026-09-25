@@ -22,7 +22,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
 from ._base_widgets import (ConfirmWindow, HSep, UMainWindow, UPushButton,
-                            WarningWindow)
+                            WarningWindow, UFrame)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -80,6 +80,11 @@ class DangerWarn(ConfirmWindow):
         return
 
 
+class MainWinRightWidget(UFrame):
+    def __init__(self):
+        super().__init__()
+
+
 class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
@@ -131,7 +136,7 @@ class WinMain(UMainWindow):
 
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.splitter.setHandleWidth(7)
+        self.splitter.setHandleWidth(15)
         self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.central_layout.addWidget(self.splitter)
 
@@ -154,10 +159,10 @@ class WinMain(UMainWindow):
         self.splitter.addWidget(self.left_menu)
 
         # Правый виджет
-        right_wid = QWidget()
+        right_wid = MainWinRightWidget()
         self.splitter.addWidget(right_wid)
         self.right_layout = QVBoxLayout(right_wid)
-        self.right_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_layout.setContentsMargins(5, 0, 5, 0)
         self.right_layout.setSpacing(0)
 
         self.grid = Grid()
