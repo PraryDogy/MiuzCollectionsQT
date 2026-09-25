@@ -323,7 +323,7 @@ QToolTip {
 }
 
 MenuLeft {
-    background: #171717;
+    background: #272727;
     border: 1px solid #2d2d2d;
     border-radius: 10px;
 }
