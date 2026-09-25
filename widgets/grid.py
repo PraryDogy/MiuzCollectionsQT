@@ -383,6 +383,24 @@ class WordTag(GridTagWidget):
         return super().clear_tag_cmd()
 
 
+class FavTag(GridTagWidget):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def clear_tag_cmd(self):
+        Dynamic.filter_favs = False
+        return super().clear_tag_cmd()
+
+
+class OnlyFolderTag(GridTagWidget):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def clear_tag_cmd(self):
+        Dynamic.filter_only_folder = False
+        return super().clear_tag_cmd()
+
+
 class GridStyledWidget(UFrame):
     def __init__(self):
         super().__init__()
