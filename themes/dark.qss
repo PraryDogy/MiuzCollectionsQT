@@ -351,12 +351,9 @@ LeftMenuSep[hidden="false"]  {
 }
 
 
-BarTopLineEdit {
-    background: transparent;
-}
-
+BarTopLineEdit,
 BarTopLineEdit:focus {
-    background: #2b2b2b;
+    background: transparent;
 }
 
 

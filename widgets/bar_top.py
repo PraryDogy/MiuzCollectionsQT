@@ -243,8 +243,6 @@ class BarTop(UFrame):
     open_filters_win = pyqtSignal()
     open_img_search_win = pyqtSignal()
     start_text_search = pyqtSignal()
-    entered = pyqtSignal()
-    leaved = pyqtSignal()
     mf_open = pyqtSignal(Mf)
     mf_new = pyqtSignal(SettingsItem)
 
@@ -279,13 +277,6 @@ class BarTop(UFrame):
 
         self.h_layout.addStretch(0)
 
-        # right_widget = QWidget()
-        # right_widget.setFixedWidth(BarTopLineEdit.ww)
-        # self.h_layout.addWidget(right_widget)
-        # right_layout = QHBoxLayout(right_widget)
-        # right_layout.setContentsMargins(0, 0, 0, 0)
-        # right_layout.setSpacing(0)
-
         # --- Виджет поиска ---
         self.search_wid = BarTopLineEdit()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
@@ -297,11 +288,3 @@ class BarTop(UFrame):
     def mouseReleaseEvent(self, a0):
         self.setFocus()
         return super().mouseReleaseEvent(a0)
-
-    def enterEvent(self, event):
-        self.entered.emit()
-        return super().enterEvent(event)
-
-    def leaveEvent(self, a0):
-        self.leaved.emit()
-        return super().leaveEvent(a0)
