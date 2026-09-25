@@ -203,8 +203,8 @@ class WinImgSearch(UMainWidget):
     def reset_img_search(self):
         self.img_label.clear()
         self.img_label.setText(self.base_text)
-        if Dynamic.thumb_path_set:
-            Dynamic.thumb_path_set.clear()
+        if Dynamic.img_search_thumb_paths:
+            Dynamic.img_search_thumb_paths.clear()
         self.reload_thumbnails.emit()
 
     def start_img_search(self):
@@ -226,7 +226,7 @@ class WinImgSearch(UMainWidget):
         self.img_search_task.sigs.found_image.connect(
             self.found_image_cmd
         )
-        Dynamic.thumb_path_set.clear()
+        Dynamic.img_search_thumb_paths.clear()
         UThreadPool.start(self.img_search_task)
         self.open_progress_win()
         self.poll_progress_win()
@@ -249,7 +249,7 @@ class WinImgSearch(UMainWidget):
         self.progress_win.show()
 
     def img_search_finished(self):
-        if not Dynamic.thumb_path_set:
+        if not Dynamic.img_search_thumb_paths:
             self.found_image_cmd("999999999999")
         
         self.poll_progress_win_timer.stop()
@@ -308,7 +308,7 @@ class WinImgSearch(UMainWidget):
             self.read_img_timer.start(self.read_img_poll_ms)
 
     def found_image_cmd(self, rel_path: str):
-        Dynamic.thumb_path_set.add(rel_path)
+        Dynamic.img_search_thumb_paths.add(rel_path)
         self.found_image_timer.stop()
         self.found_image_timer.start(500)
 

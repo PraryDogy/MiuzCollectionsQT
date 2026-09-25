@@ -92,12 +92,11 @@ class Dynamic:
     search_widget_text: str = None
     current_pixmap_size_index: int = 1
     current_dir: str = os.sep
-    sort_by_mod: bool = True
-    word_tags: list[str] = []
-    filter_favs: bool = False
-    filter_only_folder: bool = False
-    history: list[str] = []
-    thumb_path_set: set[str] = set()
+    sort_by_mod_enabled: bool = True
+    word_tags_list: list[str] = []
+    favs_tag_enabled: bool = False
+    no_subfolders_tag_enabled: bool = False
+    img_search_thumb_paths: set[str] = set()
 
 
 class JsonData:

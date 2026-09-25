@@ -285,12 +285,12 @@ class GridSortWidget(QWidget):
         self.button_menu.addAction(recent_action)
 
     def sort_btn_cmd(self, value: bool):
-        Dynamic.sort_by_mod = value
+        Dynamic.sort_by_mod_enabled = value
         self.set_button_text()
         self.load_st_grid.emit()
 
     def set_button_text(self):
-        if Dynamic.sort_by_mod:
+        if Dynamic.sort_by_mod_enabled:
             text = Lng.sort_by_mod
         else:
             text = Lng.sort_by_recent
@@ -394,7 +394,7 @@ class WordTag(GridTagWidget):
         super().__init__(text)
 
     def clear_tag_cmd(self):
-        Dynamic.word_tags.remove(self.title.text())
+        Dynamic.word_tags_list.remove(self.title.text())
         return super().clear_tag_cmd()
 
 
@@ -403,7 +403,7 @@ class FavTag(GridTagWidget):
         super().__init__(text)
 
     def clear_tag_cmd(self):
-        Dynamic.filter_favs = False
+        Dynamic.favs_tag_enabled = False
         return super().clear_tag_cmd()
 
 
@@ -412,7 +412,7 @@ class OnlyFolderTag(GridTagWidget):
         super().__init__(text)
 
     def clear_tag_cmd(self):
-        Dynamic.filter_only_folder = False
+        Dynamic.no_subfolders_tag_enabled = False
         return super().clear_tag_cmd()
 
 
@@ -426,9 +426,9 @@ class ClearFiltersTag(GridTagWidget):
     def clear_tag_cmd(self):
         Dynamic.date_start = None
         Dynamic.date_end = None
-        Dynamic.filter_favs = False
-        Dynamic.filter_only_folder = False
-        Dynamic.word_tags.clear()
+        Dynamic.favs_tag_enabled = False
+        Dynamic.no_subfolders_tag_enabled = False
+        Dynamic.word_tags_list.clear()
         return super().clear_tag_cmd()
 
 
@@ -536,27 +536,27 @@ class TagsWidget(QWidget):
             tag.clicked_clear.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
-        if Dynamic.word_tags:
-            for word in Dynamic.word_tags:
+        if Dynamic.word_tags_list:
+            for word in Dynamic.word_tags_list:
                 tag = WordTag(word)
                 tag.clicked_clear.connect(self.load_st_grid.emit)
                 self.flow_layout.addWidget(tag)
 
-        if Dynamic.filter_favs:
+        if Dynamic.favs_tag_enabled:
             tag = FavTag(Lng.favorites[JsonData.lng_index])
             tag.clicked_clear.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
-        if Dynamic.filter_only_folder:
+        if Dynamic.no_subfolders_tag_enabled:
             tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
             tag.clicked_clear.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
         has_filters = any((
             Dynamic.date_start,
-            Dynamic.word_tags,
-            Dynamic.filter_favs,
-            Dynamic.filter_only_folder,
+            Dynamic.word_tags_list,
+            Dynamic.favs_tag_enabled,
+            Dynamic.no_subfolders_tag_enabled,
         ))
 
         if has_filters:

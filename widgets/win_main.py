@@ -222,7 +222,7 @@ class WinMain(UMainWindow):
         return wrapper
 
     def set_no_img_search(self):
-        Dynamic.thumb_path_set.clear()
+        Dynamic.img_search_thumb_paths.clear()
         self.bar_top.img_search_btn.set_base_style()
         try:
             self.win_img_search.deleteLater()
@@ -236,7 +236,7 @@ class WinMain(UMainWindow):
     def open_img_search_win(self):
 
         def on_closed():
-            if Dynamic.thumb_path_set:
+            if Dynamic.img_search_thumb_paths:
                 self.bar_top.img_search_btn.set_selected_style()
                 self.win_img_search.hide()
             else:
@@ -244,7 +244,7 @@ class WinMain(UMainWindow):
                 self.win_img_search.deleteLater()
 
         self.bar_top.img_search_btn.set_selected_style()
-        if not Dynamic.thumb_path_set:
+        if not Dynamic.img_search_thumb_paths:
             self.win_img_search = WinImgSearch()
             self.win_img_search.reload_thumbnails.connect(self.load_st_grid)
             self.win_img_search.closed.connect(on_closed)

@@ -168,25 +168,25 @@ class DbImagesLoader(URunnable):
             )
             .where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
             .where(Thumbs.rel_img_path.ilike(f"{rel_path}/%"))
-            .order_by(-Thumbs.mod if Dynamic.sort_by_mod else -Thumbs.id)
+            .order_by(-Thumbs.mod if Dynamic.sort_by_mod_enabled else -Thumbs.id)
             .limit(Static.THUMBS_LOAD_LIMIT)
             .offset(Dynamic.loaded_thumbs)
         )
 
-        if Dynamic.filter_favs:
+        if Dynamic.favs_tag_enabled:
             stmt = stmt.where(Thumbs.fav == 1)
 
-        if Dynamic.filter_only_folder:
+        if Dynamic.no_subfolders_tag_enabled:
             two_slash = f"{rel_path}/%/%"
             stmt = (
                 stmt
                 .where(Thumbs.rel_img_path.not_ilike(two_slash))
             )
 
-        if Dynamic.word_tags:
+        if Dynamic.word_tags_list:
             filters = [
                 Thumbs.rel_img_path.ilike(f"%{filter}%")
-                for filter in Dynamic.word_tags
+                for filter in Dynamic.word_tags_list
             ]
             stmt = stmt.where(sqlalchemy.or_(*filters))
 
@@ -201,8 +201,8 @@ class DbImagesLoader(URunnable):
             )
             stmt = stmt.where(Thumbs.mod > start, Thumbs.mod < end)
 
-        if Dynamic.thumb_path_set:
-            stmt = stmt.where(Thumbs.rel_thumb_path.in_(Dynamic.thumb_path_set))
+        if Dynamic.img_search_thumb_paths:
+            stmt = stmt.where(Thumbs.rel_thumb_path.in_(Dynamic.img_search_thumb_paths))
 
         return stmt
 

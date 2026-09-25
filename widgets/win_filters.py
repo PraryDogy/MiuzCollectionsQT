@@ -297,7 +297,7 @@ class WinFilters(UMainWidget):
         )
         favs_item.set_checkable()
         self.list_widget.addItem(favs_item)
-        if Dynamic.filter_favs:
+        if Dynamic.favs_tag_enabled:
             favs_item.setCheckState(Qt.CheckState.Checked)
 
         folder_item = UListWidgetItem(
@@ -306,7 +306,7 @@ class WinFilters(UMainWidget):
         )
         folder_item.set_checkable()
         self.list_widget.addItem(folder_item)
-        if Dynamic.filter_only_folder:
+        if Dynamic.no_subfolders_tag_enabled:
             folder_item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.addItem(
@@ -320,7 +320,7 @@ class WinFilters(UMainWidget):
             )
             item.set_checkable()
             self.list_widget.addItem(item)
-            if i in Dynamic.word_tags:
+            if i in Dynamic.word_tags_list:
                 item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.setCurrentRow(0)
@@ -384,14 +384,14 @@ class WinFilters(UMainWidget):
     def get_filters_text(self):
         active_list = []
 
-        if Dynamic.filter_favs:
+        if Dynamic.favs_tag_enabled:
             active_list.append(Lng.favorites[JsonData.lng_index])
 
-        if Dynamic.filter_only_folder:
+        if Dynamic.no_subfolders_tag_enabled:
             active_list.append(Lng.without_subfolders[JsonData.lng_index])
 
-        if Dynamic.word_tags:
-            active_list.extend(Dynamic.word_tags)
+        if Dynamic.word_tags_list:
+            active_list.extend(Dynamic.word_tags_list)
 
         if not active_list:
             return Lng.no[JsonData.lng_index]
@@ -402,24 +402,24 @@ class WinFilters(UMainWidget):
         if isinstance(item, UListSpacerItem):
             return
         if item.text() == Lng.favorites[JsonData.lng_index]:
-            if Dynamic.filter_favs:
-                Dynamic.filter_favs = False
+            if Dynamic.favs_tag_enabled:
+                Dynamic.favs_tag_enabled = False
                 item.setCheckState(Qt.CheckState.Unchecked)
             else:
-                Dynamic.filter_favs = True
+                Dynamic.favs_tag_enabled = True
                 item.setCheckState(Qt.CheckState.Checked)
         elif item.text() == Lng.without_subfolders[JsonData.lng_index]:
-            if Dynamic.filter_only_folder:
-                Dynamic.filter_only_folder = False
+            if Dynamic.no_subfolders_tag_enabled:
+                Dynamic.no_subfolders_tag_enabled = False
                 item.setCheckState(Qt.CheckState.Unchecked)
             else:
-                Dynamic.filter_only_folder = True
+                Dynamic.no_subfolders_tag_enabled = True
                 item.setCheckState(Qt.CheckState.Checked)
-        elif item.text() in Dynamic.word_tags:
-            Dynamic.word_tags.remove(item.text())
+        elif item.text() in Dynamic.word_tags_list:
+            Dynamic.word_tags_list.remove(item.text())
             item.setCheckState(Qt.CheckState.Unchecked)
         else:
-            Dynamic.word_tags.append(item.text())
+            Dynamic.word_tags_list.append(item.text())
             item.setCheckState(Qt.CheckState.Checked)
 
         self.active_filters.setText(self.get_filters_text())
@@ -433,9 +433,9 @@ class WinFilters(UMainWidget):
         items.pop(2)  # удаляем спейсер из списка обработки
         for item in items:
             item.setCheckState(Qt.CheckState.Unchecked)
-        Dynamic.filter_favs = False
-        Dynamic.filter_only_folder = False
-        Dynamic.word_tags.clear()
+        Dynamic.favs_tag_enabled = False
+        Dynamic.no_subfolders_tag_enabled = False
+        Dynamic.word_tags_list.clear()
         self.reload_thumbnails.emit()
         self.active_filters.setText(self.get_filters_text())
 
