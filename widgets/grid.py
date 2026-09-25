@@ -257,7 +257,7 @@ class GridSortWidget(QWidget):
         self.sort_icon = QIcon(str(self.sort_icon_svg))
 
         self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(10, 0, 10, 0)
+        self.h_lay.setContentsMargins(0, 0, 0, 0)
 
         self.title = GridSortTitle(Lng.sort[JsonData.lng_index])
         self.h_lay.addWidget(self.title)
@@ -279,8 +279,6 @@ class GridSortWidget(QWidget):
         recent_action.triggered.connect(lambda: self.sort_btn_cmd(False))
         self.button_menu.addAction(recent_action)
 
-        self.h_lay.addStretch(1)
-
     def sort_btn_cmd(self, value: bool):
         Dynamic.sort_by_mod = value
         self.set_button_text()
@@ -292,6 +290,51 @@ class GridSortWidget(QWidget):
         else:
             text = Lng.sort_by_recent
         self.button.setText(text[JsonData.lng_index])
+
+
+class GridFiltersWidget(QWidget):
+    sort_icon_svg = Static.BAR_TOP_ICONS / "filters.svg"
+    load_st_grid = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        self.sort_icon = QIcon(str(self.sort_icon_svg))
+
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(0, 0, 0, 0)
+
+        self.button = UPushButton(Lng.filters[JsonData.lng_index])
+        self.button.setIcon(self.sort_icon)
+        self.button.setFixedSize(100, 23)
+        self.h_lay.addWidget(self.button)
+
+
+class GridControlsWidget(QWidget):
+    # Общий сигнал, который будет срабатывать при изменении сортировки или фильтров
+    load_st_grid = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        # Используем вертикальный лэйаут, чтобы расположить их друг под другом
+        self.v_lay = QHBoxLayout(self)
+        self.v_lay.setContentsMargins(0, 0, 0, 0)
+        self.v_lay.setSpacing(8) # Отступ между виджетом сортировки и фильтрами
+
+        # Инициализируем внутренние виджеты
+        self.sort_widget = GridSortWidget()
+        self.filters_widget = GridFiltersWidget()
+
+        # Добавляем их в лэйаут
+        self.v_lay.addWidget(self.sort_widget)
+        self.v_lay.addWidget(self.filters_widget)
+
+        # Перенаправляем (пробрасываем) внутренние сигналы наверх
+        self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
+        self.filters_widget.load_st_grid.connect(self.load_st_grid.emit)
+
+        self.v_lay.addStretch()
 
 
 class GridStyledWidget(UFrame):
@@ -362,7 +405,7 @@ class Grid(VScrollArea):
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
 
-        self.sort_widget = GridSortWidget()
+        self.sort_widget = GridControlsWidget()
         self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.sort_widget)
 
