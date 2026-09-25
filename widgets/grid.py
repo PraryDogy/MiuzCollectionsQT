@@ -542,7 +542,14 @@ class TagsWidget(QWidget):
             tag.clicked_clear.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
-        if any((Dynamic.date_start, Dynamic.word_tags, Dynamic.filter_favs, Dynamic.filter_only_folder)):
+        has_filters = any((
+            Dynamic.date_start,
+            Dynamic.word_tags,
+            Dynamic.filter_favs,
+            Dynamic.filter_only_folder,
+        ))
+
+        if has_filters:
             tag = ClearFiltersTag(Lng.reset[JsonData.lng_index])
             tag.clicked_clear.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
