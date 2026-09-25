@@ -267,8 +267,8 @@ class GridSortWidget(QWidget):
             text = Lng.sort_by_recent
 
         self.button = UPushButton(text[JsonData.lng_index])
-        self.button.setIcon(self.sort_icon_svg)
-        self.button.setFixedSize(120, 23)
+        self.button.setIcon(self.sort_icon)
+        self.button.setFixedSize(150, 23)
         self.h_lay.addWidget(self.button)
 
         self.h_lay.addStretch(1)
