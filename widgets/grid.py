@@ -26,6 +26,9 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       WinInfoAction)
 
 
+CONTROLS_MARGIN = 10
+
+
 class ThumbBaseLabel(QLabel):
     def __init__(self):
         super().__init__()
@@ -322,7 +325,7 @@ class GridControlsWidget(QWidget):
 
         # Используем вертикальный лэйаут, чтобы расположить их друг под другом
         self.v_lay = QHBoxLayout(self)
-        self.v_lay.setContentsMargins(10, 0, 0, 0)
+        self.v_lay.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
         self.v_lay.setSpacing(8) # Отступ между виджетом сортировки и фильтрами
 
         # Инициализируем внутренние виджеты
@@ -349,7 +352,7 @@ class GridTagWidget(UFrame):
         self.setFixedHeight(23)
         
         self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(8, 0, 8, 0)
+        self.h_lay.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
         self.h_lay.setSpacing(6)
 
         self.title = QLabel(text)
