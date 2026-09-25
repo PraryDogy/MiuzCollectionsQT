@@ -322,7 +322,7 @@ class GridControlsWidget(QWidget):
 
         # Используем вертикальный лэйаут, чтобы расположить их друг под другом
         self.v_lay = QHBoxLayout(self)
-        self.v_lay.setContentsMargins(0, 0, 0, 0)
+        self.v_lay.setContentsMargins(10, 0, 0, 0)
         self.v_lay.setSpacing(8) # Отступ между виджетом сортировки и фильтрами
 
         # Инициализируем внутренние виджеты
@@ -407,9 +407,6 @@ class OnlyFolderTag(GridTagWidget):
 class GridStyledWidget(UFrame):
     def __init__(self):
         super().__init__()
-
-
-
 
 
 class FlowLayout(QLayout):
@@ -608,7 +605,6 @@ class Grid(VScrollArea):
         self.tags_widget = TagsWidget()
         self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.tags_widget)
-
 
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)
