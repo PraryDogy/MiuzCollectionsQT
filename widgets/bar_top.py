@@ -250,6 +250,15 @@ class BarTop(UFrame):
 
         self.h_layout.addStretch(0)
 
+
+        # --- Виджет поиска ---
+        self.search_wid = BarTopLineEdit()
+        self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
+        self.h_layout.addWidget(self.search_wid)
+
+        self.h_layout.addStretch(0)
+
+
         # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchBtn()
         self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
@@ -260,13 +269,6 @@ class BarTop(UFrame):
         self.settings_btn = SettingsBtn()
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn)
-
-        self.h_layout.addStretch(0)
-
-        # --- Виджет поиска ---
-        self.search_wid = BarTopLineEdit()
-        self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
-        self.h_layout.addWidget(self.search_wid)
 
         # Флаг для отслеживания состояния скролла (заглушка от спама)
         self._is_scrolled = False 
