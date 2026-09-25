@@ -7,7 +7,7 @@ from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QImage, QKeyEvent, QMouseEvent, QPixmap,
                          QResizeEvent, QIcon)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout,
+from PyQt6.QtWidgets import (QApplication, QSizePolicy, QGridLayout,
                              QLabel, QRubberBand, QVBoxLayout, QWidget, QHBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
@@ -337,6 +337,31 @@ class GridControlsWidget(QWidget):
         self.v_lay.addStretch()
 
 
+class GridTagWidget(UFrame):
+    icon_path = Static.COMMON_ICONS / "cancel.svg"
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setFixedHeight(23)
+        self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(8, 0, 8, 0)
+        self.h_lay.setSpacing(6)
+
+        self.title = QLabel(text)
+        self.title.setStyleSheet("background: transparent;")
+        self.h_lay.addWidget(self.title)
+
+        self.close_btn = QSvgWidget()
+        self.close_btn.load(str(self.icon_path))
+        self.close_btn.setFixedSize(12, 12)
+        self.h_lay.addWidget(self.close_btn)
+
+        self.title.adjustSize()
+        self.adjustSize()
+
+
 class GridStyledWidget(UFrame):
     def __init__(self):
         super().__init__()
@@ -408,6 +433,12 @@ class Grid(VScrollArea):
         self.sort_widget = GridControlsWidget()
         self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.sort_widget)
+
+        if Dynamic.date_start:
+            text = f"{Dynamic.date_start} - {Dynamic.date_end}"
+            date_tag = GridTagWidget(text)
+            self.scroll_layout.addWidget(date_tag, alignment=Qt.AlignmentFlag.AlignLeft)
+
 
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)

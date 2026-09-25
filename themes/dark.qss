@@ -383,3 +383,9 @@ GridStyledWidget {
 GridSortTitle {
     background: transparent;
 }
+
+
+GridTagWidget {
+    background: #363636;
+    border-radius: 5px;
+}
