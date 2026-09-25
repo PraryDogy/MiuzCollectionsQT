@@ -110,8 +110,6 @@ class WinMain(UMainWindow):
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
 
-        self.grid_scroll_value = 0
-
         # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
         # self.test.center_to_parent(self)
         # self.test.show()
@@ -151,17 +149,13 @@ class WinMain(UMainWindow):
         )
         self.central_layout.addWidget(self.bar_top)
 
-        self.bar_top_sep = RightLayoutSeparator()
-        self.central_layout.addWidget(self.bar_top_sep)
-        self.bar_top_sep.sep.hide()
-
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setHandleWidth(7)
+        self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.central_layout.addWidget(self.splitter)
 
         self.left_menu = MenuLeft()
-        self.splitter.addWidget(self.left_menu)
-
         self.left_menu.reveal.connect(
             lambda rel_paths: self.reveal_in_finder(rel_paths)
         )
@@ -177,9 +171,7 @@ class WinMain(UMainWindow):
         self.left_menu.copy_path.connect(
             lambda rel_paths: self.copy_path(rel_paths)
         )
-        
-        # Добавляем контейнер вместо самого меню в сплиттер
-        self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.splitter.addWidget(self.left_menu)
 
         # Правый виджет
         right_wid = QWidget()
@@ -191,13 +183,9 @@ class WinMain(UMainWindow):
         self.grid = Grid()
         self.load_st_grid()
 
-        # Добавляем splitter в основной layout
-        self.central_layout.addWidget(self.splitter)
-
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 1)
         self.resize(self.ww, self.hh)
-        self.load_st_grid()
 
         self.bar_path = PathBar()
         self.path_bar_update("")
@@ -643,7 +631,7 @@ class WinMain(UMainWindow):
         self.grid.collage.connect(
             lambda data_items: self.open_collage_win(data_items)
         )
-        self.right_layout.insertWidget(self.GRID_INDEX, self.grid)
+        self.right_layout.addWidget(self.grid)
 
     @with_conn
     def open_view_win(self, mf: Mf):
