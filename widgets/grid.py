@@ -420,7 +420,6 @@ class ClearFiltersTag(GridTagWidget):
 
     def __init__(self, text: str):
         super().__init__("")
-        # self.setFixedWidth(30)
         self.title.deleteLater()
 
     def clear_tag_cmd(self):

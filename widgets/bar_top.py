@@ -16,7 +16,7 @@ from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
                             UPushButton)
 
 
-BTN_H = 23
+BTN_H = 27
 
 
 class ClearBtn(QSvgWidget):
@@ -51,8 +51,10 @@ class BarTopLineEdit(ULineEditLight):
 
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(self.ww)
+        # self.setFixedWidth(self.ww)
         self.setFixedHeight(BTN_H)
+        self.setMinimumWidth(self.ww)
+        self.setMaximumWidth(self.ww * 2)
 
         self.textChanged.connect(self.create_search)
         self.setPlaceholderText(Lng.search[JsonData.lng_index])
@@ -151,8 +153,8 @@ class SettingsBtn(BarTopBtn):
 
 
 class ImgSearchBtn(BarTopBtn):
-    base_svg = Static.BAR_TOP_ICONS / "img_search.svg"
-    selected_svg = Static.BAR_TOP_ICONS / "img_search_selected.svg"
+    base_svg = Static.BAR_TOP_ICONS / "camera.svg"
+    selected_svg = Static.BAR_TOP_ICONS / "camera_selected.svg"
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
@@ -173,6 +175,7 @@ class BarTopCatalogWidget(QWidget):
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
     mf_open = pyqtSignal(Mf)
     mf_new = pyqtSignal(SettingsItem)
+    hh = BTN_H - 3
 
     def __init__(self):
         super().__init__()
@@ -190,7 +193,7 @@ class BarTopCatalogWidget(QWidget):
 
         self.button = BarTopCatalogBtn("")
         self.set_btn_text(Mf.current_mf)
-        self.button.setFixedSize(120, BTN_H)
+        self.button.setFixedSize(120, self.hh)
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
