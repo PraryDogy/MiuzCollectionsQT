@@ -231,7 +231,6 @@ class WinMain(UMainWindow):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0
-        self.bar_top.filters_btn.set_base_style()
 
         Dynamic.search_widget_text = None
         self.bar_top.search_wid.clear()
@@ -250,7 +249,6 @@ class WinMain(UMainWindow):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0
-        self.bar_top.filters_btn.set_base_style()
 
         Dynamic.thumb_path_set.clear()
 
@@ -291,7 +289,6 @@ class WinMain(UMainWindow):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.date_index = 0  
-        self.bar_top.filters_btn.set_base_style()
 
         Dynamic.thumb_path_set.clear()
         Dynamic.search_widget_text = None
