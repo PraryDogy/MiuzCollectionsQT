@@ -500,6 +500,7 @@ class TagsWidget(QWidget):
         super().__init__(parent)
 
         self.flow_layout = FlowLayout(self, spacing=7)
+        self.flow_layout.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
         self._create_tags()
 
     def _create_tags(self):
@@ -604,6 +605,8 @@ class Grid(VScrollArea):
         self.sort_widget.open_filters_win.connect(self.open_filters_win.emit)
         self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.sort_widget)
+
+        self.scroll_layout.addSpacing(10)
 
         self.tags_widget = TagsWidget()
         self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
