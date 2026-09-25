@@ -4,11 +4,12 @@ import re
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
-                         QFontMetrics, QImage, QKeyEvent, QMouseEvent, QPixmap,
-                         QResizeEvent, QIcon)
+                         QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
+                         QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QSizePolicy, QGridLayout,
-                             QLabel, QRubberBand, QVBoxLayout, QWidget, QHBoxLayout)
+from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
+                             QLayout, QRubberBand, QSizePolicy, QVBoxLayout,
+                             QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
@@ -18,7 +19,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UFrame, UMenu, USubMenu, VScrollArea, UPushButton
+from ._base_widgets import UFrame, UMenu, UPushButton, USubMenu, VScrollArea
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -408,6 +409,133 @@ class GridStyledWidget(UFrame):
         super().__init__()
 
 
+
+
+
+class FlowLayout(QLayout):
+    def __init__(self, parent=None, spacing=7):
+        super().__init__(parent)
+        self.items = []
+        self.spacing = spacing
+
+    def addItem(self, item):
+        self.items.append(item)
+
+    def count(self):
+        return len(self.items)
+
+    def itemAt(self, index):
+        if 0 <= index < len(self.items):
+            return self.items[index]
+        return None
+
+    def takeAt(self, index):
+        if 0 <= index < len(self.items):
+            return self.items.pop(index)
+        return None
+
+    def expandingDirections(self):
+        return Qt.Orientation(0)
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, width):
+        return self._do_layout(QRect(0, 0, width, 0), True)
+
+    def setGeometry(self, rect):
+        super().setGeometry(rect)
+        self._do_layout(rect, False)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
+        size = QSize(0, 0)
+
+        for item in self.items:
+            size = size.expandedTo(item.minimumSize())
+
+        margins = self.contentsMargins()
+        size += QSize(margins.left() + margins.right(), margins.top() + margins.bottom())
+
+        return size
+
+    def _do_layout(self, rect, test_only):
+        margins = self.contentsMargins()
+        rect = rect.adjusted(
+            margins.left(),
+            margins.top(),
+            -margins.right(),
+            -margins.bottom()
+        )
+
+        x = rect.x()
+        y = rect.y()
+        line_height = 0
+
+        for item in self.items:
+            item_size = item.sizeHint()
+            next_x = x + item_size.width() + self.spacing
+
+            if next_x - self.spacing > rect.right() and line_height > 0:
+                x = rect.x()
+                y += line_height + self.spacing
+                next_x = x + item_size.width() + self.spacing
+                line_height = 0
+
+            if not test_only:
+                item.setGeometry(QRect(QPoint(x, y), item_size))
+
+            x = next_x
+            line_height = max(line_height, item_size.height())
+
+        return y + line_height - rect.y() + margins.bottom()
+
+
+class TagsWidget(QWidget):
+    load_st_grid = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.flow_layout = FlowLayout(self, spacing=7)
+        self._create_tags()
+
+    def _create_tags(self):
+        if Dynamic.date_start:
+            text = f"{Dynamic.date_start} - {Dynamic.date_end}"
+            tag = DatesTag(text)
+            tag.clicked_clear.connect(self.load_st_grid.emit)
+            self.flow_layout.addWidget(tag)
+
+        if Dynamic.word_tags:
+            for word in Dynamic.word_tags:
+                tag = WordTag(word)
+                tag.clicked_clear.connect(self.load_st_grid.emit)
+                self.flow_layout.addWidget(tag)
+
+        if Dynamic.filter_favs:
+            tag = FavTag(Lng.favorites[JsonData.lng_index])
+            tag.clicked_clear.connect(self.load_st_grid.emit)
+            self.flow_layout.addWidget(tag)
+
+        if Dynamic.filter_only_folder:
+            tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
+            tag.clicked_clear.connect(self.load_st_grid.emit)
+            self.flow_layout.addWidget(tag)
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, width):
+        return self.flow_layout.heightForWidth(width)
+
+    def sizeHint(self):
+        width = self.parentWidget().width() if self.parentWidget() else 500
+        return QSize(width, self.heightForWidth(width))
+
+
 class Grid(VScrollArea):
     load_st_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
@@ -477,27 +605,9 @@ class Grid(VScrollArea):
         self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.sort_widget)
 
-        if Dynamic.date_start:
-            text = f"{Dynamic.date_start} - {Dynamic.date_end}"
-            date_tag = DatesTag(text)
-            date_tag.clicked_clear.connect(self.load_st_grid.emit)
-            self.scroll_layout.addWidget(date_tag, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        if Dynamic.word_tags:
-            for i in Dynamic.word_tags:
-                word_tag = WordTag(i)
-                word_tag.clicked_clear.connect(self.load_st_grid.emit)
-                self.scroll_layout.addWidget(word_tag, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        if Dynamic.filter_favs:
-            fav_tag = FavTag(Lng.favorites[JsonData.lng_index])
-            fav_tag.clicked_clear.connect(self.load_st_grid.emit)
-            self.scroll_layout.addWidget(fav_tag, alignment=Qt.AlignmentFlag.AlignLeft)            
-
-        if Dynamic.filter_only_folder:
-            only_folder_tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
-            only_folder_tag.clicked_clear.connect(self.load_st_grid.emit)
-            self.scroll_layout.addWidget(only_folder_tag, alignment=Qt.AlignmentFlag.AlignLeft)   
+        self.tags_widget = TagsWidget()
+        self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
+        self.scroll_layout.addWidget(self.tags_widget)
 
 
         self.grid_wid = QWidget()
