@@ -281,7 +281,7 @@ CalendarDaySelected {
 /* --- Модуль: Плитки / Карточки (Thumbnails) --- */
 ThumbImgWidget { border-radius: 10px; }
 ThumbImgWidget[framed="false"] { background: transparent; color: #AAAAAA;}
-ThumbImgWidget[framed="true"]  { background-color: #3a3a3a; color: #AAAAAA;}
+ThumbImgWidget[framed="true"]  { background-color: #363636; color: #AAAAAA;}
 
 ThumbWhiteTextWid {
     font-size: 11px;
@@ -350,6 +350,7 @@ LeftMenuSep[hidden="false"]  {
     background: #2d2d2d;
 }
 
+
 BarTopLineEdit {
     background: transparent;
 }
@@ -365,6 +366,14 @@ MainWinRightWidget {
     border: 1px solid #2d2d2d;
     border-radius: 10px;
 }
+
+
+LeftMenuTreeWidget::item:selected,
+LeftMenuTreeWidget::item:selected:!active,
+LeftMenuTreeWidget::branch:selected {
+    background: #363636;
+}
+
 
 Thumb {
     background: transparent;
