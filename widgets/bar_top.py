@@ -111,21 +111,11 @@ class BarTopBtn(QWidget):
         self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
         self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # 1. АКТИВИРУЕМ МЕТКУ И ДОБАВЛЯЕМ В LAYOUT
-        self.lbl = GrayTextLabel("")
-        self.lbl.set_font_size(9)
-        self.v_lay.addWidget(self.lbl, alignment=Qt.AlignmentFlag.AlignCenter)
-
         self.set_base_style()
 
         for i in (base_svg, selected_svg):
             if not i.exists():
                 print(" bar top btn icon not exists", i)
-
-    def set_text(self, text: str):
-        """Новый метод для одновременной установки подсказки и текста под иконкой."""
-        self.setToolTip(text)
-        self.lbl.setText(text)
 
     def _load_svg_data(self, path: Path):  # Исправил аннотацию типа со str на Path, так как вы передаете Path
         with open(path, "rb") as f:
@@ -157,8 +147,6 @@ class FiltersBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        # 2. Используем новый метод вместо setToolTip
-        self.set_text(Lng.filters[JsonData.lng_index])
         
 
 class SettingsBtn(BarTopBtn):
@@ -167,8 +155,6 @@ class SettingsBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        # 3. Используем новый метод вместо setToolTip
-        self.set_text(Lng.settings[JsonData.lng_index])
 
 
 class ImgSearchBtn(BarTopBtn):
@@ -177,8 +163,6 @@ class ImgSearchBtn(BarTopBtn):
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
-        # 4. Используем новый метод вместо setToolTip
-        self.set_text(Lng.image_search_short[JsonData.lng_index])
 
 
 class BarTopCatalogTitle(QLabel):
