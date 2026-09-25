@@ -265,7 +265,7 @@ class GridSortWidget(QWidget):
         self.button = UPushButton("")
         self.set_button_text()
         self.button.setIcon(self.sort_icon)
-        self.button.setFixedSize(150, 23)
+        self.button.setFixedSize(155, 23)
         self.h_lay.addWidget(self.button)
 
         self.button_menu = UMenu(None)
