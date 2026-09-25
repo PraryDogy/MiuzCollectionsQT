@@ -262,6 +262,7 @@ class GridSortWidget(QWidget):
 
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(0, 0, 0, 0)
+        self.h_lay.setSpacing(5)
 
         self.title = GridSortTitle(Lng.sort[JsonData.lng_index])
         self.h_lay.addWidget(self.title)
@@ -326,7 +327,7 @@ class GridControlsWidget(QWidget):
         # Используем вертикальный лэйаут, чтобы расположить их друг под другом
         self.v_lay = QHBoxLayout(self)
         self.v_lay.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
-        self.v_lay.setSpacing(8) # Отступ между виджетом сортировки и фильтрами
+        self.v_lay.setSpacing(20) # Отступ между виджетом сортировки и фильтрами
 
         # Инициализируем внутренние виджеты
         self.sort_widget = GridSortWidget()
