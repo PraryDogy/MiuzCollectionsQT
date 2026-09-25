@@ -162,7 +162,7 @@ class WinMain(UMainWindow):
         right_wid = MainWinRightWidget()
         self.splitter.addWidget(right_wid)
         self.right_layout = QVBoxLayout(right_wid)
-        self.right_layout.setContentsMargins(5, 0, 5, 0)
+        self.right_layout.setContentsMargins(0, 10, 0, 10)
         self.right_layout.setSpacing(0)
 
         self.grid = Grid()

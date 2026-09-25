@@ -323,11 +323,6 @@ QToolTip {
     padding: 2px;
 }
 
-MenuLeft {
-    background: #272727;
-    border: 1px solid #2d2d2d;
-    border-radius: 10px;
-}
 
 LeftMenuTreeWidget,
 LeftMenuCatalogTitle {
@@ -364,6 +359,7 @@ BarTopLineEdit:focus {
 }
 
 
+MenuLeft,
 MainWinRightWidget {
     background: #272727;
     border: 1px solid #2d2d2d;
