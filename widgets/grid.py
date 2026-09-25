@@ -1162,8 +1162,12 @@ class GridStandart(Grid):
         if not self.url_to_wid:
             self.grid_wid.hide()
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.scroll_layout.addStretch(1)
             lbl = QLabel(Lng.no_photo[JsonData.lng_index])
-            self.scroll_layout.addWidget(lbl)
+            lbl.setStyleSheet("background: transparent;")
+            self.scroll_layout.addWidget(lbl, alignment=Qt.AlignmentFlag.AlignCenter)
+            self.scroll_layout.addStretch(1)
+            
         else:
             self.rearrange()
         self.finished_.emit()
