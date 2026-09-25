@@ -72,9 +72,6 @@ class BarTopLineEdit(ULineEditLight):
                 if (word := i.strip())
             ]
             self.clear_btn.enable()
-
-            print(Dynamic.search_words_list)
-
         else:
             Dynamic.search_words_list.clear()
             self.clear_btn.disable()
