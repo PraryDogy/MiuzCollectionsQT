@@ -597,5 +597,6 @@ class Lng:
         "Updating"
     )
     clear_tags = (
-        ""
+        "Очистить все",
+        "Clear all"
     )

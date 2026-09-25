@@ -420,6 +420,9 @@ class ClearFiltersTag(GridTagWidget):
     icon_path = Static.COMMON_ICONS / "trash.svg"
 
     def __init__(self, text: str):
+        # super().__init__(Lng.clear_tags[JsonData.lng_index])
+        # self.title.deleteLater()
+
         super().__init__("")
         self.title.deleteLater()
 

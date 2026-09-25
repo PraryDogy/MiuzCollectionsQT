@@ -12,7 +12,7 @@ class Themes:
 
 
 class Static:
-    APP_VERSION = 5.7
+    APP_VERSION = 6.0
     APP_NAME = "Collections"
     THUMBS_LOAD_LIMIT = 100
     
