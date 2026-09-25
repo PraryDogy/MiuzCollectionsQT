@@ -5,7 +5,7 @@ from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QImage, QKeyEvent, QMouseEvent, QPixmap,
-                         QResizeEvent)
+                         QResizeEvent, QIcon)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout,
                              QLabel, QRubberBand, QVBoxLayout, QWidget, QHBoxLayout)
@@ -248,8 +248,13 @@ class GridSortTitle(QLabel):
 
 
 class GridSortWidget(QWidget):
+    sort_icon_svg = Static.BAR_TOP_ICONS / "sort.svg"
+
     def __init__(self):
         super().__init__()
+
+        self.sort_icon = QIcon(str(self.sort_icon_svg))
+
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(10, 0, 10, 0)
 
@@ -262,6 +267,7 @@ class GridSortWidget(QWidget):
             text = Lng.sort_by_recent
 
         self.button = UPushButton(text[JsonData.lng_index])
+        self.button.setIcon(self.sort_icon_svg)
         self.button.setFixedSize(120, 23)
         self.h_lay.addWidget(self.button)
 
