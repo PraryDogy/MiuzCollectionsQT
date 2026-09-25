@@ -179,7 +179,7 @@ class WinMain(UMainWindow):
         self.footer_layout = QVBoxLayout(self.footer_container)
         
         # верхний маргин для отступа от сетки и меню
-        self.footer_layout.setContentsMargins(0, 5, 0, 0)
+        self.footer_layout.setContentsMargins(0, 10, 0, 0)
         self.footer_layout.setSpacing(0)
 
         # нижний маргин для отступа от сепаратора барами
