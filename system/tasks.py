@@ -183,10 +183,10 @@ class DbImagesLoader(URunnable):
                 .where(Thumbs.rel_img_path.not_ilike(two_slash))
             )
 
-        if Dynamic.filters_enabled:
+        if Dynamic.word_tags:
             filters = [
                 Thumbs.rel_img_path.ilike(f"%{filter}%")
-                for filter in Dynamic.filters_enabled
+                for filter in Dynamic.word_tags
             ]
             stmt = stmt.where(sqlalchemy.or_(*filters))
 

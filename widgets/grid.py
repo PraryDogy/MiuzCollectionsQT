@@ -374,6 +374,14 @@ class DatesTag(GridTagWidget):
         return super().clear_tag_cmd()
 
 
+class WordTag(GridTagWidget):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def clear_tag_cmd(self):
+        Dynamic.word_tags.remove(self.title.text())
+        return super().clear_tag_cmd()
+
 
 class GridStyledWidget(UFrame):
     def __init__(self):
@@ -452,6 +460,13 @@ class Grid(VScrollArea):
             date_tag = DatesTag(text)
             date_tag.clicked_clear.connect(self.load_st_grid.emit)
             self.scroll_layout.addWidget(date_tag, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        if Dynamic.word_tags:
+            for i in Dynamic.word_tags:
+                word_tag = WordTag(i)
+                word_tag.clicked_clear.connect(self.load_st_grid.emit)
+                self.scroll_layout.addWidget(word_tag, alignment=Qt.AlignmentFlag.AlignLeft)
+
 
 
         self.grid_wid = QWidget()

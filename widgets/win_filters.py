@@ -320,7 +320,7 @@ class WinFilters(UMainWidget):
             )
             item.set_checkable()
             self.list_widget.addItem(item)
-            if i in Dynamic.filters_enabled:
+            if i in Dynamic.word_tags:
                 item.setCheckState(Qt.CheckState.Checked)
 
         self.list_widget.setCurrentRow(0)
@@ -390,8 +390,8 @@ class WinFilters(UMainWidget):
         if Dynamic.filter_only_folder:
             active_list.append(Lng.without_subfolders[JsonData.lng_index])
 
-        if Dynamic.filters_enabled:
-            active_list.extend(Dynamic.filters_enabled)
+        if Dynamic.word_tags:
+            active_list.extend(Dynamic.word_tags)
 
         if not active_list:
             return Lng.no[JsonData.lng_index]
@@ -415,11 +415,11 @@ class WinFilters(UMainWidget):
             else:
                 Dynamic.filter_only_folder = True
                 item.setCheckState(Qt.CheckState.Checked)
-        elif item.text() in Dynamic.filters_enabled:
-            Dynamic.filters_enabled.remove(item.text())
+        elif item.text() in Dynamic.word_tags:
+            Dynamic.word_tags.remove(item.text())
             item.setCheckState(Qt.CheckState.Unchecked)
         else:
-            Dynamic.filters_enabled.append(item.text())
+            Dynamic.word_tags.append(item.text())
             item.setCheckState(Qt.CheckState.Checked)
 
         self.active_filters.setText(self.get_filters_text())
@@ -435,7 +435,7 @@ class WinFilters(UMainWidget):
             item.setCheckState(Qt.CheckState.Unchecked)
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
-        Dynamic.filters_enabled.clear()
+        Dynamic.word_tags.clear()
         self.reload_thumbnails.emit()
         self.active_filters.setText(self.get_filters_text())
 

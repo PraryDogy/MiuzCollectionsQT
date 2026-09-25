@@ -228,7 +228,7 @@ class WinMain(UMainWindow):
         return wrapper
 
     def set_no_filters(self):
-        Dynamic.filters_enabled.clear()
+        Dynamic.word_tags.clear()
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
         Dynamic.date_start = None
@@ -247,7 +247,7 @@ class WinMain(UMainWindow):
         except (RuntimeError, AttributeError):
             ...
     def base_search_start(self):
-        Dynamic.filters_enabled.clear()
+        Dynamic.word_tags.clear()
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
         Dynamic.date_start = None
@@ -288,7 +288,7 @@ class WinMain(UMainWindow):
     
     def show_in_app(self, rel_path: str):
 
-        Dynamic.filters_enabled.clear()
+        Dynamic.word_tags.clear()
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
         Dynamic.date_start = None
@@ -324,7 +324,7 @@ class WinMain(UMainWindow):
             if not any((
                 Dynamic.filter_only_folder,
                 Dynamic.filter_favs,
-                *Dynamic.filters_enabled,
+                *Dynamic.word_tags,
                 Dynamic.date_start,
                 Dynamic.date_end
             )):

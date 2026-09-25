@@ -93,7 +93,7 @@ class Dynamic:
     current_pixmap_size_index: int = 1
     current_dir: str = os.sep
     sort_by_mod: bool = True
-    filters_enabled: list[str] = []
+    word_tags: list[str] = []
     filter_favs: bool = False
     filter_only_folder: bool = False
     history: list[str] = []
