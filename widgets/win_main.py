@@ -252,18 +252,6 @@ class WinMain(UMainWindow):
         self.win_img_search.show()
     
     def show_in_app(self, rel_path: str):
-
-        # Dynamic.word_tags.clear()
-        # Dynamic.filter_favs = False
-        # Dynamic.filter_only_folder = False
-        # Dynamic.date_start = None
-        # Dynamic.date_end = None
-        # Dynamic.date_index = 0  
-
-        # Dynamic.thumb_path_set.clear()
-        # Dynamic.search_widget_text = None
-        # self.bar_top.search_wid.clear()
-
         current_dir = os.path.dirname(rel_path)
         Dynamic.current_dir = current_dir
         self.go_to_url = rel_path
