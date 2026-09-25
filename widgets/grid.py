@@ -294,7 +294,7 @@ class GridSortWidget(QWidget):
 
 class GridFiltersWidget(QWidget):
     sort_icon_svg = Static.BAR_TOP_ICONS / "filters.svg"
-    load_st_grid = pyqtSignal()
+    open_filters_win = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -305,6 +305,7 @@ class GridFiltersWidget(QWidget):
         self.h_lay.setContentsMargins(0, 0, 0, 0)
 
         self.button = UPushButton(Lng.filters[JsonData.lng_index])
+        self.button.clicked.connect(self.open_filters_win.emit)
         self.button.setIcon(self.sort_icon)
         self.button.setFixedSize(100, 23)
         self.h_lay.addWidget(self.button)
@@ -313,6 +314,7 @@ class GridFiltersWidget(QWidget):
 class GridControlsWidget(QWidget):
     # Общий сигнал, который будет срабатывать при изменении сортировки или фильтров
     load_st_grid = pyqtSignal()
+    open_filters_win = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -332,7 +334,7 @@ class GridControlsWidget(QWidget):
 
         # Перенаправляем (пробрасываем) внутренние сигналы наверх
         self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
-        self.filters_widget.load_st_grid.connect(self.load_st_grid.emit)
+        self.filters_widget.open_filters_win.connect(self.open_filters_win.emit)
 
         self.v_lay.addStretch()
 
@@ -425,6 +427,7 @@ class Grid(VScrollArea):
     show_in_app = pyqtSignal(str)
     finished_ = pyqtSignal()
     collage = pyqtSignal(list)
+    open_filters_win = pyqtSignal()
 
     grid_spacing = 7
     resize_ms = 10
@@ -470,6 +473,7 @@ class Grid(VScrollArea):
         self.up_btn.hide()
 
         self.sort_widget = GridControlsWidget()
+        self.sort_widget.open_filters_win.connect(self.open_filters_win.emit)
         self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.sort_widget)
 
