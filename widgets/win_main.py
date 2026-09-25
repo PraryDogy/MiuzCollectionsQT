@@ -226,17 +226,6 @@ class WinMain(UMainWindow):
                 self.open_win_smb(Mf.current_mf)
         return wrapper
 
-    def set_no_filters(self):
-        Dynamic.word_tags.clear()
-        Dynamic.filter_favs = False
-        Dynamic.filter_only_folder = False
-        Dynamic.date_start = None
-        Dynamic.date_end = None
-        Dynamic.date_index = 0
-
-        Dynamic.search_widget_text = None
-        self.bar_top.search_wid.clear()
-
     def set_no_img_search(self):
         Dynamic.thumb_path_set.clear()
         self.bar_top.img_search_btn.set_base_style()
@@ -261,11 +250,6 @@ class WinMain(UMainWindow):
 
     def open_img_search_win(self):
 
-        def reset_all_filters():
-            Dynamic.current_dir = os.sep
-            self.left_menu.tree_wid.expand_to_path(os.sep)
-            self.set_no_filters()
-
         def on_closed():
             if Dynamic.thumb_path_set:
                 self.bar_top.img_search_btn.set_selected_style()
@@ -278,7 +262,6 @@ class WinMain(UMainWindow):
         if not Dynamic.thumb_path_set:
             self.win_img_search = WinImgSearch()
             self.win_img_search.reload_thumbnails.connect(self.load_st_grid)
-            self.win_img_search.reset_all_filters.connect(reset_all_filters)
             self.win_img_search.closed.connect(on_closed)
             self.win_img_search.center_to_parent(self)
         self.win_img_search.show()
@@ -332,8 +315,6 @@ class WinMain(UMainWindow):
         self.win_smb.show()
 
     def on_mf_clicked(self, mf: Mf):
-        self.set_no_filters()
-        self.set_no_img_search()
         Mf.current_mf = mf
         Dynamic.current_dir = os.sep
         self.path_bar_update(Dynamic.current_dir)
@@ -352,8 +333,6 @@ class WinMain(UMainWindow):
             abs_path=abs_path
         )
         Dynamic.current_dir = rel_path
-        self.set_no_filters()
-        self.set_no_img_search()
         self.load_st_grid()
         self.path_bar_update(Dynamic.current_dir)
 

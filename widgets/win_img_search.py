@@ -102,7 +102,6 @@ class SliderWidget(QWidget):
 class WinImgSearch(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
     reload_thumbnails = pyqtSignal()
-    reset_all_filters = pyqtSignal()
     closed = pyqtSignal()
     ww = 350
     hh = 400
@@ -231,7 +230,6 @@ class WinImgSearch(UMainWidget):
         UThreadPool.start(self.img_search_task)
         self.open_progress_win()
         self.poll_progress_win()
-        self.reset_all_filters.emit()
 
     def stop_img_search(self):
         self.poll_progress_win_timer.stop()
