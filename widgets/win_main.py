@@ -101,7 +101,7 @@ class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
     ww, hh = 1050, 750
-    GRID_INDEX = 2
+    GRID_INDEX = 0
 
     def __init__(self, argv: list):
         super().__init__()
@@ -123,6 +123,31 @@ class WinMain(UMainWindow):
         self.go_to_url: str | None = None
         self.files_to_copy = set()
         self.stop_scaner = True
+
+        # Добавляем элементы в правую панель
+        self.bar_top = BarTop()
+        self.bar_top.h_layout.setContentsMargins(2, 2, RIGHT_MARGIN, 2)
+
+        self.bar_top.reload_thumbnails.connect(
+            lambda: self.load_st_grid()
+            )
+        self.bar_top.open_settings_win.connect(
+            lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.bar_top.open_filters_win.connect(
+            lambda: self.open_filters_win()
+        )
+        self.bar_top.open_img_search_win.connect(
+            lambda: self.open_img_search_win()
+        )
+        self.bar_top.start_text_search.connect(
+            lambda: self.base_search_start()
+        )
+        self.central_layout.addWidget(self.bar_top)
+
+        self.bar_top_sep = RightLayoutSeparator()
+        self.central_layout.addWidget(self.bar_top_sep)
+        self.bar_top_sep.sep.hide()
 
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -163,31 +188,6 @@ class WinMain(UMainWindow):
         self.right_layout = QVBoxLayout(right_wid)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_layout.setSpacing(0)
-
-        # Добавляем элементы в правую панель
-        self.bar_top = BarTop()
-        self.bar_top.h_layout.setContentsMargins(2, 2, RIGHT_MARGIN, 2)
-
-        self.bar_top.reload_thumbnails.connect(
-            lambda: self.load_st_grid()
-            )
-        self.bar_top.open_settings_win.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.bar_top.open_filters_win.connect(
-            lambda: self.open_filters_win()
-        )
-        self.bar_top.open_img_search_win.connect(
-            lambda: self.open_img_search_win()
-        )
-        self.bar_top.start_text_search.connect(
-            lambda: self.base_search_start()
-        )
-        self.right_layout.addWidget(self.bar_top)
-
-        self.bar_top_sep = RightLayoutSeparator()
-        self.right_layout.addWidget(self.bar_top_sep)
-        self.bar_top_sep.sep.hide()
 
         self.grid = Grid()
         self.load_st_grid()
