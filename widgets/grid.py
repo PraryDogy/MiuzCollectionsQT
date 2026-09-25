@@ -407,6 +407,22 @@ class OnlyFolderTag(GridTagWidget):
         return super().clear_tag_cmd()
 
 
+class ClearFiltersTag(GridTagWidget):
+    icon_path = Static.COMMON_ICONS / "cancel.svg"
+
+    def __init__(self, text: str):
+        super().__init__(text)
+
+    def clear_tag_cmd(self):
+        Dynamic.date_start = None
+        Dynamic.date_end = None
+        Dynamic.word_tags.clear()
+        Dynamic.filter_favs = False
+        Dynamic.filter_only_folder = False
+        return super().clear_tag_cmd()
+
+
+
 class GridStyledWidget(UFrame):
     def __init__(self):
         super().__init__()
@@ -523,6 +539,11 @@ class TagsWidget(QWidget):
 
         if Dynamic.filter_only_folder:
             tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
+            tag.clicked_clear.connect(self.load_st_grid.emit)
+            self.flow_layout.addWidget(tag)
+
+        if any((Dynamic.date_start, Dynamic.word_tags, Dynamic.filter_favs, Dynamic.filter_only_folder)):
+            tag = ClearFiltersTag(Lng.reset[JsonData.lng_index])
             tag.clicked_clear.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 

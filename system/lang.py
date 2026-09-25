@@ -596,3 +596,6 @@ class Lng:
         "Обновление",
         "Updating"
     )
+    clear_tags = (
+        ""
+    )
