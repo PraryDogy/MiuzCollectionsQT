@@ -225,7 +225,17 @@ class ImgSearchBtn(BarTopBtn):
         self.set_text(Lng.image_search_short[JsonData.lng_index])
 
 
-class BarTopCatalogBtn(QWidget):
+class BarTopCatalogTitle(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class BarTopCatalogBtn(UPushButton):
+    def __init__(self, text):
+        super().__init__(text)
+
+
+class BarTopCatalogWidget(QWidget):
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
     mf_open = pyqtSignal(Mf)
@@ -240,14 +250,14 @@ class BarTopCatalogBtn(QWidget):
         self.h_lay.setContentsMargins(0, 0, 0, 0)
         self.h_lay.setSpacing(0)
 
-        self.title = QLabel(Lng.catalog[JsonData.lng_index])
+        self.title = BarTopCatalogTitle(Lng.catalog[JsonData.lng_index])
         self.h_lay.addWidget(self.title)
 
         self.h_lay.addSpacing(10)
 
-        self.button = UPushButton("")
+        self.button = BarTopCatalogBtn("")
         self.set_btn_text(Mf.current_mf)
-        self.button.setFixedWidth(120)
+        self.button.setFixedSize(120, 23)
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
@@ -307,7 +317,7 @@ class BarTop(UFrame):
 
         self.h_layout.addSpacing(10)
 
-        self.catalog_btn = BarTopCatalogBtn()
+        self.catalog_btn = BarTopCatalogWidget()
         self.catalog_btn.mf_open.connect(self.mf_open.emit)
         self.catalog_btn.mf_new.connect(self.mf_new.emit)
         self.h_layout.addWidget(self.catalog_btn)
