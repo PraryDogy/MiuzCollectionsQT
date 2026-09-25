@@ -315,8 +315,6 @@ class BarTop(UFrame):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
-        self.h_layout.addSpacing(10)
-
         self.catalog_btn = BarTopCatalogWidget()
         self.catalog_btn.mf_open.connect(self.mf_open.emit)
         self.catalog_btn.mf_new.connect(self.mf_new.emit)

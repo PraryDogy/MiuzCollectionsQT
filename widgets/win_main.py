@@ -41,9 +41,6 @@ from .win_smb import WinSmb
 from .win_upload import UploadWin
 
 
-RIGHT_MARGIN = 10
-
-
 class TestWid(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent=parent, text="TEST")
@@ -83,25 +80,10 @@ class DangerWarn(ConfirmWindow):
         return
 
 
-class RightLayoutSeparator(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, RIGHT_MARGIN, 0)
-        layout.setSpacing(0)
-
-        self.sep = HSep()
-        layout.addWidget(self.sep)
-
-        self.setFixedHeight(1)
-
-
 class WinMain(UMainWindow):
     min_w = 750
     left_side_width = 250
     ww, hh = 1050, 750
-    GRID_INDEX = 0
 
     def __init__(self, argv: list):
         super().__init__()
@@ -124,8 +106,6 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.h_layout.setContentsMargins(2, 2, RIGHT_MARGIN, 2)
-
         self.bar_top.reload_thumbnails.connect(
             lambda: self.load_st_grid()
             )
@@ -191,7 +171,7 @@ class WinMain(UMainWindow):
         self.path_bar_update("")
         self.central_layout.addWidget(self.bar_path)
 
-        bar_bottom_sep = RightLayoutSeparator()
+        bar_bottom_sep = HSep()
         self.central_layout.addWidget(bar_bottom_sep)
 
         self.bar_bottom = BarBottom()
