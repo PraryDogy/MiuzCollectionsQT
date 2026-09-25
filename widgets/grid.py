@@ -249,6 +249,7 @@ class GridSortTitle(QLabel):
 
 class GridSortWidget(QWidget):
     sort_icon_svg = Static.BAR_TOP_ICONS / "sort.svg"
+    load_st_grid = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -261,17 +262,36 @@ class GridSortWidget(QWidget):
         self.title = GridSortTitle(Lng.sort[JsonData.lng_index])
         self.h_lay.addWidget(self.title)
 
-        if Dynamic.sort_by_mod:
-            text = Lng.sort_by_mod
-        else:
-            text = Lng.sort_by_recent
-
-        self.button = UPushButton(text[JsonData.lng_index])
+        self.button = UPushButton("")
+        self.set_button_text()
         self.button.setIcon(self.sort_icon)
         self.button.setFixedSize(150, 23)
         self.h_lay.addWidget(self.button)
 
+        self.button_menu = UMenu(None)
+        self.button.setMenu(self.button_menu)
+
+        mod_action = QAction(Lng.sort_by_mod[JsonData.lng_index], self.button_menu)
+        mod_action.triggered.connect(lambda: self.sort_btn_cmd(True))
+        self.button_menu.addAction(mod_action)
+
+        recent_action = QAction(Lng.sort_by_recent[JsonData.lng_index], self.button_menu)
+        recent_action.triggered.connect(lambda: self.sort_btn_cmd(False))
+        self.button_menu.addAction(recent_action)
+
         self.h_lay.addStretch(1)
+
+    def sort_btn_cmd(self, value: bool):
+        Dynamic.sort_by_mod = value
+        self.set_button_text()
+        self.load_st_grid.emit()
+
+    def set_button_text(self):
+        if Dynamic.sort_by_mod:
+            text = Lng.sort_by_mod
+        else:
+            text = Lng.sort_by_recent
+        self.button.setText(text[JsonData.lng_index])
 
 
 class GridStyledWidget(UFrame):
@@ -343,6 +363,7 @@ class Grid(VScrollArea):
         self.up_btn.hide()
 
         self.sort_widget = GridSortWidget()
+        self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.sort_widget)
 
         self.grid_wid = QWidget()
