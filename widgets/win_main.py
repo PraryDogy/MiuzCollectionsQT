@@ -183,12 +183,14 @@ class WinMain(UMainWindow):
         self.footer_container = QWidget()
         self.footer_layout = QVBoxLayout(self.footer_container)
         
-        # Убираем внешние и внутренние отступы, чтобы элементы внутри сидели плотно
-        self.footer_layout.setContentsMargins(5, 3, 5, 3)
-        self.footer_layout.setSpacing(3)
+        # верхний маргин для отступа от сетки и меню
+        self.footer_layout.setContentsMargins(0, 5, 0, 0)
+        self.footer_layout.setSpacing(0)
 
-        # 1. Добавляем панель пути
+        # нижний маргин для отступа от сепаратора барами
+        # левый и правый маргин для красивого отступа
         self.bar_path = PathBar()
+        self.bar_path.layout().setContentsMargins(2, 0, 2, 5)
         self.path_bar_update("")
         self.footer_layout.addWidget(self.bar_path)
 
@@ -196,8 +198,9 @@ class WinMain(UMainWindow):
         bar_bottom_sep = HSep()
         self.footer_layout.addWidget(bar_bottom_sep)
 
-        # 3. Добавляем нижнюю панель
+        # левый и правый маргин для красивого отступа
         self.bar_bottom = BarBottom()
+        self.bar_bottom.layout().setContentsMargins(2, 0, 2, 0)
         self.bar_bottom.resize_thumbnails.connect(
             lambda: self.grid.resize_thumbnails()
         )
@@ -205,7 +208,6 @@ class WinMain(UMainWindow):
 
         # --- Добавляем уже готовый собранный виджет в главный лэйаут ---
         self.central_layout.addWidget(self.footer_container)
-
 
         if "noscan" not in argv:
             self.start_scaner_task()

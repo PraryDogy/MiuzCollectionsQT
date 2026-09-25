@@ -74,7 +74,6 @@ class PathBar(QWidget):
         self.current_path: str = None
 
         self.main_lay = QHBoxLayout(self)
-        self.main_lay.setContentsMargins(0, 5, 0, 5)
         self.main_lay.setSpacing(5)
         self.main_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
 

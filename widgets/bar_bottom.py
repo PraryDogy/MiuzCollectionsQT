@@ -74,7 +74,6 @@ class BarBottom(QWidget):
         # --- Горизонтальный layout ---
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setSpacing(0)
-        self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.svg_wid = QSvgWidget()
@@ -82,11 +81,12 @@ class BarBottom(QWidget):
         self.svg_wid.setFixedSize(self.icon_size, self.icon_size)
         self.h_layout.addWidget(self.svg_wid)
 
+        self.h_layout.addSpacing(5)
+
         # --- Прогресс-бар ---
         self.progress_bar = ProgressWidget()
-        self.progress_bar.setFixedHeight(self.icon_size)
         self.progress_bar.setText("")
-        self.progress_bar.setFixedHeight(self.icon_size)
+        # self.progress_bar.setFixedHeight(self.icon_size)
         self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         # --- Разделитель перед слайдером ---
