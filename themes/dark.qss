@@ -294,6 +294,7 @@ ThumbWhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
 ThumbBlueTextWidget, ThumbMiuzBlueTextWidget {
     font-size: 11px;
     color: #6e6e6e;
+    background: transparent;
 }
 
 /* --- Модуль: Окна просмотра и заголовки --- */
