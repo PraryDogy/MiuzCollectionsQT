@@ -191,28 +191,6 @@ class WinMain(UMainWindow):
         self.grid = Grid()
         self.load_st_grid()
 
-        bar_bottom_sep = RightLayoutSeparator()
-        self.right_layout.addWidget(bar_bottom_sep)
-
-        self.bar_path = PathBar()
-        self.path_bar_update("")
-        self.right_layout.addWidget(self.bar_path)
-        wid = self.splitter.widget(1)
-        QTimer.singleShot(
-            100,
-            lambda: self.bar_path.setMaximumWidth(wid.width())
-        )
-
-        bar_path_sep = RightLayoutSeparator()
-        self.right_layout.addWidget(bar_path_sep)
-
-        self.bar_bottom = BarBottom()
-        # self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
-        self.bar_bottom.resize_thumbnails.connect(
-            lambda: self.grid.resize_thumbnails()
-        )
-        self.right_layout.addWidget(self.bar_bottom)
-
         # Добавляем splitter в основной layout
         self.central_layout.addWidget(self.splitter)
 
@@ -220,6 +198,19 @@ class WinMain(UMainWindow):
         self.splitter.setStretchFactor(1, 1)
         self.resize(self.ww, self.hh)
         self.load_st_grid()
+
+        self.bar_path = PathBar()
+        self.path_bar_update("")
+        self.central_layout.addWidget(self.bar_path)
+
+        bar_bottom_sep = RightLayoutSeparator()
+        self.central_layout.addWidget(bar_bottom_sep)
+
+        self.bar_bottom = BarBottom()
+        self.bar_bottom.resize_thumbnails.connect(
+            lambda: self.grid.resize_thumbnails()
+        )
+        self.central_layout.addWidget(self.bar_bottom)
 
         if "noscan" not in argv:
             self.start_scaner_task()
@@ -237,11 +228,6 @@ class WinMain(UMainWindow):
             else:
                 self.open_win_smb(Mf.current_mf)
         return wrapper
-
-    def handle_grid_scroll_value(self, value: int):
-        # Показываем, если скролл больше нуля, иначе скрываем
-        self.bar_top_sep.sep.setVisible(value > 0)
-        self.grid_scroll_value = value
 
     def set_no_filters(self):
         Dynamic.filters_enabled.clear()
@@ -656,9 +642,6 @@ class WinMain(UMainWindow):
         )
         self.grid.collage.connect(
             lambda data_items: self.open_collage_win(data_items)
-        )
-        self.grid.grid_is_scrolling.connect(
-            lambda value: self.handle_grid_scroll_value(value)
         )
         self.right_layout.insertWidget(self.GRID_INDEX, self.grid)
 

@@ -261,7 +261,6 @@ class Grid(VScrollArea):
     show_in_app = pyqtSignal(str)
     finished_ = pyqtSignal()
     collage = pyqtSignal(list)
-    grid_is_scrolling = pyqtSignal(int)
 
     grid_spacing = 7
     resize_ms = 10
@@ -714,7 +713,6 @@ class Grid(VScrollArea):
 
     def checkScrollValue(self, value: int):
         self.up_btn.setVisible(value > 0)
-        self.grid_is_scrolling.emit(value)
 
     def mouseDoubleClickEvent(self, a0):
 
