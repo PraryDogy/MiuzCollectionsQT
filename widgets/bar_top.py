@@ -11,7 +11,8 @@ from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 
-from ._base_widgets import GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu
+from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
+                            UPushButton)
 
 
 class ClearBtn(QSvgWidget):
@@ -223,6 +224,22 @@ class ImgSearchBtn(BarTopBtn):
         self.set_text(Lng.image_search_short[JsonData.lng_index])
 
 
+class BarTopCatalogBtn(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(0, 0, 0, 0)
+        self.h_lay.setSpacing(0)
+
+        self.title = QLabel(Lng.catalog[JsonData.lng_index])
+        self.h_lay.addWidget(self.title)
+
+        self.button = UPushButton("")
+        self.h_lay.addWidget(self.button)
+
+
+
+
 class BarTop(UFrame):
     open_settings_win = pyqtSignal(SettingsItem)
     open_filters_win = pyqtSignal()
@@ -238,28 +255,33 @@ class BarTop(UFrame):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
+        self.h_layout.addSpacing(10)
+
+        self.catalog_btn = BarTopCatalogBtn()
+        self.h_layout.addWidget(self.catalog_btn)
+
         self.h_layout.addStretch(0)
 
         # --- Кнопка сортировки ---
         self.sort_btn = SortBtn()
         self.sort_btn.clicked_.connect(self.reload_thumbnails.emit)
-        self.h_layout.addWidget(self.sort_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.h_layout.addWidget(self.sort_btn)
 
         # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchBtn()
         self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
-        self.h_layout.addWidget(self.img_search_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.h_layout.addWidget(self.img_search_btn)
 
         # --- Кнопка фильтров ---
         self.filters_btn = FiltersBtn()
         self.filters_btn.clicked_.connect(self.open_filters_win.emit)
-        self.h_layout.addWidget(self.filters_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.h_layout.addWidget(self.filters_btn)
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")
         self.settings_btn = SettingsBtn()
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
-        self.h_layout.addWidget(self.settings_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.h_layout.addWidget(self.settings_btn)
 
         self.h_layout.addStretch(0)
 
@@ -273,7 +295,7 @@ class BarTop(UFrame):
         # --- Виджет поиска ---
         self.search_wid = BarTopLineEdit()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
-        right_layout.addWidget(self.search_wid, alignment=Qt.AlignmentFlag.AlignRight)
+        right_layout.addWidget(self.search_wid)
 
         # Флаг для отслеживания состояния скролла (заглушка от спама)
         self._is_scrolled = False 
