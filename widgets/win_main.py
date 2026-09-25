@@ -114,9 +114,6 @@ class WinMain(UMainWindow):
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
-        self.bar_top.open_filters_win.connect(
-            lambda: self.open_filters_win()
-        )
         self.bar_top.open_img_search_win.connect(
             lambda: self.open_img_search_win()
         )
@@ -324,7 +321,6 @@ class WinMain(UMainWindow):
             settings_item = SettingsItem("filters", "")
             self.open_settings_win(settings_item)
 
-        self.bar_top.filters_btn.set_selected_style()
         self.filters_win = WinFilters()
         self.filters_win.reload_thumbnails.connect(self.load_st_grid)
         self.filters_win.edit_filters.connect(edit_filters)

@@ -141,14 +141,6 @@ class BarTopBtn(QWidget):
         super().mouseReleaseEvent(a0)
 
 
-class FiltersBtn(BarTopBtn):
-    base_svg = Static.BAR_TOP_ICONS / "filters.svg"
-    selected_svg = Static.BAR_TOP_ICONS / "filters_selected.svg"
-
-    def __init__(self):
-        super().__init__(self.base_svg, self.selected_svg)
-        
-
 class SettingsBtn(BarTopBtn):
     base_svg = Static.BAR_TOP_ICONS / "settings.svg"
     selected_svg = Static.BAR_TOP_ICONS / "settings_selected.svg"
@@ -240,7 +232,6 @@ class BarTopCatalogWidget(QWidget):
 
 class BarTop(UFrame):
     open_settings_win = pyqtSignal(SettingsItem)
-    open_filters_win = pyqtSignal()
     open_img_search_win = pyqtSignal()
     start_text_search = pyqtSignal()
     mf_open = pyqtSignal(Mf)
@@ -263,11 +254,6 @@ class BarTop(UFrame):
         self.img_search_btn = ImgSearchBtn()
         self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
         self.h_layout.addWidget(self.img_search_btn)
-
-        # --- Кнопка фильтров ---
-        self.filters_btn = FiltersBtn()
-        self.filters_btn.clicked_.connect(self.open_filters_win.emit)
-        self.h_layout.addWidget(self.filters_btn)
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")
