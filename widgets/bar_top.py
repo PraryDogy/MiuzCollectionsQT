@@ -245,7 +245,8 @@ class BarTopCatalogBtn(QWidget):
 
         self.h_lay.addSpacing(10)
 
-        self.button = UPushButton(Mf.current_mf.mf_alias)
+        self.button = UPushButton("")
+        self.set_btn_text(Mf.current_mf)
         self.button.setFixedWidth(120)
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
@@ -259,7 +260,7 @@ class BarTopCatalogBtn(QWidget):
             action.setIcon(self.image_folder_icon)
             action.setIconVisibleInMenu(True)
             action.triggered.connect(
-                lambda e, mf=i: self.mf_open.emit(mf)
+                lambda e, mf=i: self.mf_open_cmd(mf)
             )
             self.button_menu.addAction(action)
 
@@ -277,6 +278,14 @@ class BarTopCatalogBtn(QWidget):
             content=""
         )
         self.mf_new.emit(setting_item)
+
+    def mf_open_cmd(self, mf: Mf):
+        self.set_btn_text(mf)
+        self.mf_open.emit(mf)
+
+    def set_btn_text(self, mf: Mf):
+        text = f"{mf.mf_alias}"
+        self.button.setText(text)
 
 
 class BarTop(UFrame):
