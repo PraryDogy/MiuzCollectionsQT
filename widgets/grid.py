@@ -339,11 +339,11 @@ class GridControlsWidget(QWidget):
 
 class GridTagWidget(UFrame):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
+    clicked_clear = pyqtSignal()
 
     def __init__(self, text: str):
         super().__init__()
         self.setFixedHeight(23)
-        self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(8, 0, 8, 0)
@@ -354,12 +354,25 @@ class GridTagWidget(UFrame):
         self.h_lay.addWidget(self.title)
 
         self.close_btn = QSvgWidget()
+        self.close_btn.mouseReleaseEvent = lambda e: self.clear_tag_cmd()
+        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.close_btn.load(str(self.icon_path))
         self.close_btn.setFixedSize(12, 12)
         self.h_lay.addWidget(self.close_btn)
 
-        self.title.adjustSize()
-        self.adjustSize()
+    def clear_tag_cmd(self):
+        self.clicked_clear.emit()
+        
+
+class DatesTag(GridTagWidget):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def clear_tag_cmd(self):
+        Dynamic.date_start = None
+        Dynamic.date_end = None
+        return super().clear_tag_cmd()
+
 
 
 class GridStyledWidget(UFrame):
@@ -436,7 +449,8 @@ class Grid(VScrollArea):
 
         if Dynamic.date_start:
             text = f"{Dynamic.date_start} - {Dynamic.date_end}"
-            date_tag = GridTagWidget(text)
+            date_tag = DatesTag(text)
+            date_tag.clicked_clear.connect(self.load_st_grid.emit)
             self.scroll_layout.addWidget(date_tag, alignment=Qt.AlignmentFlag.AlignLeft)
 
 
