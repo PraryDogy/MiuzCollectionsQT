@@ -52,6 +52,7 @@ class BarTopLineEdit(ULineEditLight):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(self.ww)
+        self.setFixedHeight(BTN_H)
 
         self.textChanged.connect(self.create_search)
         self.setPlaceholderText(Lng.search[JsonData.lng_index])
@@ -94,7 +95,7 @@ class BarTopLineEdit(ULineEditLight):
 
 class BarTopBtn(QWidget):
     clicked_ = pyqtSignal()
-    svg_size = 32
+    svg_size = BTN_H + 2
 
     def __init__(self, base_svg: Path, selected_svg: Path):
         super().__init__()
@@ -240,7 +241,6 @@ class BarTop(UFrame):
     def __init__(self):
         super().__init__()
         self.h_layout = QHBoxLayout(self)
-        self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
         self.catalog_btn = BarTopCatalogWidget()
@@ -250,6 +250,10 @@ class BarTop(UFrame):
 
         self.h_layout.addStretch(0)
 
+        # --- Кнопка поиска по картинке ---
+        self.img_search_btn = ImgSearchBtn()
+        self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
+        self.h_layout.addWidget(self.img_search_btn)
 
         # --- Виджет поиска ---
         self.search_wid = BarTopLineEdit()
@@ -257,12 +261,6 @@ class BarTop(UFrame):
         self.h_layout.addWidget(self.search_wid)
 
         self.h_layout.addStretch(0)
-
-
-        # --- Кнопка поиска по картинке ---
-        self.img_search_btn = ImgSearchBtn()
-        self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
-        self.h_layout.addWidget(self.img_search_btn)
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")

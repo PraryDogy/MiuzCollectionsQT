@@ -111,6 +111,7 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
+        self.bar_top.layout().setContentsMargins(0, 0, 0, 0)
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
@@ -130,15 +131,9 @@ class WinMain(UMainWindow):
         # --- Создаем контейнер-обертку ---
         self.top_bar_container = QWidget()
         self.top_bar_layout = QHBoxLayout(self.top_bar_container)
-        
-        # Убираем внутренние отступы контейнера, если нужно, чтобы bar_top прижимался к краям
-        self.top_bar_layout.setContentsMargins(3, 0, 3, 0)
+        self.top_bar_layout.setContentsMargins(3, 5, 3, 5)
         self.top_bar_layout.setSpacing(0)
-
-        # Добавляем bar_top в горизонтальный лэйаут контейнера
         self.top_bar_layout.addWidget(self.bar_top)
-
-        # Добавляем уже сам контейнер в ваш главный вертикальный или сеточный лэйаут
         self.central_layout.addWidget(self.top_bar_container)
 
         # Создаем QSplitter
@@ -233,19 +228,9 @@ class WinMain(UMainWindow):
             self.win_img_search.deleteLater()
         except (RuntimeError, AttributeError):
             ...
+
     def base_search_start(self):
-        Dynamic.word_tags.clear()
-        Dynamic.filter_favs = False
-        Dynamic.filter_only_folder = False
-        Dynamic.date_start = None
-        Dynamic.date_end = None
-        Dynamic.date_index = 0
-
-        Dynamic.thumb_path_set.clear()
-
-        Dynamic.current_dir = os.sep
         self.left_menu.tree_wid.expand_to_path(os.sep)
-
         self.load_st_grid()
 
     def open_img_search_win(self):

@@ -391,3 +391,8 @@ GridTagWidget {
     border-radius: 6px;
     color: #ffffff;
 }
+
+
+BarTopLineEdit {
+    border-radius: 5px;
+}
