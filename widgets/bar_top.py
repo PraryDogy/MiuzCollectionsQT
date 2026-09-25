@@ -21,59 +21,82 @@ BTN_H = 27
 
 class ClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
+
     icon_path = Static.COMMON_ICONS / "cancel.svg"
     icon_size = 11
+    right_margin = 8
 
     def __init__(self, parent: ULineEditLight):
-        super().__init__(parent=parent)
+        super().__init__(parent)
+
         self.setFixedSize(self.icon_size, self.icon_size)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.load(str(self.icon_path))
 
-    def disable(self):
         self.hide()
-        self.setDisabled(True)
 
     def enable(self):
         self.show()
-        self.setDisabled(False)
 
-    def mouseReleaseEvent(self, ev):
-        self.clicked_.emit()
+    def disable(self):
+        self.hide()
 
-    def enterEvent(self, a0):
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked_.emit()
+
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
         self.setCursor(Qt.CursorShape.ArrowCursor)
+        super().leaveEvent(event)
 
 
 class BarTopLineEdit(ULineEditLight):
     reload_thumbnails = pyqtSignal()
-    open_img_search = pyqtSignal()
+
     ww = 162
 
     def __init__(self):
         super().__init__()
-        # self.setFixedWidth(self.ww)
+
         self.setFixedHeight(BTN_H)
         self.setMinimumWidth(self.ww)
         self.setMaximumWidth(self.ww * 2)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(Lng.search[JsonData.lng_index])
 
-        self.clear_btn = ClearBtn(parent=self)
+        self.setPlaceholderText(
+            Lng.search[JsonData.lng_index]
+        )
+
+        self.clear_btn = ClearBtn(self)
         self.clear_btn.clicked_.connect(self.clear_search)
-        self.clear_btn.disable()
-        self.clear_btn.move(self.ww - 20, 10)
+
+        self.update_clear_btn_position()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.update_clear_btn_position()
+
+    def update_clear_btn_position(self):
+        x = self.width() - self.clear_btn.width() - self.clear_btn.right_margin
+        y = (self.height() - self.clear_btn.height()) // 2
+
+        self.clear_btn.move(x, y)
 
     def create_search(self, new_text: str):
-        if len(new_text) > 0:
-            Dynamic.search_words_list = [
-                word
-                for i in new_text.split(",")
-                if (word := i.strip())
-            ]
+        Dynamic.search_words_list = [
+            word
+            for item in new_text.split(",")
+            if (word := item.strip())
+        ]
+
+        if Dynamic.search_words_list:
             self.clear_btn.enable()
         else:
-            Dynamic.search_words_list.clear()
             self.clear_btn.disable()
 
     def delayed_search(self):
@@ -85,17 +108,17 @@ class BarTopLineEdit(ULineEditLight):
         Dynamic.loaded_thumbs = 0
         self.reload_thumbnails.emit()
 
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+    def keyPressEvent(self, event: QKeyEvent | None):
+        if event.key() in (
+            Qt.Key.Key_Enter,
+            Qt.Key.Key_Return,
+        ):
             self.delayed_search()
-        if a0.key() == Qt.Key.Key_Escape:
-            self.clearFocus()
-        return super().keyPressEvent(a0)
-    
-    def mouseDoubleClickEvent(self, a0):
-        self.open_img_search.emit()
-        return super().mouseDoubleClickEvent(a0)
 
+        elif event.key() == Qt.Key.Key_Escape:
+            self.clearFocus()
+
+        super().keyPressEvent(event)
 
 
 class BarTopBtn(QWidget):
