@@ -129,7 +129,20 @@ class WinMain(UMainWindow):
         self.bar_top.mf_open.connect(
             lambda mf: self.on_mf_clicked(mf)
         )
-        self.central_layout.addWidget(self.bar_top)
+
+        # --- Создаем контейнер-обертку ---
+        self.top_bar_container = QWidget()
+        self.top_bar_layout = QHBoxLayout(self.top_bar_container)
+        
+        # Убираем внутренние отступы контейнера, если нужно, чтобы bar_top прижимался к краям
+        self.top_bar_layout.setContentsMargins(3, 0, 3, 0)
+        self.top_bar_layout.setSpacing(0)
+
+        # Добавляем bar_top в горизонтальный лэйаут контейнера
+        self.top_bar_layout.addWidget(self.bar_top)
+
+        # Добавляем уже сам контейнер в ваш главный вертикальный или сеточный лэйаут
+        self.central_layout.addWidget(self.top_bar_container)
 
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -169,18 +182,33 @@ class WinMain(UMainWindow):
         self.splitter.setStretchFactor(1, 1)
         self.resize(self.ww, self.hh)
 
+        # --- Создаем единый контейнер для всего нижнего блока ---
+        self.footer_container = QWidget()
+        self.footer_layout = QVBoxLayout(self.footer_container)
+        
+        # Убираем внешние и внутренние отступы, чтобы элементы внутри сидели плотно
+        self.footer_layout.setContentsMargins(5, 3, 5, 3)
+        self.footer_layout.setSpacing(3)
+
+        # 1. Добавляем панель пути
         self.bar_path = PathBar()
         self.path_bar_update("")
-        self.central_layout.addWidget(self.bar_path)
+        self.footer_layout.addWidget(self.bar_path)
 
+        # 2. Добавляем горизонтальный разделитель
         bar_bottom_sep = HSep()
-        self.central_layout.addWidget(bar_bottom_sep)
+        self.footer_layout.addWidget(bar_bottom_sep)
 
+        # 3. Добавляем нижнюю панель
         self.bar_bottom = BarBottom()
         self.bar_bottom.resize_thumbnails.connect(
             lambda: self.grid.resize_thumbnails()
         )
-        self.central_layout.addWidget(self.bar_bottom)
+        self.footer_layout.addWidget(self.bar_bottom)
+
+        # --- Добавляем уже готовый собранный виджет в главный лэйаут ---
+        self.central_layout.addWidget(self.footer_container)
+
 
         if "noscan" not in argv:
             self.start_scaner_task()
