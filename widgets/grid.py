@@ -242,11 +242,6 @@ class UpBtn(QSvgWidget):
         super().mouseReleaseEvent(ev)
 
 
-class GridWid(UFrame):
-    def __init__(self):
-        super().__init__()
-
-
 class Grid(VScrollArea):
     load_st_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
@@ -299,7 +294,7 @@ class Grid(VScrollArea):
         self.date_timer.setSingleShot(True)
 
         # --- Вкладка прокрутки ---
-        self.scroll_wid = GridWid()
+        self.scroll_wid = UFrame()
         self.setWidget(self.scroll_wid)
         self.scroll_layout = QVBoxLayout(self.scroll_wid)
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)
