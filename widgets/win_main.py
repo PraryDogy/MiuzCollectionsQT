@@ -143,6 +143,12 @@ class WinMain(UMainWindow):
         self.bar_top.start_text_search.connect(
             lambda: self.base_search_start()
         )
+        self.bar_top.mf_new.connect(
+            lambda settings_item: self.open_settings_win(settings_item)
+        )
+        self.bar_top.mf_open.connect(
+            lambda mf: self.on_mf_clicked(mf)
+        )
         self.central_layout.addWidget(self.bar_top)
 
         self.bar_top_sep = RightLayoutSeparator()

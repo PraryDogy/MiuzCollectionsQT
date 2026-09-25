@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QKeyEvent, QMouseEvent
+from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from typing_extensions import Literal
@@ -10,6 +10,7 @@ from typing_extensions import Literal
 from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
+from system.main_folder import Mf
 
 from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
                             UPushButton)
@@ -225,8 +226,16 @@ class ImgSearchBtn(BarTopBtn):
 
 
 class BarTopCatalogBtn(QWidget):
+    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
+    mf_open = pyqtSignal(Mf)
+    mf_new = pyqtSignal(SettingsItem)
+
     def __init__(self):
         super().__init__()
+        self.image_folder_icon = QIcon(str(self.image_folder_svg))
+        self.new_folder_icon = QIcon(str(self.new_folder_svg))
+
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(0, 0, 0, 0)
         self.h_lay.setSpacing(0)
@@ -234,10 +243,40 @@ class BarTopCatalogBtn(QWidget):
         self.title = QLabel(Lng.catalog[JsonData.lng_index])
         self.h_lay.addWidget(self.title)
 
-        self.button = UPushButton("")
+        self.h_lay.addSpacing(10)
+
+        self.button = UPushButton(Mf.current_mf.mf_alias)
+        self.button.setFixedWidth(120)
+        self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
+        self.button_menu = UMenu(None)
+        self.button_menu.setMaximumWidth(200)
+        self.button.setMenu(self.button_menu)
 
+        for i in Mf.items:
+            action = QAction(i.mf_alias, self.button_menu)
+            action.setIcon(self.image_folder_icon)
+            action.setIconVisibleInMenu(True)
+            action.triggered.connect(
+                lambda e, mf=i: self.mf_open.emit(mf)
+            )
+            self.button_menu.addAction(action)
+
+        self.button_menu.addSeparator()
+
+        new_folder_action = QAction(Lng.new_folder[JsonData.lng_index], self.button_menu)
+        new_folder_action.setIcon(self.new_folder_icon)
+        new_folder_action.setIconVisibleInMenu(True)
+        new_folder_action.triggered.connect(self.mf_new_cmd)
+        self.button_menu.addAction(new_folder_action)
+
+    def mf_new_cmd(self):
+        setting_item = SettingsItem(
+            type_="new_folder",
+            content=""
+        )
+        self.mf_new.emit(setting_item)
 
 
 class BarTop(UFrame):
@@ -248,6 +287,8 @@ class BarTop(UFrame):
     start_text_search = pyqtSignal()
     entered = pyqtSignal()
     leaved = pyqtSignal()
+    mf_open = pyqtSignal(Mf)
+    mf_new = pyqtSignal(SettingsItem)
 
     def __init__(self):
         super().__init__()
@@ -258,6 +299,8 @@ class BarTop(UFrame):
         self.h_layout.addSpacing(10)
 
         self.catalog_btn = BarTopCatalogBtn()
+        self.catalog_btn.mf_open.connect(self.mf_open.emit)
+        self.catalog_btn.mf_new.connect(self.mf_new.emit)
         self.h_layout.addWidget(self.catalog_btn)
 
         self.h_layout.addStretch(0)
