@@ -485,6 +485,15 @@ class Grid(VScrollArea):
                 word_tag.clicked_clear.connect(self.load_st_grid.emit)
                 self.scroll_layout.addWidget(word_tag, alignment=Qt.AlignmentFlag.AlignLeft)
 
+        if Dynamic.filter_favs:
+            fav_tag = FavTag(Lng.favorites[JsonData.lng_index])
+            fav_tag.clicked_clear.connect(self.load_st_grid.emit)
+            self.scroll_layout.addWidget(fav_tag, alignment=Qt.AlignmentFlag.AlignLeft)            
+
+        if Dynamic.filter_only_folder:
+            only_folder_tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
+            only_folder_tag.clicked_clear.connect(self.load_st_grid.emit)
+            self.scroll_layout.addWidget(only_folder_tag, alignment=Qt.AlignmentFlag.AlignLeft)   
 
 
         self.grid_wid = QWidget()
