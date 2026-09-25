@@ -378,10 +378,15 @@ MenuLeft {
 }
 
 LeftMenuTreeWidget,
-LeftMenuCatalogButton {
+LeftMenuCatalogTitle {
     background: transparent;
     border: none;
     color: #8d8d8d;
+}
+
+LeftMenuCatalogTitle {
+    font-weight: bold;
+    margin-left: 2px;
 }
 
 LeftMenuSep {

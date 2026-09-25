@@ -246,119 +246,12 @@ class CatalogArrowWidget(QWidget):
         )
 
 
-class LeftMenuCatalogWidget(QWidget):
-    mf_open = pyqtSignal(Mf)
-    mf_edit = pyqtSignal(Mf)
-    mf_new = pyqtSignal(str)
-
-    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-
+class LeftMenuCatalogTitle(QLabel):
     hh = 30
 
     def __init__(self):
-        super().__init__()
-
+        super().__init__(Lng.folders[JsonData.lng_index])
         self.setFixedHeight(self.hh)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(5, 0, 5, 0)
-        self.h_lay.setSpacing(0)
-
-        self.label = LeftMenuCatalogButton()
-        self.label.setTextInteractionFlags(
-            Qt.TextInteractionFlag.NoTextInteraction
-        )
-
-        self.h_lay.addWidget(self.label)
-        self.h_lay.addStretch(1)
-
-        self.arrow = CatalogArrowWidget()
-        self.h_lay.addWidget(self.arrow)
-
-        self.mf_folder_icon = QIcon(str(self.image_folder_svg))
-
-        self.menu_ = LeftMenuCatalogButtonMenu(None)
-        self.menu_.aboutToShow.connect(self.adjust_menu_geometry)
-
-        self.menu_.setSizePolicy(
-            QSizePolicy.Policy.Maximum,
-            QSizePolicy.Policy.Maximum
-        )
-
-        for mf in Mf.items:
-            action = QAction(mf.mf_alias, self.menu_)
-            action.setIcon(self.mf_folder_icon)
-            action.setIconVisibleInMenu(True)
-
-            action.triggered.connect(
-                lambda e, mf=mf: self.action_cmd(e, mf)
-            )
-
-            self.menu_.addAction(action)
-
-        self.menu_.addSeparator()
-
-        add_new = QAction(
-            Lng.add[JsonData.lng_index],
-            self.menu_
-        )
-
-        add_new_icon = QIcon(str(self.new_folder_svg))
-        add_new.setIcon(add_new_icon)
-        add_new.setIconVisibleInMenu(True)
-
-        add_new.triggered.connect(self.add_cmd)
-
-        self.menu_.addAction(add_new)
-
-        self.set_text(Mf.current_mf)
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.show_menu()
-
-        super().mousePressEvent(event)
-
-    def show_menu(self):
-        self.menu_.setMinimumWidth(self.width())
-
-        pos = self.mapToGlobal(
-            QPoint(0, self.height())
-        )
-
-        self.menu_.move(pos)
-        self.menu_.show()
-
-    def adjust_menu_geometry(self):
-        self.menu_.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Preferred
-        )
-
-        self.menu_.setMinimumWidth(self.width())
-
-        pos = self.mapToGlobal(
-            QPoint(0, self.height())
-        )
-
-        self.menu_.move(pos)
-
-    def action_cmd(self, e, mf: Mf):
-        self.mf_open.emit(mf)
-        self.set_text(mf)
-
-    def set_text(self, mf: Mf):
-        text = (
-            f" {Lng.catalog[JsonData.lng_index]}: "
-            f"{mf.mf_alias}"
-        )
-        self.label.setText(text)
-
-    def add_cmd(self, e):
-        self.mf_new.emit("")
-
 
 
 class LeftMenuSep(HSep):
@@ -378,8 +271,6 @@ class MenuLeft(UFrame):
     on_mf_clicked = pyqtSignal(Mf)
     reveal = pyqtSignal(list)
     copy_path = pyqtSignal(list)
-    mf_edit = pyqtSignal(SettingsItem)
-    mf_new = pyqtSignal(SettingsItem)
     on_hide_digits_clicked = pyqtSignal()
 
     def __init__(self):
@@ -390,13 +281,8 @@ class MenuLeft(UFrame):
         v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
 
-        self.mf_list_widget = LeftMenuCatalogWidget()
-        self.mf_list_widget.mf_open.connect(
-            lambda mf: self.on_mf_clicked.emit(mf)
-        )
-        self.mf_list_widget.mf_edit.connect(lambda mf: self.mf_edit_cmd(mf))
-        self.mf_list_widget.mf_new.connect(lambda path: self.mf_new_cmd(path))
-        v_lay.addWidget(self.mf_list_widget)
+        self.title_widget = LeftMenuCatalogTitle()
+        v_lay.addWidget(self.title_widget)
 
         self.sep_above_grid = LeftMenuSep()
         v_lay.addWidget(self.sep_above_grid)

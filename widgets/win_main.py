@@ -162,13 +162,6 @@ class WinMain(UMainWindow):
         self.left_menu = MenuLeft()
         self.splitter.addWidget(self.left_menu)
 
-        # Подключение сигналов
-        self.left_menu.mf_edit.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.left_menu.mf_new.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
         self.left_menu.reveal.connect(
             lambda rel_paths: self.reveal_in_finder(rel_paths)
         )
