@@ -8,7 +8,7 @@ from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QGridLayout,
-                             QLabel, QRubberBand, QVBoxLayout, QWidget)
+                             QLabel, QRubberBand, QVBoxLayout, QWidget, QHBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
@@ -18,7 +18,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UFrame, UMenu, USubMenu, VScrollArea
+from ._base_widgets import UFrame, UMenu, USubMenu, VScrollArea, UPushButton
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -242,6 +242,32 @@ class UpBtn(QSvgWidget):
         super().mouseReleaseEvent(ev)
 
 
+class GridSortTitle(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class GridSortWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(10, 0, 10, 0)
+
+        self.title = GridSortTitle(Lng.sort[JsonData.lng_index])
+        self.h_lay.addWidget(self.title)
+
+        if Dynamic.sort_by_mod:
+            text = Lng.sort_by_mod
+        else:
+            text = Lng.sort_by_recent
+
+        self.button = UPushButton(text[JsonData.lng_index])
+        self.button.setFixedSize(120, 23)
+        self.h_lay.addWidget(self.button)
+
+        self.h_lay.addStretch(1)
+
+
 class GridStyledWidget(UFrame):
     def __init__(self):
         super().__init__()
@@ -309,6 +335,9 @@ class Grid(VScrollArea):
         self.up_btn = UpBtn(self.viewport())
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
+
+        self.sort_widget = GridSortWidget()
+        self.scroll_layout.addWidget(self.sort_widget)
 
         self.grid_wid = QWidget()
         self.scroll_layout.addWidget(self.grid_wid)
