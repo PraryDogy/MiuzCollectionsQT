@@ -89,7 +89,6 @@ class Dynamic:
     date_end: datetime = None
     date_index: int = 0
     loaded_thumbs: int = 0
-    search_widget_text: str = None
     current_pixmap_size_index: int = 1
     current_dir: str = os.sep
     sort_by_mod_enabled: bool = True
@@ -97,7 +96,7 @@ class Dynamic:
     favs_tag_enabled: bool = False
     no_subfolders_tag_enabled: bool = False
     img_search_thumb_paths: set[str] = set()
-
+    search_words_list: list[str] = []
 
 class JsonData:
     app_ver = Static.APP_VERSION

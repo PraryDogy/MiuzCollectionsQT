@@ -1197,7 +1197,7 @@ class GridStandart(Grid):
         if not a0.mimeData().hasUrls() or a0.source() is not None:
             return
         
-        elif Dynamic.search_widget_text:
+        elif Dynamic.search_words_list:
             return
 
         paths: list[str] = [

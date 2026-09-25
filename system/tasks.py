@@ -190,9 +190,13 @@ class DbImagesLoader(URunnable):
             ]
             stmt = stmt.where(sqlalchemy.or_(*filters))
 
-        if Dynamic.search_widget_text:
-            text = Dynamic.search_widget_text.strip().replace("\n", "")
-            stmt = stmt.where(Thumbs.rel_img_path.ilike(f"%{text}%"))
+        if Dynamic.search_words_list:
+            search_conditions = [
+                Thumbs.rel_img_path.ilike(f"%{word}%")
+                for word in Dynamic.search_words_list
+            ]
+
+            stmt = stmt.where(sqlalchemy.or_(*search_conditions))
 
         if any((Dynamic.date_start, Dynamic.date_end)):
             start, end = self.combine_dates(

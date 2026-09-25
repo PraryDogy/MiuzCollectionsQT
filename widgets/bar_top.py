@@ -64,12 +64,19 @@ class BarTopLineEdit(ULineEditLight):
         self.clear_btn.disable()
         self.clear_btn.move(self.ww - 20, 10)
 
-    def create_search(self, new_text):
+    def create_search(self, new_text: str):
         if len(new_text) > 0:
-            Dynamic.search_widget_text = new_text
+            Dynamic.search_words_list = [
+                word
+                for i in new_text.split(",")
+                if (word := i.strip())
+            ]
             self.clear_btn.enable()
+
+            print(Dynamic.search_words_list)
+
         else:
-            Dynamic.search_widget_text = None
+            Dynamic.search_words_list.clear()
             self.clear_btn.disable()
 
     def delayed_search(self):
@@ -77,9 +84,8 @@ class BarTopLineEdit(ULineEditLight):
 
     def clear_search(self):
         self.clear()
-        Dynamic.search_widget_text = None
+        Dynamic.search_words_list.clear()
         Dynamic.loaded_thumbs = 0
-        Dynamic.img_search_thumb_paths.clear()
         self.reload_thumbnails.emit()
 
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
