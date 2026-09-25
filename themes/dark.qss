@@ -326,7 +326,6 @@ MenuLeft {
     background: #171717;
     border: 1px solid #2d2d2d;
     border-radius: 10px;
-    margin: 5px;
 }
 
 LeftMenuTreeWidget,
