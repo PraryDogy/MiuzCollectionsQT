@@ -350,7 +350,7 @@ class GridTagWidget(UFrame):
     def __init__(self, text: str):
         super().__init__()
         self.setFixedHeight(23)
-        
+
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
         self.h_lay.setSpacing(6)
@@ -359,12 +359,20 @@ class GridTagWidget(UFrame):
         self.title.setStyleSheet("background: transparent;")
         self.h_lay.addWidget(self.title)
 
+        # Контейнер для SVG
+        self.close_btn_wrapper = QWidget()
+        close_lay = QVBoxLayout(self.close_btn_wrapper)
+        close_lay.setContentsMargins(0, 1, 0, 0)
+        close_lay.setSpacing(0)
+
         self.close_btn = QSvgWidget()
         self.close_btn.mouseReleaseEvent = lambda e: self.clear_tag_cmd()
         self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.close_btn.load(str(self.icon_path))
         self.close_btn.setFixedSize(12, 12)
-        self.h_lay.addWidget(self.close_btn)
+
+        close_lay.addWidget(self.close_btn)
+        self.h_lay.addWidget(self.close_btn_wrapper)
 
     def clear_tag_cmd(self):
         self.clicked_clear.emit()
@@ -408,17 +416,19 @@ class OnlyFolderTag(GridTagWidget):
 
 
 class ClearFiltersTag(GridTagWidget):
-    icon_path = Static.COMMON_ICONS / "cancel.svg"
+    icon_path = Static.COMMON_ICONS / "trash.svg"
 
     def __init__(self, text: str):
-        super().__init__(text)
+        super().__init__("")
+        # self.setFixedWidth(30)
+        self.title.deleteLater()
 
     def clear_tag_cmd(self):
         Dynamic.date_start = None
         Dynamic.date_end = None
-        Dynamic.word_tags.clear()
         Dynamic.filter_favs = False
         Dynamic.filter_only_folder = False
+        Dynamic.word_tags.clear()
         return super().clear_tag_cmd()
 
 
