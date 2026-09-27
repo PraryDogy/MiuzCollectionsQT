@@ -59,23 +59,16 @@ class SearchWidgetBaseBtn(QSvgWidget):
         super().leaveEvent(event)
 
 
-# ==========================================
-# 2. КОНКРЕТНЫЕ РЕАЛИЗАЦИИ КНОПОК
-# ==========================================
 class SearchWidgetClearBtn(SearchWidgetBaseBtn):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
     right_margin = 8  # Отступ крайней кнопки от правого края
 
 
 class SearchWidgetLeftBtn(SearchWidgetBaseBtn):
-    # Укажите имя файла для вашей новой кнопки (например, настройки, фильтр, лупа)
     icon_path = Static.COMMON_ICONS / "list_view.svg" 
-    spacing = 6  # Расстояние между этой кнопкой и кнопкой очистки
+    spacing = 10  # Расстояние между этой кнопкой и кнопкой очистки
 
 
-# ==========================================
-# 3. ВИДЖЕТ ПОИСКА С ДВУМЯ КНОПКАМИ
-# ==========================================
 class SearchWidget(ULineEditLight):
     reload_thumbnails = pyqtSignal()
     ww = 162
