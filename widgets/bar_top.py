@@ -19,20 +19,25 @@ from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
 BTN_H = 27
 
 
-class SearchWidgetClearBtn(QSvgWidget):
+from PyQt6.QtWidgets import QLineEdit
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtSvgWidgets import QSvgWidget  # Или PyQt5.QtSvg.QSvgWidget
+
+# ==========================================
+# 1. БАЗОВЫЙ КЛАСС ДЛЯ КНОПОК ВНУТРИ ПОИСКА
+# ==========================================
+class SearchWidgetBaseBtn(QSvgWidget):
     clicked_ = pyqtSignal()
-
-    icon_path = Static.COMMON_ICONS / "cancel.svg"
+    icon_path = None  # Переопределяется в наследниках
     icon_size = 11
-    right_margin = 8
 
-    def __init__(self, parent: ULineEditLight):
+    def __init__(self, parent):
         super().__init__(parent)
-
         self.setFixedSize(self.icon_size, self.icon_size)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.load(str(self.icon_path))
-
+        if self.icon_path:
+            self.load(str(self.icon_path))
         self.hide()
 
     def enable(self):
@@ -54,49 +59,72 @@ class SearchWidgetClearBtn(QSvgWidget):
         super().leaveEvent(event)
 
 
+# ==========================================
+# 2. КОНКРЕТНЫЕ РЕАЛИЗАЦИИ КНОПОК
+# ==========================================
+class SearchWidgetClearBtn(SearchWidgetBaseBtn):
+    icon_path = Static.COMMON_ICONS / "cancel.svg"
+    right_margin = 8  # Отступ крайней кнопки от правого края
+
+
+class SearchWidgetLeftBtn(SearchWidgetBaseBtn):
+    # Укажите имя файла для вашей новой кнопки (например, настройки, фильтр, лупа)
+    icon_path = Static.COMMON_ICONS / "list_view.svg" 
+    spacing = 6  # Расстояние между этой кнопкой и кнопкой очистки
+
+
+# ==========================================
+# 3. ВИДЖЕТ ПОИСКА С ДВУМЯ КНОПКАМИ
+# ==========================================
 class SearchWidget(ULineEditLight):
     reload_thumbnails = pyqtSignal()
     ww = 162
 
     def __init__(self):
         super().__init__()
-
         self.setFixedHeight(BTN_H)
         self.setMinimumWidth(self.ww)
         self.setMaximumWidth(self.ww * 2)
 
         self.textChanged.connect(self.create_search)
+        self.setPlaceholderText(Lng.search[JsonData.lng_index])
 
-        self.setPlaceholderText(
-            Lng.search[JsonData.lng_index]
-        )
-
+        # Кнопка Очистки (правая)
         self.clear_btn = SearchWidgetClearBtn(self)
         self.clear_btn.clicked_.connect(self.clear_search)
 
-        self.update_clear_btn_position()
+        # Новая кнопка (левая)
+        self.left_btn = SearchWidgetLeftBtn(self)
+        self.left_btn.clicked_.connect(self.handle_left_btn_click) # Подключите ваш метод
+
+        self.update_buttons_position()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self.update_clear_btn_position()
+        self.update_buttons_position()
 
-    def update_clear_btn_position(self):
-        x = self.width() - self.clear_btn.width() - self.clear_btn.right_margin
-        y = (self.height() - self.clear_btn.height()) // 2
+    def update_buttons_position(self):
+        # Позиционируем правую кнопку (Clear)
+        clear_x = self.width() - self.clear_btn.width() - self.clear_btn.right_margin
+        clear_y = (self.height() - self.clear_btn.height()) // 2
+        self.clear_btn.move(clear_x, clear_y)
 
-        self.clear_btn.move(x, y)
+        # Позиционируем левую кнопку относительно правой кнопки
+        left_x = clear_x - self.left_btn.width() - self.left_btn.spacing
+        left_y = (self.height() - self.left_btn.height()) // 2
+        self.left_btn.move(left_x, left_y)
 
     def create_search(self, new_text: str):
         Dynamic.search_words_list = [
-            word
-            for item in new_text.split(",")
-            if (word := item.strip())
+            word for item in new_text.split(",") if (word := item.strip())
         ]
 
         if Dynamic.search_words_list:
             self.clear_btn.enable()
+            self.left_btn.enable()    # Поведение «такое же»: показываем вместе
         else:
             self.clear_btn.disable()
+            self.left_btn.disable()   # Скрываем вместе
 
     def delayed_search(self):
         self.reload_thumbnails.emit()
@@ -107,16 +135,15 @@ class SearchWidget(ULineEditLight):
         Dynamic.loaded_thumbs = 0
         self.reload_thumbnails.emit()
 
-    def keyPressEvent(self, event: QKeyEvent | None):
-        if event.key() in (
-            Qt.Key.Key_Enter,
-            Qt.Key.Key_Return,
-        ):
-            self.delayed_search()
+    def handle_left_btn_click(self):
+        # Напишите здесь, что должна делать новая кнопка при клике
+        print("Клик по левой кнопке")
 
+    def keyPressEvent(self, event: QKeyEvent | None):
+        if event.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            self.delayed_search()
         elif event.key() == Qt.Key.Key_Escape:
             self.clearFocus()
-
         super().keyPressEvent(event)
 
 
