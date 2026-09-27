@@ -19,19 +19,19 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UFrame, UMenu, UPushButton, USubMenu, VScrollArea
+from ._base_widgets import (TransparentFrame, TransparentLabel, UFrame, UMenu,
+                            UPushButton, USubMenu, VScrollArea)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
                       WinInfoAction)
 
-
 CONTROLS_MARGIN = 10
 
 
-class ThumbBaseLabel(QLabel):
+class ThumbBaseLabel(TransparentLabel):
     def __init__(self):
-        super().__init__()
+        super().__init__("")
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def get_shorten_text(self, text: str, parent_width: int, offset=5):
@@ -41,9 +41,6 @@ class ThumbBaseLabel(QLabel):
             Qt.TextElideMode.ElideMiddle,
             max(0, parent_width - offset)
         )
-
-    def set_opacity(self, percent: int):
-        return
 
 
 class ThumbImgWidget(ThumbBaseLabel):
@@ -139,7 +136,7 @@ class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
         self.setText(f"{day_month_year}\n{miuz_collection_name}")
 
 
-class Thumb(UFrame):
+class Thumb(TransparentFrame):
     sym_star = "\U00002605"
     wid_width = 0
     wid_height = 0
@@ -246,11 +243,6 @@ class UpBtn(QSvgWidget):
         super().mouseReleaseEvent(ev)
 
 
-class GridSortTitle(QLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
-
-
 class GridSortWidget(QWidget):
     sort_icon_svg = Static.BAR_TOP_ICONS / "sort.svg"
     load_st_grid = pyqtSignal()
@@ -264,7 +256,7 @@ class GridSortWidget(QWidget):
         self.h_lay.setContentsMargins(0, 0, 0, 0)
         self.h_lay.setSpacing(5)
 
-        self.title = GridSortTitle(Lng.sort[JsonData.lng_index])
+        self.title = TransparentLabel(Lng.sort[JsonData.lng_index])
         self.h_lay.addWidget(self.title)
 
         self.button = UPushButton("")
@@ -433,12 +425,6 @@ class ClearFiltersTag(GridTagWidget):
         Dynamic.no_subfolders_tag_enabled = False
         Dynamic.word_tags_list.clear()
         return super().clear_tag_cmd()
-
-
-
-class GridStyledWidget(UFrame):
-    def __init__(self):
-        super().__init__()
 
 
 class FlowLayout(QLayout):
@@ -631,7 +617,7 @@ class Grid(VScrollArea):
         self.date_timer.setSingleShot(True)
 
         # --- Вкладка прокрутки ---
-        self.scroll_wid = GridStyledWidget()
+        self.scroll_wid = TransparentFrame()
         self.setWidget(self.scroll_wid)
         self.scroll_layout = QVBoxLayout(self.scroll_wid)
         self.scroll_layout.setContentsMargins(0, 0, 0, 0)
@@ -642,10 +628,10 @@ class Grid(VScrollArea):
         self.up_btn.scroll_to_top.connect(lambda: self.verticalScrollBar().setValue(0))
         self.up_btn.hide()
 
-        self.sort_widget = GridControlsWidget()
-        self.sort_widget.open_filters_win.connect(self.open_filters_win.emit)
-        self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
-        self.scroll_layout.addWidget(self.sort_widget)
+        self.grid_controls_widget = GridControlsWidget()
+        self.grid_controls_widget.open_filters_win.connect(self.open_filters_win.emit)
+        self.grid_controls_widget.load_st_grid.connect(self.load_st_grid.emit)
+        self.scroll_layout.addWidget(self.grid_controls_widget)
 
         self.scroll_layout.addSpacing(10)
 
@@ -653,7 +639,7 @@ class Grid(VScrollArea):
         self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.tags_widget)
 
-        self.grid_wid = QWidget()
+        self.grid_wid = TransparentFrame()
         self.scroll_layout.addWidget(self.grid_wid)
         self.grid_lay = QGridLayout(self.grid_wid)
         self.grid_lay.setSpacing(self.grid_spacing)

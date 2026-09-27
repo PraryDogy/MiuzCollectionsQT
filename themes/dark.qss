@@ -351,10 +351,6 @@ LeftMenuSep[hidden="false"]  {
 }
 
 
-BarTopLineEdit,
-BarTopLineEdit:focus {
-    background: transparent;
-}
 
 
 MenuLeft,
@@ -372,7 +368,7 @@ LeftMenuTreeWidget::branch:selected {
 }
 
 
-Thumb {
+/* Thumb {
     background: transparent;
 }
 
@@ -382,7 +378,7 @@ GridStyledWidget {
 
 GridSortTitle {
     background: transparent;
-}
+} */
 
 
 GridTagWidget {
@@ -393,6 +389,12 @@ GridTagWidget {
 }
 
 
-BarTopLineEdit {
-    border-radius: 5px;
+TransparentButton,
+TransparentLabel,
+TransparentFrame {
+    background: transparent;
+}
+
+SearchWidget {
+    background: transparent;
 }
