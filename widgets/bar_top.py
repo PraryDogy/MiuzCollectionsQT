@@ -80,9 +80,6 @@ class SearchWidget(ULineEditLight):
         self.setMaximumWidth(self.ww * 2)
 
         self.textChanged.connect(self.create_search)
-        self.setPlaceholderText(
-            f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} {Mf.current_mf.mf_alias}"
-        )
 
         # Кнопка Очистки (правая)
         self.clear_btn = SearchWidgetClearBtn(self)
@@ -93,6 +90,11 @@ class SearchWidget(ULineEditLight):
         self.left_btn.clicked_.connect(self.handle_left_btn_click) # Подключите ваш метод
 
         self.update_buttons_position()
+
+    def update_placeholder(self):
+        self.setPlaceholderText(
+            f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} {Mf.current_mf.mf_alias}"
+        )
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

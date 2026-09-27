@@ -511,6 +511,7 @@ class WinMain(UMainWindow):
                 )
                 self.go_to_url = str()
 
+        self.bar_top.search_wid.update_placeholder()
         Dynamic.loaded_thumbs = 0
         self.grid.deleteLater()
         self.grid = GridStandart()
