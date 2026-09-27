@@ -109,7 +109,7 @@ class Calendar(UMainWidget):
         if JsonData.lng_index == 0:
             lng = QLocale.Language.Russian
             country = QLocale.Country.Russia
-        else:
+        elif JsonData.lng_index == 1:
             lng = QLocale.Language.English
             country = QLocale.Country.UnitedStates
 
