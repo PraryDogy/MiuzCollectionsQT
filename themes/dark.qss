@@ -351,8 +351,6 @@ LeftMenuSep[hidden="false"]  {
 }
 
 
-
-
 MenuLeft,
 MainWinRightWidget {
     background: #272727;
