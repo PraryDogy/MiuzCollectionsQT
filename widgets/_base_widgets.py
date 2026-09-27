@@ -287,6 +287,10 @@ class UPushButton(QPushButton):
     def text(self):
         return super().text().strip()
 
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        return super().enterEvent(event)
+
 
 class HSep(UFrame):
     def __init__(self):

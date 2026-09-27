@@ -54,9 +54,8 @@ class ClearBtn(QSvgWidget):
         super().leaveEvent(event)
 
 
-class BarTopLineEdit(ULineEditLight):
+class SearchWidget(ULineEditLight):
     reload_thumbnails = pyqtSignal()
-
     ww = 162
 
     def __init__(self):
@@ -168,6 +167,10 @@ class BarTopBtn(QWidget):
             self.set_base_style()
             self.clicked_.emit()
         super().mouseReleaseEvent(a0)
+
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        return super().enterEvent(event)
 
 
 class SettingsBtn(BarTopBtn):
@@ -285,7 +288,7 @@ class BarTop(UFrame):
         self.h_layout.addWidget(self.img_search_btn)
 
         # --- Виджет поиска ---
-        self.search_wid = BarTopLineEdit()
+        self.search_wid = SearchWidget()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         self.h_layout.addWidget(self.search_wid)
 
