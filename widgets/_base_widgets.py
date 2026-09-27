@@ -821,3 +821,18 @@ class MfStopListWidget(QWidget):
 
         if mf_stop_list:
             self.text_edit.setPlainText("\n".join(mf_stop_list))
+
+
+class TransparentButton(UPushButton):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class TransparentLabel(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class TransparentFrame(UFrame):
+    def __init__(self):
+        super().__init__()
