@@ -1,8 +1,8 @@
 import os
 import re
 
-from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
-                          pyqtSignal)
+from PyQt6.QtCore import (QDate, QLocale, QMimeData, QPoint, QRect, QSize, Qt,
+                          QTimer, QUrl, pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
@@ -372,8 +372,24 @@ class GridTagWidget(UFrame):
         
 
 class DatesTag(GridTagWidget):
-    def __init__(self, text):
-        super().__init__(text)
+    def __init__(self):
+        super().__init__("")
+        self.set_dates_text()
+
+    def set_dates_text(self):
+        q_start = QDate(Dynamic.date_start.year, Dynamic.date_start.month, Dynamic.date_start.day)
+        q_end = QDate(Dynamic.date_end.year, Dynamic.date_end.month, Dynamic.date_end.day)
+        
+        if JsonData.lng_index == 0:
+            locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
+            date_format = "d MMMM yyyy"
+        elif JsonData.lng_index == 1:
+            locale = QLocale(QLocale.Language.English, QLocale.Country.UnitedStates)
+            date_format = "MMMM d, yyyy"
+            
+        start_str = locale.toString(q_start, date_format)
+        end_str = locale.toString(q_end, date_format)
+        self.title.setText(f"{start_str} - {end_str}")
 
     def clear_tag_cmd(self):
         Dynamic.date_start = None
@@ -520,8 +536,7 @@ class TagsWidget(QWidget):
 
     def _create_tags(self):
         if Dynamic.date_start:
-            text = f"{Dynamic.date_start} - {Dynamic.date_end}"
-            tag = DatesTag(text)
+            tag = DatesTag()
             tag.clicked_clear.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
