@@ -368,26 +368,12 @@ LeftMenuTreeWidget::branch:selected {
 }
 
 
-/* Thumb {
-    background: transparent;
-}
-
-GridStyledWidget {
-    background: transparent;
-}
-
-GridSortTitle {
-    background: transparent;
-} */
-
-
 GridTagWidget {
     background: #4e4e4e;
     border: 1px solid #585858;
     border-radius: 6px;
     color: #ffffff;
 }
-
 
 TransparentButton,
 TransparentLabel,
