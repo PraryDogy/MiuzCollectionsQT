@@ -836,3 +836,8 @@ class TransparentLabel(QLabel):
 class TransparentFrame(UFrame):
     def __init__(self):
         super().__init__()
+
+
+class TransparentWidget(QWidget):
+    def __init__(self):
+        super().__init__()

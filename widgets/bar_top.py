@@ -4,7 +4,8 @@ from pathlib import Path
 from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QLineEdit, QVBoxLayout,
+                             QWidget)
 from typing_extensions import Literal
 
 from cfg import Dynamic, JsonData, Static
@@ -14,15 +15,11 @@ from system.main_folder import Mf
 
 from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
                             UPushButton)
-
+from .win_text_search import WinTextSearch
 
 BTN_H = 27
 
 
-from PyQt6.QtWidgets import QLineEdit
-from PyQt6.QtCore import pyqtSignal, Qt
-from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtSvgWidgets import QSvgWidget  # Или PyQt5.QtSvg.QSvgWidget
 
 # ==========================================
 # 1. БАЗОВЫЙ КЛАСС ДЛЯ КНОПОК ВНУТРИ ПОИСКА
@@ -87,9 +84,20 @@ class SearchWidget(ULineEditLight):
 
         # Новая кнопка (левая)
         self.left_btn = SearchWidgetLeftBtn(self)
-        self.left_btn.clicked_.connect(self.handle_left_btn_click) # Подключите ваш метод
+        self.left_btn.clicked_.connect(self.open_win_text_search) # Подключите ваш метод
 
         self.update_buttons_position()
+
+    def open_win_text_search(self):
+
+        def ok_clicked(text: str):
+            print(text, "win text search ok clicked")
+
+        text = ", ".join(Dynamic.search_words_list)
+        self.win_text_search = WinTextSearch(text)
+        self.win_text_search.ok_clicked.connect(ok_clicked)
+        self.win_text_search.center_to_parent(self.window())
+        self.win_text_search.show()
 
     def update_placeholder(self):
         self.setPlaceholderText(
@@ -131,10 +139,6 @@ class SearchWidget(ULineEditLight):
         Dynamic.search_words_list.clear()
         Dynamic.loaded_thumbs = 0
         self.reload_thumbnails.emit()
-
-    def handle_left_btn_click(self):
-        # Напишите здесь, что должна делать новая кнопка при клике
-        print("Клик по левой кнопке")
 
     def keyPressEvent(self, event: QKeyEvent | None):
         if event.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):

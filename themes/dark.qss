@@ -375,7 +375,8 @@ GridTagWidget {
 
 TransparentButton,
 TransparentLabel,
-TransparentFrame {
+TransparentFrame,
+TransparentWidget {
     background: transparent;
 }
 
