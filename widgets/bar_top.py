@@ -19,7 +19,7 @@ from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
 BTN_H = 27
 
 
-class ClearBtn(QSvgWidget):
+class SearchWidgetClearBtn(QSvgWidget):
     clicked_ = pyqtSignal()
 
     icon_path = Static.COMMON_ICONS / "cancel.svg"
@@ -71,7 +71,7 @@ class SearchWidget(ULineEditLight):
             Lng.search[JsonData.lng_index]
         )
 
-        self.clear_btn = ClearBtn(self)
+        self.clear_btn = SearchWidgetClearBtn(self)
         self.clear_btn.clicked_.connect(self.clear_search)
 
         self.update_clear_btn_position()
