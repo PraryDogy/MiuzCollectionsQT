@@ -89,13 +89,10 @@ class SearchWidget(ULineEditLight):
         self.update_buttons_position()
 
     def open_win_text_search(self):
-
-        def ok_clicked(text: str):
-            print(text, "win text search ok clicked")
-
         text = ", ".join(Dynamic.search_words_list)
         self.win_text_search = WinTextSearch(text)
-        self.win_text_search.ok_clicked.connect(ok_clicked)
+        self.win_text_search.ok_clicked.connect(self.setText)
+        self.win_text_search.ok_clicked.connect(self.win_text_search.deleteLater)
         self.win_text_search.center_to_parent(self.window())
         self.win_text_search.show()
 

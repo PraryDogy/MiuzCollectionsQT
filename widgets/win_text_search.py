@@ -18,6 +18,7 @@ class WinTextSearch(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setFixedSize(*self.size_)
+        self.central_layout.setSpacing(5)
 
         # 1. Текст описания форматов (RU / EN)
         if JsonData.lng_index == 0:
@@ -49,14 +50,15 @@ class WinTextSearch(UMainWidget):
             "Форматировать текст" if JsonData.lng_index == 0 else "Format Text"
         )
         self.format_button.clicked.connect(self.format_input_text)
-        self.central_layout.addWidget(self.format_button)
+        self.central_layout.addWidget(self.format_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.btns_container = TransparentWidget()
         self.central_layout.addWidget(self.btns_container)
 
         btns_layout = QHBoxLayout(self.btns_container)
         btns_layout.setContentsMargins(0, 0, 0, 0)
-        btns_layout.setSpacing(0)
+        btns_layout.setSpacing(5)
+        btns_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
         self.ok_btn.clicked.connect(
