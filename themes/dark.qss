@@ -388,4 +388,10 @@ SearchWidget {
 WinTextSearchTitle {
     font-weight: bold;
     font-size: 30px;
+    color: #d5d5d5;
 }
+
+
+/* WinTextSearchTitleRow {
+    background: red;
+} */

@@ -8,23 +8,24 @@ from cfg import JsonData, Static
 from system.lang import Lng
 
 from ._base_widgets import (TransparentLabel, TransparentWidget, UMainWidget,
-                            UPushButton, UTextEditLight)
+                            UPushButton, UTextEditLight, TransparentFrame, UTextEditDark)
 
 
 class WinTextSearchTitle(TransparentLabel):
     def __init__(self):
-        super().__init__("Редактор текста")
+        super().__init__("Текстовый поиск")
 
 
-class WinTextSearchTitleRow(TransparentWidget):
-    svg_path = Static.COMMON_ICONS / "edit.svg"
-    svg_size = (25, 25)
+class WinTextSearchTitleRow(TransparentFrame):
+    svg_path = Static.COMMON_ICONS / "magnifier.svg"
+    svg_size = (28, 28)
 
     def __init__(self):
         super().__init__()
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(0, 0, 0, 0)
         self.h_lay.setSpacing(10)
+        self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.svg_path))
@@ -45,7 +46,8 @@ class WinTextSearch(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setFixedSize(*self.size_)
-        self.central_layout.setSpacing(5)
+        self.central_layout.setSpacing(10)
+        self.central_layout.setContentsMargins(10, 5, 10, 5)
 
         self.title_row = WinTextSearchTitleRow()
         self.central_layout.addWidget(self.title_row)
@@ -53,19 +55,17 @@ class WinTextSearch(UMainWidget):
         # 1. Текст описания форматов (RU / EN)
         if JsonData.lng_index == 0:
             description_text = (
-                "Для поиска по нескольким словам введите их через запятую или каждое слово с новой строки. "
-                "Нажмите \"Форматировать текст\", чтобы подготовить текст для поиска."
+                "Для поиска нескольких слов введите их через запятую или с новой строки."
             )
         else:
             description_text = (
-                "To search for multiple words, enter them separated by commas or each on a new line. "
-                "Click \"Format Text\" to prepare the text for searching."
+                "Для поиска нескольких слов введите их через запятую или с новой строки."
             )
         self.description_label = TransparentLabel(description_text)
         self.description_label.setWordWrap(True) 
         self.central_layout.addWidget(self.description_label)
 
-        self.text_edit = UTextEditLight()
+        self.text_edit = UTextEditDark()
         self.central_layout.addWidget(self.text_edit)
         self.text_edit.setPlainText(text)
 
