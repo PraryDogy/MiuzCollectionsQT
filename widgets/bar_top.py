@@ -91,8 +91,7 @@ class SearchWidget(ULineEditLight):
     def open_win_text_search(self):
         text = ", ".join(Dynamic.search_words_list)
         self.win_text_search = WinTextSearch(text)
-        self.win_text_search.ok_clicked.connect(self.setText)
-        self.win_text_search.ok_clicked.connect(self.win_text_search.deleteLater)
+        self.win_text_search.ok_clicked.connect(self.win_text_search_cmd)
         self.win_text_search.center_to_parent(self.window())
         self.win_text_search.show()
 
@@ -100,6 +99,12 @@ class SearchWidget(ULineEditLight):
         self.setPlaceholderText(
             f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} {Mf.current_mf.mf_alias}"
         )
+
+    def win_text_search_cmd(self, text: str):
+        if text:
+            self.setText(text)
+            self.create_search(text)
+            self.delayed_search()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

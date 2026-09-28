@@ -1,6 +1,6 @@
 import re
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt6.QtGui import QIcon
@@ -13,7 +13,7 @@ from ._base_widgets import (TransparentLabel, TransparentWidget, UMainWidget,
 
 class WinTextSearchTitle(TransparentLabel):
     def __init__(self):
-        super().__init__("Текстовый поиск")
+        super().__init__("Поиск")
 
 
 class WinTextSearchTitleRow(TransparentFrame):
@@ -30,14 +30,14 @@ class WinTextSearchTitleRow(TransparentFrame):
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.svg_path))
         self.svg_widget.setFixedSize(*self.svg_size)
-        self.h_lay.addWidget(self.svg_widget)
+        # self.h_lay.addWidget(self.svg_widget)
 
         self.title_label = WinTextSearchTitle()
         self.h_lay.addWidget(self.title_label)
 
 
 class WinTextSearchBtn(UPushButton):
-    size_ = (100, 23)
+    size_ = (90, 23)
 
     def __init__(self, text):
         super().__init__(text)
@@ -49,6 +49,7 @@ class WinTextSearch(UMainWidget):
     size_ = (350, 330)  # Немного увеличил высоту, чтобы поместилось описание
     svg_magnifier = Static.COMMON_ICONS / "magnifier.svg"
     svg_wand = Static.COMMON_ICONS / "wand.svg"
+    icon_size = QSize(10, 10)
 
     def __init__(self, text: str):
         super().__init__()
@@ -95,11 +96,13 @@ class WinTextSearch(UMainWidget):
             "Улучшить" if JsonData.lng_index == 0 else "Улучшить"
         )
         self.format_button.clicked.connect(self.format_input_text)
+        self.format_button.setIconSize(self.icon_size)
         self.format_button.setIcon(self.wand_icon)
         btns_layout.addWidget(self.format_button)
 
         self.ok_btn = WinTextSearchBtn("Поиск")
         self.ok_btn.setIcon(self.magnifier_icon)
+        self.ok_btn.setIconSize(self.icon_size)
         self.ok_btn.clicked.connect(self.search)
         btns_layout.addWidget(self.ok_btn)
 
