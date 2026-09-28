@@ -45,7 +45,7 @@ def find_unused_icons():
         if not any(icon_name in content for content in py_contents):
             unused.append(icon_name)
 
-    return unused
+    return sorted(unused)
 
 
 if __name__ == "__main__":
