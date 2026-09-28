@@ -66,7 +66,7 @@ class SearchWidgetLeftBtn(SearchWidgetBaseBtn):
     spacing = 10  # Расстояние между этой кнопкой и кнопкой очистки
 
 
-class SearchWidget(ULineEditLight):
+class SearchWidgetLineEdit(ULineEditLight):
     reload_thumbnails = pyqtSignal()
     ww = 162
 
@@ -318,7 +318,7 @@ class BarTop(UFrame):
         self.h_layout.addWidget(self.img_search_btn)
 
         # --- Виджет поиска ---
-        self.search_wid = SearchWidget()
+        self.search_wid = SearchWidgetLineEdit()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         self.h_layout.addWidget(self.search_wid)
 

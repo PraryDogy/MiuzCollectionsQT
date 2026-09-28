@@ -380,7 +380,7 @@ TransparentWidget {
     background: transparent;
 }
 
-SearchWidget {
+SearchWidgetLineEdit {
     background: transparent;
 }
 
@@ -390,4 +390,8 @@ WinTextSearchTitle {
     font-weight: bold;
     font-size: 30px;
     /* color: #d5d5d5; */
+}
+
+WinTextSearchSubtitle {
+    color: #AAAAAA;
 }

@@ -16,6 +16,11 @@ class WinTextSearchTitle(TransparentLabel):
         super().__init__("Поиск")
 
 
+class WinTextSearchSubtitle(TransparentLabel):
+    def __init__(self, text):
+        super().__init__(text)
+
+
 class WinTextSearchTitleRow(TransparentFrame):
     svg_path = Static.COMMON_ICONS / "magnifier.svg"
     svg_size = (28, 28)
@@ -75,7 +80,7 @@ class WinTextSearch(UMainWidget):
             description_text = (
                 "Для поиска нескольких слов введите их через запятую или с новой строки."
             )
-        self.description_label = TransparentLabel(description_text)
+        self.description_label = WinTextSearchSubtitle(description_text)
         self.description_label.setWordWrap(True) 
         self.central_layout.addWidget(self.description_label)
 
