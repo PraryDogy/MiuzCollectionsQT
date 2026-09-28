@@ -3,7 +3,7 @@ import os
 
 def find_unused_icons():
     EXTS = (".py", ".qss")
-    EXCLUDED = {".git", ".venv", "venv", "__pycache__"}
+    EXCLUDED = {".git", ".venv", "venv", "__pycache__", "env", ".env"}
     project_root = os.path.dirname(os.path.abspath(__file__))
     icons_dir = os.path.join(project_root, "icons")
 

@@ -65,14 +65,12 @@ class Lng:
     no_photo = ("Нет фотографий", "No photos")
     open_settings_window = ("Открыть настройки", "Open settings window")
     paste = ("Вставить (⌘ + V)", "Paste (⌘ + V)")
-    place = ("Место", "Place")
     scan_folder = ("Искать изображения", "Find images")
     update_grid = ("Обновить", "Update")
     reset = ("Сбросить", "Reset")
     resol = ("Разрешение", "Resolution")
     reveal_in_finder = ("Показать в Finder", "Reveal in Finder")
     save_to_downloads = ("Сохранить в загрузки", "Save to Downloads")
-    save_as = ("Сохранить как", "Save as")
     search = ("Поиск", "Search")
     search_dates = (
         "Поиск фотографий по датам",
