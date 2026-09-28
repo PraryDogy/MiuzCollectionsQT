@@ -18,7 +18,7 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
-from system.paletes import ThemeChanger
+from system.themes import ThemeChanger
 from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)

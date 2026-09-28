@@ -23,10 +23,10 @@ class ThemeChanger:
             cls._apply_system_theme()
 
         elif JsonData.theme == Themes.theme_dark:
-            cls._apply_theme(Static.THEMES_DARK)
+            cls._apply_theme(Static.THEME_DARK_QSS)
 
         elif JsonData.theme == Themes.theme_light:
-            cls._apply_theme(Static.THEMES_LIGHT)
+            cls._apply_theme(Static.THEME_LIGHT_QSS)
 
     @classmethod
     def _on_system_theme_changed(cls):
@@ -37,9 +37,9 @@ class ThemeChanger:
         app: QApplication = QApplication.instance()
 
         if app.styleHints().colorScheme() == Qt.ColorScheme.Dark:
-            cls._apply_theme(Static.THEMES_DARK)
+            cls._apply_theme(Static.THEME_DARK_QSS)
         else:
-            cls._apply_theme(Static.THEMES_LIGHT)
+            cls._apply_theme(Static.THEME_LIGHT_QSS)
 
     @classmethod
     def _apply_theme(cls, path):
