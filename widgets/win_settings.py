@@ -23,7 +23,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
 from system.utils import Utils
-
+from pathlib import Path
 from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow, UGroupBox,
@@ -275,19 +275,14 @@ class NonRebootableSettings(UGroupBox):
 
 
 class ThemeBtn(QWidget):
-    clicked = pyqtSignal(str)
+    clicked = pyqtSignal()
     ww = 70
+    svg_size = (40, 40)
 
-    def __init__(self, theme: Literal["auto", "light", "dark"]):
+    def __init__(self, theme_name: str, svg_paths: list[Path]):
         super().__init__()
-        self.theme = theme
-        self.svg = Static.COMMON_ICONS / f"{theme}_theme.svg"
-        self.svg_selected = Static.COMMON_ICONS / f"{theme}_theme_selected.svg"
-        text_mappings = {
-            Themes.auto: Lng.auto_theme,
-            Themes.dark: Lng.dark_theme,
-            Themes.light: Lng.light_theme,
-        }
+        self.theme_name = theme_name
+        self.svg_1, self.svg_2 = svg_paths
 
         self.setFixedWidth(self.ww)
 
@@ -296,23 +291,23 @@ class ThemeBtn(QWidget):
         layout_.setSpacing(5)
         
         self.svg_widget = QSvgWidget()
-        self.svg_widget.setFixedSize(40, 40)
+        self.svg_widget.setFixedSize(*self.svg_size)
         layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        label = QLabel(text_mappings[theme][JsonData.lng_index])
-        layout_.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.title_label = QLabel(self.theme_name)
+        layout_.addWidget(self.title_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.clear_selection()
 
     def select(self):
-        self.svg_widget.load(str(self.svg_selected))
+        self.svg_widget.load(str(self.svg_2))
 
     def clear_selection(self):
-        self.svg_widget.load(str(self.svg))
+        self.svg_widget.load(str(self.svg_1))
 
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.LeftButton:
-            self.clicked.emit(self.theme)
+            self.clicked.emit()
         return super().mouseReleaseEvent(a0)
 
 
@@ -339,21 +334,44 @@ class ThemesWidget(UGroupBox):
         themes_layout.setSpacing(5)
         themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         main_lay.addWidget(themes_wid)
-        
-        for i in (Themes.auto, Themes.dark, Themes.light):
-            btn = ThemeBtn(i)
-            btn.clicked.connect(lambda theme, btn=btn: self.on_btn_clicked(theme, btn))
+
+        themes_mappings = (
+            (
+                Themes.theme_auto,
+                Lng.theme_auto[JsonData.lng_index],
+                Static.COMMON_ICONS / "theme_auto_1.svg",
+                Static.COMMON_ICONS / "theme_auto_2.svg"
+            ),
+            (
+                Themes.theme_light,
+                Lng.theme_light[JsonData.lng_index],
+                Static.COMMON_ICONS / "theme_light_1.svg",
+                Static.COMMON_ICONS / "theme_light_2.svg"
+            ),
+            (
+                Themes.theme_dark,
+                Lng.theme_dark[JsonData.lng_index],
+                Static.COMMON_ICONS / "theme_dark_1.svg",
+                Static.COMMON_ICONS / "theme_dark_2.svg"
+            ),
+        )
+
+        for theme_type, theme_name, svg_1, svg_2 in themes_mappings:
+            btn = ThemeBtn(theme_name, (svg_1, svg_2))
+            btn.clicked.connect(
+                lambda t=theme_type, btn=btn: self.on_btn_clicked(t, btn)
+            )
             themes_layout.addWidget(btn)
-            if i == JsonData.theme:
+            if theme_name == JsonData.theme:
                 btn.select()
 
-    def on_btn_clicked(self, theme: Literal["light", "dark"], btn: ThemeBtn):
+    def on_btn_clicked(self, theme_type: str, btn: ThemeBtn):
         theme_btns = self.findChildren(ThemeBtn)
-        if theme != JsonData.theme:
+        if theme_type != JsonData.theme:
             for i in theme_btns:
                 i.clear_selection()
             btn.select()
-            JsonData.theme = theme
+            JsonData.theme = theme_type
             ThemeChanger.init()
 
 

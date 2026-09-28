@@ -16,16 +16,16 @@ class ThemeChanger:
         except TypeError:
             pass
 
-        if JsonData.theme == Themes.auto:
+        if JsonData.theme == Themes.theme_auto:
             app.styleHints().colorSchemeChanged.connect(
                 cls._on_system_theme_changed
             )
             cls._apply_system_theme()
 
-        elif JsonData.theme == Themes.dark:
+        elif JsonData.theme == Themes.theme_dark:
             cls._apply_theme(Static.THEMES_DARK)
 
-        elif JsonData.theme == Themes.light:
+        elif JsonData.theme == Themes.theme_light:
             cls._apply_theme(Static.THEMES_LIGHT)
 
     @classmethod

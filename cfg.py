@@ -6,9 +6,9 @@ from pathlib import Path
 
 
 class Themes:
-    auto = "auto"
-    dark = "dark"
-    light = "light"
+    theme_auto = "auto"
+    theme_dark = "dark"
+    theme_light = "light"
 
 
 class Static:
@@ -100,7 +100,7 @@ class Dynamic:
 class JsonData:
     app_ver = Static.APP_VERSION
     lng_index = 0
-    theme = Themes.auto
+    theme = Themes.theme_auto
     scaner_minutes = 20
     hide_digits_mf_lst = []
 
@@ -121,8 +121,8 @@ class JsonData:
                 data: dict = json.load(file)
             for k, v in data.items():
                 setattr(cls, k, v) if hasattr(cls, k) else None
-            if JsonData.theme not in (Themes.auto, Themes.dark, Themes.light):
-                JsonData.theme = Themes.auto
+            if JsonData.theme not in (Themes.theme_auto, Themes.theme_dark, Themes.theme_light):
+                JsonData.theme = Themes.theme_auto
         except Exception as e:
             print("Cfg json to app error",e)
     
