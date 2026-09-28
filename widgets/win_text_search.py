@@ -62,7 +62,6 @@ class WinTextSearch(UMainWidget):
                 "Click \"Format Text\" to prepare the text for searching."
             )
         self.description_label = TransparentLabel(description_text)
-        # Разрешаем перенос текста, чтобы описание красиво выглядело
         self.description_label.setWordWrap(True) 
         self.central_layout.addWidget(self.description_label)
 
@@ -75,6 +74,7 @@ class WinTextSearch(UMainWidget):
             "Форматировать текст" if JsonData.lng_index == 0 else "Format Text"
         )
         self.format_button.clicked.connect(self.format_input_text)
+        self.format_button.setFixedWidth(150)
         self.central_layout.addWidget(self.format_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.btns_container = TransparentWidget()
