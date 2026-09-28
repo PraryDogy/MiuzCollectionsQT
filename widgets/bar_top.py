@@ -199,16 +199,16 @@ class BarTopBtn(QWidget):
 
 
 class SettingsBtn(BarTopBtn):
-    base_svg = Static.BAR_TOP_ICONS / "settings.svg"
-    selected_svg = Static.BAR_TOP_ICONS / "settings_selected.svg"
+    base_svg = Static.COMMON_ICONS / "settings.svg"
+    selected_svg = Static.COMMON_ICONS / "settings_selected.svg"
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)
 
 
 class ImgSearchBtn(BarTopBtn):
-    base_svg = Static.BAR_TOP_ICONS / "camera.svg"
-    selected_svg = Static.BAR_TOP_ICONS / "camera_selected.svg"
+    base_svg = Static.COMMON_ICONS / "camera.svg"
+    selected_svg = Static.COMMON_ICONS / "camera_selected.svg"
 
     def __init__(self):
         super().__init__(self.base_svg, self.selected_svg)

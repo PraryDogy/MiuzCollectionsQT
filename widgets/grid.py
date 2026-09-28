@@ -244,7 +244,7 @@ class UpBtn(QSvgWidget):
 
 
 class GridSortWidget(QWidget):
-    sort_icon_svg = Static.BAR_TOP_ICONS / "sort.svg"
+    sort_icon_svg = Static.COMMON_ICONS / "sort.svg"
     load_st_grid = pyqtSignal()
 
     def __init__(self):
@@ -290,7 +290,7 @@ class GridSortWidget(QWidget):
 
 
 class GridFiltersWidget(QWidget):
-    sort_icon_svg = Static.BAR_TOP_ICONS / "filters.svg"
+    sort_icon_svg = Static.COMMON_ICONS / "filters.svg"
     open_filters_win = pyqtSignal()
 
     def __init__(self):
