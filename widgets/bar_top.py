@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
+from PyQt6.QtCore import QByteArray, Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QLineEdit, QVBoxLayout,
@@ -225,8 +225,12 @@ class BarTopCatalogTitle(QLabel):
 
 
 class BarTopCatalogBtn(UPushButton):
+    icon_size = QSize(13, 13)
+    width_ = 110
     def __init__(self, text):
         super().__init__(text)
+        self.setIconSize(self.icon_size)
+        self.setFixedWidth(self.width_)
 
 
 class BarTopCatalogWidget(QWidget):
@@ -234,7 +238,6 @@ class BarTopCatalogWidget(QWidget):
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
     mf_open = pyqtSignal(Mf)
     mf_new = pyqtSignal(SettingsItem)
-    hh = BTN_H - 3
 
     def __init__(self):
         super().__init__()
@@ -252,7 +255,6 @@ class BarTopCatalogWidget(QWidget):
 
         self.button = BarTopCatalogBtn("")
         self.set_btn_text(Mf.current_mf)
-        self.button.setFixedSize(120, self.hh)
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
