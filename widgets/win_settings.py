@@ -310,6 +310,10 @@ class ThemeBtn(QWidget):
             self.clicked.emit()
         return super().mouseReleaseEvent(a0)
 
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        return super().enterEvent(event)
+
 
 class ThemesWidget(UGroupBox):
     theme_svg = Static.COMMON_ICONS / "theme.svg"
@@ -362,7 +366,7 @@ class ThemesWidget(UGroupBox):
                 lambda t=theme_type, btn=btn: self.on_btn_clicked(t, btn)
             )
             themes_layout.addWidget(btn)
-            if theme_name == JsonData.theme:
+            if theme_type == JsonData.theme:
                 btn.select()
 
     def on_btn_clicked(self, theme_type: str, btn: ThemeBtn):
