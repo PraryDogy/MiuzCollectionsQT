@@ -319,7 +319,7 @@ class GridControlsWidget(QWidget):
         # Используем вертикальный лэйаут, чтобы расположить их друг под другом
         self.v_lay = QHBoxLayout(self)
         self.v_lay.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
-        self.v_lay.setSpacing(20) # Отступ между виджетом сортировки и фильтрами
+        self.v_lay.setSpacing(10) # Отступ между виджетом сортировки и фильтрами
 
         # Инициализируем внутренние виджеты
         self.sort_widget = GridSortWidget()
