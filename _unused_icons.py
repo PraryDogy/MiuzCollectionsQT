@@ -2,6 +2,8 @@ import os
 
 
 def find_unused_icons():
+    EXTS = (".py", ".qss")
+    EXCLUDED = {".git", ".venv", "venv", "__pycache__"}
     project_root = os.path.dirname(os.path.abspath(__file__))
     icons_dir = os.path.join(project_root, "icons")
 
@@ -19,11 +21,11 @@ def find_unused_icons():
         # Не ищем внутри виртуальных окружений и .git
         dirs[:] = [
             d for d in dirs
-            if d not in {".git", ".venv", "venv", "__pycache__"}
+            if d not in EXCLUDED
         ]
 
         for filename in files:
-            if filename.endswith(".py"):
+            if filename.endswith(EXTS):
                 py_files.append(os.path.join(root, filename))
 
     # Читаем содержимое всех Python-файлов
