@@ -105,6 +105,8 @@ class SearchWidgetLineEdit(ULineEditLight):
             self.setText(text)
             self.create_search(text)
             self.delayed_search()
+        else:
+            self.clear_search()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -226,11 +228,11 @@ class BarTopCatalogTitle(QLabel):
 
 class BarTopCatalogBtn(UPushButton):
     icon_size = QSize(13, 13)
-    width_ = 110
+    button_size = (110, 22)
     def __init__(self, text):
         super().__init__(text)
         self.setIconSize(self.icon_size)
-        self.setFixedWidth(self.width_)
+        self.setFixedSize(*self.button_size)
 
 
 class BarTopCatalogWidget(QWidget):
