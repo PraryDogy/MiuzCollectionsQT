@@ -100,16 +100,20 @@ class WinTextSearch(UMainWidget):
 
         self.ok_btn = WinTextSearchBtn("Поиск")
         self.ok_btn.setIcon(self.magnifier_icon)
-        self.ok_btn.clicked.connect(
-            lambda: self.ok_clicked.emit(self.text_edit.toPlainText())
-        )
+        self.ok_btn.clicked.connect(self.search)
         btns_layout.addWidget(self.ok_btn)
 
     def format_input_text(self):
-        raw_text = self.text_edit.toPlainText().strip()
-        if not raw_text:
-            return
-        self.text_edit.setPlainText("finished text")
+        text = self.text_edit.toPlainText()
+        words = re.split(r"[,\n]+", text)
+        words = [word.strip() for word in words if word.strip()]
+        words = list(dict.fromkeys(words))
+        self.text_edit.setPlainText(", ".join(words))
+
+    def search(self):
+        self.format_input_text()
+        self.ok_clicked.emit(self.text_edit.toPlainText())
+        self.deleteLater()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
