@@ -1,17 +1,44 @@
 import re
+
 from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
-from cfg import JsonData
+from cfg import JsonData, Static
 from system.lang import Lng
 
 from ._base_widgets import (TransparentLabel, TransparentWidget, UMainWidget,
                             UPushButton, UTextEditLight)
 
 
+class WinTextSearchTitle(TransparentLabel):
+    def __init__(self):
+        super().__init__("Редактор текста")
+
+
+class WinTextSearchTitleRow(TransparentWidget):
+    svg_path = Static.COMMON_ICONS / "edit.svg"
+    svg_size = (25, 25)
+
+    def __init__(self):
+        super().__init__()
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(0, 0, 0, 0)
+        self.h_lay.setSpacing(10)
+
+        self.svg_widget = QSvgWidget()
+        self.svg_widget.load(str(self.svg_path))
+        self.svg_widget.setFixedSize(*self.svg_size)
+        self.h_lay.addWidget(self.svg_widget)
+
+        self.title_label = WinTextSearchTitle()
+        self.h_lay.addWidget(self.title_label)
+
+
+
 class WinTextSearch(UMainWidget):
     ok_clicked = pyqtSignal(str)
-    size_ = (350, 350)  # Немного увеличил высоту, чтобы поместилось описание
+    size_ = (430, 430)  # Немного увеличил высоту, чтобы поместилось описание
 
     def __init__(self, text: str):
         super().__init__()
@@ -20,22 +47,20 @@ class WinTextSearch(UMainWidget):
         self.setFixedSize(*self.size_)
         self.central_layout.setSpacing(5)
 
+        self.title_row = WinTextSearchTitleRow()
+        self.central_layout.addWidget(self.title_row)
+
         # 1. Текст описания форматов (RU / EN)
         if JsonData.lng_index == 0:
             description_text = (
-                "Поддерживаемый формат ввода:\n"
-                "• В столбик или через запятую\n"
-                "• Именами файлов через пробел (с расширениями)\n"
-                "Будет приведено к одной строке через запятую."
+                "Для поиска по нескольким словам введите их через запятую или каждое слово с новой строки. "
+                "Нажмите \"Форматировать текст\", чтобы подготовить текст для поиска."
             )
         else:
             description_text = (
-                "Supported input formats:\n"
-                "• In a column or comma-separated\n"
-                "• Filenames separated by spaces (with extensions)\n"
-                "Will be converted to a single comma-separated line."
+                "To search for multiple words, enter them separated by commas or each on a new line. "
+                "Click \"Format Text\" to prepare the text for searching."
             )
-
         self.description_label = TransparentLabel(description_text)
         # Разрешаем перенос текста, чтобы описание красиво выглядело
         self.description_label.setWordWrap(True) 

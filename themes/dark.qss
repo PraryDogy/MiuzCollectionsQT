@@ -383,3 +383,9 @@ TransparentWidget {
 SearchWidget {
     background: transparent;
 }
+
+
+WinTextSearchTitle {
+    font-weight: bold;
+    font-size: 30px;
+}
