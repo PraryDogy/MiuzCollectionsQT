@@ -386,12 +386,8 @@ SearchWidget {
 
 
 WinTextSearchTitle {
+    /* font-family: "SF Pro Rounded"; */
     font-weight: bold;
     font-size: 30px;
-    color: #d5d5d5;
+    /* color: #d5d5d5; */
 }
-
-
-/* WinTextSearchTitleRow {
-    background: red;
-} */

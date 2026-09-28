@@ -1,19 +1,14 @@
-non_printable = "Василий"
-lst = ["Инна", non_printable, "Енот", "Автомобиль"]
+import sys
 
-# первый
-for i in lst:
-    if i == non_printable:
-        continue
-    else:
-        ...
-        # print
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QFontDatabase
 
 
-# второй
-ind = lst.index(non_printable)
-new_lst = lst.copy()
-new_lst.pop(ind)
+app = QApplication(sys.argv)
 
-for i in new_lst:
-    print(i)
+fonts = sorted(QFontDatabase.families())
+
+for font in fonts:
+    print(font)
+
+sys.exit()
