@@ -11,10 +11,10 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (UHorizontalSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
-                            TransparentGroupBox, UListSpacerItem, UListWidget,
-                            UListWidgetItem, UMainWidget, UMenu, UPushButton,
-                            UTextEdit)
+from ._base_widgets import (QLabel, QWidget, RowArrowWidget,
+                            TransparentGroupBox, UHorizontalSep,
+                            UListSpacerItem, UListWidget, UListWidgetItem,
+                            UMainWidget, UMenu, UPushButton, UTextEdit)
 from .caledar_widget import Calendar, CalendarBigDate
 
 

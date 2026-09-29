@@ -298,6 +298,42 @@ class UHorizontalSep(TransparentFrame):
         self.setFixedHeight(1)
 
 
+
+class USlider(QSlider):
+    clicked = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.valueChanged.connect(self._on_value_changed)
+
+    def mousePressEvent(self, ev):
+        if ev.button() != Qt.MouseButton.LeftButton:
+            ev.ignore()
+            return
+
+        ratio = ev.pos().x() / self.width()
+        value = self.minimum() + round(ratio * (self.maximum() - self.minimum()))
+        self.setValue(value)
+        ev.accept()
+        return super().mousePressEvent(ev)
+
+    def wheelEvent(self, e) -> None:
+        if e:
+            e.ignore()
+
+    def _on_value_changed(self, value: int):
+        self.blockSignals(True)
+        self.setValue(value)
+        self.blockSignals(False)
+        self.clicked.emit(value)
+
+
+class USpinBox(QSpinBox):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.setFixedHeight(27)
+
+
 class SelectableLabel(QLabel):
     sym_line_feed = "\u000a"
     sym_paragraph_sep = "\u2029"
@@ -400,47 +436,6 @@ class RowArrowWidget(QWidget):
         if a0.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         return super().mouseReleaseEvent(a0)
-    
-
-class USlider(QSlider):
-    clicked = pyqtSignal(int)
-
-    def __init__(self):
-        super().__init__()
-        self.valueChanged.connect(self._on_value_changed)
-
-    def mousePressEvent(self, ev):
-        if ev.button() != Qt.MouseButton.LeftButton:
-            ev.ignore()
-            return
-
-        ratio = ev.pos().x() / self.width()
-        value = self.minimum() + round(ratio * (self.maximum() - self.minimum()))
-        self.setValue(value)
-        ev.accept()
-        return super().mousePressEvent(ev)
-
-    def wheelEvent(self, e) -> None:
-        if e:
-            e.ignore()
-
-    def _on_value_changed(self, value: int):
-        self.blockSignals(True)
-        self.setValue(value)
-        self.blockSignals(False)
-        self.clicked.emit(value)
-
-
-class USpinBox(QSpinBox):
-    def __init__(self, *args, **kw):
-        super().__init__(*args, **kw)
-        self.setFixedHeight(27)
-
-
-class UDateEdit(QDateEdit):
-    def __init__(self, *args, **kw):
-        super().__init__(*args, **kw)
-        self.setFixedHeight(27)
 
 
 class WinProgressbar(UMainWidget):
