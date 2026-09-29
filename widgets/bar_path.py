@@ -28,7 +28,6 @@ class PathItem(TransparentWidget):
 
     def __init__(self, dir: str, name: str):
         super().__init__()
-        # self.setFixedHeight(PathItem.item_height)
         self.item_dir = dir
 
         item_layout = QHBoxLayout(self)
