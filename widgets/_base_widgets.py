@@ -305,7 +305,7 @@ class UPushButton(TransparentButton):
         self.setFont(font)
 
     def setIcon(self, icon):
-        self.setText(" " + self.text())
+        self.setText("  " + self.text())
         return super().setIcon(icon)
 
     def text(self):

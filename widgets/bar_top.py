@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
-                            TransparentWidget, ULineEdit, UMenu, UPushButton)
+                            TransparentWidget, ULineEdit, UMenu, UPushButton, GrayTextLabel)
 from .win_text_search import WinTextSearch
 
 BTN_H = 27
@@ -147,7 +147,7 @@ class SearchWidLineEdit(ULineEdit):
         super().keyPressEvent(event)
 
 
-class BarTopBtn(QSvgWidget):
+class BarTopSvgBtn(QSvgWidget):
     clicked_ = pyqtSignal()
 
     def __init__(self, base_svg: Path, selected_svg: Path):
@@ -190,7 +190,7 @@ class BarTopBtn(QSvgWidget):
         super().enterEvent(event)
 
 
-class SettingsBtn(BarTopBtn):
+class SettingsSvgBtn(BarTopSvgBtn):
     base_svg = Static.COMMON_ICONS / "settings.svg"
     selected_svg = Static.COMMON_ICONS / "settings_selected.svg"
 
@@ -198,7 +198,7 @@ class SettingsBtn(BarTopBtn):
         super().__init__(self.base_svg, self.selected_svg)
 
 
-class ImgSearchBtn(BarTopBtn):
+class ImgSearchSvgBtn(BarTopSvgBtn):
     base_svg = Static.COMMON_ICONS / "camera.svg"
     selected_svg = Static.COMMON_ICONS / "camera_selected.svg"
 
@@ -206,21 +206,7 @@ class ImgSearchBtn(BarTopBtn):
         super().__init__(self.base_svg, self.selected_svg)
 
 
-class BarTopCatalogTitle(TransparentLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
-
-
-class BarTopCatalogBtn(UPushButton):
-    icon_size = QSize(13, 13)
-    button_size = (110, 22)
-    def __init__(self, text):
-        super().__init__(text)
-        self.setIconSize(self.icon_size)
-        self.setFixedSize(*self.button_size)
-
-
-class BarTopCatalogWidget(TransparentWidget):
+class CatalogWidget(TransparentWidget):
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
     mf_open = pyqtSignal(Mf)
@@ -235,13 +221,14 @@ class BarTopCatalogWidget(TransparentWidget):
         self.h_lay.setContentsMargins(0, 0, 0, 0)
         self.h_lay.setSpacing(0)
 
-        self.title = BarTopCatalogTitle(Lng.catalog[JsonData.lng_index])
+        self.title = GrayTextLabel(Lng.catalog[JsonData.lng_index])
         self.h_lay.addWidget(self.title)
 
         self.h_lay.addSpacing(10)
 
-        self.button = BarTopCatalogBtn("")
-        self.set_btn_text(Mf.current_mf)
+        self.button = UPushButton(Mf.current_mf.mf_alias)
+        self.button.setFixedWidth(110)
+        self.button.setIconSize(QSize(13, 13))
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
@@ -274,12 +261,8 @@ class BarTopCatalogWidget(TransparentWidget):
         self.mf_new.emit(setting_item)
 
     def mf_open_cmd(self, mf: Mf):
-        self.set_btn_text(mf)
+        self.button.setText(mf.mf_alias)
         self.mf_open.emit(mf)
-
-    def set_btn_text(self, mf: Mf):
-        text = f"{mf.mf_alias}"
-        self.button.setText(text)
 
 
 class BarTop(TransparentFrame):
@@ -294,7 +277,7 @@ class BarTop(TransparentFrame):
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setSpacing(10)
 
-        self.catalog_btn = BarTopCatalogWidget()
+        self.catalog_btn = CatalogWidget()
         self.catalog_btn.mf_open.connect(self.mf_open.emit)
         self.catalog_btn.mf_new.connect(self.mf_new.emit)
         self.h_layout.addWidget(self.catalog_btn)
@@ -302,7 +285,7 @@ class BarTop(TransparentFrame):
         self.h_layout.addStretch(0)
 
         # --- Кнопка поиска по картинке ---
-        self.img_search_btn = ImgSearchBtn()
+        self.img_search_btn = ImgSearchSvgBtn()
         self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
         self.h_layout.addWidget(self.img_search_btn)
 
@@ -315,7 +298,7 @@ class BarTop(TransparentFrame):
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")
-        self.settings_btn = SettingsBtn()
+        self.settings_btn = SettingsSvgBtn()
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn)
 
