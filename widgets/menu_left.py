@@ -212,25 +212,6 @@ class LeftMenuTreeWidget(UTreeWidget):
         return super().contextMenuEvent(a0)
 
 
-class LeftMenuTitle(TransparentLabel):
-    hh = 30
-    def __init__(self):
-        super().__init__(Lng.folders[JsonData.lng_index])
-        self.setFixedHeight(self.hh)
-
-
-class LeftMenuSep(UHorizontalSep):
-    def __init__(self):
-        super().__init__()
-        self.setProperty("hidden", True)
-
-    def set_hidden(self, hidden: bool):
-        self.setProperty("hidden", hidden)
-        self.style().unpolish(self)
-        self.style().polish(self)
-        self.update()
-
-
 class MenuLeft(TransparentFrame):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
@@ -246,12 +227,6 @@ class MenuLeft(TransparentFrame):
         v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
 
-        self.title_widget = LeftMenuTitle()
-        v_lay.addWidget(self.title_widget)
-
-        self.sep_above_grid = LeftMenuSep()
-        v_lay.addWidget(self.sep_above_grid)
-
         self.tree_wid = LeftMenuTreeWidget()
         v_lay.addWidget(self.tree_wid)
         self.tree_wid.reveal.connect(
@@ -266,15 +241,7 @@ class MenuLeft(TransparentFrame):
         self.tree_wid.copy_path.connect(
             lambda rel_paths: self.copy_path.emit(rel_paths)
         )
-        self.tree_wid.on_scroll_changed.connect(
-            lambda value: self.handle_tree_scroll_value(value)
-        )
         self.tree_wid.init_ui()
-
-    def handle_tree_scroll_value(self, value: int):
-        # Если скролл равен 0 -> hidden=True. Если больше 0 -> hidden=False.
-        self.sep_above_grid.set_hidden(value == 0)
-        self.scroll_value = value
     
     def mf_edit_cmd(self, mf: Mf):
         item = SettingsItem(
