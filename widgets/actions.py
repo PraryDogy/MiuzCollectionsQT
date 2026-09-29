@@ -5,6 +5,10 @@ from cfg import JsonData
 from system.lang import Lng
 
 
+# QMenu импортирован вместо base widgets UMenu, чтобы не было рекурсивного
+# импорта и только для аннотации
+
+
 class OpenInView(QAction):
     def __init__(self, rel_paths: list[str], parent_: QMenu):
         if len(rel_paths) > 1:

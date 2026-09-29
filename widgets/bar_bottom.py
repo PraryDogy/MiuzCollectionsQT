@@ -2,13 +2,12 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QHBoxLayout, QLabel,
-                             QWidget)
+from PyQt6.QtWidgets import QGraphicsOpacityEffect, QHBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import GrayTextLabel, USlider
+from ._base_widgets import GrayTextLabel, TransparentWidget, USlider
 
 
 class ThumbnailsSlider(USlider):
@@ -63,7 +62,7 @@ class ProgressWidget(GrayTextLabel):
         self.setText(text)
 
 
-class BarBottom(QWidget):
+class BarBottom(TransparentWidget):
     resize_thumbnails = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "next.svg"
     icon_size = 15
