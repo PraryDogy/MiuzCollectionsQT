@@ -298,7 +298,6 @@ class UHorizontalSep(TransparentFrame):
         self.setFixedHeight(1)
 
 
-
 class USlider(QSlider):
     clicked = pyqtSignal(int)
 
