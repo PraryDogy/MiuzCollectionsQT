@@ -194,7 +194,7 @@ class Calendar(UMainWidget):
         self.central_layout.addWidget(UHorizontalSep())
 
         # --- 3. Сетка для дней недели и чисел ---
-        self.grid_widget = QWidget()  
+        self.grid_widget = TransparentWidget()  
         self.central_layout.addWidget(self.grid_widget) # Добавляем сразу
         
         self.grid_layout = QGridLayout(self.grid_widget)  
