@@ -64,13 +64,6 @@ class UMenu(TransparentMenu):
     def __init__(self, *args, **kw):
         super().__init__()
 
-    def show_menu(self):
-        return
-        if self.event_:
-            self.exec(self.event_.globalPos())
-        else:
-            self.exec()
-
     def show_menu_under_cursor(self, event: QContextMenuEvent):
         self.exec(event.globalPos())
 
@@ -105,7 +98,7 @@ class ULineEdit(TransparentLineEdit):
         self.insert(text)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        self.menu_ = UMenu(event=a0)
+        self.menu_ = UMenu()
 
         actions = [
             (Lng.cut[JsonData.lng_index], self.cut_selection),
@@ -152,7 +145,7 @@ class UTextEdit(QTextEdit):
         self.setPlainText(new_text)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        menu_ = UMenu(event=a0)
+        menu_ = UMenu()
 
         actions = [
             (Lng.cut[JsonData.lng_index], self.cut_selection),
@@ -165,7 +158,7 @@ class UTextEdit(QTextEdit):
             act.triggered.connect(slot)
             menu_.addAction(act)
 
-        menu_.show_menu()
+        menu_.show_menu_under_cursor(a0)
 
 
 class UTextEditDark(UTextEdit):
@@ -362,7 +355,7 @@ class SelectableLabel(QLabel):
 
         is_path = any((os.path.isdir(full_text), os.path.isfile(full_text)))
 
-        menu_ = UMenu(event=ev)
+        menu_ = UMenu()
 
         label_text = Lng.copy[JsonData.lng_index]
         sel = QAction(text=label_text, parent=self)
@@ -377,7 +370,7 @@ class SelectableLabel(QLabel):
         if is_path:
             menu_.addAction(reveal)
 
-        menu_.show_menu()
+        menu_.show_menu_under_cursor(ev)
 
 
 class RowArrowWidget(QWidget):

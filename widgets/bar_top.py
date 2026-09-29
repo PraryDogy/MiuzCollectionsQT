@@ -261,7 +261,7 @@ class BarTopCatalogWidget(QWidget):
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
-        self.button_menu = UMenu(None)
+        self.button_menu = UMenu()
         self.button_menu.setMaximumWidth(200)
         self.button.setMenu(self.button_menu)
 

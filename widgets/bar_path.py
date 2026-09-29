@@ -9,7 +9,7 @@ from cfg import Static
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 
-from ._base_widgets import GrayTextLabel, UMenu, UPushButton
+from ._base_widgets import GrayTextLabel
 
 
 class PathItem(QWidget):

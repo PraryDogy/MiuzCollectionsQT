@@ -68,7 +68,7 @@ class RebootableSettings(UGroupBox):
             QIcon(str(self.eng_flag))
         )
 
-        lng_menu = UMenu(None)
+        lng_menu = UMenu()
         for value in (0, 1):
             action = QAction(Lng.russian[value], lng_menu)
             action.setIcon(self.lng_icons[value])
@@ -393,7 +393,7 @@ class AboutWidLabel(LabelMinWidth):
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        context_menu = UMenu(ev)
+        context_menu = UMenu()
 
         copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng_index])
         copy_text.triggered.connect(self.copy_text_md)
@@ -405,7 +405,7 @@ class AboutWidLabel(LabelMinWidth):
         select_all.triggered.connect(lambda: Utils.pyqt_copy_text(self.text()))
         context_menu.addAction(select_all)
 
-        context_menu.show_menu()
+        context_menu.show_menu_under_cursor(ev)
         # return super().contextMenuEvent(ev)
 
     def copy_text_md(self):

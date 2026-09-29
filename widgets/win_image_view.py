@@ -454,7 +454,7 @@ class WinImageView(UMainWidget):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
-        self.menu_ = UMenu(event=ev)
+        self.menu_ = UMenu()
         rel_paths = [self.current_data_item.rel_path, ]
         # открыть в приложении
         open_menu = USubMenu(
@@ -526,7 +526,7 @@ class WinImageView(UMainWidget):
         )
         self.menu_.addAction(save)
 
-        self.menu_.show_menu()
+        self.menu_.show_menu_under_cursor(ev)
 
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         vertical_center = a0.size().height() // 2 - self.next_image_btn.height() // 2

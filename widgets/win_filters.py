@@ -90,7 +90,7 @@ class DatesWidget(UGroupBox):
         self.preset_button.setFixedWidth(100)
         self.top_row_layout.addWidget(self.preset_button)
 
-        preset_menu = UMenu(None)
+        preset_menu = UMenu()
         self.preset_button.setMenu(preset_menu)
 
         self.preset_actions = [

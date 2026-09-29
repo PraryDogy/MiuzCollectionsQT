@@ -1,7 +1,7 @@
 import os
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent, QPixmap, QImage
+from PyQt6.QtGui import QAction, QContextMenuEvent, QImage, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QLabel, QMenu, QMenuBar,
                              QSpacerItem, QWidget)
 
@@ -10,39 +10,9 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import UMainWidget, UMenu
+from ._base_widgets import SelectableLabel, UMainWidget
 from .win_servers import ServersWin
 from .win_settings import WinSettings
-
-
-class SelectableLabel(QLabel):
-    INFO_TEXT = "\n".join([
-        f"Version {Static.APP_VERSION}",
-        "Developed by Evlosh",
-        "email: evlosh@gmail.com",
-        "telegram: evlosh",
-    ])
-
-    def __init__(self, parent: QWidget):
-        super().__init__(parent)
-        self.setText(self.INFO_TEXT)
-        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.setCursor(Qt.CursorShape.IBeamCursor)
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-        context_menu = UMenu(ev)
-        copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng_index])
-        copy_text.triggered.connect(
-            lambda: Utils.pyqt_copy_text(self.selectedText())
-        )
-        context_menu.addAction(copy_text)
-        context_menu.addSeparator()
-        select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lng_index])
-        select_all.triggered.connect(
-            lambda: Utils.pyqt_copy_text(self.text())
-        )
-        context_menu.addAction(select_all)
-        context_menu.show_menu()
 
 
 class AboutWin(UMainWidget):
@@ -50,6 +20,13 @@ class AboutWin(UMainWidget):
     icon_path = Static.APP_ICONS / "icon.png"
     icon_size = 150
     opacity = 0.85
+
+    INFO_TEXT = "\n".join([
+        f"Version {Static.APP_VERSION}",
+        "Developed by Evlosh",
+        "email: evlosh@gmail.com",
+        "telegram: evlosh",
+    ])
 
     def __init__(self):
         super().__init__()
@@ -69,7 +46,8 @@ class AboutWin(UMainWidget):
         self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.central_layout.addSpacerItem(QSpacerItem(0, 10))
-        lbl = SelectableLabel(self)
+
+        lbl = SelectableLabel(self.INFO_TEXT)
         self.central_layout.addWidget(lbl)
 
         self.adjustSize()

@@ -265,7 +265,7 @@ class GridSortWidget(QWidget):
         self.button.setFixedSize(155, 23)
         self.h_lay.addWidget(self.button)
 
-        self.button_menu = UMenu(None)
+        self.button_menu = UMenu()
         self.button.setMenu(self.button_menu)
 
         mod_action = QAction(Lng.sort_by_mod[JsonData.lng_index], self.button_menu)
@@ -907,7 +907,7 @@ class Grid(VScrollArea):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         """Создаёт контекстное меню для пустой области или выбранных виджетов."""
-        self.menu_ = UMenu(event=a0)
+        self.menu_ = UMenu()
         clicked_wid = self.get_clicked_widget(a0)
 
         def menu_empty():
@@ -961,7 +961,7 @@ class Grid(VScrollArea):
 
             # открыть в приложении
             if len(rel_paths) == 1:
-                open_menu = UMenu(None)
+                open_menu = UMenu()
                 open_menu.setParent(self.menu_)
                 open_menu.setTitle(f"{Lng.open_in[JsonData.lng_index]}")
                 self.menu_.addMenu(open_menu)
@@ -1057,7 +1057,7 @@ class Grid(VScrollArea):
         else:
             menu_widget(clicked_wid)
 
-        self.menu_.show_menu()
+        self.menu_.show_menu_under_cursor(a0)
 
     def checkScrollValue(self, value: int):
         self.up_btn.setVisible(value > 0)

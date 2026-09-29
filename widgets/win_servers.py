@@ -83,7 +83,7 @@ class ServerList(UListWidget):
         return super().mouseDoubleClickEvent(e)
 
     def contextMenuEvent(self, a0):
-        self.menu_ = UMenu(a0)
+        self.menu_ = UMenu()
 
         # Получаем элемент под курсором
         list_item: ServerListItem = self.itemAt(a0.pos())
@@ -120,7 +120,7 @@ class ServerList(UListWidget):
 
         # Отображаем меню, только если в нём есть хотя бы одно действие
         if self.menu_.actions():
-            self.menu_.show_menu()
+            self.menu_.show_menu_under_cursor(a0)
 
 
 
