@@ -196,7 +196,7 @@ USpinBox {
     border-radius: 4px;
 }
 
-USpinBox::up-button, QDateEdit::up-button {
+USpinBox::up-button {
     background: #3E3E3E;
     width: 17px;
     height: 10px;
@@ -205,11 +205,11 @@ USpinBox::up-button, QDateEdit::up-button {
     border-radius: 3px;
 }
 
-USpinBox::up-button:pressed, QDateEdit::up-button:pressed {
+USpinBox::up-button:pressed {
     background: #565656;
 }
 
-USpinBox::down-button, QDateEdit::down-button {
+USpinBox::down-button {
     background: #3E3E3E;
     width: 17px;
     height: 10px;
@@ -218,17 +218,17 @@ USpinBox::down-button, QDateEdit::down-button {
     border-radius: 3px;
 }
 
-USpinBox::down-button:pressed, QDateEdit::down-button:pressed {
+USpinBox::down-button:pressed {
     background: #565656;
 }
 
-USpinBox::up-arrow, QDateEdit::up-arrow {
+USpinBox::up-arrow {
     image: url("./icons/common/arrow_up.svg");
     width: 9px;
     height: 9px;
 }
 
-USpinBox::down-arrow, QDateEdit::down-arrow {
+USpinBox::down-arrow {
     image: url("./icons/common/arrow_down.svg");
     width: 9px;
     height: 9px;
