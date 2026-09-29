@@ -20,7 +20,7 @@ from system.utils import Utils
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
                             TransparentWidget, UMenu, UPushButton,
-                            UScrollVerticalArea)
+                            UScrollVerticalArea, TagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -336,42 +336,7 @@ class GridControlsWidget(TransparentWidget):
         self.v_lay.addStretch()
 
 
-class GridBaseTagWidget(TransparentFrame):
-    icon_path = Static.COMMON_ICONS / "cancel.svg"
-    clicked_clear = pyqtSignal()
-
-    def __init__(self, text: str):
-        super().__init__()
-        self.setFixedHeight(23)
-
-        self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
-        self.h_lay.setSpacing(6)
-
-        self.title = TransparentLabel(text)
-        self.title.setStyleSheet("background: transparent;")
-        self.h_lay.addWidget(self.title)
-
-        # Контейнер для SVG
-        self.close_btn_wrapper = TransparentWidget()
-        close_lay = QVBoxLayout(self.close_btn_wrapper)
-        close_lay.setContentsMargins(0, 1, 0, 0)
-        close_lay.setSpacing(0)
-
-        self.close_btn = QSvgWidget()
-        self.close_btn.mouseReleaseEvent = lambda e: self.clear_tag_cmd()
-        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.close_btn.load(str(self.icon_path))
-        self.close_btn.setFixedSize(12, 12)
-
-        close_lay.addWidget(self.close_btn)
-        self.h_lay.addWidget(self.close_btn_wrapper)
-
-    def clear_tag_cmd(self):
-        self.clicked_clear.emit()
-        
-
-class DatesTag(GridBaseTagWidget):
+class DatesTag(TagWidget):
     def __init__(self):
         super().__init__("")
         self.set_dates_text()
@@ -391,53 +356,53 @@ class DatesTag(GridBaseTagWidget):
         end_str = locale.toString(q_end, date_format)
         self.title.setText(f"{start_str} - {end_str}")
 
-    def clear_tag_cmd(self):
+    def cicked_close_cmd(self):
         Dynamic.date_start = None
         Dynamic.date_end = None
-        return super().clear_tag_cmd()
+        return super().cicked_close_cmd()
 
 
-class WordTag(GridBaseTagWidget):
+class WordTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def clear_tag_cmd(self):
+    def cicked_close_cmd(self):
         Dynamic.word_tags_list.remove(self.title.text())
-        return super().clear_tag_cmd()
+        return super().cicked_close_cmd()
 
 
-class FavTag(GridBaseTagWidget):
+class FavTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def clear_tag_cmd(self):
+    def cicked_close_cmd(self):
         Dynamic.favs_tag_enabled = False
-        return super().clear_tag_cmd()
+        return super().cicked_close_cmd()
 
 
-class OnlyFolderTag(GridBaseTagWidget):
+class OnlyFolderTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def clear_tag_cmd(self):
+    def cicked_close_cmd(self):
         Dynamic.no_subfolders_tag_enabled = False
-        return super().clear_tag_cmd()
+        return super().cicked_close_cmd()
 
 
-class ClearFiltersTag(GridBaseTagWidget):
+class ClearFiltersTag(TagWidget):
     icon_path = Static.COMMON_ICONS / "trash.svg"
 
     def __init__(self, text: str):
         super().__init__("")
         self.title.deleteLater()
 
-    def clear_tag_cmd(self):
+    def cicked_close_cmd(self):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.favs_tag_enabled = False
         Dynamic.no_subfolders_tag_enabled = False
         Dynamic.word_tags_list.clear()
-        return super().clear_tag_cmd()
+        return super().cicked_close_cmd()
 
 
 class FlowLayout(QLayout):
@@ -534,23 +499,23 @@ class TagsWidget(TransparentWidget):
     def _create_tags(self):
         if Dynamic.date_start:
             tag = DatesTag()
-            tag.clicked_clear.connect(self.load_st_grid.emit)
+            tag.clicked_close.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.word_tags_list:
             for word in Dynamic.word_tags_list:
                 tag = WordTag(word)
-                tag.clicked_clear.connect(self.load_st_grid.emit)
+                tag.clicked_close.connect(self.load_st_grid.emit)
                 self.flow_layout.addWidget(tag)
 
         if Dynamic.favs_tag_enabled:
             tag = FavTag(Lng.favorites[JsonData.lng_index])
-            tag.clicked_clear.connect(self.load_st_grid.emit)
+            tag.clicked_close.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.no_subfolders_tag_enabled:
             tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
-            tag.clicked_clear.connect(self.load_st_grid.emit)
+            tag.clicked_close.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
         has_filters = any((
@@ -562,7 +527,7 @@ class TagsWidget(TransparentWidget):
 
         if has_filters:
             tag = ClearFiltersTag(Lng.reset[JsonData.lng_index])
-            tag.clicked_clear.connect(self.load_st_grid.emit)
+            tag.clicked_close.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
     def hasHeightForWidth(self):

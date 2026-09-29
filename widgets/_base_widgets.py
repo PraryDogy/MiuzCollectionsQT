@@ -836,3 +836,43 @@ class MfStopListWidget(QWidget):
 
         if mf_stop_list:
             self.text_edit.setPlainText("\n".join(mf_stop_list))
+
+
+class TagWidget(TransparentFrame):
+    icon_path = Static.COMMON_ICONS / "cancel.svg"
+    clicked_close = pyqtSignal()
+    clicked_body = pyqtSignal()
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setFixedHeight(23)
+
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(7, 2, 7, 2)
+        self.h_lay.setSpacing(6)
+
+        self.title = TransparentLabel(text)
+        self.h_lay.addWidget(self.title)
+
+        # Контейнер для SVG
+        self.close_btn_wrapper = TransparentWidget()
+        close_lay = QVBoxLayout(self.close_btn_wrapper)
+        # опускаем кнопку ниже на 1 пиксель
+        close_lay.setContentsMargins(0, 1, 0, 0)
+        close_lay.setSpacing(0)
+
+        self.close_btn = QSvgWidget()
+        self.close_btn.mouseReleaseEvent = lambda e: self.cicked_close_cmd()
+        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.close_btn.load(str(self.icon_path))
+        self.close_btn.setFixedSize(12, 12)
+
+        close_lay.addWidget(self.close_btn)
+        self.h_lay.addWidget(self.close_btn_wrapper)
+
+    def cicked_close_cmd(self):
+        self.clicked_close.emit()
+
+    def mouseReleaseEvent(self, a0):
+        self.clicked_body.emit()
+        return super().mouseReleaseEvent(a0)
