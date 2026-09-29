@@ -122,7 +122,7 @@ UTreeView::item:selected:!active,
 UListWidget::item:selected,
 UListWidget::item:selected:!active,
 UTreeWidget::item:selected,
-UTreeWidget::item:selected:!active, {
+UTreeWidget::item:selected:!active {
     color: #ffffff;
     background: #2b2b2b;
 }
