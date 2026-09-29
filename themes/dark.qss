@@ -389,6 +389,7 @@ WinTextSearchSubtitle {
     color: #AAAAAA;
 }
 
+
 TransparentButton,
 TransparentLabel,
 TransparentFrame,
@@ -399,3 +400,60 @@ TransparentMenu,
 TransparentScrollArea {
     background: transparent;
 }
+
+
+/* ==========================================================================
+   5. ВСПЛЫВАЮЩИЕ МЕНЮ (QMenu)
+   ========================================================================== */
+UMenu {
+    background: #2b2b2b;
+    border: 1px solid #353535;
+    border-radius: 10px;
+    padding: 5px 2px 5px 2px; /* верх | право | низ | лево */
+}
+
+UMenu::item {
+    background: transparent;
+    color: #ffffff;
+    padding: 5px 30px 5px 10px; /* верх | право | низ | лево */
+}
+
+UMenu::item:selected {
+    background: #ff4e4e4e;
+    color: #ffffff;
+}
+
+UMenu::icon {
+    padding-left: 5px;
+}
+
+UMenu::indicator {
+    width: 16px;
+    height: 16px;
+    padding-left: 5px; /* Отступ от левого края меню */
+}
+
+UMenu::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+UMenu::indicator:unchecked {
+    image: none; 
+}
+
+/* Иконка стрелочки для подменю */
+UMenu::right-arrow {
+    image: url("./icons/common/arrow_right.svg"); /* Путь к вашей иконке */
+    width: 12px;                                 /* Ширина иконки */
+    height: 12px;                                /* Высота иконки */
+    padding-right: 5px;                          /* Отступ от правого края меню */
+}
+
+/* Состояние, когда строка подменю активна/выделена (опционально) */
+UMenu::right-arrow:selected {
+    image: url("./icons/common/arrow_right.svg"); /* Можно заменить на светлую/другую иконку */
+}
+
+/* ==========================================================================
+   6. СПИСКИ И ДЕРЕВЬЯ (Дерево элементов)
+   ========================================================================== */
