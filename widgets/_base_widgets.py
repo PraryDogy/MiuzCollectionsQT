@@ -259,7 +259,7 @@ class UTreeWidgetItem(QTreeWidgetItem):
         super().__init__(parent, [text])
 
 
-class UListWidget(QListWidget):
+class UListWidget(TransparentListWidget):
     ICON_SIZE = (16, 16)
 
     def __init__(self):
@@ -269,7 +269,7 @@ class UListWidget(QListWidget):
         self.setIconSize(QSize(*self.ICON_SIZE))
 
 
-class UTreeWidget(QTreeWidget):
+class UTreeWidget(TransparentTreeWidget):
     ICON_SIZE = (16, 16)
 
     def __init__(self):
@@ -283,7 +283,7 @@ class UTreeWidget(QTreeWidget):
         self.setIndentation(15)
 
 
-class UTreeView(QTreeView):
+class UTreeView(TransparentTreeView):
     def __init__(self, parent=None):
         super().__init__(parent)
 
