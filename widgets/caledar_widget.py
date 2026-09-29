@@ -79,11 +79,6 @@ class CalendarDaySelected(TransparentLabel):
         super().mouseReleaseEvent(ev)
 
 
-class CalendarSep(UHorizontalSep):
-    def __init__(self):
-        super().__init__()
-
-
 class Calendar(UMainWidget):
     date_selected = pyqtSignal(QDate)
 
