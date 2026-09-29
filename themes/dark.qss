@@ -260,8 +260,6 @@ QToolTip {
 }
 
 
-
-
 GrayTextLabel {
     color: #676767;
 }
@@ -285,32 +283,10 @@ GrayTextLabel {
 
 /* caledar_widget.py */
 
-CalendarDay {
-    border-bottom: 1px solid #353535;
-}
-
-
-/* кружок 30 пикселей, размер кружка задается тут через qss */
-CalendarDaySelected {
-    background: #0078D4;
-    border-bottom: 1px solid transparent;
-    border-radius: 15px; /* Половина от полученного размера (30px) делает квадрат кругом */
-    
-    /* ХАК ДЛЯ ИДЕАЛЬНОГО КРУГА (При размере виджета 65x50):
-       Вычитаем маргины, чтобы получить квадрат 30x30 в центре:
-       Ширина: 65px - 17px - 18px = 30px
-       Высота: 50px - 10px - 10px = 30px */
-    margin-left: 17px;
-    margin-right: 18px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
 CalendarSep {
     margin-left: 2px;
-    margin-right: 2px;
+    margin-right: px;
 }
-
 
 /* caledar_widget.py */
 

@@ -1,10 +1,12 @@
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QMouseEvent
+from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap, QPainter
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QGridLayout, QHBoxLayout
+from PyQt6.QtWidgets import (QGridLayout, QHBoxLayout, QStackedLayout,
+                             QStackedWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
+from system.utils import Utils
 
 from ._base_widgets import (GrayTextLabel, TransparentLabel, TransparentWidget,
                             UHorizontalSep, UMainWidget, UMenu, UPushButton)
@@ -47,25 +49,34 @@ class CalendarSvgNavi(QSvgWidget):
 
 class _CalendarDayBase(TransparentLabel):
     clicked = pyqtSignal()
+
     def __init__(self, text: str, day: int):
         super().__init__(text)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.day: int = day
+        self.day = day
 
     def mouseReleaseEvent(self, ev: QMouseEvent):
         if ev.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
-        return super().mouseReleaseEvent(ev)
+        super().mouseReleaseEvent(ev)
 
-    
+
 class CalendarDay(_CalendarDayBase):
-    def __init__(self, text: str, day: int):
-        super().__init__(text, day)
+    pass
 
 
-class CalendarDaySelected(_CalendarDayBase):
+class CalendarDaySelected(TransparentLabel):
+    clicked = pyqtSignal()
+
     def __init__(self, text: str, day: int):
-        super().__init__(text, day)
+        super().__init__()
+        self.day = day
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def mouseReleaseEvent(self, ev: QMouseEvent):
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        super().mouseReleaseEvent(ev)
 
 
 class CalendarSep(UHorizontalSep):
@@ -76,16 +87,18 @@ class CalendarSep(UHorizontalSep):
 class Calendar(UMainWidget):
     date_selected = pyqtSignal(QDate)
 
-    svg_calendar = Static.COMMON_ICONS / "calendar.svg"
-    svg_previous = Static.COMMON_ICONS / "previous.svg"
-    svg_next = Static.COMMON_ICONS / "next.svg"
+    svg_calendar_path = Static.COMMON_ICONS / "calendar.svg"
+    svg_previous_path = Static.COMMON_ICONS / "previous.svg"
+    svg_next_path = Static.COMMON_ICONS / "next.svg"
+    svg_blue_circle_path = Static.COMMON_ICONS / "blue_circle.svg"
 
     min_year = 2015
     day_property = "day_value"
 
-    cell_size = (65, 50)
-    svg_nav = (30, 30)
+    cell_size = (60, 50)
+    svg_nav_size = (30, 30)
     svg_calendar_size = (25, 25)
+    svg_blue_circle_size = (40, 40)
     grid_h_spacing = 0
     grid_v_spacing = 5
 
@@ -99,6 +112,10 @@ class Calendar(UMainWidget):
             lng = QLocale.Language.English
             country = QLocale.Country.UnitedStates
 
+        qimg = QImage(str(self.svg_blue_circle_path))
+        qimg_scaled = Utils.pyqt_scaled_high_dpi(qimg, self.svg_blue_circle_size[0])
+        self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
+        
         self.q_locale = QLocale(lng, country)
         self.current_date = date
         self.date_now = QDate.currentDate()
@@ -124,7 +141,7 @@ class Calendar(UMainWidget):
         dynamic_container_lay.setSpacing(0)
 
         calendar_icon = QSvgWidget()
-        calendar_icon.load(str(self.svg_calendar))
+        calendar_icon.load(str(self.svg_calendar_path))
         calendar_icon.setFixedSize(*self.svg_calendar_size)
         dynamic_container_lay.addWidget(calendar_icon)
 
@@ -132,12 +149,12 @@ class Calendar(UMainWidget):
 
         self.dynamic_label = CalendarBigDate()
         dynamic_container_lay.addWidget(self.dynamic_label)
-        dynamic_container_lay.addStretch()
+        dynamic_container_lay.addStretch(1)
 
         # --- Разделитель ---
         self.central_layout.addSpacing(5)
 
-        sep = CalendarSep()
+        sep = UHorizontalSep()
         self.central_layout.addWidget(sep)
 
         # --- 2. Блок навигации календаря ---
@@ -148,8 +165,8 @@ class Calendar(UMainWidget):
         self.nav_layout.setContentsMargins(margin, 15, margin, 15)
         self.nav_layout.setSpacing(0)
 
-        self.btn_prev = CalendarSvgNavi(str(self.svg_previous))
-        self.btn_prev.setFixedSize(*self.svg_nav)
+        self.btn_prev = CalendarSvgNavi(str(self.svg_previous_path))
+        self.btn_prev.setFixedSize(*self.svg_nav_size)
         self.btn_prev.clicked.connect(self.prev_month)
         self.nav_layout.addWidget(self.btn_prev)
 
@@ -171,13 +188,13 @@ class Calendar(UMainWidget):
 
         self.nav_layout.addStretch()
         
-        self.btn_next = CalendarSvgNavi(str(self.svg_next))
-        self.btn_next.setFixedSize(*self.svg_nav)
+        self.btn_next = CalendarSvgNavi(str(self.svg_next_path))
+        self.btn_next.setFixedSize(*self.svg_nav_size)
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)
 
-        sep = CalendarSep()
-        self.central_layout.addWidget(CalendarSep())
+        sep = UHorizontalSep()
+        self.central_layout.addWidget(sep)
 
         # --- 3. Сетка для дней недели и чисел ---
         self.grid_widget = TransparentWidget()  
@@ -315,9 +332,14 @@ class Calendar(UMainWidget):
         for day in range(1, days_in_month + 1):
             if day == current_day_val:
                 btn_day = CalendarDaySelected(str(day), day)
+                btn_day.setFixedSize(*self.cell_size)
+                btn_day.setPixmap(self.blue_circle_pixmap)
+                btn_day_text = TransparentLabel(text=str(day), parent=btn_day)
+                btn_day_text.setGeometry(btn_day.rect())
+                btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
             else:
                 btn_day = CalendarDay(str(day), day)
-            btn_day.setFixedSize(*self.cell_size)
+                btn_day.setFixedSize(*self.cell_size)
             btn_day.clicked.connect(self.day_selected)
             # divmod вычисляет номер строки и колонки на основе сквозного индекса ячейки
             row, col = divmod(start_col + day - 1, 7)
