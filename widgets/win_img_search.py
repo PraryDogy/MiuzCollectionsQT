@@ -6,11 +6,10 @@ import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QImage, QPixmap
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from sqlalchemy import func
 
 from cfg import Dynamic, JsonData, Static
-from system.database import Dbase, Thumbs
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
@@ -18,8 +17,9 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UHorizontalSep, RowArrowWidget, TransparentGroupBox, UMainWidget,
-                            UPushButton, USlider)
+from ._base_widgets import (RowArrowWidget, TransparentGroupBox,
+                            TransparentLabel, TransparentWidget,
+                            UHorizontalSep, UMainWidget, UPushButton, USlider)
 
 
 class ProgressWin(UMainWidget):
@@ -36,7 +36,7 @@ class ProgressWin(UMainWidget):
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(0, 0, 0, 10)
 
-        self.text_label = QLabel(Lng.preparing[JsonData.lng_index])
+        self.text_label = TransparentLabel(Lng.preparing[JsonData.lng_index])
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.text_label.setFixedSize(self.ww - 10, 30)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -66,7 +66,7 @@ class ProgressWin(UMainWidget):
         a0.ignore()
 
 
-class SliderWidget(QWidget):
+class SliderWidget(TransparentWidget):
 
     def __init__(self):
         super().__init__()
@@ -77,7 +77,7 @@ class SliderWidget(QWidget):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
-        self.accuracy_label = QLabel(Lng.accuracy[JsonData.lng_index] + ":")
+        self.accuracy_label = TransparentLabel(Lng.accuracy[JsonData.lng_index] + ":")
         self.h_layout.addWidget(self.accuracy_label)
 
         self.slider = USlider()
@@ -89,7 +89,7 @@ class SliderWidget(QWidget):
 
         self.h_layout.addWidget(self.slider)
 
-        self.value_label = QLabel(f"{base_value}%")
+        self.value_label = TransparentLabel(f"{base_value}%")
         self.h_layout.addWidget(self.value_label)
 
         self.slider.clicked.connect(self.slider_clicked_cmd)
@@ -148,7 +148,7 @@ class WinImgSearch(UMainWidget):
         )
         self.base_text = "\n".join(lines_base_text)
         
-        self.img_label = QLabel(self.base_text)
+        self.img_label = TransparentLabel(self.base_text)
         self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.img_label.setWordWrap(True)
         group_layout.addWidget(self.img_label)
