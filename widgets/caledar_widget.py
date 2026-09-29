@@ -376,6 +376,9 @@ class Calendar(UMainWidget):
 
         self.calendar_layout.addWidget(header_widget)
 
+        sep = UHorizontalSep()
+        self.calendar_layout.addWidget(sep)
+
         first_day = QDate(current_year, current_month, 1)
         start_col = first_day.dayOfWeek() - 1
         days_in_month = first_day.daysInMonth()
