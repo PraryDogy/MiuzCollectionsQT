@@ -195,6 +195,7 @@ class Calendar(UMainWidget):
 
     def recreate_calendar_widget(self):
         old_widget = self.calendar_widget
+        old_widget.hide()
 
         self.central_layout.removeWidget(old_widget)
         old_widget.deleteLater()
