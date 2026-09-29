@@ -267,82 +267,33 @@ GrayTextLabel {
 /* _base_widgets.py */
 
 /* actions.py */
+/*  */
 /* actions.py */
 
 /* bar_bottom.py */
+/*  */
 /* bar_bottom.py */
 
 /* bar_macos.py */
+/*  */
 /* bar_macos.py */
 
 /* bar_path.py */
+/*  */
 /* bar_path.py */
 
 /* bar_top.py */
+/*  */
 /* bar_top.py */
 
 /* caledar_widget.py */
-
-CalendarSep {
-    margin-left: 2px;
-    margin-right: px;
-}
-
+/*  */
 /* caledar_widget.py */
 
 
 
 
 /* grid.py */
-/* grid.py */
-
-/* menu_left.py */
-/* menu_left.py */
-
-/* path_widget.py */
-/* path_widget.py */
-
-/* win_collage.py */
-/* win_collage.py */
-
-/* win_copy_files.py */
-/* win_copy_files.py */
-
-/* win_filters.py */
-/* win_filters.py */
-
-/* win_first_load.py */
-/* win_first_load.py */
-
-/* win_image_view.py */
-/* win_image_view.py */
-
-/* win_img_search.py */
-/* win_img_search.py */
-
-/* win_info.py */
-/* win_info.py */
-
-/* win_main.py */
-/* win_main.py */
-
-/* win_servers.py */
-/* win_servers.py */
-
-/* win_settings.py */
-/* win_settings.py */
-
-/* win_smb.py */
-/* win_smb.py */
-
-/* win_text_search.py */
-/* win_text_search.py */
-
-/* win_upload.py */
-/* win_upload.py */
-
-
-/* --- Модуль: Плитки / Карточки (Thumbnails) --- */
 ThumbImgWidget { border-radius: 10px; }
 ThumbImgWidget[framed="false"] { background: transparent; color: #AAAAAA;}
 ThumbImgWidget[framed="true"]  { background-color: #363636; color: #AAAAAA;}
@@ -352,6 +303,7 @@ ThumbWhiteTextWid {
     border-radius: 5px;
     padding: 2px;
 }
+
 ThumbWhiteTextWid[framed="false"] { background: transparent; color: #ffffff; }
 ThumbWhiteTextWid[framed="true"]  { background: #0059d1; color: #ffffff; }
 
@@ -360,6 +312,53 @@ ThumbBlueTextWidget, ThumbMiuzBlueTextWidget {
     color: #6e6e6e;
     background: transparent;
 }
+/* grid.py */
+
+/* menu_left.py */
+/* menu_left.py */
+
+/* path_widget.py */
+/* path_widget.py */
+
+/* win_collage.py */
+/* win_collage.py */
+
+/* win_copy_files.py */
+/* win_copy_files.py */
+
+/* win_filters.py */
+/* win_filters.py */
+
+/* win_first_load.py */
+/* win_first_load.py */
+
+/* win_image_view.py */
+/* win_image_view.py */
+
+/* win_img_search.py */
+/* win_img_search.py */
+
+/* win_info.py */
+/* win_info.py */
+
+/* win_main.py */
+/* win_main.py */
+
+/* win_servers.py */
+/* win_servers.py */
+
+/* win_settings.py */
+/* win_settings.py */
+
+/* win_smb.py */
+/* win_smb.py */
+
+/* win_text_search.py */
+/* win_text_search.py */
+
+/* win_upload.py */
+/* win_upload.py */
+
 
 /* --- Модуль: Окна просмотра и заголовки --- */
 WinSettingsMfAliasTitle {
