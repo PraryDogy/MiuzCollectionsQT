@@ -14,9 +14,6 @@ from ._base_widgets import (TransparentFrame, TransparentLabel,
                             TransparentWidget, ULineEdit, UMenu, UPushButton, GrayTextLabel)
 from .win_text_search import WinTextSearch
 
-BTN_H = 27
-
-
 
 class SearchWidBaseSvg(QSvgWidget):
     clicked_ = pyqtSignal()
@@ -66,7 +63,6 @@ class SearchWidLineEdit(ULineEdit):
 
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(BTN_H)
         self.setMinimumWidth(self.ww)
         self.setMaximumWidth(self.ww * 2)
 
@@ -155,8 +151,6 @@ class BarTopSvgBtn(QSvgWidget):
 
         self.base_svg = self._load_svg_data(base_svg)
         self.selected_svg = self._load_svg_data(selected_svg)
-
-        self.setFixedSize(BTN_H + 2, BTN_H + 2)
         self.load(self.base_svg)
 
         for path in (base_svg, selected_svg):
@@ -274,13 +268,14 @@ class BarTop(TransparentFrame):
 
     def __init__(self):
         super().__init__()
+
         self.h_layout = QHBoxLayout(self)
         self.h_layout.setSpacing(10)
 
-        self.catalog_btn = CatalogWidget()
-        self.catalog_btn.mf_open.connect(self.mf_open.emit)
-        self.catalog_btn.mf_new.connect(self.mf_new.emit)
-        self.h_layout.addWidget(self.catalog_btn)
+        self.catalog_widget = CatalogWidget()
+        self.catalog_widget.mf_open.connect(self.mf_open.emit)
+        self.catalog_widget.mf_new.connect(self.mf_new.emit)
+        self.h_layout.addWidget(self.catalog_widget)
 
         self.h_layout.addStretch(0)
 
@@ -304,6 +299,13 @@ class BarTop(TransparentFrame):
 
         # Флаг для отслеживания состояния скролла (заглушка от спама)
         self._is_scrolled = False 
+
+        self.setFixedHeight(30)
+        for i in (self.img_search_btn, self.settings_btn):
+            i.setFixedSize(self.height() - 2, self.height() - 2)
+        self.search_wid.setFixedHeight(self.height() - 2)
+        self.catalog_widget.button.setFixedHeight(self.height() - 6)
+
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()

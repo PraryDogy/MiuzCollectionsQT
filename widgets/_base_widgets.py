@@ -165,7 +165,6 @@ class ULineEdit(TransparentLineEdit):
 
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(self.hh)
 
     def cut_selection(self, *args):
         text = self.selectedText()
