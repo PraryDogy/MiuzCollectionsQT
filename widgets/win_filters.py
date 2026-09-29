@@ -16,12 +16,6 @@ from ._base_widgets import (QLabel, QWidget, RowArrowWidget,
 from .caledar_widget import Calendar, CalendarBigDate
 
 
-class WinDatesDateLabel(QLabel):
-
-    def __init__(self):
-        super().__init__()
-
-
 class DatesWidget(TransparentGroupBox):
     reload_thumbnails = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
