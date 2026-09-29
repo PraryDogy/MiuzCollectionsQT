@@ -18,13 +18,13 @@ from ._base_widgets import (TransparentFrame, TransparentLabel,
                             UTreeWidget, UTreeWidgetItem)
 
 
-class LeftMenuTreeWidgetItem(UTreeWidgetItem):
+class MenuLeftTreeWidgetItem(UTreeWidgetItem):
     def __init__(self, parent, text, path):
         super().__init__(parent, text)
         self.path = path
 
 
-class LeftMenuTreeWidget(UTreeWidget):
+class MenuLeftTreeWidget(UTreeWidget):
     reveal = pyqtSignal(list)
     copy_path = pyqtSignal(list)
     on_tree_clicked = pyqtSignal(str)
@@ -38,7 +38,7 @@ class LeftMenuTreeWidget(UTreeWidget):
         self.itemClicked.connect(self.on_item_click)
         self.verticalScrollBar().valueChanged.connect(self.on_scroll_changed)
         self.abs_selected_path: str = os.sep
-        self.items: dict[str, LeftMenuTreeWidgetItem] = {}
+        self.items: dict[str, MenuLeftTreeWidgetItem] = {}
 
     def need_hide_digits(self):
         if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
@@ -50,7 +50,7 @@ class LeftMenuTreeWidget(UTreeWidget):
         """Удаляет начальные символы, которые не являются буквами, для сортировки."""
         return re.sub(r'^[^A-Za-zА-Яа-я]+', '', s)
 
-    def sort_children(self, parent_item: LeftMenuTreeWidgetItem):
+    def sort_children(self, parent_item: MenuLeftTreeWidgetItem):
         """Сортировка детей рекурсивно по strip_to_first_letter."""
         children = [parent_item.child(i) for i in range(parent_item.childCount())]
         children.sort(key=lambda it: self.strip_to_first_letter(it.text(0)).lower())
@@ -64,7 +64,7 @@ class LeftMenuTreeWidget(UTreeWidget):
     def init_ui(self):
         self.clear()
 
-        root_item = LeftMenuTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
+        root_item = MenuLeftTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
         root_item.setIcon(0, QIcon(str(self.icon_path)))
         self.addTopLevelItem(root_item)
 
@@ -72,8 +72,8 @@ class LeftMenuTreeWidget(UTreeWidget):
         task.sigs.finished_.connect(lambda lst: self.build_tree(root_item, lst))
         UThreadPool.start(task)
 
-    def build_tree(self, root_item: LeftMenuTreeWidgetItem, paths: list[str]) -> None:
-        self.items: dict[str, LeftMenuTreeWidgetItem] = {os.sep: root_item}
+    def build_tree(self, root_item: MenuLeftTreeWidgetItem, paths: list[str]) -> None:
+        self.items: dict[str, MenuLeftTreeWidgetItem] = {os.sep: root_item}
         hide_digits = self.need_hide_digits()
 
         for path in sorted(paths):
@@ -90,7 +90,7 @@ class LeftMenuTreeWidget(UTreeWidget):
             if parent_item is None:
                 continue
 
-            child = LeftMenuTreeWidgetItem(parent_item, name, path)
+            child = MenuLeftTreeWidgetItem(parent_item, name, path)
             child.setIcon(0, QIcon(str(self.icon_path)))
             parent_item.addChild(child)
             self.items[path] = child
@@ -114,7 +114,7 @@ class LeftMenuTreeWidget(UTreeWidget):
         self.setCurrentItem(item)
         self.scrollToItem(item, UTreeWidget.ScrollHint.PositionAtCenter)
 
-    def on_item_click(self, item: LeftMenuTreeWidgetItem, col: int):
+    def on_item_click(self, item: MenuLeftTreeWidgetItem, col: int):
         abs_path = item.path
         if abs_path == self.abs_selected_path:
             return
@@ -153,7 +153,7 @@ class LeftMenuTreeWidget(UTreeWidget):
             first_item.setExpanded(True)
             self.setCurrentItem(first_item)
 
-        item: LeftMenuTreeWidgetItem = self.itemAt(a0.pos())
+        item: MenuLeftTreeWidgetItem = self.itemAt(a0.pos())
         menu = UMenu(parent=self)
 
         abs_path = os.sep
@@ -227,7 +227,7 @@ class MenuLeft(TransparentFrame):
         v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
 
-        self.tree_wid = LeftMenuTreeWidget()
+        self.tree_wid = MenuLeftTreeWidget()
         v_lay.addWidget(self.tree_wid)
         self.tree_wid.reveal.connect(
             lambda rel_paths: self.reveal.emit(rel_paths)
