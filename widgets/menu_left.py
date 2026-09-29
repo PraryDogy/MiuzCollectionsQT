@@ -2,11 +2,10 @@ import os
 import re
 import subprocess
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal, QPoint
+from PyQt6.QtCore import QPoint, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QComboBox, QHBoxLayout, QSizePolicy, QVBoxLayout,
-                             QWidget, QLabel)
 from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QVBoxLayout
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
@@ -15,8 +14,9 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UListWidget, UHorizontalSep, UMenu, UPushButton,
-                            UTreeWidget, UTreeWidgetItem, TransparentFrame)
+from ._base_widgets import (TransparentFrame, TransparentLabel,
+                            TransparentWidget, UHorizontalSep, UMenu,
+                            UTreeWidget, UTreeWidgetItem)
 
 ITEM_HEIGHT = 25
 
@@ -220,12 +220,12 @@ class LeftMenuCatalogButtonMenu(UMenu):
         super().__init__(event)
 
 
-class LeftMenuCatalogButton(QLabel):
+class LeftMenuCatalogButton(TransparentWidget):
     def __init__(self):
         super().__init__()
 
 
-class CatalogArrowWidget(QWidget):
+class CatalogArrowWidget(TransparentWidget):
     def __init__(self):
         super().__init__()
 
@@ -246,7 +246,7 @@ class CatalogArrowWidget(QWidget):
         )
 
 
-class LeftMenuCatalogTitle(QLabel):
+class LeftMenuCatalogTitle(TransparentLabel):
     hh = 30
 
     def __init__(self):
