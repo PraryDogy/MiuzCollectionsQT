@@ -6,15 +6,17 @@ from PyQt6.QtWidgets import QGridLayout, QHBoxLayout
 from cfg import JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import (TransparentLabel, TransparentWidget,
+from ._base_widgets import (GrayTextLabel, TransparentLabel, TransparentWidget,
                             UHorizontalSep, UMainWidget, UMenu, UPushButton)
 
+QSS_ROUND_SVG_SIZE = 30
 
-class CalendarBigDate(TransparentLabel):
+
+class CalendarBigDate(GrayTextLabel):
     def __init__(self):
-        super().__init__()
+        super().__init__(text="30 сентября 2026")
+        self.set_font_size(25)
         self.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.setText("30 сентября 2026") 
         self.adjustSize() 
         self.setFixedWidth(self.width())
         self.clear()
@@ -64,12 +66,6 @@ class CalendarDay(CalendarDayBase):
 class CalendarDaySelected(CalendarDayBase):
     def __init__(self, text: str, day: int):
         super().__init__(text, day)
-
-
-class CalendarWeek(TransparentLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
 class CalendarSep(UHorizontalSep):
@@ -314,7 +310,8 @@ class Calendar(UMainWidget):
         self.clear_grid()
         for col in range(7):
             week = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
-            lbl_day = CalendarWeek(week.capitalize())
+            lbl_day = GrayTextLabel(week.capitalize())
+            lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             lbl_day.setFixedSize(*self.cell_size)
             self.grid_layout.addWidget(lbl_day, 0, col)
         first_day = QDate(current_year, current_month, 1)
