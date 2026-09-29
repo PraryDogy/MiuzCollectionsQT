@@ -1,8 +1,7 @@
 import os
 import re
-import subprocess
 
-from PyQt6.QtCore import QPoint, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QVBoxLayout

@@ -1,19 +1,17 @@
 import os
 
-import sqlalchemy
 from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QFileDialog, QHBoxLayout, QLabel, QSizePolicy,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, SmbChecker
-from system.utils import Utils
 
-from ._base_widgets import SelectableLabel, TransparentGroupBox
+from ._base_widgets import (SelectableLabel, TransparentGroupBox,
+                            TransparentLabel, TransparentWidget)
 
 
 class PathWidget(TransparentGroupBox):
@@ -37,7 +35,7 @@ class PathWidget(TransparentGroupBox):
         self.main_lay.setContentsMargins(6, 2, 6, 2)
         self.main_lay.setSpacing(0)
 
-        self.main_wid = QWidget()
+        self.main_wid = TransparentWidget()
         self.main_lay.addWidget(self.main_wid)
 
         self.mf_temp_path = mf.get_avaiable_mf_path()
@@ -49,7 +47,7 @@ class PathWidget(TransparentGroupBox):
 
     def no_path_widget(self):
         self.main_wid.deleteLater()
-        self.main_wid = QWidget()
+        self.main_wid = TransparentWidget()
         self.main_lay.addWidget(self.main_wid)
 
         h_lay = QHBoxLayout(self.main_wid)
@@ -65,7 +63,7 @@ class PathWidget(TransparentGroupBox):
             f"{Lng.folder_path[JsonData.lng_index]}:",
             Lng.path_hint_texts[JsonData.lng_index].lower()
         )
-        left_label = QLabel("\n".join(lines))
+        left_label = TransparentLabel("\n".join(lines))
         left_label.setWordWrap(True)
         h_lay.addWidget(left_label)
 
@@ -73,7 +71,7 @@ class PathWidget(TransparentGroupBox):
 
     def ok_path_widget(self):
         self.main_wid.deleteLater()
-        self.main_wid = QWidget()
+        self.main_wid = TransparentWidget()
         self.main_lay.addWidget(self.main_wid)
 
         h_lay = QHBoxLayout(self.main_wid)

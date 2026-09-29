@@ -1,16 +1,16 @@
-import io  # Встроенный модуль Python для BytesIO
+import io
 
 from PIL import Image, ImageEnhance
-from PyQt6.QtCore import (QBuffer, QIODevice,  # QBuffer импортируется отсюда
-                          Qt, QTimer)
+from PyQt6.QtCore import QBuffer, QIODevice, Qt, QTimer
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QGridLayout, QLabel, QScrollArea, QWidget
+from PyQt6.QtWidgets import QGridLayout
 
 from cfg import JsonData, Static
 from system.items import DataItem
 from system.lang import Lng
 
-from ._base_widgets import TransparentFrame, UMainWidget
+from ._base_widgets import (TransparentFrame, TransparentLabel,
+                            TransparentScrollArea, UMainWidget)
 
 
 class WinCollage(UMainWidget):
@@ -28,13 +28,13 @@ class WinCollage(UMainWidget):
             QPixmap.fromImage(i.qimages[-1])
             for i in data_items
         ]
-        self.image_labels: list[QLabel] = []
+        self.image_labels: list[TransparentLabel] = []
 
         self.resize_timer = QTimer()
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.rebuild_grid)
 
-        self.scroll_area = QScrollArea()
+        self.scroll_area = TransparentScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
@@ -69,7 +69,7 @@ class WinCollage(UMainWidget):
 
         for index, orig_pixmap in enumerate(self.pixmaps):
             row, col = divmod(index, columns)
-            label = QLabel()
+            label = TransparentLabel()
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             label.setPixmap(orig_pixmap)
             label.setFixedSize(Static.THUMB_MAX_SIZE, Static.THUMB_MAX_SIZE)

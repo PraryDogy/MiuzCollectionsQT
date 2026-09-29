@@ -2,14 +2,15 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+from PyQt6.QtWidgets import QHBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
-from ._base_widgets import UMainWidget, UPushButton, WinProgressbar
+from ._base_widgets import (TransparentLabel, TransparentWidget, UMainWidget,
+                            UPushButton, WinProgressbar)
 
 
 class ReplaceButton(UPushButton):
@@ -37,7 +38,7 @@ class ReplaceFilesWin(UMainWidget):
         self.setFixedWidth(self.ww)
         self.central_layout.setContentsMargins(15, 5, 10, 10)
 
-        h_wid = QWidget()
+        h_wid = TransparentWidget()
         self.central_layout.addWidget(h_wid)
 
         h_lay = QHBoxLayout(h_wid)
@@ -49,11 +50,11 @@ class ReplaceFilesWin(UMainWidget):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(Lng.replace_existing_files[JsonData.lng_index])
+        test_two = TransparentLabel(Lng.replace_existing_files[JsonData.lng_index])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
-        btn_wid = QWidget()
+        btn_wid = TransparentWidget()
         self.central_layout.addWidget(btn_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
         btn_lay = QHBoxLayout(btn_wid)
@@ -104,7 +105,7 @@ class ErrorWin(UMainWidget):
         self.setWindowTitle(Lng.error[JsonData.lng_index])
         self.central_layout.setContentsMargins(15, 5, 10, 10)
 
-        h_wid = QWidget()
+        h_wid = TransparentWidget()
         self.central_layout.addWidget(h_wid)
 
         h_lay = QHBoxLayout(h_wid)
@@ -116,7 +117,7 @@ class ErrorWin(UMainWidget):
         warn.setFixedSize(self.icon_size, self.icon_size)
         h_lay.addWidget(warn)
 
-        test_two = QLabel(Lng.copy_error[JsonData.lng_index])
+        test_two = TransparentLabel(Lng.copy_error[JsonData.lng_index])
         test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         h_lay.addWidget(test_two)
 
