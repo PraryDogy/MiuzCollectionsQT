@@ -20,7 +20,7 @@ from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (TransparentFrame, TransparentLabel, UFrame, UMenu,
-                            UPushButton, USubMenu, VScrollArea)
+                            UPushButton, VScrollArea)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -907,7 +907,7 @@ class Grid(VScrollArea):
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
         """Создаёт контекстное меню для пустой области или выбранных виджетов."""
-        self.menu_ = UMenu()
+        self.menu_ = UMenu(parent=self)
         clicked_wid = self.get_clicked_widget(a0)
 
         def menu_empty():
@@ -961,11 +961,10 @@ class Grid(VScrollArea):
 
             # открыть в приложении
             if len(rel_paths) == 1:
-                open_menu = UMenu()
-                open_menu.setParent(self.menu_)
-                open_menu.setTitle(f"{Lng.open_in[JsonData.lng_index]}")
-                self.menu_.addMenu(open_menu)
-
+                open_menu = UMenu(
+                    title=f"{Lng.open_in[JsonData.lng_index]}",
+                    parent=self.menu_
+                )
                 act = QAction(Lng.open_default[JsonData.lng_index], open_menu)
                 act.triggered.connect(
                     lambda: self.open_in_app.emit((rel_paths, None))
@@ -979,6 +978,8 @@ class Grid(VScrollArea):
                         lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
                     )
                     open_menu.addAction(act)
+
+                self.menu_.addMenu(open_menu)
 
                 self.menu_.addSeparator()
 

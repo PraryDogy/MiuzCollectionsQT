@@ -61,8 +61,10 @@ class TransparentScrollArea(QScrollArea):
 
 
 class UMenu(TransparentMenu):
-    def __init__(self, *args, **kw):
-        super().__init__()
+    # def __init__(self):
+        # super().__init__()
+    def __init__(self, title=None, parent=None):
+        super().__init__(title, parent)
 
     def show_menu_under_cursor(self, event: QContextMenuEvent):
         self.exec(event.globalPos())
@@ -72,11 +74,6 @@ class UMenu(TransparentMenu):
             a0.ignore()
         else:
             super().mouseReleaseEvent(a0)
-
-
-class USubMenu(QMenu):
-    def __init__(self, title: str, parent: QMenu):
-        super().__init__(title, parent)
 
 
 class ULineEdit(TransparentLineEdit):

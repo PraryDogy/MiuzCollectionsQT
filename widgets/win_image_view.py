@@ -454,12 +454,12 @@ class WinImageView(UMainWidget):
 
     def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 
-        self.menu_ = UMenu()
+        self.menu_ = UMenu(parent=self)
         rel_paths = [self.current_data_item.rel_path, ]
         # открыть в приложении
-        open_menu = USubMenu(
-            f"{Lng.open_in[JsonData.lng_index]}",
-            self.menu_
+        open_menu = UMenu(
+            title=f"{Lng.open_in[JsonData.lng_index]}",
+            parent=self.menu_
         )
 
         act = QAction(Lng.open_default[JsonData.lng_index], open_menu)
