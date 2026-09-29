@@ -23,7 +23,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWidget, UMenu, USubMenu
+from ._base_widgets import UMainWidget, UMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 

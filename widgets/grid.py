@@ -265,7 +265,7 @@ class GridSortWidget(QWidget):
         self.button.setFixedSize(155, 23)
         self.h_lay.addWidget(self.button)
 
-        self.button_menu = UMenu()
+        self.button_menu = UMenu(parent=self)
         self.button.setMenu(self.button_menu)
 
         mod_action = QAction(Lng.sort_by_mod[JsonData.lng_index], self.button_menu)

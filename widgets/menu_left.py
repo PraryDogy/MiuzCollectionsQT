@@ -157,7 +157,7 @@ class LeftMenuTreeWidget(UTreeWidget):
             self.setCurrentItem(first_item)
 
         item: LeftMenuTreeWidgetItem = self.itemAt(a0.pos())
-        menu = UMenu()
+        menu = UMenu(parent=self)
 
         abs_path = os.sep
         if item:

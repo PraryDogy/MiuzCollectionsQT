@@ -126,7 +126,7 @@ class FirstLoadWin(UMainWidget):
             QIcon(str(self.eng_flag))
         )
 
-        lng_menu = UMenu()
+        lng_menu = UMenu(parent=self)
         for value in (0, 1):
             action = QAction(Lng.russian[value], lng_menu)
             action.setIcon(lng_icons[value])

@@ -95,7 +95,7 @@ class ULineEdit(TransparentLineEdit):
         self.insert(text)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        self.menu_ = UMenu()
+        self.menu_ = UMenu(parent=self)
 
         actions = [
             (Lng.cut[JsonData.lng_index], self.cut_selection),
@@ -132,7 +132,7 @@ class UTextEdit(QTextEdit):
         self.setPlainText(new_text)
 
     def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
-        menu_ = UMenu()
+        menu_ = UMenu(parent=self)
 
         actions = [
             (Lng.cut[JsonData.lng_index], self.cut_selection),
@@ -342,7 +342,7 @@ class SelectableLabel(QLabel):
 
         is_path = any((os.path.isdir(full_text), os.path.isfile(full_text)))
 
-        menu_ = UMenu()
+        menu_ = UMenu(parent=self)
 
         label_text = Lng.copy[JsonData.lng_index]
         sel = QAction(text=label_text, parent=self)
