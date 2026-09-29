@@ -195,9 +195,9 @@ class Calendar(UMainWidget):
 
     def recreate_calendar_widget(self):
         old_widget = self.calendar_widget
-        old_widget.hide()
 
         self.central_layout.removeWidget(old_widget)
+        old_widget.setParent(None)
         old_widget.deleteLater()
 
         self.create_calendar_widget()
@@ -339,6 +339,23 @@ class Calendar(UMainWidget):
             self.btn_next.set_enabled()
 
         self.recreate_calendar_widget()
+
+
+        self.recreate_calendar_widget()
+
+        # print(
+        #     "after recreate:",
+        #     self.central_layout.count(),
+        #     self.calendar_layout.count()
+        # )
+
+        # print(
+        #     "after update:",
+        #     self.central_layout.count(),
+        #     self.calendar_layout.count(),
+        #     self.calendar_widget.sizeHint(),
+        #     self.calendar_widget.size()
+        # )
 
         header_widget = TransparentWidget()
         header_layout = QHBoxLayout(header_widget)
