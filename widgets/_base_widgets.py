@@ -803,7 +803,7 @@ class MfStopListWidget(QWidget):
 
         v_layout.addSpacing(10)
 
-        self.text_edit = UTextEditDark()
+        self.text_edit = UTextEdit()
         self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
         self.text_edit.textChanged.connect(self.changed.emit)
         v_layout.addWidget(self.text_edit)
