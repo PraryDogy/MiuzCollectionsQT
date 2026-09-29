@@ -41,13 +41,13 @@ class TransparentWidget(QWidget):
 
 
 class TransparentLineEdit(QLineEdit):
-    def __init__(self, contents="", parent=None):
-        super().__init__(contents, parent)
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
 
 class TransparentTextEdit(QTextEdit):
-    def __init__(self, text="", parent=None):
-        super().__init__(text, parent)
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
 
 class TransparentMenu(QMenu):
