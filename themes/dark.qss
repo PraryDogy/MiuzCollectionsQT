@@ -1,3 +1,16 @@
+TransparentButton,
+TransparentLabel,
+TransparentFrame,
+TransparentWidget,
+TransparentLineEdit,
+TransparentTextEdit,
+TransparentMenu,
+TransparentScrollArea,
+TransparentGroupBox {
+    background: transparent;
+}
+
+
 /* ==========================================================================
    3. КНОПКИ И СЛАЙДЕРЫ (Элементы управления)
    ========================================================================== */
@@ -56,7 +69,7 @@ QTextEdit {
     padding-right: 2px;
 }
 
-USpinBox, QDateEdit {
+USpinBox {
     background: #3E3E3E;
     color: #ffffff;
     border: 1px solid #4C4C4C;
@@ -341,19 +354,6 @@ WinTextSearchTitle {
 WinTextSearchSubtitle {
     color: #AAAAAA;
 }
-
-
-TransparentButton,
-TransparentLabel,
-TransparentFrame,
-TransparentWidget,
-TransparentLineEdit,
-TransparentTextEdit,
-TransparentMenu,
-TransparentScrollArea {
-    background: transparent;
-}
-
 
 /* ==========================================================================
    5. ВСПЛЫВАЮЩИЕ МЕНЮ (QMenu)
