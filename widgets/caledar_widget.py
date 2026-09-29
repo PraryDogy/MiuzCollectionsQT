@@ -94,8 +94,6 @@ class Calendar(UMainWidget):
     svg_nav_size = (30, 30)
     svg_calendar_size = (25, 25)
     svg_blue_circle_size = (40, 40)
-    grid_h_spacing = 0
-    grid_v_spacing = 5
 
     def __init__(self, date: QDate):
         super().__init__()
@@ -108,26 +106,30 @@ class Calendar(UMainWidget):
             country = QLocale.Country.UnitedStates
 
         qimg = QImage(str(self.svg_blue_circle_path))
-        qimg_scaled = Utils.pyqt_scaled_high_dpi(qimg, self.svg_blue_circle_size[0])
+        qimg_scaled = Utils.pyqt_scaled_high_dpi(
+            qimg,
+            self.svg_blue_circle_size[0]
+        )
         self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
-        
+
         self.q_locale = QLocale(lng, country)
         self.current_date = date
         self.date_now = QDate.currentDate()
-        
+
         self.setWindowTitle(Lng.calendar[JsonData.lng_index])
         self.set_close_only()
         self.set_always_on_top()
+
         self.init_ui()
+
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def init_ui(self):
-        # --- 1. Блок большой даты ---
         dynamic_container = TransparentWidget()
-        self.central_layout.addWidget(dynamic_container) # Добавляем сразу
-        
+        self.central_layout.addWidget(dynamic_container)
+
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(0)
@@ -143,16 +145,11 @@ class Calendar(UMainWidget):
         dynamic_container_lay.addWidget(self.dynamic_label)
         dynamic_container_lay.addStretch(1)
 
-        # --- Разделитель ---
         self.central_layout.addSpacing(5)
 
-        sep = UHorizontalSep()
-        # self.central_layout.addWidget(sep)
-
-        # --- 2. Блок навигации календаря ---
         self.nav_widget = TransparentWidget()
-        self.central_layout.addWidget(self.nav_widget) # Добавляем сразу
-        
+        self.central_layout.addWidget(self.nav_widget)
+
         self.nav_layout = QHBoxLayout(self.nav_widget)
         self.nav_layout.setContentsMargins(10, 0, 10, 0)
         self.nav_layout.setSpacing(0)
@@ -164,7 +161,7 @@ class Calendar(UMainWidget):
         self.nav_layout.addWidget(self.btn_prev)
 
         self.nav_layout.addStretch()
-        
+
         self.btn_month = UPushButton("")
         self.menu_month = UMenu(parent=self)
         self.btn_month.setMenu(self.menu_month)
@@ -180,33 +177,31 @@ class Calendar(UMainWidget):
         self.nav_layout.addWidget(self.btn_year)
 
         self.nav_layout.addStretch()
-        
+
         self.btn_next = CalendarSvgNavi(str(self.svg_next_path))
         self.btn_next.setFixedSize(*self.svg_nav_size)
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)
 
-        sep = UHorizontalSep()
-        # self.central_layout.addWidget(sep)
-
-        # --- 3. Сетка для дней недели и чисел ---
-        self.grid_widget = TransparentWidget()  
-        self.central_layout.addWidget(self.grid_widget) # Добавляем сразу
-        
-        self.grid_layout = QVBoxLayout(self.grid_widget)
-        self.grid_layout.setContentsMargins(0, 0, 0, 0)
-        self.grid_layout.setSpacing(0)
-
-        # Этот layout будет содержать весь календарь.
-        self.calendar_layout = QVBoxLayout()
-        self.calendar_layout.setContentsMargins(0, 0, 0, 0)
-        self.calendar_layout.setSpacing(0)
-
-        self.grid_layout.addLayout(self.calendar_layout)
-
+        self.create_calendar_widget()
         self.update_calendar()
 
-    def update_dynamic_label(self):        
+    def create_calendar_widget(self):
+        self.calendar_widget = TransparentWidget()
+        self.calendar_layout = QVBoxLayout(self.calendar_widget)
+        self.calendar_layout.setContentsMargins(0, 0, 0, 0)
+        self.calendar_layout.setSpacing(0)
+        self.central_layout.addWidget(self.calendar_widget)
+
+    def recreate_calendar_widget(self):
+        old_widget = self.calendar_widget
+
+        self.central_layout.removeWidget(old_widget)
+        old_widget.deleteLater()
+
+        self.create_calendar_widget()
+
+    def update_dynamic_label(self):
         readable_date = self.q_locale.toString(
             self.current_date,
             "d MMMM yyyy"
@@ -215,11 +210,13 @@ class Calendar(UMainWidget):
 
     def populate_months(self):
         self.menu_month.clear()
+
         for month in range(1, 13):
             month_name = self.q_locale.standaloneMonthName(
                 month,
                 QLocale.FormatType.LongFormat
             )
+
             action = QAction(month_name.capitalize(), self)
             action.setData(month)
             action.triggered.connect(self.month_menu_selected)
@@ -227,7 +224,9 @@ class Calendar(UMainWidget):
 
     def populate_years(self):
         self.menu_year.clear()
+
         max_year = self.date_now.year()
+
         for year in range(self.min_year, max_year + 1):
             action = QAction(str(year), self)
             action.setData(year)
@@ -237,15 +236,13 @@ class Calendar(UMainWidget):
     def month_menu_selected(self):
         action: QAction = self.sender()
         selected_month = action.data()
+
         year = self.current_date.year()
         current_day = self.current_date.day()
-        # 1. Узнаем, сколько всего дней в выбранном месяце
+
         days_in_new_month = QDate(year, selected_month, 1).daysInMonth()
-        # 2. Если текущий день больше, чем дней в новом месяце, берем максимум для этого месяца
-        if current_day > days_in_new_month:
-            target_day = days_in_new_month
-        else:
-            target_day = current_day
+        target_day = min(current_day, days_in_new_month)
+
         self.current_date = QDate(year, selected_month, target_day)
         self.update_calendar()
         self.date_selected.emit(self.current_date)
@@ -253,29 +250,47 @@ class Calendar(UMainWidget):
     def year_menu_selected(self):
         action: QAction = self.sender()
         selected_year = action.data()
+
         current_month = self.current_date.month()
         current_day = self.current_date.day()
-        days_in_new_month = QDate(selected_year, current_month, 1).daysInMonth()
-        if current_day > days_in_new_month:
-            target_day = days_in_new_month
-        else:
-            target_day = current_day
-        self.current_date = QDate(selected_year, current_month, target_day)
+
+        days_in_new_month = QDate(
+            selected_year,
+            current_month,
+            1
+        ).daysInMonth()
+
+        target_day = min(current_day, days_in_new_month)
+
+        self.current_date = QDate(
+            selected_year,
+            current_month,
+            target_day
+        )
+
         self.update_calendar()
         self.date_selected.emit(self.current_date)
 
     def day_selected(self):
         sender_button: _CalendarDayBase = self.sender()
         day = sender_button.day
+
         current_year = self.current_date.year()
         current_month = self.current_date.month()
-        self.current_date = QDate(current_year, current_month, day)
+
+        self.current_date = QDate(
+            current_year,
+            current_month,
+            day
+        )
+
         self.update_calendar()
         self.date_selected.emit(self.current_date)
 
     def prev_month(self):
         min_date = QDate(self.min_year, 1, 1)
         new_date = self.current_date.addMonths(-1)
+
         if new_date >= min_date:
             self.current_date = new_date
             self.update_calendar()
@@ -284,28 +299,21 @@ class Calendar(UMainWidget):
     def next_month(self):
         max_date = QDate(self.date_now.year(), 12, 31)
         new_date = self.current_date.addMonths(1)
+
         if new_date <= max_date:
             self.current_date = new_date
             self.update_calendar()
             self.date_selected.emit(self.current_date)
 
-    def clear_grid(self):
-        while self.calendar_layout.count():
-            item = self.calendar_layout.takeAt(0)
-            if item.layout():
-                layout = item.layout()
-                while layout.count():
-                    child = layout.takeAt(0)
-                    if child.widget():
-                        child.widget().deleteLater()
-                    del child
-                layout.deleteLater()
-            elif item.widget():
-                item.widget().deleteLater()
-            del item
+    def count_widgets(self):
+        widgets = self.findChildren((TransparentWidget, CalendarDaySelected, CalendarDay))
+        count = len(widgets) + 1
+        print(f"Widgets: {count}")
+        return count
 
     def update_calendar(self):
         self.update_dynamic_label()
+        # print(self.count_widgets())
 
         current_year = self.current_date.year()
         current_month = self.current_date.month()
@@ -329,20 +337,26 @@ class Calendar(UMainWidget):
         else:
             self.btn_next.set_enabled()
 
-        self.clear_grid()
+        self.recreate_calendar_widget()
 
-        week_header = QHBoxLayout()
-        week_header.setContentsMargins(0, 0, 0, 0)
-        week_header.setSpacing(0)
+        header_widget = TransparentWidget()
+        header_layout = QHBoxLayout(header_widget)
+        header_layout.setContentsMargins(0, 0, 0, 0)
+        header_layout.setSpacing(0)
 
         for col in range(7):
-            week = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
+            week = self.q_locale.dayName(
+                col + 1,
+                QLocale.FormatType.ShortFormat
+            )
+
             lbl_day = GrayTextLabel(week.capitalize())
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             lbl_day.setFixedSize(*self.cell_size)
-            week_header.addWidget(lbl_day)
 
-        self.calendar_layout.addLayout(week_header)
+            header_layout.addWidget(lbl_day)
+
+        self.calendar_layout.addWidget(header_widget)
 
         first_day = QDate(current_year, current_month, 1)
         start_col = first_day.dayOfWeek() - 1
@@ -354,6 +368,7 @@ class Calendar(UMainWidget):
         for day in range(1, days_in_month + 1):
             index = start_col + day - 1
             col = index % 7
+
             current_week[col] = day
 
             if col == 6:
@@ -364,7 +379,8 @@ class Calendar(UMainWidget):
             weeks.append(current_week)
 
         for week_index, week in enumerate(weeks):
-            week_layout = QHBoxLayout()
+            week_widget = TransparentWidget()
+            week_layout = QHBoxLayout(week_widget)
             week_layout.setContentsMargins(0, 0, 0, 0)
             week_layout.setSpacing(0)
 
@@ -380,10 +396,15 @@ class Calendar(UMainWidget):
                     btn_day.setFixedSize(*self.cell_size)
                     btn_day.setPixmap(self.blue_circle_pixmap)
 
-                    btn_day_text = TransparentLabel(text=str(day), parent=btn_day)
+                    btn_day_text = TransparentLabel(
+                        text=str(day),
+                        parent=btn_day
+                    )
                     btn_day_text.setGeometry(btn_day.rect())
                     btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    btn_day_text.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+                    btn_day_text.setAttribute(
+                        Qt.WidgetAttribute.WA_TransparentForMouseEvents
+                    )
                 else:
                     btn_day = CalendarDay(str(day), day)
                     btn_day.setFixedSize(*self.cell_size)
@@ -391,12 +412,71 @@ class Calendar(UMainWidget):
                 btn_day.clicked.connect(self.day_selected)
                 week_layout.addWidget(btn_day)
 
-            self.calendar_layout.addLayout(week_layout)
+            self.calendar_layout.addWidget(week_widget)
 
             if week_index < len(weeks) - 1:
-                self.calendar_layout.addWidget(UHorizontalSep())
+                separator_widget = TransparentWidget()
+                separator_layout = QHBoxLayout(separator_widget)
+                separator_layout.setContentsMargins(0, 0, 0, 0)
+                separator_layout.setSpacing(0)
+                separator_layout.addWidget(UHorizontalSep())
+
+                self.calendar_layout.addWidget(separator_widget)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
             self.deleteLater()
+
         return super().keyPressEvent(a0)
+
+### Что изменилось принципиально
+
+# Теперь **нигде в календаре нет `addLayout()`**:
+
+# ```python
+# self.calendar_layout.addWidget(header_widget)
+# self.calendar_layout.addWidget(week_widget)
+# self.calendar_layout.addWidget(separator_widget)
+# ```
+
+# Каждый layout принадлежит своему `QWidget`.
+
+# И при обновлении:
+
+# ```python
+# old_widget = self.calendar_widget
+# self.create_calendar_widget()
+# old_widget.deleteLater()
+# ```
+
+# то есть старое дерево:
+
+# ```text
+# calendar_widget
+# ├── header_widget
+# ├── week_widget
+# ├── separator_widget
+# ├── week_widget
+# └── ...
+# ```
+
+# целиком отдаётся Qt на удаление.
+
+# Поэтому `clear_grid()` тебе теперь **вообще не нужен** — его можно удалить из класса.
+
+# Ещё я заменил это:
+
+# ```python
+# if current_day > days_in_new_month:
+#     target_day = days_in_new_month
+# else:
+#     target_day = current_day
+# ```
+
+# на более компактное:
+
+# ```python
+# target_day = min(current_day, days_in_new_month)
+# ```
+
+# При этом основную логику твоего календаря я не менял.
