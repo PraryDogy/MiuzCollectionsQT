@@ -457,10 +457,6 @@ GridTagWidget {
     color: #ffffff;
 }
 
-SearchWidgetLineEdit {
-    background: transparent;
-}
-
 
 WinTextSearchTitle {
     /* font-family: "SF Pro Rounded"; */

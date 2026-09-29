@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import QTimer, pyqtSignal
+from PyQt6.QtCore import QTimer, pyqtSignal, Qt
 from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QSizePolicy, QVBoxLayout
@@ -157,3 +157,7 @@ class PathWidget(TransparentGroupBox):
     def closeEvent(self, a0):
         self.stop_task()
         return super().closeEvent(a0)
+
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        return super().enterEvent(event)

@@ -18,10 +18,7 @@ BTN_H = 27
 
 
 
-# ==========================================
-# 1. БАЗОВЫЙ КЛАСС ДЛЯ КНОПОК ВНУТРИ ПОИСКА
-# ==========================================
-class SearchWidgetBaseBtn(QSvgWidget):
+class SearchWidBaseSvg(QSvgWidget):
     clicked_ = pyqtSignal()
     icon_path = None  # Переопределяется в наследниках
     icon_size = 11
@@ -53,17 +50,17 @@ class SearchWidgetBaseBtn(QSvgWidget):
         super().leaveEvent(event)
 
 
-class SearchWidgetClearBtn(SearchWidgetBaseBtn):
+class SearchWidClearSvg(SearchWidBaseSvg):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
     right_margin = 8  # Отступ крайней кнопки от правого края
 
 
-class SearchWidgetLeftBtn(SearchWidgetBaseBtn):
+class SearchWidTextSearchSvg(SearchWidBaseSvg):
     icon_path = Static.COMMON_ICONS / "list_view.svg" 
     spacing = 10  # Расстояние между этой кнопкой и кнопкой очистки
 
 
-class SearchWidgetLineEdit(ULineEdit):
+class SearchWidLineEdit(ULineEdit):
     reload_thumbnails = pyqtSignal()
     ww = 162
 
@@ -76,11 +73,11 @@ class SearchWidgetLineEdit(ULineEdit):
         self.textChanged.connect(self.create_search)
 
         # Кнопка Очистки (правая)
-        self.clear_btn = SearchWidgetClearBtn(self)
+        self.clear_btn = SearchWidClearSvg(self)
         self.clear_btn.clicked_.connect(self.clear_search)
 
         # Новая кнопка (левая)
-        self.left_btn = SearchWidgetLeftBtn(self)
+        self.left_btn = SearchWidTextSearchSvg(self)
         self.left_btn.clicked_.connect(self.open_win_text_search) # Подключите ваш метод
 
         self.update_buttons_position()
@@ -150,57 +147,47 @@ class SearchWidgetLineEdit(ULineEdit):
         super().keyPressEvent(event)
 
 
-class BarTopBtn(TransparentWidget):
+class BarTopBtn(QSvgWidget):
     clicked_ = pyqtSignal()
-    svg_size = BTN_H + 2
 
     def __init__(self, base_svg: Path, selected_svg: Path):
         super().__init__()
-        
+
         self.base_svg = self._load_svg_data(base_svg)
         self.selected_svg = self._load_svg_data(selected_svg)
 
-        self.v_lay = QVBoxLayout(self)
-        self.v_lay.setContentsMargins(0, 0, 0, 0)
-        self.v_lay.setSpacing(1)
-        self.v_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setFixedSize(BTN_H + 2, BTN_H + 2)
+        self.load(self.base_svg)
 
-        self.svg_btn = QSvgWidget()
-        self.svg_btn.setFixedSize(self.svg_size, self.svg_size)
-        self.v_lay.addWidget(self.svg_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        for path in (base_svg, selected_svg):
+            if not path.exists():
+                print("bar top btn icon not exists", path)
 
-        self.set_base_style()
-
-        for i in (base_svg, selected_svg):
-            if not i.exists():
-                print(" bar top btn icon not exists", i)
-
-    def _load_svg_data(self, path: Path):  # Исправил аннотацию типа со str на Path, так как вы передаете Path
+    @staticmethod
+    def _load_svg_data(path: Path):
         with open(path, "rb") as f:
             return QByteArray(f.read())
 
     def set_selected_style(self):
-        self.svg_btn.load(self.selected_svg)
-        self.svg_btn.update()
+        self.load(self.selected_svg)
 
     def set_base_style(self):
-        self.svg_btn.load(self.base_svg)
-        self.svg_btn.update()
+        self.load(self.base_svg)
 
-    def mousePressEvent(self, a0):
-        if a0.button() == Qt.MouseButton.LeftButton:
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
             self.set_selected_style()
-        super().mousePressEvent(a0)
+        super().mousePressEvent(event)
 
-    def mouseReleaseEvent(self, a0):
-        if a0.button() == Qt.MouseButton.LeftButton:
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
             self.set_base_style()
             self.clicked_.emit()
-        super().mouseReleaseEvent(a0)
+        super().mouseReleaseEvent(event)
 
     def enterEvent(self, event):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        return super().enterEvent(event)
+        super().enterEvent(event)
 
 
 class SettingsBtn(BarTopBtn):
@@ -320,7 +307,7 @@ class BarTop(TransparentFrame):
         self.h_layout.addWidget(self.img_search_btn)
 
         # --- Виджет поиска ---
-        self.search_wid = SearchWidgetLineEdit()
+        self.search_wid = SearchWidLineEdit()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         self.h_layout.addWidget(self.search_wid)
 

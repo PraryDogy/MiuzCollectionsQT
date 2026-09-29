@@ -356,6 +356,10 @@ class USpinBox(QSpinBox):
         super().__init__(*args, **kw)
         self.setFixedHeight(27)
 
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        return super().enterEvent(event)
+
 
 class SelectableLabel(TransparentLabel):
     sym_line_feed = "\u000a"
@@ -459,6 +463,12 @@ class RowArrowWidget(TransparentWidget):
         if a0.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         return super().mouseReleaseEvent(a0)
+
+    def enterEvent(self, event):
+        if self.arrow_wid.isVisible():
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+        return super().enterEvent(event)
+
 
 
 class WinProgressbar(UMainWidget):
