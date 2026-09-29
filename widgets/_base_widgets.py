@@ -111,16 +111,6 @@ class ULineEdit(TransparentLineEdit):
         self.menu_.show_menu_under_cursor(a0)
 
 
-class ULineEditDark(ULineEdit):
-    def __init__(self):
-        super().__init__()
-
-
-class ULineEditLight(ULineEdit):
-    def __init__(self):
-        super().__init__()
-
-
 class UTextEdit(QTextEdit):
     def __init__(self):
         super().__init__()

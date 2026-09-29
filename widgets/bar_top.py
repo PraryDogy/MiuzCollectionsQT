@@ -13,7 +13,7 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 
-from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEditLight, UMenu,
+from ._base_widgets import (GrayTextLabel, HSep, UFrame, ULineEdit, UMenu,
                             UPushButton)
 from .win_text_search import WinTextSearch
 
@@ -66,7 +66,7 @@ class SearchWidgetLeftBtn(SearchWidgetBaseBtn):
     spacing = 10  # Расстояние между этой кнопкой и кнопкой очистки
 
 
-class SearchWidgetLineEdit(ULineEditLight):
+class SearchWidgetLineEdit(ULineEdit):
     reload_thumbnails = pyqtSignal()
     ww = 162
 

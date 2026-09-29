@@ -89,8 +89,6 @@ QLineEdit {
     padding-right: 28px;
 }
 
-ULineEditLight { background: #2b2b2b; }
-ULineEditDark  { background: #171717; }
 
 QTextEdit {
     color: #ffffff;
