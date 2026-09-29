@@ -531,7 +531,6 @@ class WinProgressbar(UMainWidget):
 class GrayTextLabel(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text)
-        # self.set_font_size(11)
 
 
 class ConfirmWindow(UMainWidget):
