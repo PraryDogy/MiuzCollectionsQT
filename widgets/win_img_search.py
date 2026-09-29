@@ -18,7 +18,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (HSep, RowArrowWidget, UGroupBox, UMainWidget,
+from ._base_widgets import (HSep, RowArrowWidget, TransparentGroupBox, UMainWidget,
                             UPushButton, USlider)
 
 
@@ -136,7 +136,7 @@ class WinImgSearch(UMainWidget):
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(0)
         
-        group = UGroupBox()
+        group = TransparentGroupBox()
         self.central_layout.addWidget(group)
         group_layout = QVBoxLayout(group)
         group_layout.setContentsMargins(5, 5, 5, 5)
@@ -155,7 +155,7 @@ class WinImgSearch(UMainWidget):
         
         self.central_layout.addSpacing(10)
         
-        self.group_box = UGroupBox()
+        self.group_box = TransparentGroupBox()
         self.central_layout.addWidget(self.group_box)
         self.group_layout = QVBoxLayout(self.group_box)
         self.group_layout.setContentsMargins(*RowArrowWidget.group_margings)

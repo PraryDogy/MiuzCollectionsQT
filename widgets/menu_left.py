@@ -16,7 +16,7 @@ from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (UListWidget, HSep, UMenu, UPushButton,
-                            UTreeWidget, UTreeWidgetItem, UFrame)
+                            UTreeWidget, UTreeWidgetItem, TransparentFrame)
 
 ITEM_HEIGHT = 25
 
@@ -266,7 +266,7 @@ class LeftMenuSep(HSep):
         self.update()
 
 
-class MenuLeft(UFrame):
+class MenuLeft(TransparentFrame):
     on_tree_clicked = pyqtSignal(str)
     on_mf_clicked = pyqtSignal(Mf)
     reveal = pyqtSignal(list)

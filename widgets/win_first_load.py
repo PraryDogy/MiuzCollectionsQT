@@ -16,7 +16,7 @@ from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
-                            RowArrowWidget, SaveRowArrowWidget, UGroupBox,
+                            RowArrowWidget, SaveRowArrowWidget, TransparentGroupBox,
                             UMainWidget, UMenu, UPushButton)
 
 
@@ -109,7 +109,7 @@ class FirstLoadWin(UMainWidget):
             lng_btn_icon  = QIcon(str(self.eng_flag))
 
         # Сохраняем ссылку в self.lng_container
-        self.lng_container = UGroupBox()
+        self.lng_container = TransparentGroupBox()
         self.central_layout.addWidget(self.lng_container)
         
         lng_layout = QHBoxLayout(self.lng_container)
@@ -165,7 +165,7 @@ class FirstLoadWin(UMainWidget):
         self.central_layout.addWidget(self.path_widget)
 
     def init_last_block(self):
-        self.last_block_container = UGroupBox()
+        self.last_block_container = TransparentGroupBox()
         self.central_layout.addWidget(self.last_block_container)
 
         last_block_layout = QVBoxLayout(self.last_block_container)

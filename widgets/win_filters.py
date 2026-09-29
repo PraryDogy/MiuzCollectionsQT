@@ -12,7 +12,7 @@ from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
-                            UGroupBox, UListSpacerItem, UListWidget,
+                            TransparentGroupBox, UListSpacerItem, UListWidget,
                             UListWidgetItem, UMainWidget, UMenu, UPushButton,
                             UTextEdit)
 from .caledar_widget import Calendar, CalendarBigDate
@@ -24,7 +24,7 @@ class WinDatesDateLabel(QLabel):
         super().__init__()
 
 
-class DatesWidget(UGroupBox):
+class DatesWidget(TransparentGroupBox):
     reload_thumbnails = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (25, 25)
@@ -45,7 +45,7 @@ class DatesWidget(UGroupBox):
             dt = QDate.currentDate()
             self.q_date_end = QDate(dt)
         
-        # Главный вертикальный layout для UGroupBox
+        # Главный вертикальный layout для TransparentGroupBox
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setSpacing(RowArrowWidget.group_spacing)
@@ -345,7 +345,7 @@ class WinFilters(UMainWidget):
         right_lay.addWidget(self.active_filters)
 
         # --- Группа для кнопок с нулевыми отступами ---
-        self.reset_group = UGroupBox()
+        self.reset_group = TransparentGroupBox()
         reset_group_lay = QVBoxLayout(self.reset_group)
         reset_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
         reset_group_lay.setSpacing(RowArrowWidget.group_spacing)

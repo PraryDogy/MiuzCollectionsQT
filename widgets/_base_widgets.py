@@ -60,6 +60,11 @@ class TransparentScrollArea(QScrollArea):
         super().__init__(parent)
 
 
+class TransparentGroupBox(QGroupBox):
+    def __init__(self, title=None, parent=None):
+        super().__init__(title, parent)
+
+
 class UMenu(TransparentMenu):
     def __init__(self, title=None, parent=None):
         super().__init__(title, parent)
@@ -146,21 +151,6 @@ class UTextEdit(QTextEdit):
         menu_.show_menu_under_cursor(a0)
 
 
-class UTextEditLight(UTextEdit):
-    def __init__(self):
-        super().__init__()
-
-
-class UGroupBox(QGroupBox):
-    def __init__(self, *args, **kw):
-        super().__init__(*args, **kw)
-
-
-class UFrame(QFrame):
-    def __init__(self):
-        super().__init__()
-
-
 class WindowMixin:
     win_list: list[QMainWindow] = []
 
@@ -201,7 +191,7 @@ class WindowMixin:
 class UMainWindow(WindowMixin, QMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-        central_widget = UFrame()
+        central_widget = TransparentFrame()
         self.setCentralWidget(central_widget)
         self.central_layout = QVBoxLayout(central_widget)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
@@ -218,7 +208,7 @@ class UMainWidget(WindowMixin, QWidget):
         central_layout.setContentsMargins(0, 0, 0, 0)
         central_layout.setSpacing(0)
 
-        frame = UFrame()
+        frame = TransparentFrame()
         central_layout.addWidget(frame)
 
         self.central_layout = QVBoxLayout(frame)
@@ -308,7 +298,7 @@ class UPushButton(QPushButton):
         return super().enterEvent(event)
 
 
-class HSep(UFrame):
+class HSep(TransparentFrame):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(1)
@@ -538,7 +528,7 @@ class GrayTextLabel(QLabel):
         self.setFont(font)
 
 
-class BlackBgFrame(UFrame):
+class BlackBgFrame(TransparentFrame):
     def __init__(self):
         super().__init__()
 
@@ -670,7 +660,7 @@ class MfAliasWidget(QWidget):
         return result
 
 
-class MfPathWidget(UGroupBox):
+class MfPathWidget(TransparentGroupBox):
     changed = pyqtSignal()
     magnifier = Static.COMMON_ICONS / "magnifier.svg"
     green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"

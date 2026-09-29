@@ -22,7 +22,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
 from ._base_widgets import (ConfirmWindow, HSep, UMainWindow, UPushButton,
-                            WarningWindow, UFrame)
+                            WarningWindow, TransparentFrame)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -80,7 +80,7 @@ class DangerWarn(ConfirmWindow):
         return
 
 
-class MainWinRightWidget(UFrame):
+class MainWinRightWidget(TransparentFrame):
     def __init__(self):
         super().__init__()
 

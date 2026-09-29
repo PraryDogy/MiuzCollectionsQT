@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
-from ._base_widgets import (HSep, RowArrowWidget, UGroupBox, UMainWidget,
+from ._base_widgets import (HSep, RowArrowWidget, TransparentGroupBox, UMainWidget,
                             UPushButton, UListWidget, UListWidgetItem)
 
 
@@ -157,7 +157,7 @@ class UploadWin(UMainWidget):
 
         right_layout.addSpacing(10)
 
-        group_one = UGroupBox()
+        group_one = TransparentGroupBox()
         group_one_layout = QVBoxLayout(group_one)
         group_one_layout.setContentsMargins(*RowArrowWidget.group_margings)
         group_one_layout.setSpacing(RowArrowWidget.group_spacing)

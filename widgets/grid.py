@@ -19,7 +19,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (TransparentFrame, TransparentLabel, UFrame, UMenu,
+from ._base_widgets import (TransparentFrame, TransparentLabel, TransparentFrame, UMenu,
                             UPushButton, VScrollArea)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
@@ -336,7 +336,7 @@ class GridControlsWidget(QWidget):
         self.v_lay.addStretch()
 
 
-class GridTagWidget(UFrame):
+class GridTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
     clicked_clear = pyqtSignal()
 
