@@ -334,7 +334,7 @@ class USpinBox(QSpinBox):
         self.setFixedHeight(27)
 
 
-class SelectableLabel(QLabel):
+class SelectableLabel(TransparentLabel):
     sym_line_feed = "\u000a"
     sym_paragraph_sep = "\u2029"
 
