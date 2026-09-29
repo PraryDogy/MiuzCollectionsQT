@@ -8,7 +8,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QSpacerItem, QSplitter,
-                             QTableWidget, QTableWidgetItem, QVBoxLayout)
+                             QTableWidget, QTableWidgetItem, QVBoxLayout, QLineEdit)
 from typing_extensions import Literal
 
 from cfg import JsonData, Static, Themes
@@ -99,7 +99,8 @@ class RebootableSettings(TransparentGroupBox):
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.spin.setMinimum(self.spin_min)
         self.spin.setMaximum(self.spin_max)
-        self.spin.findChild(ULineEdit).setTextMargins(3, 0, 3, 0)
+        # ULineEdit не найдет поэтому импортируем оригинальный QLineEdit
+        self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[JsonData.lng_index]}")
         self.spin.setValue(JsonData.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
