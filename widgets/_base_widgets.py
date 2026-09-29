@@ -64,6 +64,21 @@ class TransparentGroupBox(QGroupBox):
         super().__init__(title, parent)
 
 
+class TransparentListWidget(QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+
+class TransparentTreeWidget(QTreeWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+
+class TransparentTreeView(QTreeView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+
 class _WindowMixin:
     win_list: list[QMainWindow] = []
 
@@ -115,7 +130,7 @@ class UMainWindow(_WindowMixin, QMainWindow):
         self.register_window()
 
 
-class UMainWidget(_WindowMixin, QWidget):
+class UMainWidget(_WindowMixin, TransparentWidget):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
@@ -271,7 +286,6 @@ class UTreeWidget(QTreeWidget):
 class UTreeView(QTreeView):
     def __init__(self, parent=None):
         super().__init__(parent)
-
 
 
 class UPushButton(TransparentButton):
