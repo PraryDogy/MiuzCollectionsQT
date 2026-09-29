@@ -20,7 +20,6 @@ class ReplaceButton(UPushButton):
         self.setFixedSize(75, 17)
 
 
-
 class ReplaceFilesWin(UMainWidget):
     icon_size = 40
     ww = 330
