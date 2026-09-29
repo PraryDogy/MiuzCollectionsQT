@@ -275,7 +275,7 @@ class UTreeWidget(QTreeWidget):
         self.setIndentation(15)
 
 
-class UPushButton(QPushButton):
+class UPushButton(TransparentButton):
     def __init__(self, text: str):
         super().__init__(text)
         self.setFixedSize(80, 20)
