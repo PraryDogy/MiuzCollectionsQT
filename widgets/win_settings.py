@@ -7,9 +7,9 @@ from pathlib import Path
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QSpacerItem, QSplitter,
-                             QTableWidget, QTableWidgetItem, QVBoxLayout, QLineEdit)
-from typing_extensions import Literal
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
 from system.filters import Filters
