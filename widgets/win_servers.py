@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 from dataclasses import dataclass
@@ -13,10 +14,9 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (ConfirmWindow, UGroupBox, ULineEditDark,
-                            UListWidget, UListWidgetItem, UMainWidget, UMenu,
-                            UPushButton)
-import json
+from ._base_widgets import (ConfirmWindow, ULineEdit, UListWidget,
+                            UListWidgetItem, UMainWidget, UMenu, UPushButton)
+
 
 @dataclass(slots=True)
 class ServerItem:
@@ -145,7 +145,7 @@ class LoginWin(UMainWidget):
         self.central_layout.addWidget(alias_label)
         self.central_layout.addSpacing(5)
 
-        self.alias = ULineEditDark()
+        self.alias = ULineEdit()
         self.alias.setPlaceholderText(Lng.alias[JsonData.lng_index].capitalize())
         self.central_layout.addWidget(self.alias)
         self.central_layout.addSpacing(10)
@@ -156,7 +156,7 @@ class LoginWin(UMainWidget):
         self.central_layout.addWidget(server_label)
         self.central_layout.addSpacing(5)
 
-        self.server = ULineEditDark()
+        self.server = ULineEdit()
         self.server.setPlaceholderText(Lng.server[JsonData.lng_index].capitalize())
         self.central_layout.addWidget(self.server)
         self.central_layout.addSpacing(10)
@@ -168,7 +168,7 @@ class LoginWin(UMainWidget):
         self.central_layout.addSpacing(5)
         
 
-        self.login = ULineEditDark()
+        self.login = ULineEdit()
         self.login.setPlaceholderText(Lng.login[JsonData.lng_index].capitalize())
         self.central_layout.addWidget(self.login)
         self.central_layout.addSpacing(10)
@@ -179,8 +179,8 @@ class LoginWin(UMainWidget):
         self.central_layout.addWidget(pass_label)
         self.central_layout.addSpacing(5)
 
-        self.pass_ = ULineEditDark()
-        self.pass_.setEchoMode(ULineEditDark.EchoMode.Password)
+        self.pass_ = ULineEdit()
+        self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
         self.pass_.setPlaceholderText(f"{Lng.password[JsonData.lng_index].capitalize()}")
         self.central_layout.addWidget(self.pass_)
         self.central_layout.addSpacing(10)
@@ -221,11 +221,11 @@ class LoginWin(UMainWidget):
         self.eye_svg.mouseReleaseEvent = self.show_hide_pass
 
     def show_hide_pass(self, *args):
-        if self.pass_.echoMode() == ULineEditDark.EchoMode.Password:
-            self.pass_.setEchoMode(ULineEditDark.EchoMode.Normal)
+        if self.pass_.echoMode() == ULineEdit.EchoMode.Password:
+            self.pass_.setEchoMode(ULineEdit.EchoMode.Normal)
             self.eye_svg.load(str(self.eye_svg.eye_on))
         else:
-            self.pass_.setEchoMode(ULineEditDark.EchoMode.Password)
+            self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
             self.eye_svg.load(str(self.eye_svg.eye_off))
 
     def ok_cmd(self):
