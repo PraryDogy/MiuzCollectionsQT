@@ -2,15 +2,15 @@ import os
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QContextMenuEvent, QImage, QKeyEvent, QPixmap
-from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QLabel, QMenu, QMenuBar,
-                             QSpacerItem, QWidget)
+from PyQt6.QtWidgets import QGraphicsOpacityEffect, QMenuBar, QSpacerItem
 
 from cfg import JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import SelectableLabel, UMainWidget
+from ._base_widgets import (SelectableLabel, TransparentLabel, UMainWidget,
+                            UMenu)
 from .win_servers import ServersWin
 from .win_settings import WinSettings
 
@@ -36,7 +36,7 @@ class AboutWin(UMainWidget):
         self.setFixedWidth(self.ww)
         self.central_layout.setContentsMargins(10, 0, 10, 10)
 
-        icon = QLabel()
+        icon = TransparentLabel()
         qimage = QImage(str(self.icon_path))
         qimage_saled = Utils.pyqt_scaled_high_dpi(qimage, self.icon_size)
         icon.setPixmap(QPixmap.fromImage(qimage_saled))
@@ -64,7 +64,7 @@ class AboutWin(UMainWidget):
 class BarMacos(QMenuBar):
     def __init__(self):
         super().__init__()
-        self.mainMenu = QMenu(Lng.menu[JsonData.lng_index], self)
+        self.mainMenu = UMenu(Lng.menu[JsonData.lng_index], self)
 
         # Добавили self. к действию подключения к серверу
         self.server_win = QAction(Lng.connect_to_server[JsonData.lng_index], self)
