@@ -2,7 +2,7 @@ from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap, QPainter
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QGridLayout, QHBoxLayout, QStackedLayout,
-                             QStackedWidget)
+                             QVBoxLayout)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -193,12 +193,17 @@ class Calendar(UMainWidget):
         self.grid_widget = TransparentWidget()  
         self.central_layout.addWidget(self.grid_widget) # Добавляем сразу
         
-        self.grid_layout = QGridLayout(self.grid_widget)  
+        self.grid_layout = QVBoxLayout(self.grid_widget)
         self.grid_layout.setContentsMargins(0, 0, 0, 0)
-        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.grid_layout.setHorizontalSpacing(self.grid_h_spacing)
-        self.grid_layout.setVerticalSpacing(self.grid_v_spacing)
-        
+        self.grid_layout.setSpacing(0)
+
+        # Этот layout будет содержать весь календарь.
+        self.calendar_layout = QVBoxLayout()
+        self.calendar_layout.setContentsMargins(0, 0, 0, 0)
+        self.calendar_layout.setSpacing(0)
+
+        self.grid_layout.addLayout(self.calendar_layout)
+
         self.update_calendar()
 
     def update_dynamic_label(self):        
@@ -285,59 +290,111 @@ class Calendar(UMainWidget):
             self.date_selected.emit(self.current_date)
 
     def clear_grid(self):
-        while self.grid_layout.count():
-            item = self.grid_layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.setParent(None)
-                widget.deleteLater()
+        while self.calendar_layout.count():
+            item = self.calendar_layout.takeAt(0)
+            if item.layout():
+                layout = item.layout()
+                while layout.count():
+                    child = layout.takeAt(0)
+                    if child.widget():
+                        child.widget().deleteLater()
+                    del child
+                layout.deleteLater()
+            elif item.widget():
+                item.widget().deleteLater()
+            del item
 
     def update_calendar(self):
         self.update_dynamic_label()
+
         current_year = self.current_date.year()
         current_month = self.current_date.month()
         current_day_val = self.current_date.day()
+
         month = self.q_locale.standaloneMonthName(
             current_month,
             QLocale.FormatType.LongFormat
         )
+
         self.btn_month.setText(month.capitalize())
         self.btn_year.setText(str(current_year))
+
         if current_year == self.min_year and current_month == 1:
             self.btn_prev.set_disabled()
         else:
             self.btn_prev.set_enabled()
-        if current_year == QDate.currentDate().year() and current_month == 12:
+
+        if current_year == self.date_now.year() and current_month == 12:
             self.btn_next.set_disabled()
         else:
             self.btn_next.set_enabled()
+
         self.clear_grid()
+
+        week_header = QHBoxLayout()
+        week_header.setContentsMargins(0, 0, 0, 0)
+        week_header.setSpacing(0)
+
         for col in range(7):
             week = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
             lbl_day = GrayTextLabel(week.capitalize())
             lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
             lbl_day.setFixedSize(*self.cell_size)
-            self.grid_layout.addWidget(lbl_day, 0, col)
+            week_header.addWidget(lbl_day)
+
+        self.calendar_layout.addLayout(week_header)
+
         first_day = QDate(current_year, current_month, 1)
-        # Находим индекс колонки (0-6) для первого дня месяца, чтобы учесть смещение в сетке
         start_col = first_day.dayOfWeek() - 1
         days_in_month = first_day.daysInMonth()
+
+        weeks = []
+        current_week = [None] * 7
+
         for day in range(1, days_in_month + 1):
-            if day == current_day_val:
-                btn_day = CalendarDaySelected(str(day), day)
-                btn_day.setFixedSize(*self.cell_size)
-                btn_day.setPixmap(self.blue_circle_pixmap)
-                btn_day_text = TransparentLabel(text=str(day), parent=btn_day)
-                btn_day_text.setGeometry(btn_day.rect())
-                btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            else:
-                btn_day = CalendarDay(str(day), day)
-                btn_day.setFixedSize(*self.cell_size)
-            btn_day.clicked.connect(self.day_selected)
-            # divmod вычисляет номер строки и колонки на основе сквозного индекса ячейки
-            row, col = divmod(start_col + day - 1, 7)
-            # Смещаем строку на +1, так как нулевую строку (row=0) занимают названия дней недели
-            self.grid_layout.addWidget(btn_day, row + 1, col)
+            index = start_col + day - 1
+            col = index % 7
+            current_week[col] = day
+
+            if col == 6:
+                weeks.append(current_week)
+                current_week = [None] * 7
+
+        if any(day is not None for day in current_week):
+            weeks.append(current_week)
+
+        for week_index, week in enumerate(weeks):
+            week_layout = QHBoxLayout()
+            week_layout.setContentsMargins(0, 0, 0, 0)
+            week_layout.setSpacing(0)
+
+            for day in week:
+                if day is None:
+                    empty = TransparentWidget()
+                    empty.setFixedSize(*self.cell_size)
+                    week_layout.addWidget(empty)
+                    continue
+
+                if day == current_day_val:
+                    btn_day = CalendarDaySelected(str(day), day)
+                    btn_day.setFixedSize(*self.cell_size)
+                    btn_day.setPixmap(self.blue_circle_pixmap)
+
+                    btn_day_text = TransparentLabel(text=str(day), parent=btn_day)
+                    btn_day_text.setGeometry(btn_day.rect())
+                    btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                    btn_day_text.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+                else:
+                    btn_day = CalendarDay(str(day), day)
+                    btn_day.setFixedSize(*self.cell_size)
+
+                btn_day.clicked.connect(self.day_selected)
+                week_layout.addWidget(btn_day)
+
+            self.calendar_layout.addLayout(week_layout)
+
+            if week_index < len(weeks) - 1:
+                self.calendar_layout.addWidget(UHorizontalSep())
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
