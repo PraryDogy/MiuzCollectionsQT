@@ -65,6 +65,68 @@ class TransparentGroupBox(QGroupBox):
         super().__init__(title, parent)
 
 
+class _WindowMixin:
+    win_list: list[QMainWindow] = []
+
+    def register_window(self):
+        self.win_list.append(self)
+
+    def unregister_window(self):
+        try:
+            self.win_list.remove(self)
+        except ValueError:
+            pass
+
+    def center_to_parent(self: QWidget, parent: QWidget):
+        try:
+            geo = self.geometry()
+            geo.moveCenter(parent.geometry().center())
+            self.setGeometry(geo)
+        except Exception as e:
+            print("center error:", e)
+
+    def set_always_on_top(self: QWidget):
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+    def set_close_only(self: QWidget):
+        flags = Qt.WindowType.CustomizeWindowHint
+        flags |= Qt.WindowType.WindowCloseButtonHint
+        self.setWindowFlags(flags)
+
+    def closeEvent(self, a0: QCloseEvent | None) -> None:
+        self.unregister_window()
+        return super().closeEvent(a0)
+    
+    def deleteLater(self):
+        self.unregister_window()
+        return super().deleteLater()
+
+
+class UMainWindow(_WindowMixin, QMainWindow):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+
+        central_widget = TransparentFrame()
+        self.setCentralWidget(central_widget)
+
+        self.central_layout = QVBoxLayout(central_widget)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(0)
+
+        self.register_window()
+
+
+class UMainWidget(_WindowMixin, QWidget):
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+
+        self.central_layout = QVBoxLayout(self)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(0)
+
+        self.register_window()
+
+
 class UMenu(TransparentMenu):
     def __init__(self, title=None, parent=None):
         super().__init__(title, parent)
@@ -149,73 +211,6 @@ class UTextEdit(TransparentTextEdit):
             menu_.addAction(act)
 
         menu_.show_menu_under_cursor(a0)
-
-
-class WindowMixin:
-    win_list: list[QMainWindow] = []
-
-    def register_window(self):
-        self.win_list.append(self)
-
-    def unregister_window(self):
-        try:
-            self.win_list.remove(self)
-        except ValueError:
-            pass
-
-    def center_to_parent(self: QWidget, parent: QWidget):
-        try:
-            geo = self.geometry()
-            geo.moveCenter(parent.geometry().center())
-            self.setGeometry(geo)
-        except Exception as e:
-            print("center error:", e)
-
-    def set_always_on_top(self: QWidget):
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-
-    def set_close_only(self: QWidget):
-        flags = Qt.WindowType.CustomizeWindowHint
-        flags |= Qt.WindowType.WindowCloseButtonHint
-        self.setWindowFlags(flags)
-
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
-        self.unregister_window()
-        return super().closeEvent(a0)
-    
-    def deleteLater(self):
-        self.unregister_window()
-        return super().deleteLater()
-
-
-class UMainWindow(WindowMixin, QMainWindow):
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-        central_widget = TransparentFrame()
-        self.setCentralWidget(central_widget)
-        self.central_layout = QVBoxLayout(central_widget)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
-        self.central_layout.setSpacing(0)
-        self.register_window()
-
-
-# стилизованное простое окно
-class UMainWidget(WindowMixin, QWidget):
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-
-        central_layout = QVBoxLayout(self)
-        central_layout.setContentsMargins(0, 0, 0, 0)
-        central_layout.setSpacing(0)
-
-        frame = TransparentFrame()
-        central_layout.addWidget(frame)
-
-        self.central_layout = QVBoxLayout(frame)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
-        self.central_layout.setSpacing(0)
-
-        self.register_window()
 
 
 class VScrollArea(QScrollArea):
