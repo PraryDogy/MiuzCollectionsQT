@@ -182,7 +182,7 @@ UPushButton::menu-indicator {
 
 
 UHorizontalSep {
-    background: red;
+    background: #363636;
 }
 
 

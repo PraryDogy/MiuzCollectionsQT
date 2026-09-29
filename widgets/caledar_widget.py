@@ -83,8 +83,8 @@ class Calendar(UMainWidget):
     date_selected = pyqtSignal(QDate)
 
     svg_calendar_path = Static.COMMON_ICONS / "calendar.svg"
-    svg_previous_path = Static.COMMON_ICONS / "previous.svg"
-    svg_next_path = Static.COMMON_ICONS / "next.svg"
+    svg_previous_path = Static.COMMON_ICONS / "arrow_left.svg"
+    svg_next_path = Static.COMMON_ICONS / "arrow_right.svg"
     svg_blue_circle_path = Static.COMMON_ICONS / "blue_circle.svg"
 
     min_year = 2015
@@ -124,15 +124,12 @@ class Calendar(UMainWidget):
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def init_ui(self):
-
-        margin = 10
-
         # --- 1. Блок большой даты ---
         dynamic_container = TransparentWidget()
         self.central_layout.addWidget(dynamic_container) # Добавляем сразу
         
         dynamic_container_lay = QHBoxLayout(dynamic_container)
-        dynamic_container_lay.setContentsMargins(margin, 0, margin, 0)
+        dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(0)
 
         calendar_icon = QSvgWidget()
@@ -150,15 +147,16 @@ class Calendar(UMainWidget):
         self.central_layout.addSpacing(5)
 
         sep = UHorizontalSep()
-        self.central_layout.addWidget(sep)
+        # self.central_layout.addWidget(sep)
 
         # --- 2. Блок навигации календаря ---
         self.nav_widget = TransparentWidget()
         self.central_layout.addWidget(self.nav_widget) # Добавляем сразу
         
         self.nav_layout = QHBoxLayout(self.nav_widget)
-        self.nav_layout.setContentsMargins(margin, 15, margin, 15)
+        self.nav_layout.setContentsMargins(10, 0, 10, 0)
         self.nav_layout.setSpacing(0)
+        self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.btn_prev = CalendarSvgNavi(str(self.svg_previous_path))
         self.btn_prev.setFixedSize(*self.svg_nav_size)
@@ -189,7 +187,7 @@ class Calendar(UMainWidget):
         self.nav_layout.addWidget(self.btn_next)
 
         sep = UHorizontalSep()
-        self.central_layout.addWidget(sep)
+        # self.central_layout.addWidget(sep)
 
         # --- 3. Сетка для дней недели и чисел ---
         self.grid_widget = TransparentWidget()  
