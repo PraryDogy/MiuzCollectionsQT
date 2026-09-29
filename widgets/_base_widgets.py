@@ -10,9 +10,8 @@ from PyQt6.QtWidgets import (QDateEdit, QFileDialog, QFrame, QGroupBox,
                              QHBoxLayout, QLabel, QLineEdit, QListWidget,
                              QListWidgetItem, QMainWindow, QMenu, QProgressBar,
                              QPushButton, QScrollArea, QSlider, QSpacerItem,
-                             QSpinBox, QStackedWidget, QStyle,
-                             QStyledItemDelegate, QTextEdit, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+                             QSpinBox, QStackedWidget, QTextEdit, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget, QTreeView)
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -267,6 +266,12 @@ class UTreeWidget(QTreeWidget):
         self.setHeaderHidden(True)
         self.setAutoScroll(False)
         self.setIndentation(15)
+
+
+class UTreeView(QTreeView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
 
 
 class UPushButton(TransparentButton):

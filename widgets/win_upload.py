@@ -3,16 +3,17 @@ import re
 
 from PyQt6.QtCore import QDir, QSortFilterProxyModel, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QFileSystemModel, QIcon
-from PyQt6.QtWidgets import (QHBoxLayout, QMenu, QSplitter, QTreeView,
-                             QVBoxLayout, QWidget, QLabel)
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QMenu, QSplitter,
+                             QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
-from ._base_widgets import (UHorizontalSep, RowArrowWidget, TransparentGroupBox, UMainWidget,
-                            UPushButton, UListWidget, UListWidgetItem)
+from ._base_widgets import (RowArrowWidget, TransparentGroupBox,
+                            UHorizontalSep, UListWidget, UListWidgetItem,
+                            UMainWidget, UPushButton, UTreeView)
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -43,7 +44,7 @@ class LetterFirstProxyModel(QSortFilterProxyModel):
             return left_name.lower() < right_name.lower()
 
 
-class CustomTreeView(QTreeView):
+class CustomTreeView(UTreeView):
     """Кастомное дерево с контекстным меню для переключения режимов сортировки."""
     def __init__(self, proxy_model: LetterFirstProxyModel, parent=None):
         super().__init__(parent)
@@ -252,7 +253,7 @@ class UploadWin(UMainWidget):
             self.tree_view.expand(root_proxy_idx)
             self.tree_view.expand(dest_proxy_idx)
             self.tree_view.setCurrentIndex(dest_proxy_idx)
-            self.tree_view.scrollTo(dest_proxy_idx, QTreeView.ScrollHint.PositionAtCenter)  
+            self.tree_view.scrollTo(dest_proxy_idx, UTreeView.ScrollHint.PositionAtCenter)  
 
         QTimer.singleShot(100, cmd)
 

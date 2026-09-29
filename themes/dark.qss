@@ -18,10 +18,6 @@ UMainWidget {
 }
 
 
-
-/* ==========================================================================
-   3. КНОПКИ И СЛАЙДЕРЫ (Элементы управления)
-   ========================================================================== */
 UPushButton {
     background: #4e4e4e;
     border: 1px solid #585858;
@@ -41,14 +37,14 @@ UPushButton::menu-indicator {
     height: 12px;
 }
 
-QSlider::groove:horizontal {
+USlider::groove:horizontal {
     background-color: #353535;
     height: 3px;
     border-radius: 1px;
     margin: 0px;
 }
 
-QSlider::handle:horizontal {
+USlider::handle:horizontal {
     background-color: #A2A2A2;
     height: 10px;
     width: 10px;
@@ -57,10 +53,8 @@ QSlider::handle:horizontal {
     padding: -4px 0px;
 }
 
-/* ==========================================================================
-   4. ПОЛЯ ВВОДА И СПИНБОКСЫ (Формы)
-   ========================================================================== */
-QLineEdit {
+
+ULineEdit {
     color: #ffffff;
     border: 1px solid #353535;
     border-radius: 6px;
@@ -69,7 +63,7 @@ QLineEdit {
 }
 
 
-QTextEdit {
+UTextEdit {
     color: #ffffff;
     border: 1px solid #2d2d2d;
     border-radius: 6px;
@@ -125,45 +119,43 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
 /* ==========================================================================
    5. ВСПЛЫВАЮЩИЕ МЕНЮ (QMenu)
    ========================================================================== */
-QMenu {
+UMenu {
     background: #2b2b2b;
     border: 1px solid #353535;
     border-radius: 10px;
     padding: 5px 2px 5px 2px; /* верх | право | низ | лево */
 }
 
-QMenu::item {
+UMenu::item {
     background: transparent;
     color: #ffffff;
     padding: 5px 30px 5px 10px; /* верх | право | низ | лево */
 }
 
-QMenu::item:selected {
+UMenu::item:selected {
     background: #ff4e4e4e;
     color: #ffffff;
 }
 
-QMenu::icon {
+UMenu::icon {
     padding-left: 5px;
 }
 
-QMenu::indicator {
+UMenu::indicator {
     width: 16px;
     height: 16px;
     padding-left: 5px; /* Отступ от левого края меню */
 }
 
-QMenu::indicator:checked {
+UMenu::indicator:checked {
     image: url(./icons/common/arrow_down.svg);
 }
 
-QMenu::indicator:unchecked {
+UMenu::indicator:unchecked {
     image: none; 
 }
 
-
-/* Иконка стрелочки для подменю */
-QMenu::right-arrow {
+QUMenuMenu::right-arrow {
     image: url("./icons/common/arrow_right.svg"); /* Путь к вашей иконке */
     width: 12px;                                 /* Ширина иконки */
     height: 12px;                                /* Высота иконки */
@@ -171,14 +163,14 @@ QMenu::right-arrow {
 }
 
 /* Состояние, когда строка подменю активна/выделена (опционально) */
-QMenu::right-arrow:selected {
+UMenu::right-arrow:selected {
     image: url("./icons/common/arrow_right.svg"); /* Можно заменить на светлую/другую иконку */
 }
 
 /* ==========================================================================
    6. СПИСКИ И ДЕРЕВЬЯ (Дерево элементов)
    ========================================================================== */
-QTreeView, QListWidget {
+UTreeView, QListWidget {
     color: #ffffff;
     background: #171717;
     border: 1px solid #2d2d2d;
