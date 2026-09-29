@@ -61,7 +61,7 @@ class TransparentScrollArea(QScrollArea):
 
 
 class UMenu(TransparentMenu):
-    def __init__(self):
+    def __init__(self, *args, **kw):
         super().__init__()
 
     def show_menu(self):
@@ -71,6 +71,9 @@ class UMenu(TransparentMenu):
         else:
             self.exec()
 
+    def show_menu_under_cursor(self, event: QContextMenuEvent):
+        self.exec(event.globalPos())
+
     def mouseReleaseEvent(self, a0):
         if a0.button() == Qt.MouseButton.RightButton:
             a0.ignore()
@@ -78,15 +81,12 @@ class UMenu(TransparentMenu):
             super().mouseReleaseEvent(a0)
 
 
-
-
-
 class USubMenu(QMenu):
     def __init__(self, title: str, parent: QMenu):
         super().__init__(title, parent)
 
 
-class ULineEdit(QLineEdit):
+class ULineEdit(TransparentLineEdit):
     hh = 30
 
     def __init__(self):
@@ -118,7 +118,7 @@ class ULineEdit(QLineEdit):
             act.triggered.connect(slot)
             self.menu_.addAction(act)
 
-        self.menu_.show_menu()
+        self.menu_.show_menu_under_cursor(a0)
 
 
 class ULineEditDark(ULineEdit):
