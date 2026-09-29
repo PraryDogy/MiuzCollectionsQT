@@ -213,7 +213,7 @@ class UTextEdit(TransparentTextEdit):
         menu_.show_menu_under_cursor(a0)
 
 
-class VScrollArea(QScrollArea):
+class UScrollVerticalArea(TransparentScrollArea):
     def __init__(self):
         super().__init__()
         self.setWidgetResizable(True)

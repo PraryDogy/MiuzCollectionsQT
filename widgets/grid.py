@@ -20,7 +20,7 @@ from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (TransparentFrame, TransparentLabel, TransparentFrame, UMenu,
-                            UPushButton, VScrollArea)
+                            UPushButton, UScrollVerticalArea)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -579,7 +579,7 @@ class TagsWidget(QWidget):
         return QSize(width, self.heightForWidth(width))
 
 
-class Grid(VScrollArea):
+class Grid(UScrollVerticalArea):
     load_st_grid = pyqtSignal()
     restart_scaner = pyqtSignal()
     remove_files = pyqtSignal(list)
