@@ -59,7 +59,7 @@ class CustomTreeView(UTreeView):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
 
     def contextMenuEvent(self, event):
-        menu = UMenu(self)
+        menu = UMenu(parent=self)
         
         # Создаем действия (Actions)
         standard_sort_action = QAction(Lng.sort_standart[JsonData.lng_index], self)
@@ -81,7 +81,7 @@ class CustomTreeView(UTreeView):
         menu.addAction(standard_sort_action)
         menu.addAction(letter_sort_action)
         
-        menu.exec(event.globalPos())
+        menu.show_menu_under_cursor(event)
 
     def set_sorting_mode(self, letter_only: bool):
         if self.proxy_model.letter_only_mode != letter_only:
