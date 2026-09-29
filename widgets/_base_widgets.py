@@ -292,7 +292,7 @@ class UPushButton(TransparentButton):
         return super().enterEvent(event)
 
 
-class HSep(TransparentFrame):
+class UHorizontalSep(TransparentFrame):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(1)
@@ -308,8 +308,7 @@ class SelectableLabel(QLabel):
         self.setTextInteractionFlags(fl)
         self.setCursor(Qt.CursorShape.IBeamCursor)
 
-    def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
-
+    def contextMenuEvent(self, ev: QContextMenuEvent | None):
         text = self.selectedText()
         text = text.replace(self.sym_paragraph_sep, "")
         text = text.replace(self.sym_line_feed, "")

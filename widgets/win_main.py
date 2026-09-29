@@ -21,7 +21,7 @@ from system.scaner_new import NewScanerProcess, NewScanerWorker
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import (ConfirmWindow, HSep, UMainWindow, UPushButton,
+from ._base_widgets import (ConfirmWindow, UHorizontalSep, UMainWindow, UPushButton,
                             WarningWindow, TransparentFrame)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -190,7 +190,7 @@ class WinMain(UMainWindow):
         self.footer_layout.addWidget(self.bar_path)
 
         # 2. Добавляем горизонтальный разделитель
-        bar_bottom_sep = HSep()
+        bar_bottom_sep = UHorizontalSep()
         self.footer_layout.addWidget(bar_bottom_sep)
 
         # левый и правый маргин для красивого отступа

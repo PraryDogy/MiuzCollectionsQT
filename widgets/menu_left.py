@@ -15,7 +15,7 @@ from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (UListWidget, HSep, UMenu, UPushButton,
+from ._base_widgets import (UListWidget, UHorizontalSep, UMenu, UPushButton,
                             UTreeWidget, UTreeWidgetItem, TransparentFrame)
 
 ITEM_HEIGHT = 25
@@ -254,7 +254,7 @@ class LeftMenuCatalogTitle(QLabel):
         self.setFixedHeight(self.hh)
 
 
-class LeftMenuSep(HSep):
+class LeftMenuSep(UHorizontalSep):
     def __init__(self):
         super().__init__()
         self.setProperty("hidden", True)
