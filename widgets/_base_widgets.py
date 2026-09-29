@@ -242,7 +242,6 @@ class UListWidgetItem(QListWidgetItem):
 class UTreeWidgetItem(QTreeWidgetItem):
 
     def __init__(self, parent: QTreeWidget | QTreeWidgetItem, text: str):
-        # Важно: инициализируем суперкласс, передавая родителя
         super().__init__(parent, [text])
 
 
