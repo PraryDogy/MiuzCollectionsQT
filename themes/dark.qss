@@ -109,6 +109,7 @@ UTreeWidget {
     padding: 10px 2px 10px 2px; /* верх | право | низ | лево */
 }
 
+
 UTreeView::item,
 UListWidget::item,
 UTreeWidget::item {
@@ -116,6 +117,7 @@ UTreeWidget::item {
     background: transparent;
     height: 30px;
 }
+
 
 UTreeView::item:selected,
 UTreeView::item:selected:!active,
@@ -127,9 +129,22 @@ UTreeWidget::item:selected:!active {
     background: #2b2b2b;
 }
 
-UTreeView::branch:has-children:closed { image: url(./icons/common/plus.svg); }
-UTreeView::branch:has-children:open   { image: url(./icons/common/minus.svg); }
-UTreeView::branch:selected            { background: #2b2b2b; }
+
+UTreeView::branch:has-children:closed,
+UTreeWidget::branch:has-children:closed {
+    image: url(./icons/common/plus.svg);
+}
+
+UTreeView::branch:has-children:open,
+UTreeWidget::branch:has-children:open {
+    image: url(./icons/common/minus.svg);
+}
+
+UTreeView::branch:selected,
+UTreeWidget::branch:selected {
+    background: #2b2b2b;
+}
+
 
 UListWidget::indicator {
     width: 16px;
@@ -138,10 +153,14 @@ UListWidget::indicator {
     border-radius: 4px;
 }
 
-UListWidget::indicator:checked  { image: url(./icons/common/arrow_down.svg); }
-UListWidget::indicator:disabled { background-color: #101010; border-color: #222222; }
+UListWidget::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
 
-
+UListWidget::indicator:disabled {
+    background-color: #101010;
+    border-color: #222222;
+}
 
 
 UPushButton {
