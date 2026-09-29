@@ -267,12 +267,79 @@ GrayTextLabel {
 }
 
 
-/* _base_widgets.py end */
+/* _base_widgets.py */
 
 
-/* ==========================================================================
-   7. КАСТОМНЫЕ КОМПОНЕНТЫ И ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
-   ========================================================================== */
+/* _base_widgets.py */
+/* _base_widgets.py */
+
+/* actions.py */
+/* actions.py */
+
+/* bar_bottom.py */
+/* bar_bottom.py */
+
+/* bar_macos.py */
+/* bar_macos.py */
+
+/* bar_path.py */
+/* bar_path.py */
+
+/* bar_top.py */
+/* bar_top.py */
+
+/* caledar_widget.py */
+/* caledar_widget.py */
+
+/* grid.py */
+/* grid.py */
+
+/* menu_left.py */
+/* menu_left.py */
+
+/* path_widget.py */
+/* path_widget.py */
+
+/* win_collage.py */
+/* win_collage.py */
+
+/* win_copy_files.py */
+/* win_copy_files.py */
+
+/* win_filters.py */
+/* win_filters.py */
+
+/* win_first_load.py */
+/* win_first_load.py */
+
+/* win_image_view.py */
+/* win_image_view.py */
+
+/* win_img_search.py */
+/* win_img_search.py */
+
+/* win_info.py */
+/* win_info.py */
+
+/* win_main.py */
+/* win_main.py */
+
+/* win_servers.py */
+/* win_servers.py */
+
+/* win_settings.py */
+/* win_settings.py */
+
+/* win_smb.py */
+/* win_smb.py */
+
+/* win_text_search.py */
+/* win_text_search.py */
+
+/* win_upload.py */
+/* win_upload.py */
+
+
 
 /* --- Модуль: Календарь --- */
 CalendarBigDate {
