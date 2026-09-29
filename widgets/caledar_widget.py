@@ -1,7 +1,3 @@
-import os
-import sys
-from datetime import date
-
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
