@@ -5,16 +5,16 @@ from datetime import date
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QGridLayout, QGroupBox, QHBoxLayout, QLabel,
-                             QMenu, QPushButton, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import QGridLayout, QHBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import UHorizontalSep, UMainWidget, UPushButton
+from ._base_widgets import (TransparentLabel, TransparentWidget,
+                            UHorizontalSep, UMainWidget, UMenu, UPushButton)
 
 
-class CalendarBigDate(QLabel):
+class CalendarBigDate(TransparentLabel):
     def __init__(self):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -47,7 +47,7 @@ class CalendarSvgNavi(QSvgWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class CalendarDayBase(QLabel):
+class CalendarDayBase(TransparentLabel):
     clicked = pyqtSignal()
     def __init__(self, text: str, day: int):
         super().__init__(text)
@@ -70,7 +70,7 @@ class CalendarDaySelected(CalendarDayBase):
         super().__init__(text, day)
 
 
-class CalendarWeek(QLabel):
+class CalendarWeek(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -130,7 +130,7 @@ class Calendar(UMainWidget):
         margin = 10
 
         # --- 1. Блок большой даты ---
-        dynamic_container = QWidget()
+        dynamic_container = TransparentWidget()
         self.central_layout.addWidget(dynamic_container) # Добавляем сразу
         
         dynamic_container_lay = QHBoxLayout(dynamic_container)
@@ -155,7 +155,7 @@ class Calendar(UMainWidget):
         self.central_layout.addWidget(sep)
 
         # --- 2. Блок навигации календаря ---
-        self.nav_widget = QWidget()
+        self.nav_widget = TransparentWidget()
         self.central_layout.addWidget(self.nav_widget) # Добавляем сразу
         
         self.nav_layout = QHBoxLayout(self.nav_widget)
@@ -170,7 +170,7 @@ class Calendar(UMainWidget):
         self.nav_layout.addStretch()
         
         self.btn_month = UPushButton("")
-        self.menu_month = QMenu(self)
+        self.menu_month = UMenu(parent=self)
         self.btn_month.setMenu(self.menu_month)
         self.populate_months()
         self.nav_layout.addWidget(self.btn_month)
@@ -178,7 +178,7 @@ class Calendar(UMainWidget):
         self.nav_layout.addSpacing(10)
 
         self.btn_year = UPushButton("")
-        self.menu_year = QMenu(self)
+        self.menu_year = UMenu(parent=self)
         self.btn_year.setMenu(self.menu_year)
         self.populate_years()
         self.nav_layout.addWidget(self.btn_year)
