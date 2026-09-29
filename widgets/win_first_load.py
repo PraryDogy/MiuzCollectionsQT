@@ -7,17 +7,17 @@ from zipfile import ZipFile
 
 from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow, UHorizontalSep, MfAliasWidget, MfPathWidget,
-                            RowArrowWidget, SaveRowArrowWidget, TransparentGroupBox,
-                            UMainWidget, UMenu, UPushButton)
+from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
+                            RowArrowWidget, SaveRowArrowWidget,
+                            TransparentGroupBox, UMainWidget, UMenu,
+                            UPushButton)
 
 
 def restart_app():
