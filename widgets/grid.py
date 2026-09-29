@@ -7,9 +7,8 @@ from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
-                             QLayout, QRubberBand, QSizePolicy, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLayout,
+                             QRubberBand, QVBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
@@ -19,8 +18,9 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (TransparentFrame, TransparentLabel, TransparentFrame, UMenu,
-                            UPushButton, UScrollVerticalArea)
+from ._base_widgets import (TransparentFrame, TransparentLabel,
+                            TransparentWidget, UMenu, UPushButton,
+                            UScrollVerticalArea)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -232,7 +232,7 @@ class UpBtn(QSvgWidget):
     icon_path = Static.COMMON_ICONS / "scroll_up.svg"
     icon_size = 35
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent: TransparentWidget):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
         self.load(str(self.icon_path))
@@ -243,7 +243,7 @@ class UpBtn(QSvgWidget):
         super().mouseReleaseEvent(ev)
 
 
-class GridSortWidget(QWidget):
+class GridSortWidget(TransparentWidget):
     sort_icon_svg = Static.COMMON_ICONS / "sort.svg"
     load_st_grid = pyqtSignal()
 
@@ -289,7 +289,7 @@ class GridSortWidget(QWidget):
         self.button.setText(text[JsonData.lng_index])
 
 
-class GridFiltersWidget(QWidget):
+class GridFiltersWidget(TransparentWidget):
     sort_icon_svg = Static.COMMON_ICONS / "filters.svg"
     open_filters_win = pyqtSignal()
 
@@ -308,7 +308,7 @@ class GridFiltersWidget(QWidget):
         self.h_lay.addWidget(self.button)
 
 
-class GridControlsWidget(QWidget):
+class GridControlsWidget(TransparentWidget):
     # Общий сигнал, который будет срабатывать при изменении сортировки или фильтров
     load_st_grid = pyqtSignal()
     open_filters_win = pyqtSignal()
@@ -348,12 +348,12 @@ class GridTagWidget(TransparentFrame):
         self.h_lay.setContentsMargins(CONTROLS_MARGIN, 0, CONTROLS_MARGIN, 0)
         self.h_lay.setSpacing(6)
 
-        self.title = QLabel(text)
+        self.title = TransparentLabel(text)
         self.title.setStyleSheet("background: transparent;")
         self.h_lay.addWidget(self.title)
 
         # Контейнер для SVG
-        self.close_btn_wrapper = QWidget()
+        self.close_btn_wrapper = TransparentWidget()
         close_lay = QVBoxLayout(self.close_btn_wrapper)
         close_lay.setContentsMargins(0, 1, 0, 0)
         close_lay.setSpacing(0)
@@ -524,7 +524,7 @@ class FlowLayout(QLayout):
         return y + line_height - rect.y() + margins.bottom()
 
 
-class TagsWidget(QWidget):
+class TagsWidget(TransparentWidget):
     load_st_grid = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -1177,8 +1177,7 @@ class GridStandart(Grid):
             self.grid_wid.hide()
             self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.scroll_layout.addStretch(1)
-            lbl = QLabel(Lng.no_photo[JsonData.lng_index])
-            lbl.setStyleSheet("background: transparent;")
+            lbl = TransparentLabel(Lng.no_photo[JsonData.lng_index])
             self.scroll_layout.addWidget(lbl, alignment=Qt.AlignmentFlag.AlignCenter)
             self.scroll_layout.addStretch(1)
             
