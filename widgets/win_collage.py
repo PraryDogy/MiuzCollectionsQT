@@ -10,7 +10,7 @@ from cfg import JsonData, Static
 from system.items import DataItem
 from system.lang import Lng
 
-from ._base_widgets import BlackBgFrame, UMainWidget
+from ._base_widgets import TransparentFrame, UMainWidget
 
 
 class WinCollage(UMainWidget):
@@ -40,7 +40,7 @@ class WinCollage(UMainWidget):
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
 
-        self.container = BlackBgFrame()
+        self.container = TransparentFrame()
         self.grid_layout = QGridLayout(self.container)
         
         self.grid_layout.setSpacing(10)

@@ -372,7 +372,7 @@ class SelectableLabel(TransparentLabel):
         menu_.show_menu_under_cursor(ev)
 
 
-class RowArrowWidget(QWidget):
+class RowArrowWidget(TransparentWidget):
     clicked = pyqtSignal()
     arrow_svg = Static.COMMON_ICONS / "next.svg"
     warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
@@ -505,7 +505,7 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
-class GrayTextLabel(QLabel):
+class GrayTextLabel(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text)
         self.set_font_size(11)
@@ -514,11 +514,6 @@ class GrayTextLabel(QLabel):
         font = self.font()
         font.setPixelSize(value_px)
         self.setFont(font)
-
-
-class BlackBgFrame(TransparentFrame):
-    def __init__(self):
-        super().__init__()
 
 
 class ConfirmWindow(UMainWidget):
