@@ -3,8 +3,7 @@ import re
 
 from PyQt6.QtCore import QDir, QSortFilterProxyModel, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QFileSystemModel, QIcon
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QMenu, QSplitter,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import QHBoxLayout, QSplitter, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -12,8 +11,9 @@ from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
 from ._base_widgets import (RowArrowWidget, TransparentGroupBox,
+                            TransparentLabel, TransparentWidget,
                             UHorizontalSep, UListWidget, UListWidgetItem,
-                            UMainWidget, UPushButton, UTreeView)
+                            UMainWidget, UMenu, UPushButton, UTreeView)
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -59,7 +59,7 @@ class CustomTreeView(UTreeView):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
 
     def contextMenuEvent(self, event):
-        menu = QMenu(self)
+        menu = UMenu(self)
         
         # Создаем действия (Actions)
         standard_sort_action = QAction(Lng.sort_standart[JsonData.lng_index], self)
@@ -142,12 +142,12 @@ class UploadWin(UMainWidget):
 
         splitter.addWidget(self.tree_view)
 
-        right_widget = QWidget()
+        right_widget = TransparentWidget()
         right_layout = QVBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 5)
         right_layout.setSpacing(0)
 
-        title = QLabel(Lng.upload_list[JsonData.lng_index] + ":")
+        title = TransparentLabel(Lng.upload_list[JsonData.lng_index] + ":")
         title.setContentsMargins(2, 0, 2, 0)
         # right_layout.addWidget(title)
 

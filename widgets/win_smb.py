@@ -1,17 +1,17 @@
 import os
 import sys
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLabel, QWidget
+from PyQt6.QtWidgets import QApplication, QHBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 
-from ._base_widgets import (MfPathWidget, SuperConfirmWindow, UMainWidget,
-                            UPushButton)
+from ._base_widgets import (MfPathWidget, SuperConfirmWindow, TransparentLabel,
+                            TransparentWidget, UMainWidget, UPushButton)
 
 
 def restart_app():
@@ -20,7 +20,7 @@ def restart_app():
     QApplication.exit(0)
 
 
-class WarnWidget(QWidget):
+class WarnWidget(TransparentWidget):
     icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
 
     def __init__(self, mf: Mf):
@@ -39,7 +39,7 @@ class WarnWidget(QWidget):
             f"{Lng.access_error_text[JsonData.lng_index]} \"{mf.mf_alias}\".",
             Lng.network_error_text[JsonData.lng_index]
         )
-        up_label = QLabel("\n".join(lines))
+        up_label = TransparentLabel("\n".join(lines))
         up_label.setWordWrap(True)
         h_lay.addWidget(up_label)
 
@@ -62,7 +62,7 @@ class WinSmb(UMainWidget):
         self.path_widget = MfPathWidget(JsonData.lng_index, mf.mf_current_path)
         self.central_layout.addWidget(self.path_widget)
 
-        btns_wid = QWidget()
+        btns_wid = TransparentWidget()
         self.central_layout.addWidget(btns_wid)
         btns_lay = QHBoxLayout(btns_wid)
         btns_lay.setContentsMargins(0, 0, 0, 0)
