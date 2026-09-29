@@ -41,6 +41,7 @@ class PathItem(TransparentWidget):
         item_layout.addWidget(self.img_wid)
         
         self.text_wid = GrayTextLabel(text=name)
+        self.text_wid.set_font_size(11)
         self.collapse()
         item_layout.addWidget(self.text_wid)
 

@@ -28,6 +28,11 @@ class TransparentLabel(QLabel):
     def __init__(self, text="", parent=None):
         super().__init__(text, parent)
 
+    def set_font_size(self, value_px: int):
+        font = self.font()
+        font.setPixelSize(value_px)
+        self.setFont(font)
+
 
 class TransparentFrame(QFrame):
     def __init__(self, parent=None):
@@ -526,12 +531,7 @@ class WinProgressbar(UMainWidget):
 class GrayTextLabel(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text)
-        self.set_font_size(11)
-
-    def set_font_size(self, value_px: int):
-        font = self.font()
-        font.setPixelSize(value_px)
-        self.setFont(font)
+        # self.set_font_size(11)
 
 
 class ConfirmWindow(UMainWidget):

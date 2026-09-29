@@ -24,9 +24,8 @@ class ProgressWidget(GrayTextLabel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-
+        self.set_font_size(11)
         self.total_seconds = JsonData.scaner_minutes * 60
-
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_timer_text)
 

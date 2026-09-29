@@ -2,27 +2,14 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtWidgets import (QGraphicsOpacityEffect, QGridLayout, QLabel,
-                             QSpacerItem, QWidget)
+from PyQt6.QtWidgets import QGraphicsOpacityEffect, QGridLayout, QSpacerItem
 
 from cfg import JsonData
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 
-from ._base_widgets import SelectableLabel, UMainWidget
-
-
-
-class WinInfoLeftLabel(QLabel):
-    def __init__(self, text: str, opacity_percent=70):
-        super().__init__(text=text)
-
-        self._opacity_effect = QGraphicsOpacityEffect(self)
-        self.setGraphicsEffect(self._opacity_effect)
-        self.set_opacity(opacity_percent)
-
-    def set_opacity(self, percent: int):
-        self._opacity_effect.setOpacity(percent / 100)
+from ._base_widgets import (GrayTextLabel, SelectableLabel, TransparentWidget,
+                            UMainWidget)
 
 
 class WinInfoSelectableLabel(SelectableLabel):
@@ -46,7 +33,7 @@ class WinInfo(UMainWidget):
         self.setWindowTitle(Lng.info[JsonData.lng_index])
         self.path = paths[0]
 
-        wid = QWidget()
+        wid = TransparentWidget()
         self.central_layout.addWidget(wid)
 
         self.grid_lay = QGridLayout(wid)
@@ -67,8 +54,12 @@ class WinInfo(UMainWidget):
         l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         for left_t, right_t in self.data.items():
-            left_lbl = WinInfoLeftLabel(left_t + ":")
+            left_lbl = GrayTextLabel(left_t + ":")
             right_lbl = WinInfoSelectableLabel(right_t)
+
+            for i in left_lbl, right_lbl:
+                i.set_font_size(11)
+
             selectable_labels.append(right_lbl)
             self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
             self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
