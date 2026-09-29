@@ -19,7 +19,7 @@ TransparentTreeView {
 
 UMainWindow,
 UMainWidget {
-    background: #050505;
+    background: #151515;
 }
 
 

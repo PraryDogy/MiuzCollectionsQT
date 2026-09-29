@@ -222,7 +222,7 @@ class CatalogWidget(TransparentWidget):
 
         self.button = UPushButton(Mf.current_mf.mf_alias)
         self.button.setFixedWidth(110)
-        self.button.setIconSize(QSize(13, 13))
+        self.button.setIconSize(QSize(15, 15))
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
