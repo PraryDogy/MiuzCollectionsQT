@@ -21,23 +21,23 @@ from system.utils import Utils
 
 
 class TransparentButton(QPushButton):
-    def __init__(self, icon, text, parent=None):
-        super().__init__(icon, text, parent)
+    def __init__(self, text="", parent=None):
+        super().__init__(text=text, parent=parent)
 
 
 class TransparentLabel(QLabel):
-    def __init__(self, text, parent=None, flags=Qt.WindowType.Widget):
-        super().__init__(text, parent, flags)
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
 
 
 class TransparentFrame(QFrame):
-    def __init__(self, parent=None, flags=Qt.WindowType.Widget):
-        super().__init__(parent, flags)
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
 
 class TransparentWidget(QWidget):
-    def __init__(self, parent=None, flags=Qt.WindowType.Widget):
-        super().__init__(parent, flags)
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
 
 class TransparentLineEdit(QLineEdit):
@@ -277,7 +277,7 @@ class UTreeWidget(QTreeWidget):
 
 class UPushButton(TransparentButton):
     def __init__(self, text: str):
-        super().__init__(text)
+        super().__init__(text=text)
         self.setFixedSize(80, 20)
         self.set_font_size(11)
 

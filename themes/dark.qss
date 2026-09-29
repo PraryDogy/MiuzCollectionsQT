@@ -1,7 +1,7 @@
 /* ==========================================================================
    3. КНОПКИ И СЛАЙДЕРЫ (Элементы управления)
    ========================================================================== */
-QPushButton {
+UPushButton {
     background: #4e4e4e;
     border: 1px solid #585858;
     border-radius: 4px;
@@ -9,12 +9,12 @@ QPushButton {
     padding-right: 1px; /* Отступ справа, чтобы текст не наезжал на стрелочку */
 }
 
-QPushButton:pressed {
+UPushButton:pressed {
     background: #5d5d5d;
     border: 1px solid #6a6a6a;
 }
 
-QPushButton::menu-indicator {
+UPushButton::menu-indicator {
     image: url("./icons/common/arrow_down.svg");
     width: 12px;
     height: 12px;
