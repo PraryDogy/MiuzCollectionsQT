@@ -20,53 +20,52 @@ from system.lang import Lng
 from system.utils import Utils
 
 
-
 class TransparentButton(QPushButton):
-    def __init__(self, text: str):
-        super().__init__(text)
+    def __init__(self, icon, text, parent=None):
+        super().__init__(icon, text, parent)
 
 
 class TransparentLabel(QLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
+    def __init__(self, text, parent=None, flags=Qt.WindowType.Widget):
+        super().__init__(text, parent, flags)
 
 
 class TransparentFrame(QFrame):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None, flags=Qt.WindowType.Widget):
+        super().__init__(parent, flags)
 
 
 class TransparentWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None, flags=Qt.WindowType.Widget):
+        super().__init__(parent, flags)
 
 
 class TransparentLineEdit(QLineEdit):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, contents="", parent=None):
+        super().__init__(contents, parent)
 
 
 class TransparentTextEdit(QTextEdit):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
 
 
 class TransparentMenu(QMenu):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, title=None, parent=None):
+        super().__init__(title, parent)
 
 
 class TransparentScrollArea(QScrollArea):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
 
 class UMenu(TransparentMenu):
-    def __init__(self, event: Optional[QContextMenuEvent]):
+    def __init__(self):
         super().__init__()
-        self.event_ = event
 
     def show_menu(self):
+        return
         if self.event_:
             self.exec(self.event_.globalPos())
         else:
@@ -77,6 +76,9 @@ class UMenu(TransparentMenu):
             a0.ignore()
         else:
             super().mouseReleaseEvent(a0)
+
+
+
 
 
 class USubMenu(QMenu):

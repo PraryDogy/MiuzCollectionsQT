@@ -961,10 +961,10 @@ class Grid(VScrollArea):
 
             # открыть в приложении
             if len(rel_paths) == 1:
-                open_menu = USubMenu(
-                    f"{Lng.open_in[JsonData.lng_index]}",
-                    self.menu_
-                )
+                open_menu = UMenu(None)
+                open_menu.setParent(self.menu_)
+                open_menu.setTitle(f"{Lng.open_in[JsonData.lng_index]}")
+                self.menu_.addMenu(open_menu)
 
                 act = QAction(Lng.open_default[JsonData.lng_index], open_menu)
                 act.triggered.connect(
@@ -979,8 +979,6 @@ class Grid(VScrollArea):
                         lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
                     )
                     open_menu.addAction(act)
-
-                self.menu_.addMenu(open_menu)
 
                 self.menu_.addSeparator()
 
