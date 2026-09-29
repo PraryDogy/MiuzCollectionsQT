@@ -2,7 +2,7 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtWidgets import QGraphicsOpacityEffect, QGridLayout, QSpacerItem
+from PyQt6.QtWidgets import QGridLayout, QSpacerItem
 
 from cfg import JsonData
 from system.lang import Lng
