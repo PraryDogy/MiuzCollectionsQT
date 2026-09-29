@@ -1,11 +1,10 @@
 import os
 from pathlib import Path
 
-from PyQt6.QtCore import QByteArray, Qt, pyqtSignal, QSize
+from PyQt6.QtCore import QByteArray, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QLineEdit, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from typing_extensions import Literal
 
 from cfg import Dynamic, JsonData, Static
@@ -13,8 +12,8 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 
-from ._base_widgets import (GrayTextLabel, UHorizontalSep, TransparentFrame, ULineEdit, UMenu,
-                            UPushButton)
+from ._base_widgets import (TransparentFrame, TransparentLabel,
+                            TransparentWidget, ULineEdit, UMenu, UPushButton)
 from .win_text_search import WinTextSearch
 
 BTN_H = 27
@@ -153,7 +152,7 @@ class SearchWidgetLineEdit(ULineEdit):
         super().keyPressEvent(event)
 
 
-class BarTopBtn(QWidget):
+class BarTopBtn(TransparentWidget):
     clicked_ = pyqtSignal()
     svg_size = BTN_H + 2
 
@@ -222,7 +221,7 @@ class ImgSearchBtn(BarTopBtn):
         super().__init__(self.base_svg, self.selected_svg)
 
 
-class BarTopCatalogTitle(QLabel):
+class BarTopCatalogTitle(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text)
 
@@ -236,7 +235,7 @@ class BarTopCatalogBtn(UPushButton):
         self.setFixedSize(*self.button_size)
 
 
-class BarTopCatalogWidget(QWidget):
+class BarTopCatalogWidget(TransparentWidget):
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
     mf_open = pyqtSignal(Mf)

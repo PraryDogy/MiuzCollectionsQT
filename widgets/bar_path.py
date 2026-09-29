@@ -3,16 +3,16 @@ import os
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+from PyQt6.QtWidgets import QHBoxLayout
 
 from cfg import Static
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils
 
-from ._base_widgets import GrayTextLabel
+from ._base_widgets import GrayTextLabel, TransparentWidget
 
 
-class PathItem(QWidget):
+class PathItem(TransparentWidget):
     min_wid = 5
     new_history_item = pyqtSignal(str)
     load_st_grid = pyqtSignal()
@@ -61,7 +61,7 @@ class PathItem(QWidget):
             self.text_wid.setMinimumWidth(self.min_wid)
 
 
-class PathBar(QWidget):
+class PathBar(TransparentWidget):
     new_history_item = pyqtSignal(str)
     load_st_grid = pyqtSignal()
     info_win = pyqtSignal(list)
