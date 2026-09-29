@@ -10,7 +10,7 @@ from system.lang import Lng
 from ._base_widgets import GrayTextLabel, TransparentWidget, USlider
 
 
-class ThumbnailsSlider(USlider):
+class BarBottomSlider(USlider):
     def __init__(self):
         super().__init__()
 
@@ -19,7 +19,7 @@ class ThumbnailsSlider(USlider):
         super()._on_value_changed(value)
 
 
-class ProgressWidget(GrayTextLabel):
+class BarBottomLeftLabel(GrayTextLabel):
     interval_ms = 1000  # 1 секунда
 
     def __init__(self, parent=None):
@@ -82,7 +82,7 @@ class BarBottom(TransparentWidget):
         self.h_layout.addSpacing(5)
 
         # --- Прогресс-бар ---
-        self.progress_bar = ProgressWidget()
+        self.progress_bar = BarBottomLeftLabel()
         self.progress_bar.setText("")
         # self.progress_bar.setFixedHeight(self.icon_size)
         self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
@@ -91,7 +91,7 @@ class BarBottom(TransparentWidget):
         self.h_layout.addStretch()
 
         # --- Слайдер изменения размера миниатюр ---
-        self.slider = ThumbnailsSlider()
+        self.slider = BarBottomSlider()
 
         self.slider.setOrientation(Qt.Orientation.Horizontal)
         self.slider.setMinimum(0)
