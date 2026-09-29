@@ -45,7 +45,7 @@ class CalendarSvgNavi(QSvgWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class CalendarDayBase(TransparentLabel):
+class _CalendarDayBase(TransparentLabel):
     clicked = pyqtSignal()
     def __init__(self, text: str, day: int):
         super().__init__(text)
@@ -58,25 +58,19 @@ class CalendarDayBase(TransparentLabel):
         return super().mouseReleaseEvent(ev)
 
     
-class CalendarDay(CalendarDayBase):
+class CalendarDay(_CalendarDayBase):
     def __init__(self, text: str, day: int):
         super().__init__(text, day)
 
 
-class CalendarDaySelected(CalendarDayBase):
+class CalendarDaySelected(_CalendarDayBase):
     def __init__(self, text: str, day: int):
         super().__init__(text, day)
 
 
 class CalendarSep(UHorizontalSep):
-    def __init__(self, margin: int):
+    def __init__(self):
         super().__init__()
-        self.setStyleSheet(
-            f"""
-                margin-left: {margin}px;
-                margin-right: {margin}px;
-            """
-        )
 
 
 class Calendar(UMainWidget):
@@ -143,7 +137,7 @@ class Calendar(UMainWidget):
         # --- Разделитель ---
         self.central_layout.addSpacing(5)
 
-        sep = CalendarSep(margin)
+        sep = CalendarSep()
         self.central_layout.addWidget(sep)
 
         # --- 2. Блок навигации календаря ---
@@ -182,8 +176,8 @@ class Calendar(UMainWidget):
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)
 
-        sep = CalendarSep(margin)
-        self.central_layout.addWidget(UHorizontalSep())
+        sep = CalendarSep()
+        self.central_layout.addWidget(CalendarSep())
 
         # --- 3. Сетка для дней недели и чисел ---
         self.grid_widget = TransparentWidget()  
@@ -256,7 +250,7 @@ class Calendar(UMainWidget):
         self.date_selected.emit(self.current_date)
 
     def day_selected(self):
-        sender_button: CalendarDayBase = self.sender()
+        sender_button: _CalendarDayBase = self.sender()
         day = sender_button.day
         current_year = self.current_date.year()
         current_month = self.current_date.month()

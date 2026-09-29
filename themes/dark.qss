@@ -285,7 +285,6 @@ GrayTextLabel {
 
 /* caledar_widget.py */
 
-
 CalendarDay {
     border-bottom: 1px solid #353535;
 }
@@ -305,6 +304,11 @@ CalendarDaySelected {
     margin-right: 18px;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+CalendarSep {
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 
