@@ -6,7 +6,10 @@ TransparentLineEdit,
 TransparentTextEdit,
 TransparentMenu,
 TransparentScrollArea,
-TransparentGroupBox {
+TransparentGroupBox,
+TransparentListWidget,
+TransparentTreeWidget,
+TransparentTreeView {
     background: transparent;
     border: none;
 }
