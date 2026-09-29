@@ -20,7 +20,48 @@ from system.lang import Lng
 from system.utils import Utils
 
 
-class UMenu(QMenu):
+
+class TransparentButton(QPushButton):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class TransparentLabel(QLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class TransparentFrame(QFrame):
+    def __init__(self):
+        super().__init__()
+
+
+class TransparentWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+
+
+class TransparentLineEdit(QLineEdit):
+    def __init__(self):
+        super().__init__()
+
+
+class TransparentTextEdit(QTextEdit):
+    def __init__(self):
+        super().__init__()
+
+
+class TransparentMenu(QMenu):
+    def __init__(self):
+        super().__init__()
+
+
+class TransparentScrollArea(QScrollArea):
+    def __init__(self):
+        super().__init__()
+
+
+class UMenu(TransparentMenu):
     def __init__(self, event: Optional[QContextMenuEvent]):
         super().__init__()
         self.event_ = event
@@ -821,23 +862,3 @@ class MfStopListWidget(QWidget):
 
         if mf_stop_list:
             self.text_edit.setPlainText("\n".join(mf_stop_list))
-
-
-class TransparentButton(UPushButton):
-    def __init__(self, text: str):
-        super().__init__(text)
-
-
-class TransparentLabel(QLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
-
-
-class TransparentFrame(UFrame):
-    def __init__(self):
-        super().__init__()
-
-
-class TransparentWidget(QWidget):
-    def __init__(self):
-        super().__init__()

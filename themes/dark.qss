@@ -373,13 +373,6 @@ GridTagWidget {
     color: #ffffff;
 }
 
-TransparentButton,
-TransparentLabel,
-TransparentFrame,
-TransparentWidget {
-    background: transparent;
-}
-
 SearchWidgetLineEdit {
     background: transparent;
 }
@@ -394,4 +387,15 @@ WinTextSearchTitle {
 
 WinTextSearchSubtitle {
     color: #AAAAAA;
+}
+
+TransparentButton,
+TransparentLabel,
+TransparentFrame,
+TransparentWidget,
+TransparentLineEdit,
+TransparentTextEdit,
+TransparentMenu,
+TransparentScrollArea {
+    background: transparent;
 }
