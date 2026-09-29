@@ -61,8 +61,6 @@ class TransparentScrollArea(QScrollArea):
 
 
 class UMenu(TransparentMenu):
-    # def __init__(self):
-        # super().__init__()
     def __init__(self, title=None, parent=None):
         super().__init__(title, parent)
 
@@ -146,11 +144,6 @@ class UTextEdit(QTextEdit):
             menu_.addAction(act)
 
         menu_.show_menu_under_cursor(a0)
-
-
-class UTextEditDark(UTextEdit):
-    def __init__(self):
-        super().__init__()
 
 
 class UTextEditLight(UTextEdit):

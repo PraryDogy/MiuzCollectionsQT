@@ -28,7 +28,7 @@ from ._base_widgets import (ConfirmWindow, HSep, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow, UGroupBox,
                             UMainWidget, UMenu, UPushButton, USpinBox,
-                            UTextEditDark, UListSpacerItem, UListWidget,
+                            UTextEdit, UListSpacerItem, UListWidget,
                             UListWidgetItem, WarningWindow)
 
 
@@ -513,7 +513,7 @@ class FiltersWid(QWidget):
         filters_text.setWordWrap(True)
         main_lay.addWidget(filters_text)
 
-        self.filters_edit = UTextEditDark()
+        self.filters_edit = UTextEdit()
         self.filters_edit.setFixedHeight(220)
         self.filters_edit.setPlaceholderText(Lng.filters[JsonData.lng_index])
         self.filters_edit.setPlainText("\n".join(Filters.items))

@@ -14,7 +14,7 @@ from system.lang import Lng
 from ._base_widgets import (HSep, QLabel, QWidget, RowArrowWidget, UDateEdit,
                             UGroupBox, UListSpacerItem, UListWidget,
                             UListWidgetItem, UMainWidget, UMenu, UPushButton,
-                            UTextEditDark)
+                            UTextEdit)
 from .caledar_widget import Calendar, CalendarBigDate
 
 
@@ -338,7 +338,7 @@ class WinFilters(UMainWidget):
         right_lay.addSpacing(5)
 
         # Текстовое поле для вывода списка
-        self.active_filters = UTextEditDark()
+        self.active_filters = UTextEdit()
         self.active_filters.setReadOnly(True)
         self.active_filters.setText(self.get_filters_text())
         self.active_filters.setFixedHeight(self.right_group_hh)
