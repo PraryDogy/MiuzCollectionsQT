@@ -17,8 +17,6 @@ from ._base_widgets import (TransparentFrame, TransparentLabel,
                             TransparentWidget, UHorizontalSep, UMenu,
                             UTreeWidget, UTreeWidgetItem)
 
-ITEM_HEIGHT = 25
-
 
 class LeftMenuTreeWidgetItem(UTreeWidgetItem):
     def __init__(self, parent, text, path):
@@ -214,40 +212,8 @@ class LeftMenuTreeWidget(UTreeWidget):
         return super().contextMenuEvent(a0)
 
 
-class LeftMenuCatalogButtonMenu(UMenu):
-    def __init__(self, event):
-        super().__init__(event)
-
-
-class LeftMenuCatalogButton(TransparentWidget):
-    def __init__(self):
-        super().__init__()
-
-
-class CatalogArrowWidget(TransparentWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.setFixedSize(15, 30)
-
-        self.arrow = QSvgWidget(self)
-        self.arrow.load(
-            str(Static.COMMON_ICONS / "arrow_down.svg")
-        )
-        self.arrow.setFixedSize(15, 15)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 2, 0, 0)
-        layout.setSpacing(0)
-        layout.addWidget(
-            self.arrow,
-            alignment=Qt.AlignmentFlag.AlignHCenter
-        )
-
-
-class LeftMenuCatalogTitle(TransparentLabel):
+class LeftMenuTitle(TransparentLabel):
     hh = 30
-
     def __init__(self):
         super().__init__(Lng.folders[JsonData.lng_index])
         self.setFixedHeight(self.hh)
@@ -280,7 +246,7 @@ class MenuLeft(TransparentFrame):
         v_lay.setContentsMargins(0, 0, 0, 0)
         v_lay.setSpacing(0)
 
-        self.title_widget = LeftMenuCatalogTitle()
+        self.title_widget = LeftMenuTitle()
         v_lay.addWidget(self.title_widget)
 
         self.sep_above_grid = LeftMenuSep()

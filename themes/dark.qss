@@ -330,6 +330,31 @@ ThumbMiuzBlueTextWidget {
 /* grid.py */
 
 /* menu_left.py */
+LeftMenuTreeWidget,
+LeftMenuTitle {
+    background: transparent;
+    border: none;
+    color: #AAAAAA
+}
+
+LeftMenuTitle {
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+
+LeftMenuSep {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+LeftMenuSep[hidden="true"] {
+    background: transparent;
+}
+
+LeftMenuSep[hidden="false"]  {
+    background: #2d2d2d;
+}
 /* menu_left.py */
 
 /* path_widget.py */
@@ -393,31 +418,7 @@ ServerLabel {
 
 
 
-LeftMenuTreeWidget,
-LeftMenuCatalogTitle {
-    background: transparent;
-    border: none;
-    color: #AAAAAA
-}
 
-LeftMenuCatalogTitle {
-    font-weight: bold;
-    margin-left: 2px;
-}
-
-
-LeftMenuSep {
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-LeftMenuSep[hidden="true"] {
-    background: transparent;
-}
-
-LeftMenuSep[hidden="false"]  {
-    background: #2d2d2d;
-}
 
 
 MenuLeft,
