@@ -297,9 +297,6 @@ class BarTop(TransparentFrame):
         self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
         self.h_layout.addWidget(self.settings_btn)
 
-        # Флаг для отслеживания состояния скролла (заглушка от спама)
-        self._is_scrolled = False 
-
         self.setFixedHeight(30)
         for i in (self.img_search_btn, self.settings_btn):
             i.setFixedSize(self.height() - 2, self.height() - 2)
