@@ -7,15 +7,15 @@ from pathlib import Path
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSpacerItem, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import QHBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (ConfirmWindow, ULineEdit, UListWidget,
-                            UListWidgetItem, UMainWidget, UMenu, UPushButton)
+from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
+                            ULineEdit, UListWidget, UListWidgetItem,
+                            UMainWidget, UMenu, UPushButton)
 
 
 @dataclass(slots=True)
@@ -124,7 +124,7 @@ class ServerList(UListWidget):
 
 
 
-class ServerLabel(QLabel):
+class ServerLabel(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text=text)
         self.setContentsMargins(2, 0, 0, 0)
@@ -276,7 +276,7 @@ class ServersWin(UMainWidget):
         self.central_layout.addSpacing(10)
 
         # Кнопки
-        btn_widget = QWidget()
+        btn_widget = TransparentWidget()
         btn_layout = QHBoxLayout(btn_widget)
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)

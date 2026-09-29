@@ -2,14 +2,13 @@ import os
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QPixmap, QImage
+from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect, QHBoxLayout,
-                             QLabel, QLineEdit, QSpacerItem, QSplitter,
-                             QTableWidget, QTableWidgetItem, QVBoxLayout,
-                             QWidget)
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QSpacerItem, QSplitter,
+                             QTableWidget, QTableWidgetItem, QVBoxLayout)
 from typing_extensions import Literal
 
 from cfg import JsonData, Static, Themes
@@ -18,18 +17,20 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
-from system.themes import ThemeChanger
 from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
                           UThreadPool)
+from system.themes import ThemeChanger
 from system.utils import Utils
-from pathlib import Path
-from ._base_widgets import (ConfirmWindow, UHorizontalSep, MfAliasWidget, MfPathWidget,
+
+from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
-                            SaveRowArrowWidget, SuperConfirmWindow, TransparentGroupBox,
+                            SaveRowArrowWidget, SuperConfirmWindow,
+                            TransparentGroupBox, TransparentLabel,
+                            TransparentWidget, UHorizontalSep, ULineEdit,
+                            UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWidget, UMenu, UPushButton, USpinBox,
-                            UTextEdit, UListSpacerItem, UListWidget,
-                            UListWidgetItem, WarningWindow)
+                            UTextEdit, WarningWindow)
 
 
 def restart_app():
@@ -38,7 +39,7 @@ def restart_app():
     QApplication.exit(0)
 
 
-class LabelMinWidth(QLabel):
+class LabelMinWidth(TransparentLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setMinimumWidth(30)
@@ -98,7 +99,7 @@ class RebootableSettings(TransparentGroupBox):
         self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.spin.setMinimum(self.spin_min)
         self.spin.setMaximum(self.spin_max)
-        self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
+        self.spin.findChild(ULineEdit).setTextMargins(3, 0, 3, 0)
         self.spin.setSuffix(f" {Lng.minutes[JsonData.lng_index]}")
         self.spin.setValue(JsonData.scaner_minutes)
         self.spin.valueChanged.connect(self.change_scan_time)
@@ -160,11 +161,11 @@ class SizesWin(UMainWidget):
         total_size = SharedUtils.get_f_size(sum(
             item.size for item in size_items
         ))
-        first_row = QLabel(f"{Lng.data_size[JsonData.lng_index]}: {total_size}")
+        first_row = TransparentLabel(f"{Lng.data_size[JsonData.lng_index]}: {total_size}")
         self.central_layout.addWidget(first_row)
 
         total = sum(item.total_images for item in size_items)
-        sec_row = QLabel(f"{Lng.images[JsonData.lng_index]}: {total}")
+        sec_row = TransparentLabel(f"{Lng.images[JsonData.lng_index]}: {total}")
         self.central_layout.addWidget(sec_row)
 
         headers = [
@@ -274,7 +275,7 @@ class NonRebootableSettings(TransparentGroupBox):
             print(e)
 
 
-class ThemeBtn(QWidget):
+class ThemeBtn(TransparentWidget):
     clicked = pyqtSignal()
     ww = 70
     svg_size = (40, 40)
@@ -294,7 +295,7 @@ class ThemeBtn(QWidget):
         self.svg_widget.setFixedSize(*self.svg_size)
         layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.title_label = QLabel(self.theme_name)
+        self.title_label = TransparentLabel(self.theme_name)
         layout_.addWidget(self.title_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.clear_selection()
@@ -332,7 +333,7 @@ class ThemesWidget(TransparentGroupBox):
         main_lay.addWidget(UHorizontalSep())
         main_lay.addSpacing(5)
 
-        themes_wid = QWidget()
+        themes_wid = TransparentWidget()
         themes_layout = QHBoxLayout(themes_wid)
         themes_layout.setContentsMargins(0, 0, 0, 0)
         themes_layout.setSpacing(5)
@@ -422,7 +423,7 @@ class AboutWid(TransparentGroupBox):
         h_lay.setContentsMargins(0, 0, 0, 0)
         h_lay.setSpacing(0)
 
-        icon = QLabel()
+        icon = TransparentLabel()
         qimage = QImage(str(self.icon_path))
         qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, self.icon_size)
         pixmap = QPixmap.fromImage(qimage_scaled)
@@ -440,7 +441,7 @@ class AboutWid(TransparentGroupBox):
             print("win settings about wid, icon.png not exists")
 
 
-class GeneralSettings(QWidget):
+class GeneralSettings(TransparentWidget):
     lang_changed = pyqtSignal()
 
     def __init__(self):
@@ -498,7 +499,7 @@ class GeneralSettings(QWidget):
         win.show()
 
 
-class FiltersWid(QWidget):
+class FiltersWid(TransparentWidget):
     changed = pyqtSignal()
     reset_svg = Static.COMMON_ICONS / "reset.svg"
 
@@ -578,12 +579,12 @@ class FiltersWid(QWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class WinSettingsMfAliasTitle(QLabel):
+class WinSettingsMfAliasTitle(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text)
 
 
-class MfSettings(QWidget):
+class MfSettings(TransparentWidget):
     repair_svg = Static.COMMON_ICONS / "repair.svg"
     trash_svg = Static.COMMON_ICONS / "trash.svg"
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
@@ -599,7 +600,7 @@ class MfSettings(QWidget):
         main_lay.setContentsMargins(0, 0, 0, 0)
         main_lay.setSpacing(10)
 
-        header_container = QWidget()
+        header_container = TransparentWidget()
         header_lay = QHBoxLayout(header_container)
         header_lay.setAlignment(Qt.AlignmentFlag.AlignBottom)
         header_lay.setContentsMargins(2, 0, 2, 0)
@@ -761,7 +762,7 @@ class MfSettings(QWidget):
 
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
-class NewMfSettings(QWidget):
+class NewMfSettings(TransparentWidget):
     yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
     def __init__(self, mf_path: str = None):
@@ -927,7 +928,7 @@ class WinSettings(UMainWidget):
             new_folder.setIcon(QIcon(str(self.image_folder_svg)))
             self.left_menu.addItem(new_folder)
 
-        self.right_wid = QWidget()
+        self.right_wid = TransparentWidget()
         self.right_lay = QVBoxLayout(self.right_wid)
         self.right_lay.setContentsMargins(0, 0, 0, 0)
         self.right_lay.setSpacing(0)
