@@ -336,6 +336,9 @@ ThumbMiuzBlueTextWidget {
 /* path_widget.py */
 
 /* win_collage.py */
+WinCollage {
+    background: black;
+}
 /* win_collage.py */
 
 /* win_copy_files.py */
