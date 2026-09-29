@@ -336,7 +336,7 @@ class GridControlsWidget(TransparentWidget):
         self.v_lay.addStretch()
 
 
-class GridTagWidget(TransparentFrame):
+class GridBaseTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
     clicked_clear = pyqtSignal()
 
@@ -371,7 +371,7 @@ class GridTagWidget(TransparentFrame):
         self.clicked_clear.emit()
         
 
-class DatesTag(GridTagWidget):
+class DatesTag(GridBaseTagWidget):
     def __init__(self):
         super().__init__("")
         self.set_dates_text()
@@ -397,7 +397,7 @@ class DatesTag(GridTagWidget):
         return super().clear_tag_cmd()
 
 
-class WordTag(GridTagWidget):
+class WordTag(GridBaseTagWidget):
     def __init__(self, text):
         super().__init__(text)
 
@@ -406,7 +406,7 @@ class WordTag(GridTagWidget):
         return super().clear_tag_cmd()
 
 
-class FavTag(GridTagWidget):
+class FavTag(GridBaseTagWidget):
     def __init__(self, text):
         super().__init__(text)
 
@@ -415,7 +415,7 @@ class FavTag(GridTagWidget):
         return super().clear_tag_cmd()
 
 
-class OnlyFolderTag(GridTagWidget):
+class OnlyFolderTag(GridBaseTagWidget):
     def __init__(self, text):
         super().__init__(text)
 
@@ -424,13 +424,10 @@ class OnlyFolderTag(GridTagWidget):
         return super().clear_tag_cmd()
 
 
-class ClearFiltersTag(GridTagWidget):
+class ClearFiltersTag(GridBaseTagWidget):
     icon_path = Static.COMMON_ICONS / "trash.svg"
 
     def __init__(self, text: str):
-        # super().__init__(Lng.clear_tags[JsonData.lng_index])
-        # self.title.deleteLater()
-
         super().__init__("")
         self.title.deleteLater()
 
