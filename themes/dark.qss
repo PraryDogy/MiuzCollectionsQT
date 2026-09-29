@@ -235,6 +235,14 @@ USpinBox::down-arrow, QDateEdit::down-arrow {
 }
 
 
+QToolTip {
+    color: #FFFFFF;
+    background-color: #2B2B2B;
+    border: 1px solid #454545;
+    padding: 2px;
+}
+
+
 
 /* _base_widgets.py end */
 
@@ -316,12 +324,6 @@ ServerLabel {
     padding-left: 1px;
 }
 
-QToolTip {
-    color: #FFFFFF;
-    background-color: #2B2B2B;
-    border: 1px solid #454545;
-    padding: 2px;
-}
 
 
 LeftMenuTreeWidget,
