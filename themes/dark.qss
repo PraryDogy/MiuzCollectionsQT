@@ -8,6 +8,7 @@ TransparentMenu,
 TransparentScrollArea,
 TransparentGroupBox {
     background: transparent;
+    border: none;
 }
 
 
