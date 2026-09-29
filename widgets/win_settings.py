@@ -40,8 +40,8 @@ def restart_app():
 
 
 class LabelMinWidth(TransparentLabel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
         self.setMinimumWidth(30)
 
 
@@ -389,7 +389,7 @@ class AboutWidLabel(LabelMinWidth):
         "telegram: evlosh",
         ])
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent=parent)
         self.setText(self.txt)
         self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.setCursor(Qt.CursorShape.IBeamCursor)
