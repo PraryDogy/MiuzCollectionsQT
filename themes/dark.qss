@@ -387,6 +387,13 @@ WinFiltersTitle {
     font-size: 20px;
 }
 
+WinFiltersAddTag {
+    border-radius: 6px;
+    color: #ffffff;
+    background: #4e4e4e;
+    border: 1px solid #585858;
+}
+
 /* win_filters.py */
 
 /* win_first_load.py */
