@@ -248,14 +248,19 @@ class DatesWidget(UGroupBox):
         self.reload_thumbnails.emit()
 
 
-class TagWidget(TransparentFrame):
+class WinFiltersTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "trash.svg"
     clicked_trash = pyqtSignal()
-    clicked_body = pyqtSignal()
+    toggled = pyqtSignal(bool) 
 
-    def __init__(self, text: str):
+    def __init__(self, text: str, active: bool = False):
         super().__init__()
         self.setFixedHeight(23)
+        self.setCursor(Qt.CursorShape.PointingHandCursor) # Указываем курсор руки на весь виджет
+
+        # Устанавливаем начальное состояние через свойство для QSS
+        self._active = active
+        self.setProperty("active", str(active))
 
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(7, 2, 7, 2)
@@ -267,12 +272,12 @@ class TagWidget(TransparentFrame):
         # Контейнер для SVG
         self.close_btn_wrapper = TransparentWidget()
         close_lay = QVBoxLayout(self.close_btn_wrapper)
-        # опускаем кнопку ниже на 1 пиксель
         close_lay.setContentsMargins(0, 1, 0, 0)
         close_lay.setSpacing(0)
 
         self.trash_btn = QSvgWidget()
-        self.trash_btn.mouseReleaseEvent = lambda e: self.clicked_trash_cmd()
+        # Перехватываем клик по иконке мусорки, чтобы он не триггерил клик по body
+        self.trash_btn.mouseReleaseEvent = self.on_trash_clicked
         self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.trash_btn.load(str(self.icon_path))
         self.trash_btn.setFixedSize(12, 12)
@@ -280,18 +285,44 @@ class TagWidget(TransparentFrame):
         close_lay.addWidget(self.trash_btn)
         self.h_lay.addWidget(self.close_btn_wrapper)
 
+    @property
+    def is_active(self) -> bool:
+        return self._active
+
+    def set_active(self, active: bool):
+        """Метод для программного изменения состояния (например, из модального окна)"""
+        if self._active != active:
+            self._active = active
+            self.setProperty("active", str(active))
+            # Принудительно обновляем стили в PyQt, чтобы QSS применился мгновенно
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.update()
+
+    def on_trash_clicked(self, event):
+        # Останавливаем событие, чтобы оно не ушло на родителя (mouseReleaseEvent виджета)
+        event.accept()
+        self.clicked_trash.emit()
+
     def clicked_trash_cmd(self):
+        # Оставляем для совместимости, если где-то вызывается напрямую
         self.clicked_trash.emit()
 
     def hide_trash_btn(self):
         self.trash_btn.deleteLater()
 
     def mouseReleaseEvent(self, a0):
-        self.clicked_body.emit()
-        return super().mouseReleaseEvent(a0)
+        # Инвертируем состояние при клике на тело
+        new_state = not self._active
+        self.set_active(new_state)
+        
+        # Сигнализируем наружу
+        self.toggled.emit(new_state)
+        
+        super().mouseReleaseEvent(a0)
 
 
-class WordTag(TagWidget):
+class WinFiltersWordTag(WinFiltersTagWidget):
     def __init__(self, text):
         super().__init__(text)
 
@@ -300,7 +331,7 @@ class WordTag(TagWidget):
         return super().clicked_trash_cmd()
 
 
-class FavTag(TagWidget):
+class WinFiltersFavTag(WinFiltersTagWidget):
     def __init__(self, text):
         super().__init__(text)
 
@@ -309,7 +340,7 @@ class FavTag(TagWidget):
         return super().clicked_trash_cmd()
 
 
-class OnlyFolderTag(TagWidget):
+class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
     def __init__(self, text):
         super().__init__(text)
 
@@ -329,16 +360,16 @@ class TagsWidget(UGroupBox):
         self._create_tags()
 
     def _create_tags(self):
-        tag = FavTag(Lng.favorites[JsonData.lng_index])
+        tag = WinFiltersFavTag(Lng.favorites[JsonData.lng_index])
         tag.clicked_trash.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
-        tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
+        tag = WinFiltersOnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
         tag.clicked_trash.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
         for word in Filters.items:
-            tag = WordTag(word)
+            tag = WinFiltersWordTag(word)
             tag.clicked_trash.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 

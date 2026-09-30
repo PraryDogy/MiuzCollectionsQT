@@ -1,3 +1,5 @@
+/* background: #0059D1; */
+
 /* _base_widgets.py */
 
 TransparentButton,
@@ -270,14 +272,6 @@ GrayTextLabel {
     color: #676767;
 }
 
-
-TagWidget {
-    background: #4e4e4e;
-    border: 1px solid #585858;
-    border-radius: 7px;
-    color: #ffffff;
-}
-
 /* _base_widgets.py */
 
 /* actions.py */
@@ -343,6 +337,14 @@ ThumbMiuzBlueTextWidget {
     color: #6E6E6E;
     font-size: 11px;
 }
+
+GridTagWidget {
+    background: #4e4e4e;
+    border: 1px solid #585858;
+    border-radius: 6px;
+    color: #ffffff;
+}
+
 /* grid.py */
 
 /* menu_left.py */
@@ -363,6 +365,24 @@ WinCollage {
 /* win_copy_files.py */
 
 /* win_filters.py */
+
+WinFiltersTagWidget {
+    border-radius: 6px;
+    color: #ffffff;
+}
+
+
+WinFiltersTagWidget[active="True"] {
+    background: #0059D1;;
+    border: 1px solid #156ee3;
+}
+
+
+WinFiltersTagWidget[active="False"] {
+    background: #4e4e4e;
+    border: 1px solid #585858;
+}
+
 /* win_filters.py */
 
 /* win_first_load.py */
@@ -421,16 +441,6 @@ MainWinRightWidget {
     border: 1px solid #2d2d2d;
     border-radius: 10px;
 } */
-
-
-
-
-GridTagWidget {
-    background: #4e4e4e;
-    border: 1px solid #585858;
-    border-radius: 6px;
-    color: #ffffff;
-}
 
 
 WinTextSearchTitle {
