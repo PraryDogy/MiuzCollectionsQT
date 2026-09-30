@@ -440,13 +440,9 @@ class Calendar(UMainWidget):
             self.calendar_layout.addWidget(week_widget)
 
             if week_index < len(weeks) - 1:
-                separator_widget = TransparentWidget()
-                separator_layout = QHBoxLayout(separator_widget)
-                separator_layout.setContentsMargins(0, 0, 0, 0)
-                separator_layout.setSpacing(0)
-                separator_layout.addWidget(UHorizontalSep())
+                self.calendar_layout.addWidget(UHorizontalSep())
 
-                self.calendar_layout.addWidget(separator_widget)
+            self.calendar_layout.addWidget(UHorizontalSep())
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
