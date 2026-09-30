@@ -222,15 +222,15 @@ class DatesWidget(UGroupBox):
         else:
             locale = QLocale(QLocale.Language.English)
 
-        text = self.preset_actions[index].text()
-        if index == len(self.preset_actions) - 1:
+        # text = self.preset_actions[index].text()
+        # if index == len(self.preset_actions) - 1:
             # if self.q_date_start == self.q_date_end:
             #     str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
             #     text = f"{str_date}"
             # else:
-            str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
-            str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-            text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
+        str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+        str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+        text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
 
         self.dynamic_label.setText(text)
 
