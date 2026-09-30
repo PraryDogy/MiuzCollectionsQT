@@ -805,11 +805,12 @@ class WinMain(UMainWindow):
     def keyPressEvent(self, a0: QKeyEvent | None) -> None:
         
         if a0.key() == Qt.Key.Key_V:
-            dest = os.path.join(
-                Mf.current_mf.mf_current_path,
-                Dynamic.current_dir.strip(os.sep)
-            )
-            self.paste_files(self.files_to_copy, dest)
+            if self.files_to_copy:
+                dest = os.path.join(
+                    Mf.current_mf.mf_current_path,
+                    Dynamic.current_dir.strip(os.sep)
+                )
+                self.paste_files(self.files_to_copy, dest)
         
         elif a0.key() == Qt.Key.Key_W:
             if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:

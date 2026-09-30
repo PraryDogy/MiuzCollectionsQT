@@ -125,11 +125,12 @@ class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
         self.data_item = data_item
 
     def set_text(self, parent_width: int):
-        match = self.COLLECTION_RE.search(self.data_item.rel_path)
-        if match:
-            miuz_collection_name = match.group(1)
-        else:
+        root = os.path.dirname(self.data_item.rel_path)
+        if len(root) == 1:
             miuz_collection_name = Mf.current_mf.mf_alias
+        else:
+            paths_list = root.split(os.sep)
+            miuz_collection_name = paths_list[1]
 
         miuz_collection_name = self.get_shorten_text(miuz_collection_name, parent_width)
         day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
