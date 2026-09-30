@@ -390,14 +390,20 @@ class TagsContolWidget(TransparentWidget):
             tag = WinFiltersWordTag(word)
             tag.load_st_grid.connect(self.load_st_grid.emit)
             tag.on_trash_clicked.connect(
-                lambda t=word: self.show_remove_tag_win(t)
+                lambda w=tag: self.show_remove_tag_win(w)
             )
             self.flow_layout.addWidget(tag)
 
-    def show_remove_tag_win(self, text: str):
+    def show_remove_tag_win(self, widget: WinFiltersWordTag):
 
         def ok_clicked():
-            print(text, "removing")
+            text = widget.title.text() 
+            Filters.items.remove(text)
+            Filters.write_json_data()
+            if text in Dynamic.word_tags_list:
+                Dynamic.word_tags_list.remove(text)
+                self.load_st_grid.emit()
+            widget.deleteLater()
             self.remove_tag_win.deleteLater()
 
         self.remove_tag_win = ConfirmWindow(
