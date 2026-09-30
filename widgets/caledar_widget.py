@@ -1,26 +1,14 @@
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPainter, QPixmap
+from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (
-	QGridLayout,
-	QHBoxLayout,
-	QStackedLayout,
-	QVBoxLayout,
-)
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import (
-	GrayTextLabel,
-	TransparentLabel,
-	TransparentWidget,
-	UHorizontalSep,
-	UMainWidget,
-	UMenu,
-	UPushButton,
-)
+from ._base_widgets import (GrayTextLabel, TransparentLabel, TransparentWidget,
+                            UHorizontalSep, UMainWidget, UMenu, UPushButton)
 
 QSS_ROUND_SVG_SIZE = 30
 
