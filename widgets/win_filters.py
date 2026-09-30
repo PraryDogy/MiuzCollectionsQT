@@ -362,8 +362,7 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         super().__init__(text, show_trash=True, active=active)
 
     def clicked_trash_cmd(self):
-        Dynamic.word_tags_list.remove(self.title.text())
-        return super().clicked_trash_cmd()
+        pass
 
 
 class TagsContolWidget(TransparentWidget):
