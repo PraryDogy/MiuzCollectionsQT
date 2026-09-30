@@ -9,10 +9,10 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (QLabel, QWidget, RowArrowWidget, UGroupBox,
-                            UHorizontalSep, UListSpacerItem, UListWidget,
-                            UListWidgetItem, UMainWidget, UMenu, UPushButton,
-                            UTextEdit, TransparentLabel)
+from ._base_widgets import (RowArrowWidget, TransparentLabel,
+                            TransparentWidget, UGroupBox, UHorizontalSep,
+                            UListSpacerItem, UListWidget, UListWidgetItem,
+                            UMainWidget, UMenu, UPushButton, UTextEdit)
 from .caledar_widget import Calendar
 
 
@@ -39,23 +39,23 @@ class DatesWidget(UGroupBox):
         
         # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
-        self.main_layout.setSpacing(RowArrowWidget.group_spacing)
+        # self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
+        self.main_layout.setContentsMargins(5, 10, 5, 10)
+        # self.main_layout.setSpacing(RowArrowWidget.group_spacing)
+        self.main_layout.setSpacing(10)
 
         # --- 1. Блок большой даты ---
-        dynamic_container = QWidget()
+        dynamic_container = TransparentWidget()
         self.main_layout.addWidget(dynamic_container) # Добавляем сразу
         
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-        dynamic_container_lay.setSpacing(0)
+        dynamic_container_lay.setSpacing(10)
 
         calendar_icon = QSvgWidget()
         calendar_icon.load(str(self.calendar_svg))
         calendar_icon.setFixedSize(*self.svg_calendar_size)
         dynamic_container_lay.addWidget(calendar_icon)
-
-        dynamic_container_lay.addSpacing(10)
 
         self.dynamic_label = TransparentLabel()
         self.dynamic_label.setFixedWidth(self.width())
@@ -63,17 +63,15 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.addStretch()
 
         self.main_layout.addWidget(UHorizontalSep())
-        self.main_layout.addSpacing(5)
         
         # --- СТРОКА 1: Виджет панели управления (Вместо вложенного layout) ---
-        self.top_row_widget = QWidget()
+        self.top_row_widget = TransparentWidget()
         self.top_row_layout = QHBoxLayout(self.top_row_widget)
         self.top_row_layout.setContentsMargins(0, 0, 0, 0)
         self.top_row_layout.setSpacing(0)
-        self.top_row_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         # Период
-        period_label = QLabel(Lng.period[JsonData.lng_index])
+        period_label = TransparentLabel(Lng.period[JsonData.lng_index])
         self.top_row_layout.addWidget(period_label)
         self.top_row_layout.addSpacing(10)
 
@@ -106,7 +104,7 @@ class DatesWidget(UGroupBox):
         self.top_row_layout.addSpacing(15)
 
         # Выбор дат "От" и "До"
-        from_label = QLabel(Lng.from_text[JsonData.lng_index] + ":")
+        from_label = TransparentLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
         self.date_start_btn = UPushButton(self.date_digits(self.q_date_start))
@@ -115,7 +113,7 @@ class DatesWidget(UGroupBox):
 
         self.top_row_layout.addSpacing(10) 
 
-        to_label = QLabel(Lng.to_text[JsonData.lng_index] + ":")
+        to_label = TransparentLabel(Lng.to_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(to_label)
         self.top_row_layout.addSpacing(5)
         self.date_end_btn = UPushButton(self.date_digits(self.q_date_end))
@@ -132,8 +130,6 @@ class DatesWidget(UGroupBox):
 
         # Добавляем созданную строку-виджет в главный вертикальный layout
         self.main_layout.addWidget(self.top_row_widget)
-
-        self.main_layout.addSpacing(5)
 
         self.update_readable_date_label(index=0)
 
@@ -252,6 +248,11 @@ class DatesWidget(UGroupBox):
         self.reload_thumbnails.emit()
 
 
+class TagsWidget(UGroupBox):
+    def __init__(self, title=None, parent=None):
+        super().__init__(title, parent)
+
+
 class WinFilters(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
     edit_svg = Static.COMMON_ICONS / "edit.svg"
@@ -323,13 +324,13 @@ class WinFilters(UMainWidget):
         self.list_widget.setCurrentRow(0)
         
         # --- Правая часть (Контейнер) ---
-        self.right_container = QWidget()
+        self.right_container = TransparentWidget()
         right_lay = QVBoxLayout(self.right_container)
         right_lay.setContentsMargins(0, 0, 0, 0)
         right_lay.setSpacing(0)
 
         # Шапка групбокса: статичный лейбл
-        self.active_label = QLabel(f" {Lng.active_filters[JsonData.lng_index]}:")
+        self.active_label = TransparentLabel(f" {Lng.active_filters[JsonData.lng_index]}:")
         right_lay.addWidget(self.active_label)
 
         right_lay.addSpacing(5)
