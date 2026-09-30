@@ -259,7 +259,7 @@ class DatesWidget(UGroupBox):
 
 class WinFiltersTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "trash.svg"
-    clicked_trash = pyqtSignal()
+    on_trash_clicked = pyqtSignal()
     load_st_grid = pyqtSignal() 
 
     # Добавляем параметр show_trash=True по умолчанию
@@ -286,7 +286,7 @@ class WinFiltersTagWidget(TransparentFrame):
             close_lay.setSpacing(0)
 
             self.trash_btn = QSvgWidget()
-            self.trash_btn.mouseReleaseEvent = self.on_trash_clicked
+            self.trash_btn.mouseReleaseEvent = self.on_trash_clicked_cmd
             self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
             self.trash_btn.load(str(self.icon_path))
             self.trash_btn.setFixedSize(12, 12)
@@ -305,11 +305,8 @@ class WinFiltersTagWidget(TransparentFrame):
             self.style().polish(self)
             self.update()
 
-    def on_trash_clicked(self, e):
-        self.clicked_trash.emit()
-
-    def clicked_trash_cmd(self):
-        self.clicked_trash.emit()
+    def on_trash_clicked_cmd(self, e):
+        self.on_trash_clicked.emit()
 
     def mouseReleaseEvent(self, a0):
         self.load_st_grid.emit()
@@ -323,9 +320,6 @@ class WinFiltersFavTag(WinFiltersTagWidget):
         else:
             active = False
         super().__init__(text, show_trash=False, active=active)
-
-    def clicked_trash_cmd(self):
-        pass
 
     def mouseReleaseEvent(self, a0):
         if Dynamic.favs_tag_enabled:
@@ -345,9 +339,6 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
             active = False
         super().__init__(text, show_trash=False, active=active)
 
-    def clicked_trash_cmd(self):
-        pass
-
     def mouseReleaseEvent(self, a0):
         if Dynamic.no_subfolders_tag_enabled:
             self.set_active(False)
@@ -365,9 +356,6 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         else:
             active = False
         super().__init__(text, show_trash=True, active=active)
-
-    def clicked_trash_cmd(self):
-        pass
 
     def mouseReleaseEvent(self, a0):
         if self.title.text() in Dynamic.word_tags_list:
@@ -401,7 +389,13 @@ class TagsContolWidget(TransparentWidget):
         for word in Filters.items:
             tag = WinFiltersWordTag(word)
             tag.load_st_grid.connect(self.load_st_grid.emit)
+            tag.on_trash_clicked.connect(
+                lambda t=word: self.remove_tag_win(t)
+            )
             self.flow_layout.addWidget(tag)
+
+    def remove_tag_win(self, text: str):
+        print(text)
 
     def hasHeightForWidth(self):
         return True
