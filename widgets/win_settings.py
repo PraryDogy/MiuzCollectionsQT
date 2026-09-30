@@ -26,7 +26,7 @@ from system.utils import Utils
 from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow,
-                            TransparentGroupBox, TransparentLabel,
+                            UGroupBox, TransparentLabel,
                             TransparentWidget, UHorizontalSep, ULineEdit,
                             UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWidget, UMenu, UPushButton, USpinBox,
@@ -45,7 +45,7 @@ class LabelMinWidth(TransparentLabel):
         self.setMinimumWidth(30)
 
 
-class RebootableSettings(TransparentGroupBox):
+class RebootableSettings(UGroupBox):
     changed = pyqtSignal()
     lang_changed = pyqtSignal()
     spin_max = 60
@@ -231,7 +231,7 @@ class SizesWin(UMainWidget):
         return super().keyPressEvent(a0)
 
 
-class NonRebootableSettings(TransparentGroupBox):
+class NonRebootableSettings(UGroupBox):
     finder_svg = Static.COMMON_ICONS / "finder.svg"
     hdd_svg = Static.COMMON_ICONS / "hdd.svg"
 
@@ -317,7 +317,7 @@ class ThemeBtn(TransparentWidget):
         return super().enterEvent(event)
 
 
-class ThemesWidget(TransparentGroupBox):
+class ThemesWidget(UGroupBox):
     theme_svg = Static.COMMON_ICONS / "theme.svg"
 
     def __init__(self):
@@ -414,7 +414,7 @@ class AboutWidLabel(LabelMinWidth):
         Utils.pyqt_copy_text(self.selectedText())
 
 
-class AboutWid(TransparentGroupBox):
+class AboutWid(UGroupBox):
     icon_path = Static.APP_ICONS / "icon.png"
     icon_size = 85
 
@@ -470,7 +470,7 @@ class GeneralSettings(TransparentWidget):
         about = AboutWid()
         v_lay.addWidget(about)
 
-        save_container = TransparentGroupBox()
+        save_container = UGroupBox()
         v_lay.addWidget(save_container)
         save_container_lay = QVBoxLayout(save_container)
         save_container_lay.setContentsMargins(*RowArrowWidget.group_margings)
@@ -524,7 +524,7 @@ class FiltersWid(TransparentWidget):
         )
         main_lay.addWidget(self.filters_edit)
 
-        second_container = TransparentGroupBox()
+        second_container = UGroupBox()
         main_lay.addWidget(second_container)
         second_container_layout = QVBoxLayout(second_container)
         second_container_layout.setContentsMargins(*RowArrowWidget.group_margings)
@@ -640,7 +640,7 @@ class MfSettings(TransparentWidget):
         )
         main_lay.addWidget(self.mf_stop_list)
 
-        general_wid = TransparentGroupBox()
+        general_wid = UGroupBox()
         main_lay.addWidget(general_wid)
         general_wid_lay = QVBoxLayout(general_wid)
         general_wid_lay.setContentsMargins(*RowArrowWidget.group_margings)
@@ -796,7 +796,7 @@ class NewMfSettings(TransparentWidget):
         )
         main_lay.addWidget(self.mf_stop_list)
 
-        save_group = TransparentGroupBox()
+        save_group = UGroupBox()
         main_lay.addWidget(save_group)
         save_group_container = QVBoxLayout(save_group)
         save_group_container.setContentsMargins(*RowArrowWidget.group_margings)

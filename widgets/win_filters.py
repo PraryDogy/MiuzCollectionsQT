@@ -37,7 +37,7 @@ class DatesWidget(UGroupBox):
             dt = QDate.currentDate()
             self.q_date_end = QDate(dt)
         
-        # Главный вертикальный layout для TransparentGroupBox
+        # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setSpacing(RowArrowWidget.group_spacing)

@@ -8,7 +8,7 @@ TransparentLineEdit,
 TransparentTextEdit,
 TransparentMenu,
 TransparentScrollArea,
-TransparentGroupBox,
+UGroupBox,
 TransparentListWidget,
 TransparentTreeWidget,
 TransparentTreeView {

@@ -71,6 +71,10 @@ class _CalendarDayBase(TransparentLabel):
 			self.clicked.emit()
 		super().mouseReleaseEvent(ev)
 
+	def enterEvent(self, event):
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		return super().enterEvent(event)
+
 
 class CalendarDay(_CalendarDayBase):
 	pass
@@ -88,6 +92,11 @@ class CalendarDayInactive(GrayTextLabel):
 		if ev.button() == Qt.MouseButton.LeftButton:
 			self.clicked.emit(self.date)
 		super().mouseReleaseEvent(ev)
+
+	def enterEvent(self, event):
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		return super().enterEvent(event)
+
 
 
 class CalendarDaySelected(TransparentLabel):
@@ -408,9 +417,6 @@ class Calendar(UMainWidget):
 						)
 						btn_day_text.setGeometry(btn_day.rect())
 						btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-						btn_day_text.setAttribute(
-							Qt.WidgetAttribute.WA_TransparentForMouseEvents
-						)
 					else:
 						btn_day = CalendarDay(str(day_num), d_date)
 						btn_day.setFixedSize(*self.cell_size)

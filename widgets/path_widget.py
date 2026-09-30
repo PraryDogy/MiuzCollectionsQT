@@ -10,11 +10,11 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, SmbChecker
 
-from ._base_widgets import (SelectableLabel, TransparentGroupBox,
+from ._base_widgets import (SelectableLabel, UGroupBox,
                             TransparentLabel, TransparentWidget)
 
 
-class PathWidget(TransparentGroupBox):
+class PathWidget(UGroupBox):
     mf_path_avaiable = pyqtSignal()
     magnifier = Static.COMMON_ICONS / "magnifier.svg"
     green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"

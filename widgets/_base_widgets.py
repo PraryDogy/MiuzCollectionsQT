@@ -64,7 +64,7 @@ class TransparentScrollArea(QScrollArea):
         super().__init__(parent)
 
 
-class TransparentGroupBox(QGroupBox):
+class UGroupBox(QGroupBox):
     def __init__(self, title=None, parent=None):
         super().__init__(title, parent)
 
@@ -362,7 +362,7 @@ class USpinBox(QSpinBox):
         return super().enterEvent(event)
 
 
-class UGroupBox(TransparentGroupBox):
+class UGroupBox(UGroupBox):
     def __init__(self, title=None, parent=None):
         super().__init__(title, parent)
 
@@ -677,7 +677,7 @@ class MfAliasWidget(QWidget):
         return result
 
 
-class MfPathWidget(TransparentGroupBox):
+class MfPathWidget(UGroupBox):
     changed = pyqtSignal()
     magnifier = Static.COMMON_ICONS / "magnifier.svg"
     green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
