@@ -14,7 +14,7 @@ from ._base_widgets import (ConfirmWindow, FlowLayout, RowArrowWidget,
                             TransparentWidget, UGroupBox, UListWidget,
                             UListWidgetItem, UMainWidget, UMenu, UPushButton,
                             USep)
-from .caledar_widget import Calendar
+from .win_calendar import WinCalendar
 
 UGroupBox_margins = (5, 5, 5, 5)
 UGroupBox_spacing = 10
@@ -38,7 +38,7 @@ class DatesWidget(UGroupBox):
             dt = Dynamic.date_start
             self.q_date_start = QDate(dt.year, dt.month, dt.day)
         else:
-            self.q_date_start = QDate(Calendar.min_year, 1, 1)
+            self.q_date_start = QDate(WinCalendar.min_year, 1, 1)
 
         if Dynamic.date_end:
             dt = Dynamic.date_end
@@ -178,11 +178,11 @@ class DatesWidget(UGroupBox):
             callback = lambda qdate: set_date_end(qdate)
             target_btn = self.date_end_btn
 
-        self.calendar_win = Calendar(qdate)
-        global_pos = target_btn.mapToGlobal(QPoint(0, target_btn.height()))
-        offset = QPoint(0, 0)  # (по X, по Y)
-        self.calendar_win.move(global_pos + offset)
-        # self.calendar_win.center_to_parent(self.window())
+        self.calendar_win = WinCalendar(qdate)
+        # global_pos = target_btn.mapToGlobal(QPoint(0, target_btn.height()))
+        # offset = QPoint(0, 0)  # (по X, по Y)
+        # self.calendar_win.move(global_pos + offset)
+        self.calendar_win.center_to_parent(self.window())
         self.calendar_win.date_selected.connect(callback)
         self.calendar_win.show()
 
@@ -200,7 +200,7 @@ class DatesWidget(UGroupBox):
         today = QDate.currentDate()
         if not is_custom:
             if index == 0:  # Все время
-                self.q_date_start = QDate(Calendar.min_year, 1, 1)
+                self.q_date_start = QDate(WinCalendar.min_year, 1, 1)
                 self.q_date_end = today
             elif index == 1:  # Сегодня
                 self.q_date_start = today

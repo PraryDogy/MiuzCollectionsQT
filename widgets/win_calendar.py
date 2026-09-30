@@ -99,7 +99,7 @@ class CalendarDaySelected(TransparentLabel):
 		super().mouseReleaseEvent(ev)
 
 
-class Calendar(UMainWidget):
+class WinCalendar(UMainWidget):
 	date_selected = pyqtSignal(QDate)
 
 	svg_calendar_path = Static.COMMON_ICONS / "calendar.svg"
@@ -141,7 +141,7 @@ class Calendar(UMainWidget):
 		self.adjustSize()
 		self.setFixedSize(self.width(), self.height())
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
+		self.central_layout.setContentsMargins(10, 10, 10, 12)
 
 	def init_ui(self):
 		dynamic_container = TransparentWidget()
@@ -210,6 +210,7 @@ class Calendar(UMainWidget):
 		self.central_layout.addWidget(self.btn_container)
 		self.btn_container_layout = QHBoxLayout(self.btn_container)
 		self.btn_container_layout.setContentsMargins(0, 0, 0, 0)
+		self.btn_container_layout.setSpacing(10)
 
 		self.btn_container_layout.addStretch(1)
 
