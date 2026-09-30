@@ -260,7 +260,7 @@ class DatesWidget(UGroupBox):
 class WinFiltersTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "trash.svg"
     clicked_trash = pyqtSignal()
-    toggled = pyqtSignal(bool) 
+    clicked_body = pyqtSignal() 
 
     # Добавляем параметр show_trash=True по умолчанию
     def __init__(self, text: str, active: bool = False, show_trash: bool = True):
@@ -297,10 +297,6 @@ class WinFiltersTagWidget(TransparentFrame):
         if active:
             self.set_active(True)
 
-    @property
-    def is_active(self) -> bool:
-        return self._active
-
     def set_active(self, active: bool):
         if self._active != active:
             self._active = active
@@ -309,23 +305,14 @@ class WinFiltersTagWidget(TransparentFrame):
             self.style().polish(self)
             self.update()
 
-    def on_trash_clicked(self, event):
-        event.accept()
+    def on_trash_clicked(self, e):
         self.clicked_trash.emit()
 
     def clicked_trash_cmd(self):
         self.clicked_trash.emit()
 
-    def hide_trash_btn(self):
-        # Метод можно оставить для обратной совместимости, если где-то вызывается, 
-        # но теперь он больше не нужен для наследников.
-        if hasattr(self, 'close_btn_wrapper'):
-            self.close_btn_wrapper.deleteLater()
-
     def mouseReleaseEvent(self, a0):
-        new_state = not self._active
-        self.set_active(new_state)
-        self.toggled.emit(new_state)
+        self.clicked_body.emit()
         super().mouseReleaseEvent(a0)
 
 
