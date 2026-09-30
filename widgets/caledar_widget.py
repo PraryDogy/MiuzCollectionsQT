@@ -123,9 +123,9 @@ class Calendar(UMainWidget):
 
         self.init_ui()
 
-        hh = 530
+        # hh = 530
         self.adjustSize()
-        self.setFixedSize(self.width(), hh)
+        self.setFixedSize(self.width(), self.height())
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def init_ui(self):
