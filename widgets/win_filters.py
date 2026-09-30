@@ -294,6 +294,9 @@ class WinFiltersTagWidget(TransparentFrame):
             close_lay.addWidget(self.trash_btn)
             self.h_lay.addWidget(self.close_btn_wrapper)
 
+        if active:
+            self.set_active(True)
+
     @property
     def is_active(self) -> bool:
         return self._active
@@ -328,8 +331,11 @@ class WinFiltersTagWidget(TransparentFrame):
 
 class WinFiltersFavTag(WinFiltersTagWidget):
     def __init__(self, text):
-        # Передаем show_trash=False сразу в базовый класс
-        super().__init__(text, show_trash=False)
+        if Dynamic.favs_tag_enabled:
+            active = True
+        else:
+            active = False
+        super().__init__(text, show_trash=False, active=active)
 
     def clicked_trash_cmd(self):
         pass
@@ -337,8 +343,11 @@ class WinFiltersFavTag(WinFiltersTagWidget):
 
 class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
     def __init__(self, text):
-        # Тоже отключаем создание мусорки на корню
-        super().__init__(text, show_trash=False)
+        if Dynamic.no_subfolders_tag_enabled:
+            active = True
+        else:
+            active = False
+        super().__init__(text, show_trash=False, active=active)
 
     def clicked_trash_cmd(self):
         pass
@@ -346,7 +355,11 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
 
 class WinFiltersWordTag(WinFiltersTagWidget):
     def __init__(self, text):
-        super().__init__(text)
+        if text in Dynamic.word_tags_list:
+            active = True
+        else:
+            active = False
+        super().__init__(text, show_trash=False, active=active)
 
     def clicked_trash_cmd(self):
         Dynamic.word_tags_list.remove(self.title.text())
