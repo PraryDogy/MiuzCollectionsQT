@@ -359,7 +359,7 @@ class WinFiltersWordTag(WinFiltersTagWidget):
             active = True
         else:
             active = False
-        super().__init__(text, show_trash=False, active=active)
+        super().__init__(text, show_trash=True, active=active)
 
     def clicked_trash_cmd(self):
         Dynamic.word_tags_list.remove(self.title.text())
