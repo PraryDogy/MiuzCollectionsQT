@@ -72,16 +72,14 @@ UMenu::right-arrow:selected {
     image: url("./icons/common/arrow_right.svg"); /* Можно заменить на светлую/другую иконку */
 }
 
-
-
 ULineEdit {
     color: #ffffff;
     border: 1px solid #353535;
     border-radius: 6px;
     padding-left: 2px;
     padding-right: 2px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 
@@ -293,7 +291,9 @@ TagWidget {
 /* bar_path.py */
 
 /* bar_top.py */
-/*  */
+SearchWidLineEdit {
+    padding-right: 45px;
+}
 /* bar_top.py */
 
 /* caledar_widget.py */
