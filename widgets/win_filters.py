@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import QDate, QLocale, QPoint, Qt, pyqtSignal, QSize
+from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSplitter, QVBoxLayout
@@ -9,12 +9,12 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (RowArrowWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, USep,
-                            FlowLayout, UListWidget, UListWidgetItem,
-                            UMainWidget, UMenu, UPushButton, TransparentFrame)
+from ._base_widgets import (ConfirmWindow, FlowLayout, RowArrowWidget,
+                            TransparentFrame, TransparentLabel,
+                            TransparentWidget, UGroupBox, UListWidget,
+                            UListWidgetItem, UMainWidget, UMenu, UPushButton,
+                            USep)
 from .caledar_widget import Calendar
-
 
 UGroupBox_margins = (5, 5, 5, 5)
 UGroupBox_spacing = 10
@@ -390,12 +390,23 @@ class TagsContolWidget(TransparentWidget):
             tag = WinFiltersWordTag(word)
             tag.load_st_grid.connect(self.load_st_grid.emit)
             tag.on_trash_clicked.connect(
-                lambda t=word: self.remove_tag_win(t)
+                lambda t=word: self.show_remove_tag_win(t)
             )
             self.flow_layout.addWidget(tag)
 
-    def remove_tag_win(self, text: str):
-        print(text)
+    def show_remove_tag_win(self, text: str):
+
+        def ok_clicked():
+            print(text, "removing")
+            self.remove_tag_win.deleteLater()
+
+        self.remove_tag_win = ConfirmWindow(
+            text=Lng.remove_tag_question[JsonData.lng_index],
+            w=300, h=300
+        )
+        self.remove_tag_win.ok_clicked.connect(ok_clicked)
+        self.remove_tag_win.center_to_parent(self.window())
+        self.remove_tag_win.show()
 
     def hasHeightForWidth(self):
         return True
