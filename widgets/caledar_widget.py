@@ -73,6 +73,8 @@ class CalendarDayInactive(GrayTextLabel):
 		self.date = date
 
 	def mouseReleaseEvent(self, ev: QMouseEvent):
+		ev.ignore()
+		return
 		if ev.button() == Qt.MouseButton.LeftButton:
 			self.clicked.emit(self.date)
 		super().mouseReleaseEvent(ev)
@@ -134,6 +136,7 @@ class Calendar(UMainWidget):
 		self.adjustSize()
 		self.setFixedSize(self.width(), self.height())
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+		self.central_layout.setContentsMargins(10, 10, 10, 10)
 
 	def init_ui(self):
 		dynamic_container = TransparentWidget()
@@ -160,7 +163,7 @@ class Calendar(UMainWidget):
 		self.central_layout.addWidget(self.nav_widget)
 
 		self.nav_layout = QHBoxLayout(self.nav_widget)
-		self.nav_layout.setContentsMargins(10, 0, 10, 0)
+		self.nav_layout.setContentsMargins(0, 0, 0, 0)
 		self.nav_layout.setSpacing(0)
 		self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -214,7 +217,7 @@ class Calendar(UMainWidget):
 		self.btn_container = TransparentWidget()
 		self.central_layout.addWidget(self.btn_container)
 		self.btn_container_layout = QHBoxLayout(self.btn_container)
-		self.btn_container_layout.setContentsMargins(0, 0, 10, 20)
+		self.btn_container_layout.setContentsMargins(0, 20, 0, 0)
 		self.btn_container_layout.setSpacing(15)
 
 		self.btn_container_layout.addStretch(1)
