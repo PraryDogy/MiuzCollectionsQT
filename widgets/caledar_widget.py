@@ -1,15 +1,28 @@
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPainter, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QGridLayout, QHBoxLayout, QStackedLayout,
-                             QVBoxLayout)
+from PyQt6.QtWidgets import (
+	QGridLayout,
+	QHBoxLayout,
+	QStackedLayout,
+	QVBoxLayout,
+)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import (GrayTextLabel, TransparentLabel, TransparentWidget,
-                            UHorizontalSep, UMainWidget, UMenu, UPushButton)
+from ._base_widgets import (
+	GrayTextLabel,
+	TransparentLabel,
+	TransparentWidget,
+	UHorizontalSep,
+	UMainWidget,
+	UMenu,
+	UPushButton,
+)
+
+QSS_ROUND_SVG_SIZE = 30
 
 
 class CalendarBigDate(GrayTextLabel):
@@ -40,7 +53,6 @@ class CalendarSvgNavi(QSvgWidget):
 		self.setCursor(Qt.CursorShape.ForbiddenCursor)
 
 	def mouseReleaseEvent(self, a0):
-		# Если флаг False, клик просто игнорируется
 		if self._is_active and a0.button() == Qt.MouseButton.LeftButton:
 			self.clicked.emit()
 		return super().mouseReleaseEvent(a0)
@@ -49,10 +61,10 @@ class CalendarSvgNavi(QSvgWidget):
 class _CalendarDayBase(TransparentLabel):
 	clicked = pyqtSignal()
 
-	def __init__(self, text: str, date: QDate):  # Принимаем date
+	def __init__(self, text: str, date: QDate):
 		super().__init__(text)
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.date = date  # Сохраняем дату
+		self.date = date
 
 	def mouseReleaseEvent(self, ev: QMouseEvent):
 		if ev.button() == Qt.MouseButton.LeftButton:
@@ -73,8 +85,6 @@ class CalendarDayInactive(GrayTextLabel):
 		self.date = date
 
 	def mouseReleaseEvent(self, ev: QMouseEvent):
-		ev.ignore()
-		return
 		if ev.button() == Qt.MouseButton.LeftButton:
 			self.clicked.emit(self.date)
 		super().mouseReleaseEvent(ev)
@@ -83,9 +93,9 @@ class CalendarDayInactive(GrayTextLabel):
 class CalendarDaySelected(TransparentLabel):
 	clicked = pyqtSignal()
 
-	def __init__(self, text: str, date: QDate):  # Принимаем date
+	def __init__(self, text: str, date: QDate):
 		super().__init__()
-		self.date = date  # Сохраняем дату
+		self.date = date
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 	def mouseReleaseEvent(self, ev: QMouseEvent):
@@ -197,28 +207,12 @@ class Calendar(UMainWidget):
 
 		self.central_layout.addWidget(UHorizontalSep())
 
-		# --- СОЗДАЕМ ПОСТОЯННУЮ ШАПКУ ДНЕЙ НЕДЕЛИ ---
-		header_widget = TransparentWidget()
-		header_layout = QHBoxLayout(header_widget)
-		header_layout.setContentsMargins(0, 0, 0, 0)
-		header_layout.setSpacing(0)
-
-		for col in range(7):
-			week_name = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
-			lbl_day = GrayTextLabel(week_name.capitalize())
-			lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
-			lbl_day.setFixedSize(*self.cell_size)
-			header_layout.addWidget(lbl_day)
-
-		self.central_layout.addWidget(header_widget)
-		self.central_layout.addWidget(UHorizontalSep())
-		# ---------------------------------------------
+		self.central_layout.addSpacing(15)
 
 		self.btn_container = TransparentWidget()
 		self.central_layout.addWidget(self.btn_container)
 		self.btn_container_layout = QHBoxLayout(self.btn_container)
-		self.btn_container_layout.setContentsMargins(0, 20, 0, 0)
-		self.btn_container_layout.setSpacing(15)
+		self.btn_container_layout.setContentsMargins(0, 0, 0, 0)
 
 		self.btn_container_layout.addStretch(1)
 
@@ -242,7 +236,6 @@ class Calendar(UMainWidget):
 		self.calendar_layout = QVBoxLayout(self.calendar_widget)
 		self.calendar_layout.setContentsMargins(0, 0, 0, 0)
 		self.calendar_layout.setSpacing(0)
-		# Вставляем сетку календаря перед блоком кнопок (предпоследний элемент)
 		widget_num = self.central_layout.count() - 2
 		self.central_layout.insertWidget(widget_num, self.calendar_widget)
 
@@ -303,7 +296,6 @@ class Calendar(UMainWidget):
 		self.update_calendar()
 
 	def inactive_day_clicked(self, clicked_date: QDate):
-		"""Метод для клика по неактивному дню (автоматически переключает месяц)"""
 		self.current_date = clicked_date
 		self.update_calendar()
 
@@ -345,16 +337,33 @@ class Calendar(UMainWidget):
 		else:
 			self.btn_next.set_enabled()
 
-		# Очищаем старую сетку дней перед перерисовкой
 		self.recreate_calendar_widget()
 
+		# 1. Шапка дней недели внутри динамического контейнера
+		header_widget = TransparentWidget()
+		header_layout = QHBoxLayout(header_widget)
+		header_layout.setContentsMargins(0, 0, 0, 0)
+		header_layout.setSpacing(0)
+
+		for col in range(7):
+			week_name = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
+			lbl_day = GrayTextLabel(week_name.capitalize())
+			lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
+			lbl_day.setFixedSize(*self.cell_size)
+			header_layout.addWidget(lbl_day)
+
+		self.calendar_layout.addWidget(header_widget)
+
+		# 2. Сепаратор под днями недели
+		self.calendar_layout.addWidget(UHorizontalSep())
+
+		# 3. Расчет сетки дней (всегда 6 строк / 42 ячейки)
 		first_day = QDate(current_year, current_month, 1)
-		start_col = first_day.dayOfWeek() - 1  # 0 (пн) - 6 (вс)
+		start_col = first_day.dayOfWeek() - 1
 		days_in_month = first_day.daysInMonth()
 
 		all_days = []
 
-		# 1. Дни предыдущего месяца для заполнения пустоты в начале
 		prev_month_date = first_day.addMonths(-1)
 		days_in_prev_month = prev_month_date.daysInMonth()
 		for i in range(start_col):
@@ -362,21 +371,18 @@ class Calendar(UMainWidget):
 			d_date = QDate(prev_month_date.year(), prev_month_date.month(), day_num)
 			all_days.append((day_num, d_date, "inactive"))
 
-		# 2. Дни текущего месяца
 		for day in range(1, days_in_month + 1):
 			d_date = QDate(current_year, current_month, day)
 			all_days.append((day, d_date, "active"))
 
-		# 3. Дни следующего месяца так, чтобы всегда получалось ровно 42 ячейки (6 строк по 7 дней)
 		next_month_date = first_day.addMonths(1)
-		total_cells = 42  # 6 строк * 7 дней
+		total_cells = 42
 		extra_days = total_cells - len(all_days)
 
 		for day in range(1, extra_days + 1):
 			d_date = QDate(next_month_date.year(), next_month_date.month(), day)
 			all_days.append((day, d_date, "inactive"))
 
-		# Разбиваем строго на 6 недель по 7 дней
 		weeks = [all_days[i:i + 7] for i in range(0, len(all_days), 7)]
 
 		for week_index, week in enumerate(weeks):
@@ -415,7 +421,6 @@ class Calendar(UMainWidget):
 
 			self.calendar_layout.addWidget(week_widget)
 
-			# Разделитель между неделями (кроме последней)
 			if week_index < len(weeks) - 1:
 				self.calendar_layout.addWidget(UHorizontalSep())
 
