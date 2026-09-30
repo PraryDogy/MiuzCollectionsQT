@@ -422,3 +422,11 @@ class Lng:
         "Применить",
         "Apply"
     )
+    tag_management = (
+        "Управление тегами",
+        "Tag Management",
+    )
+    dates_management = (
+        "Управление датами",
+        "Dates management"
+    )

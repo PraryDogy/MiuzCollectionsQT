@@ -183,7 +183,7 @@ UPushButton::menu-indicator {
 }
 
 
-UHorizontalSep {
+USep {
     background: #363636;
 }
 
@@ -371,7 +371,6 @@ WinFiltersTagWidget {
     color: #ffffff;
 }
 
-
 WinFiltersTagWidget[active="True"] {
     background: #0059D1;;
     border: 1px solid #156ee3;
@@ -381,6 +380,11 @@ WinFiltersTagWidget[active="True"] {
 WinFiltersTagWidget[active="False"] {
     background: #4e4e4e;
     border: 1px solid #585858;
+}
+
+WinFiltersTitle {
+    font-weight: bold;
+    font-size: 20px;
 }
 
 /* win_filters.py */

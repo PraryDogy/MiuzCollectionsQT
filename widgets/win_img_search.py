@@ -19,7 +19,7 @@ from system.utils import Utils
 
 from ._base_widgets import (RowArrowWidget, UGroupBox,
                             TransparentLabel, TransparentWidget,
-                            UHorizontalSep, UMainWidget, UPushButton, USlider)
+                            USep, UMainWidget, UPushButton, USlider)
 
 
 class ProgressWin(UMainWidget):
@@ -166,7 +166,7 @@ class WinImgSearch(UMainWidget):
         self.reset_btn.clicked.connect(self.reset_img_search)
         self.group_layout.addWidget(self.reset_btn)
 
-        self.group_layout.addWidget(UHorizontalSep())
+        self.group_layout.addWidget(USep())
         
         self.slider_widget = SliderWidget()
         self.group_layout.addWidget(self.slider_widget)

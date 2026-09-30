@@ -27,7 +27,7 @@ from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             MfStopListWidget, RowArrowWidget,
                             SaveRowArrowWidget, SuperConfirmWindow,
                             UGroupBox, TransparentLabel,
-                            TransparentWidget, UHorizontalSep, ULineEdit,
+                            TransparentWidget, USep, ULineEdit,
                             UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWidget, UMenu, UPushButton, USpinBox,
                             UTextEdit, WarningWindow)
@@ -88,7 +88,7 @@ class RebootableSettings(UGroupBox):
         # чтобы кнопка меню не теряла стиль
         lng_wid.setFixedHeight(RowArrowWidget.hh + 6)
 
-        main_layout.addWidget(UHorizontalSep())
+        main_layout.addWidget(USep())
 
         scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
         scaner_time_wid.set_left_icon(self.clock_svg)
@@ -106,7 +106,7 @@ class RebootableSettings(UGroupBox):
         self.spin.valueChanged.connect(self.change_scan_time)
         scaner_time_wid.replace_arrow_widget(self.spin)
 
-        main_layout.addWidget(UHorizontalSep())
+        main_layout.addWidget(USep())
 
         reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
         reset_data_wid.set_left_icon(self.eraser_svg)
@@ -248,7 +248,7 @@ class NonRebootableSettings(UGroupBox):
         data_size_wid.clicked.connect(self.show_sizes_win)
         main_layout.addWidget(data_size_wid)
 
-        main_layout.addWidget(UHorizontalSep())
+        main_layout.addWidget(USep())
 
         show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
         show_files_wid.set_left_icon(self.finder_svg)
@@ -331,7 +331,7 @@ class ThemesWidget(UGroupBox):
         title_wid.hide_arrow()
         main_lay.addWidget(title_wid)
 
-        main_lay.addWidget(UHorizontalSep())
+        main_lay.addWidget(USep())
         main_lay.addSpacing(5)
 
         themes_wid = TransparentWidget()
@@ -535,7 +535,7 @@ class FiltersWid(TransparentWidget):
         erase_filters_wid.clicked.connect(self.reset_filters_cmd)
         second_container_layout.addWidget(erase_filters_wid)
 
-        second_container_layout.addWidget(UHorizontalSep())
+        second_container_layout.addWidget(USep())
 
         self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
         self.save_wid.clicked.connect(lambda: self.save_filters_cmd())
@@ -651,7 +651,7 @@ class MfSettings(TransparentWidget):
         repair_widget.clicked.connect(self.repair_mf)
         general_wid_lay.addWidget(repair_widget)
 
-        general_wid_lay.addWidget(UHorizontalSep())
+        general_wid_lay.addWidget(USep())
 
 
         if len(Mf.items) > 1:
@@ -661,7 +661,7 @@ class MfSettings(TransparentWidget):
             remove_wid.clicked.connect(self.remove_mf)
             general_wid_lay.addWidget(remove_wid)
 
-            general_wid_lay.addWidget(UHorizontalSep())
+            general_wid_lay.addWidget(USep())
 
         self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
         self.mf_save_widget.clicked.connect(self.save_mf_settings)

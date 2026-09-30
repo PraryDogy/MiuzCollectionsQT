@@ -10,10 +10,20 @@ from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import (RowArrowWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UHorizontalSep,
+                            TransparentWidget, UGroupBox, USep,
                             FlowLayout, UListWidget, UListWidgetItem,
                             UMainWidget, UMenu, UPushButton, TransparentFrame)
 from .caledar_widget import Calendar
+
+
+UGroupBox_margins = (5, 5, 5, 5)
+UGroupBox_spacing = 10
+
+
+
+class WinFiltersTitle(TransparentLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
 
 
 class DatesWidget(UGroupBox):
@@ -40,9 +50,14 @@ class DatesWidget(UGroupBox):
         # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
         # self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
-        self.main_layout.setContentsMargins(5, 10, 5, 10)
+        self.main_layout.setContentsMargins(*UGroupBox_margins)
         # self.main_layout.setSpacing(RowArrowWidget.group_spacing)
-        self.main_layout.setSpacing(10)
+        self.main_layout.setSpacing(UGroupBox_spacing)
+
+        self.title_widget = WinFiltersTitle(Lng.dates_management[JsonData.lng_index])
+        self.main_layout.addWidget(self.title_widget)
+
+        self.main_layout.addWidget(USep())
 
         # --- 1. Блок большой даты ---
         dynamic_container = TransparentWidget()
@@ -62,7 +77,7 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.addWidget(self.dynamic_label)
         dynamic_container_lay.addStretch()
 
-        self.main_layout.addWidget(UHorizontalSep())
+        # self.main_layout.addWidget(USep())
         
         # --- СТРОКА 1: Виджет панели управления (Вместо вложенного layout) ---
         self.top_row_widget = TransparentWidget()
@@ -218,12 +233,6 @@ class DatesWidget(UGroupBox):
         else:
             locale = QLocale(QLocale.Language.English)
 
-        # text = self.preset_actions[index].text()
-        # if index == len(self.preset_actions) - 1:
-            # if self.q_date_start == self.q_date_end:
-            #     str_date = locale.toString(self.q_date_start, "d MMMM yyyy")
-            #     text = f"{str_date}"
-            # else:
         str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
         str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
         text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
@@ -253,12 +262,12 @@ class WinFiltersTagWidget(TransparentFrame):
     clicked_trash = pyqtSignal()
     toggled = pyqtSignal(bool) 
 
-    def __init__(self, text: str, active: bool = False):
+    # Добавляем параметр show_trash=True по умолчанию
+    def __init__(self, text: str, active: bool = False, show_trash: bool = True):
         super().__init__()
         self.setFixedHeight(23)
-        self.setCursor(Qt.CursorShape.PointingHandCursor) # Указываем курсор руки на весь виджет
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-        # Устанавливаем начальное состояние через свойство для QSS
         self._active = active
         self.setProperty("active", str(active))
 
@@ -269,57 +278,70 @@ class WinFiltersTagWidget(TransparentFrame):
         self.title = TransparentLabel(text)
         self.h_lay.addWidget(self.title)
 
-        # Контейнер для SVG
-        self.close_btn_wrapper = TransparentWidget()
-        close_lay = QVBoxLayout(self.close_btn_wrapper)
-        close_lay.setContentsMargins(0, 1, 0, 0)
-        close_lay.setSpacing(0)
+        # Создаем контейнер и иконку только если передан флаг True
+        if show_trash:
+            self.close_btn_wrapper = TransparentWidget()
+            close_lay = QVBoxLayout(self.close_btn_wrapper)
+            close_lay.setContentsMargins(0, 1, 0, 0)
+            close_lay.setSpacing(0)
 
-        self.trash_btn = QSvgWidget()
-        # Перехватываем клик по иконке мусорки, чтобы он не триггерил клик по body
-        self.trash_btn.mouseReleaseEvent = self.on_trash_clicked
-        self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.trash_btn.load(str(self.icon_path))
-        self.trash_btn.setFixedSize(12, 12)
+            self.trash_btn = QSvgWidget()
+            self.trash_btn.mouseReleaseEvent = self.on_trash_clicked
+            self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.trash_btn.load(str(self.icon_path))
+            self.trash_btn.setFixedSize(12, 12)
 
-        close_lay.addWidget(self.trash_btn)
-        self.h_lay.addWidget(self.close_btn_wrapper)
+            close_lay.addWidget(self.trash_btn)
+            self.h_lay.addWidget(self.close_btn_wrapper)
 
     @property
     def is_active(self) -> bool:
         return self._active
 
     def set_active(self, active: bool):
-        """Метод для программного изменения состояния (например, из модального окна)"""
         if self._active != active:
             self._active = active
             self.setProperty("active", str(active))
-            # Принудительно обновляем стили в PyQt, чтобы QSS применился мгновенно
             self.style().unpolish(self)
             self.style().polish(self)
             self.update()
 
     def on_trash_clicked(self, event):
-        # Останавливаем событие, чтобы оно не ушло на родителя (mouseReleaseEvent виджета)
         event.accept()
         self.clicked_trash.emit()
 
     def clicked_trash_cmd(self):
-        # Оставляем для совместимости, если где-то вызывается напрямую
         self.clicked_trash.emit()
 
     def hide_trash_btn(self):
-        self.trash_btn.deleteLater()
+        # Метод можно оставить для обратной совместимости, если где-то вызывается, 
+        # но теперь он больше не нужен для наследников.
+        if hasattr(self, 'close_btn_wrapper'):
+            self.close_btn_wrapper.deleteLater()
 
     def mouseReleaseEvent(self, a0):
-        # Инвертируем состояние при клике на тело
         new_state = not self._active
         self.set_active(new_state)
-        
-        # Сигнализируем наружу
         self.toggled.emit(new_state)
-        
         super().mouseReleaseEvent(a0)
+
+
+class WinFiltersFavTag(WinFiltersTagWidget):
+    def __init__(self, text):
+        # Передаем show_trash=False сразу в базовый класс
+        super().__init__(text, show_trash=False)
+
+    def clicked_trash_cmd(self):
+        pass
+
+
+class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
+    def __init__(self, text):
+        # Тоже отключаем создание мусорки на корню
+        super().__init__(text, show_trash=False)
+
+    def clicked_trash_cmd(self):
+        pass
 
 
 class WinFiltersWordTag(WinFiltersTagWidget):
@@ -331,25 +353,7 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         return super().clicked_trash_cmd()
 
 
-class WinFiltersFavTag(WinFiltersTagWidget):
-    def __init__(self, text):
-        super().__init__(text)
-
-    def clicked_trash_cmd(self):
-        Dynamic.favs_tag_enabled = False
-        return super().clicked_trash_cmd()
-
-
-class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
-    def __init__(self, text):
-        super().__init__(text)
-
-    def clicked_trash_cmd(self):
-        Dynamic.no_subfolders_tag_enabled = False
-        return super().clicked_trash_cmd()
-
-
-class TagsWidget(UGroupBox):
+class TagsContolWidget(TransparentWidget):
     load_st_grid = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -384,6 +388,21 @@ class TagsWidget(UGroupBox):
         return QSize(width, self.heightForWidth(width))
 
 
+class TagsWidget(UGroupBox):
+    def __init__(self):
+        super().__init__()
+        self.v_lay = QVBoxLayout(self)
+        self.v_lay.setContentsMargins(*UGroupBox_margins)
+        self.v_lay.setSpacing(UGroupBox_spacing)
+
+        self.title_widget = WinFiltersTitle(Lng.tag_management[JsonData.lng_index])
+        self.v_lay.addWidget(self.title_widget)
+
+        self.v_lay.addWidget(USep())
+
+        self.tags_control_widget = TagsContolWidget()
+        self.v_lay.addWidget(self.tags_control_widget)
+    
 
 class WinFilters(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"

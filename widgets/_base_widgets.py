@@ -318,7 +318,7 @@ class UPushButton(TransparentButton):
         return super().enterEvent(event)
 
 
-class UHorizontalSep(TransparentFrame):
+class USep(TransparentFrame):
     def __init__(self):
         super().__init__()
         self.setFixedHeight(1)

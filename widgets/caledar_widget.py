@@ -8,7 +8,7 @@ from system.lang import Lng
 from system.utils import Utils
 
 from ._base_widgets import (GrayTextLabel, TransparentLabel, TransparentWidget,
-                            UHorizontalSep, UMainWidget, UMenu, UPushButton)
+                            USep, UMainWidget, UMenu, UPushButton)
 
 
 class CalendarBigDate(GrayTextLabel):
@@ -163,7 +163,7 @@ class Calendar(UMainWidget):
 		dynamic_container_lay.addStretch(1)
 
 		self.central_layout.addSpacing(15)
-		self.central_layout.addWidget(UHorizontalSep())
+		self.central_layout.addWidget(USep())
 		# self.central_layout.addSpacing(5)
 
 		self.nav_widget = TransparentWidget()
@@ -202,7 +202,7 @@ class Calendar(UMainWidget):
 		self.btn_next.clicked.connect(self.next_month)
 		self.nav_layout.addWidget(self.btn_next)
 
-		self.central_layout.addWidget(UHorizontalSep())
+		self.central_layout.addWidget(USep())
 
 		self.central_layout.addSpacing(15)
 
@@ -352,7 +352,7 @@ class Calendar(UMainWidget):
 		self.calendar_layout.addWidget(header_widget)
 
 		# 2. Сепаратор под днями недели
-		self.calendar_layout.addWidget(UHorizontalSep())
+		self.calendar_layout.addWidget(USep())
 
 		# 3. Расчет сетки дней (всегда 6 строк / 42 ячейки)
 		first_day = QDate(current_year, current_month, 1)
@@ -416,7 +416,7 @@ class Calendar(UMainWidget):
 			self.calendar_layout.addWidget(week_widget)
 
 			if week_index < len(weeks) - 1:
-				self.calendar_layout.addWidget(UHorizontalSep())
+				self.calendar_layout.addWidget(USep())
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:

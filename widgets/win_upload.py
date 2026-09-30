@@ -12,7 +12,7 @@ from system.shared_utils import ImgUtils, SharedUtils
 
 from ._base_widgets import (RowArrowWidget, UGroupBox,
                             TransparentLabel, TransparentWidget,
-                            UHorizontalSep, UListWidget, UListWidgetItem,
+                            USep, UListWidget, UListWidgetItem,
                             UMainWidget, UMenu, UPushButton, UTreeView)
 
 
@@ -169,14 +169,14 @@ class UploadWin(UMainWidget):
         self.total_files_widget.hide_arrow()
         group_one_layout.addWidget(self.total_files_widget)
 
-        group_one_layout.addWidget(UHorizontalSep())
+        group_one_layout.addWidget(USep())
 
         self.total_size_widget = RowArrowWidget("")
         self.total_size_widget.set_left_icon(self.storage_svg)
         self.total_size_widget.hide_arrow()
         group_one_layout.addWidget(self.total_size_widget)
 
-        group_one_layout.addWidget(UHorizontalSep())
+        group_one_layout.addWidget(USep())
 
         self.lbl_target_dir = RowArrowWidget("")
         self.lbl_target_dir.set_left_icon(self.base_folder_svg)

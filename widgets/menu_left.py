@@ -14,7 +14,7 @@ from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
-                            TransparentWidget, UHorizontalSep, UMenu,
+                            TransparentWidget, USep, UMenu,
                             UTreeWidget, UTreeWidgetItem)
 
 
