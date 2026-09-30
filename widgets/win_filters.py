@@ -261,11 +261,12 @@ class WinFiltersTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "trash.svg"
     on_trash_clicked = pyqtSignal()
     load_st_grid = pyqtSignal() 
+    tag_height = 23
 
     # Добавляем параметр show_trash=True по умолчанию
     def __init__(self, text: str, active: bool = False, show_trash: bool = True):
         super().__init__()
-        self.setFixedHeight(23)
+        self.setFixedHeight(self.tag_height)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self._active = active
@@ -367,6 +368,23 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         return super().mouseReleaseEvent(a0)
 
 
+class WinFiltersAddTag(TransparentLabel):
+    clicked_ = pyqtSignal()
+
+    def __init__(self):
+        super().__init__("+")
+        self.setFixedWidth(30)
+        self.setFixedHeight(WinFiltersTagWidget.tag_height)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def mouseReleaseEvent(self, ev):
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.clicked_.emit()
+        return super().mouseReleaseEvent(ev)
+
+
+
 class TagsContolWidget(TransparentWidget):
     load_st_grid = pyqtSignal()
 
@@ -393,6 +411,10 @@ class TagsContolWidget(TransparentWidget):
                 lambda w=tag: self.show_remove_tag_win(w)
             )
             self.flow_layout.addWidget(tag)
+
+        self.add_tag = WinFiltersAddTag()
+        self.add_tag.clicked_.connect(lambda: print("add tag"))
+        self.flow_layout.addWidget(self.add_tag)
 
     def show_remove_tag_win(self, widget: WinFiltersWordTag):
 

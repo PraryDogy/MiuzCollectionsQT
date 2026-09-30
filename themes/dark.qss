@@ -392,6 +392,7 @@ WinFiltersAddTag {
     color: #ffffff;
     background: #4e4e4e;
     border: 1px solid #585858;
+    font-weight: bold;
 }
 
 /* win_filters.py */
