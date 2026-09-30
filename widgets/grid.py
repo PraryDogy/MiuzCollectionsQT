@@ -372,9 +372,6 @@ class TagWidget(TransparentFrame):
     def clicked_close_cmd(self):
         self.clicked_close.emit()
 
-    def hide_close_btn(self):
-        self.close_btn.deleteLater()
-
     def mouseReleaseEvent(self, a0):
         self.clicked_body.emit()
         return super().mouseReleaseEvent(a0)

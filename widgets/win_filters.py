@@ -250,7 +250,7 @@ class DatesWidget(UGroupBox):
 
 class TagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "trash.svg"
-    clicked_close = pyqtSignal()
+    clicked_trash = pyqtSignal()
     clicked_body = pyqtSignal()
 
     def __init__(self, text: str):
@@ -271,20 +271,20 @@ class TagWidget(TransparentFrame):
         close_lay.setContentsMargins(0, 1, 0, 0)
         close_lay.setSpacing(0)
 
-        self.remove_btn = QSvgWidget()
-        self.remove_btn.mouseReleaseEvent = lambda e: self.clicked_close_cmd()
-        self.remove_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.remove_btn.load(str(self.icon_path))
-        self.remove_btn.setFixedSize(12, 12)
+        self.trash_btn = QSvgWidget()
+        self.trash_btn.mouseReleaseEvent = lambda e: self.clicked_trash_cmd()
+        self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.trash_btn.load(str(self.icon_path))
+        self.trash_btn.setFixedSize(12, 12)
 
-        close_lay.addWidget(self.remove_btn)
+        close_lay.addWidget(self.trash_btn)
         self.h_lay.addWidget(self.close_btn_wrapper)
 
-    def clicked_close_cmd(self):
-        self.clicked_close.emit()
+    def clicked_trash_cmd(self):
+        self.clicked_trash.emit()
 
-    def hide_close_btn(self):
-        self.remove_btn.deleteLater()
+    def hide_trash_btn(self):
+        self.trash_btn.deleteLater()
 
     def mouseReleaseEvent(self, a0):
         self.clicked_body.emit()
@@ -295,27 +295,27 @@ class WordTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def clicked_close_cmd(self):
+    def clicked_trash_cmd(self):
         Dynamic.word_tags_list.remove(self.title.text())
-        return super().clicked_close_cmd()
+        return super().clicked_trash_cmd()
 
 
 class FavTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def clicked_close_cmd(self):
+    def clicked_trash_cmd(self):
         Dynamic.favs_tag_enabled = False
-        return super().clicked_close_cmd()
+        return super().clicked_trash_cmd()
 
 
 class OnlyFolderTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def clicked_close_cmd(self):
+    def clicked_trash_cmd(self):
         Dynamic.no_subfolders_tag_enabled = False
-        return super().clicked_close_cmd()
+        return super().clicked_trash_cmd()
 
 
 class TagsWidget(UGroupBox):
@@ -330,16 +330,16 @@ class TagsWidget(UGroupBox):
 
     def _create_tags(self):
         tag = FavTag(Lng.favorites[JsonData.lng_index])
-        tag.clicked_close.connect(self.load_st_grid.emit)
+        tag.clicked_trash.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
         tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
-        tag.clicked_close.connect(self.load_st_grid.emit)
+        tag.clicked_trash.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
-        for word in Dynamic.word_tags_list:
+        for word in Filters.items:
             tag = WordTag(word)
-            tag.clicked_close.connect(self.load_st_grid.emit)
+            tag.clicked_trash.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
     def hasHeightForWidth(self):
