@@ -331,6 +331,9 @@ class WinFiltersFavTag(WinFiltersTagWidget):
         if Dynamic.favs_tag_enabled:
             self.set_active(False)
             Dynamic.favs_tag_enabled = False
+        else:
+            self.set_active(True)
+            Dynamic.favs_tag_enabled = True
         return super().mouseReleaseEvent(a0)
 
 
@@ -349,6 +352,9 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
         if Dynamic.no_subfolders_tag_enabled:
             self.set_active(False)
             Dynamic.no_subfolders_tag_enabled = False
+        else:
+            self.set_active(True)
+            Dynamic.no_subfolders_tag_enabled = True
         return super().mouseReleaseEvent(a0)
 
 
@@ -367,6 +373,9 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         if self.title.text() in Dynamic.word_tags_list:
             self.set_active(False)
             Dynamic.word_tags_list.remove(self.title.text())
+        else:
+            self.set_active(True)
+            Dynamic.word_tags_list.append(self.title.text())
         return super().mouseReleaseEvent(a0)
 
 
@@ -382,16 +391,16 @@ class TagsContolWidget(TransparentWidget):
 
     def _create_tags(self):
         tag = WinFiltersFavTag(Lng.favorites[JsonData.lng_index])
-        tag.clicked_trash.connect(self.load_st_grid.emit)
+        tag.load_st_grid.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
         tag = WinFiltersOnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
-        tag.clicked_trash.connect(self.load_st_grid.emit)
+        tag.load_st_grid.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
         for word in Filters.items:
             tag = WinFiltersWordTag(word)
-            tag.clicked_trash.connect(self.load_st_grid.emit)
+            tag.load_st_grid.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
     def hasHeightForWidth(self):
