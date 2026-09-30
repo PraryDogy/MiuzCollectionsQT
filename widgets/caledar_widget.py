@@ -10,8 +10,6 @@ from system.utils import Utils
 from ._base_widgets import (GrayTextLabel, TransparentLabel, TransparentWidget,
                             UHorizontalSep, UMainWidget, UMenu, UPushButton)
 
-QSS_ROUND_SVG_SIZE = 30
-
 
 class CalendarBigDate(GrayTextLabel):
 
@@ -113,8 +111,8 @@ class Calendar(UMainWidget):
 
 	cell_size = (60, 50)
 	svg_nav_size = (30, 30)
-	svg_calendar_size = (25, 25)
-	svg_blue_circle_size = (40, 40)
+	svg_calendar_size = (15, 15)
+	svg_blue_circle_size = (35, 35)
 
 	def __init__(self, date: QDate):
 		super().__init__()
@@ -160,11 +158,13 @@ class Calendar(UMainWidget):
 
 		dynamic_container_lay.addSpacing(10)
 
-		self.dynamic_label = CalendarBigDate()
+		self.dynamic_label = TransparentLabel()
 		dynamic_container_lay.addWidget(self.dynamic_label)
 		dynamic_container_lay.addStretch(1)
 
-		self.central_layout.addSpacing(5)
+		self.central_layout.addSpacing(15)
+		self.central_layout.addWidget(UHorizontalSep())
+		# self.central_layout.addSpacing(5)
 
 		self.nav_widget = TransparentWidget()
 		self.central_layout.addWidget(self.nav_widget)

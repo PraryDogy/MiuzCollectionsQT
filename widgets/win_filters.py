@@ -169,7 +169,7 @@ class DatesWidget(UGroupBox):
 
         self.calendar_win = Calendar(qdate)
         global_pos = target_btn.mapToGlobal(QPoint(0, target_btn.height()))
-        offset = QPoint(0, -20)  # (по X, по Y)
+        offset = QPoint(0, 0)  # (по X, по Y)
         self.calendar_win.move(global_pos + offset)
         # self.calendar_win.center_to_parent(self.window())
         self.calendar_win.date_selected.connect(callback)
