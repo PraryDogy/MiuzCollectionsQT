@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
+from PyQt6.QtCore import QDate, QLocale, QPoint, Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSplitter, QVBoxLayout
@@ -161,12 +161,17 @@ class DatesWidget(TransparentGroupBox):
         if flag == "start":
             qdate = self.q_date_start
             callback = lambda qdate: set_date_start(qdate)
+            target_btn = self.date_start_btn
         elif flag == "end":
             qdate = self.q_date_end
             callback = lambda qdate: set_date_end(qdate)
+            target_btn = self.date_end_btn
 
         self.calendar_win = Calendar(qdate)
-        self.calendar_win.center_to_parent(self.window())
+        global_pos = target_btn.mapToGlobal(QPoint(0, target_btn.height()))
+        offset = QPoint(0, -20)  # (по X, по Y)
+        self.calendar_win.move(global_pos + offset)
+        # self.calendar_win.center_to_parent(self.window())
         self.calendar_win.date_selected.connect(callback)
         self.calendar_win.show()
 
