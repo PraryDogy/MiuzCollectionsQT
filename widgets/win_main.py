@@ -277,7 +277,7 @@ class WinMain(UMainWindow):
             self.open_settings_win(settings_item)
 
         self.filters_win = WinFilters()
-        self.filters_win.reload_thumbnails.connect(self.load_st_grid)
+        self.filters_win.load_st_grid.connect(self.load_st_grid)
         self.filters_win.edit_filters.connect(edit_filters)
         self.filters_win.center_to_parent(self.window())
         self.filters_win.show()

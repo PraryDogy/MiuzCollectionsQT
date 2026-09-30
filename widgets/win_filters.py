@@ -260,7 +260,7 @@ class DatesWidget(UGroupBox):
 class WinFiltersTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "trash.svg"
     clicked_trash = pyqtSignal()
-    clicked_body = pyqtSignal() 
+    load_st_grid = pyqtSignal() 
 
     # Добавляем параметр show_trash=True по умолчанию
     def __init__(self, text: str, active: bool = False, show_trash: bool = True):
@@ -312,7 +312,7 @@ class WinFiltersTagWidget(TransparentFrame):
         self.clicked_trash.emit()
 
     def mouseReleaseEvent(self, a0):
-        self.clicked_body.emit()
+        self.load_st_grid.emit()
         super().mouseReleaseEvent(a0)
 
 
@@ -327,6 +327,12 @@ class WinFiltersFavTag(WinFiltersTagWidget):
     def clicked_trash_cmd(self):
         pass
 
+    def mouseReleaseEvent(self, a0):
+        if Dynamic.favs_tag_enabled:
+            self.set_active(False)
+            Dynamic.favs_tag_enabled = False
+        return super().mouseReleaseEvent(a0)
+
 
 class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
     def __init__(self, text):
@@ -339,6 +345,12 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
     def clicked_trash_cmd(self):
         pass
 
+    def mouseReleaseEvent(self, a0):
+        if Dynamic.no_subfolders_tag_enabled:
+            self.set_active(False)
+            Dynamic.no_subfolders_tag_enabled = False
+        return super().mouseReleaseEvent(a0)
+
 
 class WinFiltersWordTag(WinFiltersTagWidget):
     def __init__(self, text):
@@ -350,6 +362,12 @@ class WinFiltersWordTag(WinFiltersTagWidget):
 
     def clicked_trash_cmd(self):
         pass
+
+    def mouseReleaseEvent(self, a0):
+        if self.title.text() in Dynamic.word_tags_list:
+            self.set_active(False)
+            Dynamic.word_tags_list.remove(self.title.text())
+        return super().mouseReleaseEvent(a0)
 
 
 class TagsContolWidget(TransparentWidget):
@@ -388,6 +406,8 @@ class TagsContolWidget(TransparentWidget):
 
 
 class TagsWidget(UGroupBox):
+    load_st_grid = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.v_lay = QVBoxLayout(self)
@@ -400,6 +420,7 @@ class TagsWidget(UGroupBox):
         self.v_lay.addWidget(USep())
 
         self.tags_control_widget = TagsContolWidget()
+        self.tags_control_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.v_lay.addWidget(self.tags_control_widget)
     
 
@@ -407,7 +428,7 @@ class WinFilters(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
     edit_svg = Static.COMMON_ICONS / "edit.svg"
     closed_ = pyqtSignal()
-    reload_thumbnails = pyqtSignal()
+    load_st_grid = pyqtSignal()
     edit_filters = pyqtSignal()
     ww = 590
     item_h = 25
@@ -422,10 +443,11 @@ class WinFilters(UMainWidget):
         self.central_layout.setSpacing(10)
 
         self.dates_widget = DatesWidget()
-        self.dates_widget.reload_thumbnails.connect(self.reload_thumbnails.emit)
+        self.dates_widget.reload_thumbnails.connect(self.load_st_grid.emit)
         self.central_layout.addWidget(self.dates_widget)
 
         self.tags_widget = TagsWidget()
+        self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.central_layout.addWidget(self.tags_widget)
 
         # self.central_layout.addWidget(HSep())
