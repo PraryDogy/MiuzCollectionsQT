@@ -79,7 +79,9 @@ ULineEdit {
     border: 1px solid #353535;
     border-radius: 6px;
     padding-left: 2px;
-    padding-right: 28px;
+    padding-right: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 
