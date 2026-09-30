@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import QDate, QLocale, QPoint, Qt, pyqtSignal
+from PyQt6.QtCore import QDate, QLocale, QPoint, Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSplitter, QVBoxLayout
@@ -11,8 +11,8 @@ from system.lang import Lng
 
 from ._base_widgets import (RowArrowWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UHorizontalSep,
-                            UListSpacerItem, UListWidget, UListWidgetItem,
-                            UMainWidget, UMenu, UPushButton, UTextEdit)
+                            FlowLayout, UListWidget, UListWidgetItem,
+                            UMainWidget, UMenu, UPushButton, TransparentFrame)
 from .caledar_widget import Calendar
 
 
@@ -248,9 +248,110 @@ class DatesWidget(UGroupBox):
         self.reload_thumbnails.emit()
 
 
+class TagWidget(TransparentFrame):
+    icon_path = Static.COMMON_ICONS / "trash.svg"
+    clicked_close = pyqtSignal()
+    clicked_body = pyqtSignal()
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setFixedHeight(23)
+
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(7, 2, 7, 2)
+        self.h_lay.setSpacing(6)
+
+        self.title = TransparentLabel(text)
+        self.h_lay.addWidget(self.title)
+
+        # Контейнер для SVG
+        self.close_btn_wrapper = TransparentWidget()
+        close_lay = QVBoxLayout(self.close_btn_wrapper)
+        # опускаем кнопку ниже на 1 пиксель
+        close_lay.setContentsMargins(0, 1, 0, 0)
+        close_lay.setSpacing(0)
+
+        self.remove_btn = QSvgWidget()
+        self.remove_btn.mouseReleaseEvent = lambda e: self.clicked_close_cmd()
+        self.remove_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.remove_btn.load(str(self.icon_path))
+        self.remove_btn.setFixedSize(12, 12)
+
+        close_lay.addWidget(self.remove_btn)
+        self.h_lay.addWidget(self.close_btn_wrapper)
+
+    def clicked_close_cmd(self):
+        self.clicked_close.emit()
+
+    def hide_close_btn(self):
+        self.remove_btn.deleteLater()
+
+    def mouseReleaseEvent(self, a0):
+        self.clicked_body.emit()
+        return super().mouseReleaseEvent(a0)
+
+
+class WordTag(TagWidget):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def clicked_close_cmd(self):
+        Dynamic.word_tags_list.remove(self.title.text())
+        return super().clicked_close_cmd()
+
+
+class FavTag(TagWidget):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def clicked_close_cmd(self):
+        Dynamic.favs_tag_enabled = False
+        return super().clicked_close_cmd()
+
+
+class OnlyFolderTag(TagWidget):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def clicked_close_cmd(self):
+        Dynamic.no_subfolders_tag_enabled = False
+        return super().clicked_close_cmd()
+
+
 class TagsWidget(UGroupBox):
-    def __init__(self, title=None, parent=None):
-        super().__init__(title, parent)
+    load_st_grid = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.flow_layout = FlowLayout(self, spacing=7)
+        self.flow_layout.setContentsMargins(0, 0, 0, 0)
+        self._create_tags()
+
+    def _create_tags(self):
+        tag = FavTag(Lng.favorites[JsonData.lng_index])
+        tag.clicked_close.connect(self.load_st_grid.emit)
+        self.flow_layout.addWidget(tag)
+
+        tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
+        tag.clicked_close.connect(self.load_st_grid.emit)
+        self.flow_layout.addWidget(tag)
+
+        for word in Dynamic.word_tags_list:
+            tag = WordTag(word)
+            tag.clicked_close.connect(self.load_st_grid.emit)
+            self.flow_layout.addWidget(tag)
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, width):
+        return self.flow_layout.heightForWidth(width)
+
+    def sizeHint(self):
+        width = self.parentWidget().width() if self.parentWidget() else 500
+        return QSize(width, self.heightForWidth(width))
+
 
 
 class WinFilters(UMainWidget):
@@ -271,171 +372,176 @@ class WinFilters(UMainWidget):
         self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(10)
 
-        dates = DatesWidget()
-        dates.reload_thumbnails.connect(self.reload_thumbnails.emit)
-        self.central_layout.addWidget(dates)
+        self.dates_widget = DatesWidget()
+        self.dates_widget.reload_thumbnails.connect(self.reload_thumbnails.emit)
+        self.central_layout.addWidget(self.dates_widget)
+
+        self.tags_widget = TagsWidget()
+        self.central_layout.addWidget(self.tags_widget)
 
         # self.central_layout.addWidget(HSep())
 
         # Создаем ГОРИЗОНТАЛЬНЫЙ сплиттер
-        self.splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.splitter.setHandleWidth(15)
-        self.central_layout.addWidget(self.splitter)
+        # self.splitter = QSplitter(Qt.Orientation.Horizontal)
+        # self.splitter.setHandleWidth(15)
+        # self.central_layout.addWidget(self.splitter)
         
-        self.list_widget = UListWidget()
-        self.list_widget.itemClicked.connect(self.item_cmd)
-        self.splitter.addWidget(self.list_widget)
+        # self.list_widget = UListWidget()
+        # self.list_widget.itemClicked.connect(self.item_cmd)
+        # self.splitter.addWidget(self.list_widget)
         
-        self.splitter.addWidget(self.list_widget)
+        # self.splitter.addWidget(self.list_widget)
 
-        # Заполнение списка элементами
-        favs_item = UListWidgetItem(
-            parent=self.list_widget,
-            text=Lng.favorites[JsonData.lng_index]
-        )
-        favs_item.set_checkable()
-        self.list_widget.addItem(favs_item)
-        if Dynamic.favs_tag_enabled:
-            favs_item.setCheckState(Qt.CheckState.Checked)
+        # # Заполнение списка элементами
+        # favs_item = UListWidgetItem(
+        #     parent=self.list_widget,
+        #     text=Lng.favorites[JsonData.lng_index]
+        # )
+        # favs_item.set_checkable()
+        # self.list_widget.addItem(favs_item)
+        # if Dynamic.favs_tag_enabled:
+        #     favs_item.setCheckState(Qt.CheckState.Checked)
 
-        folder_item = UListWidgetItem(
-            parent=self.list_widget,
-            text=Lng.without_subfolders[JsonData.lng_index]
-        )
-        folder_item.set_checkable()
-        self.list_widget.addItem(folder_item)
-        if Dynamic.no_subfolders_tag_enabled:
-            folder_item.setCheckState(Qt.CheckState.Checked)
+        # folder_item = UListWidgetItem(
+        #     parent=self.list_widget,
+        #     text=Lng.without_subfolders[JsonData.lng_index]
+        # )
+        # folder_item.set_checkable()
+        # self.list_widget.addItem(folder_item)
+        # if Dynamic.no_subfolders_tag_enabled:
+        #     folder_item.setCheckState(Qt.CheckState.Checked)
 
-        self.list_widget.addItem(
-            UListSpacerItem(parent=self.list_widget)
-        )
+        # self.list_widget.addItem(
+        #     UListSpacerItem(parent=self.list_widget)
+        # )
 
-        for i in Filters.items:
-            item = UListWidgetItem(
-                parent=self.list_widget,
-                text=i
-            )
-            item.set_checkable()
-            self.list_widget.addItem(item)
-            if i in Dynamic.word_tags_list:
-                item.setCheckState(Qt.CheckState.Checked)
+        # for i in Filters.items:
+        #     item = UListWidgetItem(
+        #         parent=self.list_widget,
+        #         text=i
+        #     )
+        #     item.set_checkable()
+        #     self.list_widget.addItem(item)
+        #     if i in Dynamic.word_tags_list:
+        #         item.setCheckState(Qt.CheckState.Checked)
 
-        self.list_widget.setCurrentRow(0)
+        # self.list_widget.setCurrentRow(0)
         
-        # --- Правая часть (Контейнер) ---
-        self.right_container = TransparentWidget()
-        right_lay = QVBoxLayout(self.right_container)
-        right_lay.setContentsMargins(0, 0, 0, 0)
-        right_lay.setSpacing(0)
+        # # --- Правая часть (Контейнер) ---
+        # self.right_container = TransparentWidget()
+        # right_lay = QVBoxLayout(self.right_container)
+        # right_lay.setContentsMargins(0, 0, 0, 0)
+        # right_lay.setSpacing(0)
 
-        # Шапка групбокса: статичный лейбл
-        self.active_label = TransparentLabel(f" {Lng.active_filters[JsonData.lng_index]}:")
-        right_lay.addWidget(self.active_label)
+        # # Шапка групбокса: статичный лейбл
+        # self.active_label = TransparentLabel(f" {Lng.active_filters[JsonData.lng_index]}:")
+        # right_lay.addWidget(self.active_label)
 
-        right_lay.addSpacing(5)
+        # right_lay.addSpacing(5)
 
-        # Текстовое поле для вывода списка
-        self.active_filters = UTextEdit()
-        self.active_filters.setReadOnly(True)
-        self.active_filters.setText(self.get_filters_text())
-        self.active_filters.setFixedHeight(self.right_group_hh)
-        right_lay.addWidget(self.active_filters)
+        # # Текстовое поле для вывода списка
+        # self.active_filters = UTextEdit()
+        # self.active_filters.setReadOnly(True)
+        # self.active_filters.setText(self.get_filters_text())
+        # self.active_filters.setFixedHeight(self.right_group_hh)
+        # right_lay.addWidget(self.active_filters)
 
-        # --- Группа для кнопок с нулевыми отступами ---
-        self.reset_group = UGroupBox()
-        reset_group_lay = QVBoxLayout(self.reset_group)
-        reset_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
-        reset_group_lay.setSpacing(RowArrowWidget.group_spacing)
+        # # --- Группа для кнопок с нулевыми отступами ---
+        # self.reset_group = UGroupBox()
+        # reset_group_lay = QVBoxLayout(self.reset_group)
+        # reset_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
+        # reset_group_lay.setSpacing(RowArrowWidget.group_spacing)
 
-        # Создаем кастомную кнопку редактирования фильтров
-        self.edit_filters_btn = RowArrowWidget(Lng.edit[JsonData.lng_index])
-        self.edit_filters_btn.set_left_icon(self.edit_svg) # Убедитесь, что self.edit_svg определен ранее
-        self.edit_filters_btn.clicked.connect(self.edit_filters.emit) # Метод-обработчик клика
+        # # Создаем кастомную кнопку редактирования фильтров
+        # self.edit_filters_btn = RowArrowWidget(Lng.edit[JsonData.lng_index])
+        # self.edit_filters_btn.set_left_icon(self.edit_svg) # Убедитесь, что self.edit_svg определен ранее
+        # self.edit_filters_btn.clicked.connect(self.edit_filters.emit) # Метод-обработчик клика
 
-        # Создаем кастомную кнопку сброса
-        self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
-        self.reset_btn.set_left_icon(self.reset_svg)
-        self.reset_btn.clicked.connect(self.reset_cmd)
+        # # Создаем кастомную кнопку сброса
+        # self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
+        # self.reset_btn.set_left_icon(self.reset_svg)
+        # self.reset_btn.clicked.connect(self.reset_cmd)
 
-        right_lay.addSpacing(10)
-        # Добавляем сначала кнопку редактирования, затем кнопку сброса в слой группы
-        reset_group_lay.addWidget(self.edit_filters_btn)
-        reset_group_lay.addWidget(UHorizontalSep())
-        reset_group_lay.addWidget(self.reset_btn)
+        # right_lay.addSpacing(10)
+        # # Добавляем сначала кнопку редактирования, затем кнопку сброса в слой группы
+        # reset_group_lay.addWidget(self.edit_filters_btn)
+        # reset_group_lay.addWidget(UHorizontalSep())
+        # reset_group_lay.addWidget(self.reset_btn)
 
-        # Добавляем группу в основной правый контейнер
-        right_lay.addWidget(self.reset_group)
-        right_lay.addSpacing(10)
-        right_lay.addStretch()
+        # # Добавляем группу в основной правый контейнер
+        # right_lay.addWidget(self.reset_group)
+        # right_lay.addSpacing(10)
+        # right_lay.addStretch()
         
-        self.splitter.addWidget(self.right_container)
+        # self.splitter.addWidget(self.right_container)
 
-        # Устанавливаем пропорции ширины
-        self.splitter.setSizes([250, 350])
-        self.splitter.setStretchFactor(0, 1)
-        self.splitter.setStretchFactor(1, 0)
+        # # Устанавливаем пропорции ширины
+        # self.splitter.setSizes([250, 350])
+        # self.splitter.setStretchFactor(0, 1)
+        # self.splitter.setStretchFactor(1, 0)
 
-        self.adjustSize()
-        self.setFixedHeight(self.height())
+        # self.adjustSize()
+        # self.setFixedHeight(self.height())
 
-    def get_filters_text(self):
-        active_list = []
+    # def get_filters_text(self):
+    #     active_list = []
 
-        if Dynamic.favs_tag_enabled:
-            active_list.append(Lng.favorites[JsonData.lng_index])
+    #     if Dynamic.favs_tag_enabled:
+    #         active_list.append(Lng.favorites[JsonData.lng_index])
 
-        if Dynamic.no_subfolders_tag_enabled:
-            active_list.append(Lng.without_subfolders[JsonData.lng_index])
+    #     if Dynamic.no_subfolders_tag_enabled:
+    #         active_list.append(Lng.without_subfolders[JsonData.lng_index])
 
-        if Dynamic.word_tags_list:
-            active_list.extend(Dynamic.word_tags_list)
+    #     if Dynamic.word_tags_list:
+    #         active_list.extend(Dynamic.word_tags_list)
 
-        if not active_list:
-            return Lng.no[JsonData.lng_index]
+    #     if not active_list:
+    #         return Lng.no[JsonData.lng_index]
         
-        return ', '.join(active_list)
+    #     return ', '.join(active_list)
 
-    def item_cmd(self, item: UListWidgetItem):
-        if isinstance(item, UListSpacerItem):
-            return
-        if item.text() == Lng.favorites[JsonData.lng_index]:
-            if Dynamic.favs_tag_enabled:
-                Dynamic.favs_tag_enabled = False
-                item.setCheckState(Qt.CheckState.Unchecked)
-            else:
-                Dynamic.favs_tag_enabled = True
-                item.setCheckState(Qt.CheckState.Checked)
-        elif item.text() == Lng.without_subfolders[JsonData.lng_index]:
-            if Dynamic.no_subfolders_tag_enabled:
-                Dynamic.no_subfolders_tag_enabled = False
-                item.setCheckState(Qt.CheckState.Unchecked)
-            else:
-                Dynamic.no_subfolders_tag_enabled = True
-                item.setCheckState(Qt.CheckState.Checked)
-        elif item.text() in Dynamic.word_tags_list:
-            Dynamic.word_tags_list.remove(item.text())
-            item.setCheckState(Qt.CheckState.Unchecked)
-        else:
-            Dynamic.word_tags_list.append(item.text())
-            item.setCheckState(Qt.CheckState.Checked)
+    # def item_cmd(self, item: UListWidgetItem):
+    #     if isinstance(item, UListSpacerItem):
+    #         return
+    #     if item.text() == Lng.favorites[JsonData.lng_index]:
+    #         if Dynamic.favs_tag_enabled:
+    #             Dynamic.favs_tag_enabled = False
+    #             item.setCheckState(Qt.CheckState.Unchecked)
+    #         else:
+    #             Dynamic.favs_tag_enabled = True
+    #             item.setCheckState(Qt.CheckState.Checked)
+    #     elif item.text() == Lng.without_subfolders[JsonData.lng_index]:
+    #         if Dynamic.no_subfolders_tag_enabled:
+    #             Dynamic.no_subfolders_tag_enabled = False
+    #             item.setCheckState(Qt.CheckState.Unchecked)
+    #         else:
+    #             Dynamic.no_subfolders_tag_enabled = True
+    #             item.setCheckState(Qt.CheckState.Checked)
+    #     elif item.text() in Dynamic.word_tags_list:
+    #         Dynamic.word_tags_list.remove(item.text())
+    #         item.setCheckState(Qt.CheckState.Unchecked)
+    #     else:
+    #         Dynamic.word_tags_list.append(item.text())
+    #         item.setCheckState(Qt.CheckState.Checked)
 
-        self.active_filters.setText(self.get_filters_text())
-        self.reload_thumbnails.emit()
+    #     self.active_filters.setText(self.get_filters_text())
+    #     self.reload_thumbnails.emit()
 
-    def reset_cmd(self):
-        items = [
-            self.list_widget.item(i)
-            for i in range(self.list_widget.count())
-        ]
-        items.pop(2)  # удаляем спейсер из списка обработки
-        for item in items:
-            item.setCheckState(Qt.CheckState.Unchecked)
-        Dynamic.favs_tag_enabled = False
-        Dynamic.no_subfolders_tag_enabled = False
-        Dynamic.word_tags_list.clear()
-        self.reload_thumbnails.emit()
-        self.active_filters.setText(self.get_filters_text())
+    # def reset_cmd(self):
+    #     items = [
+    #         self.list_widget.item(i)
+    #         for i in range(self.list_widget.count())
+    #     ]
+    #     items.pop(2)  # удаляем спейсер из списка обработки
+    #     for item in items:
+    #         item.setCheckState(Qt.CheckState.Unchecked)
+    #     Dynamic.favs_tag_enabled = False
+    #     Dynamic.no_subfolders_tag_enabled = False
+    #     Dynamic.word_tags_list.clear()
+    #     self.reload_thumbnails.emit()
+    #     self.active_filters.setText(self.get_filters_text())
+
+        self.central_layout.addStretch(1)
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)

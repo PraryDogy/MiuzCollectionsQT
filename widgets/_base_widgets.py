@@ -2,16 +2,17 @@ import os
 import re
 from pathlib import Path
 
-from PyQt6.QtCore import QPoint, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
                          QIcon, QMouseEvent, QPainter, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QDateEdit, QFileDialog, QFrame, QGroupBox,
-                             QHBoxLayout, QLabel, QLineEdit, QListWidget,
+from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
+                             QLabel, QLayout, QLineEdit, QListWidget,
                              QListWidgetItem, QMainWindow, QMenu, QProgressBar,
                              QPushButton, QScrollArea, QSlider, QSpacerItem,
-                             QSpinBox, QStackedWidget, QTextEdit, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget, QTreeView)
+                             QSpinBox, QStackedWidget, QTextEdit, QTreeView,
+                             QTreeWidget, QTreeWidgetItem, QVBoxLayout,
+                             QWidget)
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -846,44 +847,82 @@ class MfStopListWidget(QWidget):
             self.text_edit.setPlainText("\n".join(mf_stop_list))
 
 
-class TagWidget(TransparentFrame):
-    icon_path = Static.COMMON_ICONS / "cancel.svg"
-    clicked_close = pyqtSignal()
-    clicked_body = pyqtSignal()
+class FlowLayout(QLayout):
+    def __init__(self, parent=None, spacing=7):
+        super().__init__(parent)
+        self.items = []
+        self.spacing = spacing
 
-    def __init__(self, text: str):
-        super().__init__()
-        self.setFixedHeight(23)
+    def addItem(self, item):
+        self.items.append(item)
 
-        self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(7, 2, 7, 2)
-        self.h_lay.setSpacing(6)
+    def count(self):
+        return len(self.items)
 
-        self.title = TransparentLabel(text)
-        self.h_lay.addWidget(self.title)
+    def itemAt(self, index):
+        if 0 <= index < len(self.items):
+            return self.items[index]
+        return None
 
-        # Контейнер для SVG
-        self.close_btn_wrapper = TransparentWidget()
-        close_lay = QVBoxLayout(self.close_btn_wrapper)
-        # опускаем кнопку ниже на 1 пиксель
-        close_lay.setContentsMargins(0, 1, 0, 0)
-        close_lay.setSpacing(0)
+    def takeAt(self, index):
+        if 0 <= index < len(self.items):
+            return self.items.pop(index)
+        return None
 
-        self.close_btn = QSvgWidget()
-        self.close_btn.mouseReleaseEvent = lambda e: self.cicked_close_cmd()
-        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.close_btn.load(str(self.icon_path))
-        self.close_btn.setFixedSize(12, 12)
+    def expandingDirections(self):
+        return Qt.Orientation(0)
 
-        close_lay.addWidget(self.close_btn)
-        self.h_lay.addWidget(self.close_btn_wrapper)
+    def hasHeightForWidth(self):
+        return True
 
-    def cicked_close_cmd(self):
-        self.clicked_close.emit()
+    def heightForWidth(self, width):
+        return self._do_layout(QRect(0, 0, width, 0), True)
 
-    def hide_close_btn(self):
-        self.close_btn.deleteLater()
+    def setGeometry(self, rect):
+        super().setGeometry(rect)
+        self._do_layout(rect, False)
 
-    def mouseReleaseEvent(self, a0):
-        self.clicked_body.emit()
-        return super().mouseReleaseEvent(a0)
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
+        size = QSize(0, 0)
+
+        for item in self.items:
+            size = size.expandedTo(item.minimumSize())
+
+        margins = self.contentsMargins()
+        size += QSize(margins.left() + margins.right(), margins.top() + margins.bottom())
+
+        return size
+
+    def _do_layout(self, rect, test_only):
+        margins = self.contentsMargins()
+        rect = rect.adjusted(
+            margins.left(),
+            margins.top(),
+            -margins.right(),
+            -margins.bottom()
+        )
+
+        x = rect.x()
+        y = rect.y()
+        line_height = 0
+
+        for item in self.items:
+            item_size = item.sizeHint()
+            next_x = x + item_size.width() + self.spacing
+
+            if next_x - self.spacing > rect.right() and line_height > 0:
+                x = rect.x()
+                y += line_height + self.spacing
+                next_x = x + item_size.width() + self.spacing
+                line_height = 0
+
+            if not test_only:
+                item.setGeometry(QRect(QPoint(x, y), item_size))
+
+            x = next_x
+            line_height = max(line_height, item_size.height())
+
+        return y + line_height - rect.y() + margins.bottom()

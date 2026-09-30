@@ -20,7 +20,7 @@ from system.utils import Utils
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
                             TransparentWidget, UMenu, UPushButton,
-                            UScrollVerticalArea, TagWidget)
+                            UScrollVerticalArea, FlowLayout)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -337,6 +337,49 @@ class GridControlsWidget(TransparentWidget):
         self.v_lay.addStretch()
 
 
+class TagWidget(TransparentFrame):
+    icon_path = Static.COMMON_ICONS / "cancel.svg"
+    clicked_close = pyqtSignal()
+    clicked_body = pyqtSignal()
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.setFixedHeight(23)
+
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(7, 2, 7, 2)
+        self.h_lay.setSpacing(6)
+
+        self.title = TransparentLabel(text)
+        self.h_lay.addWidget(self.title)
+
+        # Контейнер для SVG
+        self.close_btn_wrapper = TransparentWidget()
+        close_lay = QVBoxLayout(self.close_btn_wrapper)
+        # опускаем кнопку ниже на 1 пиксель
+        close_lay.setContentsMargins(0, 1, 0, 0)
+        close_lay.setSpacing(0)
+
+        self.close_btn = QSvgWidget()
+        self.close_btn.mouseReleaseEvent = lambda e: self.clicked_close_cmd()
+        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.close_btn.load(str(self.icon_path))
+        self.close_btn.setFixedSize(12, 12)
+
+        close_lay.addWidget(self.close_btn)
+        self.h_lay.addWidget(self.close_btn_wrapper)
+
+    def clicked_close_cmd(self):
+        self.clicked_close.emit()
+
+    def hide_close_btn(self):
+        self.close_btn.deleteLater()
+
+    def mouseReleaseEvent(self, a0):
+        self.clicked_body.emit()
+        return super().mouseReleaseEvent(a0)
+
+
 class DatesTag(TagWidget):
     def __init__(self):
         super().__init__("")
@@ -357,37 +400,37 @@ class DatesTag(TagWidget):
         end_str = locale.toString(q_end, date_format)
         self.title.setText(f"{start_str} - {end_str}")
 
-    def cicked_close_cmd(self):
+    def clicked_close_cmd(self):
         Dynamic.date_start = None
         Dynamic.date_end = None
-        return super().cicked_close_cmd()
+        return super().clicked_close_cmd()
 
 
 class WordTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def cicked_close_cmd(self):
+    def clicked_close_cmd(self):
         Dynamic.word_tags_list.remove(self.title.text())
-        return super().cicked_close_cmd()
+        return super().clicked_close_cmd()
 
 
 class FavTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def cicked_close_cmd(self):
+    def clicked_close_cmd(self):
         Dynamic.favs_tag_enabled = False
-        return super().cicked_close_cmd()
+        return super().clicked_close_cmd()
 
 
 class OnlyFolderTag(TagWidget):
     def __init__(self, text):
         super().__init__(text)
 
-    def cicked_close_cmd(self):
+    def clicked_close_cmd(self):
         Dynamic.no_subfolders_tag_enabled = False
-        return super().cicked_close_cmd()
+        return super().clicked_close_cmd()
 
 
 class ClearFiltersTag(TagWidget):
@@ -397,94 +440,13 @@ class ClearFiltersTag(TagWidget):
         super().__init__("")
         self.title.deleteLater()
 
-    def cicked_close_cmd(self):
+    def clicked_close_cmd(self):
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.favs_tag_enabled = False
         Dynamic.no_subfolders_tag_enabled = False
         Dynamic.word_tags_list.clear()
-        return super().cicked_close_cmd()
-
-
-class FlowLayout(QLayout):
-    def __init__(self, parent=None, spacing=7):
-        super().__init__(parent)
-        self.items = []
-        self.spacing = spacing
-
-    def addItem(self, item):
-        self.items.append(item)
-
-    def count(self):
-        return len(self.items)
-
-    def itemAt(self, index):
-        if 0 <= index < len(self.items):
-            return self.items[index]
-        return None
-
-    def takeAt(self, index):
-        if 0 <= index < len(self.items):
-            return self.items.pop(index)
-        return None
-
-    def expandingDirections(self):
-        return Qt.Orientation(0)
-
-    def hasHeightForWidth(self):
-        return True
-
-    def heightForWidth(self, width):
-        return self._do_layout(QRect(0, 0, width, 0), True)
-
-    def setGeometry(self, rect):
-        super().setGeometry(rect)
-        self._do_layout(rect, False)
-
-    def sizeHint(self):
-        return self.minimumSize()
-
-    def minimumSize(self):
-        size = QSize(0, 0)
-
-        for item in self.items:
-            size = size.expandedTo(item.minimumSize())
-
-        margins = self.contentsMargins()
-        size += QSize(margins.left() + margins.right(), margins.top() + margins.bottom())
-
-        return size
-
-    def _do_layout(self, rect, test_only):
-        margins = self.contentsMargins()
-        rect = rect.adjusted(
-            margins.left(),
-            margins.top(),
-            -margins.right(),
-            -margins.bottom()
-        )
-
-        x = rect.x()
-        y = rect.y()
-        line_height = 0
-
-        for item in self.items:
-            item_size = item.sizeHint()
-            next_x = x + item_size.width() + self.spacing
-
-            if next_x - self.spacing > rect.right() and line_height > 0:
-                x = rect.x()
-                y += line_height + self.spacing
-                next_x = x + item_size.width() + self.spacing
-                line_height = 0
-
-            if not test_only:
-                item.setGeometry(QRect(QPoint(x, y), item_size))
-
-            x = next_x
-            line_height = max(line_height, item_size.height())
-
-        return y + line_height - rect.y() + margins.bottom()
+        return super().clicked_close_cmd()
 
 
 class TagsWidget(TransparentWidget):
