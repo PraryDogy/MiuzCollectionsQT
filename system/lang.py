@@ -431,6 +431,6 @@ class Lng:
         "Dates management"
     )
     remove_tag_question = (
-        "Вы уверены, что хотите удалить тег из приложения навсегда?",
-        "Вы уверены, что хотите удалить тег из приложения навсегда?"
+        "Вы уверены, что хотите удалить этот тег из приложения навсегда?",
+        "Are you sure you want to permanently delete this tag from the app?"
     )

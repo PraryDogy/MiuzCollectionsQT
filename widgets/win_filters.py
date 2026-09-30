@@ -408,7 +408,7 @@ class TagsContolWidget(TransparentWidget):
 
         self.remove_tag_win = ConfirmWindow(
             text=Lng.remove_tag_question[JsonData.lng_index],
-            w=300, h=300
+            w=320, h=90
         )
         self.remove_tag_win.ok_clicked.connect(ok_clicked)
         self.remove_tag_win.center_to_parent(self.window())
@@ -451,8 +451,6 @@ class WinFilters(UMainWidget):
     load_st_grid = pyqtSignal()
     edit_filters = pyqtSignal()
     ww = 590
-    item_h = 25
-    right_group_hh = 280
 
     def __init__(self):
         super().__init__()
@@ -461,6 +459,7 @@ class WinFilters(UMainWidget):
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
         self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(10)
+        self.central_layout.setContentsMargins(5, 10, 5, 10)
 
         self.dates_widget = DatesWidget()
         self.dates_widget.reload_thumbnails.connect(self.load_st_grid.emit)
@@ -470,169 +469,7 @@ class WinFilters(UMainWidget):
         self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.central_layout.addWidget(self.tags_widget)
 
-        # self.central_layout.addWidget(HSep())
-
-        # Создаем ГОРИЗОНТАЛЬНЫЙ сплиттер
-        # self.splitter = QSplitter(Qt.Orientation.Horizontal)
-        # self.splitter.setHandleWidth(15)
-        # self.central_layout.addWidget(self.splitter)
-        
-        # self.list_widget = UListWidget()
-        # self.list_widget.itemClicked.connect(self.item_cmd)
-        # self.splitter.addWidget(self.list_widget)
-        
-        # self.splitter.addWidget(self.list_widget)
-
-        # # Заполнение списка элементами
-        # favs_item = UListWidgetItem(
-        #     parent=self.list_widget,
-        #     text=Lng.favorites[JsonData.lng_index]
-        # )
-        # favs_item.set_checkable()
-        # self.list_widget.addItem(favs_item)
-        # if Dynamic.favs_tag_enabled:
-        #     favs_item.setCheckState(Qt.CheckState.Checked)
-
-        # folder_item = UListWidgetItem(
-        #     parent=self.list_widget,
-        #     text=Lng.without_subfolders[JsonData.lng_index]
-        # )
-        # folder_item.set_checkable()
-        # self.list_widget.addItem(folder_item)
-        # if Dynamic.no_subfolders_tag_enabled:
-        #     folder_item.setCheckState(Qt.CheckState.Checked)
-
-        # self.list_widget.addItem(
-        #     UListSpacerItem(parent=self.list_widget)
-        # )
-
-        # for i in Filters.items:
-        #     item = UListWidgetItem(
-        #         parent=self.list_widget,
-        #         text=i
-        #     )
-        #     item.set_checkable()
-        #     self.list_widget.addItem(item)
-        #     if i in Dynamic.word_tags_list:
-        #         item.setCheckState(Qt.CheckState.Checked)
-
-        # self.list_widget.setCurrentRow(0)
-        
-        # # --- Правая часть (Контейнер) ---
-        # self.right_container = TransparentWidget()
-        # right_lay = QVBoxLayout(self.right_container)
-        # right_lay.setContentsMargins(0, 0, 0, 0)
-        # right_lay.setSpacing(0)
-
-        # # Шапка групбокса: статичный лейбл
-        # self.active_label = TransparentLabel(f" {Lng.active_filters[JsonData.lng_index]}:")
-        # right_lay.addWidget(self.active_label)
-
-        # right_lay.addSpacing(5)
-
-        # # Текстовое поле для вывода списка
-        # self.active_filters = UTextEdit()
-        # self.active_filters.setReadOnly(True)
-        # self.active_filters.setText(self.get_filters_text())
-        # self.active_filters.setFixedHeight(self.right_group_hh)
-        # right_lay.addWidget(self.active_filters)
-
-        # # --- Группа для кнопок с нулевыми отступами ---
-        # self.reset_group = UGroupBox()
-        # reset_group_lay = QVBoxLayout(self.reset_group)
-        # reset_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
-        # reset_group_lay.setSpacing(RowArrowWidget.group_spacing)
-
-        # # Создаем кастомную кнопку редактирования фильтров
-        # self.edit_filters_btn = RowArrowWidget(Lng.edit[JsonData.lng_index])
-        # self.edit_filters_btn.set_left_icon(self.edit_svg) # Убедитесь, что self.edit_svg определен ранее
-        # self.edit_filters_btn.clicked.connect(self.edit_filters.emit) # Метод-обработчик клика
-
-        # # Создаем кастомную кнопку сброса
-        # self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
-        # self.reset_btn.set_left_icon(self.reset_svg)
-        # self.reset_btn.clicked.connect(self.reset_cmd)
-
-        # right_lay.addSpacing(10)
-        # # Добавляем сначала кнопку редактирования, затем кнопку сброса в слой группы
-        # reset_group_lay.addWidget(self.edit_filters_btn)
-        # reset_group_lay.addWidget(UHorizontalSep())
-        # reset_group_lay.addWidget(self.reset_btn)
-
-        # # Добавляем группу в основной правый контейнер
-        # right_lay.addWidget(self.reset_group)
-        # right_lay.addSpacing(10)
-        # right_lay.addStretch()
-        
-        # self.splitter.addWidget(self.right_container)
-
-        # # Устанавливаем пропорции ширины
-        # self.splitter.setSizes([250, 350])
-        # self.splitter.setStretchFactor(0, 1)
-        # self.splitter.setStretchFactor(1, 0)
-
-        # self.adjustSize()
-        # self.setFixedHeight(self.height())
-
-    # def get_filters_text(self):
-    #     active_list = []
-
-    #     if Dynamic.favs_tag_enabled:
-    #         active_list.append(Lng.favorites[JsonData.lng_index])
-
-    #     if Dynamic.no_subfolders_tag_enabled:
-    #         active_list.append(Lng.without_subfolders[JsonData.lng_index])
-
-    #     if Dynamic.word_tags_list:
-    #         active_list.extend(Dynamic.word_tags_list)
-
-    #     if not active_list:
-    #         return Lng.no[JsonData.lng_index]
-        
-    #     return ', '.join(active_list)
-
-    # def item_cmd(self, item: UListWidgetItem):
-    #     if isinstance(item, UListSpacerItem):
-    #         return
-    #     if item.text() == Lng.favorites[JsonData.lng_index]:
-    #         if Dynamic.favs_tag_enabled:
-    #             Dynamic.favs_tag_enabled = False
-    #             item.setCheckState(Qt.CheckState.Unchecked)
-    #         else:
-    #             Dynamic.favs_tag_enabled = True
-    #             item.setCheckState(Qt.CheckState.Checked)
-    #     elif item.text() == Lng.without_subfolders[JsonData.lng_index]:
-    #         if Dynamic.no_subfolders_tag_enabled:
-    #             Dynamic.no_subfolders_tag_enabled = False
-    #             item.setCheckState(Qt.CheckState.Unchecked)
-    #         else:
-    #             Dynamic.no_subfolders_tag_enabled = True
-    #             item.setCheckState(Qt.CheckState.Checked)
-    #     elif item.text() in Dynamic.word_tags_list:
-    #         Dynamic.word_tags_list.remove(item.text())
-    #         item.setCheckState(Qt.CheckState.Unchecked)
-    #     else:
-    #         Dynamic.word_tags_list.append(item.text())
-    #         item.setCheckState(Qt.CheckState.Checked)
-
-    #     self.active_filters.setText(self.get_filters_text())
-    #     self.reload_thumbnails.emit()
-
-    # def reset_cmd(self):
-    #     items = [
-    #         self.list_widget.item(i)
-    #         for i in range(self.list_widget.count())
-    #     ]
-    #     items.pop(2)  # удаляем спейсер из списка обработки
-    #     for item in items:
-    #         item.setCheckState(Qt.CheckState.Unchecked)
-    #     Dynamic.favs_tag_enabled = False
-    #     Dynamic.no_subfolders_tag_enabled = False
-    #     Dynamic.word_tags_list.clear()
-    #     self.reload_thumbnails.emit()
-    #     self.active_filters.setText(self.get_filters_text())
-
-        self.central_layout.addStretch(1)
+        self.adjustSize()
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)
