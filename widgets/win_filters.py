@@ -9,17 +9,17 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (QLabel, QWidget, RowArrowWidget,
-                            UGroupBox, UHorizontalSep,
-                            UListSpacerItem, UListWidget, UListWidgetItem,
-                            UMainWidget, UMenu, UPushButton, UTextEdit)
-from .caledar_widget import Calendar, CalendarBigDate
+from ._base_widgets import (QLabel, QWidget, RowArrowWidget, UGroupBox,
+                            UHorizontalSep, UListSpacerItem, UListWidget,
+                            UListWidgetItem, UMainWidget, UMenu, UPushButton,
+                            UTextEdit, TransparentLabel)
+from .caledar_widget import Calendar
 
 
 class DatesWidget(UGroupBox):
     reload_thumbnails = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
-    svg_calendar_size = (25, 25)
+    svg_calendar_size = (15, 15)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -57,7 +57,7 @@ class DatesWidget(UGroupBox):
 
         dynamic_container_lay.addSpacing(10)
 
-        self.dynamic_label = CalendarBigDate()
+        self.dynamic_label = TransparentLabel()
         self.dynamic_label.setFixedWidth(self.width())
         dynamic_container_lay.addWidget(self.dynamic_label)
         dynamic_container_lay.addStretch()
