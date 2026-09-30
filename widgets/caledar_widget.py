@@ -189,11 +189,9 @@ class Calendar(UMainWidget):
         self.central_layout.addWidget(self.btn_container)
         self.btn_container_layout = QHBoxLayout(self.btn_container)
         self.btn_container_layout.setContentsMargins(0, 0, 10, 20)
-        self.btn_container_layout.setSpacing(10)
+        self.btn_container_layout.setSpacing(15)
 
         self.btn_container_layout.addStretch(1)
-
-        btn_size = (100, 30)
 
         self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.deleteLater)
@@ -362,20 +360,6 @@ class Calendar(UMainWidget):
 
 
         self.recreate_calendar_widget()
-
-        # print(
-        #     "after recreate:",
-        #     self.central_layout.count(),
-        #     self.calendar_layout.count()
-        # )
-
-        # print(
-        #     "after update:",
-        #     self.central_layout.count(),
-        #     self.calendar_layout.count(),
-        #     self.calendar_widget.sizeHint(),
-        #     self.calendar_widget.size()
-        # )
 
         header_widget = TransparentWidget()
         header_layout = QHBoxLayout(header_widget)
