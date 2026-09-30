@@ -252,6 +252,12 @@ USpinBox::down-arrow {
 }
 
 
+UGroupBox {
+    border: 1px solid #363636;
+    border-radius: 10px;
+}
+
+
 QToolTip {
     color: #FFFFFF;
     background-color: #2B2B2B;

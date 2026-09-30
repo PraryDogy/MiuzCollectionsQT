@@ -10,13 +10,13 @@ from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import (QLabel, QWidget, RowArrowWidget,
-                            TransparentGroupBox, UHorizontalSep,
+                            UGroupBox, UHorizontalSep,
                             UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWidget, UMenu, UPushButton, UTextEdit)
 from .caledar_widget import Calendar, CalendarBigDate
 
 
-class DatesWidget(TransparentGroupBox):
+class DatesWidget(UGroupBox):
     reload_thumbnails = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (25, 25)
@@ -342,7 +342,7 @@ class WinFilters(UMainWidget):
         right_lay.addWidget(self.active_filters)
 
         # --- Группа для кнопок с нулевыми отступами ---
-        self.reset_group = TransparentGroupBox()
+        self.reset_group = UGroupBox()
         reset_group_lay = QVBoxLayout(self.reset_group)
         reset_group_lay.setContentsMargins(*RowArrowWidget.group_margings)
         reset_group_lay.setSpacing(RowArrowWidget.group_spacing)

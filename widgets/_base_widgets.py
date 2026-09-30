@@ -362,6 +362,12 @@ class USpinBox(QSpinBox):
         return super().enterEvent(event)
 
 
+class UGroupBox(TransparentGroupBox):
+    def __init__(self, title=None, parent=None):
+        super().__init__(title, parent)
+
+
+
 class SelectableLabel(TransparentLabel):
     sym_line_feed = "\u000a"
     sym_paragraph_sep = "\u2029"
