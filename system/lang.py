@@ -418,3 +418,7 @@ class Lng:
         "Очистить все",
         "Clear all"
     )
+    apply = (
+        "Применить",
+        "Apply"
+    )

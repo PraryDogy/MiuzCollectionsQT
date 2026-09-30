@@ -119,6 +119,7 @@ class Calendar(UMainWidget):
         self.setWindowTitle(Lng.calendar[JsonData.lng_index])
         self.set_close_only()
         self.set_always_on_top()
+        # self.setWindowFlags(Qt.WindowType.Popup)
 
         self.init_ui()
 
@@ -127,6 +128,7 @@ class Calendar(UMainWidget):
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def init_ui(self):
+
         dynamic_container = TransparentWidget()
         self.central_layout.addWidget(dynamic_container)
 
@@ -183,15 +185,38 @@ class Calendar(UMainWidget):
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)
 
+        self.btn_container = TransparentWidget()
+        self.central_layout.addWidget(self.btn_container)
+        self.btn_container_layout = QHBoxLayout(self.btn_container)
+        self.btn_container_layout.setContentsMargins(0, 0, 10, 20)
+        self.btn_container_layout.setSpacing(10)
+
+        self.btn_container_layout.addStretch(1)
+
+        btn_size = (100, 30)
+
+        self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+        self.cancel_btn.clicked.connect(self.deleteLater)
+        self.btn_container_layout.addWidget(self.cancel_btn)
+
+        self.ok_btn = UPushButton(Lng.apply[JsonData.lng_index])
+        self.ok_btn.clicked.connect(self.ok_clicked_cmd)
+        self.btn_container_layout.addWidget(self.ok_btn)
+
         self.create_calendar_widget()
         self.update_calendar()
+
+    def ok_clicked_cmd(self):
+        self.date_selected.emit(self.current_date)
+        self.deleteLater()
 
     def create_calendar_widget(self):
         self.calendar_widget = TransparentWidget()
         self.calendar_layout = QVBoxLayout(self.calendar_widget)
         self.calendar_layout.setContentsMargins(0, 0, 0, 0)
         self.calendar_layout.setSpacing(0)
-        self.central_layout.addWidget(self.calendar_widget)
+        widget_num = self.central_layout.count() - 1
+        self.central_layout.insertWidget(widget_num, self.calendar_widget)
 
     def recreate_calendar_widget(self):
         old_widget = self.calendar_widget
@@ -246,7 +271,6 @@ class Calendar(UMainWidget):
 
         self.current_date = QDate(year, selected_month, target_day)
         self.update_calendar()
-        self.date_selected.emit(self.current_date)
 
     def year_menu_selected(self):
         action: QAction = self.sender()
@@ -270,7 +294,6 @@ class Calendar(UMainWidget):
         )
 
         self.update_calendar()
-        self.date_selected.emit(self.current_date)
 
     def day_selected(self):
         sender_button: _CalendarDayBase = self.sender()
@@ -286,7 +309,6 @@ class Calendar(UMainWidget):
         )
 
         self.update_calendar()
-        self.date_selected.emit(self.current_date)
 
     def prev_month(self):
         min_date = QDate(self.min_year, 1, 1)
@@ -295,7 +317,6 @@ class Calendar(UMainWidget):
         if new_date >= min_date:
             self.current_date = new_date
             self.update_calendar()
-            self.date_selected.emit(self.current_date)
 
     def next_month(self):
         max_date = QDate(self.date_now.year(), 12, 31)
@@ -304,7 +325,6 @@ class Calendar(UMainWidget):
         if new_date <= max_date:
             self.current_date = new_date
             self.update_calendar()
-            self.date_selected.emit(self.current_date)
 
     def count_widgets(self):
         widgets = self.findChildren((TransparentWidget, CalendarDaySelected, CalendarDay))

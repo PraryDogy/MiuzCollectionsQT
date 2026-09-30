@@ -1,61 +1,74 @@
 import sys
-
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPainter, QPixmap
-from PyQt6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget
-
-
-class NumberLabel(QLabel):
-    def __init__(self, text, parent=None):
-        super().__init__(text, parent)
-
-        self.bg_pixmap = QPixmap("icons/common/calendar.svg")
-        self.active = False
-
-        self.setFixedSize(40, 40)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-    def set_active(self, active: bool):
-        self.active = active
-        self.update()
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        if self.active:
-            painter.drawPixmap(self.rect(), self.bg_pixmap)
-
-        painter.setPen(Qt.GlobalColor.white)
-        painter.drawText(
-            self.rect(),
-            Qt.AlignmentFlag.AlignCenter,
-            self.text()
-        )
+from PyQt6.QtCore import QPoint, Qt
+from PyQt6.QtWidgets import (
+    QApplication,
+    QGridLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 
-class Window(QWidget):
-    def __init__(self):
-        super().__init__()
+# Ваш собственный кастомный календарь
+class CustomCalendarWidget(QWidget):
 
-        self.setWindowTitle("Number Label")
-        self.setFixedSize(300, 200)
+  def __init__(self, parent=None):
+    super().__init__(parent)
 
-        self.number = NumberLabel("1")
+    # 1. МАГИЯ ПОПАПА: Делаем виджет всплывающим и автозакрывающимся
+    self.setWindowFlags(Qt.WindowType.Popup)
 
-        self.button = QPushButton("Переключить")
-        self.button.clicked.connect(self.toggle)
+    # Пример вашей кастомной структуры
+    layout = QVBoxLayout(self)
+    layout.setContentsMargins(10, 10, 10, 10)
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.number, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.button)
+    # Шапка (например, месяц и год)
+    lbl_title = QLabel("<b>Сентябрь 2026</b>")
+    layout.addWidget(lbl_title)
 
-    def toggle(self):
-        self.number.set_active(not self.number.active)
+    # Ваша кастомная сетка дней
+    grid_layout = QGridLayout()
+    for row in range(3):
+      for col in range(3):
+        day_btn = QPushButton(str(row * 3 + col + 1))
+        # При клике на день можно закрывать попап
+        day_btn.clicked.connect(self.hide)
+        grid_layout.addWidget(day_btn, row, col)
+
+    layout.addLayout(grid_layout)
 
 
-app = QApplication(sys.argv)
+# Главное окно
+class MainWindow(QWidget):
 
-window = Window()
-window.show()
+  def __init__(self):
+    super().__init__()
+    self.setWindowTitle("Главное окно")
+    self.resize(400, 300)
 
-sys.exit(app.exec())
+    layout = QVBoxLayout(self)
+
+    # Кнопка вызова календаря
+    self.btn_open = QPushButton("Открыть мой календарь")
+    self.btn_open.setFixedWidth(200)
+    layout.addWidget(self.btn_open)
+
+    # Создаем экземпляр вашего кастомного календаря
+    self.calendar_popup = CustomCalendarWidget(self)
+
+    # Привязываем клик
+    self.btn_open.clicked.connect(self.toggle_calendar)
+
+  def toggle_calendar(self):
+    # Вычисляем позицию прямо под кнопкой
+    global_pos = self.btn_open.mapToGlobal(QPoint(0, self.btn_open.height()))
+    self.calendar_popup.move(global_pos)
+    self.calendar_popup.show()
+
+
+if __name__ == "__main__":
+  app = QApplication(sys.argv)
+  window = MainWindow()
+  window.show()
+  sys.exit(app.exec())
