@@ -123,8 +123,9 @@ class Calendar(UMainWidget):
 
         self.init_ui()
 
+        hh = 530
         self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
+        self.setFixedSize(self.width(), hh)
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def init_ui(self):
@@ -184,6 +185,8 @@ class Calendar(UMainWidget):
         self.btn_next.setFixedSize(*self.svg_nav_size)
         self.btn_next.clicked.connect(self.next_month)
         self.nav_layout.addWidget(self.btn_next)
+
+        self.central_layout.addWidget(UHorizontalSep())
 
         self.btn_container = TransparentWidget()
         self.central_layout.addWidget(self.btn_container)
@@ -441,8 +444,6 @@ class Calendar(UMainWidget):
 
             if week_index < len(weeks) - 1:
                 self.calendar_layout.addWidget(UHorizontalSep())
-
-            self.calendar_layout.addWidget(UHorizontalSep())
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
