@@ -263,7 +263,7 @@ class WinFiltersTagWidget(TransparentFrame):
     tag_height = 23
 
     # Добавляем параметр show_trash=True по умолчанию
-    def __init__(self, text: str, active: bool = False, show_trash: bool = True):
+    def __init__(self, text: str, active: bool, show_trash: bool):
         super().__init__()
         self.setFixedHeight(self.tag_height)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -319,7 +319,7 @@ class WinFiltersFavTag(WinFiltersTagWidget):
             active = True
         else:
             active = False
-        super().__init__(text, show_trash=False, active=active)
+        super().__init__(text, active, False)
 
     def mouseReleaseEvent(self, a0):
         if Dynamic.favs_tag_enabled:
@@ -337,7 +337,7 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
             active = True
         else:
             active = False
-        super().__init__(text, show_trash=False, active=active)
+        super().__init__(text, active, False)
 
     def mouseReleaseEvent(self, a0):
         if Dynamic.no_subfolders_tag_enabled:
@@ -355,7 +355,7 @@ class WinFiltersWordTag(WinFiltersTagWidget):
             active = True
         else:
             active = False
-        super().__init__(text, show_trash=True, active=active)
+        super().__init__(text, active, True)
 
     def mouseReleaseEvent(self, a0):
         if self.title.text() in Dynamic.word_tags_list:
