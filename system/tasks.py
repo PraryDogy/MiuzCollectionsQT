@@ -385,15 +385,17 @@ class ImgArrayQImage(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal(QImage)
 
-    def __init__(self, img_array: np.ndarray):
+    def __init__(self, img_array: np.ndarray, size: int = None):
         super().__init__()
         self.sigs = ImgArrayQImage.Sigs()
+        self.size_ = size
         self.img_array = img_array
 
     def task(self):
-        self.sigs.finished_.emit(
-            Utils.pyqt_qimage_from_array(self.img_array)
-        )
+        qimage = Utils.pyqt_qimage_from_array(self.img_array)
+        if self.size_:
+            qimage = Utils.qimage_scaled_high_dpi(qimage, self.size_)
+        self.sigs.finished_.emit(qimage)
 
 
 class ImageSearcher(URunnable):

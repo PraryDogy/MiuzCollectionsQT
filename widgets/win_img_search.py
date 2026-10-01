@@ -15,7 +15,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import ImgUtils
-from system.tasks import ImageSearcher, UThreadPool
+from system.tasks import ImageSearcher, UThreadPool, ImgArrayQImage
 from system.utils import Utils
 
 from ._base_widgets import (GrayTextLabel, RowArrowWidget, TitleTextLabel,
@@ -210,10 +210,15 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         layout.setSpacing(0)
         layout.addWidget(self.image_label)
 
-    def set_pixmap(self, qimage: QImage):
-        scaled = Utils.qimage_scaled_high_dpi(qimage, self.size_[0])
-        self.pixmap = QPixmap.fromImage(scaled)
-        self.image_label.setPixmap(self.pixmap)
+    def set_pixmap(self, img_array: np.ndarray):
+
+        def finished(qimage: QImage):
+            self.pixmap = QPixmap.fromImage(qimage)
+            self.image_label.setPixmap(self.pixmap)
+
+        self.qimage_task = ImgArrayQImage(img_array, self.size_[0])
+        self.qimage_task.sigs.finished_.connect(finished)
+        UThreadPool.start(self.qimage_task)
 
     def clear(self):
         self.pixmap = QPixmap()
