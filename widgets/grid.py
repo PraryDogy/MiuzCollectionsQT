@@ -237,6 +237,7 @@ class UpBtn(QSvgWidget):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
         self.load(str(self.icon_path))
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
         if ev.button() == Qt.MouseButton.LeftButton:
