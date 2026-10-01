@@ -148,6 +148,7 @@ class WinImgSearch(UMainWidget):
         self.set_close_only()
         self.setAcceptDrops(True)
         self.setWindowTitle(Lng.image_search[JsonData.lng_index])
+        self.central_layout.addSpacing(10)
 
         self.img_array = None
         self.img_search_task = None
@@ -173,25 +174,6 @@ class WinImgSearch(UMainWidget):
 
         self.drop_widget = WinImgSearchDropWidget()
         self.central_layout.addWidget(self.drop_widget)
-        
-        # group = UGroupBox()
-        # self.central_layout.addWidget(group)
-        # group_layout = QVBoxLayout(group)
-        # group_layout.setContentsMargins(5, 5, 5, 5)
-        
-        # lines_base_text = (
-        #     f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} "
-        #     f"\"{Mf.current_mf.mf_alias}\".",
-        #     f"{Lng.image_search_drop[JsonData.lng_index]}."
-        # )
-        # self.base_text = "\n".join(lines_base_text)
-        
-        # self.img_label = TransparentLabel(self.base_text)
-        # self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # self.img_label.setWordWrap(True)
-        # group_layout.addWidget(self.img_label)
-        
-        self.central_layout.addSpacing(10)
         
         self.group_box = UGroupBox()
         self.central_layout.addWidget(self.group_box)
@@ -232,14 +214,10 @@ class WinImgSearch(UMainWidget):
         btn_layout.addStretch()
 
         self.central_layout.addSpacing(5)
-
-        # self.resize(self.ww, self.hh)
         
         self.adjustSize()
-        # self.setFixedSize(self.width(), self.height())
 
     def reset_img_search(self):
-        return
         self.img_label.clear()
         self.img_label.setText(self.base_text)
         if Dynamic.img_search_thumb_paths:
