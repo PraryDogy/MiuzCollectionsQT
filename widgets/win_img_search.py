@@ -249,10 +249,10 @@ class WinImgSearch(UMainWidget):
         self.read_img_timer = QTimer(self)
         self.read_img_timer.setSingleShot(True)
         self.read_img_timer.timeout.connect(self.poll_read_img)
-        self.central_layout.setContentsMargins(10, 10, 10, 5)
 
-        self.central_layout.setSpacing(0)
-        self.central_layout.addSpacing(10)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
+        self.central_layout.setSpacing(10)
+
         self.image_stack = QStackedWidget()
         self.image_stack.setFixedSize(300, 300)
         self.drop_widget = WinImgSearchDropWidget()
@@ -280,23 +280,19 @@ class WinImgSearch(UMainWidget):
         self.slider_widget = SliderWidget()
         self.group_layout.addWidget(self.slider_widget)
         self.slider_widget.setFixedHeight(self.reset_btn.height())
-        self.group_layout.addSpacing(3)
         self.group_box.adjustSize()
         self.group_box.setFixedHeight(self.group_box.height())
 
-        self.central_layout.addSpacing(10)
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
         btn_layout.addStretch()
         self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
         self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
-        btn_layout.addSpacing(10)
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
         cancel_btn.clicked.connect(self.hide_window)
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
-        self.central_layout.addSpacing(5)
         self.adjustSize()
 
     def image_dropped(self, path: str):
