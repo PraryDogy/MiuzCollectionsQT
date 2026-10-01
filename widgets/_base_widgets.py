@@ -294,11 +294,12 @@ class UTreeView(TransparentTreeView):
 
 
 class UPushButton(TransparentButton):
-    size_ = (80, 24)
+    size_ = (80, 26)
 
     def __init__(self, text: str):
         super().__init__(text=text)
-        self.setFixedSize(*self.size_)
+        # self.setFixedSize(*self.size_)
+        self.setFixedHeight(self.size_[1])
         self.set_font_size(11)
 
     def set_font_size(self, value_px: int):

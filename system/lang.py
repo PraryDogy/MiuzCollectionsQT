@@ -470,3 +470,7 @@ class Lng:
         "Редактор текста",
         "Text editor"
     )
+    find_matches = (
+        "Найти совпадения",
+        "Find matches"
+    )

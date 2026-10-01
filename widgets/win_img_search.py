@@ -308,7 +308,7 @@ class WinImgSearch(UMainWidget):
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
         btn_layout.addStretch()
-        self.start_btn = ActiveButton(Lng.start[JsonData.lng_index])
+        self.start_btn = ActiveButton(Lng.find_matches[JsonData.lng_index])
         self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])

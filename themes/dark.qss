@@ -171,7 +171,8 @@ UPushButton {
     border: 1px solid #585858;
     border-radius: 6px;
     color: #ffffff;
-    padding-right: 1px; /* Отступ справа, чтобы текст не наезжал на стрелочку */
+    padding-right: 5px; /* Отступ справа, чтобы текст не наезжал на стрелочку */
+    padding-left: 5px;
 }
 
 UPushButton:pressed {
