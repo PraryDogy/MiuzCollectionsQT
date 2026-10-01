@@ -305,7 +305,7 @@ class BarTop(TransparentFrame):
         for i in (self.img_search_btn, self.settings_btn):
             i.setFixedSize(self.height() - 2, self.height() - 2)
         self.search_wid.setFixedHeight(self.height() - 2)
-        self.catalog_widget.button.setFixedHeight(self.height() - 6)
+        # self.catalog_widget.button.setFixedHeight(self.height() - 6)
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
