@@ -220,9 +220,10 @@ class CatalogWidget(TransparentWidget):
 
         # self.h_lay.addSpacing(10)
 
-        self.button = UPushButton(Mf.current_mf.mf_alias)
+        self.button = UPushButton("")
+        self.catalog_btn_text(Mf.current_mf.mf_alias)
         self.button.setFixedWidth(110)
-        self.button.setIconSize(QSize(15, 15))
+        self.button.setIconSize(QSize(12, 12))
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
@@ -255,8 +256,11 @@ class CatalogWidget(TransparentWidget):
         self.mf_new.emit(setting_item)
 
     def mf_open_cmd(self, mf: Mf):
-        self.button.setText(mf.mf_alias)
+        self.catalog_btn_text(mf.mf_alias)
         self.mf_open.emit(mf)
+
+    def catalog_btn_text(self, text: str):
+        self.button.setText(" " + text)
 
 
 class BarTop(TransparentFrame):
@@ -302,7 +306,6 @@ class BarTop(TransparentFrame):
             i.setFixedSize(self.height() - 2, self.height() - 2)
         self.search_wid.setFixedHeight(self.height() - 2)
         self.catalog_widget.button.setFixedHeight(self.height() - 6)
-
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()
