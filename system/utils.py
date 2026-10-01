@@ -13,6 +13,7 @@ from cfg import Static
 
 
 class Utils:
+    DPR = 2
 
     @classmethod
     def pyqt_qimage_from_array(cls, image: np.ndarray) -> QImage | None:
@@ -63,7 +64,7 @@ class Utils:
             return None
 
     @classmethod
-    def qimage_scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = 2):
+    def qimage_scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = DPR):
         scaled = qimage.scaled(
             int(size * dpr),
             int(size * dpr),

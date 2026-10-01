@@ -127,6 +127,11 @@ class SliderWidget(TransparentWidget):
         self.current_value = value
 
 
+
+DROP_WIDGET_SIZE = (350, 300)
+
+
+
 class WinImgSearchDropWidget(TransparentFrame):
     svg_path = Static.COMMON_ICONS / "base_image.svg"
     svg_size = (50, 50)
@@ -134,6 +139,7 @@ class WinImgSearchDropWidget(TransparentFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setFixedSize(*DROP_WIDGET_SIZE)
         self.setAcceptDrops(True)
 
         self.v_layout = QVBoxLayout(self)
@@ -188,9 +194,16 @@ class WinImgSearchDropWidget(TransparentFrame):
 
 
 class WinImgSearchPreviewWidget(TransparentFrame):
+    close_svg_path = Static.COMMON_ICONS / "cancel.svg"
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setFixedSize(*DROP_WIDGET_SIZE)
+        self.close_icon = QSvgWidget(self)
+        self.close_icon.load(str(self.close_svg_path))
+        self.close_icon.setFixedSize(15, 15)
+        self.close_icon.hide()
+
         self.pixmap = QPixmap()
         self.image_label = QLabel(Lng.loading[JsonData.lng_index])
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -204,14 +217,21 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         def finished(qimage: QImage):
             self.pixmap = QPixmap.fromImage(qimage)
             self.image_label.setPixmap(self.pixmap)
+            x = int(self.pixmap.width()) // Utils.DPR
+            y = -5
+            self.close_icon.move(x + 40, y)
+            self.close_icon.show()
+            self.close_icon.raise_()
 
-        self.qimage_task = ImgArrayQImage(img_array, self.size_[0])
+
+        self.qimage_task = ImgArrayQImage(img_array, DROP_WIDGET_SIZE[1])
         self.qimage_task.sigs.finished_.connect(finished)
         UThreadPool.start(self.qimage_task)
 
     def clear(self):
         self.pixmap = QPixmap()
         self.image_label.clear()
+        self.close_icon.hide()
 
 
 class ControlsWidget(UGroupBox):
@@ -236,35 +256,31 @@ class ControlsWidget(UGroupBox):
         descr = GrayTextLabel(Lng.image_search_descr[JsonData.lng_index])
         self.v_layout.addWidget(descr)
 
-        self.v_layout.addSpacing(10)
-        self.v_layout.addWidget(USep())
-        self.v_layout.addSpacing(10)
+        # self.v_layout.addSpacing(10)
+        # self.v_layout.addWidget(USep())
+        # self.v_layout.addSpacing(10)
 
-        self.reset_wrapper = TransparentWidget()
-        reset_layout = QHBoxLayout(self.reset_wrapper)
-        reset_layout.setContentsMargins(0, 0, 0, 0)  # убираем внутренние отступы
-        reset_layout.setSpacing(10)  # расстояние между текстом и кнопкой
+        # self.reset_wrapper = TransparentWidget()
+        # reset_layout = QHBoxLayout(self.reset_wrapper)
+        # reset_layout.setContentsMargins(0, 0, 0, 0)  # убираем внутренние отступы
+        # reset_layout.setSpacing(10)  # расстояние между текстом и кнопкой
 
-        self.reset_label = GrayTextLabel("Ваш текст здесь") 
-        reset_layout.addWidget(self.reset_label)
+        # # Ваша кнопка
+        # self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
+        # self.reset_btn.setIcon(self.reset_icon)
+        # self.reset_btn.setFixedWidth(100)
+        # # self.reset_btn.clicked.connect(self.reset_img_search)
+        # self.reset_btn.clicked.connect(self.reset_btn_clicked.emit)
+        # reset_layout.addWidget(self.reset_btn)
 
-        # Ваша кнопка
-        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        self.reset_btn.setIcon(self.reset_icon)
-        self.reset_btn.setFixedWidth(100)
-        # self.reset_btn.clicked.connect(self.reset_img_search)
-        self.reset_btn.clicked.connect(self.reset_btn_clicked.emit)
-        reset_layout.addWidget(self.reset_btn)
-
-        # Добавляем весь контейнер в основной вертикальный слой
-        self.v_layout.addWidget(self.reset_wrapper, alignment=Qt.AlignmentFlag.AlignRight)
+        # # Добавляем весь контейнер в основной вертикальный слой
+        # self.v_layout.addWidget(self.reset_wrapper, alignment=Qt.AlignmentFlag.AlignRight)
         
 
 
 class WinImgSearch(UMainWidget):
     reload_thumbnails = pyqtSignal()
     closed = pyqtSignal()
-    image_stack_size = (350, 300)
     magnifier_svg_path = Static.COMMON_ICONS / "magnifier.svg"
 
     def __init__(self):
@@ -295,7 +311,6 @@ class WinImgSearch(UMainWidget):
         self.central_layout.setSpacing(10)
 
         self.image_stack = QStackedWidget()
-        self.image_stack.setFixedSize(*self.image_stack_size)
         self.drop_widget = WinImgSearchDropWidget()
         self.preview_widget = WinImgSearchPreviewWidget()
         self.image_stack.addWidget(self.drop_widget)
