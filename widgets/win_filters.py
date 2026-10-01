@@ -383,7 +383,7 @@ class WinFiltersAddTag(TransparentLabel):
         return super().mouseReleaseEvent(ev)
 
 
-class TagsContolWidget(TransparentWidget):
+class StandartTags(TransparentWidget):
     load_st_grid = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -402,6 +402,18 @@ class TagsContolWidget(TransparentWidget):
         tag.load_st_grid.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
+
+class UserTags(TransparentWidget):
+    load_st_grid = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.flow_layout = FlowLayout(self, spacing=7)
+        self.flow_layout.setContentsMargins(0, 0, 0, 0)
+        self._create_tags()
+
+    def _create_tags(self):
         for word in Filters.items:
             tag = WinFiltersWordTag(word)
             tag.load_st_grid.connect(self.load_st_grid.emit)
@@ -481,9 +493,13 @@ class TagsWidget(UGroupBox):
 
         self.v_lay.addWidget(USep())
 
-        self.tags_control_widget = TagsContolWidget()
-        self.tags_control_widget.load_st_grid.connect(self.load_st_grid.emit)
-        self.v_lay.addWidget(self.tags_control_widget)
+        self.user_tags = StandartTags()
+        self.user_tags.load_st_grid.connect(self.load_st_grid.emit)
+        self.v_lay.addWidget(self.user_tags)
+
+        self.user_tags = UserTags()
+        self.user_tags.load_st_grid.connect(self.load_st_grid.emit)
+        self.v_lay.addWidget(self.user_tags)
 
         self.v_lay.addWidget(USep())
 
