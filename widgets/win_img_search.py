@@ -240,12 +240,24 @@ class ControlsWidget(UGroupBox):
         self.v_layout.addWidget(USep())
         self.v_layout.addSpacing(10)
 
+        self.reset_wrapper = TransparentWidget()
+        reset_layout = QHBoxLayout(self.reset_wrapper)
+        reset_layout.setContentsMargins(0, 0, 0, 0)  # убираем внутренние отступы
+        reset_layout.setSpacing(10)  # расстояние между текстом и кнопкой
+
+        self.reset_label = GrayTextLabel("Ваш текст здесь") 
+        reset_layout.addWidget(self.reset_label)
+
+        # Ваша кнопка
         self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.setIcon(self.reset_icon)
         self.reset_btn.setFixedWidth(100)
         # self.reset_btn.clicked.connect(self.reset_img_search)
         self.reset_btn.clicked.connect(self.reset_btn_clicked.emit)
-        self.v_layout.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignRight)
+        reset_layout.addWidget(self.reset_btn)
+
+        # Добавляем весь контейнер в основной вертикальный слой
+        self.v_layout.addWidget(self.reset_wrapper, alignment=Qt.AlignmentFlag.AlignRight)
         
 
 
