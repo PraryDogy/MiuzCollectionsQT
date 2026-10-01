@@ -149,8 +149,6 @@ class App(QApplication):
         # icon = QIcon(str(Static.APP_ICONS / "icon.png"))
         # self.setWindowIcon(icon)
 
-        print("win text search настрой lng")
-
     def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
         if a1.type() == QEvent.Type.ApplicationActivate:
             win_list = [
