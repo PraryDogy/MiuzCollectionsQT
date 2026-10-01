@@ -418,9 +418,14 @@ class TagsContolWidget(TransparentWidget):
 
         def ok_clicked(text: str):
             if text:
-                print("new tag", text)
-            else:
-                print("no text")
+                Filters.items.append(text)
+                Filters.write_json_data()
+                tag = WinFiltersWordTag(text)
+                tag.load_st_grid.connect(self.load_st_grid.emit)
+                tag.on_trash_clicked.connect(
+                    lambda w=tag: self.show_remove_tag_win(w)
+                )
+                self.flow_layout.addWidget(tag)
 
         self.text_win = TextWindow(
             title=Lng.new_tag[JsonData.lng_index],
