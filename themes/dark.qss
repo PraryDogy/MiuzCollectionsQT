@@ -405,6 +405,14 @@ WinFiltersAddTag[active="False"] {
 /* win_image_view.py */
 
 /* win_img_search.py */
+
+WinImgSearchDropWidget {
+    border: 2px dashed #A2A2A2;
+    border-radius: 20px;
+    background: #202020;
+}
+
+
 /* win_img_search.py */
 
 /* win_info.py */

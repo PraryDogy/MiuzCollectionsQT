@@ -6,8 +6,8 @@ import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
-from sqlalchemy import func
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
@@ -17,9 +17,10 @@ from system.shared_utils import ImgUtils
 from system.tasks import ImageSearcher, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (RowArrowWidget, UGroupBox,
-                            TransparentLabel, TransparentWidget,
-                            USep, UMainWidget, UPushButton, USlider)
+from ._base_widgets import (GrayTextLabel, RowArrowWidget, TitleTextLabel,
+                            TransparentFrame, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWidget,
+                            UPushButton, USep, USlider)
 
 
 class ProgressWin(UMainWidget):
@@ -99,6 +100,41 @@ class SliderWidget(TransparentWidget):
         self.current_value = value
 
 
+class WinImgSearchDropWidget(TransparentFrame):
+    svg_path = Static.COMMON_ICONS / "base_image.svg"
+    svg_size = (50, 50)
+    size_ = (300, 300)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(*self.size_)
+        self.v_layout = QVBoxLayout(self)
+        self.v_layout.setContentsMargins(0, 0, 0, 0)
+        self.v_layout.setSpacing(10)
+        self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.svg_widget = QSvgWidget()
+        self.svg_widget.load(str(self.svg_path))
+        self.svg_widget.setFixedSize(*self.svg_size)
+        self.v_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.title_label = TitleTextLabel(Lng.image_search[JsonData.lng_index])
+        self.v_layout.addWidget(self.title_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.descr_label = GrayTextLabel("")
+        self.descr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.v_layout.addWidget(self.descr_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        lines_base_text = (
+            f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} "
+            f"\"{Mf.current_mf.mf_alias}\"",
+            f"{Lng.image_search_drop[JsonData.lng_index]}."
+        )
+        self.base_text = "\n".join(lines_base_text)
+
+        self.descr_label.setText(self.base_text)
+
+
 class WinImgSearch(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
     reload_thumbnails = pyqtSignal()
@@ -112,7 +148,6 @@ class WinImgSearch(UMainWidget):
         self.set_close_only()
         self.setAcceptDrops(True)
         self.setWindowTitle(Lng.image_search[JsonData.lng_index])
-        self.setMinimumSize(300, 330)
 
         self.img_array = None
         self.img_search_task = None
@@ -135,23 +170,26 @@ class WinImgSearch(UMainWidget):
         
         self.central_layout.setContentsMargins(10, 10, 10, 5)
         self.central_layout.setSpacing(0)
+
+        self.drop_widget = WinImgSearchDropWidget()
+        self.central_layout.addWidget(self.drop_widget)
         
-        group = UGroupBox()
-        self.central_layout.addWidget(group)
-        group_layout = QVBoxLayout(group)
-        group_layout.setContentsMargins(5, 5, 5, 5)
+        # group = UGroupBox()
+        # self.central_layout.addWidget(group)
+        # group_layout = QVBoxLayout(group)
+        # group_layout.setContentsMargins(5, 5, 5, 5)
         
-        lines_base_text = (
-            f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} "
-            f"\"{Mf.current_mf.mf_alias}\".",
-            f"{Lng.image_search_drop[JsonData.lng_index]}."
-        )
-        self.base_text = "\n".join(lines_base_text)
+        # lines_base_text = (
+        #     f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} "
+        #     f"\"{Mf.current_mf.mf_alias}\".",
+        #     f"{Lng.image_search_drop[JsonData.lng_index]}."
+        # )
+        # self.base_text = "\n".join(lines_base_text)
         
-        self.img_label = TransparentLabel(self.base_text)
-        self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.img_label.setWordWrap(True)
-        group_layout.addWidget(self.img_label)
+        # self.img_label = TransparentLabel(self.base_text)
+        # self.img_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # self.img_label.setWordWrap(True)
+        # group_layout.addWidget(self.img_label)
         
         self.central_layout.addSpacing(10)
         
@@ -195,12 +233,13 @@ class WinImgSearch(UMainWidget):
 
         self.central_layout.addSpacing(5)
 
-        self.resize(self.ww, self.hh)
+        # self.resize(self.ww, self.hh)
         
-        # self.adjustSize()
+        self.adjustSize()
         # self.setFixedSize(self.width(), self.height())
 
     def reset_img_search(self):
+        return
         self.img_label.clear()
         self.img_label.setText(self.base_text)
         if Dynamic.img_search_thumb_paths:
@@ -274,6 +313,7 @@ class WinImgSearch(UMainWidget):
             self.poll_progress_win_timer.stop()
 
     def poll_read_img(self):
+        return
         self.read_img_timer.stop()
         if self.read_img_task is None:
             return
@@ -372,6 +412,7 @@ class WinImgSearch(UMainWidget):
         return super().dragEnterEvent(a0)
 
     def dropEvent(self, a0):
+        return
         if a0.mimeData().hasUrls():
             first_url = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
             if first_url.endswith(ImgUtils.ext_all):
