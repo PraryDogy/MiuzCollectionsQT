@@ -48,7 +48,7 @@ class WinTextSearchBtn(UPushButton):
         self.setFixedWidth(self.ww)
 
     def set_text(self, text):
-        self.setText(" " + text)
+        self.setText(text)
 
 
 class WinTextSearch(UMainWidget):

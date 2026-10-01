@@ -239,7 +239,7 @@ class ControlsWidget(UGroupBox):
         self.first_row_layout.setContentsMargins(0, 0, 0, 0)
         self.first_row_layout.setSpacing(0)
 
-        self.reset_btn = UPushButton(" " + Lng.reset[JsonData.lng_index])
+        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.setIcon(self.reset_icon)
         self.reset_btn.setFixedWidth(100)
         # self.reset_btn.clicked.connect(self.reset_img_search)
@@ -261,6 +261,7 @@ class WinImgSearch(UMainWidget):
     reload_thumbnails = pyqtSignal()
     closed = pyqtSignal()
     image_stack_size = (350, 300)
+    magnifier_svg_path = Static.COMMON_ICONS / "magnifier.svg"
 
     def __init__(self):
         super().__init__()
@@ -274,6 +275,7 @@ class WinImgSearch(UMainWidget):
         self.shm = None
         self.progress_win = None
         self.read_img_poll_ms = 300
+        self.magnifier_icon = QIcon(str(self.magnifier_svg_path))
 
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
@@ -304,11 +306,11 @@ class WinImgSearch(UMainWidget):
         self.group_box = ControlsWidget()
         self.central_layout.addWidget(self.group_box)
 
-
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
         btn_layout.addStretch()
         self.start_btn = ActiveButton(Lng.find_matches[JsonData.lng_index])
+        self.start_btn.setIcon(self.magnifier_icon)
         self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])

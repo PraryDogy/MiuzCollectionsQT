@@ -260,7 +260,7 @@ class CatalogWidget(TransparentWidget):
         self.mf_open.emit(mf)
 
     def catalog_btn_text(self, text: str):
-        self.button.setText(" " + text)
+        self.button.setText(text)
 
 
 class BarTop(TransparentFrame):
