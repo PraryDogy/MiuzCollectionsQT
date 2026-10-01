@@ -216,7 +216,7 @@ class CatalogWidget(TransparentWidget):
         self.h_lay.setSpacing(0)
 
         self.title = GrayTextLabel(Lng.catalog[JsonData.lng_index])
-        self.h_lay.addWidget(self.title)
+        # self.h_lay.addWidget(self.title)
 
         self.h_lay.addSpacing(10)
 
