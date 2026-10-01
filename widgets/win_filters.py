@@ -13,7 +13,7 @@ from system.lang import Lng
 from ._base_widgets import (ConfirmWindow, FlowLayout, RowArrowWidget,
                             TextWindow, TransparentFrame, TransparentLabel,
                             TransparentWidget, UGroupBox, UListWidget,
-                            UMainWidget, UMenu, UPushButton, USep)
+                            UMainWidget, UMenu, UPushButton, USep, GrayTextLabel)
 from .win_calendar import WinCalendar
 
 UGroupBox_margins = (5, 5, 5, 5)
@@ -97,9 +97,9 @@ class DatesWidget(UGroupBox):
         calendar_icon = QSvgWidget()
         calendar_icon.load(str(self.calendar_svg))
         calendar_icon.setFixedSize(*self.svg_calendar_size)
-        dynamic_container_lay.addWidget(calendar_icon)
+        # dynamic_container_lay.addWidget(calendar_icon)
 
-        self.dynamic_label = TransparentLabel()
+        self.dynamic_label = GrayTextLabel("")
         self.dynamic_label.setFixedWidth(self.width())
         dynamic_container_lay.addWidget(self.dynamic_label)
         dynamic_container_lay.addStretch()
@@ -541,29 +541,20 @@ class TagsWidget(UGroupBox):
 
         self.v_lay.addWidget(USep())
 
-        self.user_tags = StandartTags()
-        self.user_tags.load_st_grid.connect(self.load_st_grid.emit)
-        self.v_lay.addWidget(self.user_tags)
+        st_tags_title = GrayTextLabel(Lng.standart_tags[JsonData.lng_index])
+        self.v_lay.addWidget(st_tags_title)
+
+        self.standart_tags = StandartTags()
+        self.standart_tags.load_st_grid.connect(self.load_st_grid.emit)
+        self.v_lay.addWidget(self.standart_tags)
+
+        user_tags_title = GrayTextLabel(Lng.user_tags[JsonData.lng_index])
+        self.v_lay.addWidget(user_tags_title)
 
         self.user_tags = UserTags()
         self.user_tags.load_st_grid.connect(self.load_st_grid.emit)
         self.v_lay.addWidget(self.user_tags)
 
-        self.v_lay.addWidget(USep())
-
-        btn_widget = TransparentWidget()
-        self.v_lay.addWidget(btn_widget)
-
-        self.btn_layout = QHBoxLayout(btn_widget)
-        self.btn_layout.setContentsMargins(0, 0, 0, 0)
-        self.btn_layout.setSpacing(10)
-
-        self.btn_layout.addStretch(1)
-
-        self.default_tags = UPushButton(Lng.recover_tags[JsonData.lng_index])
-        self.default_tags.setFixedWidth(110)
-        self.btn_layout.addWidget(self.default_tags)
-    
 
 class WinFilters(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"

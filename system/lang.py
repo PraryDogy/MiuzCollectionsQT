@@ -450,3 +450,11 @@ class Lng:
         "Восстановить теги",
         "Reset tags"
     )
+    standart_tags = (
+        "Стандартные теги",
+        "Standart "
+    )
+    user_tags = (
+        "Пользовательские теги",
+        "User tags"
+    )
