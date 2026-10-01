@@ -103,11 +103,6 @@ class SliderWidget(TransparentWidget):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
-        # self.accuracy_label = TransparentLabel(
-        #     Lng.accuracy[JsonData.lng_index] + ":"
-        # )
-        # self.h_layout.addWidget(self.accuracy_label)
-
         self.slider = USlider()
         self.slider.setOrientation(
             Qt.Orientation.Horizontal
@@ -230,31 +225,24 @@ class ControlsWidget(UGroupBox):
         self.reset_icon = QIcon(str(self.reset_svg))
 
         self.v_layout = QVBoxLayout(self)
-        self.v_layout.setContentsMargins(5, 5, 5, 5)
+        self.v_layout.setContentsMargins(5, 5, 5, 10)
         self.v_layout.setSpacing(10)
 
-        first_row_container = TransparentWidget()
-        self.v_layout.addWidget(first_row_container)
-        self.first_row_layout = QHBoxLayout(first_row_container)
-        self.first_row_layout.setContentsMargins(0, 0, 0, 0)
-        self.first_row_layout.setSpacing(0)
+        descr = GrayTextLabel(Lng.image_search_descr[JsonData.lng_index])
+        self.v_layout.addWidget(descr)
+
+        self.slider_widget = SliderWidget()
+        self.v_layout.addWidget(self.slider_widget)
+
+        self.v_layout.addWidget(USep())
 
         self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.setIcon(self.reset_icon)
         self.reset_btn.setFixedWidth(100)
         # self.reset_btn.clicked.connect(self.reset_img_search)
         self.reset_btn.clicked.connect(self.reset_btn_clicked.emit)
-        self.first_row_layout.addWidget(self.reset_btn)
-        self.first_row_layout.addStretch(1)
+        self.v_layout.addWidget(self.reset_btn, alignment=Qt.AlignmentFlag.AlignRight)
         
-        self.v_layout.addWidget(USep())
-        self.slider_widget = SliderWidget()
-        self.v_layout.addWidget(self.slider_widget)
-        # self.slider_widget.setFixedHeight(self.reset_btn.height())
-        # self.group_box.adjustSize()
-        # self.group_box.setFixedHeight(self.group_box.height())
-
-
 
 
 class WinImgSearch(UMainWidget):

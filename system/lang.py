@@ -474,3 +474,7 @@ class Lng:
         "Найти совпадения",
         "Find matches"
     )
+    image_search_descr = (
+            "Поиск по цветовой гистограмме.\nЧем выше точность, тем меньше результатов.",
+            "Color histogram search.\nHigher accuracy means fewer results."
+        )
