@@ -203,7 +203,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         super().__init__(parent)
         self.setFixedSize(*self.size_)
         self.pixmap = QPixmap()
-        self.image_label = QLabel()
+        self.image_label = QLabel(Lng.loading[JsonData.lng_index])
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
