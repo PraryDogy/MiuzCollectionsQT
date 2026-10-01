@@ -10,21 +10,16 @@ from system.lang import Lng
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
                             TransparentWidget, UMainWidget, UPushButton,
-                            UTextEdit)
+                            UTextEdit, USep, GrayTextLabel)
 
 
 class WinTextSearchTitle(TransparentLabel):
     def __init__(self):
-        super().__init__("Поиск")
-
-
-class WinTextSearchSubtitle(TransparentLabel):
-    def __init__(self, text):
-        super().__init__(text)
+        super().__init__(Lng.text_editor[JsonData.lng_index])
 
 
 class WinTextSearchTitleRow(TransparentFrame):
-    svg_path = Static.COMMON_ICONS / "magnifier.svg"
+    svg_path = Static.COMMON_ICONS / "text_edit.svg"
     svg_size = (28, 28)
 
     def __init__(self):
@@ -37,18 +32,23 @@ class WinTextSearchTitleRow(TransparentFrame):
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.svg_path))
         self.svg_widget.setFixedSize(*self.svg_size)
-        # self.h_lay.addWidget(self.svg_widget)
+        self.h_lay.addWidget(self.svg_widget)
 
         self.title_label = WinTextSearchTitle()
         self.h_lay.addWidget(self.title_label)
 
 
 class WinTextSearchBtn(UPushButton):
-    size_ = (90, 23)
+    ww = 90
 
     def __init__(self, text):
-        super().__init__(text)
+        super().__init__("")
         self.setFixedSize(*self.size_)
+        self.set_text(text)
+        self.setFixedWidth(self.ww)
+
+    def set_text(self, text):
+        self.setText(" " + text)
 
 
 class WinTextSearch(UMainWidget):
@@ -73,16 +73,10 @@ class WinTextSearch(UMainWidget):
         self.title_row = WinTextSearchTitleRow()
         self.central_layout.addWidget(self.title_row)
 
+        self.central_layout.addWidget(USep())
+
         # 1. Текст описания форматов (RU / EN)
-        if JsonData.lng_index == 0:
-            description_text = (
-                "Для поиска нескольких слов введите их через запятую или с новой строки."
-            )
-        else:
-            description_text = (
-                "Для поиска нескольких слов введите их через запятую или с новой строки."
-            )
-        self.description_label = WinTextSearchSubtitle(description_text)
+        self.description_label = GrayTextLabel(Lng.text_search_descr[JsonData.lng_index])
         self.description_label.setWordWrap(True) 
         self.central_layout.addWidget(self.description_label)
 
@@ -99,15 +93,13 @@ class WinTextSearch(UMainWidget):
 
         btns_layout.addStretch(1)
 
-        self.format_button = WinTextSearchBtn(
-            "Улучшить" if JsonData.lng_index == 0 else "Улучшить"
-        )
+        self.format_button = WinTextSearchBtn(Lng.enhance[JsonData.lng_index])
         self.format_button.clicked.connect(self.format_input_text)
         self.format_button.setIconSize(self.icon_size)
         self.format_button.setIcon(self.wand_icon)
         btns_layout.addWidget(self.format_button)
 
-        self.ok_btn = WinTextSearchBtn("Поиск")
+        self.ok_btn = WinTextSearchBtn(Lng.search[JsonData.lng_index])
         self.ok_btn.setIcon(self.magnifier_icon)
         self.ok_btn.setIconSize(self.icon_size)
         self.ok_btn.clicked.connect(self.search)

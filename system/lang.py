@@ -458,3 +458,15 @@ class Lng:
         "Пользовательские теги",
         "User tags"
     )
+    enhance = (
+        "Улучшить",
+        "Enhance"
+    )
+    text_search_descr = (
+        "Для поиска нескольких слов введите их через запятую или с новой строки.",
+        "Separate search words with commas or line breaks."
+    )
+    text_editor = (
+        "Редактор текста",
+        "Text editor"
+    )

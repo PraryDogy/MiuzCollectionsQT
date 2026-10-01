@@ -53,7 +53,7 @@ class SearchWidClearSvg(SearchWidBaseSvg):
 
 
 class SearchWidTextSearchSvg(SearchWidBaseSvg):
-    icon_path = Static.COMMON_ICONS / "list_view.svg" 
+    icon_path = Static.COMMON_ICONS / "text_edit.svg" 
     spacing = 10  # Расстояние между этой кнопкой и кнопкой очистки
 
 
