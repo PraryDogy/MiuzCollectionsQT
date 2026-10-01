@@ -205,20 +205,17 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         self.pixmap = QPixmap()
         self.image_label = QLabel()
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
+        # self.image_label.setSizePolicy(
+        #     QSizePolicy.Policy.Expanding,
+        #     QSizePolicy.Policy.Expanding,
+        # )
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(0)
         layout.addWidget(self.image_label)
 
     def set_pixmap(self, qimage: QImage):
-        scaled = Utils.qimage_scaled_high_dpi(
-            qimage,
-            self.image_label.size()
-        )
+        scaled = Utils.qimage_scaled_high_dpi(qimage, self.size_[0])
         self.pixmap = QPixmap.fromImage(scaled)
         self.image_label.setPixmap(self.pixmap)
 
