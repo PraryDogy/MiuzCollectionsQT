@@ -348,7 +348,8 @@ GridTagWidget {
 /* grid.py */
 
 /* menu_left.py */
-/*  */
+/* стилизация этого меню будет в main_win, так как стиль меню будет
+таким же, как и у виджета сетки изображений */
 /* menu_left.py */
 
 /* path_widget.py */
@@ -409,6 +410,14 @@ WinFiltersAddTag[active="False"] {
 /* win_info.py */
 
 /* win_main.py */
+
+MenuLeftTreeWidget,
+MainWinRightWidget {
+    background: #202020;
+    border-radius: 10px;
+    border: transparent;
+}
+
 /* win_main.py */
 
 /* win_servers.py */
