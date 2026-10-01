@@ -4,7 +4,7 @@ from multiprocessing import shared_memory
 import cv2
 import numpy as np
 import sqlalchemy
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QStackedWidget,
@@ -194,6 +194,7 @@ class WinImgSearchDropWidget(TransparentFrame):
 
 
 class WinImgSearchPreviewWidget(TransparentFrame):
+    pixmap_finished = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -212,6 +213,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         def finished(qimage: QImage):
             self.pixmap = QPixmap.fromImage(qimage)
             self.image_label.setPixmap(self.pixmap)
+            self.pixmap_finished.emit()
 
         self.qimage_task = ImgArrayQImage(img_array, DROP_WIDGET_SIZE[1])
         self.qimage_task.sigs.finished_.connect(finished)
@@ -267,10 +269,10 @@ class WinImgSearch(UMainWidget):
 
         self.magnifier_icon = QIcon(str(self.magnifier_svg_path))
 
-        self.close_icon = QSvgWidget(self)
-        self.close_icon.load(str(self.close_svg_path))
-        self.close_icon.setFixedSize(15, 15)
-        self.close_icon.hide()
+        self.cancel_icon = QSvgWidget(self)
+        self.cancel_icon.load(str(self.cancel_svg_path))
+        self.cancel_icon.setFixedSize(15, 15)
+        self.cancel_icon.hide()
 
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
@@ -288,6 +290,7 @@ class WinImgSearch(UMainWidget):
         self.image_stack = QStackedWidget()
         self.drop_widget = WinImgSearchDropWidget()
         self.preview_widget = WinImgSearchPreviewWidget()
+        self.preview_widget.pixmap_finished.connect(self.show_clear_image_button)
         self.image_stack.addWidget(self.drop_widget)
         self.image_stack.addWidget(self.preview_widget)
         self.image_stack.setCurrentIndex(0)
@@ -312,6 +315,22 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
         self.adjustSize()
+
+    def show_clear_image_button(self):
+        # 1. Берем правый верхний угол виджета в его собственных локальных координатах:
+        # Правый край = ширина виджета, Верх = 0
+        local_top_right = QPoint(self.preview_widget.width(), 0)
+
+        # 2. Переводим эти координаты в систему координат главного окна (this - это главное окно)
+        window_top_right = self.preview_widget.mapTo(self, local_top_right)
+
+        # Теперь в window_top_right.x() и window_top_right.y() лежат точные координаты
+        x = window_top_right.x() - 10
+        y = window_top_right.y() - 5
+        
+        self.cancel_icon.move(x, y)
+        self.cancel_icon.show()
+        self.cancel_icon.raise_()
 
     def image_dropped(self, path: str):
         self.start_read_img_task(path)
