@@ -362,27 +362,6 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class WinFiltersAddTag(WinFiltersTagWidget):
-    icon_path =  Static.COMMON_ICONS / "folder_gray.svg"
-
-    def __init__(self):
-        if Dynamic.no_subfolders_tag_enabled:
-            active = True
-        else:
-            active = False
-        text = Lng.new_tag[JsonData.lng_index]
-        super().__init__(text, active, False, str(self.icon_path))
-
-    def mouseReleaseEvent(self, a0):
-        if Dynamic.no_subfolders_tag_enabled:
-            self.set_active(False)
-            Dynamic.no_subfolders_tag_enabled = False
-        else:
-            self.set_active(True)
-            Dynamic.no_subfolders_tag_enabled = True
-        return super().mouseReleaseEvent(a0)
-
-
 class WinFiltersWordTag(WinFiltersTagWidget):
     def __init__(self, text):
         if text in Dynamic.word_tags_list:
@@ -401,20 +380,21 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-# class WinFiltersAddTag(TransparentLabel):
-#     clicked_ = pyqtSignal()
+class WinFiltersAddTag(WinFiltersTagWidget):
+    icon_path =  Static.COMMON_ICONS / "plus_simple.svg"
+    clicked_ = pyqtSignal()
 
-#     def __init__(self):
-#         super().__init__("+")
-#         self.setFixedWidth(30)
-#         self.setFixedHeight(WinFiltersTagWidget.tag_height)
-#         self.setCursor(Qt.CursorShape.PointingHandCursor)
-#         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    def __init__(self):
+        if Dynamic.no_subfolders_tag_enabled:
+            active = True
+        else:
+            active = False
+        text = Lng.new_tag[JsonData.lng_index]
+        super().__init__(text, active, False, str(self.icon_path))
 
-#     def mouseReleaseEvent(self, ev):
-#         if ev.button() == Qt.MouseButton.LeftButton:
-#             self.clicked_.emit()
-#         return super().mouseReleaseEvent(ev)
+    def mouseReleaseEvent(self, a0):
+        self.clicked_.emit()
+        return super().mouseReleaseEvent(a0)
 
 
 class StandartTags(TransparentWidget):

@@ -387,12 +387,11 @@ WinFiltersTitle {
     font-size: 20px;
 }
 
-WinFiltersAddTag {
-    border-radius: 6px;
+WinFiltersAddTag[active="False"] {
+    border-radius: 10px;
     color: #ffffff;
-    background: #4e4e4e;
+    background: transparent;
     border: 1px solid #585858;
-    font-weight: bold;
 }
 
 /* win_filters.py */
