@@ -667,7 +667,9 @@ class TextWindow(UMainWidget):
         btn_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def ok_clicked_cmd(self):
-        self.ok_clicked.emit(self.line_edit_widget.text().strip())
+        text = self.line_edit_widget.text()
+        text = text.strip().replace("\n", " ")
+        self.ok_clicked.emit(text)
         self.deleteLater()
 
     def keyPressEvent(self, a0):
