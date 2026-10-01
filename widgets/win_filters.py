@@ -323,11 +323,12 @@ class WinFiltersTagWidget(TransparentFrame):
 class WinFiltersFavTag(WinFiltersTagWidget):
     icon_path =  Static.COMMON_ICONS / "fav.svg"
 
-    def __init__(self, text):
+    def __init__(self):
         if Dynamic.favs_tag_enabled:
             active = True
         else:
             active = False
+        text = Lng.favorites[JsonData.lng_index]
         super().__init__(text, active, False, str(self.icon_path))
 
     def mouseReleaseEvent(self, a0):
@@ -343,11 +344,33 @@ class WinFiltersFavTag(WinFiltersTagWidget):
 class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
     icon_path =  Static.COMMON_ICONS / "folder_gray.svg"
 
-    def __init__(self, text):
+    def __init__(self):
         if Dynamic.no_subfolders_tag_enabled:
             active = True
         else:
             active = False
+        text = Lng.without_subfolders[JsonData.lng_index]
+        super().__init__(text, active, False, str(self.icon_path))
+
+    def mouseReleaseEvent(self, a0):
+        if Dynamic.no_subfolders_tag_enabled:
+            self.set_active(False)
+            Dynamic.no_subfolders_tag_enabled = False
+        else:
+            self.set_active(True)
+            Dynamic.no_subfolders_tag_enabled = True
+        return super().mouseReleaseEvent(a0)
+
+
+class WinFiltersAddTag(WinFiltersTagWidget):
+    icon_path =  Static.COMMON_ICONS / "folder_gray.svg"
+
+    def __init__(self):
+        if Dynamic.no_subfolders_tag_enabled:
+            active = True
+        else:
+            active = False
+        text = Lng.new_tag[JsonData.lng_index]
         super().__init__(text, active, False, str(self.icon_path))
 
     def mouseReleaseEvent(self, a0):
@@ -378,20 +401,20 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class WinFiltersAddTag(TransparentLabel):
-    clicked_ = pyqtSignal()
+# class WinFiltersAddTag(TransparentLabel):
+#     clicked_ = pyqtSignal()
 
-    def __init__(self):
-        super().__init__("+")
-        self.setFixedWidth(30)
-        self.setFixedHeight(WinFiltersTagWidget.tag_height)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#     def __init__(self):
+#         super().__init__("+")
+#         self.setFixedWidth(30)
+#         self.setFixedHeight(WinFiltersTagWidget.tag_height)
+#         self.setCursor(Qt.CursorShape.PointingHandCursor)
+#         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    def mouseReleaseEvent(self, ev):
-        if ev.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
-        return super().mouseReleaseEvent(ev)
+#     def mouseReleaseEvent(self, ev):
+#         if ev.button() == Qt.MouseButton.LeftButton:
+#             self.clicked_.emit()
+#         return super().mouseReleaseEvent(ev)
 
 
 class StandartTags(TransparentWidget):
@@ -405,11 +428,11 @@ class StandartTags(TransparentWidget):
         self._create_tags()
 
     def _create_tags(self):
-        tag = WinFiltersFavTag(Lng.favorites[JsonData.lng_index])
+        tag = WinFiltersFavTag()
         tag.load_st_grid.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
-        tag = WinFiltersOnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
+        tag = WinFiltersOnlyFolderTag()
         tag.load_st_grid.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
