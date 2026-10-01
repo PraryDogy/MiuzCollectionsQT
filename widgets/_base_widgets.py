@@ -294,7 +294,7 @@ class UTreeView(TransparentTreeView):
 
 
 class UPushButton(TransparentButton):
-    size_ = (80, 22)
+    size_ = (80, 24)
 
     def __init__(self, text: str):
         super().__init__(text=text)

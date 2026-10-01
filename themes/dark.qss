@@ -18,6 +18,9 @@ TransparentTreeView {
     border: none;
 }
 
+UGroupBox {
+    background: #202020
+}
 
 UMainWindow,
 UMainWidget {

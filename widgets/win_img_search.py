@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtGui import QImage, QPixmap, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QStackedWidget,
                              QVBoxLayout)
@@ -103,10 +103,10 @@ class SliderWidget(TransparentWidget):
         self.h_layout.setContentsMargins(0, 0, 0, 0)
         self.h_layout.setSpacing(10)
 
-        self.accuracy_label = TransparentLabel(
-            Lng.accuracy[JsonData.lng_index] + ":"
-        )
-        self.h_layout.addWidget(self.accuracy_label)
+        # self.accuracy_label = TransparentLabel(
+        #     Lng.accuracy[JsonData.lng_index] + ":"
+        # )
+        # self.h_layout.addWidget(self.accuracy_label)
 
         self.slider = USlider()
         self.slider.setOrientation(
@@ -135,13 +135,10 @@ class SliderWidget(TransparentWidget):
 class WinImgSearchDropWidget(TransparentFrame):
     svg_path = Static.COMMON_ICONS / "base_image.svg"
     svg_size = (50, 50)
-    size_ = (300, 300)
     image_dropped = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.setFixedSize(*self.size_)
         self.setAcceptDrops(True)
 
         self.v_layout = QVBoxLayout(self)
@@ -197,11 +194,9 @@ class WinImgSearchDropWidget(TransparentFrame):
 
 
 class WinImgSearchPreviewWidget(TransparentFrame):
-    size_ = (300, 300)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedSize(*self.size_)
         self.pixmap = QPixmap()
         self.image_label = QLabel(Lng.loading[JsonData.lng_index])
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -225,12 +220,47 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         self.image_label.clear()
 
 
-class WinImgSearch(UMainWidget):
+class ControlsWidget(UGroupBox):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
+    reset_btn_clicked = pyqtSignal()
+    slider_moved = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.reset_icon = QIcon(str(self.reset_svg))
+
+        self.v_layout = QVBoxLayout(self)
+        self.v_layout.setContentsMargins(5, 5, 5, 5)
+        self.v_layout.setSpacing(10)
+
+        first_row_container = TransparentWidget()
+        self.v_layout.addWidget(first_row_container)
+        self.first_row_layout = QHBoxLayout(first_row_container)
+        self.first_row_layout.setContentsMargins(0, 0, 0, 0)
+        self.first_row_layout.setSpacing(0)
+
+        self.reset_btn = UPushButton(" " + Lng.reset[JsonData.lng_index])
+        self.reset_btn.setIcon(self.reset_icon)
+        self.reset_btn.setFixedWidth(100)
+        # self.reset_btn.clicked.connect(self.reset_img_search)
+        self.reset_btn.clicked.connect(self.reset_btn_clicked.emit)
+        self.first_row_layout.addWidget(self.reset_btn)
+        self.first_row_layout.addStretch(1)
+        
+        self.v_layout.addWidget(USep())
+        self.slider_widget = SliderWidget()
+        self.v_layout.addWidget(self.slider_widget)
+        # self.slider_widget.setFixedHeight(self.reset_btn.height())
+        # self.group_box.adjustSize()
+        # self.group_box.setFixedHeight(self.group_box.height())
+
+
+
+
+class WinImgSearch(UMainWidget):
     reload_thumbnails = pyqtSignal()
     closed = pyqtSignal()
-    ww = 350
-    hh = 400
+    image_stack_size = (350, 300)
 
     def __init__(self):
         super().__init__()
@@ -259,7 +289,7 @@ class WinImgSearch(UMainWidget):
         self.central_layout.setSpacing(10)
 
         self.image_stack = QStackedWidget()
-        self.image_stack.setFixedSize(300, 300)
+        self.image_stack.setFixedSize(*self.image_stack_size)
         self.drop_widget = WinImgSearchDropWidget()
         self.preview_widget = WinImgSearchPreviewWidget()
         self.image_stack.addWidget(self.drop_widget)
@@ -271,22 +301,9 @@ class WinImgSearch(UMainWidget):
         )
         self.drop_widget.image_dropped.connect(self.image_dropped)
 
-        self.group_box = UGroupBox()
+        self.group_box = ControlsWidget()
         self.central_layout.addWidget(self.group_box)
-        self.group_layout = QVBoxLayout(self.group_box)
-        self.group_layout.setContentsMargins(*RowArrowWidget.group_margings)
-        self.group_layout.setSpacing(RowArrowWidget.group_spacing)
 
-        self.reset_btn = RowArrowWidget(Lng.reset[JsonData.lng_index])
-        self.reset_btn.set_left_icon(self.reset_svg)
-        self.reset_btn.clicked.connect(self.reset_img_search)
-        self.group_layout.addWidget(self.reset_btn)
-        self.group_layout.addWidget(USep())
-        self.slider_widget = SliderWidget()
-        self.group_layout.addWidget(self.slider_widget)
-        self.slider_widget.setFixedHeight(self.reset_btn.height())
-        self.group_box.adjustSize()
-        self.group_box.setFixedHeight(self.group_box.height())
 
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
