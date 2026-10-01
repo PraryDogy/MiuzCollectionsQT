@@ -226,6 +226,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         self.pixmap = QPixmap()
         self.image_label.clear()
 
+
 class WinImgSearch(UMainWidget):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
     reload_thumbnails = pyqtSignal()

@@ -30,7 +30,7 @@ class Utils:
             else:
                 print(f"qimage_from_array: channels trouble {image.shape}")
                 return None
-            print(qimage)
+            print(123123)
             return qimage
         except Exception as e:
             print(f"qimage_from_array: {e}")
