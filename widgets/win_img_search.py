@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QImage, QPixmap, QIcon
+from PyQt6.QtGui import QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QStackedWidget,
                              QVBoxLayout)
@@ -15,11 +15,11 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import ImgUtils
-from system.tasks import ImageSearcher, UThreadPool, ImgArrayQImage
+from system.tasks import ImageSearcher, ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (GrayTextLabel, RowArrowWidget, TitleTextLabel,
-                            TransparentFrame, TransparentLabel,
+from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
+                            TitleTextLabel, TransparentFrame, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWidget,
                             UPushButton, USep, USlider)
 
@@ -308,7 +308,7 @@ class WinImgSearch(UMainWidget):
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
         btn_layout.addStretch()
-        self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
+        self.start_btn = ActiveButton(Lng.start[JsonData.lng_index])
         self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
         cancel_btn = UPushButton(Lng.close[JsonData.lng_index])

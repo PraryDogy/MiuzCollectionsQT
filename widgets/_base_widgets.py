@@ -318,6 +318,11 @@ class UPushButton(TransparentButton):
         return super().enterEvent(event)
 
 
+class ActiveButton(UPushButton):
+    def __init__(self, text):
+        super().__init__(text)
+
+
 class USep(TransparentFrame):
     def __init__(self):
         super().__init__()

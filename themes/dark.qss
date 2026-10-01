@@ -186,6 +186,18 @@ UPushButton::menu-indicator {
 }
 
 
+ActiveButton {
+    background: #0059D1;
+    border: 1px solid #0e69df
+}
+
+ActiveButton:pressed {
+    background: #0e69df;
+    border: 1px solid #2d7be1
+}
+
+
+
 USep {
     background: #363636;
 }
