@@ -272,6 +272,8 @@ class WinImgSearch(UMainWidget):
         self.cancel_icon = QSvgWidget(self)
         self.cancel_icon.load(str(self.cancel_svg_path))
         self.cancel_icon.setFixedSize(15, 15)
+        self.cancel_icon.mouseReleaseEvent = self.clear_image_cmd
+        self.cancel_icon.setCursor(Qt.CursorShape.PointingHandCursor)
         self.cancel_icon.hide()
 
         self.found_image_timer = QTimer(self)
@@ -316,18 +318,16 @@ class WinImgSearch(UMainWidget):
         btn_layout.addStretch()
         self.adjustSize()
 
+    def clear_image_cmd(self, e):
+        self.cancel_icon.hide()
+        # self.preview_widget.clear()
+        self.reset_img_search()
+
     def show_clear_image_button(self):
-        # 1. Берем правый верхний угол виджета в его собственных локальных координатах:
-        # Правый край = ширина виджета, Верх = 0
         local_top_right = QPoint(self.preview_widget.width(), 0)
-
-        # 2. Переводим эти координаты в систему координат главного окна (this - это главное окно)
         window_top_right = self.preview_widget.mapTo(self, local_top_right)
-
-        # Теперь в window_top_right.x() и window_top_right.y() лежат точные координаты
         x = window_top_right.x() - 10
         y = window_top_right.y() - 5
-        
         self.cancel_icon.move(x, y)
         self.cancel_icon.show()
         self.cancel_icon.raise_()
