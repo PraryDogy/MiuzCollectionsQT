@@ -111,7 +111,7 @@ class WinMain(UMainWindow):
 
         # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.layout().setContentsMargins(0, 0, 0, 0)
+        self.bar_top.layout().setContentsMargins(5, 0, 5, 0)
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
@@ -131,7 +131,7 @@ class WinMain(UMainWindow):
         # --- Создаем контейнер-обертку ---
         self.top_bar_container = QWidget()
         self.top_bar_layout = QHBoxLayout(self.top_bar_container)
-        self.top_bar_layout.setContentsMargins(3, 5, 3, 5)
+        self.top_bar_layout.setContentsMargins(0, 5, 0, 5)
         self.top_bar_layout.setSpacing(0)
         self.top_bar_layout.addWidget(self.bar_top)
         self.central_layout.addWidget(self.top_bar_container)

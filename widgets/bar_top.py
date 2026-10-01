@@ -218,7 +218,7 @@ class CatalogWidget(TransparentWidget):
         self.title = GrayTextLabel(Lng.catalog[JsonData.lng_index])
         # self.h_lay.addWidget(self.title)
 
-        self.h_lay.addSpacing(10)
+        # self.h_lay.addSpacing(10)
 
         self.button = UPushButton(Mf.current_mf.mf_alias)
         self.button.setFixedWidth(110)
