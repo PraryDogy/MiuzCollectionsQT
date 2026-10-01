@@ -1,16 +1,16 @@
 import re
 
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QTextCursor
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import (TransparentFrame, TransparentLabel,
-                            TransparentWidget, UMainWidget, UPushButton,
-                            UTextEdit, USep, GrayTextLabel, TitleTextLabel)
+from ._base_widgets import (GrayTextLabel, TitleTextLabel, TransparentFrame,
+                            TransparentLabel, TransparentWidget, UMainWidget,
+                            UPushButton, USep, UTextEdit)
 
 
 class WinTextSearchTitle(TitleTextLabel):
@@ -83,6 +83,7 @@ class WinTextSearch(UMainWidget):
         self.text_edit = UTextEdit()
         self.central_layout.addWidget(self.text_edit)
         self.text_edit.setPlainText(text)
+        self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
 
         self.btns_container = TransparentWidget()
         self.central_layout.addWidget(self.btns_container)
