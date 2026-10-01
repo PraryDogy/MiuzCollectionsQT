@@ -318,11 +318,6 @@ class WinImgSearch(UMainWidget):
         self.adjustSize()
 
     def image_dropped(self, path: str):
-        pixmap = QPixmap(path)
-        if pixmap.isNull():
-            return
-        self.preview_widget.set_pixmap(pixmap)
-        self.image_stack.setCurrentIndex(1)
         self.start_read_img_task(path)
 
     def reset_img_search(self):
@@ -408,6 +403,17 @@ class WinImgSearch(UMainWidget):
                     dtype=np.dtype(item.dtype),
                     buffer=self.shm.buf,
                 )
+
+                print("image readed")
+                pixmap = Utils.pyqt_pixmap_from_array(self.img_array)
+                self.preview_widget.set_pixmap(pixmap)
+                self.image_stack.setCurrentIndex(1)
+                # pixmap = QPixmap(path)
+                # if pixmap.isNull():
+                #     return
+                # self.preview_widget.set_pixmap(pixmap)
+                # self.image_stack.setCurrentIndex(1)
+
                 if ImgUtils.is_grayscale(self.img_array):
                     self.cleanup_shm()
                     self.img_array = None
@@ -441,7 +447,7 @@ class WinImgSearch(UMainWidget):
         self.read_img_poll_ms = ms
         self.read_img_task = ProcessWorker(
             target=ReadImg.start,
-            args=(url, Static.THUMB_MAX_SIZE * 2,),
+            args=(url, Static.THUMB_MAX_SIZE,),
         )
         self.read_img_task.start()
         self.read_img_timer.start(ms)
