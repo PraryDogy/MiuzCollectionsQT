@@ -261,6 +261,7 @@ class WinFiltersTagWidget(TransparentFrame):
     on_trash_clicked = pyqtSignal()
     load_st_grid = pyqtSignal() 
     tag_height = 23
+    icon_size = (12, 12)
 
     # Добавляем параметр show_trash=True по умолчанию
     def __init__(self, text: str, active: bool, show_trash: bool, left_icon_path: str = None):
@@ -278,6 +279,7 @@ class WinFiltersTagWidget(TransparentFrame):
         if left_icon_path:
             self.left_icon = QSvgWidget()
             self.left_icon.load(left_icon_path)
+            self.left_icon.setFixedSize(*self.icon_size)
             self.h_lay.addWidget(self.left_icon)
 
         self.title = TransparentLabel(text)
@@ -294,7 +296,7 @@ class WinFiltersTagWidget(TransparentFrame):
             self.trash_btn.mouseReleaseEvent = self.on_trash_clicked_cmd
             self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
             self.trash_btn.load(str(self.icon_path))
-            self.trash_btn.setFixedSize(12, 12)
+            self.trash_btn.setFixedSize(*self.icon_size)
 
             close_lay.addWidget(self.trash_btn)
             self.h_lay.addWidget(self.close_btn_wrapper)
