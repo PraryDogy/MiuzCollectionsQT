@@ -386,8 +386,8 @@ class WinImgSearch(UMainWidget):
                     dtype=np.dtype(item.dtype),
                     buffer=self.shm.buf,
                 )
-                self.preview_widget.set_pixmap(self.img_array)
                 self.image_stack.setCurrentIndex(1)
+                self.preview_widget.set_pixmap(self.img_array)
 
                 if ImgUtils.is_grayscale(self.img_array):
                     self.cleanup_shm()
