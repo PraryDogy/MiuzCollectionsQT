@@ -256,9 +256,7 @@ class GridSortWidget(TransparentWidget):
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(0, 0, 0, 0)
         self.h_lay.setSpacing(5)
-
-        self.title = TransparentLabel(Lng.sort[JsonData.lng_index])
-        self.h_lay.addWidget(self.title)
+        self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.button = UPushButton("")
         self.set_button_text()
