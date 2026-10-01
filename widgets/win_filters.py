@@ -321,12 +321,14 @@ class WinFiltersTagWidget(TransparentFrame):
 
 
 class WinFiltersFavTag(WinFiltersTagWidget):
+    icon_path =  Static.COMMON_ICONS / "fav.svg"
+
     def __init__(self, text):
         if Dynamic.favs_tag_enabled:
             active = True
         else:
             active = False
-        super().__init__(text, active, False)
+        super().__init__(text, active, False, str(self.icon_path))
 
     def mouseReleaseEvent(self, a0):
         if Dynamic.favs_tag_enabled:
@@ -339,12 +341,14 @@ class WinFiltersFavTag(WinFiltersTagWidget):
 
 
 class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
+    icon_path =  Static.COMMON_ICONS / "folder_gray.svg"
+
     def __init__(self, text):
         if Dynamic.no_subfolders_tag_enabled:
             active = True
         else:
             active = False
-        super().__init__(text, active, False)
+        super().__init__(text, active, False, str(self.icon_path))
 
     def mouseReleaseEvent(self, a0):
         if Dynamic.no_subfolders_tag_enabled:
