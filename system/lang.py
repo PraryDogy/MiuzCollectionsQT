@@ -446,3 +446,7 @@ class Lng:
         "Придумайте название для нового тега",
         "Create a name for the new tag"
     )
+    recover_tags = (
+        "Восстановить теги",
+        "Reset tags"
+    )

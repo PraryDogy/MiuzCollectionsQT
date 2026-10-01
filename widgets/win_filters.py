@@ -484,6 +484,21 @@ class TagsWidget(UGroupBox):
         self.tags_control_widget = TagsContolWidget()
         self.tags_control_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.v_lay.addWidget(self.tags_control_widget)
+
+        self.v_lay.addWidget(USep())
+
+        btn_widget = TransparentWidget()
+        self.v_lay.addWidget(btn_widget)
+
+        self.btn_layout = QHBoxLayout(btn_widget)
+        self.btn_layout.setContentsMargins(0, 0, 0, 0)
+        self.btn_layout.setSpacing(10)
+
+        self.btn_layout.addStretch(1)
+
+        self.default_tags = UPushButton(Lng.recover_tags[JsonData.lng_index])
+        self.default_tags.setFixedWidth(110)
+        self.btn_layout.addWidget(self.default_tags)
     
 
 class WinFilters(UMainWidget):

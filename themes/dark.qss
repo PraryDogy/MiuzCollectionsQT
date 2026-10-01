@@ -367,7 +367,7 @@ WinCollage {
 /* win_filters.py */
 
 WinFiltersTagWidget {
-    border-radius: 6px;
+    border-radius: 10px;
     color: #ffffff;
 }
 
