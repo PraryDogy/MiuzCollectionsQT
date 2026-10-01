@@ -10,10 +10,10 @@ from system.lang import Lng
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
                             TransparentWidget, UMainWidget, UPushButton,
-                            UTextEdit, USep, GrayTextLabel)
+                            UTextEdit, USep, GrayTextLabel, TitleTextLabel)
 
 
-class WinTextSearchTitle(TransparentLabel):
+class WinTextSearchTitle(TitleTextLabel):
     def __init__(self):
         super().__init__(Lng.text_editor[JsonData.lng_index])
 

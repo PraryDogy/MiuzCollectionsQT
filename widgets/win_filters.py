@@ -10,7 +10,7 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (ConfirmWindow, FlowLayout, RowArrowWidget,
+from ._base_widgets import (ConfirmWindow, FlowLayout, TitleTextLabel,
                             TextWindow, TransparentFrame, TransparentLabel,
                             TransparentWidget, UGroupBox, UListWidget,
                             UMainWidget, UMenu, UPushButton, USep, GrayTextLabel)
@@ -18,11 +18,6 @@ from .win_calendar import WinCalendar
 
 UGroupBox_margins = (5, 5, 5, 5)
 UGroupBox_spacing = 10
-
-
-class WinFiltersTitleLabel(TransparentLabel):
-    def __init__(self, text="", parent=None):
-        super().__init__(text, parent)
 
 
 class WinFiltersTitleWidget(QWidget):
@@ -39,7 +34,7 @@ class WinFiltersTitleWidget(QWidget):
         self.icon_widget.setFixedSize(QSize(24, 24))  # Задайте нужный размер иконки
         
         # 3. Создаем лейбл для текста
-        self.label = WinFiltersTitleLabel(text)
+        self.label = TitleTextLabel(text)
         
         # 4. Добавляем виджеты в слой
         layout.addWidget(self.icon_widget)

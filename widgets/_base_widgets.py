@@ -551,6 +551,11 @@ class GrayTextLabel(TransparentLabel):
         super().__init__(text)
 
 
+class TitleTextLabel(TransparentLabel):
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
+
+
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()

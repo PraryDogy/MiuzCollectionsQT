@@ -272,6 +272,11 @@ GrayTextLabel {
     color: #676767;
 }
 
+TitleTextLabel {
+    font-weight: bold;
+    font-size: 20px;
+}
+
 /* _base_widgets.py */
 
 /* actions.py */
@@ -383,10 +388,6 @@ WinFiltersTagWidget[active="False"] {
     border: 1px solid #585858;
 }
 
-WinFiltersTitleLabel {
-    font-weight: bold;
-    font-size: 20px;
-}
 
 WinFiltersAddTag[active="False"] {
     border-radius: 10px;
@@ -461,11 +462,3 @@ MainWinRightWidget {
     border: 1px solid #2d2d2d;
     border-radius: 10px;
 } */
-
-
-WinTextSearchTitle {
-    /* font-family: "SF Pro Rounded"; */
-    font-weight: bold;
-    font-size: 30px;
-    /* color: #d5d5d5; */
-}
