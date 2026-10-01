@@ -386,8 +386,7 @@ class WinImgSearch(UMainWidget):
                     dtype=np.dtype(item.dtype),
                     buffer=self.shm.buf,
                 )
-                qimage = Utils.pyqt_qimage_from_array(self.img_array)
-                self.preview_widget.set_pixmap(qimage)
+                self.preview_widget.set_pixmap(self.img_array)
                 self.image_stack.setCurrentIndex(1)
 
                 if ImgUtils.is_grayscale(self.img_array):
