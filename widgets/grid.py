@@ -18,9 +18,9 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (TransparentFrame, TransparentLabel,
+from ._base_widgets import (FlowLayout, TransparentFrame, TransparentLabel,
                             TransparentWidget, UMenu, UPushButton,
-                            UScrollVerticalArea, FlowLayout)
+                            UScrollVerticalArea)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -260,9 +260,8 @@ class GridSortWidget(TransparentWidget):
         self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.button = UPushButton("")
-        self.set_button_text()
+        self.set_sort_button_text()
         self.button.setIcon(self.sort_icon)
-        self.button.setFixedWidth(160)
         self.h_lay.addWidget(self.button)
 
         self.button_menu = UMenu(parent=self)
@@ -278,10 +277,10 @@ class GridSortWidget(TransparentWidget):
 
     def sort_btn_cmd(self, value: bool):
         Dynamic.sort_by_mod_enabled = value
-        self.set_button_text()
+        self.set_sort_button_text()
         self.load_st_grid.emit()
 
-    def set_button_text(self):
+    def set_sort_button_text(self):
         if Dynamic.sort_by_mod_enabled:
             text = Lng.sort_by_mod
         else:
