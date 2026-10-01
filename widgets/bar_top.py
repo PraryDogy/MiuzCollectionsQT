@@ -130,10 +130,9 @@ class SearchWidLineEdit(ULineEdit):
 
     def clear_search(self):
         self.clear()
-        if Dynamic.search_words_list:
-            Dynamic.search_words_list.clear()
-            Dynamic.loaded_thumbs = 0
-            self.reload_thumbnails.emit()
+        Dynamic.search_words_list.clear()
+        Dynamic.loaded_thumbs = 0
+        self.reload_thumbnails.emit()
 
     def keyPressEvent(self, event: QKeyEvent | None):
         if event.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):

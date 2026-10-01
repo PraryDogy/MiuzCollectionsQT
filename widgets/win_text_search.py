@@ -8,8 +8,8 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from cfg import JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import (GrayTextLabel, TitleTextLabel, TransparentFrame,
-                            TransparentLabel, TransparentWidget, UMainWidget,
+from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
+                            TransparentFrame, TransparentWidget, UMainWidget,
                             UPushButton, USep, UTextEdit)
 
 
@@ -36,19 +36,6 @@ class WinTextSearchTitleRow(TransparentFrame):
 
         self.title_label = WinTextSearchTitle()
         self.h_lay.addWidget(self.title_label)
-
-
-class WinTextSearchBtn(UPushButton):
-    ww = 90
-
-    def __init__(self, text):
-        super().__init__("")
-        self.setFixedSize(*self.size_)
-        self.set_text(text)
-        self.setFixedWidth(self.ww)
-
-    def set_text(self, text):
-        self.setText(text)
 
 
 class WinTextSearch(UMainWidget):
@@ -94,13 +81,13 @@ class WinTextSearch(UMainWidget):
 
         btns_layout.addStretch(1)
 
-        self.format_button = WinTextSearchBtn(Lng.enhance[JsonData.lng_index])
+        self.format_button = UPushButton(Lng.enhance[JsonData.lng_index])
         self.format_button.clicked.connect(self.format_input_text)
         self.format_button.setIconSize(self.icon_size)
         self.format_button.setIcon(self.wand_icon)
         btns_layout.addWidget(self.format_button)
 
-        self.ok_btn = WinTextSearchBtn(Lng.search[JsonData.lng_index])
+        self.ok_btn = ActiveButton(Lng.search[JsonData.lng_index])
         self.ok_btn.setIcon(self.magnifier_icon)
         self.ok_btn.setIconSize(self.icon_size)
         self.ok_btn.clicked.connect(self.search)

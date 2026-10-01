@@ -294,13 +294,12 @@ class UTreeView(TransparentTreeView):
 
 
 class UPushButton(TransparentButton):
-    size_ = (80, 26)
+    hh = 28
     icon_size = (14, 14)
 
     def __init__(self, text: str):
-        super().__init__(text=text)
-        # self.setFixedSize(*self.size_)
-        self.setFixedHeight(self.size_[1])
+        super().__init__(text)
+        self.setFixedHeight(self.hh)
         self.setIconSize(QSize(*self.icon_size))
         self.set_font_size(11)
 
@@ -312,9 +311,6 @@ class UPushButton(TransparentButton):
     def setIcon(self, icon):
         self.setText("  " + self.text())
         return super().setIcon(icon)
-
-    def text(self):
-        return super().text().strip()
 
     def enterEvent(self, event):
         self.setCursor(Qt.CursorShape.PointingHandCursor)

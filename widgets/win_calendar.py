@@ -7,8 +7,9 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import (GrayTextLabel, TransparentLabel, TransparentWidget,
-                            USep, UMainWidget, UMenu, UPushButton)
+from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
+                            TransparentWidget, UMainWidget, UMenu, UPushButton,
+                            USep)
 
 
 class CalendarBigDate(GrayTextLabel):
@@ -218,7 +219,7 @@ class WinCalendar(UMainWidget):
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_container_layout.addWidget(self.cancel_btn)
 
-		self.ok_btn = UPushButton(Lng.apply[JsonData.lng_index])
+		self.ok_btn = ActiveButton(Lng.apply[JsonData.lng_index])
 		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
 		self.btn_container_layout.addWidget(self.ok_btn)
 
