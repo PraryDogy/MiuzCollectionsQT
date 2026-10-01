@@ -158,7 +158,6 @@ class WinImgSearchDropWidget(TransparentFrame):
 
         self.descr_label = GrayTextLabel("")
         self.descr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
         self.v_layout.addWidget(
             self.descr_label,
             alignment=Qt.AlignmentFlag.AlignCenter,
@@ -225,16 +224,21 @@ class ControlsWidget(UGroupBox):
         self.reset_icon = QIcon(str(self.reset_svg))
 
         self.v_layout = QVBoxLayout(self)
-        self.v_layout.setContentsMargins(5, 5, 5, 10)
-        self.v_layout.setSpacing(10)
+        self.v_layout.setContentsMargins(5, 5, 5, 15)
+        self.v_layout.setSpacing(0)
 
-        descr = GrayTextLabel(Lng.image_search_descr[JsonData.lng_index])
-        self.v_layout.addWidget(descr)
+        title = TitleTextLabel(Lng.accuracy[JsonData.lng_index])
+        self.v_layout.addWidget(title)
 
         self.slider_widget = SliderWidget()
         self.v_layout.addWidget(self.slider_widget)
 
+        descr = GrayTextLabel(Lng.image_search_descr[JsonData.lng_index])
+        self.v_layout.addWidget(descr)
+
+        self.v_layout.addSpacing(10)
         self.v_layout.addWidget(USep())
+        self.v_layout.addSpacing(10)
 
         self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
         self.reset_btn.setIcon(self.reset_icon)
@@ -488,7 +492,6 @@ class WinImgSearch(UMainWidget):
         if event.key() == Qt.Key.Key_Escape:
             self.hide_window()
             return
-
         super().keyPressEvent(event)
 
     def closeEvent(self, event):

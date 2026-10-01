@@ -18,10 +18,6 @@ TransparentTreeView {
     border: none;
 }
 
-UGroupBox {
-    background: #202020
-}
-
 UMainWindow,
 UMainWidget {
     background: #151515;
@@ -271,6 +267,7 @@ USpinBox::down-arrow {
 
 
 UGroupBox {
+    background: #202020;
     border: 1px solid #363636;
     border-radius: 10px;
 }
@@ -423,7 +420,7 @@ WinFiltersAddTag[active="False"] {
 /* win_img_search.py */
 
 WinImgSearchDropWidget {
-    border: 2px dashed #A2A2A2;
+    border: 2px dashed #363636;
     border-radius: 20px;
     background: #202020;
 }
