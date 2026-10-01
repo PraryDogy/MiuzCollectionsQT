@@ -10,10 +10,9 @@ from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import (ConfirmWindow, FlowLayout, RowArrowWidget,
-                            TransparentFrame, TransparentLabel,
+                            TextWindow, TransparentFrame, TransparentLabel,
                             TransparentWidget, UGroupBox, UListWidget,
-                            UListWidgetItem, UMainWidget, UMenu, UPushButton,
-                            USep)
+                            UMainWidget, UMenu, UPushButton, USep)
 from .win_calendar import WinCalendar
 
 UGroupBox_margins = (5, 5, 5, 5)
@@ -384,7 +383,6 @@ class WinFiltersAddTag(TransparentLabel):
         return super().mouseReleaseEvent(ev)
 
 
-
 class TagsContolWidget(TransparentWidget):
     load_st_grid = pyqtSignal()
 
@@ -413,8 +411,25 @@ class TagsContolWidget(TransparentWidget):
             self.flow_layout.addWidget(tag)
 
         self.add_tag = WinFiltersAddTag()
-        self.add_tag.clicked_.connect(lambda: print("add tag"))
+        self.add_tag.clicked_.connect(self.show_text_win)
         self.flow_layout.addWidget(self.add_tag)
+
+    def show_text_win(self):
+
+        def ok_clicked(text: str):
+            if text:
+                print("new tag", text)
+            else:
+                print("no text")
+
+        self.text_win = TextWindow(
+            title=Lng.new_tag[JsonData.lng_index],
+            description=Lng.new_tag_desc[JsonData.lng_index],
+            size=(300, 100)
+        )
+        self.text_win.center_to_parent(self.window())
+        self.text_win.ok_clicked.connect(ok_clicked)
+        self.text_win.show()
 
     def show_remove_tag_win(self, widget: WinFiltersWordTag):
 

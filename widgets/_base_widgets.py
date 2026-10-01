@@ -625,6 +625,60 @@ class WarningWindow(ConfirmWindow):
         self.cancel_btn.hide()
 
 
+class TextWindow(UMainWidget):
+    ok_clicked = pyqtSignal(str)
+    cancel_clicked = pyqtSignal()
+
+    def __init__(self, title: str, description: str, size: tuple):
+        super().__init__()
+        self.setFixedSize(*size)
+        self.set_always_on_top()
+        self.set_close_only()
+        self.setWindowTitle(title)
+
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(5)
+
+        self.description_label = TransparentLabel(description)
+        self.description_label.setWordWrap(True)
+        self.central_layout.addWidget(self.description_label)
+
+        self.line_edit_widget = ULineEdit()
+        self.line_edit_widget.setPlaceholderText(Lng.input_text[JsonData.lng_index])
+        self.central_layout.addWidget(self.line_edit_widget)
+
+        btn_widget = QWidget()
+        self.central_layout.addWidget(btn_widget)
+
+        btn_layout = QHBoxLayout(btn_widget)
+        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        btn_layout.setContentsMargins(0, 0, 0, 0)
+        btn_layout.setSpacing(10)
+
+        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
+        self.ok_btn.setFixedWidth(75)
+        self.ok_btn.clicked.connect(self.ok_clicked_cmd)
+        btn_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+        self.cancel_btn.setFixedWidth(75)
+        self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
+        self.cancel_btn.clicked.connect(self.deleteLater)
+        btn_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
+    def ok_clicked_cmd(self):
+        self.ok_clicked.emit(self.line_edit_widget.text().strip())
+        self.deleteLater()
+
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.deleteLater()
+        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.ok_clicked_cmd()
+        return super().keyPressEvent(a0)
+
+
+
 class SaveRowArrowWidget(RowArrowWidget):
     save_svg = Static.COMMON_ICONS / "save.svg"
 

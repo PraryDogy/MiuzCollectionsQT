@@ -434,3 +434,15 @@ class Lng:
         "Вы уверены, что хотите удалить этот тег из приложения навсегда?",
         "Are you sure you want to permanently delete this tag from the app?"
     )
+    new_tag = (
+        "Новый тег",
+        "New tag"
+    )
+    input_text = (
+        "Введите текст",
+        "Enter text"
+    )
+    new_tag_desc = (
+        "Придумайте название для нового тега",
+        "Create a name for the new tag"
+    )
