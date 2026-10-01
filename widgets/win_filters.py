@@ -263,7 +263,7 @@ class WinFiltersTagWidget(TransparentFrame):
     tag_height = 23
 
     # Добавляем параметр show_trash=True по умолчанию
-    def __init__(self, text: str, active: bool, show_trash: bool):
+    def __init__(self, text: str, active: bool, show_trash: bool, left_icon_path: str = None):
         super().__init__()
         self.setFixedHeight(self.tag_height)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -274,6 +274,11 @@ class WinFiltersTagWidget(TransparentFrame):
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(7, 2, 7, 2)
         self.h_lay.setSpacing(6)
+
+        if left_icon_path:
+            self.left_icon = QSvgWidget()
+            self.left_icon.load(left_icon_path)
+            self.h_lay.addWidget(self.left_icon)
 
         self.title = TransparentLabel(text)
         self.h_lay.addWidget(self.title)
