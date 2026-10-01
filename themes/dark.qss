@@ -412,6 +412,11 @@ WinImgSearchDropWidget {
     background: #202020;
 }
 
+WinImgSearchPreviewWidget {
+    background: #000000;
+    border-radius: 10px;
+}
+
 
 /* win_img_search.py */
 
