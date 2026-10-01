@@ -451,7 +451,9 @@ class UserTags(TransparentWidget):
                 tag.on_trash_clicked.connect(
                     lambda w=tag: self.show_remove_tag_win(w)
                 )
-                self.flow_layout.addWidget(tag)
+
+                self.flow_layout.clear()
+                self._create_tags()
 
         self.text_win = TextWindow(
             title=Lng.new_tag[JsonData.lng_index],

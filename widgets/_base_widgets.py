@@ -909,6 +909,15 @@ class FlowLayout(QLayout):
         self.items = []
         self.spacing = spacing
 
+    def clear(self):
+        while self.count():
+            child = self.takeAt(0)
+            if child and child.widget():
+                # Уничтожаем сам виджет, чтобы он не завис в памяти и на экране
+                child.widget().deleteLater()
+        self.update()
+
+
     def addItem(self, item):
         self.items.append(item)
 
