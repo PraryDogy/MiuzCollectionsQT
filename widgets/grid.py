@@ -263,7 +263,7 @@ class GridSortWidget(TransparentWidget):
         self.button = UPushButton("")
         self.set_button_text()
         self.button.setIcon(self.sort_icon)
-        self.button.setFixedSize(155, 23)
+        self.button.setFixedWidth(160)
         self.h_lay.addWidget(self.button)
 
         self.button_menu = UMenu(parent=self)
@@ -305,7 +305,6 @@ class GridFiltersWidget(TransparentWidget):
         self.button = UPushButton(Lng.filters[JsonData.lng_index])
         self.button.clicked.connect(self.open_filters_win.emit)
         self.button.setIcon(self.sort_icon)
-        self.button.setFixedSize(100, 23)
         self.h_lay.addWidget(self.button)
 
 
