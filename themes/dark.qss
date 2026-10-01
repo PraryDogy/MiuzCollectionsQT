@@ -382,7 +382,7 @@ WinFiltersTagWidget[active="False"] {
     border: 1px solid #585858;
 }
 
-WinFiltersTitle {
+WinFiltersTitleLabel {
     font-weight: bold;
     font-size: 20px;
 }

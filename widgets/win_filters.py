@@ -3,7 +3,8 @@ import os
 from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QSplitter, QVBoxLayout
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSplitter, QVBoxLayout,
+                             QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -19,10 +20,34 @@ UGroupBox_margins = (5, 5, 5, 5)
 UGroupBox_spacing = 10
 
 
+class WinFiltersTitleLabel(TransparentLabel):
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
 
-class WinFiltersTitle(TransparentLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
+
+class WinFiltersTitleWidget(QWidget):
+    def __init__(self, text: str, svg_path: str):
+        super().__init__()
+        
+        # 1. Создаем главное горизонтальное выравнивание
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)  # Убираем внешние отступы
+        layout.setSpacing(8)                  # Отступ между иконкой и текстом
+        
+        # 2. Создаем SVG-виджет для иконки
+        self.icon_widget = QSvgWidget(svg_path)
+        self.icon_widget.setFixedSize(QSize(24, 24))  # Задайте нужный размер иконки
+        
+        # 3. Создаем лейбл для текста
+        self.label = WinFiltersTitleLabel(text)
+        
+        # 4. Добавляем виджеты в слой
+        layout.addWidget(self.icon_widget)
+        layout.addWidget(self.label)
+        
+        # Если ваш прошлый TransparentLabel управлял прозрачностью фонов:
+        # self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
 
 
 class DatesWidget(UGroupBox):
@@ -53,7 +78,10 @@ class DatesWidget(UGroupBox):
         # self.main_layout.setSpacing(RowArrowWidget.group_spacing)
         self.main_layout.setSpacing(UGroupBox_spacing)
 
-        self.title_widget = WinFiltersTitle(Lng.dates_management[JsonData.lng_index])
+        self.title_widget = WinFiltersTitleWidget(
+            text=Lng.dates_management[JsonData.lng_index],
+            svg_path=str(self.calendar_svg)
+        )
         self.main_layout.addWidget(self.title_widget)
 
         self.main_layout.addWidget(USep())
@@ -497,6 +525,7 @@ class UserTags(TransparentWidget):
 
 class TagsWidget(UGroupBox):
     load_st_grid = pyqtSignal()
+    svg_path = Static.COMMON_ICONS / "tags.svg"
 
     def __init__(self):
         super().__init__()
@@ -504,7 +533,10 @@ class TagsWidget(UGroupBox):
         self.v_lay.setContentsMargins(*UGroupBox_margins)
         self.v_lay.setSpacing(UGroupBox_spacing)
 
-        self.title_widget = WinFiltersTitle(Lng.tag_management[JsonData.lng_index])
+        self.title_widget = WinFiltersTitleWidget(
+            text=Lng.tag_management[JsonData.lng_index],
+            svg_path=str(self.svg_path)
+        )
         self.v_lay.addWidget(self.title_widget)
 
         self.v_lay.addWidget(USep())
