@@ -12,7 +12,6 @@ from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
                              QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
-from system.filters import Filters
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -500,86 +499,6 @@ class GeneralSettings(TransparentWidget):
         win.show()
 
 
-class FiltersWid(TransparentWidget):
-    changed = pyqtSignal()
-    reset_svg = Static.COMMON_ICONS / "reset.svg"
-
-    def __init__(self):
-        super().__init__()
-        main_lay = QVBoxLayout(self)
-        main_lay.setContentsMargins(0, 0, 0, 0)
-        main_lay.setSpacing(10)
-
-        filters_text = LabelMinWidth(Lng.filters_descr[JsonData.lng_index])
-        filters_text.setContentsMargins(2, 0, 0, 0)
-        filters_text.setWordWrap(True)
-        main_lay.addWidget(filters_text)
-
-        self.filters_edit = UTextEdit()
-        self.filters_edit.setFixedHeight(220)
-        self.filters_edit.setPlaceholderText(Lng.filters[JsonData.lng_index])
-        self.filters_edit.setPlainText("\n".join(Filters.items))
-        self.filters_edit.textChanged.connect(
-            lambda: self.save_wid.show_warning()
-        )
-        main_lay.addWidget(self.filters_edit)
-
-        second_container = UGroupBox()
-        main_lay.addWidget(second_container)
-        second_container_layout = QVBoxLayout(second_container)
-        second_container_layout.setContentsMargins(*RowArrowWidget.group_margings)
-        second_container_layout.setSpacing(RowArrowWidget.group_spacing)
-
-        erase_filters_wid = RowArrowWidget(Lng.reset_filters[JsonData.lng_index])
-        erase_filters_wid.set_left_icon(self.reset_svg)
-        erase_filters_wid.clicked.connect(self.reset_filters_cmd)
-        second_container_layout.addWidget(erase_filters_wid)
-
-        second_container_layout.addWidget(USep())
-
-        self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
-        self.save_wid.clicked.connect(lambda: self.save_filters_cmd())
-        second_container_layout.addWidget(self.save_wid)
-
-        main_lay.addStretch()
-        
-    def reset_filters_cmd(self):
-
-        def fin():
-            Filters.items = Static.DEFAULT_FILTERS
-            Filters.write_json_data()
-            restart_app()
-
-        self.filters_win = ConfirmWindow(
-            Lng.reset_filters_long[JsonData.lng_index], 290, 90
-        )
-        self.filters_win.ok_clicked.connect(fin)
-        self.filters_win.center_to_parent(self.window())
-        self.filters_win.show()
-
-    def save_filters_cmd(self):
-
-        def fin():
-            Filters.items = [
-                line.strip() 
-                for line in self.filters_edit.toPlainText().split("\n") 
-                if line.strip()
-            ]
-            Filters.write_json_data()
-            restart_app()
-
-        win = ConfirmWindow(
-            Lng.app_will_restarted[JsonData.lng_index], 300, 90
-        )
-        win.ok_clicked.connect(fin)
-        win.center_to_parent(self.window())
-        win.show()
-
-    def mouseReleaseEvent(self, a0):
-        self.setFocus()
-        return super().mouseReleaseEvent(a0)
-
-
 class WinSettingsMfAliasTitle(TransparentLabel):
     def __init__(self, text: str):
         super().__init__(text)
@@ -873,7 +792,6 @@ class WinSettings(UMainWidget):
     
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
     new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-    filters_svg = Static.COMMON_ICONS / "filters.svg"
     settings_svg = Static.COMMON_ICONS / "settings.svg"
     yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
@@ -907,13 +825,6 @@ class WinSettings(UMainWidget):
         main_settings_item.setIcon(QIcon(str(self.settings_svg)))
         self.left_menu.addItem(main_settings_item)
         
-        filter_settings = UListWidgetItem(
-            parent=self.left_menu,
-            text=Lng.filters[JsonData.lng_index]
-        )
-        filter_settings.setIcon(QIcon(str(self.filters_svg)))
-        self.left_menu.addItem(filter_settings)
-
         new_folder = UListWidgetItem(
             parent=self.left_menu,
             text=Lng.new_folder[JsonData.lng_index]
@@ -943,12 +854,10 @@ class WinSettings(UMainWidget):
         # спейсером
         if settings_item.type_ == "general":
             idx = 0
-        elif settings_item.type_ == "filters":
-            idx = 1
         elif settings_item.type_ == "new_folder":
-            idx = 2
+            idx = 1
         elif settings_item.type_ == "edit_folder":
-            for x, i in enumerate(Mf.items, start=4):
+            for x, i in enumerate(Mf.items, start=3):
                 if i.mf_alias == self.settings_item.content:
                     idx = x
                     break
@@ -958,17 +867,14 @@ class WinSettings(UMainWidget):
     def init_right_side(self, idx: int):
         if idx == 0:
             r_wid = GeneralSettings()
-            # r_wid.lang_changed.connect(lambda: self.left_menu_click())
         elif idx == 1:
-            r_wid = FiltersWid()
-        elif idx == 2:
             if self.settings_item.type_ == "new_folder":
                 r_wid = NewMfSettings(self.settings_item.content)
                 self.settings_item.type_ = "general"
                 self.settings_item.content = ""
             else:
                 r_wid = NewMfSettings()
-        elif idx > 3:
+        elif idx > 2:
             item: UListWidgetItem = self.left_menu.item(idx)
             for index, mf in enumerate(Mf.items):
                 if mf.mf_alias == item.text():
@@ -979,7 +885,7 @@ class WinSettings(UMainWidget):
         self.right_lay.insertWidget(0, r_wid)
 
     def clear_right_side(self):
-        wids = (GeneralSettings, MfSettings, NewMfSettings, FiltersWid)
+        wids = (GeneralSettings, MfSettings, NewMfSettings)
         right_wid = self.right_wid.findChild(wids)
         right_wid.deleteLater()
 
