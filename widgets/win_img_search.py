@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QStackedWidget,
                              QVBoxLayout)
@@ -214,28 +214,17 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         layout.setSpacing(0)
         layout.addWidget(self.image_label)
 
-    def set_pixmap(self, pixmap: QPixmap):
-        self.pixmap = pixmap
-        self._update_pixmap()
+    def set_pixmap(self, qimage: QImage):
+        scaled = Utils.qimage_scaled_high_dpi(
+            qimage,
+            self.image_label.size()
+        )
+        self.pixmap = QPixmap.fromImage(scaled)
+        self.image_label.setPixmap(self.pixmap)
 
     def clear(self):
         self.pixmap = QPixmap()
         self.image_label.clear()
-
-    def _update_pixmap(self):
-        if self.pixmap.isNull():
-            self.image_label.clear()
-            return
-        scaled = self.pixmap.scaled(
-            self.image_label.size(),
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation,
-        )
-        self.image_label.setPixmap(scaled)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self._update_pixmap()
 
 
 class WinImgSearch(UMainWidget):
@@ -403,16 +392,9 @@ class WinImgSearch(UMainWidget):
                     dtype=np.dtype(item.dtype),
                     buffer=self.shm.buf,
                 )
-
-                print("image readed")
-                pixmap = Utils.pyqt_pixmap_from_array(self.img_array)
-                self.preview_widget.set_pixmap(pixmap)
+                qimage = Utils.pyqt_qimage_from_array(self.img_array)
+                self.preview_widget.set_pixmap(qimage)
                 self.image_stack.setCurrentIndex(1)
-                # pixmap = QPixmap(path)
-                # if pixmap.isNull():
-                #     return
-                # self.preview_widget.set_pixmap(pixmap)
-                # self.image_stack.setCurrentIndex(1)
 
                 if ImgUtils.is_grayscale(self.img_array):
                     self.cleanup_shm()
@@ -447,7 +429,7 @@ class WinImgSearch(UMainWidget):
         self.read_img_poll_ms = ms
         self.read_img_task = ProcessWorker(
             target=ReadImg.start,
-            args=(url, Static.THUMB_MAX_SIZE,),
+            args=(url, 0),
         )
         self.read_img_task.start()
         self.read_img_timer.start(ms)

@@ -132,7 +132,7 @@ class DbImagesLoader(URunnable):
             for i in Static.THUMB_WID_PIXMAP_SIZE:
                 resized = ImgUtils.fit_to_thumb(img_rgb, i * 2)
                 qimage = Utils.pyqt_qimage_from_array(resized)
-                qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, i)
+                qimage_scaled = Utils.qimage_scaled_high_dpi(qimage, i)
                 qimages.append(qimage_scaled)
 
             src_qimage = Utils.pyqt_qimage_from_array(img_rgb)

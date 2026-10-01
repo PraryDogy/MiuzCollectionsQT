@@ -63,8 +63,19 @@ class Utils:
             return None
 
     @classmethod
-    def pyqt_scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = 2):
+    def qimage_scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = 2):
         scaled = qimage.scaled(
+            int(size * dpr),
+            int(size * dpr),
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        scaled.setDevicePixelRatio(dpr)
+        return scaled
+
+    @classmethod
+    def qpixmap_scaled_high_dpi(cls, qpixmap: QPixmap, size: int, dpr: int = 2):
+        scaled = qpixmap.scaled(
             int(size * dpr),
             int(size * dpr),
             Qt.AspectRatioMode.KeepAspectRatio,

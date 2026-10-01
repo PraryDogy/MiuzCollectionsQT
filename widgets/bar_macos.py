@@ -38,7 +38,7 @@ class AboutWin(UMainWidget):
 
         icon = TransparentLabel()
         qimage = QImage(str(self.icon_path))
-        qimage_saled = Utils.pyqt_scaled_high_dpi(qimage, self.icon_size)
+        qimage_saled = Utils.qimage_scaled_high_dpi(qimage, self.icon_size)
         icon.setPixmap(QPixmap.fromImage(qimage_saled))
         opacity_effect = QGraphicsOpacityEffect()
         opacity_effect.setOpacity(self.opacity) 

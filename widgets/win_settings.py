@@ -425,7 +425,7 @@ class AboutWid(UGroupBox):
 
         icon = TransparentLabel()
         qimage = QImage(str(self.icon_path))
-        qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, self.icon_size)
+        qimage_scaled = Utils.qimage_scaled_high_dpi(qimage, self.icon_size)
         pixmap = QPixmap.fromImage(qimage_scaled)
         icon.setPixmap(pixmap)
         h_lay.addWidget(icon)

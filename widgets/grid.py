@@ -527,7 +527,7 @@ class Grid(UScrollVerticalArea):
     def __init__(self):
         super().__init__()
         qimage = QImage(str(self.copy_files_path))
-        qimage_scaled = Utils.pyqt_scaled_high_dpi(qimage, 80)
+        qimage_scaled = Utils.qimage_scaled_high_dpi(qimage, 80)
         self.copy_files_icon = QPixmap.fromImage(qimage_scaled)
 
         # --- Состояние и данные ---
