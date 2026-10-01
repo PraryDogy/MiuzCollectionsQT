@@ -452,13 +452,3 @@ WinImgViewGraphics, BlackBgFrame {
 ServerLabel {
     padding-left: 1px;
 }
-
-
-
-
-/* MenuLeft,
-MainWinRightWidget {
-    background: #272727;
-    border: 1px solid #2d2d2d;
-    border-radius: 10px;
-} */
