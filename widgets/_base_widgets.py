@@ -301,16 +301,17 @@ class UPushButton(TransparentButton):
         super().__init__(text)
         self.setIconSize(QSize(*self.icon_size))
         self.setFixedHeight(self.hh)
-        # без этого съезжают стили по неизвестной причине
         self.ensurePolished()
 
+    def setText(self, text):
+        super().setText(" " + text)
+
     def setIcon(self, icon):
-        self.setText("  " + self.text())
-        return super().setIcon(icon)
+        super().setIcon(icon)
 
     def enterEvent(self, event):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        return super().enterEvent(event)
+        super().enterEvent(event)
 
 
 class ActiveButton(UPushButton):
