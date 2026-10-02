@@ -82,6 +82,8 @@ class Static:
         ".psb"
     ]
 
+    DPR = 2
+
 
 class Dynamic:
     date_start: datetime = None

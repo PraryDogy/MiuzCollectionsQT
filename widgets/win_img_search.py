@@ -131,7 +131,6 @@ class SliderWidget(TransparentWidget):
 DROP_WIDGET_SIZE = (350, 300)
 
 
-
 class WinImgSearchDropWidget(TransparentFrame):
     svg_path = Static.COMMON_ICONS / "base_image.svg"
     svg_size = (50, 50)
@@ -215,7 +214,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
             self.image_label.setPixmap(self.pixmap)
             self.pixmap_finished.emit()
 
-        self.qimage_task = ImgArrayQImage(img_array, DROP_WIDGET_SIZE[1])
+        self.qimage_task = ImgArrayQImage(img_array, DROP_WIDGET_SIZE)
         self.qimage_task.sigs.finished_.connect(finished)
         UThreadPool.start(self.qimage_task)
 
