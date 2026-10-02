@@ -27,7 +27,8 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
 
 class ProgressWin(UMainWidget):
     stop_img_search = pyqtSignal()
-    base_image_svg_path = Static.COMMON_ICONS
+    base_image_svg_path = Static.COMMON_ICONS / "base_image.svg"
+    stop_svg_path = Static.COMMON_ICONS / "stop.svg"
     base_image_size = (20, 20)
 
     def __init__(self):
@@ -36,6 +37,8 @@ class ProgressWin(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.progress[JsonData.lng_index])
+
+        self.stop_icon = QIcon(str(self.stop_svg_path))
 
         self.central_layout.setSpacing(20)
         self.central_layout.setContentsMargins(15, 15, 15, 20)
@@ -49,25 +52,24 @@ class ProgressWin(UMainWidget):
         self.text_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         self.svg_icon = QSvgWidget() 
-        self.svg_icon.load(self.base_image_svg_path)
+        self.svg_icon.load(str(self.base_image_svg_path))
         self.svg_icon.setFixedSize(*self.base_image_size) # Фиксируем размер иконки, чтобы она не растягивалась
         self.text_layout.addWidget(self.svg_icon, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.text_label = TransparentLabel("")
-        self.text_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.text_layout.addWidget(self.text_label, Qt.AlignmentFlag.AlignLeft)
 
         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
+        self.cancel_btn.setIcon(self.stop_icon)
         self.cancel_btn.clicked.connect(self.stop_img_search.emit)
-        self.central_layout.addWidget(self.cancel_btn)
+        self.text_layout.addWidget(self.cancel_btn)
 
         max_ = 99999
         self.set_text(max_, max_)
-        self.central_layout.invalidate()
-        self.central_layout.activate()
-        target_size = self.sizeHint()
-        self.setFixedSize(target_size.width() + 40, target_size.height())
-        self.text_label.setText(Lng.please_wait[JsonData.lng_index])
+        self.text_label.adjustSize()
+        self.adjustSize()
+        self.text_label.setFixedWidth(self.text_label.width())
+        # self.text_label.setText(Lng.please_wait[JsonData.lng_index])
 
     def set_text(self, current_count, total_count):
         if current_count > total_count:
@@ -101,8 +103,8 @@ class ProgressWin(UMainWidget):
 
         self.text_label.setText(text)
 
-    def closeEvent(self, event):
-        event.ignore()
+    def closeEvent(self, a0):
+        a0.ignore()
 
 
 class SliderWidget(TransparentWidget):
@@ -351,6 +353,8 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
         self.adjustSize()
+
+        QTimer.singleShot(500, self.open_progress_win)
 
     def image_dropped(self, path: str):
         self.start_read_img_task(path)

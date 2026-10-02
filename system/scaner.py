@@ -584,7 +584,7 @@ class ThumbsUpdater(ScanerParent):
         scaner = self.scaner_item
         return (
             f"{scaner.mf.mf_alias}: "
-            f"{Lng.indexing[scaner.lng_index].lower()} "
+            f"{Lng.indexing_files[scaner.lng_index].lower()} "
             f"{scaner.current_count} {Lng.from_[scaner.lng_index]} {scaner.total_count}"
         )
 
