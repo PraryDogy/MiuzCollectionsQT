@@ -255,7 +255,7 @@ class WinImgSearch(UMainWidget):
     closed = pyqtSignal()
     magnifier_svg_path = Static.COMMON_ICONS / "magnifier.svg"
     cancel_svg_path = Static.COMMON_ICONS / "cancel.svg"
-
+    cancel_icon_size = (20, 20)
 
     def __init__(self):
         super().__init__()
@@ -274,7 +274,7 @@ class WinImgSearch(UMainWidget):
 
         self.cancel_icon = QSvgWidget(self)
         self.cancel_icon.load(str(self.cancel_svg_path))
-        self.cancel_icon.setFixedSize(15, 15)
+        self.cancel_icon.setFixedSize(*self.cancel_icon_size)
         self.cancel_icon.mouseReleaseEvent = self.clear_image_cmd
         self.cancel_icon.setCursor(Qt.CursorShape.PointingHandCursor)
         self.cancel_icon.hide()
@@ -305,8 +305,8 @@ class WinImgSearch(UMainWidget):
         )
         self.drop_widget.image_dropped.connect(self.image_dropped)
 
-        self.group_box = ControlsWidget()
-        self.central_layout.addWidget(self.group_box)
+        self.controls_widget = ControlsWidget()
+        self.central_layout.addWidget(self.controls_widget)
 
         btn_layout = QHBoxLayout()
         self.central_layout.addLayout(btn_layout)
@@ -323,15 +323,16 @@ class WinImgSearch(UMainWidget):
 
     def clear_image_cmd(self, e):
         self.cancel_icon.hide()
-        # self.preview_widget.clear()
         self.reset_img_search()
 
     def show_clear_image_button(self):
-        local_top_right = QPoint(self.preview_widget.width(), 0)
-        window_top_right = self.preview_widget.mapTo(self, local_top_right)
-        x = window_top_right.x() - 10
-        y = window_top_right.y() - 5
-        self.cancel_icon.move(x, y)
+        padding = 8 
+        icon_width = self.cancel_icon.width()
+        local_x = self.preview_widget.width() - icon_width - padding
+        local_y = padding 
+        local_top_right = QPoint(local_x, local_y)
+        window_pos = self.preview_widget.mapTo(self, local_top_right)
+        self.cancel_icon.move(window_pos) 
         self.cancel_icon.show()
         self.cancel_icon.raise_()
 
@@ -356,7 +357,7 @@ class WinImgSearch(UMainWidget):
             self.img_search_task = None
         self.img_search_task = ImageSearcher(
             src_img=self.img_array,
-            similarity_value=self.slider_widget.current_value,
+            similarity_value=self.controls_widget.slider_widget.current_value,
             mf=Mf.current_mf,
         )
         self.img_search_task.sigs.finished_.connect(self.img_search_finished)
