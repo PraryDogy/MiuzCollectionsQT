@@ -440,10 +440,12 @@ class ClearFiltersTag(GridTagWidget):
     icon_path = Static.COMMON_ICONS / "trash.svg"
 
     def __init__(self, text: str):
-        super().__init__("")
-        self.title.deleteLater()
+        super().__init__(Lng.reset[JsonData.lng_index])
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.mouseReleaseEvent = self.clicked_close_cmd
 
-    def clicked_close_cmd(self):
+    def clicked_close_cmd(self, *args):
+        print(123)
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.favs_tag_enabled = False
