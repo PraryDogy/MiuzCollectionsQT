@@ -234,22 +234,27 @@ class WinMain(UMainWindow):
         self.load_st_grid()
 
     def open_img_search_win(self):
-
         def on_closed():
-            if self.win_img_search.preview_widget.pixmap:
+            win = self.win_img_search
+            if not win.preview_widget.pixmap.isNull():
                 self.bar_top.img_search_btn.set_selected_style()
-                self.win_img_search.hide()
+                win.hide()
             else:
                 self.bar_top.img_search_btn.set_base_style()
-                self.win_img_search.deleteLater()
+                self.win_img_search = None
+                win.deleteLater()
 
         self.bar_top.img_search_btn.set_selected_style()
-        if not Dynamic.img_search_thumb_paths:
+
+        if not getattr(self, "win_img_search", None):
             self.win_img_search = WinImgSearch()
             self.win_img_search.reload_thumbnails.connect(self.load_st_grid)
             self.win_img_search.closed.connect(on_closed)
             self.win_img_search.center_to_parent(self)
+
         self.win_img_search.show()
+        self.win_img_search.raise_()
+        self.win_img_search.activateWindow()
     
     def show_in_app(self, rel_path: str):
         current_dir = os.path.dirname(rel_path)
