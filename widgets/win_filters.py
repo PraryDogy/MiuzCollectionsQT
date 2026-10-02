@@ -1,7 +1,7 @@
 import os
 
 from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSplitter, QVBoxLayout,
                              QWidget)
@@ -21,8 +21,13 @@ UGroupBox_spacing = 10
 
 
 class WinFiltersTitleWidget(QWidget):
+    reset_clicked = pyqtSignal()
+    reset_svg_path = Static.COMMON_ICONS / "reset.svg"
+
     def __init__(self, text: str, svg_path: str):
         super().__init__()
+
+        self.reset_icon = QIcon(str(self.reset_svg_path))
         
         # 1. Создаем главное горизонтальное выравнивание
         layout = QHBoxLayout(self)
@@ -39,9 +44,12 @@ class WinFiltersTitleWidget(QWidget):
         # 4. Добавляем виджеты в слой
         layout.addWidget(self.icon_widget)
         layout.addWidget(self.label)
+        layout.addStretch(1)
         
-        # Если ваш прошлый TransparentLabel управлял прозрачностью фонов:
-        # self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
+        self.reset_button.setIcon(self.reset_icon)
+        self.reset_button.clicked.connect(self.reset_clicked.emit)
+        layout.addWidget(self.reset_button)
 
 
 
@@ -77,6 +85,7 @@ class DatesWidget(UGroupBox):
             text=Lng.dates_management[JsonData.lng_index],
             svg_path=str(self.calendar_svg)
         )
+        self.title_widget.reset_clicked.connect(self.clear_btn_cmd) 
         self.main_layout.addWidget(self.title_widget)
 
         self.main_layout.addWidget(USep())
@@ -159,12 +168,6 @@ class DatesWidget(UGroupBox):
 
         # Пружина смещает кнопку сброса вправо
         self.top_row_layout.addStretch(1)
-
-        # Кнопка сброса
-        self.reset_btn = UPushButton(Lng.reset[JsonData.lng_index])
-        self.reset_btn.clicked.connect(self.clear_btn_cmd) 
-        self.top_row_layout.addWidget(self.reset_btn)
-
         # Добавляем созданную строку-виджет в главный вертикальный layout
         self.main_layout.addWidget(self.top_row_widget)
 
