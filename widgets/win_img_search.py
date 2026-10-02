@@ -321,25 +321,34 @@ class WinImgSearch(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.image_search[JsonData.lng_index])
-        self.img_array = self.img_search_task = self.read_img_task = self.shm = self.progress_win = None
+        self.img_array = None
+        self.img_search_task = None
+        self.read_img_task = None
+        self.shm = None
+        self.progress_win = None
         self.read_img_poll_ms = 300
         self.magnifier_icon = QIcon(str(self.magnifier_svg_path))
 
-        self.found_image_timer = QTimer(self); self.found_image_timer.setSingleShot(True)
+        self.found_image_timer = QTimer(self)
+        self.found_image_timer.setSingleShot(True)
         self.found_image_timer.timeout.connect(self.reload_thumbnails.emit)
-        self.poll_progress_win_timer = QTimer(self); self.poll_progress_win_timer.setSingleShot(True)
+        self.poll_progress_win_timer = QTimer(self)
+        self.poll_progress_win_timer.setSingleShot(True)
         self.poll_progress_win_timer.timeout.connect(self.poll_progress_win)
-        self.read_img_timer = QTimer(self); self.read_img_timer.setSingleShot(True)
+        self.read_img_timer = QTimer(self)
+        self.read_img_timer.setSingleShot(True)
         self.read_img_timer.timeout.connect(self.poll_read_img)
 
-        self.central_layout.setContentsMargins(10, 10, 10, 10); self.central_layout.setSpacing(10)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
+        self.central_layout.setSpacing(10)
 
         self.image_stack = QStackedWidget()
         self.drop_widget = WinImgSearchDropWidget()
         self.preview_widget = WinImgSearchPreviewWidget()
         self.preview_widget.cancel_clicked.connect(self.reset_img_search)
         self.preview_widget.pixmap_finished.connect(self.set_close_button_text)
-        self.image_stack.addWidget(self.drop_widget); self.image_stack.addWidget(self.preview_widget)
+        self.image_stack.addWidget(self.drop_widget)
+        self.image_stack.addWidget(self.preview_widget)
         self.image_stack.setCurrentIndex(0)
         self.central_layout.addWidget(self.image_stack, alignment=Qt.AlignmentFlag.AlignCenter)
         self.drop_widget.image_dropped.connect(self.image_dropped)
@@ -347,20 +356,25 @@ class WinImgSearch(UMainWidget):
         self.controls_widget = ControlsWidget()
         self.central_layout.addWidget(self.controls_widget)
 
-        btn_layout = QHBoxLayout(); self.central_layout.addLayout(btn_layout); btn_layout.addStretch()
+        btn_layout = QHBoxLayout()
+        self.central_layout.addLayout(btn_layout)
+        btn_layout.addStretch()
         self.start_btn = ActiveButton(Lng.find_matches[JsonData.lng_index])
-        self.start_btn.setIcon(self.magnifier_icon); self.start_btn.clicked.connect(self.start_img_search)
+        self.start_btn.setIcon(self.magnifier_icon)
+        self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
 
         self.close_button = UPushButton("")
         self.set_close_button_width()
         self.set_close_button_text()
         self.close_button.clicked.connect(self.request_close)
-        btn_layout.addWidget(self.close_button); btn_layout.addStretch()
+        btn_layout.addWidget(self.close_button)
+        btn_layout.addStretch()
 
         self.set_close_button_width()
 
-        self.adjustSize(); self.setFixedSize(self.width(), self.height())
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
     def set_close_button_width(self):
         ind = JsonData.lng_index
@@ -379,109 +393,148 @@ class WinImgSearch(UMainWidget):
         self.start_read_img_task(path)
 
     def reset_img_search(self):
-        self.stop_timers_and_tasks(); self.cleanup_shm()
-        self.img_array = None; self.preview_widget.clear(); self.image_stack.setCurrentIndex(0)
-        Dynamic.img_search_thumb_paths.clear(); self.reload_thumbnails.emit()
+        self.stop_timers_and_tasks()
+        self.cleanup_shm()
+        self.img_array = None
+        self.preview_widget.clear()
+        self.image_stack.setCurrentIndex(0)
+        Dynamic.img_search_thumb_paths.clear()
+        self.reload_thumbnails.emit()
         self.set_close_button_text()
 
     def start_img_search(self):
-        if self.img_array is None: return
+        if self.img_array is None:
+            return
         self.stop_img_search()
         self.img_search_task = ImageSearcher(src_img=self.img_array, similarity_value=self.controls_widget.slider_widget.current_value, mf=Mf.current_mf)
         self.img_search_task.sigs.finished_.connect(self.img_search_finished)
         self.img_search_task.sigs.found_image.connect(self.found_image_cmd)
-        Dynamic.img_search_thumb_paths.clear(); UThreadPool.start(self.img_search_task)
-        self.open_progress_win(); self.poll_progress_win()
+        Dynamic.img_search_thumb_paths.clear()
+        UThreadPool.start(self.img_search_task)
+        self.open_progress_win()
+        self.poll_progress_win()
 
     def stop_img_search(self):
         self.poll_progress_win_timer.stop()
         if self.img_search_task is not None:
-            try: self.img_search_task.stop_task()
-            except Exception: pass
+            try:
+                self.img_search_task.stop_task()
+            except Exception:
+                pass
             self.img_search_task = None
         self.close_progress_win()
 
     def img_search_finished(self):
-        if not Dynamic.img_search_thumb_paths: self.found_image_cmd("999999999999")
+        if not Dynamic.img_search_thumb_paths:
+            self.found_image_cmd("999999999999")
         self.poll_progress_win_timer.stop()
         if self.progress_win is not None:
-            try: QTimer.singleShot(1000, self.progress_win.deleteLater)
-            except RuntimeError: pass
+            try:
+                QTimer.singleShot(1000, self.progress_win.deleteLater)
+            except RuntimeError:
+                pass
             self.progress_win = None
 
     def open_progress_win(self):
         self.close_progress_win()
-        self.progress_win = ProgressWin(); self.progress_win.center_to_parent(self)
-        self.progress_win.stop_img_search.connect(self.stop_img_search); self.progress_win.show()
+        self.progress_win = ProgressWin()
+        self.progress_win.center_to_parent(self)
+        self.progress_win.stop_img_search.connect(self.stop_img_search)
+        self.progress_win.show()
 
     def close_progress_win(self):
         if self.progress_win is not None:
-            try: self.progress_win.deleteLater()
-            except RuntimeError: pass
+            try:
+                self.progress_win.deleteLater()
+            except RuntimeError:
+                pass
             self.progress_win = None
 
     def poll_progress_win(self):
         self.poll_progress_win_timer.stop()
-        if self.progress_win is None or self.img_search_task is None: return
+        if self.progress_win is None or self.img_search_task is None:
+            return
         try:
             self.progress_win.set_text(self.img_search_task.current_count, self.img_search_task.total_count)
             self.poll_progress_win_timer.start(500)
-        except RuntimeError: self.poll_progress_win_timer.stop()
+        except RuntimeError:
+            self.poll_progress_win_timer.stop()
 
     def start_read_img_task(self, url: str, ms=300):
-        self.cleanup_shm(); self.read_img_timer.stop()
+        self.cleanup_shm()
+        self.read_img_timer.stop()
         if self.read_img_task is not None:
-            try: self.read_img_task.terminate_join()
-            except Exception: pass
+            try:
+                self.read_img_task.terminate_join()
+            except Exception:
+                pass
             self.read_img_task = None
-        self.img_array = None; self.read_img_poll_ms = ms
+        self.img_array = None
+        self.read_img_poll_ms = ms
         self.read_img_task = ProcessWorker(target=ReadImg.start, args=(url, 0))
-        self.read_img_task.start(); self.read_img_timer.start(ms)
+        self.read_img_task.start()
+        self.read_img_timer.start(ms)
 
     def poll_read_img(self):
         self.read_img_timer.stop()
-        if self.read_img_task is None: return
+        if self.read_img_task is None:
+            return
 
         if not self.read_img_task.process_queue.empty():
             item: ReadImgItem = self.read_img_task.process_queue.get()
             try:
                 self.shm = shared_memory.SharedMemory(name=item.shm_name)
                 self.img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=self.shm.buf)
-                self.image_stack.setCurrentIndex(1); self.preview_widget.set_pixmap(self.img_array)
+                self.image_stack.setCurrentIndex(1)
+                self.preview_widget.set_pixmap(self.img_array)
 
                 if ImgUtils.is_grayscale(self.img_array):
-                    self.cleanup_shm(); self.img_array = None
+                    self.cleanup_shm()
+                    self.img_array = None
                     QTimer.singleShot(1500, self.reset_img_search)
 
                 if not self.read_img_task.is_alive():
-                    self.read_img_task.terminate_join(); self.read_img_task = None
+                    self.read_img_task.terminate_join()
+                    self.read_img_task = None
             except Exception:
-                self.cleanup_shm(); self.img_array = None
+                self.cleanup_shm()
+                self.img_array = None
                 if self.read_img_task is not None:
-                    try: self.read_img_task.terminate_join()
-                    except Exception: pass
+                    try:
+                        self.read_img_task.terminate_join()
+                    except Exception:
+                        pass
                     self.read_img_task = None
         else:
             self.read_img_timer.start(self.read_img_poll_ms)
 
     def found_image_cmd(self, rel_path: str):
         Dynamic.img_search_thumb_paths.add(rel_path)
-        self.found_image_timer.stop(); self.found_image_timer.start(500)
+        self.found_image_timer.stop()
+        self.found_image_timer.start(500)
 
     def cleanup_shm(self):
         if self.shm is not None:
-            try: self.shm.close()
-            except Exception: pass
-            try: self.shm.unlink()
-            except Exception: pass
+            try:
+                self.shm.close()
+            except Exception:
+                pass
+            try:
+                self.shm.unlink()
+            except Exception:
+                pass
             self.shm = None
 
     def stop_timers_and_tasks(self):
-        self.found_image_timer.stop(); self.poll_progress_win_timer.stop(); self.read_img_timer.stop()
+        self.found_image_timer.stop()
+        self.poll_progress_win_timer.stop()
+        self.read_img_timer.stop()
         self.stop_img_search()
         if self.read_img_task is not None:
-            try: self.read_img_task.terminate_join()
-            except Exception: pass
+            try:
+                self.read_img_task.terminate_join()
+            except Exception:
+                pass
             self.read_img_task = None
 
     def request_close(self):
@@ -489,8 +542,11 @@ class WinImgSearch(UMainWidget):
         self.closed.emit()
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key.Key_Escape: self.request_close(); return
+        if event.key() == Qt.Key.Key_Escape:
+            self.request_close()
+            return
         super().keyPressEvent(event)
 
     def closeEvent(self, event):
-        event.ignore(); self.request_close()
+        event.ignore()
+        self.request_close()
