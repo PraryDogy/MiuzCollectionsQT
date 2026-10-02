@@ -6,16 +6,16 @@ import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QIcon, QImage, QPixmap
-from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtSvgWidgets import QSvgWidget  # Не забудьте импортировать
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QStackedWidget,
-                             QVBoxLayout)
+                             QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import ImgUtils
-from system.tasks import ImageSearcher, ImagePreviewTask, UThreadPool
+from system.tasks import ImagePreviewTask, ImageSearcher, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
@@ -24,8 +24,11 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
                             UPushButton, USep, USlider)
 
 
+
 class ProgressWin(UMainWidget):
     stop_img_search = pyqtSignal()
+    base_image_svg_path = Static.COMMON_ICONS
+    base_image_size = (20, 20)
 
     def __init__(self):
         super().__init__()
@@ -34,26 +37,53 @@ class ProgressWin(UMainWidget):
         self.set_close_only()
         self.setWindowTitle(Lng.progress[JsonData.lng_index])
 
-        self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.setSpacing(20)
         self.central_layout.setContentsMargins(15, 15, 15, 20)
 
+        self.text_container = QWidget()
+        self.central_layout.addWidget(self.text_container)
+
+        self.text_layout = QHBoxLayout(self.text_container)
+        self.text_layout.setContentsMargins(0, 0, 0, 0)
+        self.text_layout.setSpacing(10)
+        self.text_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        self.svg_icon = QSvgWidget() 
+        self.svg_icon.load(self.base_image_svg_path)
+        self.svg_icon.setFixedSize(*self.base_image_size) # Фиксируем размер иконки, чтобы она не растягивалась
+        self.text_layout.addWidget(self.svg_icon, alignment=Qt.AlignmentFlag.AlignLeft)
+
         self.text_label = TransparentLabel("")
-        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.text_layout.addWidget(self.text_label, Qt.AlignmentFlag.AlignLeft)
 
         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.stop_img_search.emit)
         self.central_layout.addWidget(self.cancel_btn)
 
-        # делаем макс значения для макс расширения окна
-        max_ = 1000
+        max_ = 99999
         self.set_text(max_, max_)
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height(),)
+        self.central_layout.invalidate()
+        self.central_layout.activate()
+        target_size = self.sizeHint()
+        self.setFixedSize(target_size.width() + 40, target_size.height())
         self.text_label.setText(Lng.please_wait[JsonData.lng_index])
 
-        # self.set_text(3, 123)
+    def set_text(self, current_count, total_count):
+        if current_count > total_count:
+            current_count = total_count
+
+        if total_count == 0:
+            text = Lng.please_wait[JsonData.lng_index]
+        else:
+            text = (
+                f"{Lng.indexing[JsonData.lng_index]} "
+                f"{current_count} "
+                f"{Lng.from_[JsonData.lng_index]} "
+                f"{total_count}"
+            )
+
+        self.text_label.setText(text)
 
     def set_text(self, current_count, total_count):
         if current_count > total_count:
@@ -109,7 +139,6 @@ class SliderWidget(TransparentWidget):
     def slider_clicked_cmd(self, value: int):
         self.value_label.setText(f"{value}%")
         self.current_value = value
-
 
 
 DROP_WIDGET_SIZE = (350, 300)
