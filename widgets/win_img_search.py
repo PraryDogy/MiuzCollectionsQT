@@ -53,14 +53,14 @@ class ProgressWin(UMainWidget):
         self.setFixedSize(self.width(), self.height(),)
         self.text_label.setText(Lng.please_wait[JsonData.lng_index])
 
-        self.set_text(3, 123)
+        # self.set_text(3, 123)
 
     def set_text(self, current_count, total_count):
         if current_count > total_count:
             current_count = total_count
 
         if total_count == 0:
-            text = Lng.preparing[JsonData.lng_index]
+            text = Lng.please_wait[JsonData.lng_index]
         else:
             text = (
                 f"{Lng.indexing[JsonData.lng_index]} "
@@ -266,7 +266,6 @@ class WinImgSearch(UMainWidget):
     closed = pyqtSignal()
     magnifier_svg_path = Static.COMMON_ICONS / "magnifier.svg"
 
-
     def __init__(self):
         super().__init__()
 
@@ -298,6 +297,7 @@ class WinImgSearch(UMainWidget):
         self.image_stack = QStackedWidget()
         self.drop_widget = WinImgSearchDropWidget()
         self.preview_widget = WinImgSearchPreviewWidget()
+        self.preview_widget.cancel_clicked.connect(self.reset_img_search)
         self.image_stack.addWidget(self.drop_widget)
         self.image_stack.addWidget(self.preview_widget)
         self.image_stack.setCurrentIndex(0)
@@ -322,12 +322,6 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
         self.adjustSize()
-
-        QTimer.singleShot(500, self.open_progress_win)
-
-    def clear_image_cmd(self, e):
-        self.cancel_icon.hide()
-        self.reset_img_search()
 
     def image_dropped(self, path: str):
         self.start_read_img_task(path)
