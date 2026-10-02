@@ -40,36 +40,17 @@ class ProgressWin(UMainWidget):
         self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(0, 0, 0, 10)
 
-        self.text_label = TransparentLabel(
-            Lng.preparing[JsonData.lng_index]
-        )
+        self.text_label = TransparentLabel(Lng.preparing[JsonData.lng_index])
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.text_label.setFixedSize(self.ww - 10, 30)
+        self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter,)
 
-        self.central_layout.addWidget(
-            self.text_label,
-            alignment=Qt.AlignmentFlag.AlignCenter,
-        )
-
-        self.cancel_btn = UPushButton(
-            Lng.stop[JsonData.lng_index]
-        )
-        self.cancel_btn.clicked.connect(
-            self.stop_img_search.emit
-        )
-
-        self.central_layout.addWidget(
-            self.cancel_btn,
-            alignment=Qt.AlignmentFlag.AlignCenter,
-        )
-
+        self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
+        self.cancel_btn.clicked.connect(self.stop_img_search.emit)
+        self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter,)
         self.set_text(0, 0)
-
         self.adjustSize()
-        self.setFixedSize(
-            self.width(),
-            self.height(),
-        )
+        self.setFixedSize(self.width(), self.height(),)
 
     def set_text(self, current_count, total_count):
         if current_count > total_count:
@@ -320,6 +301,8 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
         self.adjustSize()
+
+        self.open_progress_win()
 
     def clear_image_cmd(self, e):
         self.cancel_icon.hide()
