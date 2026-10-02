@@ -535,6 +535,7 @@ class TagsWidget(UGroupBox):
             text=Lng.tag_management[JsonData.lng_index],
             svg_path=str(self.svg_path)
         )
+        self.title_widget.reset_clicked.connect(self.reset_tags)
         self.v_lay.addWidget(self.title_widget)
 
         self.v_lay.addWidget(USep())
@@ -552,6 +553,15 @@ class TagsWidget(UGroupBox):
         self.user_tags = UserTags()
         self.user_tags.load_st_grid.connect(self.load_st_grid.emit)
         self.v_lay.addWidget(self.user_tags)
+
+    def reset_tags(self):
+        Dynamic.favs_tag_enabled = False
+        Dynamic.no_subfolders_tag_enabled = False
+        Dynamic.word_tags_list.clear()
+        tags = self.findChildren(WinFiltersTagWidget)
+        for i in tags:
+            i.set_active(False)
+        self.load_st_grid.emit()
 
 
 class WinFilters(UMainWidget):
