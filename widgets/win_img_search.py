@@ -26,33 +26,33 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
 
 class ProgressWin(UMainWidget):
     stop_img_search = pyqtSignal()
-    ww = 250
-    stop_width = 100
 
     def __init__(self):
         super().__init__()
 
         self.set_always_on_top()
         self.set_close_only()
-        self.setFixedWidth(self.ww)
         self.setWindowTitle(Lng.progress[JsonData.lng_index])
 
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.central_layout.setSpacing(15)
-        self.central_layout.setContentsMargins(10, 10, 10, 15)
+        self.central_layout.setSpacing(20)
+        self.central_layout.setContentsMargins(15, 15, 15, 20)
 
-        self.text_label = TransparentLabel(Lng.please_wait[JsonData.lng_index])
+        self.text_label = TransparentLabel("")
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.stop_img_search.emit)
-        self.cancel_btn.setFixedWidth(self.stop_width)
-        self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.central_layout.addWidget(self.cancel_btn)
 
-        self.set_text(0, 0)
+        # делаем макс значения для макс расширения окна
+        max_ = 1000
+        self.set_text(max_, max_)
         self.adjustSize()
-        # self.setFixedSize(self.width(), self.height(),)
+        self.setFixedSize(self.width(), self.height(),)
+        self.text_label.setText(Lng.please_wait[JsonData.lng_index])
+
         self.set_text(3, 123)
 
     def set_text(self, current_count, total_count):
