@@ -215,14 +215,14 @@ class CatalogWidget(TransparentWidget):
         self.h_lay.setSpacing(0)
 
         self.title = GrayTextLabel(Lng.catalog[JsonData.lng_index])
-        # self.h_lay.addWidget(self.title)
+        self.h_lay.addWidget(self.title)
 
-        # self.h_lay.addSpacing(10)
+        self.h_lay.addSpacing(10)
 
         self.button = UPushButton("")
         self.catalog_btn_text(Mf.current_mf.mf_alias)
         self.button.setFixedWidth(110)
-        self.button.setIconSize(QSize(12, 12))
+        self.button.setIconSize(QSize(15, 15))
         self.button.setIcon(self.image_folder_icon)
         self.h_lay.addWidget(self.button)
 
