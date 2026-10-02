@@ -260,6 +260,7 @@ class GridSortWidget(TransparentWidget):
         self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.button = UPushButton("")
+        self.set_button_width()
         self.set_sort_button_text()
         self.button.setIcon(self.sort_icon)
         self.h_lay.addWidget(self.button)
@@ -274,6 +275,14 @@ class GridSortWidget(TransparentWidget):
         recent_action = QAction(Lng.sort_by_recent[JsonData.lng_index], self.button_menu)
         recent_action.triggered.connect(lambda: self.sort_btn_cmd(False))
         self.button_menu.addAction(recent_action)
+
+    def set_button_width(self):
+        ind = JsonData.lng_index
+        word = max((Lng.sort_by_mod[ind], Lng.sort_by_recent[ind]), key=len)
+        self.button.setText(word)
+        self.button.adjustSize()
+        offset = 40 # иконка слева и стрелочка справа
+        self.button.setFixedWidth(self.button.width() + offset)
 
     def sort_btn_cmd(self, value: bool):
         Dynamic.sort_by_mod_enabled = value
