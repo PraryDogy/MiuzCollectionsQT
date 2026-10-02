@@ -495,125 +495,6 @@ class ImagePreviewTask(URunnable):
         self.sigs.finished_.emit(final_qimg)
 
 
-# class ImageSearcher(URunnable):
-
-#     class Sigs(QObject):
-#         finished_ = pyqtSignal()
-#         found_image = pyqtSignal(str)
-
-#     def __init__(self, src_img: np.ndarray, similarity_value: int, mf: Mf):
-#         super().__init__()
-#         self.sigs = ImageSearcher.Sigs()
-#         self.src_img = src_img
-#         self.similarity_value = similarity_value / 100
-#         self.mf = mf
-#         self.current_count = 0
-#         self.total_count = 0
-#         self.stop_flag = False
-#         self.chunk_size = 500
-
-#         self.thumbs_with_hist = []
-#         self.thumbs_no_hist = []
-
-#         hsv1 = cv2.cvtColor(src_img, cv2.COLOR_BGR2HSV)
-#         self.hist1 = cv2.calcHist([hsv1], [0, 1], None, [50, 60], [0, 180, 0, 256])
-#         cv2.normalize(self.hist1, self.hist1, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-
-#     def stop_task(self):
-#         self.stop_flag = True
-
-#     def task(self):
-#         self.start()
-#         if not self.stop_flag:
-#             self.sigs.finished_.emit()
-
-#     def start(self):
-#         self.split_by_histogram()
-#         self.set_total_count()
-#         self.manage_thumbs_no_hist()
-#         self.manage_thumbs_with_hist()
-        
-#     def split_by_histogram(self):
-#         select_hist = (
-#             sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path, Properties.bytes_hist)
-#             .join(Properties.table, Thumbs.id == Properties.thumb_id, isouter=True)
-#             .where(Thumbs.mf_alias == self.mf.mf_alias)
-#         )
-#         with Dbase.main_engine.connect() as conn:
-#             hist_result = conn.execute(select_hist)
-
-#         for id_, rel_thumb_path, bytes_hist in hist_result:
-#             if bytes_hist is None:
-#                 self.thumbs_no_hist.append((id_, rel_thumb_path, bytes_hist))
-#             else:
-#                 decoded_hist = self.decode_hist(bytes_hist)
-#                 new_data = (id_, rel_thumb_path, decoded_hist)
-#                 self.thumbs_with_hist.append(new_data)
-
-#     def set_total_count(self):
-#         self.total_count = len(self.thumbs_no_hist)
-
-#     def manage_thumbs_no_hist(self):
-#         db_data = []
-
-#         for x, (id_, rel_thumb_path, no_hist) in enumerate(self.thumbs_no_hist):
-#             if self.stop_flag:
-#                 print("индексация гистограмм остановлена")
-#                 return
-#             self.current_count += 1
-#             abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-#             hist = self.calc_hist(abs_thumb_path)
-#             bytes_hist = hist.tobytes()
-#             self.thumbs_with_hist.append((id_, rel_thumb_path, hist))
-#             db_data.append((id_, rel_thumb_path, bytes_hist))
-#             if x % self.chunk_size == 0:
-#                 self.write_to_db(db_data)
-#                 db_data.clear()
-#         if db_data:
-#             self.write_to_db(db_data)
-#             db_data.clear()
-
-#     def calc_hist(self, abs_thumb_path: str):
-#         img = ImgUtils.read_img(abs_thumb_path)
-#         hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)        
-#         hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
-#         cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-#         return hist2
-
-#     def decode_hist(self, bytes_hist: bytes) -> np.ndarray:
-#         flat_array = np.frombuffer(bytes_hist, dtype=np.float32)
-#         hist = flat_array.reshape(50, 60)
-#         return hist
-
-#     def write_to_db(sefl, db_data: list):
-#         values = [
-#             {
-#                 Properties.thumb_id.name: id_,
-#                 Properties.bytes_hist.name: bytes_hist,
-#             }
-#             for id_, rel_thumb_path, bytes_hist in db_data
-#         ]
-#         stmt = (
-#             sqlalchemy.insert(Properties.table)
-#             .values(values)
-#         )
-#         with Dbase.main_engine.connect() as conn:
-#             conn.execute(stmt)
-#             conn.commit()
-
-#     def manage_thumbs_with_hist(self):
-#         for id_, rel_thumb_path, hist in self.thumbs_with_hist:
-#             result = self.compare_hist(hist)
-#             if result > self.similarity_value:
-#                 self.sigs.found_image.emit(rel_thumb_path)
-
-#     def compare_hist(self, hist2):
-#         similarity = cv2.compareHist(self.hist1, hist2, cv2.HISTCMP_CORREL)
-#         return similarity
-
-
-
-
 class ImageSearcher(URunnable):
 
     class Sigs(QObject):
@@ -631,11 +512,12 @@ class ImageSearcher(URunnable):
         self.stop_flag = False
         self.chunk_size = 500
 
-        self.sift = cv2.SIFT_create()
-        self.matcher = cv2.BFMatcher()
+        self.thumbs_with_hist = []
+        self.thumbs_no_hist = []
 
-        gray = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
-        self.kp1, self.des1 = self.sift.detectAndCompute(gray, None)
+        hsv1 = cv2.cvtColor(src_img, cv2.COLOR_BGR2HSV)
+        self.hist1 = cv2.calcHist([hsv1], [0, 1], None, [50, 60], [0, 180, 0, 256])
+        cv2.normalize(self.hist1, self.hist1, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 
     def stop_task(self):
         self.stop_flag = True
@@ -646,81 +528,201 @@ class ImageSearcher(URunnable):
             self.sigs.finished_.emit()
 
     def start(self):
-        self.load_thumbs()
-        self.search()
-
-    def load_thumbs(self):
-        select = sqlalchemy.select(
-            Thumbs.id,
-            Thumbs.rel_thumb_path
-        ).where(
-            Thumbs.mf_alias == self.mf.mf_alias
+        self.split_by_histogram()
+        self.set_total_count()
+        self.manage_thumbs_no_hist()
+        self.manage_thumbs_with_hist()
+        
+    def split_by_histogram(self):
+        select_hist = (
+            sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path, Properties.bytes_hist)
+            .join(Properties.table, Thumbs.id == Properties.thumb_id, isouter=True)
+            .where(Thumbs.mf_alias == self.mf.mf_alias)
         )
-
         with Dbase.main_engine.connect() as conn:
-            self.thumbs = conn.execute(select).fetchall()
+            hist_result = conn.execute(select_hist)
 
-        self.total_count = len(self.thumbs)
+        for id_, rel_thumb_path, bytes_hist in hist_result:
+            if bytes_hist is None:
+                self.thumbs_no_hist.append((id_, rel_thumb_path, bytes_hist))
+            else:
+                decoded_hist = self.decode_hist(bytes_hist)
+                new_data = (id_, rel_thumb_path, decoded_hist)
+                self.thumbs_with_hist.append(new_data)
 
-    def search(self):
-        if self.des1 is None:
-            return
+    def set_total_count(self):
+        self.total_count = len(self.thumbs_no_hist)
 
-        for id_, rel_thumb_path in self.thumbs:
+    def manage_thumbs_no_hist(self):
+        db_data = []
+
+        for x, (id_, rel_thumb_path, no_hist) in enumerate(self.thumbs_no_hist):
             if self.stop_flag:
+                print("индексация гистограмм остановлена")
                 return
-
             self.current_count += 1
             abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+            hist = self.calc_hist(abs_thumb_path)
+            bytes_hist = hist.tobytes()
+            self.thumbs_with_hist.append((id_, rel_thumb_path, hist))
+            db_data.append((id_, rel_thumb_path, bytes_hist))
+            if x % self.chunk_size == 0:
+                self.write_to_db(db_data)
+                db_data.clear()
+        if db_data:
+            self.write_to_db(db_data)
+            db_data.clear()
 
-            try:
-                img = ImgUtils.read_img(abs_thumb_path)
-                similarity = self.compare_sift(img)
+    def calc_hist(self, abs_thumb_path: str):
+        img = ImgUtils.read_img(abs_thumb_path)
+        hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)        
+        hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
+        cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+        return hist2
 
-                if similarity >= self.similarity_value:
-                    self.sigs.found_image.emit(rel_thumb_path)
+    def decode_hist(self, bytes_hist: bytes) -> np.ndarray:
+        flat_array = np.frombuffer(bytes_hist, dtype=np.float32)
+        hist = flat_array.reshape(50, 60)
+        return hist
 
-            except Exception as e:
-                print(f"SIFT error: {abs_thumb_path}: {e}")
+    def write_to_db(sefl, db_data: list):
+        values = [
+            {
+                Properties.thumb_id.name: id_,
+                Properties.bytes_hist.name: bytes_hist,
+            }
+            for id_, rel_thumb_path, bytes_hist in db_data
+        ]
+        stmt = (
+            sqlalchemy.insert(Properties.table)
+            .values(values)
+        )
+        with Dbase.main_engine.connect() as conn:
+            conn.execute(stmt)
+            conn.commit()
 
-    def compare_sift(self, img: np.ndarray) -> float:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        kp2, des2 = self.sift.detectAndCompute(gray, None)
+    def manage_thumbs_with_hist(self):
+        for id_, rel_thumb_path, hist in self.thumbs_with_hist:
+            result = self.compare_hist(hist)
+            if result > self.similarity_value:
+                self.sigs.found_image.emit(rel_thumb_path)
 
-        if des2 is None:
-            return 0.0
+    def compare_hist(self, hist2):
+        similarity = cv2.compareHist(self.hist1, hist2, cv2.HISTCMP_CORREL)
+        return similarity
 
-        matches = self.matcher.knnMatch(self.des1, des2, k=2)
 
-        good = []
-        for m, n in matches:
-            if m.distance < 0.7 * n.distance:
-                good.append(m)
 
-        if len(good) < 4:
-            return 0.0
 
-        src_pts = np.float32(
-            [self.kp1[m.queryIdx].pt for m in good]
-        ).reshape(-1, 1, 2)
+# class ImageSearcher(URunnable):
 
-        dst_pts = np.float32(
-            [kp2[m.trainIdx].pt for m in good]
-        ).reshape(-1, 1, 2)
+#     class Sigs(QObject):
+#         finished_ = pyqtSignal()
+#         found_image = pyqtSignal(str)
 
-        try:
-            _, mask = cv2.findHomography(
-                src_pts,
-                dst_pts,
-                cv2.RANSAC,
-                5.0
-            )
-        except cv2.error:
-            return 0.0
+#     def __init__(self, src_img: np.ndarray, similarity_value: int, mf: Mf):
+#         super().__init__()
+#         self.sigs = ImageSearcher.Sigs()
+#         self.src_img = src_img
+#         self.similarity_value = similarity_value / 100
+#         self.mf = mf
+#         self.current_count = 0
+#         self.total_count = 0
+#         self.stop_flag = False
+#         self.chunk_size = 500
 
-        if mask is None:
-            return 0.0
+#         self.sift = cv2.SIFT_create()
+#         self.matcher = cv2.BFMatcher()
 
-        inliers = mask.ravel().sum()
+#         gray = cv2.cvtColor(src_img, cv2.COLOR_BGR2GRAY)
+#         self.kp1, self.des1 = self.sift.detectAndCompute(gray, None)
 
-        return inliers / len(good)
+#     def stop_task(self):
+#         self.stop_flag = True
+
+#     def task(self):
+#         self.start()
+#         if not self.stop_flag:
+#             self.sigs.finished_.emit()
+
+#     def start(self):
+#         self.load_thumbs()
+#         self.search()
+
+#     def load_thumbs(self):
+#         select = sqlalchemy.select(
+#             Thumbs.id,
+#             Thumbs.rel_thumb_path
+#         ).where(
+#             Thumbs.mf_alias == self.mf.mf_alias
+#         ).order_by(
+#             Thumbs.mod.desc()
+#         )
+
+#         with Dbase.main_engine.connect() as conn:
+#             self.thumbs = conn.execute(select).fetchall()
+
+#         self.total_count = len(self.thumbs)
+
+#     def search(self):
+#         if self.des1 is None:
+#             return
+
+#         for id_, rel_thumb_path in self.thumbs:
+#             if self.stop_flag:
+#                 return
+
+#             self.current_count += 1
+#             abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+
+#             try:
+#                 img = ImgUtils.read_img(abs_thumb_path)
+#                 similarity = self.compare_sift(img)
+
+#                 if similarity >= self.similarity_value:
+#                     self.sigs.found_image.emit(rel_thumb_path)
+
+#             except Exception as e:
+#                 print(f"SIFT error: {abs_thumb_path}: {e}")
+
+#     def compare_sift(self, img: np.ndarray) -> float:
+#         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#         kp2, des2 = self.sift.detectAndCompute(gray, None)
+
+#         if des2 is None:
+#             return 0.0
+
+#         matches = self.matcher.knnMatch(self.des1, des2, k=2)
+
+#         good = []
+#         for m, n in matches:
+#             if m.distance < 0.7 * n.distance:
+#                 good.append(m)
+
+#         if len(good) < 4:
+#             return 0.0
+
+#         src_pts = np.float32(
+#             [self.kp1[m.queryIdx].pt for m in good]
+#         ).reshape(-1, 1, 2)
+
+#         dst_pts = np.float32(
+#             [kp2[m.trainIdx].pt for m in good]
+#         ).reshape(-1, 1, 2)
+
+#         try:
+#             _, mask = cv2.findHomography(
+#                 src_pts,
+#                 dst_pts,
+#                 cv2.RANSAC,
+#                 5.0
+#             )
+#         except cv2.error:
+#             return 0.0
+
+#         if mask is None:
+#             return 0.0
+
+#         inliers = mask.ravel().sum()
+
+#         return inliers / len(good)

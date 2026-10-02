@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QIcon, QImage, QPixmap
+from PyQt6.QtGui import QIcon, QImage, QPixmap, QCursor
 from PyQt6.QtSvgWidgets import QSvgWidget  # Не забудьте импортировать
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QStackedWidget,
                              QVBoxLayout, QWidget)
@@ -228,6 +228,10 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 
         self.create_cancel_button()
 
+        self.cancel_timer = QTimer(self)
+        self.cancel_timer.setSingleShot(True)
+        self.cancel_timer.timeout.connect(self.hide_cancel_icon)
+
     def clear_image_cmd(self, e):
         self.cancel_clicked.emit()
 
@@ -261,6 +265,14 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         self.cancel_icon.move(x, y)
         self.cancel_icon.hide()
 
+    def hide_cancel_icon(self):
+        pos = self.mapFromGlobal(QCursor.pos())
+
+        if not self.rect().contains(pos):
+            self.cancel_icon.hide()
+        else:
+            self.cancel_timer.start(2000)
+
     def enterEvent(self, event):
         self.cancel_icon.show()
         return super().enterEvent(event)
@@ -268,6 +280,12 @@ class WinImgSearchPreviewWidget(TransparentFrame):
     def leaveEvent(self, a0):
         self.cancel_icon.hide()
         return super().leaveEvent(a0)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+
+        self.cancel_icon.show()
+        self.cancel_timer.start(2000)
 
 
 class ControlsWidget(UGroupBox):
