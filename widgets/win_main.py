@@ -236,7 +236,7 @@ class WinMain(UMainWindow):
     def open_img_search_win(self):
 
         def on_closed():
-            if Dynamic.img_search_thumb_paths:
+            if self.win_img_search.preview_widget.pixmap:
                 self.bar_top.img_search_btn.set_selected_style()
                 self.win_img_search.hide()
             else:
