@@ -338,6 +338,7 @@ class WinImgSearch(UMainWidget):
         self.drop_widget = WinImgSearchDropWidget()
         self.preview_widget = WinImgSearchPreviewWidget()
         self.preview_widget.cancel_clicked.connect(self.reset_img_search)
+        self.preview_widget.pixmap_finished.connect(self.set_close_button_text)
         self.image_stack.addWidget(self.drop_widget); self.image_stack.addWidget(self.preview_widget)
         self.image_stack.setCurrentIndex(0)
         self.central_layout.addWidget(self.image_stack, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -350,10 +351,29 @@ class WinImgSearch(UMainWidget):
         self.start_btn = ActiveButton(Lng.find_matches[JsonData.lng_index])
         self.start_btn.setIcon(self.magnifier_icon); self.start_btn.clicked.connect(self.start_img_search)
         btn_layout.addWidget(self.start_btn)
-        cancel_btn = UPushButton(Lng.close[JsonData.lng_index]); cancel_btn.clicked.connect(self.request_close)
-        btn_layout.addWidget(cancel_btn); btn_layout.addStretch()
+
+        self.close_button = UPushButton("")
+        self.set_close_button_width()
+        self.set_close_button_text()
+        self.close_button.clicked.connect(self.request_close)
+        btn_layout.addWidget(self.close_button); btn_layout.addStretch()
+
+        self.set_close_button_width()
 
         self.adjustSize(); self.setFixedSize(self.width(), self.height())
+
+    def set_close_button_width(self):
+        ind = JsonData.lng_index
+        max_word = max((Lng.close[ind], Lng.hide[ind]), key=len)
+        self.close_button.setText(max_word)
+        self.close_button.adjustSize()
+        self.close_button.setFixedWidth(self.close_button.width())
+
+    def set_close_button_text(self):
+        if self.preview_widget.pixmap.isNull():
+            self.close_button.setText(Lng.close[JsonData.lng_index])
+        else:
+            self.close_button.setText(Lng.hide[JsonData.lng_index])
 
     def image_dropped(self, path: str):
         self.start_read_img_task(path)
@@ -362,6 +382,7 @@ class WinImgSearch(UMainWidget):
         self.stop_timers_and_tasks(); self.cleanup_shm()
         self.img_array = None; self.preview_widget.clear(); self.image_stack.setCurrentIndex(0)
         Dynamic.img_search_thumb_paths.clear(); self.reload_thumbnails.emit()
+        self.set_close_button_text()
 
     def start_img_search(self):
         if self.img_array is None: return
