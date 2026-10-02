@@ -16,7 +16,6 @@ from ._base_widgets import (TransparentLabel, TransparentWidget, UMainWidget,
 class ReplaceButton(UPushButton):
     def __init__(self, text):
         super().__init__(text)
-        self.set_font_size(9)
         self.setFixedSize(75, 17)
 
 

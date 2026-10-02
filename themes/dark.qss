@@ -163,11 +163,12 @@ UListWidget::indicator:disabled {
 
 
 UPushButton {
+    font-size: 11px;
     background: #4e4e4e;
     border: 1px solid #585858;
     border-radius: 6px;
     color: #ffffff;
-    padding-right: 5px; /* Отступ справа, чтобы текст не наезжал на стрелочку */
+    padding-right: 5px;
     padding-left: 5px;
 }
 

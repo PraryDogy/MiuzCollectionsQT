@@ -7,6 +7,9 @@ from PyQt6.QtCore import Qt
 class TestWindow(UMainWidget):
     def __init__(self, parent = None):
         super().__init__(parent)
+        self.set_always_on_top()
+        self.set_close_only()
+
         h_widget = TransparentWidget()
         self.central_layout.addWidget(h_widget)
 
@@ -27,6 +30,10 @@ class TestWindow(UMainWidget):
         self._apply_system_theme()
 
     def _apply_system_theme(cls):
+        from system.themes import ThemeChanger
+        ThemeChanger.init()
+        return
+
         app: QApplication = QApplication.instance()
         with open("./themes/dark.qss", "r", encoding="utf-8") as f:
             app.setStyleSheet(f.read())

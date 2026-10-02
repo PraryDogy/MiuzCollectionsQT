@@ -25,86 +25,143 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
 
 
 
+# class ProgressWin(UMainWidget):
+#     stop_img_search = pyqtSignal()
+#     base_image_svg_path = Static.COMMON_ICONS / "base_image.svg"
+#     stop_svg_path = Static.COMMON_ICONS / "stop.svg"
+#     base_image_size = (20, 20)
+
+#     def __init__(self):
+#         super().__init__()
+
+#         self.set_always_on_top()
+#         self.set_close_only()
+#         self.setWindowTitle(Lng.progress[JsonData.lng_index])
+
+#         self.stop_icon = QIcon(str(self.stop_svg_path))
+
+#         self.central_layout.setSpacing(20)
+#         self.central_layout.setContentsMargins(15, 15, 15, 20)
+
+#         self.text_container = QWidget()
+#         self.central_layout.addWidget(self.text_container)
+
+#         self.text_layout = QHBoxLayout(self.text_container)
+#         self.text_layout.setContentsMargins(0, 0, 0, 0)
+#         self.text_layout.setSpacing(10)
+#         self.text_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+#         self.svg_icon = QSvgWidget() 
+#         self.svg_icon.load(str(self.base_image_svg_path))
+#         self.svg_icon.setFixedSize(*self.base_image_size) # Фиксируем размер иконки, чтобы она не растягивалась
+#         self.text_layout.addWidget(self.svg_icon, alignment=Qt.AlignmentFlag.AlignLeft)
+
+#         self.text_label = TransparentLabel("")
+#         self.text_layout.addWidget(self.text_label, Qt.AlignmentFlag.AlignLeft)
+
+#         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
+#         self.cancel_btn.setIcon(self.stop_icon)
+#         self.cancel_btn.clicked.connect(self.stop_img_search.emit)
+#         self.text_layout.addWidget(self.cancel_btn)
+
+#         max_ = 99999
+#         self.set_text(max_, max_)
+#         self.text_label.adjustSize()
+#         self.adjustSize()
+#         self.text_label.setFixedWidth(self.text_label.width())
+#         # self.text_label.setText(Lng.please_wait[JsonData.lng_index])
+
+#     def set_text(self, current_count, total_count):
+#         if current_count > total_count:
+#             current_count = total_count
+
+#         if total_count == 0:
+#             text = Lng.please_wait[JsonData.lng_index]
+#         else:
+#             text = (
+#                 f"{Lng.indexing[JsonData.lng_index]} "
+#                 f"{current_count} "
+#                 f"{Lng.from_[JsonData.lng_index]} "
+#                 f"{total_count}"
+#             )
+
+#         self.text_label.setText(text)
+
+#     def set_text(self, current_count, total_count):
+#         if current_count > total_count:
+#             current_count = total_count
+
+#         if total_count == 0:
+#             text = Lng.please_wait[JsonData.lng_index]
+#         else:
+#             text = (
+#                 f"{Lng.indexing[JsonData.lng_index]} "
+#                 f"{current_count} "
+#                 f"{Lng.from_[JsonData.lng_index]} "
+#                 f"{total_count}"
+#             )
+
+#         self.text_label.setText(text)
+
+#     def closeEvent(self, a0):
+#         a0.ignore()
+
+
+
+
+
+
+
+
+
+
+
 class ProgressWin(UMainWidget):
     stop_img_search = pyqtSignal()
     base_image_svg_path = Static.COMMON_ICONS / "base_image.svg"
     stop_svg_path = Static.COMMON_ICONS / "stop.svg"
-    base_image_size = (20, 20)
 
     def __init__(self):
-        super().__init__()
-
+        super().__init__(None)
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.progress[JsonData.lng_index])
 
-        self.stop_icon = QIcon(str(self.stop_svg_path))
+        h_widget = TransparentWidget()
+        self.central_layout.addWidget(h_widget)
 
-        self.central_layout.setSpacing(20)
-        self.central_layout.setContentsMargins(15, 15, 15, 20)
+        h_lay = QHBoxLayout(h_widget)
+        h_lay.setContentsMargins(0, 0, 0, 0)
+        h_lay.setSpacing(0)
 
-        self.text_container = QWidget()
-        self.central_layout.addWidget(self.text_container)
+        svg = QSvgWidget()
+        svg.setFixedHeight(28)
+        svg.setFixedWidth(28)
+        svg.load("./icons/common/stop.svg")
+        h_lay.addWidget(svg)
 
-        self.text_layout = QHBoxLayout(self.text_container)
-        self.text_layout.setContentsMargins(0, 0, 0, 0)
-        self.text_layout.setSpacing(10)
-        self.text_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        btn = UPushButton("Stop")
+        btn.setFixedHeight(28)
 
-        self.svg_icon = QSvgWidget() 
-        self.svg_icon.load(str(self.base_image_svg_path))
-        self.svg_icon.setFixedSize(*self.base_image_size) # Фиксируем размер иконки, чтобы она не растягивалась
-        self.text_layout.addWidget(self.svg_icon, alignment=Qt.AlignmentFlag.AlignLeft)
+        # btn.style().unpolish(btn)
+        # btn.style().polish(btn)
+        # btn.updateGeometry()
 
-        self.text_label = TransparentLabel("")
-        self.text_layout.addWidget(self.text_label, Qt.AlignmentFlag.AlignLeft)
+        h_lay.addWidget(btn)
 
-        self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
-        self.cancel_btn.setIcon(self.stop_icon)
-        self.cancel_btn.clicked.connect(self.stop_img_search.emit)
-        self.text_layout.addWidget(self.cancel_btn)
+        self._apply_system_theme()
 
-        max_ = 99999
-        self.set_text(max_, max_)
-        self.text_label.adjustSize()
-        self.adjustSize()
-        self.text_label.setFixedWidth(self.text_label.width())
-        # self.text_label.setText(Lng.please_wait[JsonData.lng_index])
+    def _apply_system_theme(cls):
+        return
+        from system.themes import ThemeChanger
+        ThemeChanger.init()
+        return
+        from PyQt6.QtWidgets import QApplication
+        app: QApplication = QApplication.instance()
+        with open("./themes/dark.qss", "r", encoding="utf-8") as f:
+            app.setStyleSheet(f.read())
 
-    def set_text(self, current_count, total_count):
-        if current_count > total_count:
-            current_count = total_count
 
-        if total_count == 0:
-            text = Lng.please_wait[JsonData.lng_index]
-        else:
-            text = (
-                f"{Lng.indexing[JsonData.lng_index]} "
-                f"{current_count} "
-                f"{Lng.from_[JsonData.lng_index]} "
-                f"{total_count}"
-            )
 
-        self.text_label.setText(text)
-
-    def set_text(self, current_count, total_count):
-        if current_count > total_count:
-            current_count = total_count
-
-        if total_count == 0:
-            text = Lng.please_wait[JsonData.lng_index]
-        else:
-            text = (
-                f"{Lng.indexing[JsonData.lng_index]} "
-                f"{current_count} "
-                f"{Lng.from_[JsonData.lng_index]} "
-                f"{total_count}"
-            )
-
-        self.text_label.setText(text)
-
-    def closeEvent(self, a0):
-        a0.ignore()
 
 
 class SliderWidget(TransparentWidget):

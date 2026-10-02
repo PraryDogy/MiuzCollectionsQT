@@ -301,7 +301,7 @@ class UPushButton(TransparentButton):
         super().__init__(text)
         self.setFixedHeight(self.hh)
         self.setIconSize(QSize(*self.icon_size))
-        self.set_font_size(11)
+        # self.set_font_size(11)
 
     def set_font_size(self, value_px: int):
         font = self.font()
