@@ -15,7 +15,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import ImgUtils
-from system.tasks import ImageSearcher, ImgArrayQImage, UThreadPool
+from system.tasks import ImageSearcher, ImagePreviewTask, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
@@ -214,7 +214,11 @@ class WinImgSearchPreviewWidget(TransparentFrame):
             self.image_label.setPixmap(self.pixmap)
             self.pixmap_finished.emit()
 
-        self.qimage_task = ImgArrayQImage(img_array, DROP_WIDGET_SIZE)
+        self.qimage_task = ImagePreviewTask(
+            img_array=img_array,
+            size=DROP_WIDGET_SIZE,
+            radius=10.0
+        )
         self.qimage_task.sigs.finished_.connect(finished)
         UThreadPool.start(self.qimage_task)
 

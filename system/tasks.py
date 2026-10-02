@@ -18,6 +18,10 @@ from .main_folder import Mf
 from .shared_utils import ImgUtils
 from .utils import Utils
 
+import numpy as np
+from PyQt6.QtCore import QObject, pyqtSignal, Qt, QSize, QRectF
+from PyQt6.QtGui import QImage, QPainter, QPainterPath, QColor
+
 
 class URunnable(QRunnable):
     def __init__(self):
@@ -385,17 +389,110 @@ class ImgArrayQImage(URunnable):
     class Sigs(QObject):
         finished_ = pyqtSignal(QImage)
 
-    def __init__(self, img_array: np.ndarray, size: int = None):
+    def __init__(self, img_array: np.ndarray):
         super().__init__()
         self.sigs = ImgArrayQImage.Sigs()
-        self.size_ = size
         self.img_array = img_array
 
     def task(self):
         qimage = Utils.pyqt_qimage_from_array(self.img_array)
-        if self.size_:
-            qimage = Utils.qimage_scaled_high_dpi(qimage, self.size_)
         self.sigs.finished_.emit(qimage)
+
+
+class ImagePreviewTask(URunnable):
+
+    class Sigs(QObject):
+        finished_ = pyqtSignal(QImage)
+
+    def __init__(self, img_array: np.ndarray, size: tuple = None, radius: float = 16.0):
+        super().__init__()
+        self.sigs = ImgArrayQImage.Sigs()
+        self.size_ = size      # Логический размер виджета: tuple(width, height)
+        self.radius = radius   # Логический радиус скругления углов
+        self.img_array = img_array
+
+    def task(self):
+        orig_qimg = Utils.pyqt_qimage_from_array(self.img_array)
+        if not self.size_:
+            # Если размер не задан, просто применяем DPR к оригиналу
+            orig_qimg.setDevicePixelRatio(Static.DPR)
+            self.sigs.finished_.emit(orig_qimg)
+            return
+
+        # 1. Распаковываем кортеж и считаем физический размер в пикселях с учетом DPR
+        logic_w, logic_h = self.size_
+        physical_w = int(logic_w * Static.DPR)
+        physical_h = int(logic_h * Static.DPR)
+        target_size_physical = QSize(physical_w, physical_h)
+
+        # ==========================================
+        # ШАГ 1: Размытый фон (в физических пикселях)
+        # ==========================================
+        bg_qimg = orig_qimg.scaled(
+            target_size_physical, 
+            Qt.AspectRatioMode.KeepAspectRatioByExpanding, 
+            Qt.TransformationMode.SmoothTransformation
+        )
+
+        # Трюк быстрого размытия (Downscale -> Upscale)
+        # Используем IgnoreAspectRatio, чтобы блюр равномерно заполнил любой прямоугольник
+        micro_size = QSize(15, 15)
+        bg_blurred = bg_qimg.scaled(micro_size, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        bg_blurred = bg_blurred.scaled(target_size_physical, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+        # ==========================================
+        # ШАГ 2: Картинка на передний план (Foreground)
+        # ==========================================
+        fg_qimg = orig_qimg.scaled(
+            target_size_physical, 
+            Qt.AspectRatioMode.KeepAspectRatio, 
+            Qt.TransformationMode.SmoothTransformation
+        )
+
+        # ==========================================
+        # ШАГ 3: Композиция и скругление углов
+        # ==========================================
+        # Создаем холст в ФИЗИЧЕСКИХ пикселях
+        final_qimg = QImage(target_size_physical, QImage.Format.Format_ARGB32_Premultiplied)
+        final_qimg.fill(Qt.GlobalColor.transparent)
+
+        painter = QPainter(final_qimg)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+
+        # 3.1. Делаем обтравочную маску с заданным радиусом
+        # Умножаем заданный радиус на DPR для корректного отображения
+        physical_radius = self.radius * Static.DPR
+        
+        clip_path = QPainterPath()
+        clip_path.addRoundedRect(
+            QRectF(0, 0, target_size_physical.width(), target_size_physical.height()), 
+            physical_radius, 
+            physical_radius
+        )
+        painter.setClipPath(clip_path)
+
+        # 3.2. Рисуем размытый фон
+        bg_rect = bg_blurred.rect()
+        bg_rect.moveCenter(final_qimg.rect().center())
+        painter.drawImage(bg_rect, bg_blurred)
+
+        # 3.3. Рисуем легкое затемнение
+        painter.fillRect(final_qimg.rect(), QColor(0, 0, 0, 60))
+
+        # 3.4. Рисуем саму картинку поверх фона
+        fg_rect = fg_qimg.rect()
+        fg_rect.moveCenter(final_qimg.rect().center())
+        painter.drawImage(fg_rect, fg_qimg)
+
+        painter.end() 
+
+        # ==========================================
+        # ШАГ 4: Применяем DPR к финализированному QImage
+        # ==========================================
+        final_qimg.setDevicePixelRatio(Static.DPR)
+
+        self.sigs.finished_.emit(final_qimg)
 
 
 class ImageSearcher(URunnable):
