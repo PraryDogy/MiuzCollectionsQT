@@ -478,3 +478,7 @@ class Lng:
             "Поиск по цветовой гистограмме.\nЧем выше точность, тем меньше результатов.",
             "Color histogram search.\nHigher accuracy means fewer results."
         )
+    please_wait = (
+        "Пожалуйста, подождите",
+        "Wait, please"
+    )

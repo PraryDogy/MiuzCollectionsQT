@@ -27,6 +27,7 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
 class ProgressWin(UMainWidget):
     stop_img_search = pyqtSignal()
     ww = 250
+    stop_width = 100
 
     def __init__(self):
         super().__init__()
@@ -37,20 +38,22 @@ class ProgressWin(UMainWidget):
         self.setWindowTitle(Lng.progress[JsonData.lng_index])
 
         self.central_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.central_layout.setSpacing(5)
-        self.central_layout.setContentsMargins(0, 0, 0, 10)
+        self.central_layout.setSpacing(15)
+        self.central_layout.setContentsMargins(10, 10, 10, 15)
 
-        self.text_label = TransparentLabel(Lng.preparing[JsonData.lng_index])
+        self.text_label = TransparentLabel(Lng.please_wait[JsonData.lng_index])
         self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.text_label.setFixedSize(self.ww - 10, 30)
-        self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter,)
+        self.central_layout.addWidget(self.text_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.stop_img_search.emit)
-        self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter,)
+        self.cancel_btn.setFixedWidth(self.stop_width)
+        self.central_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+
         self.set_text(0, 0)
         self.adjustSize()
-        self.setFixedSize(self.width(), self.height(),)
+        # self.setFixedSize(self.width(), self.height(),)
+        self.set_text(3, 123)
 
     def set_text(self, current_count, total_count):
         if current_count > total_count:
@@ -302,7 +305,7 @@ class WinImgSearch(UMainWidget):
         btn_layout.addStretch()
         self.adjustSize()
 
-        self.open_progress_win()
+        QTimer.singleShot(500, self.open_progress_win)
 
     def clear_image_cmd(self, e):
         self.cancel_icon.hide()
