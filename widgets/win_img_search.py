@@ -354,8 +354,9 @@ class WinImgSearch(UMainWidget):
         btn_layout.addWidget(cancel_btn)
         btn_layout.addStretch()
         self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
-        QTimer.singleShot(500, self.open_progress_win)
+        # QTimer.singleShot(500, self.open_progress_win)
 
     def image_dropped(self, path: str):
         self.start_read_img_task(path)
