@@ -347,14 +347,21 @@ class GridTagWidget(TransparentFrame):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
     clicked_close = pyqtSignal()
     clicked_body = pyqtSignal()
+    svg_size = (15, 15)
 
-    def __init__(self, text: str):
+    def __init__(self, text: str, svg_path: str):
         super().__init__()
         self.setFixedHeight(23)
 
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(7, 2, 7, 2)
         self.h_lay.setSpacing(6)
+
+        if svg_path:
+            self.svg_widget = QSvgWidget()
+            self.svg_widget.load(svg_path)
+            self.svg_widget.setFixedSize(*self.svg_size)
+            self.h_lay.addWidget(self.svg_widget)
 
         self.title = TransparentLabel(text)
         self.h_lay.addWidget(self.title)
@@ -384,8 +391,10 @@ class GridTagWidget(TransparentFrame):
 
 
 class DatesTag(GridTagWidget):
+    svg_path = Static.COMMON_ICONS / "calendar.svg"
+
     def __init__(self):
-        super().__init__("")
+        super().__init__("", str(self.svg_path))
         self.set_dates_text()
 
     def set_dates_text(self):
@@ -410,8 +419,10 @@ class DatesTag(GridTagWidget):
 
 
 class WordTag(GridTagWidget):
+    svg_path = Static.COMMON_ICONS / "tags.svg"
+
     def __init__(self, text):
-        super().__init__(text)
+        super().__init__(text, str(self.svg_path))
 
     def clicked_close_cmd(self):
         Dynamic.word_tags_list.remove(self.title.text())
@@ -419,8 +430,10 @@ class WordTag(GridTagWidget):
 
 
 class FavTag(GridTagWidget):
+    svg_path = Static.COMMON_ICONS / "fav.svg"
+
     def __init__(self, text):
-        super().__init__(text)
+        super().__init__(text, str(self.svg_path))
 
     def clicked_close_cmd(self):
         Dynamic.favs_tag_enabled = False
@@ -428,8 +441,10 @@ class FavTag(GridTagWidget):
 
 
 class OnlyFolderTag(GridTagWidget):
+    svg_path = Static.COMMON_ICONS / "folder_gray.svg"
+
     def __init__(self, text):
-        super().__init__(text)
+        super().__init__(text, str(self.svg_path))
 
     def clicked_close_cmd(self):
         Dynamic.no_subfolders_tag_enabled = False
@@ -438,14 +453,14 @@ class OnlyFolderTag(GridTagWidget):
 
 class ClearFiltersTag(GridTagWidget):
     icon_path = Static.COMMON_ICONS / "trash.svg"
+    svg_path = ""
 
     def __init__(self, text: str):
-        super().__init__(Lng.reset[JsonData.lng_index])
+        super().__init__(Lng.reset[JsonData.lng_index], self.svg_path)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.mouseReleaseEvent = self.clicked_close_cmd
 
     def clicked_close_cmd(self, *args):
-        print(123)
         Dynamic.date_start = None
         Dynamic.date_end = None
         Dynamic.favs_tag_enabled = False
