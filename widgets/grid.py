@@ -20,7 +20,7 @@ from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, TransparentFrame, TransparentLabel,
                             TransparentWidget, UMenu, UPushButton,
-                            UScrollVerticalArea)
+                            UScrollVerticalArea, USep)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -501,17 +501,9 @@ class TagsWidget(TransparentWidget):
             tag.clicked_close.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
 
-        has_filters = any((
-            Dynamic.date_start,
-            Dynamic.word_tags_list,
-            Dynamic.favs_tag_enabled,
-            Dynamic.no_subfolders_tag_enabled,
-        ))
-
-        if has_filters:
-            tag = ClearFiltersTag(Lng.reset[JsonData.lng_index])
-            tag.clicked_close.connect(self.load_st_grid.emit)
-            self.flow_layout.addWidget(tag)
+        tag = ClearFiltersTag(Lng.reset[JsonData.lng_index])
+        tag.clicked_close.connect(self.load_st_grid.emit)
+        self.flow_layout.addWidget(tag)
 
     def hasHeightForWidth(self):
         return True
@@ -592,12 +584,21 @@ class Grid(UScrollVerticalArea):
         self.grid_controls_widget.open_filters_win.connect(self.open_filters_win.emit)
         self.grid_controls_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.scroll_layout.addWidget(self.grid_controls_widget)
-
         self.scroll_layout.addSpacing(10)
 
-        self.tags_widget = TagsWidget()
-        self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
-        self.scroll_layout.addWidget(self.tags_widget)
+        has_filters = any((
+            Dynamic.date_start,
+            Dynamic.word_tags_list,
+            Dynamic.favs_tag_enabled,
+            Dynamic.no_subfolders_tag_enabled,
+        ))
+
+        if has_filters:
+            self.scroll_layout.addWidget(USep())
+            self.scroll_layout.addSpacing(10)
+            self.tags_widget = TagsWidget()
+            self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
+            self.scroll_layout.addWidget(self.tags_widget)
 
         self.grid_wid = TransparentFrame()
         self.scroll_layout.addWidget(self.grid_wid)
