@@ -178,6 +178,9 @@ class WinImgSearchDropWidget(TransparentFrame):
 
 class WinImgSearchPreviewWidget(TransparentFrame):
     pixmap_finished = pyqtSignal()
+    cancel_clicked = pyqtSignal()
+    cancel_svg_path = Static.COMMON_ICONS / "cancel.svg"
+    cancel_icon_size = (20, 20)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -190,6 +193,11 @@ class WinImgSearchPreviewWidget(TransparentFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.addWidget(self.image_label)
+
+        self.create_cancel_button()
+
+    def clear_image_cmd(self, e):
+        self.cancel_clicked.emit()
 
     def set_pixmap(self, img_array: np.ndarray):
 
@@ -209,6 +217,25 @@ class WinImgSearchPreviewWidget(TransparentFrame):
     def clear(self):
         self.pixmap = QPixmap()
         self.image_label.clear()
+
+    def create_cancel_button(self):
+        self.cancel_icon = QSvgWidget(self)
+        self.cancel_icon.load(str(self.cancel_svg_path))
+        self.cancel_icon.setFixedSize(*self.cancel_icon_size)
+        self.cancel_icon.mouseReleaseEvent = self.clear_image_cmd
+        self.cancel_icon.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        x, y = self.width() - self.cancel_icon.width() - 10, 10
+        self.cancel_icon.move(x, y)
+        self.cancel_icon.hide()
+
+    def enterEvent(self, event):
+        self.cancel_icon.show()
+        return super().enterEvent(event)
+
+    def leaveEvent(self, a0):
+        self.cancel_icon.hide()
+        return super().leaveEvent(a0)
 
 
 class ControlsWidget(UGroupBox):
@@ -238,8 +265,7 @@ class WinImgSearch(UMainWidget):
     reload_thumbnails = pyqtSignal()
     closed = pyqtSignal()
     magnifier_svg_path = Static.COMMON_ICONS / "magnifier.svg"
-    cancel_svg_path = Static.COMMON_ICONS / "cancel.svg"
-    cancel_icon_size = (20, 20)
+
 
     def __init__(self):
         super().__init__()
@@ -255,13 +281,6 @@ class WinImgSearch(UMainWidget):
         self.read_img_poll_ms = 300
 
         self.magnifier_icon = QIcon(str(self.magnifier_svg_path))
-
-        self.cancel_icon = QSvgWidget(self)
-        self.cancel_icon.load(str(self.cancel_svg_path))
-        self.cancel_icon.setFixedSize(*self.cancel_icon_size)
-        self.cancel_icon.mouseReleaseEvent = self.clear_image_cmd
-        self.cancel_icon.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.cancel_icon.hide()
 
         self.found_image_timer = QTimer(self)
         self.found_image_timer.setSingleShot(True)
@@ -279,7 +298,6 @@ class WinImgSearch(UMainWidget):
         self.image_stack = QStackedWidget()
         self.drop_widget = WinImgSearchDropWidget()
         self.preview_widget = WinImgSearchPreviewWidget()
-        self.preview_widget.pixmap_finished.connect(self.show_clear_image_button)
         self.image_stack.addWidget(self.drop_widget)
         self.image_stack.addWidget(self.preview_widget)
         self.image_stack.setCurrentIndex(0)
@@ -310,17 +328,6 @@ class WinImgSearch(UMainWidget):
     def clear_image_cmd(self, e):
         self.cancel_icon.hide()
         self.reset_img_search()
-
-    def show_clear_image_button(self):
-        padding = 8 
-        icon_width = self.cancel_icon.width()
-        local_x = self.preview_widget.width() - icon_width - padding
-        local_y = padding 
-        local_top_right = QPoint(local_x, local_y)
-        window_pos = self.preview_widget.mapTo(self, local_top_right)
-        self.cancel_icon.move(window_pos) 
-        self.cancel_icon.show()
-        self.cancel_icon.raise_()
 
     def image_dropped(self, path: str):
         self.start_read_img_task(path)
