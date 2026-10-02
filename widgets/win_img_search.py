@@ -29,7 +29,7 @@ class ProgressWin(UMainWidget):
     stop_img_search = pyqtSignal()
     base_image_svg_path = Static.COMMON_ICONS / "base_image.svg"
     stop_svg_path = Static.COMMON_ICONS / "stop.svg"
-    base_image_size = (UPushButton.hh, UPushButton.hh)
+    base_image_size = (28, 28)
 
     def __init__(self):
         super().__init__()
@@ -40,35 +40,36 @@ class ProgressWin(UMainWidget):
 
         self.stop_icon = QIcon(str(self.stop_svg_path))
 
-        self.central_layout.setSpacing(20)
-        self.central_layout.setContentsMargins(15, 15, 15, 20)
+        self.central_layout.setSpacing(10)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
 
-        self.text_container = QWidget()
+        self.text_container = TransparentWidget()
         self.central_layout.addWidget(self.text_container)
 
         self.text_layout = QHBoxLayout(self.text_container)
-        self.text_layout.setContentsMargins(0, 0, 0, 0)
+        self.text_layout.setContentsMargins(5, 0, 5, 0)
         self.text_layout.setSpacing(10)
-        self.text_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         self.svg_icon = QSvgWidget() 
         self.svg_icon.load(str(self.base_image_svg_path))
-        self.svg_icon.setFixedSize(*self.base_image_size) # Фиксируем размер иконки, чтобы она не растягивалась
+        self.svg_icon.setFixedSize(*self.base_image_size)
         self.text_layout.addWidget(self.svg_icon)
 
         self.text_label = TransparentLabel("")
-        # self.text_layout.addWidget(self.text_label)
+        self.text_layout.addWidget(self.text_label)
 
         self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
-        # self.cancel_btn.setIcon(self.stop_icon)
+        self.cancel_btn.setIcon(self.stop_icon)
         self.cancel_btn.clicked.connect(self.stop_img_search.emit)
-        self.text_layout.addWidget(self.cancel_btn)
+        self.central_layout.addWidget(self.cancel_btn)
 
         max_ = 99999
         self.set_text(max_, max_)
         self.text_label.adjustSize()
-        self.adjustSize()
         self.text_label.setFixedWidth(self.text_label.width())
+
+        self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
         # self.text_label.setText(Lng.please_wait[JsonData.lng_index])
 
     def set_text(self, current_count, total_count):
