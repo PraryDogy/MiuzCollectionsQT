@@ -304,6 +304,7 @@ class UPushButton(TransparentButton):
         # self.set_font_size(11)
 
     def set_font_size(self, value_px: int):
+        return
         font = self.font()
         font.setPixelSize(value_px)
         self.setFont(font)
