@@ -68,7 +68,6 @@ class DatesButton(UPushButton):
 class DatesWidget(UGroupBox):
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (15, 15)
-    reset_button_clicked = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -122,12 +121,6 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(10)
-
-        # Иконка календаря
-        calendar_icon = QSvgWidget()
-        calendar_icon.load(str(self.calendar_svg))
-        calendar_icon.setFixedSize(*self.svg_calendar_size)
-        dynamic_container_lay.addWidget(calendar_icon) # ИСПРАВЛЕНО: иконка теперь добавлена в layout
 
         self.dynamic_label = GrayTextLabel("")
         # ИСПРАВЛЕНО: Убрано self.dynamic_label.setFixedWidth(self.width()), 
