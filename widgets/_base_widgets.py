@@ -88,8 +88,37 @@ class TransparentTreeView(QTreeView):
 
 
 class _WindowMixin:
-    win_list: list[QMainWindow] = []
+    win_list: list[QWidget] = []
     bar_height = 30
+
+    def setup_window(self):
+        # Title bar
+        self.setTitleBar(StandardTitleBar(self))
+
+        title_layout = self.titleBar.layout()
+        title_layout.insertStretch(1, 1)
+
+        # Central widget
+        central_widget = TransparentFrame()
+        self.setCentralWidget(central_widget)
+
+        self.central_layout = QVBoxLayout(central_widget)
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(0)
+        self.central_layout.addSpacing(self.bar_height)
+
+        # macOS
+        if sys.platform == "darwin":
+            self.setSystemTitleBarButtonVisible(True)
+
+            self.titleBar.minBtn.hide()
+            self.titleBar.maxBtn.hide()
+            self.titleBar.closeBtn.hide()
+
+        self.titleBar.raise_()
+
+        # Register
+        self.register_window()
 
     def register_window(self):
         self.win_list.append(self)
@@ -100,7 +129,7 @@ class _WindowMixin:
         except ValueError:
             pass
 
-    def center_to_parent(self: QWidget, parent: QWidget):
+    def center_to_parent(self, parent: QWidget):
         try:
             geo = self.geometry()
             geo.moveCenter(parent.geometry().center())
@@ -108,18 +137,18 @@ class _WindowMixin:
         except Exception as e:
             print("center error:", e)
 
-    def set_always_on_top(self: QWidget):
+    def set_always_on_top(self):
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-    def set_close_only(self: QWidget):
+    def set_close_only(self):
         flags = Qt.WindowType.CustomizeWindowHint
         flags |= Qt.WindowType.WindowCloseButtonHint
         self.setWindowFlags(flags)
 
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
+    def closeEvent(self, event: QCloseEvent | None):
         self.unregister_window()
-        return super().closeEvent(a0)
-    
+        return super().closeEvent(event)
+
     def deleteLater(self):
         self.unregister_window()
         return super().deleteLater()
@@ -128,59 +157,13 @@ class _WindowMixin:
 class UMainWindow(_WindowMixin, FramelessMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-
-        self.setTitleBar(StandardTitleBar(self))
-        layout_ = self.titleBar.layout()
-        layout_.insertStretch(1, 1)
-
-        central_widget = TransparentFrame()
-        self.setCentralWidget(central_widget)
-
-        self.central_layout = QVBoxLayout(central_widget)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
-        self.central_layout.setSpacing(0)
-
-        self.central_layout.addSpacing(self.bar_height)
-
-        self.register_window()
-
-        if sys.platform == "darwin":
-            self.setSystemTitleBarButtonVisible(True)
-            self.titleBar.minBtn.hide()
-            self.titleBar.maxBtn.hide()
-            self.titleBar.closeBtn.hide()
-        self.titleBar.raise_()
-
-    def setWindowTitle(self, a0):
-        return super().setWindowTitle(a0)
+        self.setup_window()
 
 
 class UMainWidget(_WindowMixin, FramelessMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
-
-        self.setTitleBar(StandardTitleBar(self))
-        layout_ = self.titleBar.layout()
-        layout_.insertStretch(1, 1)
-
-
-        central_widget = TransparentFrame()
-        self.setCentralWidget(central_widget)
-
-        self.central_layout = QVBoxLayout(central_widget)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
-        self.central_layout.setSpacing(0)
-
-        self.central_layout.addSpacing(self.bar_height)
-
-        self.register_window()
-
-        if sys.platform == "darwin":
-            self.setSystemTitleBarButtonVisible(True)
-            self.titleBar.minBtn.hide()
-            self.titleBar.maxBtn.hide()
-            self.titleBar.closeBtn.hide()
-        self.titleBar.raise_()
+        self.setup_window()
 
 
 class UMenu(TransparentMenu):
