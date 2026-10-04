@@ -24,7 +24,7 @@ class WinFiltersTitleWidget(QWidget):
     reset_clicked = pyqtSignal()
     reset_svg_path = Static.COMMON_ICONS / "reset.svg"
 
-    def __init__(self, text: str, svg_path: str):
+    def __init__(self, text: str, svg_path: str, show_reset: bool = True):
         super().__init__()
 
         self.reset_icon = QIcon(str(self.reset_svg_path))
@@ -45,11 +45,12 @@ class WinFiltersTitleWidget(QWidget):
         layout.addWidget(self.icon_widget)
         layout.addWidget(self.label)
         layout.addStretch(1)
-        
-        self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
-        self.reset_button.setIcon(self.reset_icon)
-        self.reset_button.clicked.connect(self.reset_clicked.emit)
-        layout.addWidget(self.reset_button)
+
+        if show_reset:
+            self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
+            self.reset_button.setIcon(self.reset_icon)
+            self.reset_button.clicked.connect(self.reset_clicked.emit)
+            layout.addWidget(self.reset_button)
 
 
 class DatesButton(UPushButton):
@@ -92,6 +93,14 @@ class DatesPeriodTag(UTagWidget):
         self.close_btn.load(str(self.svg_path))
         self.close_btn.setFixedSize(*self.svg_close_size)
         close_lay.addWidget(self.close_btn)
+
+    def set_active(self, active: bool):
+        if active:
+            self.set_qss_style(self.qss_green)
+            self.close_btn_wrapper.setVisible(True)
+        else:
+            self.set_qss_style(self.qss_gray)
+            self.close_btn_wrapper.setVisible(False)
 
 
 class DatesWidget(UGroupBox):
@@ -139,9 +148,9 @@ class DatesWidget(UGroupBox):
 
         self.title_widget = WinFiltersTitleWidget(
             text=Lng.dates_management[ind],
-            svg_path=str(self.calendar_svg)
+            svg_path=str(self.calendar_svg),
+            show_reset=False
         )
-        self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
         self.main_layout.addWidget(self.title_widget)
 
         self.main_layout.addWidget(USep())
@@ -156,13 +165,16 @@ class DatesWidget(UGroupBox):
         choosed_label.setFixedHeight(UTagWidget.tag_height)
         dynamic_container_lay.addWidget(choosed_label)
 
-        self.dates_pariod_tag = DatesPeriodTag("")
+        self.dates_period_tag = DatesPeriodTag("")
+        self.dates_period_tag.clicked_close.connect(lambda: self.reset_all(True))
         if Dynamic.py_date_start:
-            self.dates_pariod_tag.set_qss_style(UTagWidget.qss_green)
+            self.dates_period_tag.set_active(True)
+        else:
+            self.dates_period_tag.set_active(False)
         # ИСПРАВЛЕНО: Убрано self.dynamic_label.setFixedWidth(self.width()), 
         # так как в __init__ ширина виджета еще не рассчитана (обычно равна 100 или 0)
         
-        dynamic_container_lay.addWidget(self.dates_pariod_tag)
+        dynamic_container_lay.addWidget(self.dates_period_tag)
         dynamic_container_lay.addStretch()
         
         self.main_layout.addWidget(dynamic_container)
@@ -274,20 +286,20 @@ class DatesWidget(UGroupBox):
 
         if self.all_time == (self.q_date_start, self.q_date_end):
             text = Lng.all_time[ind]
-            qss_style = UTagWidget.qss_gray
+            active = False
         elif (self.q_date_start, self.q_date_end) in self.dates_dict:
             text = self.dates_dict[self.q_date_start, self.q_date_end]
-            qss_style = UTagWidget.qss_green
+            active = True
         else:
             str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
             str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
             text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
-            qss_style = UTagWidget.qss_green
+            active = True
 
-        self.dates_pariod_tag.label.setText(text)
-        self.dates_pariod_tag.set_qss_style(qss_style=qss_style)
+        self.dates_period_tag.label.setText(text)
+        self.dates_period_tag.set_active(active)
 
-    def apply_filter(self, with_sig: bool):
+    def apply_filter(self, load_st_grid: bool):
         # ИСПРАВЛЕНО: Корректно передаем None, если выбрано "Все время"
         if self.all_time == (self.q_date_start, self.q_date_end):
             self.py_date_start = None
@@ -298,13 +310,13 @@ class DatesWidget(UGroupBox):
 
         Dynamic.py_date_start = self.py_date_start
         Dynamic.py_date_end = self.py_date_end
-        if with_sig:
+        if load_st_grid:
             self.load_st_grid.emit()
 
-    def reset_all(self, with_sig: bool):
+    def reset_all(self, load_st_grid: bool):
         self.q_date_start = self.q_date_min
         self.q_date_end = QDate.currentDate()
-        self.apply_filter(with_sig)
+        self.apply_filter(load_st_grid)
         self.handle_preset_change() 
 
 
