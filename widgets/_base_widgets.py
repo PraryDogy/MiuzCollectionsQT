@@ -91,7 +91,7 @@ class _WindowMixin:
     win_list: list[QWidget] = []
     bar_height = 30
 
-    def setup_window(self):
+    def setup_window(self: FramelessMainWindow):
         # Title bar
         self.setTitleBar(StandardTitleBar(self))
 
@@ -129,7 +129,7 @@ class _WindowMixin:
         except ValueError:
             pass
 
-    def center_to_parent(self, parent: QWidget):
+    def center_to_parent(self: FramelessMainWindow, parent: QWidget):
         try:
             geo = self.geometry()
             geo.moveCenter(parent.geometry().center())
@@ -137,19 +137,19 @@ class _WindowMixin:
         except Exception as e:
             print("center error:", e)
 
-    def set_always_on_top(self):
+    def set_always_on_top(self: FramelessMainWindow):
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-    def set_close_only(self):
+    def set_close_only(self: FramelessMainWindow):
         flags = Qt.WindowType.CustomizeWindowHint
         flags |= Qt.WindowType.WindowCloseButtonHint
         self.setWindowFlags(flags)
 
-    def closeEvent(self, event: QCloseEvent | None):
+    def closeEvent(self: FramelessMainWindow, event: QCloseEvent | None):
         self.unregister_window()
         return super().closeEvent(event)
 
-    def deleteLater(self):
+    def deleteLater(self: FramelessMainWindow):
         self.unregister_window()
         return super().deleteLater()
 
