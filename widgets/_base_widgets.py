@@ -298,17 +298,31 @@ class UPushButton(TransparentButton):
     icon_size = (12, 12)
 
     def __init__(self, text: str):
+        self._raw_text = ""      # Инициализируем переменную для хранения чистого текста
         super().__init__("")
-        self.setText(text)
         self.setIconSize(QSize(*self.icon_size))
         self.setFixedHeight(self.hh)
+        self.setText(text)       # Вызываем наш переопределенный setText
         self.ensurePolished()
 
     def setText(self, text):
-        super().setText(" " + text)
+        self._raw_text = text    # Сохраняем оригинальный текст без пробелов
+        self._apply_text()       # Применяем форматирование
+
+    def text(self):
+        # Возвращаем чистый текст, чтобы в других частях программы не вылезали лишние пробелы
+        return self._raw_text
 
     def setIcon(self, icon):
         super().setIcon(icon)
+        self._apply_text()       # Пересчитываем текст, так как иконка могла появиться или исчезнуть
+
+    def _apply_text(self):
+        # Если у кнопки есть иконка (не пустая) и есть текст — добавляем пробел
+        if not self.icon().isNull() and self._raw_text:
+            super().setText(" " + self._raw_text)
+        else:
+            super().setText(self._raw_text)
 
     def enterEvent(self, event):
         self.setCursor(Qt.CursorShape.PointingHandCursor)

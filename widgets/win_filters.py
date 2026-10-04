@@ -184,12 +184,19 @@ class DatesWidget(UGroupBox):
         return q_date.toString("dd.MM.yyyy")
 
     def show_calendar_win(self, flag: str):
-        qdate = self.q_date_start if flag == "start" else self.q_date_end
+        # Проверяем, находится ли весь виджет в состоянии "За всё время" (когда на кнопках "Не выбрано")
+        is_not_selected = (self.all_time == (self.q_date_start, self.q_date_end))
+        
+        # Если даты не выбраны, всегда открываем "сегодня" для обеих кнопок
+        if is_not_selected:
+            qdate = QDate.currentDate()
+        else:
+            # Иначе открываем ту дату, которая реально выбрана (даже если это q_date_min)
+            qdate = self.q_date_start if flag == "start" else self.q_date_end
         
         self.calendar_win = WinCalendar(qdate)
         self.calendar_win.center_to_parent(self.window())
 
-        # ИСПРАВЛЕНО: Вместо вложенных лямбд используем одну понятную функцию-замыкание
         def on_date_selected(date: QDate):
             if flag == "start":
                 self.q_date_start = date

@@ -215,13 +215,14 @@ class WinCalendar(UMainWidget):
 
 		self.btn_container_layout.addStretch(1)
 
-		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
-		self.cancel_btn.clicked.connect(self.deleteLater)
-		self.btn_container_layout.addWidget(self.cancel_btn)
-
 		self.ok_btn = ActiveButton(Lng.apply[JsonData.lng_index])
 		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
 		self.btn_container_layout.addWidget(self.ok_btn)
+
+		self.cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
+		self.cancel_btn.clicked.connect(self.deleteLater)
+		self.btn_container_layout.addWidget(self.cancel_btn)
+
 
 		self.create_calendar_widget()
 		self.update_calendar()
