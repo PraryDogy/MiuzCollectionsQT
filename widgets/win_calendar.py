@@ -129,6 +129,7 @@ class WinCalendar(UMainWidget):
 		qimg_scaled = Utils.qimage_scaled_high_dpi(qimg, self.svg_blue_circle_size[0])
 		self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
+		self.base_date = date
 		self.q_locale = QLocale(lng, country)
 		self.current_date = date
 		self.date_now = QDate.currentDate()
@@ -214,11 +215,19 @@ class WinCalendar(UMainWidget):
 
 		self.btn_container_layout.addStretch(1)
 
-		self.cancel_btn = ActiveButton(Lng.close[JsonData.lng_index])
-		self.cancel_btn.clicked.connect(self.deleteLater)
-		self.btn_container_layout.addWidget(self.cancel_btn)
+		self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
+		self.reset_button.clicked.connect(self.reset_button_cmd)
+		self.btn_container_layout.addWidget(self.reset_button)
+
+		self.done_btn = ActiveButton(Lng.done[JsonData.lng_index])
+		self.done_btn.clicked.connect(self.deleteLater)
+		self.btn_container_layout.addWidget(self.done_btn)
 
 		self.create_calendar_widget()
+		self.update_calendar()
+
+	def reset_button_cmd(self):
+		self.current_date = self.base_date
 		self.update_calendar()
 
 	def create_calendar_widget(self):
