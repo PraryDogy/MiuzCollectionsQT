@@ -596,10 +596,8 @@ class WinFilters(UMainWidget):
     def apply_filters(self):
         date_start = self.dates_widget.date_start
         date_end = self.dates_widget.date_end
-        if date_start:
-            Dynamic.date_start = date_start
-        if date_end:
-            Dynamic.date_end = date_end
+        Dynamic.date_start = date_start
+        Dynamic.date_end = date_end
         self.load_st_grid.emit()
         self.deleteLater()
 
