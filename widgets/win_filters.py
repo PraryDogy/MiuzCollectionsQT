@@ -72,7 +72,7 @@ class DatesPeriodTag(UTagWidget):
     def __init__(self, text: str):
         super().__init__(qss_style=self.qss_gray)
         self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(0, 0, 0, 0)
+        self.h_lay.setContentsMargins(8, 0, 8, 0)
         self.h_lay.setSpacing(5)
         self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
@@ -141,9 +141,10 @@ class DatesWidget(UGroupBox):
         dynamic_container = TransparentWidget()
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-        dynamic_container_lay.setSpacing(3)
+        dynamic_container_lay.setSpacing(10)
 
         choosed_label = TransparentLabel(Lng.period[JsonData.lng_index] + ":")
+        choosed_label.setFixedHeight(UTagWidget.tag_height)
         dynamic_container_lay.addWidget(choosed_label)
 
         self.dates_pariod_tag = DatesPeriodTag("")
@@ -274,7 +275,7 @@ class DatesWidget(UGroupBox):
             text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
             qss_style = UTagWidget.qss_green
 
-        self.dates_pariod_tag.label.setText(text.lower())
+        self.dates_pariod_tag.label.setText(text)
         self.dates_pariod_tag.set_qss_style(qss_style=qss_style)
 
     def apply_filter(self, with_sig: bool):

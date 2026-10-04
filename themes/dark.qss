@@ -296,10 +296,9 @@ UTagWidget[style="transparent"] {
 }
 
 UTagWidget[style="green"] {
-    background: #49c932;
-    border: 1px solid #6ae555;
+    background: #064E3B;
+    border: 1px solid #10B981;
 }
-
 
 QToolTip {
     color: #FFFFFF;
@@ -406,13 +405,6 @@ WinCollage {
 /* win_copy_files.py */
 
 /* win_filters.py */
-
-
-DatesPeriodTag {
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
 
 
 
