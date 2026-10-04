@@ -175,9 +175,9 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(5)
 
-        choosed_label = TransparentLabel(Lng.period[JsonData.lng_index])
-        choosed_label.setFixedHeight(UTagWidget.tag_height)
-        dynamic_container_lay.addWidget(choosed_label)
+        # choosed_label = TransparentLabel(Lng.period[JsonData.lng_index])
+        # choosed_label.setFixedHeight(UTagWidget.tag_height)
+        # dynamic_container_lay.addWidget(choosed_label)
 
         self.dates_period_tag = DatesPeriodTag("")
         self.dates_period_tag.clicked_close.connect(lambda: self.reset_all(True))
@@ -211,6 +211,11 @@ class DatesWidget(UGroupBox):
                 lambda _, d=qdates: self.action_cmd(d[0], d[1])
             )
             self.preset_menu.addAction(action)
+
+        self.preset_menu.addSeparator()
+        action = QAction(Lng.reset[JsonData.lng_index], self.preset_menu)
+        action.triggered.connect(lambda: self.reset_all(True))
+        self.preset_menu.addAction(action)
 
         # Выбор дат "От" и "До"
         from_label = TransparentLabel(Lng.from_text[ind] + ":")
@@ -313,6 +318,7 @@ class DatesWidget(UGroupBox):
             text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
             active = True
 
+        text = f"{Lng.period[JsonData.lng_index]}: {text.lower()}"
         self.dates_period_tag.label.setText(text)
         self.dates_period_tag.set_active(active)
 
