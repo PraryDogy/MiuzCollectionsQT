@@ -143,6 +143,7 @@ class WinCalendar(UMainWidget):
 		self.setFixedSize(self.width(), self.height())
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setContentsMargins(10, 10, 10, 12)
+		self.central_layout.setSpacing(10)
 
 	def init_ui(self):
 		dynamic_container = TransparentWidget()
@@ -163,9 +164,8 @@ class WinCalendar(UMainWidget):
 		dynamic_container_lay.addWidget(self.dynamic_label)
 		dynamic_container_lay.addStretch(1)
 
-		self.central_layout.addSpacing(15)
-		self.central_layout.addWidget(USep())
-		# self.central_layout.addSpacing(5)
+		above_nav_sep = USep()
+		self.central_layout.addWidget(above_nav_sep)
 
 		self.nav_widget = TransparentWidget()
 		self.central_layout.addWidget(self.nav_widget)
@@ -203,9 +203,8 @@ class WinCalendar(UMainWidget):
 		self.btn_next.clicked.connect(self.next_month)
 		self.nav_layout.addWidget(self.btn_next)
 
-		self.central_layout.addWidget(USep())
-
-		self.central_layout.addSpacing(15)
+		below_nav_sep = USep()
+		self.central_layout.addWidget(below_nav_sep)
 
 		self.btn_container = TransparentWidget()
 		self.central_layout.addWidget(self.btn_container)
@@ -219,7 +218,6 @@ class WinCalendar(UMainWidget):
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_container_layout.addWidget(self.cancel_btn)
 
-
 		self.create_calendar_widget()
 		self.update_calendar()
 
@@ -228,6 +226,7 @@ class WinCalendar(UMainWidget):
 		self.calendar_layout = QVBoxLayout(self.calendar_widget)
 		self.calendar_layout.setContentsMargins(0, 0, 0, 0)
 		self.calendar_layout.setSpacing(0)
+		# минус кнопка закрыть минус сепаратор над кнопкой
 		widget_num = self.central_layout.count() - 2
 		self.central_layout.insertWidget(widget_num, self.calendar_widget)
 
@@ -337,6 +336,8 @@ class WinCalendar(UMainWidget):
 		header_layout = QHBoxLayout(header_widget)
 		header_layout.setContentsMargins(0, 0, 0, 0)
 		header_layout.setSpacing(0)
+
+		self.calendar_layout.addWidget(USep())
 
 		for col in range(7):
 			week_name = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
