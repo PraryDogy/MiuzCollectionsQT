@@ -256,9 +256,7 @@ class DatesWidget(UGroupBox):
         # ИСПРАВЛЕНО: Сбрасываем q_dates на значения "за все время"
         self.q_date_start = self.q_date_min
         self.q_date_end = QDate.currentDate()
-        
         self.apply_filter() # Применяем фильтр (установит py_date в None)
-        
         # ИСПРАВЛЕНО: Убран 0. Метод handle_preset_change не принимает аргументов!
         self.handle_preset_change() 
         print("Dates successfully reset")
