@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from pathlib import Path
 
 from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
@@ -13,6 +14,7 @@ from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
                              QSpinBox, QStackedWidget, QTextEdit, QTreeView,
                              QTreeWidget, QTreeWidgetItem, QVBoxLayout,
                              QWidget)
+from qframelesswindow import FramelessMainWindow
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -122,7 +124,7 @@ class _WindowMixin:
         return super().deleteLater()
 
 
-class UMainWindow(_WindowMixin, QMainWindow):
+class UMainWindow(_WindowMixin, FramelessMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
@@ -133,7 +135,16 @@ class UMainWindow(_WindowMixin, QMainWindow):
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(0)
 
+        self.central_layout.addSpacing(35)
+
         self.register_window()
+
+        if sys.platform == "darwin":
+            self.setSystemTitleBarButtonVisible(True)
+            self.titleBar.minBtn.hide()
+            self.titleBar.maxBtn.hide()
+            self.titleBar.closeBtn.hide()
+        self.titleBar.raise_()
 
 
 class UMainWidget(_WindowMixin, TransparentWidget):
