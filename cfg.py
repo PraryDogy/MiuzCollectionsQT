@@ -88,7 +88,6 @@ class Static:
 class Dynamic:
     py_date_start: datetime = None
     py_date_end: datetime = None
-    date_index: int = 0
     loaded_thumbs: int = 0
     current_pixmap_size_index: int = 1
     current_dir: str = os.sep
