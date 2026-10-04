@@ -397,19 +397,20 @@ class DatesTag(GridTagWidget):
         self.set_dates_text()
 
     def set_dates_text(self):
-        q_start = QDate(Dynamic.py_date_start.year, Dynamic.py_date_start.month, Dynamic.py_date_start.day)
-        q_end = QDate(Dynamic.py_date_end.year, Dynamic.py_date_end.month, Dynamic.py_date_end.day)
+        # q_start = QDate(Dynamic.py_date_start.year, Dynamic.py_date_start.month, Dynamic.py_date_start.day)
+        # q_end = QDate(Dynamic.py_date_end.year, Dynamic.py_date_end.month, Dynamic.py_date_end.day)
         
-        if JsonData.lng_index == 0:
-            locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
-            date_format = "d MMMM yyyy"
-        elif JsonData.lng_index == 1:
-            locale = QLocale(QLocale.Language.English, QLocale.Country.UnitedStates)
-            date_format = "MMMM d, yyyy"
+        # if JsonData.lng_index == 0:
+        #     locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
+        #     date_format = "d MMMM yyyy"
+        # elif JsonData.lng_index == 1:
+        #     locale = QLocale(QLocale.Language.English, QLocale.Country.UnitedStates)
+        #     date_format = "MMMM d, yyyy"
             
-        start_str = locale.toString(q_start, date_format)
-        end_str = locale.toString(q_end, date_format)
-        self.title.setText(f"{start_str} - {end_str}")
+        # start_str = locale.toString(q_start, date_format)
+        # end_str = locale.toString(q_end, date_format)
+        # self.title.setText(f"{start_str} - {end_str}")
+        # Да костыль, ну и что
         self.title.setText(DatesWidget.readable_date)
 
     def clicked_close_cmd(self):
