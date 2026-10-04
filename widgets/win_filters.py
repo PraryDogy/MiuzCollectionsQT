@@ -71,6 +71,7 @@ class PeriodLabel(GrayTextLabel):
 
 
 class DatesWidget(UGroupBox):
+    load_st_grid = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (15, 15)
 
@@ -264,11 +265,14 @@ class DatesWidget(UGroupBox):
             self.py_date_start = self.q_date_start.toPyDate()
             self.py_date_end = self.q_date_end.toPyDate()
 
+        Dynamic.py_date_start = self.py_date_start
+        Dynamic.py_date_end = self.py_date_end
+        self.load_st_grid.emit()
+
     def clear_btn_cmd(self, *args):
         self.q_date_start = self.q_date_min
         self.q_date_end = QDate.currentDate()
-        self.apply_filter() # Применяем фильтр (установит py_date в None)
-        # ИСПРАВЛЕНО: Убран 0. Метод handle_preset_change не принимает аргументов!
+        self.apply_filter()
         self.handle_preset_change() 
 
 
@@ -558,6 +562,7 @@ class WinFilters(UMainWidget):
         self.central_layout.setContentsMargins(10, 10, 10, 10)
 
         self.dates_widget = DatesWidget()
+        self.dates_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.central_layout.addWidget(self.dates_widget)
 
         self.tags_widget = TagsWidget()
@@ -571,9 +576,6 @@ class WinFilters(UMainWidget):
         self.buttons_layout.setSpacing(10)
 
         self.buttons_layout.addStretch(1)
-        self.apply_button = ActiveButton(Lng.apply[JsonData.lng_index])
-        self.apply_button.clicked.connect(self.apply_filters)
-        self.buttons_layout.addWidget(self.apply_button)
 
         self.close_button = UPushButton(Lng.close[JsonData.lng_index])
         self.close_button.clicked.connect(self.deleteLater)
@@ -582,21 +584,6 @@ class WinFilters(UMainWidget):
         self.tags_widget.user_tags.adjustSize()
         self.tags_widget.adjustSize()
         self.adjustSize()
-
-    def apply_filters(self):
-        py_date_start = self.dates_widget.py_date_start
-        py_date_end = self.dates_widget.py_date_end
-        q_dates = (self.dates_widget.q_date_start, self.dates_widget.q_date_end)
-        if q_dates == self.dates_widget.all_time:
-            Dynamic.loaded_thumbs = 0
-            Dynamic.py_date_start = None
-            Dynamic.py_date_end = None
-        else:
-            Dynamic.py_date_start = py_date_start
-            Dynamic.py_date_end = py_date_end
-
-        self.load_st_grid.emit()
-        self.deleteLater()
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)
