@@ -72,9 +72,9 @@ class DatesWidget(UGroupBox):
             (_today.addYears(-1), _today): Lng.preset_year
         }
 
-        self.date_start = Dynamic.date_start
-        self.date_end = Dynamic.date_end
-        self.minimal_date = QDate(WinCalendar.min_year, 1, 1)
+        self.py_date_start = Dynamic.date_start
+        self.py_date_end = Dynamic.date_end
+        self.q_date_min = QDate(WinCalendar.min_year, 1, 1)
 
         if Dynamic.date_start:
             dt = Dynamic.date_start
@@ -86,7 +86,7 @@ class DatesWidget(UGroupBox):
             dt = Dynamic.date_end
             self.q_date_end = QDate(dt.year, dt.month, dt.day)
         else:
-            dt = QDate.currentDate()
+            dt = _today
             self.q_date_end = QDate(dt)
         
         # Главный вертикальный layout для UGroupBox
@@ -114,7 +114,6 @@ class DatesWidget(UGroupBox):
         calendar_icon = QSvgWidget()
         calendar_icon.load(str(self.calendar_svg))
         calendar_icon.setFixedSize(*self.svg_calendar_size)
-        # dynamic_container_lay.addWidget(calendar_icon)
 
         self.dynamic_label = GrayTextLabel("")
         self.dynamic_label.setFixedWidth(self.width())
@@ -145,11 +144,12 @@ class DatesWidget(UGroupBox):
             QAction(Lng.preset_year[JsonData.lng_index], preset_menu),      
         ]
 
-        for x, act in enumerate(self.preset_actions):
-            act.triggered.connect(
-                lambda e, ind=x, act=act: self.action_cmd(e, ind, act)
+        for (q_date_start, q_date_end), text in self.dates_dict.items():
+            action = QAction(text=text, parent=preset_menu)
+            action.triggered.connect(
+                lambda e, : self.action_cmd()
             )
-            preset_menu.addAction(act)
+            preset_menu.addAction(action)
 
         self.top_row_layout.addSpacing(15)
 
@@ -268,13 +268,13 @@ class DatesWidget(UGroupBox):
         self.dynamic_label.setText(text)
 
     def apply_filter(self, index: int):
-        self.date_start = self.q_date_start.toPyDate()
-        self.date_end = self.q_date_end.toPyDate()
+        self.py_date_start = self.q_date_start.toPyDate()
+        self.py_date_end = self.q_date_end.toPyDate()
 
     def clear_btn_cmd(self, *args):
         Dynamic.loaded_thumbs = 0
-        self.date_start = None
-        self.date_end = None
+        self.py_date_start = None
+        self.py_date_end = None
         all_time_action = self.preset_actions[0]
         self.preset_button.setText(all_time_action.text())
         self.handle_preset_change(0)
@@ -594,8 +594,8 @@ class WinFilters(UMainWidget):
         self.adjustSize()
 
     def apply_filters(self):
-        date_start = self.dates_widget.date_start
-        date_end = self.dates_widget.date_end
+        date_start = self.dates_widget.py_date_start
+        date_end = self.dates_widget.py_date_end
         Dynamic.date_start = date_start
         Dynamic.date_end = date_end
         self.load_st_grid.emit()
