@@ -69,9 +69,7 @@ class DatesButton(UPushButton):
 class DatesPeriodTag(UTagWidget):
     svg_path = Static.COMMON_ICONS / "cancel.svg"
     svg_icon_path = Static.COMMON_ICONS / "tags.svg"  # 1. Путь к левой иконке
-    svg_close_size = (12, 12)
     svg_icon_size = (14, 14)  # 2. Размер левой иконки (можно скорректировать)
-    clicked_close = pyqtSignal()
     clicked_tag = pyqtSignal()
 
     def __init__(self, text: str):
@@ -91,24 +89,6 @@ class DatesPeriodTag(UTagWidget):
         self.label = TransparentLabel(text)
         self.h_lay.addWidget(self.label)
 
-        self.close_btn_wrapper = TransparentWidget()
-        close_lay = QVBoxLayout(self.close_btn_wrapper)
-        close_lay.setContentsMargins(0, 1, 0, 0)
-        close_lay.setSpacing(0)
-        self.h_lay.addWidget(self.close_btn_wrapper)
-
-        self.close_btn = QSvgWidget()
-        self.close_btn.mouseReleaseEvent = self._on_close_clicked 
-        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.close_btn.load(str(self.svg_path))
-        self.close_btn.setFixedSize(*self.svg_close_size)
-        close_lay.addWidget(self.close_btn)
-
-    def _on_close_clicked(self, event):
-        """Обработка клика по крестику без триггера самого тега"""
-        self.clicked_close.emit()
-        event.accept()  # Блокируем передачу клика родительскому виджету
-
     def mouseReleaseEvent(self, event):
         """Перехватываем клик по самому тегу"""
         if event.button() == Qt.MouseButton.LeftButton:
@@ -118,10 +98,8 @@ class DatesPeriodTag(UTagWidget):
     def set_active(self, active: bool):
         if active:
             self.set_qss_style(self.qss_green)
-            self.close_btn_wrapper.setVisible(True)
         else:
             self.set_qss_style(self.qss_gray)
-            self.close_btn_wrapper.setVisible(False)
 
 
 class DatesWidget(UGroupBox):
@@ -169,9 +147,9 @@ class DatesWidget(UGroupBox):
 
         self.title_widget = WinFiltersTitleWidget(
             text=Lng.dates_management[ind],
-            svg_path=str(self.calendar_svg),
-            show_reset=False
+            svg_path=str(self.calendar_svg)
         )
+        self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
         self.main_layout.addWidget(self.title_widget)
 
         self.main_layout.addWidget(USep())
@@ -187,9 +165,6 @@ class DatesWidget(UGroupBox):
         # dynamic_container_lay.addWidget(choosed_label)
 
         self.dates_period_tag = DatesPeriodTag("")
-        self.dates_period_tag.clicked_close.connect(lambda: self.reset_all(True))
-        
-        # Подключаем вызов меню по клику на сам тег
         self.dates_period_tag.clicked_tag.connect(self.show_tag_menu)
         
         if Dynamic.py_date_start:
