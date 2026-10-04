@@ -1,46 +1,130 @@
-from PyQt6.QtWidgets import QApplication
-from widgets._base_widgets import UPushButton, TransparentWidget, UMainWidget, QHBoxLayout
-from PyQt6.QtSvgWidgets import QSvgWidget
+import sys
+
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QApplication,
+    QFrame,
+    QLabel,
+    QMainWindow,
+    QVBoxLayout,
+    QWidget,
+)
+
+from qframelesswindow import FramelessMainWindow
 
 
-class TestWindow(UMainWidget):
-    def __init__(self, parent = None):
-        super().__init__(parent)
-        self.set_always_on_top()
-        self.set_close_only()
+class MainWindow(FramelessMainWindow):
+    def __init__(self):
+        super().__init__()
 
-        h_widget = TransparentWidget()
-        self.central_layout.addWidget(h_widget)
+        self.setWindowTitle("Miuz Collections")
+        self.resize(1200, 800)
 
-        h_lay = QHBoxLayout(h_widget)
-        h_lay.setContentsMargins(0, 0, 0, 0)
-        h_lay.setSpacing(0)
+        # ---------------------------------------------------------
+        # macOS native traffic lights:
+        # 🔴 close
+        # 🟡 minimize
+        # 🟢 maximize
+        # ---------------------------------------------------------
+        if sys.platform == "darwin":
+            self.setSystemTitleBarButtonVisible(True)
 
-        svg = QSvgWidget()
-        svg.setFixedHeight(28)
-        svg.setFixedWidth(28)
-        svg.load("./icons/common/stop.svg")
-        h_lay.addWidget(svg)
+        # ---------------------------------------------------------
+        # Центральный контейнер
+        # ---------------------------------------------------------
+        central = QWidget()
+        central.setObjectName("CentralWidget")
 
-        btn = UPushButton("Stop")
-        btn.setFixedHeight(28)
-        h_lay.addWidget(btn)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(16)
 
-        self._apply_system_theme()
+        # ---------------------------------------------------------
+        # Наш кастомный верхний бар
+        # ---------------------------------------------------------
+        top_bar = QFrame()
+        top_bar.setObjectName("TopBar")
+        top_bar.setFixedHeight(44)
 
-    def _apply_system_theme(cls):
-        from system.themes import ThemeChanger
-        ThemeChanger.init()
-        return
+        top_layout = QVBoxLayout(top_bar)
+        top_layout.setContentsMargins(70, 0, 20, 0)
 
-        app: QApplication = QApplication.instance()
-        with open("./themes/dark.qss", "r", encoding="utf-8") as f:
-            app.setStyleSheet(f.read())
+        title = QLabel("Miuz Collections")
+        title.setObjectName("WindowTitle")
+
+        top_layout.addWidget(
+            title,
+            alignment=Qt.AlignmentFlag.AlignVCenter
+        )
+
+        # ---------------------------------------------------------
+        # Контент
+        # ---------------------------------------------------------
+        content = QFrame()
+        content.setObjectName("Content")
+
+        content_layout = QVBoxLayout(content)
+        content_layout.setContentsMargins(20, 20, 20, 20)
+
+        label = QLabel("Your content")
+        label.setObjectName("ContentLabel")
+
+        content_layout.addWidget(
+            label,
+            alignment=Qt.AlignmentFlag.AlignCenter
+        )
+
+        # ---------------------------------------------------------
+        # Добавляем всё
+        # ---------------------------------------------------------
+        layout.addWidget(top_bar)
+        layout.addWidget(content, 1)
+
+        self.setCentralWidget(central)
+
+        # Важно: titleBar библиотеки должен находиться сверху,
+        # чтобы native traffic lights оставались кликабельными.
+        self.titleBar.raise_()
+
+        # ---------------------------------------------------------
+        # QSS
+        # ---------------------------------------------------------
+        self.setStyleSheet("""
+            #CentralWidget {
+                background: #0c1218;
+            }
+
+            #TopBar {
+                background: rgba(15, 23, 31, 180);
+                border: 1px solid #263440;
+                border-radius: 10px;
+            }
+
+            #WindowTitle {
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            #Content {
+                background: #0f171f;
+                border: 1px solid #263440;
+                border-radius: 10px;
+            }
+
+            #ContentLabel {
+                color: #7b8792;
+                font-size: 18px;
+            }
+        """)
 
 
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
 
-app = QApplication([])
-main_win = TestWindow()
-main_win.show()
-app.exec()
+    app.setApplicationName("Miuz Collections")
+
+    window = MainWindow()
+    window.show()
+
+    sys.exit(app.exec())
