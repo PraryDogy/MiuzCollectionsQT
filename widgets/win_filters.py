@@ -68,6 +68,7 @@ class DatesButton(UPushButton):
 class DatesWidget(UGroupBox):
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (15, 15)
+    reset_button_clicked = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -252,7 +253,6 @@ class DatesWidget(UGroupBox):
 
     def clear_btn_cmd(self, *args):
         Dynamic.loaded_thumbs = 0
-        
         # ИСПРАВЛЕНО: Сбрасываем q_dates на значения "за все время"
         self.q_date_start = self.q_date_min
         self.q_date_end = QDate.currentDate()
