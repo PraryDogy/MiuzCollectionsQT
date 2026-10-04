@@ -252,6 +252,10 @@ class DatesWidget(UGroupBox):
                 self.q_date_start = date
             else:
                 self.q_date_end = date
+
+            if self.q_date_start > self.q_date_end:
+                self.q_date_end = self.q_date_start
+
             self.handle_preset_change()
             self.apply_filter(True)
 
