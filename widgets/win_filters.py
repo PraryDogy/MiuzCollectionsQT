@@ -59,8 +59,18 @@ class DatesWidget(UGroupBox):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        _today = QDate.currentDate()
+        self.today = (_today, _today)
+        self.yesterday = (_today.addDays(-1), _today.addDays(-1))
+        self.last_week = (_today.addDays(-7), _today)
+        self.last_two_weeks = (_today.addDays(-14), _today)
+        self.last_month = (_today.addMonths(-1), _today)
+        self.last_year = (_today.addYears(-1), _today)
+
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
+        self.minimal_date = QDate(WinCalendar.min_year, 1, 1)
 
         if Dynamic.date_start:
             dt = Dynamic.date_start
