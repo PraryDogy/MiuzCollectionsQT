@@ -443,7 +443,7 @@ WinCollage {
 
 /* win_image_view.py */
 
-WinImgViewGraphics {
+WinImgViewGraphics, WinImageView {
     background: #000000;
 }
 
