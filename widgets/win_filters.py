@@ -579,7 +579,7 @@ class WinFilters(UMainWidget):
 
         self.buttons_layout.addStretch(1)
 
-        self.close_button = UPushButton(Lng.close[JsonData.lng_index])
+        self.close_button = ActiveButton(Lng.close[JsonData.lng_index])
         self.close_button.clicked.connect(self.deleteLater)
         self.buttons_layout.addWidget(self.close_button)
 

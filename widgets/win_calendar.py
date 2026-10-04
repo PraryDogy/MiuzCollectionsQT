@@ -214,7 +214,7 @@ class WinCalendar(UMainWidget):
 
 		self.btn_container_layout.addStretch(1)
 
-		self.cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
+		self.cancel_btn = ActiveButton(Lng.close[JsonData.lng_index])
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_container_layout.addWidget(self.cancel_btn)
 
