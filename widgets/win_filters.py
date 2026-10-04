@@ -74,12 +74,11 @@ class DatesPeriodTag(UTagWidget):
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(8, 0, 8, 0)
         self.h_lay.setSpacing(5)
-        self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.svg_path))
         self.svg_widget.setFixedSize(*self.left_svg_size)
-        self.h_lay.addWidget(self.svg_widget)
+        # self.h_lay.addWidget(self.svg_widget)
 
         self.label = TransparentLabel(text)
         self.h_lay.addWidget(self.label)
@@ -141,15 +140,15 @@ class DatesWidget(UGroupBox):
         dynamic_container = TransparentWidget()
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-        dynamic_container_lay.setSpacing(10)
+        dynamic_container_lay.setSpacing(5)
 
-        choosed_label = TransparentLabel(Lng.period[JsonData.lng_index] + ":")
+        choosed_label = TransparentLabel(Lng.period[JsonData.lng_index])
         choosed_label.setFixedHeight(UTagWidget.tag_height)
         dynamic_container_lay.addWidget(choosed_label)
 
         self.dates_pariod_tag = DatesPeriodTag("")
         if Dynamic.py_date_start:
-            self.dates_pariod_tag.set_qss_style(self.qss_green)
+            self.dates_pariod_tag.set_qss_style(UTagWidget.qss_green)
         # ИСПРАВЛЕНО: Убрано self.dynamic_label.setFixedWidth(self.width()), 
         # так как в __init__ ширина виджета еще не рассчитана (обычно равна 100 или 0)
         
@@ -354,14 +353,14 @@ class FavTagWidget(TagWidget):
             l_icon_path=str(self.icon_path)
         )
         if Dynamic.favs_tag_enabled:
-            self.set_qss_style(self.qss_blue)
+            self.set_qss_style(self.qss_green)
 
     def mouseReleaseEvent(self, a0):
         if Dynamic.favs_tag_enabled:
             self.set_qss_style(self.qss_gray)
             Dynamic.favs_tag_enabled = False
         else:
-            self.set_qss_style(self.qss_blue)
+            self.set_qss_style(self.qss_green)
             Dynamic.favs_tag_enabled = True
         return super().mouseReleaseEvent(a0)
 
@@ -375,14 +374,14 @@ class SubfoldersTagWidget(TagWidget):
             l_icon_path=str(self.icon_path)
         )
         if Dynamic.no_subfolders_tag_enabled:
-            self.set_qss_style(self.qss_blue)
+            self.set_qss_style(self.qss_green)
 
     def mouseReleaseEvent(self, a0):
         if Dynamic.no_subfolders_tag_enabled:
             self.set_qss_style(self.qss_gray)
             Dynamic.no_subfolders_tag_enabled = False
         else:
-            self.set_qss_style(self.qss_blue)
+            self.set_qss_style(self.qss_green)
             Dynamic.no_subfolders_tag_enabled = True
         return super().mouseReleaseEvent(a0)
 
@@ -396,14 +395,14 @@ class WordFiltersTagWidget(TagWidget):
             l_icon_path=str(self.icon_path)
         )
         if text in Dynamic.word_tags_list:
-            self.set_qss_style(self.qss_blue)
+            self.set_qss_style(self.qss_green)
 
     def mouseReleaseEvent(self, a0):
         if self.title.text() in Dynamic.word_tags_list:
             self.set_qss_style(self.qss_gray)
             Dynamic.word_tags_list.remove(self.title.text())
         else:
-            self.set_qss_style(self.qss_blue)
+            self.set_qss_style(self.qss_green)
             Dynamic.word_tags_list.append(self.title.text())
         return super().mouseReleaseEvent(a0)
 

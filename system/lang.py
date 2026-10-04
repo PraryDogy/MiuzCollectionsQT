@@ -401,7 +401,7 @@ class Lng:
     preset_today = ("Сегодня", "Today")
     preset_yesterday = ("Вчера", "Yesterday")
     preset_week = ("За неделю", "Past week")
-    preset_two_weeks = ("За дне недели", "Past two weeks")
+    preset_two_weeks = ("За две недели", "Past two weeks")
     preset_month = ("За месяц", "Past month")
     preset_year = ("За год", "Past year")
     active_filters = ("Активные фильтры", "Active filters")
