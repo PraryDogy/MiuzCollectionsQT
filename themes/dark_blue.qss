@@ -442,6 +442,12 @@ WinCollage {
 /* win_first_load.py */
 
 /* win_image_view.py */
+
+WinImgViewGraphics {
+    background: #000000;
+}
+
+
 /* win_image_view.py */
 
 /* win_img_search.py */
