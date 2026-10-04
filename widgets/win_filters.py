@@ -188,32 +188,23 @@ class DatesWidget(UGroupBox):
         def set_date_end(date: QDate):
             self.date_end_btn.setText(self.date_digits(date))
             self.q_date_end = date
-            index = len(self.preset_actions) - 1
-            self.handle_preset_change(index)
-            self.apply_filter(index)
-            self.preset_button.setText(Lng.choose_period[JsonData.lng_index])
+            self.handle_preset_change()
+            self.apply_filter()
 
         def set_date_start(date: QDate):
             self.date_start_btn.setText(self.date_digits(date))
             self.q_date_start = date
-            index = len(self.preset_actions) - 1
-            self.handle_preset_change(index)
-            self.apply_filter(index)
-            self.preset_button.setText(Lng.choose_period[JsonData.lng_index])
+            self.handle_preset_change()
+            self.apply_filter()
 
         if flag == "start":
             qdate = self.q_date_start
             callback = lambda qdate: set_date_start(qdate)
-            target_btn = self.date_start_btn
         elif flag == "end":
             qdate = self.q_date_end
             callback = lambda qdate: set_date_end(qdate)
-            target_btn = self.date_end_btn
 
         self.calendar_win = WinCalendar(qdate)
-        # global_pos = target_btn.mapToGlobal(QPoint(0, target_btn.height()))
-        # offset = QPoint(0, 0)  # (по X, по Y)
-        # self.calendar_win.move(global_pos + offset)
         self.calendar_win.center_to_parent(self.window())
         self.calendar_win.date_selected.connect(callback)
         self.calendar_win.show()
@@ -254,7 +245,7 @@ class DatesWidget(UGroupBox):
 
         self.dynamic_label.setText(text)
 
-    def apply_filter(self, index: int):
+    def apply_filter(self):
         self.py_date_start = self.q_date_start.toPyDate()
         self.py_date_end = self.q_date_end.toPyDate()
 
