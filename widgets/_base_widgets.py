@@ -396,22 +396,24 @@ class TitleTextLabel(TransparentLabel):
 
 class UTagWidget(TransparentFrame):
     tag_height = 23
-    qss_property_name = "active"
+    qss_property_name = "style"
+    qss_blue = "blue"
+    qss_gray = "gray"
+    qss_transparent = "transparent"
+    qss_green = "green"
     icon_size = (15, 15)
 
-    def __init__(self, active: bool = False):
+    def __init__(self, qss_style: str):
         super().__init__()
-        self._active = active
+        self.qss_style = qss_style
 
         self.setFixedHeight(self.tag_height)
-        self.setProperty(UTagWidget.qss_property_name, str(active))
-        if active:
-            self.set_active(True)
+        self.setProperty(UTagWidget.qss_property_name, qss_style)
 
-    def set_active(self, active: bool):
-        if self._active != active:
-            self._active = active
-            self.setProperty(UTagWidget.qss_property_name, str(active))
+    def set_qss_style(self, qss_style: str):
+        if self.qss_style != qss_style:
+            self.qss_style = qss_style
+            self.setProperty(UTagWidget.qss_property_name, qss_style)
             self.style().unpolish(self)
             self.style().polish(self)
             self.update()
