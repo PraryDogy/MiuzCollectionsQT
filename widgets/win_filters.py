@@ -185,7 +185,7 @@ class DatesWidget(UGroupBox):
         action.triggered.connect(lambda: self.reset_all(True))
         self.preset_menu.addAction(action)
 
-        from_label = TransparentLabel(Lng.from_text[ind] + ":")
+        from_label = GrayTextLabel(Lng.start_date[ind])
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
 
@@ -193,9 +193,9 @@ class DatesWidget(UGroupBox):
         self.date_start_btn.clicked.connect(lambda: self.show_calendar_win("start"))
         self.top_row_layout.addWidget(self.date_start_btn)
 
-        self.top_row_layout.addSpacing(10)
+        self.top_row_layout.addSpacing(30)
 
-        to_label = TransparentLabel(Lng.to_text[ind] + ":")
+        to_label = GrayTextLabel(Lng.end_date[ind])
         self.top_row_layout.addWidget(to_label)
         self.top_row_layout.addSpacing(5)
 

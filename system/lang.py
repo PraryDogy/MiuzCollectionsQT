@@ -494,3 +494,12 @@ class Lng:
         "Готово",
         "Done"
     )
+    start_date = (
+        "Дата начала",
+        "Start date",
+    )
+
+    end_date = (
+        "Дата окончания",
+        "End date",
+    )
