@@ -52,6 +52,16 @@ class WinFiltersTitleWidget(QWidget):
         layout.addWidget(self.reset_button)
 
 
+class DatesButton(UPushButton):
+    def __init__(self, text):
+        super().__init__(text)
+        _today = QDate.currentDate()
+        _date_digits = _today.toString("dd.MM.yyyy")
+        self.setText(_date_digits)
+        self.adjustSize()
+        self.setFixedWidth(self.width())
+        self.setText("")
+
 
 class DatesWidget(UGroupBox):
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
@@ -149,7 +159,7 @@ class DatesWidget(UGroupBox):
         from_label = TransparentLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
-        self.date_start_btn = UPushButton("")
+        self.date_start_btn = DatesButton("")
         self.date_start_btn.clicked.connect(lambda: self.show_calendar_win("start"))
         self.top_row_layout.addWidget(self.date_start_btn)
 
@@ -158,7 +168,7 @@ class DatesWidget(UGroupBox):
         to_label = TransparentLabel(Lng.to_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(to_label)
         self.top_row_layout.addSpacing(5)
-        self.date_end_btn = UPushButton("")
+        self.date_end_btn = DatesButton("")
         self.date_end_btn.clicked.connect(lambda: self.show_calendar_win("end"))
         self.top_row_layout.addWidget(self.date_end_btn)
 
