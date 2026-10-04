@@ -68,17 +68,25 @@ class DatesButton(UPushButton):
 
 class DatesPeriodTag(UTagWidget):
     svg_path = Static.COMMON_ICONS / "cancel.svg"
+    svg_icon_path = Static.COMMON_ICONS / "tags.svg"  # 1. Путь к левой иконке
     svg_close_size = (12, 12)
+    svg_icon_size = (14, 14)  # 2. Размер левой иконки (можно скорректировать)
     clicked_close = pyqtSignal()
-    clicked_tag = pyqtSignal()  # 1. Добавляем новый сигнал
+    clicked_tag = pyqtSignal()
 
     def __init__(self, text: str):
         super().__init__(qss_style=self.qss_gray)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)  # 2. Курсор руки для всего тега
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(8, 0, 8, 0)
         self.h_lay.setSpacing(5)
+
+        # 3. Создаем и добавляем левую иконку ПЕРЕД текстом
+        self.left_icon = QSvgWidget()
+        self.left_icon.load(str(self.svg_icon_path))
+        self.left_icon.setFixedSize(*self.svg_icon_size)
+        self.h_lay.addWidget(self.left_icon)
 
         self.label = TransparentLabel(text)
         self.h_lay.addWidget(self.label)
@@ -90,7 +98,6 @@ class DatesPeriodTag(UTagWidget):
         self.h_lay.addWidget(self.close_btn_wrapper)
 
         self.close_btn = QSvgWidget()
-        # 3. Меняем обработчик закрытия на метод, чтобы остановить propagation
         self.close_btn.mouseReleaseEvent = self._on_close_clicked 
         self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.close_btn.load(str(self.svg_path))
