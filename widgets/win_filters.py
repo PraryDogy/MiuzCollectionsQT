@@ -400,7 +400,8 @@ class FavTagWidget(TagWidget):
     def __init__(self):
         super().__init__(
             text=Lng.favorites[JsonData.lng_index],
-            l_icon_path=str(self.icon_path)
+            l_icon_path=str(self.icon_path),
+            show_trash=False
         )
         if Dynamic.favs_tag_enabled:
             self.set_qss_style(self.qss_green)
@@ -421,7 +422,8 @@ class SubfoldersTagWidget(TagWidget):
     def __init__(self):
         super().__init__(
             text=Lng.without_subfolders[JsonData.lng_index], 
-            l_icon_path=str(self.icon_path)
+            l_icon_path=str(self.icon_path),
+            show_trash=False
         )
         if Dynamic.no_subfolders_tag_enabled:
             self.set_qss_style(self.qss_green)
@@ -468,6 +470,7 @@ class AddTagWidget(TagWidget):
             l_icon_path=str(self.icon_path)
         )
         self.set_qss_style(self.qss_transparent)
+        self.left_icon.setFixedSize(12, 12)
 
     def mouseReleaseEvent(self, a0):
         self.clicked_.emit()
