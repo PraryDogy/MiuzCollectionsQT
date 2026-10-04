@@ -282,7 +282,7 @@ class WinFiltersTagWidget(UTagWidget):
     load_st_grid = pyqtSignal() 
 
     def __init__(self, text: str, active: bool, show_trash: bool, left_icon_path: str = None):
-        super().__init__()
+        super().__init__(active)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.h_lay = QHBoxLayout(self)
