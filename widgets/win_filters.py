@@ -70,9 +70,12 @@ class DatesPeriodTag(UTagWidget):
     svg_path = Static.COMMON_ICONS / "cancel.svg"
     svg_close_size = (12, 12)
     clicked_close = pyqtSignal()
+    clicked_tag = pyqtSignal()  # 1. Добавляем новый сигнал
 
     def __init__(self, text: str):
         super().__init__(qss_style=self.qss_gray)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)  # 2. Курсор руки для всего тега
+        
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(8, 0, 8, 0)
         self.h_lay.setSpacing(5)
@@ -80,7 +83,6 @@ class DatesPeriodTag(UTagWidget):
         self.label = TransparentLabel(text)
         self.h_lay.addWidget(self.label)
 
-        # Контейнер для SVG
         self.close_btn_wrapper = TransparentWidget()
         close_lay = QVBoxLayout(self.close_btn_wrapper)
         close_lay.setContentsMargins(0, 1, 0, 0)
@@ -88,11 +90,23 @@ class DatesPeriodTag(UTagWidget):
         self.h_lay.addWidget(self.close_btn_wrapper)
 
         self.close_btn = QSvgWidget()
-        self.close_btn.mouseReleaseEvent = lambda e: self.clicked_close.emit()
+        # 3. Меняем обработчик закрытия на метод, чтобы остановить propagation
+        self.close_btn.mouseReleaseEvent = self._on_close_clicked 
         self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.close_btn.load(str(self.svg_path))
         self.close_btn.setFixedSize(*self.svg_close_size)
         close_lay.addWidget(self.close_btn)
+
+    def _on_close_clicked(self, event):
+        """Обработка клика по крестику без триггера самого тега"""
+        self.clicked_close.emit()
+        event.accept()  # Блокируем передачу клика родительскому виджету
+
+    def mouseReleaseEvent(self, event):
+        """Перехватываем клик по самому тегу"""
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked_tag.emit()
+        super().mouseReleaseEvent(event)
 
     def set_active(self, active: bool):
         if active:
@@ -167,12 +181,14 @@ class DatesWidget(UGroupBox):
 
         self.dates_period_tag = DatesPeriodTag("")
         self.dates_period_tag.clicked_close.connect(lambda: self.reset_all(True))
+        
+        # Подключаем вызов меню по клику на сам тег
+        self.dates_period_tag.clicked_tag.connect(self.show_tag_menu)
+        
         if Dynamic.py_date_start:
             self.dates_period_tag.set_active(True)
         else:
             self.dates_period_tag.set_active(False)
-        # ИСПРАВЛЕНО: Убрано self.dynamic_label.setFixedWidth(self.width()), 
-        # так как в __init__ ширина виджета еще не рассчитана (обычно равна 100 или 0)
         
         dynamic_container_lay.addWidget(self.dates_period_tag)
         dynamic_container_lay.addStretch()
@@ -186,22 +202,15 @@ class DatesWidget(UGroupBox):
         self.top_row_layout.setContentsMargins(0, 0, 0, 0)
         self.top_row_layout.setSpacing(0)
 
-        # Кнопка пресетов
-        self.preset_button = UPushButton(Lng.choose_period[ind] + " ")
-        self.top_row_layout.addWidget(self.preset_button)
-
-        preset_menu = UMenu(parent=self)
-        self.preset_button.setMenu(preset_menu)
+        # Делаем меню атрибутом класса
+        self.preset_menu = UMenu(parent=self)
 
         for qdates, text in self.dates_dict.items():
-            action = QAction(text, preset_menu)
-            # ИСПРАВЛЕНО: Игнорируем boolean параметр от clicked/triggered через _
+            action = QAction(text, self.preset_menu)
             action.triggered.connect(
                 lambda _, d=qdates: self.action_cmd(d[0], d[1])
             )
-            preset_menu.addAction(action)
-
-        self.top_row_layout.addSpacing(15)
+            self.preset_menu.addAction(action)
 
         # Выбор дат "От" и "До"
         from_label = TransparentLabel(Lng.from_text[ind] + ":")
@@ -227,6 +236,14 @@ class DatesWidget(UGroupBox):
 
         self.update_readable_date_label()
         self.set_date_buttons_text()
+
+    def show_tag_menu(self):
+        # Показываем меню ровно под тегом
+        pos = self.dates_period_tag.mapToGlobal(QPoint(0, self.dates_period_tag.height()))
+        if hasattr(self.preset_menu, "exec_"):
+            self.preset_menu.exec_(pos)
+        else:
+            self.preset_menu.exec(pos)
 
     def date_digits(self, q_date: QDate) -> str:
         return q_date.toString("dd.MM.yyyy")
