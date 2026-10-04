@@ -349,7 +349,7 @@ class GridTagWidget(UTagWidget):
     clicked_body = pyqtSignal()
 
     def __init__(self, text: str, svg_path: str):
-        super().__init__(qss_style=UTagWidget.qss_gray)
+        super().__init__(qss_style=UTagWidget.qss_green)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.h_lay = QHBoxLayout(self)
