@@ -350,6 +350,7 @@ class GridTagWidget(UTagWidget):
 
     def __init__(self, text: str, svg_path: str):
         super().__init__()
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(7, 2, 7, 2)
@@ -373,7 +374,6 @@ class GridTagWidget(UTagWidget):
 
         self.close_btn = QSvgWidget()
         self.close_btn.mouseReleaseEvent = lambda e: self.clicked_close_cmd()
-        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.close_btn.load(str(self.icon_path))
         self.close_btn.setFixedSize(12, 12)
 
@@ -469,6 +469,7 @@ class ClearFiltersTag(GridTagWidget):
 
 class TagsWidget(TransparentWidget):
     load_st_grid = pyqtSignal()
+    open_filters_win = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -481,22 +482,26 @@ class TagsWidget(TransparentWidget):
         if Dynamic.py_date_start:
             tag = DatesTag()
             tag.clicked_close.connect(self.load_st_grid.emit)
+            tag.clicked_body.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.word_tags_list:
             for word in Dynamic.word_tags_list:
                 tag = WordTag(word)
                 tag.clicked_close.connect(self.load_st_grid.emit)
+                tag.clicked_body.connect(self.open_filters_win.emit)
                 self.flow_layout.addWidget(tag)
 
         if Dynamic.favs_tag_enabled:
             tag = FavTag(Lng.favorites[JsonData.lng_index])
             tag.clicked_close.connect(self.load_st_grid.emit)
+            tag.clicked_body.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.no_subfolders_tag_enabled:
             tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
             tag.clicked_close.connect(self.load_st_grid.emit)
+            tag.clicked_body.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
         tag = ClearFiltersTag(Lng.reset[JsonData.lng_index])
@@ -595,6 +600,7 @@ class Grid(UScrollVerticalArea):
             self.scroll_layout.addWidget(USep())
             self.scroll_layout.addSpacing(10)
             self.tags_widget = TagsWidget()
+            self.tags_widget.open_filters_win.connect(self.open_filters_win.emit)
             self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
             self.scroll_layout.addWidget(self.tags_widget)
 
