@@ -202,10 +202,10 @@ class DbImagesLoader(URunnable):
 
             stmt = stmt.where(sqlalchemy.or_(*search_conditions))
 
-        if any((Dynamic.date_start, Dynamic.date_end)):
+        if any((Dynamic.py_date_start, Dynamic.py_date_end)):
             start, end = self.combine_dates(
-                Dynamic.date_start,
-                Dynamic.date_end
+                Dynamic.py_date_start,
+                Dynamic.py_date_end
             )
             stmt = stmt.where(Thumbs.mod > start, Thumbs.mod < end)
 

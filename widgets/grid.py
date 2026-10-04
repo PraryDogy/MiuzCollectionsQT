@@ -396,8 +396,8 @@ class DatesTag(GridTagWidget):
         self.set_dates_text()
 
     def set_dates_text(self):
-        q_start = QDate(Dynamic.date_start.year, Dynamic.date_start.month, Dynamic.date_start.day)
-        q_end = QDate(Dynamic.date_end.year, Dynamic.date_end.month, Dynamic.date_end.day)
+        q_start = QDate(Dynamic.py_date_start.year, Dynamic.py_date_start.month, Dynamic.py_date_start.day)
+        q_end = QDate(Dynamic.py_date_end.year, Dynamic.py_date_end.month, Dynamic.py_date_end.day)
         
         if JsonData.lng_index == 0:
             locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
@@ -411,8 +411,8 @@ class DatesTag(GridTagWidget):
         self.title.setText(f"{start_str} - {end_str}")
 
     def clicked_close_cmd(self):
-        Dynamic.date_start = None
-        Dynamic.date_end = None
+        Dynamic.py_date_start = None
+        Dynamic.py_date_end = None
         return super().clicked_close_cmd()
 
 
@@ -459,8 +459,8 @@ class ClearFiltersTag(GridTagWidget):
         self.mouseReleaseEvent = self.clicked_close_cmd
 
     def clicked_close_cmd(self, *args):
-        Dynamic.date_start = None
-        Dynamic.date_end = None
+        Dynamic.py_date_start = None
+        Dynamic.py_date_end = None
         Dynamic.favs_tag_enabled = False
         Dynamic.no_subfolders_tag_enabled = False
         Dynamic.word_tags_list.clear()
@@ -478,7 +478,7 @@ class TagsWidget(TransparentWidget):
         self._create_tags()
 
     def _create_tags(self):
-        if Dynamic.date_start:
+        if Dynamic.py_date_start:
             tag = DatesTag()
             tag.clicked_close.connect(self.load_st_grid.emit)
             self.flow_layout.addWidget(tag)
@@ -585,7 +585,7 @@ class Grid(UScrollVerticalArea):
         self.scroll_layout.addSpacing(10)
 
         has_filters = any((
-            Dynamic.date_start,
+            Dynamic.py_date_start,
             Dynamic.word_tags_list,
             Dynamic.favs_tag_enabled,
             Dynamic.no_subfolders_tag_enabled,

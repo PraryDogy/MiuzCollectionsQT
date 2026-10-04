@@ -87,20 +87,20 @@ class DatesWidget(UGroupBox):
         }
 
         # Инициализация дат с проверкой Dynamic
-        if Dynamic.date_start:
-            dt = Dynamic.date_start
+        if Dynamic.py_date_start:
+            dt = Dynamic.py_date_start
             self.q_date_start = QDate(dt.year, dt.month, dt.day)
         else:
             self.q_date_start = self.q_date_min
 
-        if Dynamic.date_end:
-            dt = Dynamic.date_end
+        if Dynamic.py_date_end:
+            dt = Dynamic.py_date_end
             self.q_date_end = QDate(dt.year, dt.month, dt.day)
         else:
             self.q_date_end = _today
 
-        self.py_date_start = Dynamic.date_start
-        self.py_date_end = Dynamic.date_end
+        self.py_date_start = Dynamic.py_date_start
+        self.py_date_end = Dynamic.py_date_end
         
         # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
@@ -250,14 +250,11 @@ class DatesWidget(UGroupBox):
             self.py_date_end = self.q_date_end.toPyDate()
 
     def clear_btn_cmd(self, *args):
-        Dynamic.loaded_thumbs = 0
-        # ИСПРАВЛЕНО: Сбрасываем q_dates на значения "за все время"
         self.q_date_start = self.q_date_min
         self.q_date_end = QDate.currentDate()
         self.apply_filter() # Применяем фильтр (установит py_date в None)
         # ИСПРАВЛЕНО: Убран 0. Метод handle_preset_change не принимает аргументов!
         self.handle_preset_change() 
-        print("Dates successfully reset")
 
 
 class WinFiltersTagWidget(UTagWidget):
@@ -572,10 +569,17 @@ class WinFilters(UMainWidget):
         self.adjustSize()
 
     def apply_filters(self):
-        date_start = self.dates_widget.py_date_start
-        date_end = self.dates_widget.py_date_end
-        Dynamic.date_start = date_start
-        Dynamic.date_end = date_end
+        py_date_start = self.dates_widget.py_date_start
+        py_date_end = self.dates_widget.py_date_end
+        q_dates = (self.dates_widget.q_date_start, self.dates_widget.q_date_end)
+        if q_dates == self.dates_widget.all_time:
+            Dynamic.loaded_thumbs = 0
+            Dynamic.py_date_start = None
+            Dynamic.py_date_end = None
+        else:
+            Dynamic.py_date_start = py_date_start
+            Dynamic.py_date_end = py_date_end
+
         self.load_st_grid.emit()
         self.deleteLater()
 
