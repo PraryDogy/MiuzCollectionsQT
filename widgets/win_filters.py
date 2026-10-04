@@ -1,7 +1,7 @@
 import os
 
 from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtGui import QAction, QCursor, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout,
                              QWidget)
@@ -250,12 +250,10 @@ class DatesWidget(UGroupBox):
         self.set_date_buttons_text()
 
     def show_tag_menu(self):
-        # Показываем меню ровно под тегом
-        pos = self.dates_period_tag.mapToGlobal(QPoint(0, self.dates_period_tag.height()))
-        if hasattr(self.preset_menu, "exec_"):
-            self.preset_menu.exec_(pos)
-        else:
-            self.preset_menu.exec(pos)
+        pos = QCursor.pos()
+        # Смещаем меню на 15 пикселей вниз (можно изменить значение)
+        pos = pos + QPoint(-20, 5)
+        self.preset_menu.exec(pos)
 
     def date_digits(self, q_date: QDate) -> str:
         return q_date.toString("dd.MM.yyyy")
