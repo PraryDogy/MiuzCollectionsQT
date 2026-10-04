@@ -65,9 +65,15 @@ class DatesButton(UPushButton):
         self.setFixedWidth(max_width + 20)
 
 
-class PeriodLabel(GrayTextLabel):
-    def __init__(self, text):
-        super().__init__(text)
+class DatesPeriodTag(UTagWidget):
+    def __init__(self, text: str, active = False):
+        super().__init__(active)
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(0, 0, 0, 0)
+        self.h_lay.setSpacing(0)
+
+        self.label = TransparentLabel(text)
+        self.h_lay.addWidget(self.label)
 
 
 class DatesWidget(UGroupBox):
@@ -131,7 +137,7 @@ class DatesWidget(UGroupBox):
         choosed_label = TransparentLabel(Lng.period[JsonData.lng_index] + ":")
         dynamic_container_lay.addWidget(choosed_label)
 
-        self.dynamic_label = PeriodLabel("")
+        self.dynamic_label = DatesPeriodTag("")
         # ИСПРАВЛЕНО: Убрано self.dynamic_label.setFixedWidth(self.width()), 
         # так как в __init__ ширина виджета еще не рассчитана (обычно равна 100 или 0)
         
@@ -247,14 +253,18 @@ class DatesWidget(UGroupBox):
 
         if self.all_time == (self.q_date_start, self.q_date_end):
             text = Lng.all_time[ind]
+            active = False
         elif (self.q_date_start, self.q_date_end) in self.dates_dict:
             text = self.dates_dict[self.q_date_start, self.q_date_end]
+            active = True
         else:
             str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
             str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
             text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
+            active = True
 
-        self.dynamic_label.setText(text.lower())
+        self.dynamic_label.label.setText(text.lower())
+        self.dynamic_label.set_active(active)
 
     def apply_filter(self, with_sig: bool):
         # ИСПРАВЛЕНО: Корректно передаем None, если выбрано "Все время"
