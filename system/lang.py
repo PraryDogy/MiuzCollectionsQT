@@ -390,8 +390,10 @@ class Lng:
         "MIUZ Diamonds"
     )
     choose_period = ("Выбрать период", "Choose period")
+    all_time = ("За все время", "All time")
     from_text = ("С", "From")
     to_text = ("По", "To")
+    not_selected = ["Не выбрано", "Not set"]
 
     # Пресеты меню
     preset_today = ("Сегодня", "Today")

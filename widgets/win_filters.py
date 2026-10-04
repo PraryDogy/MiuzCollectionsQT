@@ -59,7 +59,7 @@ class DatesButton(UPushButton):
         # Правильный способ задать фиксированную ширину под дату
         fm = self.fontMetrics()
         # Берем строку с запасом (с пробелами), чтобы текст не прилипал к краям
-        max_width = fm.horizontalAdvance(" 31.12.9999 ")
+        max_width = fm.horizontalAdvance(Lng.not_selected[JsonData.lng_index])
         
         # Добавляем 20px на внутренние отступы (padding/borders) кнопки
         self.setFixedWidth(max_width + 20)
@@ -212,9 +212,15 @@ class DatesWidget(UGroupBox):
         self.update_readable_date_label()
 
     def set_date_buttons_text(self):
+        ind = JsonData.lng_index
+        
         if self.all_time == (self.q_date_start, self.q_date_end):
-            self.date_start_btn.setText("-")
-            self.date_end_btn.setText("-")
+            # Вместо "-" ставим осмысленный текст
+            # В Lng добавьте: not_selected = ["Любая", "Any"] или ["Не выбрано", "None"]
+            empty_text = Lng.not_selected[ind] 
+            
+            self.date_start_btn.setText(empty_text)
+            self.date_end_btn.setText(empty_text)
         else:
             self.date_start_btn.setText(self.date_digits(self.q_date_start))
             self.date_end_btn.setText(self.date_digits(self.q_date_end))
@@ -224,14 +230,13 @@ class DatesWidget(UGroupBox):
         locale = QLocale(QLocale.Language.Russian if ind == 0 else QLocale.Language.English)
 
         if self.all_time == (self.q_date_start, self.q_date_end):
-            text = "-"
+            text = Lng.all_time[ind]
         elif (self.q_date_start, self.q_date_end) in self.dates_dict:
             text = self.dates_dict[self.q_date_start, self.q_date_end]
         else:
             str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
             str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-            # ИСПРАВЛЕНО: Хардкод "по" заменен на тире, чтобы работало и на английском
-            text = f"{Lng.from_text[ind]} {str_from} - {str_to}" 
+            text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
 
         self.dynamic_label.setText(text)
 
