@@ -66,8 +66,9 @@ class DatesButton(UPushButton):
 
 
 class DatesPeriodTag(UTagWidget):
-    svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
-    left_svg_size = (12, 12)
+    svg_path = Static.COMMON_ICONS / "cancel.svg"
+    svg_close_size = (12, 12)
+    clicked_close = pyqtSignal()
 
     def __init__(self, text: str):
         super().__init__(qss_style=self.qss_gray)
@@ -75,13 +76,22 @@ class DatesPeriodTag(UTagWidget):
         self.h_lay.setContentsMargins(8, 0, 8, 0)
         self.h_lay.setSpacing(5)
 
-        self.svg_widget = QSvgWidget()
-        self.svg_widget.load(str(self.svg_path))
-        self.svg_widget.setFixedSize(*self.left_svg_size)
-        # self.h_lay.addWidget(self.svg_widget)
-
         self.label = TransparentLabel(text)
         self.h_lay.addWidget(self.label)
+
+        # Контейнер для SVG
+        self.close_btn_wrapper = TransparentWidget()
+        close_lay = QVBoxLayout(self.close_btn_wrapper)
+        close_lay.setContentsMargins(0, 1, 0, 0)
+        close_lay.setSpacing(0)
+        self.h_lay.addWidget(self.close_btn_wrapper)
+
+        self.close_btn = QSvgWidget()
+        self.close_btn.mouseReleaseEvent = lambda e: self.clicked_close.emit()
+        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.close_btn.load(str(self.svg_path))
+        self.close_btn.setFixedSize(*self.svg_close_size)
+        close_lay.addWidget(self.close_btn)
 
 
 class DatesWidget(UGroupBox):
