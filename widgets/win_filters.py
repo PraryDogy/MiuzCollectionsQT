@@ -54,12 +54,13 @@ class WinFiltersTitleWidget(QWidget):
 
 
 class DatesWidget(UGroupBox):
-    reload_thumbnails = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (15, 15)
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.date_start = Dynamic.date_start
+        self.date_end = Dynamic.date_end
 
         if Dynamic.date_start:
             dt = Dynamic.date_start
@@ -265,10 +266,9 @@ class DatesWidget(UGroupBox):
         self.dynamic_label.setText(text)
 
     def apply_filter(self, index: int):
-        Dynamic.date_start = self.q_date_start.toPyDate()
-        Dynamic.date_end = self.q_date_end.toPyDate()
+        self.date_start = self.q_date_start.toPyDate()
+        self.date_end = self.q_date_end.toPyDate()
         Dynamic.date_index = index
-        self.reload_thumbnails.emit()
 
     def clear_btn_cmd(self, *args):
         Dynamic.loaded_thumbs = 0
@@ -568,7 +568,6 @@ class WinFilters(UMainWidget):
         self.central_layout.setContentsMargins(10, 10, 10, 10)
 
         self.dates_widget = DatesWidget()
-        self.dates_widget.reload_thumbnails.connect(self.load_st_grid.emit)
         self.central_layout.addWidget(self.dates_widget)
 
         self.tags_widget = TagsWidget()
@@ -583,6 +582,7 @@ class WinFilters(UMainWidget):
 
         self.buttons_layout.addStretch(1)
         self.apply_button = ActiveButton(Lng.apply[JsonData.lng_index])
+        self.apply_button.clicked.connect(self.apply_filters)
         self.buttons_layout.addWidget(self.apply_button)
 
         self.close_button = UPushButton(Lng.close[JsonData.lng_index])
@@ -592,6 +592,16 @@ class WinFilters(UMainWidget):
         self.tags_widget.user_tags.adjustSize()
         self.tags_widget.adjustSize()
         self.adjustSize()
+
+    def apply_filters(self):
+        date_start = self.dates_widget.date_start
+        date_end = self.dates_widget.date_end
+        if date_start:
+            Dynamic.date_start = date_start
+        if date_end:
+            Dynamic.date_end = date_end
+        self.load_st_grid.emit()
+        self.deleteLater()
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)
