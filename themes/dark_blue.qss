@@ -447,9 +447,9 @@ WinCollage {
 /* win_img_search.py */
 
 WinImgSearchDropWidget {
-    border: 2px dashed #363636;
+    border: 2px dashed #263440;
     border-radius: 20px;
-    background: #202020;
+    background: #111a23;
 }
 
 WinImgSearchPreviewWidget {
