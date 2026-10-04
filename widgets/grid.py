@@ -389,7 +389,7 @@ class GridTagWidget(UTagWidget):
 
 
 class DatesTag(GridTagWidget):
-    svg_path = Static.COMMON_ICONS / "calendar.svg"
+    svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
 
     def __init__(self):
         super().__init__("", str(self.svg_path))

@@ -66,11 +66,20 @@ class DatesButton(UPushButton):
 
 
 class DatesPeriodTag(UTagWidget):
+    svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
+    left_svg_size = (12, 12)
+
     def __init__(self, text: str, active = False):
         super().__init__(active)
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(0, 0, 0, 0)
-        self.h_lay.setSpacing(0)
+        self.h_lay.setSpacing(5)
+        self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+
+        self.svg_widget = QSvgWidget()
+        self.svg_widget.load(str(self.svg_path))
+        self.svg_widget.setFixedSize(*self.left_svg_size)
+        self.h_lay.addWidget(self.svg_widget)
 
         self.label = TransparentLabel(text)
         self.h_lay.addWidget(self.label)
