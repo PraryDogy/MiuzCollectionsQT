@@ -117,7 +117,7 @@ class DatesWidget(UGroupBox):
             text=Lng.dates_management[ind],
             svg_path=str(self.calendar_svg)
         )
-        self.title_widget.reset_clicked.connect(self.clear_btn_cmd) 
+        self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
         self.main_layout.addWidget(self.title_widget)
 
         self.main_layout.addWidget(USep())
@@ -212,7 +212,7 @@ class DatesWidget(UGroupBox):
             else:
                 self.q_date_end = date
             self.handle_preset_change()
-            self.apply_filter()
+            self.apply_filter(True)
 
         self.calendar_win.date_selected.connect(on_date_selected)
         self.calendar_win.show()
@@ -221,7 +221,7 @@ class DatesWidget(UGroupBox):
         self.q_date_start = q_date_start
         self.q_date_end = q_date_end
         self.handle_preset_change()
-        self.apply_filter() # ИСПРАВЛЕНО: Раскомментировано, иначе фильтр не применялся
+        self.apply_filter(True) # ИСПРАВЛЕНО: Раскомментировано, иначе фильтр не применялся
 
     def handle_preset_change(self):
         self.set_date_buttons_text()
@@ -256,7 +256,7 @@ class DatesWidget(UGroupBox):
 
         self.dynamic_label.setText(text.lower())
 
-    def apply_filter(self):
+    def apply_filter(self, with_sig: bool):
         # ИСПРАВЛЕНО: Корректно передаем None, если выбрано "Все время"
         if self.all_time == (self.q_date_start, self.q_date_end):
             self.py_date_start = None
@@ -267,16 +267,17 @@ class DatesWidget(UGroupBox):
 
         Dynamic.py_date_start = self.py_date_start
         Dynamic.py_date_end = self.py_date_end
-        self.load_st_grid.emit()
+        if with_sig:
+            self.load_st_grid.emit()
 
-    def clear_btn_cmd(self, *args):
+    def reset_all(self, with_sig: bool):
         self.q_date_start = self.q_date_min
         self.q_date_end = QDate.currentDate()
-        self.apply_filter()
+        self.apply_filter(with_sig)
         self.handle_preset_change() 
 
 
-class WinFiltersTagWidget(UTagWidget):
+class TagWidget(UTagWidget):
     trash_icon_path = Static.COMMON_ICONS / "trash.svg"
     on_trash_clicked = pyqtSignal()
     load_st_grid = pyqtSignal() 
@@ -322,7 +323,7 @@ class WinFiltersTagWidget(UTagWidget):
         super().mouseReleaseEvent(a0)
 
 
-class WinFiltersFavTag(WinFiltersTagWidget):
+class FavTagWidget(TagWidget):
     icon_path =  Static.COMMON_ICONS / "fav.svg"
 
     def __init__(self):
@@ -343,7 +344,7 @@ class WinFiltersFavTag(WinFiltersTagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
+class SubfoldersTagWidget(TagWidget):
     icon_path =  Static.COMMON_ICONS / "folder_gray.svg"
 
     def __init__(self):
@@ -364,7 +365,7 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class WinFiltersWordTag(WinFiltersTagWidget):
+class WordFiltersTagWidget(TagWidget):
     icon_path = Static.COMMON_ICONS / "tags.svg"
 
     def __init__(self, text):
@@ -384,7 +385,7 @@ class WinFiltersWordTag(WinFiltersTagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class WinFiltersAddTag(WinFiltersTagWidget):
+class AddTagWidget(TagWidget):
     icon_path =  Static.COMMON_ICONS / "plus_simple.svg"
     clicked_ = pyqtSignal()
 
@@ -412,11 +413,11 @@ class StandartTags(TransparentWidget):
         self._create_tags()
 
     def _create_tags(self):
-        tag = WinFiltersFavTag()
+        tag = FavTagWidget()
         tag.load_st_grid.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
-        tag = WinFiltersOnlyFolderTag()
+        tag = SubfoldersTagWidget()
         tag.load_st_grid.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
@@ -437,14 +438,14 @@ class UserTags(TransparentWidget):
 
     def _create_tags(self):
         for word in Filters.items:
-            tag = WinFiltersWordTag(word)
+            tag = WordFiltersTagWidget(word)
             tag.load_st_grid.connect(self.load_st_grid.emit)
             tag.on_trash_clicked.connect(
                 lambda w=tag: self.show_remove_tag_win(w)
             )
             self.flow_layout.addWidget(tag)
 
-        self.add_tag = WinFiltersAddTag()
+        self.add_tag = AddTagWidget()
         self.add_tag.clicked_.connect(self.show_text_win)
         self.flow_layout.addWidget(self.add_tag)
 
@@ -454,7 +455,7 @@ class UserTags(TransparentWidget):
             if text:
                 Filters.items.append(text)
                 Filters.write_json_data()
-                tag = WinFiltersWordTag(text)
+                tag = WordFiltersTagWidget(text)
                 tag.load_st_grid.connect(self.load_st_grid.emit)
                 tag.on_trash_clicked.connect(
                     lambda w=tag: self.show_remove_tag_win(w)
@@ -472,7 +473,7 @@ class UserTags(TransparentWidget):
         self.text_win.ok_clicked.connect(ok_clicked)
         self.text_win.show()
 
-    def show_remove_tag_win(self, widget: WinFiltersWordTag):
+    def show_remove_tag_win(self, widget: WordFiltersTagWidget):
 
         def ok_clicked():
             text = widget.title.text() 
@@ -517,7 +518,7 @@ class TagsWidget(UGroupBox):
             text=Lng.tag_management[JsonData.lng_index],
             svg_path=str(self.svg_path)
         )
-        self.title_widget.reset_clicked.connect(self.reset_tags)
+        self.title_widget.reset_clicked.connect(lambda: self.reset_tags(True))
         self.v_lay.addWidget(self.title_widget)
 
         self.v_lay.addWidget(USep())
@@ -536,14 +537,15 @@ class TagsWidget(UGroupBox):
         self.user_tags.load_st_grid.connect(self.load_st_grid.emit)
         self.v_lay.addWidget(self.user_tags)
 
-    def reset_tags(self):
+    def reset_tags(self, with_sig: bool):
         Dynamic.favs_tag_enabled = False
         Dynamic.no_subfolders_tag_enabled = False
         Dynamic.word_tags_list.clear()
-        tags = self.findChildren(WinFiltersTagWidget)
+        tags = self.findChildren(TagWidget)
         for i in tags:
             i.set_active(False)
-        self.load_st_grid.emit()
+        if with_sig:
+            self.load_st_grid.emit()
 
 
 class WinFilters(UMainWidget):
@@ -579,13 +581,22 @@ class WinFilters(UMainWidget):
 
         self.buttons_layout.addStretch(1)
 
-        self.close_button = ActiveButton(Lng.close[JsonData.lng_index])
+        self.reset_all_button = UPushButton(Lng.reset_all[JsonData.lng_index])
+        self.reset_all_button.clicked.connect(self.reset_all_cmd)
+        self.buttons_layout.addWidget(self.reset_all_button)
+
+        self.close_button = ActiveButton(Lng.done[JsonData.lng_index])
         self.close_button.clicked.connect(self.deleteLater)
         self.buttons_layout.addWidget(self.close_button)
 
         self.tags_widget.user_tags.adjustSize()
         self.tags_widget.adjustSize()
         self.adjustSize()
+
+    def reset_all_cmd(self):
+        self.dates_widget.reset_all(False)
+        self.tags_widget.reset_tags(False)
+        self.load_st_grid.emit()
 
     def mouseReleaseEvent(self, a0):
         return super().mouseReleaseEvent(a0)

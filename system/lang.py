@@ -68,6 +68,7 @@ class Lng:
     scan_folder = ("Искать изображения", "Find images")
     update_grid = ("Обновить", "Update")
     reset = ("Сбросить", "Reset")
+    reset_all = ("Сбросить все", "Reset all")
     resol = ("Разрешение", "Resolution")
     reveal_in_finder = ("Показать в Finder", "Reveal in Finder")
     save_to_downloads = ("Сохранить в загрузки", "Save to Downloads")
@@ -488,4 +489,8 @@ class Lng:
     hide = (
         "Скрыть",
         "Hide"
+    )
+    done = (
+        "Готово",
+        "Done"
     )
