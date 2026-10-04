@@ -125,17 +125,13 @@ class WinImgViewGraphics(QGraphicsView):
             self.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
 
 
-class CustomSvg(QSvgWidget):
+class ImgViewSvg(QSvgWidget):
     clicked = pyqtSignal()
     svg_size = 50
 
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(
-            """
-                background: transparent;
-            """
-        )
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def load(self, file_path: str):
         super().load(file_path)
@@ -152,7 +148,7 @@ class CustomSvg(QSvgWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class ZoomWidget(CustomSvg):
+class ZoomWidget(ImgViewSvg):
     zoom_close = pyqtSignal()
     zoom_in = pyqtSignal()
     zoom_out = pyqtSignal()
@@ -162,6 +158,7 @@ class ZoomWidget(CustomSvg):
     def __init__(self):
         super().__init__()
         self.load(str(self.svg_path))
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.zone_width = self.width() / 4
         self.start_pos = None
         self.is_move = False
@@ -204,7 +201,7 @@ class ZoomWidget(CustomSvg):
         return super().mouseReleaseEvent(a0)
 
 
-class PrevButton(CustomSvg):
+class PrevButton(ImgViewSvg):
     svg_path = Static.COMMON_ICONS / "previous.svg"
 
     def __init__(self) -> None:
@@ -212,7 +209,7 @@ class PrevButton(CustomSvg):
         self.load(str(self.svg_path))
 
 
-class NextButton(CustomSvg):
+class NextButton(ImgViewSvg):
     svg_path = Static.COMMON_ICONS / "next.svg"
 
     def __init__(self) -> None:
