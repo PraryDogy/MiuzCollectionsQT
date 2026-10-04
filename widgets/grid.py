@@ -20,7 +20,7 @@ from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, TransparentFrame, TransparentLabel,
                             TransparentWidget, UMenu, UPushButton,
-                            UScrollVerticalArea, USep)
+                            UScrollVerticalArea, USep, UTagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
@@ -343,15 +343,13 @@ class GridControlsWidget(TransparentWidget):
         self.v_lay.addStretch()
 
 
-class GridTagWidget(TransparentFrame):
+class GridTagWidget(UTagWidget):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
     clicked_close = pyqtSignal()
     clicked_body = pyqtSignal()
-    svg_size = (15, 15)
 
     def __init__(self, text: str, svg_path: str):
         super().__init__()
-        self.setFixedHeight(23)
 
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(7, 2, 7, 2)
@@ -360,7 +358,7 @@ class GridTagWidget(TransparentFrame):
         if svg_path:
             self.svg_widget = QSvgWidget()
             self.svg_widget.load(svg_path)
-            self.svg_widget.setFixedSize(*self.svg_size)
+            self.svg_widget.setFixedSize(*self.icon_size)
             self.h_lay.addWidget(self.svg_widget)
 
         self.title = TransparentLabel(text)

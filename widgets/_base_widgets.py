@@ -370,6 +370,38 @@ class UGroupBox(UGroupBox):
         super().__init__(title, parent)
 
 
+class GrayTextLabel(TransparentLabel):
+    def __init__(self, text: str):
+        super().__init__(text)
+
+
+class TitleTextLabel(TransparentLabel):
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
+
+
+class UTagWidget(TransparentFrame):
+    tag_height = 23
+    qss_property_name = "active"
+    icon_size = (15, 15)
+
+    def __init__(self, active: bool = False):
+        super().__init__()
+        self._active = active
+
+        self.setFixedHeight(self.tag_height)
+        self.setProperty(UTagWidget.qss_property_name, str(active))
+        if active:
+            self.set_active(True)
+
+    def set_active(self, active: bool):
+        if self._active != active:
+            self._active = active
+            self.setProperty(UTagWidget.qss_property_name, str(active))
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.update()
+
 
 class SelectableLabel(TransparentLabel):
     sym_line_feed = "\u000a"
@@ -548,16 +580,6 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
-class GrayTextLabel(TransparentLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
-
-
-class TitleTextLabel(TransparentLabel):
-    def __init__(self, text="", parent=None):
-        super().__init__(text, parent)
-
-
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
@@ -632,7 +654,7 @@ class WarningWindow(ConfirmWindow):
         self.cancel_btn.hide()
 
 
-class TextWindow(UMainWidget):
+class InputTextWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
     cancel_clicked = pyqtSignal()
 

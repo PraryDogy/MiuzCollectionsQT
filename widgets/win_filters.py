@@ -10,10 +10,10 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (ConfirmWindow, FlowLayout, TitleTextLabel,
-                            TextWindow, TransparentFrame, TransparentLabel,
-                            TransparentWidget, UGroupBox, UListWidget,
-                            UMainWidget, UMenu, UPushButton, USep, GrayTextLabel)
+from ._base_widgets import (ConfirmWindow, FlowLayout, GrayTextLabel,
+                            InputTextWin, TitleTextLabel, TransparentFrame,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UMainWidget, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
 
 UGroupBox_margins = (5, 5, 5, 5)
@@ -282,21 +282,14 @@ class DatesWidget(UGroupBox):
         self.reload_thumbnails.emit()
 
 
-class WinFiltersTagWidget(TransparentFrame):
+class WinFiltersTagWidget(UTagWidget):
     icon_path = Static.COMMON_ICONS / "trash.svg"
     on_trash_clicked = pyqtSignal()
     load_st_grid = pyqtSignal() 
-    tag_height = 23
-    icon_size = (12, 12)
 
-    # Добавляем параметр show_trash=True по умолчанию
     def __init__(self, text: str, active: bool, show_trash: bool, left_icon_path: str = None):
         super().__init__()
-        self.setFixedHeight(self.tag_height)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        self._active = active
-        self.setProperty("active", str(active))
 
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(7, 2, 7, 2)
@@ -326,17 +319,6 @@ class WinFiltersTagWidget(TransparentFrame):
 
             close_lay.addWidget(self.trash_btn)
             self.h_lay.addWidget(self.close_btn_wrapper)
-
-        if active:
-            self.set_active(True)
-
-    def set_active(self, active: bool):
-        if self._active != active:
-            self._active = active
-            self.setProperty("active", str(active))
-            self.style().unpolish(self)
-            self.style().polish(self)
-            self.update()
 
     def on_trash_clicked_cmd(self, e):
         self.on_trash_clicked.emit()
@@ -481,7 +463,7 @@ class UserTags(TransparentWidget):
                 self.flow_layout.clear()
                 self._create_tags()
 
-        self.text_win = TextWindow(
+        self.text_win = InputTextWin(
             title=Lng.new_tag[JsonData.lng_index],
             description=Lng.new_tag_desc[JsonData.lng_index],
             size=(300, 100)

@@ -274,6 +274,23 @@ UGroupBox {
 }
 
 
+UTagWidget {
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+UTagWidget[active="True"] {
+    background: #0059D1;;
+    border: 1px solid #156ee3;
+}
+
+
+UTagWidget[active="False"] {
+    background: #4e4e4e;
+    border: 1px solid #585858;
+}
+
+
 QToolTip {
     color: #FFFFFF;
     background-color: #2B2B2B;
@@ -357,12 +374,6 @@ ThumbMiuzBlueTextWidget {
     font-size: 11px;
 }
 
-GridTagWidget {
-    background: #4e4e4e;
-    border: 1px solid #585858;
-    border-radius: 10px;
-    color: #ffffff;
-}
 
 /* grid.py */
 
@@ -385,22 +396,6 @@ WinCollage {
 /* win_copy_files.py */
 
 /* win_filters.py */
-
-WinFiltersTagWidget {
-    border-radius: 10px;
-    color: #ffffff;
-}
-
-WinFiltersTagWidget[active="True"] {
-    background: #0059D1;;
-    border: 1px solid #156ee3;
-}
-
-
-WinFiltersTagWidget[active="False"] {
-    background: #4e4e4e;
-    border: 1px solid #585858;
-}
 
 
 WinFiltersAddTag[active="False"] {
