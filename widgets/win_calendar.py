@@ -215,10 +215,6 @@ class WinCalendar(UMainWidget):
 
 		self.btn_container_layout.addStretch(1)
 
-		self.ok_btn = ActiveButton(Lng.apply[JsonData.lng_index])
-		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
-		self.btn_container_layout.addWidget(self.ok_btn)
-
 		self.cancel_btn = UPushButton(Lng.close[JsonData.lng_index])
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_container_layout.addWidget(self.cancel_btn)
@@ -226,10 +222,6 @@ class WinCalendar(UMainWidget):
 
 		self.create_calendar_widget()
 		self.update_calendar()
-
-	def ok_clicked_cmd(self):
-		self.date_selected.emit(self.current_date)
-		self.deleteLater()
 
 	def create_calendar_widget(self):
 		self.calendar_widget = TransparentWidget()
@@ -315,6 +307,7 @@ class WinCalendar(UMainWidget):
 
 	def update_calendar(self):
 		self.update_dynamic_label()
+		self.date_selected.emit(self.current_date)
 
 		current_year = self.current_date.year()
 		current_month = self.current_date.month()
