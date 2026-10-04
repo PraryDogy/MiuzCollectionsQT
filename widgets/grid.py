@@ -449,24 +449,6 @@ class OnlyFolderTag(GridTagWidget):
         return super().clicked_close_cmd()
 
 
-class ClearFiltersTag(GridTagWidget):
-    icon_path = Static.COMMON_ICONS / "trash.svg"
-    svg_path = ""
-
-    def __init__(self, text: str):
-        super().__init__(Lng.reset[JsonData.lng_index], self.svg_path)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.mouseReleaseEvent = self.clicked_close_cmd
-
-    def clicked_close_cmd(self, *args):
-        Dynamic.py_date_start = None
-        Dynamic.py_date_end = None
-        Dynamic.favs_tag_enabled = False
-        Dynamic.no_subfolders_tag_enabled = False
-        Dynamic.word_tags_list.clear()
-        return super().clicked_close_cmd()
-
-
 class TagsWidget(TransparentWidget):
     load_st_grid = pyqtSignal()
     open_filters_win = pyqtSignal()
@@ -503,10 +485,6 @@ class TagsWidget(TransparentWidget):
             tag.clicked_close.connect(self.load_st_grid.emit)
             tag.clicked_body.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
-
-        tag = ClearFiltersTag(Lng.reset[JsonData.lng_index])
-        tag.clicked_close.connect(self.load_st_grid.emit)
-        self.flow_layout.addWidget(tag)
 
     def hasHeightForWidth(self):
         return True
