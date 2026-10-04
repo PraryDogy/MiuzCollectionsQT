@@ -1,0 +1,490 @@
+/* _base_widgets.py */
+
+TransparentButton,
+TransparentLabel,
+TransparentFrame,
+TransparentWidget,
+TransparentLineEdit,
+TransparentTextEdit,
+TransparentMenu,
+TransparentScrollArea,
+UGroupBox,
+TransparentListWidget,
+TransparentTreeWidget,
+TransparentTreeView {
+    background: transparent;
+    border: none;
+}
+
+UMainWindow,
+UMainWidget {
+    background: #0c1218;
+}
+
+
+/* ==================== MENU ==================== */
+
+UMenu {
+    background: #111a23;
+    border: 1px solid #263440;
+    border-radius: 10px;
+    padding: 5px 2px 5px 2px;
+}
+
+UMenu::item {
+    background: transparent;
+    color: #ffffff;
+    padding: 5px 30px 5px 10px;
+}
+
+UMenu::item:selected {
+    background: #202c38;
+    color: #ffffff;
+}
+
+UMenu::icon {
+    padding-left: 5px;
+}
+
+UMenu::indicator {
+    width: 16px;
+    height: 16px;
+    padding-left: 5px;
+}
+
+UMenu::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+UMenu::indicator:unchecked {
+    image: none;
+}
+
+UMenu::right-arrow {
+    image: url("./icons/common/arrow_right.svg");
+    width: 12px;
+    height: 12px;
+    padding-right: 5px;
+}
+
+UMenu::right-arrow:selected {
+    image: url("./icons/common/arrow_right.svg");
+}
+
+
+/* ==================== INPUT ==================== */
+
+ULineEdit {
+    color: #ffffff;
+    background: #151f29;
+    border: 1px solid #263440;
+    border-radius: 6px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+UTextEdit {
+    color: #ffffff;
+    background: #151f29;
+    border: 1px solid #263440;
+    border-radius: 6px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+
+/* ==================== SCROLL ==================== */
+
+UScrollVerticalArea {
+    background: transparent;
+}
+
+
+/* ==================== TREE / LIST ==================== */
+
+UTreeView,
+UListWidget,
+UTreeWidget {
+    color: #ffffff;
+    background: #111a23;
+    border: 1px solid #263440;
+    border-radius: 10px;
+    padding: 10px 2px 10px 2px;
+}
+
+UTreeView::item,
+UListWidget::item,
+UTreeWidget::item {
+    color: #ffffff;
+    background: transparent;
+    height: 30px;
+}
+
+UTreeView::item:selected,
+UTreeView::item:selected:!active,
+UListWidget::item:selected,
+UListWidget::item:selected:!active,
+UTreeWidget::item:selected,
+UTreeWidget::item:selected:!active {
+    color: #ffffff;
+    background: #202c38;
+}
+
+UTreeView::branch:has-children:closed,
+UTreeWidget::branch:has-children:closed {
+    image: url(./icons/common/plus.svg);
+}
+
+UTreeView::branch:has-children:open,
+UTreeWidget::branch:has-children:open {
+    image: url(./icons/common/minus.svg);
+}
+
+UTreeView::branch:selected,
+UTreeWidget::branch:selected {
+    background: #202c38;
+}
+
+UListWidget::indicator {
+    width: 16px;
+    height: 16px;
+    background: #151f29;
+    border: 1px solid #30404f;
+    border-radius: 4px;
+}
+
+UListWidget::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+UListWidget::indicator:disabled {
+    background-color: #111a23;
+    border-color: #1d2833;
+}
+
+
+/* ==================== BUTTON ==================== */
+
+UPushButton {
+    font-size: 11px;
+    background: #18212a;
+    border: 1px solid #263440;
+    border-radius: 6px;
+    color: #ffffff;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+UPushButton:hover {
+    background: #1d2833;
+    border-color: #30404f;
+}
+
+UPushButton:pressed {
+    background: #202c38;
+    border: 1px solid #30404f;
+}
+
+UPushButton::menu-indicator {
+    image: url("./icons/common/arrow_down.svg");
+    width: 12px;
+    height: 12px;
+}
+
+
+/* ==================== ACTIVE BUTTON ==================== */
+
+ActiveButton {
+    background: #0059D1;
+    border: 1px solid #0e69df;
+}
+
+ActiveButton:hover {
+    background: #0a63dc;
+}
+
+ActiveButton:pressed {
+    background: #0e69df;
+    border: 1px solid #2d7be1;
+}
+
+
+/* ==================== SEPARATOR ==================== */
+
+USep {
+    background: #1c2833;
+}
+
+
+/* ==================== SLIDER ==================== */
+
+USlider::groove:horizontal {
+    background-color: #263440;
+    height: 3px;
+    border-radius: 1px;
+    margin: 0px;
+}
+
+USlider::handle:horizontal {
+    background-color: #8f9ba6;
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin: -4px 0;
+    padding: -4px 0px;
+}
+
+
+/* ==================== SPINBOX ==================== */
+
+USpinBox {
+    background: #151f29;
+    color: #ffffff;
+    border: 1px solid #263440;
+    border-radius: 4px;
+}
+
+USpinBox::up-button,
+USpinBox::down-button {
+    background: #18212a;
+    width: 17px;
+    margin-right: 2px;
+    border-radius: 3px;
+}
+
+USpinBox::up-button {
+    height: 10px;
+    margin-top: 2px;
+}
+
+USpinBox::down-button {
+    height: 10px;
+    margin-bottom: 2px;
+}
+
+USpinBox::up-button:hover,
+USpinBox::down-button:hover {
+    background: #1d2833;
+}
+
+USpinBox::up-button:pressed,
+USpinBox::down-button:pressed {
+    background: #202c38;
+}
+
+USpinBox::up-arrow {
+    image: url("./icons/common/arrow_up.svg");
+    width: 9px;
+    height: 9px;
+}
+
+USpinBox::down-arrow {
+    image: url("./icons/common/arrow_down.svg");
+    width: 9px;
+    height: 9px;
+}
+
+
+/* ==================== GROUP BOX ==================== */
+
+UGroupBox {
+    background: #111a23;
+    border: 1px solid #263440;
+    border-radius: 10px;
+}
+
+
+/* ==================== TAG ==================== */
+
+UTagWidget {
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+UTagWidget[style="blue"] {
+    background: #0059D1;
+    border: 1px solid #156ee3;
+}
+
+UTagWidget[style="gray"] {
+    background: #303b46;
+    border: 1px solid #3d4a56;
+}
+
+UTagWidget[style="transparent"] {
+    background: transparent;
+    border: 1px solid #30404f;
+}
+
+UTagWidget[style="green"] {
+    background: #064E3B;
+    border: 1px solid #10B981;
+}
+
+
+/* ==================== TOOLTIP ==================== */
+
+QToolTip {
+    color: #FFFFFF;
+    background-color: #18212a;
+    border: 1px solid #30404f;
+    padding: 2px;
+}
+
+
+/* ==================== TEXT ==================== */
+
+GrayTextLabel {
+    color: #7b8792;
+}
+
+TitleTextLabel {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* _base_widgets.py */
+
+/* actions.py */
+/*  */
+/* actions.py */
+
+/* bar_bottom.py */
+/*  */
+/* bar_bottom.py */
+
+/* bar_macos.py */
+/*  */
+/* bar_macos.py */
+
+/* bar_path.py */
+/*  */
+/* bar_path.py */
+
+/* bar_top.py */
+SearchWidLineEdit {
+    padding-right: 45px;
+}
+/* bar_top.py */
+
+/* caledar_widget.py */
+/*  */
+/* caledar_widget.py */
+
+
+
+
+/* grid.py */
+ThumbImgWidget {
+    border-radius: 10px;
+}
+
+ThumbImgWidget[framed="false"] {
+    background: transparent;
+}
+
+ThumbImgWidget[framed="true"] {
+    background: #202c38;
+}
+
+ThumbWhiteTextWid {
+    padding: 2px;
+    border-radius: 5px;
+    font-size: 11px;
+    color: #FFFFFF;
+}
+
+ThumbWhiteTextWid[framed="false"] {
+    background: transparent;
+}
+
+ThumbWhiteTextWid[framed="true"] {
+    background: #0059D1;
+}
+
+ThumbBlueTextWidget,
+ThumbMiuzBlueTextWidget {
+    background: transparent;
+    color: #6E6E6E;
+    font-size: 11px;
+}
+
+
+/* grid.py */
+
+/* menu_left.py */
+/* стилизация этого меню будет в main_win, так как стиль меню будет
+таким же, как и у виджета сетки изображений */
+/* menu_left.py */
+
+/* path_widget.py */
+/*  */
+/* path_widget.py */
+
+/* win_collage.py */
+WinCollage {
+    background: black;
+}
+/* win_collage.py */
+
+/* win_copy_files.py */
+/* win_copy_files.py */
+
+/* win_filters.py */
+
+
+
+/* win_filters.py */
+
+/* win_first_load.py */
+/* win_first_load.py */
+
+/* win_image_view.py */
+/* win_image_view.py */
+
+/* win_img_search.py */
+
+WinImgSearchDropWidget {
+    border: 2px dashed #363636;
+    border-radius: 20px;
+    background: #202020;
+}
+
+WinImgSearchPreviewWidget {
+    background: #000000;
+    border-radius: 10px;
+}
+
+
+/* win_img_search.py */
+
+/* win_info.py */
+/* win_info.py */
+
+/* win_main.py */
+
+MenuLeftTreeWidget,
+MainWinRightWidget {
+    background: #0c1218;
+    border-radius: 10px;
+    border: 1px solid #1e252b;
+}
+
+/* win_main.py */
+
+/* win_servers.py */
+/* win_servers.py */
+
+/* win_settings.py */
+/* win_settings.py */
+
+/* win_smb.py */
+/* win_smb.py */
+
+/* win_text_search.py */
+/* win_text_search.py */
+
+/* win_upload.py */
+/* win_upload.py */

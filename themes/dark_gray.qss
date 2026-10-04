@@ -1,3 +1,5 @@
+/* background: #0059D1; */
+
 /* _base_widgets.py */
 
 TransparentButton,
@@ -18,13 +20,13 @@ TransparentTreeView {
 
 UMainWindow,
 UMainWidget {
-    background: #0c1218;
+    background: #151515;
 }
 
 
 UMenu {
-    background: #ff121c22;
-    border: 1px solid #1e252b;
+    background: #2b2b2b;
+    border: 1px solid #353535;
     border-radius: 10px;
     padding: 5px 2px 5px 2px; /* верх | право | низ | лево */
 }
@@ -162,8 +164,8 @@ UListWidget::indicator:disabled {
 
 UPushButton {
     font-size: 11px;
-    background: #2b333b;
-    border: 1px solid #353e48;
+    background: #4e4e4e;
+    border: 1px solid #585858;
     border-radius: 6px;
     color: #ffffff;
     padding-right: 5px;
@@ -171,8 +173,8 @@ UPushButton {
 }
 
 UPushButton:pressed {
-    background: #353f49;
-    border: 1px solid #3b4651;
+    background: #5d5d5d;
+    border: 1px solid #6a6a6a;
 }
 
 UPushButton::menu-indicator {
@@ -195,8 +197,10 @@ ActiveButton:pressed {
 
 
 USep {
-    background: #1e252b;
+    background: #363636;
 }
+
+
 
 
 
@@ -435,9 +439,9 @@ WinImgSearchPreviewWidget {
 
 MenuLeftTreeWidget,
 MainWinRightWidget {
-    background: #0c1218;
+    background: #202020;
     border-radius: 10px;
-    border: 1px solid #1e252b;
+    border: transparent;
 }
 
 /* win_main.py */
@@ -456,3 +460,20 @@ MainWinRightWidget {
 
 /* win_upload.py */
 /* win_upload.py */
+
+
+/* --- Модуль: Окна просмотра и заголовки --- */
+WinSettingsMfAliasTitle {
+    color: #ffffff;
+    font-size: 23px;
+    font-weight: bold;
+}
+
+WinImgViewGraphics, BlackBgFrame {
+    background: #000000;
+}
+
+
+ServerLabel {
+    padding-left: 1px;
+}

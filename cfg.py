@@ -35,7 +35,7 @@ class Static:
     MIUZ_ZIP = Path("./_miuz.zip")
 
     THEMES = Path("./themes")
-    THEME_DARK_QSS = THEMES / "dark.qss"
+    THEME_DARK_QSS = THEMES / "dark_blue.qss"
     THEME_LIGHT_QSS = THEMES / "light.qss"
 
     # Подпапки для иконок (красиво собираются от базовой папки icons)
