@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
                              QSpinBox, QStackedWidget, QTextEdit, QTreeView,
                              QTreeWidget, QTreeWidgetItem, QVBoxLayout,
                              QWidget)
-from qframelesswindow import FramelessMainWindow
+from qframelesswindow import FramelessMainWindow, StandardTitleBar
 from typing_extensions import Optional
 
 from cfg import JsonData, Static
@@ -129,6 +129,10 @@ class UMainWindow(_WindowMixin, FramelessMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
+        self.setTitleBar(StandardTitleBar(self))
+        layout_ = self.titleBar.layout()
+        layout_.insertStretch(1, 1)
+
         central_widget = TransparentFrame()
         self.setCentralWidget(central_widget)
 
@@ -147,10 +151,18 @@ class UMainWindow(_WindowMixin, FramelessMainWindow):
             self.titleBar.closeBtn.hide()
         self.titleBar.raise_()
 
+    def setWindowTitle(self, a0):
+        return super().setWindowTitle(a0)
+
 
 class UMainWidget(_WindowMixin, FramelessMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
+
+        self.setTitleBar(StandardTitleBar(self))
+        layout_ = self.titleBar.layout()
+        layout_.insertStretch(1, 1)
+
 
         central_widget = TransparentFrame()
         self.setCentralWidget(central_widget)
