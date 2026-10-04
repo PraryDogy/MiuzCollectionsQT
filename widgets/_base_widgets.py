@@ -89,6 +89,7 @@ class TransparentTreeView(QTreeView):
 
 class _WindowMixin:
     win_list: list[QMainWindow] = []
+    bar_height = 30
 
     def register_window(self):
         self.win_list.append(self)
@@ -135,7 +136,7 @@ class UMainWindow(_WindowMixin, FramelessMainWindow):
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(0)
 
-        self.central_layout.addSpacing(35)
+        self.central_layout.addSpacing(self.bar_height)
 
         self.register_window()
 
@@ -147,15 +148,27 @@ class UMainWindow(_WindowMixin, FramelessMainWindow):
         self.titleBar.raise_()
 
 
-class UMainWidget(_WindowMixin, TransparentWidget):
+class UMainWidget(_WindowMixin, FramelessMainWindow):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
 
-        self.central_layout = QVBoxLayout(self)
+        central_widget = TransparentFrame()
+        self.setCentralWidget(central_widget)
+
+        self.central_layout = QVBoxLayout(central_widget)
         self.central_layout.setContentsMargins(5, 5, 5, 5)
         self.central_layout.setSpacing(0)
 
+        self.central_layout.addSpacing(self.bar_height)
+
         self.register_window()
+
+        if sys.platform == "darwin":
+            self.setSystemTitleBarButtonVisible(True)
+            self.titleBar.minBtn.hide()
+            self.titleBar.maxBtn.hide()
+            self.titleBar.closeBtn.hide()
+        self.titleBar.raise_()
 
 
 class UMenu(TransparentMenu):
