@@ -3,7 +3,7 @@ import os
 from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSplitter, QVBoxLayout,
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout,
                              QWidget)
 
 from cfg import Dynamic, JsonData, Static
@@ -431,6 +431,10 @@ class UserTags(TransparentWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        policy.setHeightForWidth(True) # Включаем зависимость высоты от ширины!
+        self.setSizePolicy(policy)
+
         self.flow_layout = FlowLayout(self, spacing=7)
         self.flow_layout.setContentsMargins(0, 0, 0, 0)
         self._create_tags()
@@ -585,6 +589,7 @@ class WinFilters(UMainWidget):
         self.close_button.clicked.connect(self.deleteLater)
         self.buttons_layout.addWidget(self.close_button)
 
+        self.tags_widget.user_tags.adjustSize()
         self.tags_widget.adjustSize()
         self.adjustSize()
 

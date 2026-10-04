@@ -946,7 +946,6 @@ class FlowLayout(QLayout):
                 child.widget().deleteLater()
         self.update()
 
-
     def addItem(self, item):
         self.items.append(item)
 
