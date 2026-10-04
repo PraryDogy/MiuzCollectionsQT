@@ -253,10 +253,7 @@ class DatesWidget(UGroupBox):
         Dynamic.loaded_thumbs = 0
         self.py_date_start = None
         self.py_date_end = None
-        all_time_action = self.preset_actions[0]
-        self.preset_button.setText(all_time_action.text())
         self.handle_preset_change(0)
-
         print("RESET DATES NOT WORKING NOW")
 
 
