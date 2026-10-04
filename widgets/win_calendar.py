@@ -252,23 +252,30 @@ class WinCalendar(UMainWidget):
 
 	def populate_months(self):
 		self.menu_month.clear()
+		max_width = 0
+		font_metrics = self.btn_month.fontMetrics()
 		for month in range(1, 13):
 			month_name = self.q_locale.standaloneMonthName(
 				month, QLocale.FormatType.LongFormat
-			)
-			action = QAction(month_name.capitalize(), self)
+			).capitalize()
+			action = QAction(month_name, self)
 			action.setData(month)
 			action.triggered.connect(self.month_menu_selected)
 			self.menu_month.addAction(action)
-
+			max_width = max(max_width, font_metrics.horizontalAdvance(month_name))
+		offset = 30
+		self.btn_month.setFixedWidth(max_width + offset)
+	
 	def populate_years(self):
 		self.menu_year.clear()
 		max_year = self.date_now.year()
+		max_width = self.btn_year.fontMetrics().horizontalAdvance(str(max_year))
 		for year in range(self.min_year, max_year + 1):
 			action = QAction(str(year), self)
 			action.setData(year)
 			action.triggered.connect(self.year_menu_selected)
 			self.menu_year.addAction(action)
+		self.btn_year.setFixedWidth(max_width + 35)
 
 	def month_menu_selected(self):
 		action: QAction = self.sender()
