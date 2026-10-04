@@ -277,7 +277,7 @@ class DatesWidget(UGroupBox):
 
 
 class WinFiltersTagWidget(UTagWidget):
-    icon_path = Static.COMMON_ICONS / "trash.svg"
+    trash_icon_path = Static.COMMON_ICONS / "trash.svg"
     on_trash_clicked = pyqtSignal()
     load_st_grid = pyqtSignal() 
 
@@ -308,7 +308,7 @@ class WinFiltersTagWidget(UTagWidget):
             self.trash_btn = QSvgWidget()
             self.trash_btn.mouseReleaseEvent = self.on_trash_clicked_cmd
             self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            self.trash_btn.load(str(self.icon_path))
+            self.trash_btn.load(str(self.trash_icon_path))
             self.trash_btn.setFixedSize(*self.icon_size)
 
             close_lay.addWidget(self.trash_btn)
@@ -365,12 +365,14 @@ class WinFiltersOnlyFolderTag(WinFiltersTagWidget):
 
 
 class WinFiltersWordTag(WinFiltersTagWidget):
+    icon_path = Static.COMMON_ICONS / "tags.svg"
+
     def __init__(self, text):
         if text in Dynamic.word_tags_list:
             active = True
         else:
             active = False
-        super().__init__(text, active, True)
+        super().__init__(text, active, True, str(self.icon_path))
 
     def mouseReleaseEvent(self, a0):
         if self.title.text() in Dynamic.word_tags_list:
