@@ -10,8 +10,8 @@ from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
-from ._base_widgets import (ConfirmWindow, FlowLayout, GrayTextLabel,
-                            InputTextWin, TitleTextLabel, TransparentFrame,
+from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
+                            GrayTextLabel, InputTextWin, TitleTextLabel,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UMainWidget, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
@@ -561,7 +561,7 @@ class WinFilters(UMainWidget):
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
         self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(10)
-        self.central_layout.setContentsMargins(5, 10, 5, 10)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
 
         self.dates_widget = DatesWidget()
         self.dates_widget.reload_thumbnails.connect(self.load_st_grid.emit)
@@ -571,6 +571,21 @@ class WinFilters(UMainWidget):
         self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
         self.central_layout.addWidget(self.tags_widget)
 
+        buttons_widget = TransparentWidget()
+        self.central_layout.addWidget(buttons_widget)
+        self.buttons_layout = QHBoxLayout(buttons_widget)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
+        self.buttons_layout.setSpacing(10)
+
+        self.buttons_layout.addStretch(1)
+        self.apply_button = ActiveButton(Lng.apply[JsonData.lng_index])
+        self.buttons_layout.addWidget(self.apply_button)
+
+        self.close_button = UPushButton(Lng.close[JsonData.lng_index])
+        self.close_button.clicked.connect(self.deleteLater)
+        self.buttons_layout.addWidget(self.close_button)
+
+        self.tags_widget.adjustSize()
         self.adjustSize()
 
     def mouseReleaseEvent(self, a0):
