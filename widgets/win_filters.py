@@ -112,6 +112,7 @@ class DatesWidget(UGroupBox):
 
         ind = JsonData.lng_index
         _today = QDate.currentDate()
+
         self.q_date_min = QDate(WinCalendar.min_year, 1, 1)
         self.all_time = (self.q_date_min, _today)
 
@@ -121,26 +122,21 @@ class DatesWidget(UGroupBox):
             (_today.addDays(-7), _today): Lng.preset_week[ind],
             (_today.addDays(-14), _today): Lng.preset_two_weeks[ind],
             (_today.addMonths(-1), _today): Lng.preset_month[ind],
-            (_today.addYears(-1), _today): Lng.preset_year[ind]
+            (_today.addYears(-1), _today): Lng.preset_year[ind],
         }
 
-        # Инициализация дат с проверкой Dynamic
         if Dynamic.py_date_start:
             dt = Dynamic.py_date_start
             self.q_date_start = QDate(dt.year, dt.month, dt.day)
-        else:
-            self.q_date_start = self.q_date_min
 
-        if Dynamic.py_date_end:
             dt = Dynamic.py_date_end
             self.q_date_end = QDate(dt.year, dt.month, dt.day)
         else:
-            self.q_date_end = _today
+            self.q_date_start, self.q_date_end = self.all_time
 
         self.py_date_start = Dynamic.py_date_start
         self.py_date_end = Dynamic.py_date_end
-        
-        # Главный вертикальный layout для UGroupBox
+
         self.main_layout = QVBoxLayout(self)
         self.main_layout.setContentsMargins(*UGroupBox_margins)
         self.main_layout.setSpacing(UGroupBox_spacing)
@@ -151,40 +147,28 @@ class DatesWidget(UGroupBox):
         )
         self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
         self.main_layout.addWidget(self.title_widget)
-
         self.main_layout.addWidget(USep())
 
-        # --- 1. Блок большой даты ---
         dynamic_container = TransparentWidget()
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(5)
 
-        # choosed_label = TransparentLabel(Lng.period[JsonData.lng_index])
-        # choosed_label.setFixedHeight(UTagWidget.tag_height)
-        # dynamic_container_lay.addWidget(choosed_label)
-
         self.dates_period_tag = DatesPeriodTag("")
         self.dates_period_tag.clicked_tag.connect(self.show_tag_menu)
-        
-        if Dynamic.py_date_start:
-            self.dates_period_tag.set_active(True)
-        else:
-            self.dates_period_tag.set_active(False)
-        
+        self.dates_period_tag.set_active(Dynamic.py_date_start is not None)
+
         dynamic_container_lay.addWidget(self.dates_period_tag)
         dynamic_container_lay.addStretch()
-        
+
         self.main_layout.addWidget(dynamic_container)
         self.main_layout.addWidget(USep())
-        
-        # --- СТРОКА 1: Виджет панели управления ---
+
         self.top_row_widget = TransparentWidget()
         self.top_row_layout = QHBoxLayout(self.top_row_widget)
         self.top_row_layout.setContentsMargins(0, 0, 0, 0)
         self.top_row_layout.setSpacing(0)
 
-        # Делаем меню атрибутом класса
         self.preset_menu = UMenu(parent=self)
 
         for qdates, text in self.dates_dict.items():
@@ -195,25 +179,25 @@ class DatesWidget(UGroupBox):
             self.preset_menu.addAction(action)
 
         self.preset_menu.addSeparator()
-        action = QAction(Lng.reset[JsonData.lng_index], self.preset_menu)
+
+        action = QAction(Lng.reset[ind], self.preset_menu)
         action.triggered.connect(lambda: self.reset_all(True))
         self.preset_menu.addAction(action)
 
-        # Выбор дат "От" и "До"
         from_label = TransparentLabel(Lng.from_text[ind] + ":")
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
-        
+
         self.date_start_btn = DatesButton("")
         self.date_start_btn.clicked.connect(lambda: self.show_calendar_win("start"))
         self.top_row_layout.addWidget(self.date_start_btn)
 
-        self.top_row_layout.addSpacing(10) 
+        self.top_row_layout.addSpacing(10)
 
         to_label = TransparentLabel(Lng.to_text[ind] + ":")
         self.top_row_layout.addWidget(to_label)
         self.top_row_layout.addSpacing(5)
-        
+
         self.date_end_btn = DatesButton("")
         self.date_end_btn.clicked.connect(lambda: self.show_calendar_win("end"))
         self.top_row_layout.addWidget(self.date_end_btn)
@@ -224,37 +208,43 @@ class DatesWidget(UGroupBox):
         self.update_readable_date_label()
         self.set_date_buttons_text()
 
+    def is_all_time(self) -> bool:
+        return (self.q_date_start, self.q_date_end) == self.all_time
+
     def show_tag_menu(self):
-        pos = QCursor.pos()
-        # Смещаем меню на 15 пикселей вниз (можно изменить значение)
-        pos = pos + QPoint(-20, 5)
+        pos = QCursor.pos() + QPoint(-20, 5)
         self.preset_menu.exec(pos)
 
     def date_digits(self, q_date: QDate) -> str:
         return q_date.toString("dd.MM.yyyy")
 
     def show_calendar_win(self, flag: str):
-        # Проверяем, находится ли весь виджет в состоянии "За всё время" (когда на кнопках "Не выбрано")
-        is_not_selected = (self.all_time == (self.q_date_start, self.q_date_end))
-        
-        # Если даты не выбраны, всегда открываем "сегодня" для обеих кнопок
-        if is_not_selected:
+        was_all_time = self.is_all_time()
+
+        if was_all_time:
             qdate = QDate.currentDate()
         else:
-            # Иначе открываем ту дату, которая реально выбрана (даже если это q_date_min)
             qdate = self.q_date_start if flag == "start" else self.q_date_end
-        
+
         self.calendar_win = WinCalendar(qdate)
         self.calendar_win.center_to_parent(self.window())
 
         def on_date_selected(date: QDate):
-            if flag == "start":
+            if was_all_time:
                 self.q_date_start = date
+                self.q_date_end = date
+
+            elif flag == "start":
+                self.q_date_start = date
+
+                if self.q_date_start > self.q_date_end:
+                    self.q_date_end = self.q_date_start
+
             else:
                 self.q_date_end = date
 
-            if self.q_date_start > self.q_date_end:
-                self.q_date_end = self.q_date_start
+                if self.q_date_end < self.q_date_start:
+                    self.q_date_start = self.q_date_end
 
             self.handle_preset_change()
             self.apply_filter(True)
@@ -266,7 +256,7 @@ class DatesWidget(UGroupBox):
         self.q_date_start = q_date_start
         self.q_date_end = q_date_end
         self.handle_preset_change()
-        self.apply_filter(True) # ИСПРАВЛЕНО: Раскомментировано, иначе фильтр не применялся
+        self.apply_filter(True)
 
     def handle_preset_change(self):
         self.set_date_buttons_text()
@@ -274,12 +264,9 @@ class DatesWidget(UGroupBox):
 
     def set_date_buttons_text(self):
         ind = JsonData.lng_index
-        
-        if self.all_time == (self.q_date_start, self.q_date_end):
-            # Вместо "-" ставим осмысленный текст
-            # В Lng добавьте: not_selected = ["Любая", "Any"] или ["Не выбрано", "None"]
-            empty_text = Lng.not_selected[ind] 
-            
+
+        if self.is_all_time():
+            empty_text = Lng.not_selected[ind]
             self.date_start_btn.setText(empty_text)
             self.date_end_btn.setText(empty_text)
         else:
@@ -288,27 +275,33 @@ class DatesWidget(UGroupBox):
 
     def update_readable_date_label(self):
         ind = JsonData.lng_index
-        locale = QLocale(QLocale.Language.Russian if ind == 0 else QLocale.Language.English)
+        locale = QLocale(
+            QLocale.Language.Russian if ind == 0 else QLocale.Language.English
+        )
 
-        if self.all_time == (self.q_date_start, self.q_date_end):
+        if self.is_all_time():
             text = Lng.all_time[ind]
             active = False
+
         elif (self.q_date_start, self.q_date_end) in self.dates_dict:
             text = self.dates_dict[self.q_date_start, self.q_date_end]
             active = True
+
         else:
             str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
             str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-            text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
+            text = (
+                f"{Lng.from_text[ind]} {str_from} "
+                f"{Lng.to_text[ind].lower()} {str_to}"
+            )
             active = True
 
-        text = f"{Lng.period[JsonData.lng_index]}: {text.lower()}"
+        text = f"{Lng.period[ind]}: {text.lower()}"
         self.dates_period_tag.label.setText(text)
         self.dates_period_tag.set_active(active)
 
     def apply_filter(self, load_st_grid: bool):
-        # ИСПРАВЛЕНО: Корректно передаем None, если выбрано "Все время"
-        if self.all_time == (self.q_date_start, self.q_date_end):
+        if self.is_all_time():
             self.py_date_start = None
             self.py_date_end = None
         else:
@@ -317,14 +310,16 @@ class DatesWidget(UGroupBox):
 
         Dynamic.py_date_start = self.py_date_start
         Dynamic.py_date_end = self.py_date_end
+
         if load_st_grid:
             self.load_st_grid.emit()
 
     def reset_all(self, load_st_grid: bool):
         self.q_date_start = self.q_date_min
         self.q_date_end = QDate.currentDate()
+
         self.apply_filter(load_st_grid)
-        self.handle_preset_change() 
+        self.handle_preset_change()
 
 
 class TagWidget(UTagWidget):
