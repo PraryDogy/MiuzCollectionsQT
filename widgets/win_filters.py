@@ -60,13 +60,17 @@ class DatesWidget(UGroupBox):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        ind = JsonData.lng_index
         _today = QDate.currentDate()
-        self.today = (_today, _today)
-        self.yesterday = (_today.addDays(-1), _today.addDays(-1))
-        self.last_week = (_today.addDays(-7), _today)
-        self.last_two_weeks = (_today.addDays(-14), _today)
-        self.last_month = (_today.addMonths(-1), _today)
-        self.last_year = (_today.addYears(-1), _today)
+
+        self.dates_dict = {
+            (_today, _today): Lng.preset_today[ind],
+            (_today.addDays(-1), _today.addDays(-1)): Lng.preset_yesterday[ind],
+            (_today.addDays(-7), _today): Lng.preset_week[ind],
+            (_today.addDays(-14), _today): Lng.preset_two_weeks[ind],
+            (_today.addMonths(-1), _today): Lng.preset_month,
+            (_today.addYears(-1), _today): Lng.preset_year
+        }
 
         self.date_start = Dynamic.date_start
         self.date_end = Dynamic.date_end
@@ -117,7 +121,7 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.addWidget(self.dynamic_label)
         dynamic_container_lay.addStretch()
 
-        # self.main_layout.addWidget(USep())
+        self.main_layout.addWidget(USep())
         
         # --- СТРОКА 1: Виджет панели управления (Вместо вложенного layout) ---
         self.top_row_widget = TransparentWidget()
@@ -125,30 +129,21 @@ class DatesWidget(UGroupBox):
         self.top_row_layout.setContentsMargins(0, 0, 0, 0)
         self.top_row_layout.setSpacing(0)
 
-        # Период
-        period_label = TransparentLabel(Lng.period[JsonData.lng_index])
-        self.top_row_layout.addWidget(period_label)
-        self.top_row_layout.addSpacing(10)
-
         # Кнопка пресетов
-        self.preset_button = UPushButton("")
-        self.preset_button.setFixedWidth(100)
+        self.preset_button = UPushButton(Lng.period[JsonData.lng_index])
         self.top_row_layout.addWidget(self.preset_button)
 
         preset_menu = UMenu(parent=self)
         self.preset_button.setMenu(preset_menu)
 
         self.preset_actions = [
-            QAction(Lng.preset_all_time[JsonData.lng_index], preset_menu),
             QAction(Lng.preset_today[JsonData.lng_index], preset_menu),
             QAction(Lng.preset_yesterday[JsonData.lng_index], preset_menu), 
-            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),      
+            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),   
+            QAction(Lng.preset_two_weeks[JsonData.lng_index], preset_menu),      
             QAction(Lng.preset_month[JsonData.lng_index], preset_menu),     
             QAction(Lng.preset_year[JsonData.lng_index], preset_menu),      
-            QAction(Lng.preset_custom[JsonData.lng_index], preset_menu),    
         ]
-
-        self.preset_button.setText(self.preset_actions[Dynamic.date_index].text())
 
         for x, act in enumerate(self.preset_actions):
             act.triggered.connect(
@@ -221,7 +216,6 @@ class DatesWidget(UGroupBox):
         self.calendar_win.show()
 
     def action_cmd(self, e, index: int, action: QAction):
-        self.preset_button.setText(action.text())
         self.handle_preset_change(index)
         self.apply_filter(index)
 

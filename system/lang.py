@@ -394,13 +394,12 @@ class Lng:
     to_text = ("По", "To")
 
     # Пресеты меню
-    preset_all_time = ("Все время", "All time")
     preset_today = ("Сегодня", "Today")
     preset_yesterday = ("Вчера", "Yesterday")
     preset_week = ("За неделю", "Past week")
+    preset_two_weeks = ("За дне недели", "Past two weeks")
     preset_month = ("За месяц", "Past month")
     preset_year = ("За год", "Past year")
-    preset_custom = ("Диапазон", "Custom range")
     active_filters = ("Активные фильтры", "Active filters")
     no = ("Нет", "None")
     folders = (
