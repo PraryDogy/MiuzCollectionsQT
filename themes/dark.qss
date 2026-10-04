@@ -398,6 +398,11 @@ WinCollage {
 /* win_filters.py */
 
 
+PeriodLabel {
+    font-size: 14px;
+}
+
+
 WinFiltersAddTag[active="False"] {
     background: transparent;
     border: 1px solid #585858;

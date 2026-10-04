@@ -65,6 +65,11 @@ class DatesButton(UPushButton):
         self.setFixedWidth(max_width + 20)
 
 
+class PeriodLabel(GrayTextLabel):
+    def __init__(self, text):
+        super().__init__(text)
+
+
 class DatesWidget(UGroupBox):
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (15, 15)
@@ -120,9 +125,12 @@ class DatesWidget(UGroupBox):
         dynamic_container = TransparentWidget()
         dynamic_container_lay = QHBoxLayout(dynamic_container)
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-        dynamic_container_lay.setSpacing(10)
+        dynamic_container_lay.setSpacing(3)
 
-        self.dynamic_label = GrayTextLabel("")
+        choosed_label = TransparentLabel(Lng.period[JsonData.lng_index] + ":")
+        dynamic_container_lay.addWidget(choosed_label)
+
+        self.dynamic_label = PeriodLabel("")
         # ИСПРАВЛЕНО: Убрано self.dynamic_label.setFixedWidth(self.width()), 
         # так как в __init__ ширина виджета еще не рассчитана (обычно равна 100 или 0)
         
@@ -245,7 +253,7 @@ class DatesWidget(UGroupBox):
             str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
             text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
 
-        self.dynamic_label.setText(text)
+        self.dynamic_label.setText(text.lower())
 
     def apply_filter(self):
         # ИСПРАВЛЕНО: Корректно передаем None, если выбрано "Все время"
