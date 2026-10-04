@@ -77,9 +77,7 @@ class DatesWidget(UGroupBox):
         
         # Главный вертикальный layout для UGroupBox
         self.main_layout = QVBoxLayout(self)
-        # self.main_layout.setContentsMargins(*RowArrowWidget.group_margings)
         self.main_layout.setContentsMargins(*UGroupBox_margins)
-        # self.main_layout.setSpacing(RowArrowWidget.group_spacing)
         self.main_layout.setSpacing(UGroupBox_spacing)
 
         self.title_widget = WinFiltersTitleWidget(
@@ -268,18 +266,16 @@ class DatesWidget(UGroupBox):
     def apply_filter(self, index: int):
         self.date_start = self.q_date_start.toPyDate()
         self.date_end = self.q_date_end.toPyDate()
-        Dynamic.date_index = index
 
     def clear_btn_cmd(self, *args):
         Dynamic.loaded_thumbs = 0
-        Dynamic.date_start = None
-        Dynamic.date_end = None
-        Dynamic.date_index = 0
-        
+        self.date_start = None
+        self.date_end = None
         all_time_action = self.preset_actions[0]
         self.preset_button.setText(all_time_action.text())
         self.handle_preset_change(0)
-        self.reload_thumbnails.emit()
+
+        print("RESET DATES NOT WORKING NOW")
 
 
 class WinFiltersTagWidget(UTagWidget):
