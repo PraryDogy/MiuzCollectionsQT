@@ -25,6 +25,7 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
                       PasteFiles, RemoveFiles, RevealInFinder, Save,
                       ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
                       WinInfoAction)
+from .win_filters import DatesWidget
 
 CONTROLS_MARGIN = 10
 
@@ -409,6 +410,7 @@ class DatesTag(GridTagWidget):
         start_str = locale.toString(q_start, date_format)
         end_str = locale.toString(q_end, date_format)
         self.title.setText(f"{start_str} - {end_str}")
+        self.title.setText(DatesWidget.readable_date)
 
     def clicked_close_cmd(self):
         Dynamic.py_date_start = None

@@ -106,6 +106,7 @@ class DatesWidget(UGroupBox):
     load_st_grid = pyqtSignal()
     calendar_svg = Static.COMMON_ICONS / "calendar.svg"
     svg_calendar_size = (15, 15)
+    readable_date = None
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -299,6 +300,7 @@ class DatesWidget(UGroupBox):
         text = f"{Lng.period[ind]}: {text.lower()}"
         self.dates_period_tag.label.setText(text)
         self.dates_period_tag.set_active(active)
+        DatesWidget.readable_date = text
 
     def apply_filter(self, load_st_grid: bool):
         if self.is_all_time():
