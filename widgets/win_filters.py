@@ -149,7 +149,7 @@ class DatesWidget(UGroupBox):
         from_label = TransparentLabel(Lng.from_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
-        self.date_start_btn = UPushButton(self.date_digits(self.q_date_start))
+        self.date_start_btn = UPushButton("")
         self.date_start_btn.clicked.connect(lambda: self.show_calendar_win("start"))
         self.top_row_layout.addWidget(self.date_start_btn)
 
@@ -158,7 +158,7 @@ class DatesWidget(UGroupBox):
         to_label = TransparentLabel(Lng.to_text[JsonData.lng_index] + ":")
         self.top_row_layout.addWidget(to_label)
         self.top_row_layout.addSpacing(5)
-        self.date_end_btn = UPushButton(self.date_digits(self.q_date_end))
+        self.date_end_btn = UPushButton("")
         self.date_end_btn.clicked.connect(lambda: self.show_calendar_win("end"))
         self.top_row_layout.addWidget(self.date_end_btn)
 
@@ -168,6 +168,7 @@ class DatesWidget(UGroupBox):
         self.main_layout.addWidget(self.top_row_widget)
 
         self.update_readable_date_label()
+        self.set_date_buttons_text()
 
     def date_digits(self, q_date: QDate):
         return q_date.toString("dd.MM.yyyy")
