@@ -389,7 +389,7 @@ class Lng:
         "MIUZ Diamonds",
         "MIUZ Diamonds"
     )
-    period = ("Период", "Period")
+    choose_period = ("Выбрать период", "Choose period")
     from_text = ("С", "From")
     to_text = ("По", "To")
 

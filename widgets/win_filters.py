@@ -62,19 +62,20 @@ class DatesWidget(UGroupBox):
 
         ind = JsonData.lng_index
         _today = QDate.currentDate()
+        self.q_date_min = QDate(WinCalendar.min_year, 1, 1)
+        self.all_time = (self.q_date_min, _today)
 
         self.dates_dict = {
             (_today, _today): Lng.preset_today[ind],
             (_today.addDays(-1), _today.addDays(-1)): Lng.preset_yesterday[ind],
             (_today.addDays(-7), _today): Lng.preset_week[ind],
             (_today.addDays(-14), _today): Lng.preset_two_weeks[ind],
-            (_today.addMonths(-1), _today): Lng.preset_month,
-            (_today.addYears(-1), _today): Lng.preset_year
+            (_today.addMonths(-1), _today): Lng.preset_month[ind],
+            (_today.addYears(-1), _today): Lng.preset_year[ind]
         }
 
         self.py_date_start = Dynamic.date_start
         self.py_date_end = Dynamic.date_end
-        self.q_date_min = QDate(WinCalendar.min_year, 1, 1)
 
         if Dynamic.date_start:
             dt = Dynamic.date_start
@@ -129,25 +130,16 @@ class DatesWidget(UGroupBox):
         self.top_row_layout.setSpacing(0)
 
         # Кнопка пресетов
-        self.preset_button = UPushButton(Lng.period[JsonData.lng_index])
+        self.preset_button = UPushButton(Lng.choose_period[JsonData.lng_index] + " ")
         self.top_row_layout.addWidget(self.preset_button)
 
         preset_menu = UMenu(parent=self)
         self.preset_button.setMenu(preset_menu)
 
-        self.preset_actions = [
-            QAction(Lng.preset_today[JsonData.lng_index], preset_menu),
-            QAction(Lng.preset_yesterday[JsonData.lng_index], preset_menu), 
-            QAction(Lng.preset_week[JsonData.lng_index], preset_menu),   
-            QAction(Lng.preset_two_weeks[JsonData.lng_index], preset_menu),      
-            QAction(Lng.preset_month[JsonData.lng_index], preset_menu),     
-            QAction(Lng.preset_year[JsonData.lng_index], preset_menu),      
-        ]
-
-        for (q_date_start, q_date_end), text in self.dates_dict.items():
-            action = QAction(text=text, parent=preset_menu)
+        for qdates, text in self.dates_dict.items():
+            action = QAction(text, preset_menu)
             action.triggered.connect(
-                lambda e, : self.action_cmd()
+                lambda e, qdates=qdates: self.action_cmd(e, *qdates)
             )
             preset_menu.addAction(action)
 
@@ -175,7 +167,7 @@ class DatesWidget(UGroupBox):
         # Добавляем созданную строку-виджет в главный вертикальный layout
         self.main_layout.addWidget(self.top_row_widget)
 
-        self.update_readable_date_label(index=0)
+        self.update_readable_date_label()
 
     def date_digits(self, q_date: QDate):
         return q_date.toString("dd.MM.yyyy")
@@ -188,7 +180,7 @@ class DatesWidget(UGroupBox):
             index = len(self.preset_actions) - 1
             self.handle_preset_change(index)
             self.apply_filter(index)
-            self.preset_button.setText(Lng.period[JsonData.lng_index])
+            self.preset_button.setText(Lng.choose_period[JsonData.lng_index])
 
         def set_date_start(date: QDate):
             self.date_start_btn.setText(self.date_digits(date))
@@ -196,7 +188,7 @@ class DatesWidget(UGroupBox):
             index = len(self.preset_actions) - 1
             self.handle_preset_change(index)
             self.apply_filter(index)
-            self.preset_button.setText(Lng.period[JsonData.lng_index])
+            self.preset_button.setText(Lng.choose_period[JsonData.lng_index])
 
         if flag == "start":
             qdate = self.q_date_start
@@ -215,55 +207,39 @@ class DatesWidget(UGroupBox):
         self.calendar_win.date_selected.connect(callback)
         self.calendar_win.show()
 
-    def action_cmd(self, e, index: int, action: QAction):
-        self.handle_preset_change(index)
-        self.apply_filter(index)
+    def action_cmd(self, e, q_date_start: QDate, q_date_end: QDate):
+        self.q_date_start = q_date_start
+        self.q_date_end = q_date_end
+        self.handle_preset_change()
+        # self.apply_filter(index)
 
-    def handle_preset_change(self, index):
-        is_custom = (index == len(self.preset_actions) - 1)
-        
-        self.date_start_btn.blockSignals(True)
-        self.date_end_btn.blockSignals(True)
-        
-        today = QDate.currentDate()
-        if not is_custom:
-            if index == 0:  # Все время
-                self.q_date_start = QDate(WinCalendar.min_year, 1, 1)
-                self.q_date_end = today
-            elif index == 1:  # Сегодня
-                self.q_date_start = today
-                self.q_date_end = today
-            elif index == 2:  # Вчера
-                self.q_date_start = today.addDays(-1)
-                self.q_date_end = today.addDays(-1)
-            elif index == 3:  # Последняя неделя
-                self.q_date_start = today.addDays(-7)
-                self.q_date_end = today
-            elif index == 4:  # Последний месяц
-                self.q_date_start = today.addMonths(-1)
-                self.q_date_end = today
-            elif index == 5:  # Последний год
-                self.q_date_start = today.addYears(-1)
-                self.q_date_end = today
-                
-        self.date_start_btn.setText(self.date_digits(self.q_date_start))
-        self.date_end_btn.setText(self.date_digits(self.q_date_end))
-        self.update_readable_date_label(index)
-        
-        # Не забудьте разблокировать сигналы кнопок
-        self.date_start_btn.blockSignals(False)
-        self.date_end_btn.blockSignals(False)
+    def handle_preset_change(self):
+        self.set_date_buttons_text()
+        self.update_readable_date_label()
 
-    def update_readable_date_label(self, index: int):
+    def set_date_buttons_text(self):
+        if self.all_time == (self.q_date_start, self.q_date_end):
+            self.date_start_btn.setText("-")
+            self.date_end_btn.setText("-")
+        else:
+            self.date_start_btn.setText(self.date_digits(self.q_date_start))
+            self.date_end_btn.setText(self.date_digits(self.q_date_end))
+
+    def update_readable_date_label(self):
         ind = JsonData.lng_index
         if ind == 0:
             locale = QLocale(QLocale.Language.Russian)
         else:
             locale = QLocale(QLocale.Language.English)
 
-        str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
-        str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-        text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
+        if self.all_time == (self.q_date_start, self.q_date_end):
+            text = "-"
+        elif (self.q_date_start, self.q_date_end) in self.dates_dict:
+            text = self.dates_dict[self.q_date_start, self.q_date_end]
+        else:
+            str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+            str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+            text = f"{Lng.from_text[ind]} {str_from} по {str_to}"
 
         self.dynamic_label.setText(text)
 
