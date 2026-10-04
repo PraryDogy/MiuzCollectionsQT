@@ -411,7 +411,11 @@ class DatesTag(GridTagWidget):
         # end_str = locale.toString(q_end, date_format)
         # self.title.setText(f"{start_str} - {end_str}")
         # Да костыль, ну и что
-        self.title.setText(DatesWidget.readable_date)
+        readable = DatesWidget.readable_date
+        if readable:
+            self.title.setText(DatesWidget.readable_date)
+        else:
+            print("DatesWidget.readable_date NONE")
 
     def clicked_close_cmd(self):
         Dynamic.py_date_start = None
