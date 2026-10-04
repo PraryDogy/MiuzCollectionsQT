@@ -279,15 +279,25 @@ UTagWidget {
     color: #ffffff;
 }
 
-UTagWidget[active="True"] {
+UTagWidget[style="blue"] {
     background: #0059D1;;
     border: 1px solid #156ee3;
 }
 
 
-UTagWidget[active="False"] {
+UTagWidget[style="gray"] {
     background: #4e4e4e;
     border: 1px solid #585858;
+}
+
+UTagWidget[style="transparent"] {
+    background: transparent;
+    border: 1px solid #585858;
+}
+
+UTagWidget[style="green"] {
+    background: #49c932;
+    border: 1px solid #6ae555;
 }
 
 
@@ -404,10 +414,7 @@ DatesPeriodTag {
 }
 
 
-AddTagWidget[active="False"] {
-    background: transparent;
-    border: 1px solid #585858;
-}
+
 
 /* win_filters.py */
 
