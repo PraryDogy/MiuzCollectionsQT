@@ -207,7 +207,6 @@ class DatesWidget(UGroupBox):
         self.calendar_win.center_to_parent(self.window())
 
         def on_date_selected(date: QDate):
-            print(123)
             if flag == "start":
                 self.q_date_start = date
             else:
