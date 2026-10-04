@@ -467,9 +467,10 @@ WinImgSearchPreviewWidget {
 
 MenuLeftTreeWidget,
 MainWinRightWidget {
-    background: #0c1218;
+    background: #0f171f;
+    border: 1px solid #263440;
+    border: 1px solid transparent;
     border-radius: 10px;
-    border: 1px solid #1e252b;
 }
 
 /* win_main.py */
