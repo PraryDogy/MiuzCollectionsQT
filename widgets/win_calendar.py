@@ -110,10 +110,10 @@ class WinCalendar(UMainWidget):
 
 	min_year = 2015
 
-	cell_size = (60, 50)
-	svg_nav_size = (30, 30)
+	cell_size = (45, 30)
+	svg_nav_size = (23, 23)
 	svg_calendar_size = (15, 15)
-	svg_blue_circle_size = (35, 35)
+	svg_blue_circle_size = (23, 23)
 
 	def __init__(self, date: QDate):
 		super().__init__()
