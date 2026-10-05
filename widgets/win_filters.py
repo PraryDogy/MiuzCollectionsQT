@@ -69,6 +69,7 @@ class DatesButton(UPushButton):
 class WinFiltersDatesTag(UTagWidget):
     right_svg_path = Static.COMMON_ICONS / "cancel.svg"
     left_svg_path = Static.COMMON_ICONS / "tags.svg" 
+    right_svg_size = (12, 12)
 
     def __init__(self, text: str):
         super().__init__(
@@ -77,11 +78,13 @@ class WinFiltersDatesTag(UTagWidget):
             text=text,
             right_svg_path=str(self.right_svg_path)
         )
+        self.right_svg_widget.setFixedSize(*self.right_svg_size)
+        self.right_svg_lay.setContentsMargins(0, 1, 0, 0)
 
     def set_active(self, active: bool):
         if active:
             self.set_qss_style(self.qss_green)
-            self.set_base_right_spacing(0)
+            self.set_base_right_spacing()
         else:
             self.set_qss_style(self.qss_gray)
             self.set_low_right_spacing()

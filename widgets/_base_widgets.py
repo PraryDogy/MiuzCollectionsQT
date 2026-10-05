@@ -459,15 +459,15 @@ class UTagWidget(TransparentFrame):
 
         right_svg_wrapper = TransparentWidget()
         self.h_lay.addWidget(right_svg_wrapper)
-        right_svg_lay = QVBoxLayout(right_svg_wrapper)
-        right_svg_lay.setContentsMargins(0, 0, 0, 0)
-        right_svg_lay.setSpacing(0)
+        self.right_svg_lay = QVBoxLayout(right_svg_wrapper)
+        self.right_svg_lay.setContentsMargins(0, 0, 0, 0)
+        self.right_svg_lay.setSpacing(0)
 
         self.right_svg_widget = QSvgWidget()
         self.right_svg_widget.mouseReleaseEvent = self.right_svg_cmd
         self.right_svg_widget.load(right_svg_path)
         self.right_svg_widget.setFixedSize(*self.right_svg_size)
-        right_svg_lay.addWidget(self.right_svg_widget)
+        self.right_svg_lay.addWidget(self.right_svg_widget)
 
     def set_qss_style(self, qss_style: str):
         self.qss_style = qss_style
@@ -490,6 +490,11 @@ class UTagWidget(TransparentFrame):
     def set_base_right_spacing(self):
         l, t, _, b = self.h_lay.getContentsMargins()
         self.h_lay.setContentsMargins(l, t, self.base_right_spacing, b)
+
+    def move_right_svg_widget(self, value: int):
+        # некоторые маленькие иконки справа от текста нужно смещать вниз
+        l, t, r, b = self.right_svg_lay.getContentsMargins()
+        self.right_svg_lay.setContentsMargins(l, value, r, b)
 
 
 class SelectableLabel(TransparentLabel):
