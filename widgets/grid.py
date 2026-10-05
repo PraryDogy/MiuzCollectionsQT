@@ -368,10 +368,10 @@ class GridDatesTag(GridTag):
             left_svg_path=self.left_svg_path
         )
 
-    def right_svg_cmd(self):
+    def right_svg_cmd(self, *args):
         Dynamic.py_date_start = None
         Dynamic.py_date_end = None
-        return super().right_svg_cmd()
+        return super().right_svg_cmd(*args)
 
 
 class GridWordTag(GridTag):
@@ -383,9 +383,9 @@ class GridWordTag(GridTag):
             left_svg_path=self.left_svg_path
         )
 
-    def right_svg_cmd(self):
+    def right_svg_cmd(self, *args):
         Dynamic.word_tags_list.remove(self.text_widget.text())
-        return super().right_svg_cmd()
+        return super().right_svg_cmd(*args)
 
 
 class GridFavTag(GridTag):
@@ -397,9 +397,9 @@ class GridFavTag(GridTag):
             left_svg_path=self.left_svg_path
         )
 
-    def right_svg_cmd(self):
+    def right_svg_cmd(self, *args):
         Dynamic.favs_tag_enabled = False
-        return super().right_svg_cmd()
+        return super().right_svg_cmd(*args)
 
 
 class GridNoSubfoldersTag(GridTag):
@@ -411,9 +411,9 @@ class GridNoSubfoldersTag(GridTag):
             left_svg_path=self.left_svg_path
         )
 
-    def right_svg_cmd(self):
+    def right_svg_cmd(self, *args):
         Dynamic.no_subfolders_tag_enabled = False
-        return super().right_svg_cmd()
+        return super().right_svg_cmd(*args)
 
 
 class TagsWidget(TransparentWidget):
