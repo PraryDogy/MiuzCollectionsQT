@@ -144,9 +144,11 @@ class WinCalendar(UMainWidget):
 		self.setFixedSize(self.width(), self.height())
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setContentsMargins(10, 10, 10, 12)
-		self.central_layout.setSpacing(10)
+		self.central_layout.setSpacing(0)
 
 	def init_ui(self):
+		spacing = 10
+
 		dynamic_container = TransparentWidget()
 		self.central_layout.addWidget(dynamic_container)
 
@@ -165,8 +167,10 @@ class WinCalendar(UMainWidget):
 		dynamic_container_lay.addWidget(self.dynamic_label)
 		dynamic_container_lay.addStretch(1)
 
+		self.central_layout.addSpacing(spacing)
 		above_nav_sep = USep()
 		self.central_layout.addWidget(above_nav_sep)
+		self.central_layout.addSpacing(spacing)
 
 		self.nav_widget = TransparentWidget()
 		self.central_layout.addWidget(self.nav_widget)
@@ -204,8 +208,12 @@ class WinCalendar(UMainWidget):
 		self.btn_next.clicked.connect(self.next_month)
 		self.nav_layout.addWidget(self.btn_next)
 
+		self.central_layout.addSpacing(spacing)
 		below_nav_sep = USep()
 		self.central_layout.addWidget(below_nav_sep)
+
+
+		self.central_layout.addSpacing(spacing)
 
 		self.btn_container = TransparentWidget()
 		self.central_layout.addWidget(self.btn_container)
@@ -236,7 +244,7 @@ class WinCalendar(UMainWidget):
 		self.calendar_layout.setContentsMargins(0, 0, 0, 0)
 		self.calendar_layout.setSpacing(0)
 		# минус кнопка закрыть минус сепаратор над кнопкой
-		widget_num = self.central_layout.count() - 2
+		widget_num = self.central_layout.count() - 3
 		self.central_layout.insertWidget(widget_num, self.calendar_widget)
 
 	def recreate_calendar_widget(self):
