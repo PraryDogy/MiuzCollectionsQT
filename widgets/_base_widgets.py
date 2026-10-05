@@ -97,7 +97,7 @@ class _WindowMixin:
 
         # Title bar
         self.setTitleBar(StandardTitleBar(self))
-        title_layout = self.titleBar.layout()
+        title_layout = self.get_titlebar_layout()
         title_layout.insertStretch(0, 1)
 
         # Central widget
@@ -121,6 +121,9 @@ class _WindowMixin:
 
         # Register
         self.register_window()
+
+    def get_titlebar_layout(self: FramelessMainWindow) -> QLayout:
+        return self.titleBar.layout()
 
     def register_window(self):
         self.win_list.append(self)
