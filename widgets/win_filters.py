@@ -329,6 +329,7 @@ class WinFiltersStantartTag(WinFiltersTag):
             left_svg_path=left_svg_path
         )
         self.right_svg_widget.setVisible(False)
+        self.set_low_right_spacing()
 
 
 class WinFiltersFavTag(WinFiltersStantartTag):

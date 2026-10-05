@@ -489,6 +489,7 @@ class UTagWidget(TransparentFrame):
         self.left_svg_clicked.emit()
 
     def set_low_right_spacing(self):
+        # когда скрыта правая икона, необходимо уменьшить пространство справа
         l, t, _, b = self.h_lay.getContentsMargins()
         self.h_lay.setContentsMargins(l, t, self.low_right_spacing, b)
 
