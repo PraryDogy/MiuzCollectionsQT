@@ -110,7 +110,7 @@ class WinCalendar(UMainWidget):
 
 	min_year = 2015
 
-	cell_size = (45, 30)
+	cell_size = (45, 35)
 	svg_nav_size = (23, 23)
 	svg_calendar_size = (15, 15)
 	svg_blue_circle_size = (23, 23)
