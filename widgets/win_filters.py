@@ -66,7 +66,7 @@ class DatesButton(UPushButton):
         self.setFixedWidth(max_width + 20)
 
 
-class DatesPeriodTag(UTagWidget):
+class WinFiltersDatesTag(UTagWidget):
     right_svg_path = Static.COMMON_ICONS / "cancel.svg"
     left_svg_path = Static.COMMON_ICONS / "tags.svg" 
 
@@ -81,8 +81,11 @@ class DatesPeriodTag(UTagWidget):
     def set_active(self, active: bool):
         if active:
             self.set_qss_style(self.qss_green)
+            self.set_base_right_spacing(0)
         else:
             self.set_qss_style(self.qss_gray)
+            self.set_low_right_spacing()
+        self.right_svg_widget.setVisible(active)
 
 
 class DatesWidget(UGroupBox):
@@ -138,7 +141,7 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(5)
 
-        self.dates_period_tag = DatesPeriodTag(text="")
+        self.dates_period_tag = WinFiltersDatesTag(text="")
         self.dates_period_tag.text_clicked.connect(self.show_tag_menu)
         self.dates_period_tag.set_active(Dynamic.py_date_start is not None)
 
@@ -312,7 +315,7 @@ class WinFiltersTag(UTagWidget):
 
     def __init__(self, text: str, left_svg_path: str):
         super().__init__(
-            qss_style=UTagWidget.qss_green,
+            qss_style=UTagWidget.qss_gray,
             left_svg_path=left_svg_path,
             text=text,
             right_svg_path=str(self.right_svg_path)
