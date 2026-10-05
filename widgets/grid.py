@@ -344,25 +344,25 @@ class GridControlsWidget(TransparentWidget):
         self.v_lay.addStretch()
 
 
-class GridTagWidget(UTagWidget):
+class GridTag(UTagWidget):
     right_svg_path = Static.COMMON_ICONS / "cancel.svg"
 
     def __init__(self, left_svg_path, text):
         super().__init__(
             qss_style=self.qss_green,
-            left_svg_path=left_svg_path,
+            left_svg_path=str(left_svg_path),
             text=text,
-            right_svg_path=self.right_svg_path
+            right_svg_path=str(self.right_svg_path)
         )
 
 
-class DatesTag(GridTagWidget):
-    calendar_svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
+class GridDatesTag(GridTag):
+    left_svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
 
     def __init__(self):
         super().__init__(
             text=DatesWidget.readable_date,
-            left_svg_path=str(self.calendar_svg_path)
+            left_svg_path=self.left_svg_path
         )
 
     def right_svg_cmd(self):
@@ -371,13 +371,13 @@ class DatesTag(GridTagWidget):
         return super().right_svg_cmd()
 
 
-class WordTag(GridTagWidget):
-    tags_svg_path = Static.COMMON_ICONS / "tags.svg"
+class GridWordTag(GridTag):
+    left_svg_path = Static.COMMON_ICONS / "tags.svg"
 
     def __init__(self, text):
         super().__init__(
             text=text,
-            left_svg_path=str(self.tags_svg_path)
+            left_svg_path=self.left_svg_path
         )
 
     def right_svg_cmd(self):
@@ -385,13 +385,13 @@ class WordTag(GridTagWidget):
         return super().right_svg_cmd()
 
 
-class FavTag(GridTagWidget):
-    fav_svg_path = Static.COMMON_ICONS / "fav.svg"
+class GridFavTag(GridTag):
+    left_svg_path = Static.COMMON_ICONS / "fav.svg"
 
     def __init__(self):
         super().__init__(
-            left_svg_path=str(self.fav_svg_path),
-            text=Lng.favorites[JsonData.lng_index]
+            text=Lng.favorites[JsonData.lng_index],
+            left_svg_path=self.left_svg_path
         )
 
     def right_svg_cmd(self):
@@ -399,13 +399,13 @@ class FavTag(GridTagWidget):
         return super().right_svg_cmd()
 
 
-class NoSubfoldersTag(GridTagWidget):
-    folder_gray_svg_path = Static.COMMON_ICONS / "folder_gray.svg"
+class GridNoSubfoldersTag(GridTag):
+    left_svg_path = Static.COMMON_ICONS / "folder_gray.svg"
 
     def __init__(self):
         super().__init__(
-            left_svg_path=str(self.folder_gray_svg_path),
             text=Lng.without_subfolders[JsonData.lng_index],
+            left_svg_path=self.left_svg_path
         )
 
     def right_svg_cmd(self):
@@ -426,26 +426,26 @@ class TagsWidget(TransparentWidget):
 
     def _create_tags(self):
         if Dynamic.py_date_start:
-            tag = DatesTag()
+            tag = GridDatesTag()
             tag.right_svg_clicked.connect(self.load_st_grid.emit)
             tag.text_clicked.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.word_tags_list:
             for word in Dynamic.word_tags_list:
-                tag = WordTag(word)
+                tag = GridWordTag(word)
                 tag.right_svg_clicked.connect(self.load_st_grid.emit)
                 tag.text_clicked.connect(self.open_filters_win.emit)
                 self.flow_layout.addWidget(tag)
 
         if Dynamic.favs_tag_enabled:
-            tag = FavTag()
+            tag = GridFavTag()
             tag.right_svg_clicked.connect(self.load_st_grid.emit)
             tag.text_clicked.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.no_subfolders_tag_enabled:
-            tag = NoSubfoldersTag()
+            tag = GridNoSubfoldersTag()
             tag.right_svg_clicked.connect(self.load_st_grid.emit)
             tag.text_clicked.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)

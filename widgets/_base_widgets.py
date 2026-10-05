@@ -435,9 +435,6 @@ class UTagWidget(TransparentFrame):
     base_right_spacing = 7
     low_right_spacing = 3
 
-    left_svg_path = ""
-    right_svg_path = ""
-
     def __init__(self, qss_style: str, left_svg_path: str, text: str, right_svg_path: str):
         super().__init__()
         self.qss_style = qss_style
@@ -451,7 +448,7 @@ class UTagWidget(TransparentFrame):
         self.h_lay.setSpacing(6)
 
         self.left_svg_widget = QSvgWidget()
-        self.left_svg_widget.mouseReleaseEvent = self.left_svg_cmd
+        self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
         self.left_svg_widget.load(left_svg_path)
         self.left_svg_widget.setFixedSize(*self.left_svg_size)
         self.h_lay.addWidget(self.left_svg_widget)
@@ -484,9 +481,6 @@ class UTagWidget(TransparentFrame):
 
     def text_widget_cmd(self, *args):
         self.text_clicked.emit()
-
-    def left_svg_cmd(self, *args):
-        self.left_svg_clicked.emit()
 
     def set_low_right_spacing(self):
         # когда скрыта правая икона, необходимо уменьшить пространство справа

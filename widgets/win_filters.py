@@ -343,14 +343,14 @@ class WinFiltersFavTag(WinFiltersStantartTag):
         if Dynamic.favs_tag_enabled:
             self.set_qss_style(self.qss_green)
 
-    # def mouseReleaseEvent(self, a0):
-    #     if Dynamic.favs_tag_enabled:
-    #         self.set_qss_style(self.qss_gray)
-    #         Dynamic.favs_tag_enabled = False
-    #     else:
-    #         self.set_qss_style(self.qss_green)
-    #         Dynamic.favs_tag_enabled = True
-    #     return super().mouseReleaseEvent(a0)
+    def text_widget_cmd(self, *args):
+        if Dynamic.favs_tag_enabled:
+            self.set_qss_style(self.qss_gray)
+            Dynamic.favs_tag_enabled = False
+        else:
+            self.set_qss_style(self.qss_green)
+            Dynamic.favs_tag_enabled = True
+        return super().text_widget_cmd(*args)
 
 
 class SubfoldersTagWidget(WinFiltersStantartTag):
@@ -364,14 +364,14 @@ class SubfoldersTagWidget(WinFiltersStantartTag):
         if Dynamic.no_subfolders_tag_enabled:
             self.set_qss_style(self.qss_green)
 
-    # def mouseReleaseEvent(self, a0):
-    #     if Dynamic.no_subfolders_tag_enabled:
-    #         self.set_qss_style(self.qss_gray)
-    #         Dynamic.no_subfolders_tag_enabled = False
-    #     else:
-    #         self.set_qss_style(self.qss_green)
-    #         Dynamic.no_subfolders_tag_enabled = True
-    #     return super().mouseReleaseEvent(a0)
+    def text_widget_cmd(self, *args):
+        if Dynamic.no_subfolders_tag_enabled:
+            self.set_qss_style(self.qss_gray)
+            Dynamic.no_subfolders_tag_enabled = False
+        else:
+            self.set_qss_style(self.qss_green)
+            Dynamic.no_subfolders_tag_enabled = True
+        return super().text_widget_cmd(*args)
 
 
 class WordFiltersTagWidget(WinFiltersTag):
@@ -385,14 +385,14 @@ class WordFiltersTagWidget(WinFiltersTag):
         if text in Dynamic.word_tags_list:
             self.set_qss_style(self.qss_green)
 
-    # def mouseReleaseEvent(self, a0):
-    #     if self.title.text() in Dynamic.word_tags_list:
-    #         self.set_qss_style(self.qss_gray)
-    #         Dynamic.word_tags_list.remove(self.title.text())
-    #     else:
-    #         self.set_qss_style(self.qss_green)
-    #         Dynamic.word_tags_list.append(self.title.text())
-    #     return super().mouseReleaseEvent(a0)
+    def text_widget_cmd(self, *args):
+        if self.text_widget.text() in Dynamic.word_tags_list:
+            self.set_qss_style(self.qss_gray)
+            Dynamic.word_tags_list.remove(self.text_widget.text())
+        else:
+            self.set_qss_style(self.qss_green)
+            Dynamic.word_tags_list.append(self.text_widget.text())
+        return super().text_widget_cmd(*args)
 
 
 class AddTagWidget(WinFiltersTag):
@@ -448,10 +448,10 @@ class UserTags(TransparentWidget):
     def _create_tags(self):
         for word in Filters.items:
             tag = WordFiltersTagWidget(word)
-            # tag.load_st_grid.connect(self.load_st_grid.emit)
-            # tag.on_trash_clicked.connect(
-            #     lambda w=tag: self.show_remove_tag_win(w)
-            # )
+            tag.text_clicked.connect(self.load_st_grid.emit)
+            tag.right_svg_clicked.connect(
+                lambda w=tag: self.show_remove_tag_win(w)
+            )
             self.flow_layout.addWidget(tag)
 
         self.add_tag = AddTagWidget()
