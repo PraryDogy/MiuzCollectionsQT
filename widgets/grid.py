@@ -346,6 +346,7 @@ class GridControlsWidget(TransparentWidget):
 
 class GridTag(UTagWidget):
     right_svg_path = Static.COMMON_ICONS / "cancel.svg"
+    right_svg_size = (12, 12)
 
     def __init__(self, left_svg_path, text):
         super().__init__(
@@ -354,6 +355,8 @@ class GridTag(UTagWidget):
             text=text,
             right_svg_path=str(self.right_svg_path)
         )
+        self.right_svg_widget.setFixedSize(*self.right_svg_size)
+        self.right_svg_lay.setContentsMargins(0, 1, 0, 0)
 
 
 class GridDatesTag(GridTag):

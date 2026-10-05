@@ -491,11 +491,6 @@ class UTagWidget(TransparentFrame):
         l, t, _, b = self.h_lay.getContentsMargins()
         self.h_lay.setContentsMargins(l, t, self.base_right_spacing, b)
 
-    def move_right_svg_widget(self, value: int):
-        # некоторые маленькие иконки справа от текста нужно смещать вниз
-        l, t, r, b = self.right_svg_lay.getContentsMargins()
-        self.right_svg_lay.setContentsMargins(l, value, r, b)
-
 
 class SelectableLabel(TransparentLabel):
     sym_line_feed = "\u000a"
