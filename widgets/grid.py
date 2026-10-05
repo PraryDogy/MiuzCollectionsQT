@@ -345,115 +345,72 @@ class GridControlsWidget(TransparentWidget):
 
 
 class GridTagWidget(UTagWidget):
-    icon_path = Static.COMMON_ICONS / "cancel.svg"
-    clicked_close = pyqtSignal()
-    clicked_body = pyqtSignal()
+    right_svg_path = Static.COMMON_ICONS / "cancel.svg"
 
-    def __init__(self, text: str, svg_path: str):
-        super().__init__(qss_style=UTagWidget.qss_green)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(7, 2, 7, 2)
-        self.h_lay.setSpacing(6)
-
-        if svg_path:
-            self.svg_widget = QSvgWidget()
-            self.svg_widget.load(svg_path)
-            self.svg_widget.setFixedSize(*self.icon_size)
-            self.h_lay.addWidget(self.svg_widget)
-
-        self.title = TransparentLabel(text)
-        self.h_lay.addWidget(self.title)
-
-        # Контейнер для SVG
-        self.close_btn_wrapper = TransparentWidget()
-        close_lay = QVBoxLayout(self.close_btn_wrapper)
-        # опускаем кнопку ниже на 1 пиксель
-        close_lay.setContentsMargins(0, 1, 0, 0)
-        close_lay.setSpacing(0)
-
-        self.close_btn = QSvgWidget()
-        self.close_btn.mouseReleaseEvent = lambda e: self.clicked_close_cmd()
-        self.close_btn.load(str(self.icon_path))
-        self.close_btn.setFixedSize(12, 12)
-
-        close_lay.addWidget(self.close_btn)
-        self.h_lay.addWidget(self.close_btn_wrapper)
-
-    def clicked_close_cmd(self):
-        self.clicked_close.emit()
-
-    def mouseReleaseEvent(self, a0):
-        self.clicked_body.emit()
-        return super().mouseReleaseEvent(a0)
+    def __init__(self, left_svg_path, text):
+        super().__init__(
+            qss_style=self.qss_green,
+            left_svg_path=left_svg_path,
+            text=text,
+            right_svg_path=self.right_svg_path
+        )
 
 
 class DatesTag(GridTagWidget):
-    svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
+    calendar_svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
 
     def __init__(self):
-        super().__init__("", str(self.svg_path))
-        self.set_dates_text()
+        super().__init__(
+            text=DatesWidget.readable_date,
+            left_svg_path=str(self.calendar_svg_path)
+        )
 
-    def set_dates_text(self):
-        # q_start = QDate(Dynamic.py_date_start.year, Dynamic.py_date_start.month, Dynamic.py_date_start.day)
-        # q_end = QDate(Dynamic.py_date_end.year, Dynamic.py_date_end.month, Dynamic.py_date_end.day)
-        
-        # if JsonData.lng_index == 0:
-        #     locale = QLocale(QLocale.Language.Russian, QLocale.Country.Russia)
-        #     date_format = "d MMMM yyyy"
-        # elif JsonData.lng_index == 1:
-        #     locale = QLocale(QLocale.Language.English, QLocale.Country.UnitedStates)
-        #     date_format = "MMMM d, yyyy"
-            
-        # start_str = locale.toString(q_start, date_format)
-        # end_str = locale.toString(q_end, date_format)
-        # self.title.setText(f"{start_str} - {end_str}")
-        # Да костыль, ну и что
-        readable = DatesWidget.readable_date
-        if readable:
-            self.title.setText(DatesWidget.readable_date)
-        else:
-            print("DatesWidget.readable_date NONE")
-
-    def clicked_close_cmd(self):
+    def right_svg_cmd(self):
         Dynamic.py_date_start = None
         Dynamic.py_date_end = None
-        return super().clicked_close_cmd()
+        return super().right_svg_cmd()
 
 
 class WordTag(GridTagWidget):
-    svg_path = Static.COMMON_ICONS / "tags.svg"
+    tags_svg_path = Static.COMMON_ICONS / "tags.svg"
 
     def __init__(self, text):
-        super().__init__(text, str(self.svg_path))
+        super().__init__(
+            text=text,
+            left_svg_path=str(self.tags_svg_path)
+        )
 
-    def clicked_close_cmd(self):
-        Dynamic.word_tags_list.remove(self.title.text())
-        return super().clicked_close_cmd()
+    def right_svg_cmd(self):
+        Dynamic.word_tags_list.remove(self.text_widget.text())
+        return super().right_svg_cmd()
 
 
 class FavTag(GridTagWidget):
-    svg_path = Static.COMMON_ICONS / "fav.svg"
+    fav_svg_path = Static.COMMON_ICONS / "fav.svg"
 
-    def __init__(self, text):
-        super().__init__(text, str(self.svg_path))
+    def __init__(self):
+        super().__init__(
+            left_svg_path=str(self.fav_svg_path),
+            text=Lng.favorites[JsonData.lng_index]
+        )
 
-    def clicked_close_cmd(self):
+    def right_svg_cmd(self):
         Dynamic.favs_tag_enabled = False
-        return super().clicked_close_cmd()
+        return super().right_svg_cmd()
 
 
-class OnlyFolderTag(GridTagWidget):
-    svg_path = Static.COMMON_ICONS / "folder_gray.svg"
+class NoSubfoldersTag(GridTagWidget):
+    folder_gray_svg_path = Static.COMMON_ICONS / "folder_gray.svg"
 
-    def __init__(self, text):
-        super().__init__(text, str(self.svg_path))
+    def __init__(self):
+        super().__init__(
+            left_svg_path=str(self.folder_gray_svg_path),
+            text=Lng.without_subfolders[JsonData.lng_index],
+        )
 
-    def clicked_close_cmd(self):
+    def right_svg_cmd(self):
         Dynamic.no_subfolders_tag_enabled = False
-        return super().clicked_close_cmd()
+        return super().right_svg_cmd()
 
 
 class TagsWidget(TransparentWidget):
@@ -470,27 +427,27 @@ class TagsWidget(TransparentWidget):
     def _create_tags(self):
         if Dynamic.py_date_start:
             tag = DatesTag()
-            tag.clicked_close.connect(self.load_st_grid.emit)
-            tag.clicked_body.connect(self.open_filters_win.emit)
+            tag.right_svg_clicked.connect(self.load_st_grid.emit)
+            tag.text_clicked.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.word_tags_list:
             for word in Dynamic.word_tags_list:
                 tag = WordTag(word)
-                tag.clicked_close.connect(self.load_st_grid.emit)
-                tag.clicked_body.connect(self.open_filters_win.emit)
+                tag.right_svg_clicked.connect(self.load_st_grid.emit)
+                tag.text_clicked.connect(self.open_filters_win.emit)
                 self.flow_layout.addWidget(tag)
 
         if Dynamic.favs_tag_enabled:
-            tag = FavTag(Lng.favorites[JsonData.lng_index])
-            tag.clicked_close.connect(self.load_st_grid.emit)
-            tag.clicked_body.connect(self.open_filters_win.emit)
+            tag = FavTag()
+            tag.right_svg_clicked.connect(self.load_st_grid.emit)
+            tag.text_clicked.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
         if Dynamic.no_subfolders_tag_enabled:
-            tag = OnlyFolderTag(Lng.without_subfolders[JsonData.lng_index])
-            tag.clicked_close.connect(self.load_st_grid.emit)
-            tag.clicked_body.connect(self.open_filters_win.emit)
+            tag = NoSubfoldersTag()
+            tag.right_svg_clicked.connect(self.load_st_grid.emit)
+            tag.text_clicked.connect(self.open_filters_win.emit)
             self.flow_layout.addWidget(tag)
 
     def hasHeightForWidth(self):

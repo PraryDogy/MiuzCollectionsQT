@@ -324,53 +324,21 @@ class DatesWidget(UGroupBox):
         self.handle_preset_change()
 
 
-class TagWidget(UTagWidget):
-    trash_icon_path = Static.COMMON_ICONS / "trash.svg"
-    on_trash_clicked = pyqtSignal()
-    load_st_grid = pyqtSignal() 
+class WinFiltersTagWidget(UTagWidget):
+    right_svg_path = Static.COMMON_ICONS / "trash.svg"
 
-    def __init__(self, text: str, show_trash: bool = True, l_icon_path: str = None):
-        super().__init__(self.qss_gray)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(7, 2, 7, 2)
-        self.h_lay.setSpacing(6)
-
-        if l_icon_path:
-            self.left_icon = QSvgWidget()
-            self.left_icon.load(l_icon_path)
-            self.left_icon.setFixedSize(*self.icon_size)
-            self.h_lay.addWidget(self.left_icon)
-
-        self.title = TransparentLabel(text)
-        self.h_lay.addWidget(self.title)
-
-        # Создаем контейнер и иконку только если передан флаг True
-        if show_trash:
-            self.close_btn_wrapper = TransparentWidget()
-            close_lay = QVBoxLayout(self.close_btn_wrapper)
-            close_lay.setContentsMargins(0, 1, 0, 0)
-            close_lay.setSpacing(0)
-
-            self.trash_btn = QSvgWidget()
-            self.trash_btn.mouseReleaseEvent = self.on_trash_clicked_cmd
-            self.trash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            self.trash_btn.load(str(self.trash_icon_path))
-            self.trash_btn.setFixedSize(*self.icon_size)
-
-            close_lay.addWidget(self.trash_btn)
-            self.h_lay.addWidget(self.close_btn_wrapper)
-
-    def on_trash_clicked_cmd(self, e):
-        self.on_trash_clicked.emit()
-
-    def mouseReleaseEvent(self, a0):
-        self.load_st_grid.emit()
-        super().mouseReleaseEvent(a0)
+    def __init__(self, text: str, left_svg_path: str):
+        super().__init__(
+            qss_style=UTagWidget.qss_green,
+            left_svg_path=left_svg_path,
+            text=text,
+            right_svg_path=self.right_svg_path
+        )
 
 
-class FavTagWidget(TagWidget):
+
+
+class FavTagWidget(WinFiltersTagWidget):
     icon_path =  Static.COMMON_ICONS / "fav.svg"
 
     def __init__(self):
@@ -392,7 +360,7 @@ class FavTagWidget(TagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class SubfoldersTagWidget(TagWidget):
+class SubfoldersTagWidget(WinFiltersTagWidget):
     icon_path =  Static.COMMON_ICONS / "folder_gray.svg"
 
     def __init__(self):
@@ -414,7 +382,7 @@ class SubfoldersTagWidget(TagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class WordFiltersTagWidget(TagWidget):
+class WordFiltersTagWidget(WinFiltersTagWidget):
     icon_path = Static.COMMON_ICONS / "tags.svg"
 
     def __init__(self, text):
@@ -435,7 +403,7 @@ class WordFiltersTagWidget(TagWidget):
         return super().mouseReleaseEvent(a0)
 
 
-class AddTagWidget(TagWidget):
+class AddTagWidget(WinFiltersTagWidget):
     icon_path =  Static.COMMON_ICONS / "plus_simple.svg"
     clicked_ = pyqtSignal()
 

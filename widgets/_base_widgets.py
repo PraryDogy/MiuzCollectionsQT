@@ -419,28 +419,69 @@ class TitleTextLabel(TransparentLabel):
 
 
 class UTagWidget(TransparentFrame):
-    tag_height = 23
+    right_svg_clicked = pyqtSignal()
+    text_clicked = pyqtSignal()
+    left_svg_clicked = pyqtSignal()
+
     qss_property_name = "style"
     qss_blue = "blue"
     qss_gray = "gray"
     qss_transparent = "transparent"
     qss_green = "green"
-    icon_size = (15, 15)
 
-    def __init__(self, qss_style: str):
+    tag_height = 23
+    right_svg_size = (15, 15)
+    left_svg_size = (15, 15)
+
+    def __init__(self, qss_style: str, left_svg_path: str, text: str, right_svg_path: str):
         super().__init__()
         self.qss_style = qss_style
-
         self.setFixedHeight(self.tag_height)
         self.setProperty(UTagWidget.qss_property_name, qss_style)
+        self.set_qss_style(qss_style)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        self.h_lay = QHBoxLayout(self)
+        self.h_lay.setContentsMargins(7, 2, 7, 2)
+        self.h_lay.setSpacing(6)
+
+        self.left_svg_widget = QSvgWidget()
+        self.left_svg_widget.mouseReleaseEvent = self.left_svg_cmd
+        self.left_svg_widget.load(left_svg_path)
+        self.left_svg_widget.setFixedSize(*self.left_svg_size)
+        self.h_lay.addWidget(self.left_svg_widget)
+
+        self.text_widget = TransparentLabel(text)
+        self.text_widget.mouseReleaseEvent = self.text_widget_cmd
+        self.h_lay.addWidget(self.text_widget)
+
+        right_svg_wrapper = TransparentWidget()
+        self.h_lay.addWidget(right_svg_wrapper)
+        right_svg_lay = QVBoxLayout(right_svg_wrapper)
+        right_svg_lay.setContentsMargins(0, 1, 0, 0)
+        right_svg_lay.setSpacing(0)
+
+        self.right_svg_widget = QSvgWidget()
+        self.right_svg_widget.mouseReleaseEvent = self.right_svg_cmd
+        self.right_svg_widget.load(right_svg_path)
+        self.right_svg_widget.setFixedSize(*self.right_svg_size)
+        right_svg_lay.addWidget(self.right_svg_widget)
 
     def set_qss_style(self, qss_style: str):
-        if self.qss_style != qss_style:
-            self.qss_style = qss_style
-            self.setProperty(UTagWidget.qss_property_name, qss_style)
-            self.style().unpolish(self)
-            self.style().polish(self)
-            self.update()
+        self.qss_style = qss_style
+        self.setProperty(UTagWidget.qss_property_name, qss_style)
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.update()
+
+    def right_svg_cmd(self, *args):
+        self.right_svg_clicked.emit()
+
+    def text_widget_cmd(self, *args):
+        self.text_clicked.emit()
+
+    def left_svg_cmd(self, *args):
+        self.left_svg_clicked.emit()
 
 
 class SelectableLabel(TransparentLabel):
