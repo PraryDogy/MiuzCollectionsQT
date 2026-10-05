@@ -92,11 +92,13 @@ class _WindowMixin:
     bar_height = 30
 
     def setup_window(self: FramelessMainWindow):
+
+        # self.setWindowIcon(QIcon("icons/app_icons/icon.icns"))
+
         # Title bar
         self.setTitleBar(StandardTitleBar(self))
-
         title_layout = self.titleBar.layout()
-        title_layout.insertStretch(1, 1)
+        title_layout.insertStretch(0, 1)
 
         # Central widget
         central_widget = TransparentFrame()
