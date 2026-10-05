@@ -10,8 +10,6 @@ from time import sleep
 import numpy as np
 import sqlalchemy
 from typing_extensions import Literal
-from watchdog.events import FileSystemEvent, FileSystemEventHandler
-from watchdog.observers.polling import PollingObserver
 
 from cfg import JsonData, Static
 
@@ -345,54 +343,6 @@ class MfRemover:
                 .where(Dirs.mf_alias == mf_alias)
             )
             conn.execute(stmt)
-
-
-class WatchDogHandler(FileSystemEventHandler):
-    def __init__(self, callback: callable):
-        super().__init__()
-        self.callback = callback
-
-    def on_any_event(self, event: FileSystemEvent):
-        if event.is_directory:
-            self.callback(event.src_path)
-
-
-@dataclass(slots=True)
-class WatchDogItem:
-    mf: Mf
-    src_path: str
-
-
-class WatchDog:
-    @staticmethod
-    def start(mf_list: list[Mf], queue: Queue):
-        observer = PollingObserver()
-
-        for mf in mf_list:
-            avaiable_path = mf.get_avaiable_mf_path()
-            if not avaiable_path:
-                print(mf.mf_alias, "watchdog: нет подключения")
-                continue
-            else:
-                print(mf.mf_alias, "watchdog started", mf.mf_current_path)
-
-            callback = lambda x, mf=mf: queue.put(WatchDogItem(mf, x))
-            handler = WatchDogHandler(callback)
-            observer.schedule(handler, mf.mf_current_path, recursive=True)
-
-        # очень долго будет обходить все подпапки и очень долго будет
-        # получать уведомления от WatchDogHandler из-за скорости диска
-        # короче не подходит нам
-        print("starting observer")
-        observer.start()
-        print("observer started")
-
-        try:
-            while True:
-                sleep(1)
-        finally:
-            observer.stop()
-            observer.join()
 
 
 @dataclass(slots=True)
