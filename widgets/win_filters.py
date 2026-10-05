@@ -90,6 +90,15 @@ class WinFiltersDatesTag(UTagWidget):
             self.set_low_right_spacing()
         self.right_svg_widget.setVisible(active)
 
+    def clear_data(self):
+        Dynamic.py_date_start = None
+        Dynamic.py_date_end = None
+
+    def right_svg_cmd(self, *args):
+        self.clear_data()
+        self.set_active(False)
+        return super().right_svg_cmd(*args)
+
 
 class DatesWidget(UGroupBox):
     load_st_grid = pyqtSignal()
@@ -146,6 +155,7 @@ class DatesWidget(UGroupBox):
 
         self.dates_period_tag = WinFiltersDatesTag(text="")
         self.dates_period_tag.text_clicked.connect(self.show_tag_menu)
+        self.dates_period_tag.right_svg_clicked.connect(self.load_st_grid.emit)
         self.dates_period_tag.set_active(Dynamic.py_date_start is not None)
 
         dynamic_container_lay.addWidget(self.dates_period_tag)
