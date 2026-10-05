@@ -410,7 +410,7 @@ class WordFiltersTagWidget(WinFiltersTag):
 
 class AddTagWidget(WinFiltersTag):
     left_svg_path =  Static.COMMON_ICONS / "plus_simple.svg"
-    # clicked_ = pyqtSignal()
+    left_svg_size = (12, 12)
 
     def __init__(self):
         super().__init__(
@@ -418,10 +418,9 @@ class AddTagWidget(WinFiltersTag):
             left_svg_path=str(self.left_svg_path)
         )
         self.set_qss_style(self.qss_transparent)
-
-    # def mouseReleaseEvent(self, a0):
-    #     self.clicked_.emit()
-    #     return super().mouseReleaseEvent(a0)
+        self.right_svg_widget.setVisible(False)
+        self.set_low_right_spacing()
+        self.left_svg_widget.setFixedSize(*self.left_svg_size)
 
 
 class StandartTags(TransparentWidget):
@@ -468,7 +467,7 @@ class UserTags(TransparentWidget):
             self.flow_layout.addWidget(tag)
 
         self.add_tag = AddTagWidget()
-        # self.add_tag.clicked_.connect(self.show_text_win)
+        self.add_tag.text_clicked.connect(self.show_text_win)
         self.flow_layout.addWidget(self.add_tag)
 
     def show_text_win(self):
