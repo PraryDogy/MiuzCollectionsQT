@@ -436,11 +436,11 @@ class StandartTags(TransparentWidget):
 
     def _create_tags(self):
         tag = WinFiltersFavTag()
-        # tag.load_st_grid.connect(self.load_st_grid.emit)
+        tag.text_clicked.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
         tag = SubfoldersTagWidget()
-        # tag.load_st_grid.connect(self.load_st_grid.emit)
+        tag.text_clicked.connect(self.load_st_grid.emit)
         self.flow_layout.addWidget(tag)
 
 
