@@ -96,6 +96,7 @@ class WinMain(UMainWindow):
     def __init__(self, argv: list):
         super().__init__()
         self.central_layout.setContentsMargins(10, 0, 10, 0)
+        self.insert_sep()
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())

@@ -169,6 +169,11 @@ class UBaseWindow(FramelessMainWindow):
 		self.register_window()
 		title_bar.raise_()
 
+	def insert_sep(self):
+		index = 1
+		sep = USep()
+		self.central_layout.insertWidget(index, sep)
+
 	def get_titlebar_layout(self) -> QLayout:
 		return self.titleBar.layout()
 
@@ -700,8 +705,9 @@ class ConfirmWindow(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
+        self.insert_sep()
 
-        self.central_layout.setContentsMargins(15, 10, 10, 10)
+        self.central_layout.setContentsMargins(15, 0, 10, 10)
         self.central_layout.setSpacing(10)
 
         svg_text_container = TransparentWidget()

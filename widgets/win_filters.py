@@ -597,7 +597,7 @@ class WinFilters(UMainWidget):
         self.setWindowTitle(Lng.filters[JsonData.lng_index])
         self.setFixedWidth(self.ww)
         self.central_layout.setSpacing(10)
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
+        self.central_layout.setContentsMargins(10, 5, 10, 10)
 
         self.dates_widget = DatesWidget()
         self.dates_widget.load_st_grid.connect(self.load_st_grid.emit)
