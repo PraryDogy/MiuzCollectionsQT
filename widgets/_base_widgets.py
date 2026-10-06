@@ -527,6 +527,45 @@ class SelectableLabel(TransparentLabel):
         menu_.show_menu_under_cursor(ev)
 
 
+class SelectableGrayLabel(GrayTextLabel):
+    sym_line_feed = "\u000a"
+    sym_paragraph_sep = "\u2029"
+
+    def __init__(self, text: str):
+        super().__init__(text)
+        fl = Qt.TextInteractionFlag.TextSelectableByMouse
+        self.setTextInteractionFlags(fl)
+        self.setCursor(Qt.CursorShape.IBeamCursor)
+
+    def contextMenuEvent(self, ev: QContextMenuEvent | None):
+        text = self.selectedText()
+        text = text.replace(self.sym_paragraph_sep, "")
+        text = text.replace(self.sym_line_feed, "")
+
+        full_text = self.text().replace(self.sym_paragraph_sep, "")
+        full_text = full_text.replace(self.sym_line_feed, "")
+
+        is_path = any((os.path.isdir(full_text), os.path.isfile(full_text)))
+
+        menu_ = UMenu(parent=self)
+
+        label_text = Lng.copy[JsonData.lng_index]
+        sel = QAction(text=label_text, parent=self)
+        sel.triggered.connect(lambda: Utils.pyqt_copy_text(text))
+        menu_.addAction(sel)
+
+        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[JsonData.lng_index])
+        reveal.triggered.connect(
+            lambda: Utils.macos_reveal_files([full_text])
+        )
+        
+        if is_path:
+            menu_.addAction(reveal)
+
+        menu_.show_menu_under_cursor(ev)
+
+
+
 class RowArrowWidget(TransparentWidget):
     clicked = pyqtSignal()
     arrow_svg = Static.COMMON_ICONS / "next.svg"
@@ -669,8 +708,8 @@ class WinProgressbar(UMainWidget):
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
-    icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
-    icon_size = 30
+    icon_path = Static.COMMON_ICONS / "green_checkmark.svg"
+    icon_size = 40
     min_width = 100
     max_width = 300
 
@@ -678,29 +717,37 @@ class ConfirmWindow(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(10)
 
-        text_container = QWidget()
-        self.central_layout.addWidget(text_container)
+        svg_text_container = TransparentWidget()
+        self.central_layout.addWidget(svg_text_container)
 
-        text_layout = QHBoxLayout(text_container)
-        text_layout.setContentsMargins(0, 0, 0, 0)
-        text_layout.setSpacing(10)
+        svg_text_layout = QHBoxLayout(svg_text_container)
+        svg_text_layout.setContentsMargins(0, 0, 0, 0)
+        svg_text_layout.setSpacing(15)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.icon_path))
         self.svg_widget.setFixedSize(self.icon_size, self.icon_size)
-        text_layout.addWidget(self.svg_widget)
+        svg_text_layout.addWidget(self.svg_widget)
 
-        self.text_wid = SelectableLabel(text)
+        text_container = TransparentWidget()
+        svg_text_layout.addWidget(text_container)
+        text_layout = QVBoxLayout(text_container)
+        text_layout.setContentsMargins(0, 0, 0, 0)
+        text_layout.setSpacing(5)
+
+        title_text_wid = TitleTextLabel(Lng.confirmation[JsonData.lng_index])
+        text_layout.addWidget(title_text_wid)
+
+        self.text_wid = SelectableGrayLabel(text)
         self.text_wid.setWordWrap(True)
         self._adjust_text_width(text)
         text_layout.addWidget(self.text_wid)
 
-        text_layout.addStretch(1)
+        svg_text_layout.addStretch(1)
 
         btn_widget = QWidget()
         self.central_layout.addWidget(btn_widget)

@@ -118,6 +118,7 @@ class Lng:
     calendar = ("Календарь", "Calendar")
     favorites = ("Избранное", "Favorites")
     cancel = ("Отмена", "Cancel")
+    confirmation = ("Подтверждение", "Confirmation")
     no_connection = ("Нет подключения", "No connection")
     ok = ("Ок", "Ok")
     alias = ("Имя", "Name")
