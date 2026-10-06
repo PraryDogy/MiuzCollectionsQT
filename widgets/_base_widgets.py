@@ -670,23 +670,25 @@ class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
-    icon_size = 40
+    icon_size = 30
+    min_width = 100
+    max_width = 400
 
-    def __init__(self, text: str, w: int, h: int):
+    def __init__(self, text: str, *args, **kwargs):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
         self.central_layout.setContentsMargins(10, 10, 10, 10)
-        self.central_layout.setSpacing(0)
+        self.central_layout.setSpacing(10)
 
         text_container = QWidget()
         self.central_layout.addWidget(text_container)
 
         text_layout = QHBoxLayout(text_container)
         text_layout.setContentsMargins(0, 0, 0, 0)
-        text_layout.setSpacing(15)
+        text_layout.setSpacing(10)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.icon_path))
@@ -694,8 +696,11 @@ class ConfirmWindow(UMainWidget):
         text_layout.addWidget(self.svg_widget)
 
         self.text_wid = SelectableLabel(text)
-        # self.text_wid.setWordWrap(True)
+        self.text_wid.setWordWrap(True)
+        self._adjust_text_width(text)
         text_layout.addWidget(self.text_wid)
+
+        text_layout.addStretch(1)
 
         btn_widget = QWidget()
         self.central_layout.addWidget(btn_widget)
@@ -713,9 +718,23 @@ class ConfirmWindow(UMainWidget):
 
         self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
+        self.ok_btn.clicked.connect(self.deleteLater)
         btn_layout.addWidget(self.ok_btn)
 
+        self.setMinimumWidth(self.min_width)
         self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
+
+    def _adjust_text_width(self, text: str):
+        """Интеллектуальный расчет и установка ширины текста"""
+        fm = self.text_wid.fontMetrics()
+        text_width = fm.horizontalAdvance(text)
+        
+        if text_width > self.max_width:
+            self.text_wid.setFixedWidth(self.max_width)
+        else:
+            # +10px запас, чтобы последняя буква точно не обрезалась
+            self.text_wid.setFixedWidth(text_width + 10)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
