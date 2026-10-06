@@ -122,6 +122,23 @@ class TransparentTreeView(QTreeView):
         super().__init__(parent)
 
 
+class UTitleBar(StandardTitleBar):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedHeight(30)
+
+        self.center_title = QLabel(self)
+        self.center_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.center_title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.center_title.setGeometry(0, 0, self.width(), self.height())
+
+    def setTitle(self, title: str):
+        self.center_title.setText(title)
+
+
 class UBaseWindow(FramelessMainWindow):
 	win_list: list[QWidget] = []
 	bar_height = 30
@@ -131,18 +148,9 @@ class UBaseWindow(FramelessMainWindow):
 		self.setup_window()
 
 	def setup_window(self):
-		# Title bar
-		title_bar = StandardTitleBar(self)
-		title_bar.setStyleSheet("""
-            StandardTitleBar {
-                background-color: #252525;
-            }
-        """)
+		title_bar = UTitleBar(self)
 		self.setTitleBar(title_bar)
-		title_layout = self.get_titlebar_layout()
-		title_layout.insertStretch(0, 1)
 
-		# Central widget
 		central_widget = TransparentFrame()
 		self.setCentralWidget(central_widget)
 
@@ -154,15 +162,12 @@ class UBaseWindow(FramelessMainWindow):
 		# macOS
 		if sys.platform == "darwin":
 			self.setSystemTitleBarButtonVisible(True)
-
 			self.titleBar.minBtn.hide()
 			self.titleBar.maxBtn.hide()
 			self.titleBar.closeBtn.hide()
 
-		self.titleBar.raise_()
-
-		# Register
 		self.register_window()
+		title_bar.raise_()
 
 	def get_titlebar_layout(self) -> QLayout:
 		return self.titleBar.layout()
