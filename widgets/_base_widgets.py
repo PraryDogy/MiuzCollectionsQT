@@ -698,8 +698,8 @@ class ConfirmWindow(UMainWidget):
     cancel_clicked = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "green_checkmark.svg"
     icon_size = 40
-    min_width = 100
-    max_width = 300
+    min_width = 300
+    max_width = 350
 
     def __init__(self, text: str, *args, **kwargs):
         super().__init__()
@@ -708,7 +708,7 @@ class ConfirmWindow(UMainWidget):
         self.insert_sep()
 
         self.central_layout.setContentsMargins(15, 0, 10, 10)
-        self.central_layout.setSpacing(10)
+        self.central_layout.setSpacing(15)
 
         svg_text_container = TransparentWidget()
         self.central_layout.addWidget(svg_text_container)
@@ -728,7 +728,7 @@ class ConfirmWindow(UMainWidget):
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(5)
 
-        title_text_wid = TitleTextLabel(Lng.confirmation[JsonData.lng_index])
+        title_text_wid = TitleTextLabel(Lng.attention[JsonData.lng_index])
         text_layout.addWidget(title_text_wid)
 
         self.text_wid = SelectableGrayLabel(text)
