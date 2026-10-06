@@ -64,14 +64,12 @@ class TestWid(QLabel):
 
 class DangerWarn(ConfirmWindow):
     icon_path = Static.COMMON_ICONS / "red_warning.svg"
-    hh = 215
-    ww = 400
 
     def __init__(self, mf_alias: str, removed_images_count: int):
         text = (
             f"{Lng.dangerous_text[JsonData.lng_index]}".format(removed_images_count)
         )
-        super().__init__(text, self.ww, self.hh)
+        super().__init__(text)
         self.svg_widget.load(str(self.icon_path))
         self.ok_btn.setText(Lng.allow[JsonData.lng_index])
         self.cancel_btn.setText(Lng.deny[JsonData.lng_index])
@@ -105,8 +103,8 @@ class WinMain(UMainWindow):
         # self.test.center_to_parent(self)
         # self.test.show()
 
-        test_wid = TestWid()
-        self.central_layout.addWidget(test_wid)
+        # test_wid = TestWid()
+        # self.central_layout.addWidget(test_wid)
 
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None
