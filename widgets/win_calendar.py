@@ -113,7 +113,7 @@ class WinCalendar(UMainWidget):
 	cell_size = (45, 35)
 	svg_nav_size = (23, 23)
 	svg_calendar_size = (15, 15)
-	svg_blue_circle_size = (23, 23)
+	svg_blue_circle_size = (27, 27)
 
 	def __init__(self, date: QDate):
 		super().__init__()
@@ -149,6 +149,7 @@ class WinCalendar(UMainWidget):
 	def init_ui(self):
 		spacing = 10
 
+		# --- 1. ВЕРХНИЙ БЛОК (Иконка + Дата) ---
 		dynamic_container = TransparentWidget()
 		self.central_layout.addWidget(dynamic_container)
 
@@ -160,7 +161,6 @@ class WinCalendar(UMainWidget):
 		calendar_icon.load(str(self.svg_calendar_path))
 		calendar_icon.setFixedSize(*self.svg_calendar_size)
 		dynamic_container_lay.addWidget(calendar_icon)
-
 		dynamic_container_lay.addSpacing(10)
 
 		self.dynamic_label = TransparentLabel()
@@ -168,10 +168,10 @@ class WinCalendar(UMainWidget):
 		dynamic_container_lay.addStretch(1)
 
 		self.central_layout.addSpacing(spacing)
-		above_nav_sep = USep()
-		self.central_layout.addWidget(above_nav_sep)
+		self.central_layout.addWidget(USep())
 		self.central_layout.addSpacing(spacing)
 
+		# --- 2. БЛОК НАВИГАЦИИ (Месяц, Год, Стрелки) ---
 		self.nav_widget = TransparentWidget()
 		self.central_layout.addWidget(self.nav_widget)
 
@@ -184,7 +184,6 @@ class WinCalendar(UMainWidget):
 		self.btn_prev.setFixedSize(*self.svg_nav_size)
 		self.btn_prev.clicked.connect(self.prev_month)
 		self.nav_layout.addWidget(self.btn_prev)
-
 		self.nav_layout.addStretch()
 
 		self.btn_month = UPushButton("")
@@ -192,7 +191,6 @@ class WinCalendar(UMainWidget):
 		self.btn_month.setMenu(self.menu_month)
 		self.populate_months()
 		self.nav_layout.addWidget(self.btn_month)
-
 		self.nav_layout.addSpacing(10)
 
 		self.btn_year = UPushButton("")
@@ -200,7 +198,6 @@ class WinCalendar(UMainWidget):
 		self.btn_year.setMenu(self.menu_year)
 		self.populate_years()
 		self.nav_layout.addWidget(self.btn_year)
-
 		self.nav_layout.addStretch()
 
 		self.btn_next = CalendarSvgNavi(str(self.svg_next_path))
@@ -209,18 +206,40 @@ class WinCalendar(UMainWidget):
 		self.nav_layout.addWidget(self.btn_next)
 
 		self.central_layout.addSpacing(spacing)
-		below_nav_sep = USep()
-		self.central_layout.addWidget(below_nav_sep)
+		self.central_layout.addWidget(USep())
 
+		# --- 3. ШАПКА ДНЕЙ НЕДЕЛИ (Пн, Вт, Ср...) ---
+		header_widget = TransparentWidget()
+		header_layout = QHBoxLayout(header_widget)
+		header_layout.setContentsMargins(0, 0, 0, 0)
+		header_layout.setSpacing(0)
 
+		for col in range(7):
+			week_name = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
+			lbl_day = GrayTextLabel(week_name.capitalize())
+			lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
+			lbl_day.setFixedSize(*self.cell_size)
+			header_layout.addWidget(lbl_day)
+
+		self.central_layout.addWidget(header_widget)
+		self.central_layout.addWidget(USep())
+
+		# --- 4. ПОСТОЯННЫЙ КОНТЕЙНЕР ДЛЯ СЕТКИ ЧИСЕЛ ---
+		self.calendar_container = TransparentWidget()
+		self.calendar_container_layout = QVBoxLayout(self.calendar_container)
+		self.calendar_container_layout.setContentsMargins(0, 0, 0, 0)
+		self.calendar_container_layout.setSpacing(0)
+		self.central_layout.addWidget(self.calendar_container)
+
+		self.central_layout.addWidget(USep())
 		self.central_layout.addSpacing(spacing)
 
+		# --- 5. НИЖНИЙ БЛОК КНОПОК (Reset, Done) ---
 		self.btn_container = TransparentWidget()
 		self.central_layout.addWidget(self.btn_container)
 		self.btn_container_layout = QHBoxLayout(self.btn_container)
 		self.btn_container_layout.setContentsMargins(0, 0, 0, 0)
 		self.btn_container_layout.setSpacing(10)
-
 		self.btn_container_layout.addStretch(1)
 
 		self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
@@ -231,6 +250,7 @@ class WinCalendar(UMainWidget):
 		self.done_btn.clicked.connect(self.deleteLater)
 		self.btn_container_layout.addWidget(self.done_btn)
 
+		# Инициализация самой сетки чисел
 		self.create_calendar_widget()
 		self.update_calendar()
 
@@ -243,13 +263,13 @@ class WinCalendar(UMainWidget):
 		self.calendar_layout = QVBoxLayout(self.calendar_widget)
 		self.calendar_layout.setContentsMargins(0, 0, 0, 0)
 		self.calendar_layout.setSpacing(0)
-		# минус кнопка закрыть минус сепаратор над кнопкой
-		widget_num = self.central_layout.count() - 3
-		self.central_layout.insertWidget(widget_num, self.calendar_widget)
+		
+		# Добавляем в постоянный контейнер
+		self.calendar_container_layout.addWidget(self.calendar_widget)
 
 	def recreate_calendar_widget(self):
 		old_widget = self.calendar_widget
-		self.central_layout.removeWidget(old_widget)
+		self.calendar_container_layout.removeWidget(old_widget)
 		old_widget.setParent(None)
 		old_widget.deleteLater()
 		self.create_calendar_widget()
@@ -273,7 +293,7 @@ class WinCalendar(UMainWidget):
 			max_width = max(max_width, font_metrics.horizontalAdvance(month_name))
 		offset = 30
 		self.btn_month.setFixedWidth(max_width + offset)
-	
+
 	def populate_years(self):
 		self.menu_year.clear()
 		max_year = self.date_now.year()
@@ -355,27 +375,7 @@ class WinCalendar(UMainWidget):
 
 		self.recreate_calendar_widget()
 
-		# 1. Шапка дней недели внутри динамического контейнера
-		header_widget = TransparentWidget()
-		header_layout = QHBoxLayout(header_widget)
-		header_layout.setContentsMargins(0, 0, 0, 0)
-		header_layout.setSpacing(0)
-
-		self.calendar_layout.addWidget(USep())
-
-		for col in range(7):
-			week_name = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
-			lbl_day = GrayTextLabel(week_name.capitalize())
-			lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
-			lbl_day.setFixedSize(*self.cell_size)
-			header_layout.addWidget(lbl_day)
-
-		self.calendar_layout.addWidget(header_widget)
-
-		# 2. Сепаратор под днями недели
-		self.calendar_layout.addWidget(USep())
-
-		# 3. Расчет сетки дней (всегда 6 строк / 42 ячейки)
+		# --- Расчет сетки дней (всегда 6 строк / 42 ячейки) ---
 		first_day = QDate(current_year, current_month, 1)
 		start_col = first_day.dayOfWeek() - 1
 		days_in_month = first_day.daysInMonth()

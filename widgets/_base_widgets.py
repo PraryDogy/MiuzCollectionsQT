@@ -87,88 +87,85 @@ class TransparentTreeView(QTreeView):
         super().__init__(parent)
 
 
-class _WindowMixin:
-    win_list: list[QWidget] = []
-    bar_height = 30
+class UBaseWindow(FramelessMainWindow):
+	win_list: list[QWidget] = []
+	bar_height = 30
 
-    def setup_window(self: FramelessMainWindow):
+	def __init__(self, parent: QWidget = None):
+		super().__init__(parent)
+		self.setup_window()
 
-        # self.setWindowIcon(QIcon("icons/app_icons/icon.icns"))
+	def setup_window(self):
+		# Title bar
+		self.setTitleBar(StandardTitleBar(self))
+		title_layout = self.get_titlebar_layout()
+		title_layout.insertStretch(0, 1)
 
-        # Title bar
-        self.setTitleBar(StandardTitleBar(self))
-        title_layout = self.get_titlebar_layout()
-        title_layout.insertStretch(0, 1)
+		# Central widget
+		central_widget = TransparentFrame()
+		self.setCentralWidget(central_widget)
 
-        # Central widget
-        central_widget = TransparentFrame()
-        self.setCentralWidget(central_widget)
+		self.central_layout = QVBoxLayout(central_widget)
+		self.central_layout.setContentsMargins(5, 5, 5, 5)
+		self.central_layout.setSpacing(0)
+		self.central_layout.addSpacing(self.bar_height)
 
-        self.central_layout = QVBoxLayout(central_widget)
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
-        self.central_layout.setSpacing(0)
-        self.central_layout.addSpacing(self.bar_height)
+		# macOS
+		if sys.platform == "darwin":
+			self.setSystemTitleBarButtonVisible(True)
 
-        # macOS
-        if sys.platform == "darwin":
-            self.setSystemTitleBarButtonVisible(True)
+			self.titleBar.minBtn.hide()
+			self.titleBar.maxBtn.hide()
+			self.titleBar.closeBtn.hide()
 
-            self.titleBar.minBtn.hide()
-            self.titleBar.maxBtn.hide()
-            self.titleBar.closeBtn.hide()
+		self.titleBar.raise_()
 
-        self.titleBar.raise_()
+		# Register
+		self.register_window()
 
-        # Register
-        self.register_window()
+	def get_titlebar_layout(self) -> QLayout:
+		return self.titleBar.layout()
 
-    def get_titlebar_layout(self: FramelessMainWindow) -> QLayout:
-        return self.titleBar.layout()
+	def register_window(self):
+		self.win_list.append(self)
 
-    def register_window(self):
-        self.win_list.append(self)
+	def unregister_window(self):
+		try:
+			self.win_list.remove(self)
+		except ValueError:
+			pass
 
-    def unregister_window(self):
-        try:
-            self.win_list.remove(self)
-        except ValueError:
-            pass
+	def center_to_parent(self, parent: QWidget):
+		try:
+			geo = self.geometry()
+			geo.moveCenter(parent.geometry().center())
+			self.setGeometry(geo)
+		except Exception as e:
+			print("center error:", e)
 
-    def center_to_parent(self: FramelessMainWindow, parent: QWidget):
-        try:
-            geo = self.geometry()
-            geo.moveCenter(parent.geometry().center())
-            self.setGeometry(geo)
-        except Exception as e:
-            print("center error:", e)
+	def set_always_on_top(self):
+		self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-    def set_always_on_top(self: FramelessMainWindow):
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+	def set_close_only(self):
+		flags = Qt.WindowType.CustomizeWindowHint
+		flags |= Qt.WindowType.WindowCloseButtonHint
+		self.setWindowFlags(flags)
 
-    def set_close_only(self: FramelessMainWindow):
-        flags = Qt.WindowType.CustomizeWindowHint
-        flags |= Qt.WindowType.WindowCloseButtonHint
-        self.setWindowFlags(flags)
+	def closeEvent(self, event: QCloseEvent | None):
+		self.unregister_window()
+		return super().closeEvent(event)
 
-    def closeEvent(self: FramelessMainWindow, event: QCloseEvent | None):
-        self.unregister_window()
-        return super().closeEvent(event)
-
-    def deleteLater(self: FramelessMainWindow):
-        self.unregister_window()
-        return super().deleteLater()
-
-
-class UMainWindow(_WindowMixin, FramelessMainWindow):
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-        self.setup_window()
+	def deleteLater(self):
+		self.unregister_window()
+		return super().deleteLater()
 
 
-class UMainWidget(_WindowMixin, FramelessMainWindow):
-    def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-        self.setup_window()
+class UMainWindow(UBaseWindow):
+	pass
+
+
+class UMainWidget(UBaseWindow):
+	pass
 
 
 class UMenu(TransparentMenu):
