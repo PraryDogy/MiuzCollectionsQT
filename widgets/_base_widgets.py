@@ -28,13 +28,48 @@ class TransparentButton(QPushButton):
 
 
 class TransparentLabel(QLabel):
+    sym_line_feed = "\u000a"
+    sym_paragraph_sep = "\u2029"
+
     def __init__(self, text="", parent=None):
         super().__init__(text, parent)
+        self._context_menu_enabled = False
 
     def set_font_size(self, value_px: int):
         font = self.font()
         font.setPixelSize(value_px)
         self.setFont(font)
+
+    def set_selectable(self, enabled: bool):
+        if enabled:
+            self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+            self.setCursor(Qt.CursorShape.IBeamCursor)
+        else:
+            self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+            self.unsetCursor()
+
+    def set_context_menu(self, enabled: bool):
+        self._context_menu_enabled = enabled
+
+    def contextMenuEvent(self, ev: QContextMenuEvent):
+        if not self._context_menu_enabled:
+            return super().contextMenuEvent(ev)
+
+        text = self.selectedText().replace(self.sym_paragraph_sep, "").replace(self.sym_line_feed, "")
+        full_text = self.text().replace(self.sym_paragraph_sep, "").replace(self.sym_line_feed, "")
+
+        menu = UMenu(parent=self)
+
+        copy_action = QAction(Lng.copy[JsonData.lng_index], menu)
+        copy_action.triggered.connect(lambda: Utils.pyqt_copy_text(text))
+        menu.addAction(copy_action)
+
+        if os.path.isfile(full_text) or os.path.isdir(full_text):
+            reveal_action = QAction(Lng.reveal_in_finder[JsonData.lng_index], menu)
+            reveal_action.triggered.connect(lambda: Utils.macos_reveal_files([full_text]))
+            menu.addAction(reveal_action)
+
+        menu.show_menu_under_cursor(ev)
 
 
 class TransparentFrame(QFrame):
@@ -490,80 +525,17 @@ class UTagWidget(TransparentFrame):
 
 
 class SelectableLabel(TransparentLabel):
-    sym_line_feed = "\u000a"
-    sym_paragraph_sep = "\u2029"
-
     def __init__(self, text: str):
         super().__init__(text)
-        fl = Qt.TextInteractionFlag.TextSelectableByMouse
-        self.setTextInteractionFlags(fl)
-        self.setCursor(Qt.CursorShape.IBeamCursor)
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None):
-        text = self.selectedText()
-        text = text.replace(self.sym_paragraph_sep, "")
-        text = text.replace(self.sym_line_feed, "")
-
-        full_text = self.text().replace(self.sym_paragraph_sep, "")
-        full_text = full_text.replace(self.sym_line_feed, "")
-
-        is_path = any((os.path.isdir(full_text), os.path.isfile(full_text)))
-
-        menu_ = UMenu(parent=self)
-
-        label_text = Lng.copy[JsonData.lng_index]
-        sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(lambda: Utils.pyqt_copy_text(text))
-        menu_.addAction(sel)
-
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[JsonData.lng_index])
-        reveal.triggered.connect(
-            lambda: Utils.macos_reveal_files([full_text])
-        )
-        
-        if is_path:
-            menu_.addAction(reveal)
-
-        menu_.show_menu_under_cursor(ev)
+        self.set_selectable(True)
+        self.set_context_menu(True)
 
 
 class SelectableGrayLabel(GrayTextLabel):
-    sym_line_feed = "\u000a"
-    sym_paragraph_sep = "\u2029"
-
     def __init__(self, text: str):
         super().__init__(text)
-        fl = Qt.TextInteractionFlag.TextSelectableByMouse
-        self.setTextInteractionFlags(fl)
-        self.setCursor(Qt.CursorShape.IBeamCursor)
-
-    def contextMenuEvent(self, ev: QContextMenuEvent | None):
-        text = self.selectedText()
-        text = text.replace(self.sym_paragraph_sep, "")
-        text = text.replace(self.sym_line_feed, "")
-
-        full_text = self.text().replace(self.sym_paragraph_sep, "")
-        full_text = full_text.replace(self.sym_line_feed, "")
-
-        is_path = any((os.path.isdir(full_text), os.path.isfile(full_text)))
-
-        menu_ = UMenu(parent=self)
-
-        label_text = Lng.copy[JsonData.lng_index]
-        sel = QAction(text=label_text, parent=self)
-        sel.triggered.connect(lambda: Utils.pyqt_copy_text(text))
-        menu_.addAction(sel)
-
-        reveal = QAction(parent=menu_, text=Lng.reveal_in_finder[JsonData.lng_index])
-        reveal.triggered.connect(
-            lambda: Utils.macos_reveal_files([full_text])
-        )
-        
-        if is_path:
-            menu_.addAction(reveal)
-
-        menu_.show_menu_under_cursor(ev)
-
+        self.set_selectable(True)
+        self.set_context_menu(True)
 
 
 class RowArrowWidget(TransparentWidget):
@@ -718,7 +690,7 @@ class ConfirmWindow(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
 
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
+        self.central_layout.setContentsMargins(15, 10, 10, 10)
         self.central_layout.setSpacing(10)
 
         svg_text_container = TransparentWidget()
