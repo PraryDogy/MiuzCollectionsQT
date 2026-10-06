@@ -4,6 +4,7 @@ pillow==11.2.1
 pillow_heif==1.2.0
 py2app==0.28.8
 PyQt6==6.11.0
+PyQt6-Frameless-Window==0.8.2
 rawpy==0.21.0
 SQLAlchemy==2.0.41
 tifffile==2026.1.28
