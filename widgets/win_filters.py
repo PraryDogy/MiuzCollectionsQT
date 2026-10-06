@@ -232,21 +232,33 @@ class DatesWidget(UGroupBox):
         self.calendar_win.center_to_parent(self.window())
 
         def on_date_selected(date: QDate):
-            if was_all_time:
+            today = QDate.currentDate()
+
+            if flag == "start":
                 self.q_date_start = date
+                if was_all_time:
+                    # Если конечной даты не было, ставим "сегодня".
+                    # (Но если пользователь выбрал начальную дату в будущем, то ставим такую же).
+                    self.q_date_end = today if date <= today else date
+                else:
+                    # Если начальная дата стала больше конечной, подтягиваем конечную
+                    if self.q_date_start > self.q_date_end:
+                        self.q_date_end = self.q_date_start
+
+            elif flag == "end":
                 self.q_date_end = date
 
-            elif flag == "start":
-                self.q_date_start = date
+                if was_all_time:
+                    # Если начальной даты не было, логичнее всего сделать начальную дату
+                    # такой же как конечная (то есть выбрать период в 1 день).
+                    self.q_date_start = date
+                else:
+                    # Если начальная дата больше выбранной конечной, подтягиваем начальную
+                    if self.q_date_start > self.q_date_end:
+                        self.q_date_start = self.q_date_end
 
-                if self.q_date_start > self.q_date_end:
-                    self.q_date_end = self.q_date_start
-
-            else:
-                self.q_date_end = date
-
-                if self.q_date_end < self.q_date_start:
-                    self.q_date_start = self.q_date_end
+            self.handle_preset_change()
+            self.apply_filter(True)
 
             self.handle_preset_change()
             self.apply_filter(True)
