@@ -268,6 +268,10 @@ class Lng:
         "Вы уверены, что хотите удалить данные этого сервера?",
         "Are you sure you want to delete this server's data?",
     )
+    confirm = (
+        "Подтвердить",
+        "Confirm"
+    )
     show_in_folder = (
         "Перейти к папке",
         "Go to folder"
