@@ -155,7 +155,7 @@ class DatesWidget(UGroupBox):
 
         self.dates_period_tag = WinFiltersDatesTag(text="")
         self.dates_period_tag.text_clicked.connect(self.show_tag_menu)
-        self.dates_period_tag.right_svg_clicked.connect(self.load_st_grid.emit)
+        self.dates_period_tag.right_svg_clicked.connect(lambda: self.reset_all(True))
         self.dates_period_tag.set_active(Dynamic.py_date_start is not None)
 
         dynamic_container_lay.addWidget(self.dates_period_tag)
