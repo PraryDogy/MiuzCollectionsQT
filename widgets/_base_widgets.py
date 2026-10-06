@@ -132,7 +132,13 @@ class UBaseWindow(FramelessMainWindow):
 
 	def setup_window(self):
 		# Title bar
-		self.setTitleBar(StandardTitleBar(self))
+		title_bar = StandardTitleBar(self)
+		title_bar.setStyleSheet("""
+            StandardTitleBar {
+                background-color: #252525;
+            }
+        """)
+		self.setTitleBar(title_bar)
 		title_layout = self.get_titlebar_layout()
 		title_layout.insertStretch(0, 1)
 
