@@ -184,6 +184,8 @@ class DatesWidget(UGroupBox):
         action.triggered.connect(lambda: self.reset_all(True))
         self.preset_menu.addAction(action)
 
+        # КНОПКИ КАЛЕНДАРЕЙ
+
         from_label = GrayTextLabel(Lng.start_date[ind])
         self.top_row_layout.addWidget(from_label)
         self.top_row_layout.addSpacing(5)
