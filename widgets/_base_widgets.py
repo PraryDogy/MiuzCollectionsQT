@@ -726,15 +726,18 @@ class ConfirmWindow(UMainWidget):
         self.setFixedSize(self.width(), self.height())
 
     def _adjust_text_width(self, text: str):
-        """Интеллектуальный расчет и установка ширины текста"""
+        """Интеллектуальный расчет габаритов текста с учетом переносов"""
         fm = self.text_wid.fontMetrics()
-        text_width = fm.horizontalAdvance(text)
-        
-        if text_width > self.max_width:
-            self.text_wid.setFixedWidth(self.max_width)
-        else:
-            # +10px запас, чтобы последняя буква точно не обрезалась
-            self.text_wid.setFixedWidth(text_width + 10)
+        # Симулируем отрисовку текста в коробке с ограничением max_width
+        # Высоту ставим с запасом (например, 10000), чтобы тексту было куда расти вниз
+        flags = Qt.TextFlag.TextWordWrap
+        bounding_rect = fm.boundingRect(QRect(0, 0, self.max_width, 10000), flags, text)
+        # bounding_rect.width() вернет ширину самой длинной строки ПОСЛЕ переноса.
+        # Например, если лимит 400, но слово перенеслось так, что максимальная строка
+        # заняла 362 пикселя, метод вернет именно 362.
+        real_width = bounding_rect.width()
+        # Ставим ширину по реальному тексту + небольшой запас (от багов округления Qt)
+        self.text_wid.setFixedWidth(real_width + 10)
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
