@@ -59,9 +59,7 @@ class ServerList(UListWidget):
         self.evlosh_servers_path = Path("./_miuz_servers.json")
 
     def remove_cmd(self, server_item: ServerItem):
-        self.win_warn = ConfirmWindow(
-            Lng.confirm_delete[JsonData.lng_index], 300, 90
-        )
+        self.win_warn = ConfirmWindow(Lng.confirm_delete[JsonData.lng_index])
         self.win_warn.ok_clicked.connect(
             lambda: self.remove_server.emit(server_item)
         )

@@ -217,9 +217,7 @@ class FirstLoadWin(UMainWidget):
         mf_alias = self.mf_alias_widget.validate()
         mf_path = self.path_widget.validate()
         if mf_alias and mf_path:
-            self.save_win = ConfirmWindow(
-                Lng.save_text_long[self.lng_index], 300, 90
-            )
+            self.save_win = ConfirmWindow(Lng.save_text_long[self.lng_index])
             self.save_win.ok_clicked.connect(
                 lambda: save_fin(mf_alias, mf_path)
             )

@@ -140,7 +140,7 @@ class RebootableSettings(UGroupBox):
             shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
             restart_app()
 
-        reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index], 320, 110)
+        reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index])
         reset_win.center_to_parent(self.window())
         reset_win.ok_clicked.connect(fin)
         reset_win.show()
@@ -491,9 +491,7 @@ class GeneralSettings(TransparentWidget):
             JsonData.write_json_data()
             restart_app()
 
-        win = ConfirmWindow(
-            Lng.app_will_restarted[JsonData.lng_index], 300, 90
-        )
+        win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
         win.ok_clicked.connect(fin)
         win.center_to_parent(self.window())
         win.show()
@@ -622,9 +620,7 @@ class MfSettings(TransparentWidget):
             )
             win.ok_clicked.connect(win.deleteLater)
         else:
-            win = ConfirmWindow(
-                Lng.app_will_restarted[JsonData.lng_index], 300, 90
-            )
+            win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
             win.ok_clicked.connect(start_mf_remover)
         win.center_to_parent(self.window())
         win.show()
@@ -635,9 +631,7 @@ class MfSettings(TransparentWidget):
             self.reset_task.sigs.finished_.connect(restart_app)
             UThreadPool.start(self.reset_task)
 
-        win = ConfirmWindow(
-            Lng.app_will_restarted[JsonData.lng_index], 300, 90
-        )
+        win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
         win.ok_clicked.connect(reset_data)
         win.center_to_parent(self.window())
         win.show()

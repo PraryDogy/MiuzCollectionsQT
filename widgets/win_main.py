@@ -50,9 +50,7 @@ class TestWid(QLabel):
     def reload(self):
         from ._base_widgets import ConfirmWindow
         self.confirm_win = ConfirmWindow(
-            text="Стандратное окно подтверждения, другая строка и другой текстовый текст",
-            w=0,
-            h=0
+            text="Стандратное окно подтверждения, другая строка и другой текстовый текст"
         )
         self.confirm_win.center_to_parent(self.window())
         self.confirm_win.show()
@@ -445,7 +443,7 @@ class WinMain(UMainWindow):
             text = f"{Lng.remove_file_question[JsonData.lng_index]}?"
         else:
             text = f"{Lng.remove_files_question[JsonData.lng_index]}?"
-        self.remove_files_win = ConfirmWindow(text, 290, 90)
+        self.remove_files_win = ConfirmWindow(text)
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
                 args=(abs_paths, )

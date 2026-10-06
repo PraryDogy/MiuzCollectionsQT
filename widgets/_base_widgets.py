@@ -786,14 +786,14 @@ class ConfirmWindow(UMainWidget):
 class SuperConfirmWindow(ConfirmWindow):
     icon_path = Static.COMMON_ICONS / "red_warning.svg"
 
-    def __init__(self, text: str, w: int, h: int):
-        super().__init__(text, w, h)
+    def __init__(self, text: str):
+        super().__init__(text)
         self.svg_widget.load(str(self.icon_path))
 
 
 class WarningWindow(ConfirmWindow):
-    def __init__(self, text, w, h):
-        super().__init__(text, w, h)
+    def __init__(self, text):
+        super().__init__(text)
         self.cancel_btn.hide()
 
 
