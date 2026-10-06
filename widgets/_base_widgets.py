@@ -672,7 +672,7 @@ class ConfirmWindow(UMainWidget):
     icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
     icon_size = 30
     min_width = 100
-    max_width = 400
+    max_width = 300
 
     def __init__(self, text: str, *args, **kwargs):
         super().__init__()

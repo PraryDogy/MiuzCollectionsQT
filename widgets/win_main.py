@@ -50,7 +50,7 @@ class TestWid(QLabel):
     def reload(self):
         from ._base_widgets import ConfirmWindow
         self.confirm_win = ConfirmWindow(
-            text="Стандратное окно подтверждения",
+            text="Стандратное окно подтверждения, Стандратное окно подтверждения, Стандратное окно подтверждения, Стандратное окно подтверждения",
             w=0,
             h=0
         )
