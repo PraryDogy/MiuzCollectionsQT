@@ -48,11 +48,14 @@ class TestWid(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def reload(self):
-        test = NewScanerWorker(
-            target=NewScanerProcess.start,
-            args=(Mf.items, 0, )
+        from ._base_widgets import ConfirmWindow
+        self.confirm_win = ConfirmWindow(
+            text="Стандратное окно подтверждения",
+            w=0,
+            h=0
         )
-        test.start()
+        self.confirm_win.center_to_parent(self.window())
+        self.confirm_win.show()
 
     def mouseReleaseEvent(self, a0):
         self.reload()
@@ -101,8 +104,8 @@ class WinMain(UMainWindow):
         # self.test.center_to_parent(self)
         # self.test.show()
 
-        # test_wid = TestWid()
-        # self.central_layout.addWidget(test_wid)
+        test_wid = TestWid()
+        self.central_layout.addWidget(test_wid)
 
         self.forced_scaner_dirs = set()
         self.go_to_url: str | None = None

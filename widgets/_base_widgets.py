@@ -678,7 +678,7 @@ class ConfirmWindow(UMainWidget):
         self.set_close_only()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
-        self.central_layout.setContentsMargins(15, 5, 5, 0)
+        self.central_layout.setContentsMargins(10, 10, 10, 10)
         self.central_layout.setSpacing(0)
 
         text_container = QWidget()
@@ -694,29 +694,31 @@ class ConfirmWindow(UMainWidget):
         text_layout.addWidget(self.svg_widget)
 
         self.text_wid = SelectableLabel(text)
-        self.text_wid.setWordWrap(True)
+        # self.text_wid.setWordWrap(True)
         text_layout.addWidget(self.text_wid)
 
         btn_widget = QWidget()
         self.central_layout.addWidget(btn_widget)
 
         btn_layout = QHBoxLayout(btn_widget)
-        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)
 
-        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
-        self.ok_btn.setFixedWidth(75)
-        self.ok_btn.clicked.connect(self.ok_clicked.emit)
-        btn_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btn_layout.addStretch(1)
 
         self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         self.cancel_btn.setFixedWidth(75)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btn_layout.addWidget(self.cancel_btn)
 
-        self.setFixedSize(w, h)
+        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
+        self.ok_btn.setFixedWidth(75)
+        self.ok_btn.clicked.connect(self.ok_clicked.emit)
+        btn_layout.addWidget(self.ok_btn)
+
+        self.adjustSize()
 
     def keyPressEvent(self, a0):
         if a0.key() == Qt.Key.Key_Escape:
