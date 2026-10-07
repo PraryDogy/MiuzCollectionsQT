@@ -459,6 +459,7 @@ class StandartTags(TransparentWidget):
 
 class UserTags(TransparentWidget):
     load_st_grid = pyqtSignal()
+    svg_path = Static.COMMON_ICONS / "tags.svg"
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -498,7 +499,10 @@ class UserTags(TransparentWidget):
                 self.flow_layout.clear()
                 self._create_tags()
 
-        self.text_win = InputTextWin(Lng.new_tag_desc[JsonData.lng_index])
+        self.text_win = InputTextWin(
+            description=Lng.new_tag_desc[JsonData.lng_index],
+            svg_icon=str(self.svg_path)
+        )
         self.text_win.center_to_parent(self.window())
         self.text_win.ok_clicked.connect(ok_clicked)
         self.text_win.show()

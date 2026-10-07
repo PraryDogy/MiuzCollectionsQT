@@ -10,10 +10,10 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
                              QLabel, QLayout, QLineEdit, QListWidget,
                              QListWidgetItem, QMainWindow, QMenu, QProgressBar,
-                             QPushButton, QScrollArea, QSlider, QSpacerItem,
-                             QSpinBox, QStackedWidget, QTextEdit, QTreeView,
-                             QTreeWidget, QTreeWidgetItem, QVBoxLayout,
-                             QWidget, QSizePolicy)
+                             QPushButton, QScrollArea, QSizePolicy, QSlider,
+                             QSpacerItem, QSpinBox, QStackedWidget, QTextEdit,
+                             QTreeView, QTreeWidget, QTreeWidgetItem,
+                             QVBoxLayout, QWidget)
 from qframelesswindow import FramelessMainWindow, StandardTitleBar
 from typing_extensions import Optional
 
@@ -862,9 +862,8 @@ class SuperConfirmWindow(ConfirmWindow):
 class InputTextWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
     cancel_clicked = pyqtSignal()
-    svg_path = Static.COMMON_ICONS / "tags.svg"
 
-    def __init__(self, description: str):
+    def __init__(self, description: str, svg_icon: str = None):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
@@ -880,10 +879,11 @@ class InputTextWin(UMainWidget):
         svg_text_layout.setContentsMargins(5, 0, 10, 0)
         svg_text_layout.setSpacing(5)
 
-        svg_icon = QSvgWidget()
-        svg_icon.load(str(self.svg_path))
-        svg_icon.setFixedSize(20, 20)
-        svg_text_layout.addWidget(svg_icon)
+        if svg_icon:
+            svg_icon = QSvgWidget()
+            svg_icon.load(svg_icon)
+            svg_icon.setFixedSize(20, 20)
+            svg_text_layout.addWidget(svg_icon)
 
         self.description_label = GrayTextLabel(description)
         svg_text_layout.addWidget(self.description_label)
