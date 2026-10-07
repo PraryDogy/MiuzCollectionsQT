@@ -618,7 +618,6 @@ class MfSettings(TransparentWidget):
                 Lng.at_least_one_folder_required[JsonData.lng_index],
                 280, 90
             )
-            win.ok_clicked.connect(win.deleteLater)
         else:
             win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
             win.ok_clicked.connect(start_mf_remover)

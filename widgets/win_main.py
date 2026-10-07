@@ -449,12 +449,7 @@ class WinMain(UMainWindow):
                 args=(abs_paths, )
             )
         self.remove_files_win.center_to_parent(self.window())
-        self.remove_files_win.ok_clicked.connect(
-            start_file_remover
-        )
-        self.remove_files_win.ok_clicked.connect(
-            self.remove_files_win.deleteLater
-        )
+        self.remove_files_win.ok_clicked.connect(start_file_remover)
         self.remove_files_win.show()
     
     @with_conn

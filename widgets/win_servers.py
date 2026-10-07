@@ -60,12 +60,7 @@ class ServerList(UListWidget):
 
     def remove_cmd(self, server_item: ServerItem):
         self.win_warn = ConfirmWindow(Lng.confirm_delete[JsonData.lng_index])
-        self.win_warn.ok_clicked.connect(
-            lambda: self.remove_server.emit(server_item)
-        )
-        self.win_warn.ok_clicked.connect(
-            self.win_warn.deleteLater
-        )
+        self.win_warn.ok_clicked.connect(lambda: self.remove_server.emit(server_item))
         self.win_warn.center_to_parent(self.window())
         self.win_warn.show()
 

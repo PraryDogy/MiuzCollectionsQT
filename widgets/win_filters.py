@@ -518,7 +518,6 @@ class UserTags(TransparentWidget):
                 Dynamic.word_tags_list.remove(text)
                 self.load_st_grid.emit()
             widget.deleteLater()
-            self.remove_tag_win.deleteLater()
 
         self.remove_tag_win = ConfirmWindow(Lng.remove_tag_question[JsonData.lng_index])
         self.remove_tag_win.ok_clicked.connect(ok_clicked)

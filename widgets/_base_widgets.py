@@ -795,7 +795,7 @@ class SuperConfirmWindow(ConfirmWindow):
 class WarningWindow(ConfirmWindow):
     def __init__(self, text):
         super().__init__(text)
-        self.cancel_btn.hide()
+        self.cancel_btn.setVisible(False)
 
 
 class InputTextWin(UMainWidget):
