@@ -584,7 +584,7 @@ class Grid(UScrollVerticalArea):
             self.cell_to_wid[row, col] = thumb
             thumb.row, thumb.col = row, col
             self.grid_lay.addWidget(thumb, row, col)
-        QTimer.singleShot(100, self.grid_wid.show)
+        self.grid_wid.show()
 
     def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
         global_pos = QCursor.pos() 
