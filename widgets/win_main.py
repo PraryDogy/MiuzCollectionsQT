@@ -321,15 +321,19 @@ class WinMain(UMainWindow):
                 update_thumb_item: UpdateThumbItem = queue.get()
                 wid = self.grid.url_to_wid.get(update_thumb_item.rel_img_path)
                 if wid:
-                    qimages = []
-                    for x in Static.THUMB_WID_PIXMAP_SIZE:
-                        resized = ImgUtils.fit_to_thumb(update_thumb_item.array, x * 2)
-                        qimage = Utils.pyqt_qimage_from_array(resized)
-                        qimage_scaled = Utils.qimage_scaled_high_dpi(qimage, x)
-                        qimages.append(qimage_scaled)
-                    wid.data_item.qimages = qimages
+                    ind = Dynamic.current_pixmap_size_index
+                    current_size = Static.THUMB_WID_PIXMAP_SIZE[ind] * Utils.DPR
+                    qimage = Utils.pyqt_qimage_from_array(update_thumb_item.array)
+                    qimage_scaled = qimage.scaled(
+                        current_size, current_size,
+                        aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                        transformMode=Qt.TransformationMode.SmoothTransformation
+                    )
+                    qimage_scaled.setDevicePixelRatio(Utils.DPR)
+                    wid.data_item.qimage = qimage_scaled
                     wid.set_pixmap_with_actual_size()
-                    wid.img_wid.restore_image()   
+                    wid.img_wid.restore_image()
+  
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()
             else:
