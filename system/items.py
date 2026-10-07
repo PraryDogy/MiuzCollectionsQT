@@ -12,7 +12,7 @@ class SettingsItem:
 
 @dataclass(slots=True)
 class DataItem:
-    qimages: list[QImage]
+    qimage: QImage
     rel_path: str
     fav: bool
     month_year: str
