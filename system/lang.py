@@ -479,6 +479,10 @@ class Lng:
         "Улучшить",
         "Enhance"
     )
+    enhance_text = (
+        "Улучшить текст",
+        "Enhance text"
+    )
     text_search_descr = (
         "Для поиска нескольких слов введите их через запятую или с новой строки.",
         "Separate search words with commas or line breaks."

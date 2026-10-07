@@ -35,7 +35,7 @@ class WinTextSearchTitleRow(TransparentFrame):
 
 class WinTextSearch(UMainWidget):
     ok_clicked = pyqtSignal(str)
-    size_ = (350, 330)  # Немного увеличил высоту, чтобы поместилось описание
+    size_ = (380, 330)  # Немного увеличил высоту, чтобы поместилось описание
     svg_magnifier = Static.COMMON_ICONS / "magnifier.svg"
     svg_wand = Static.COMMON_ICONS / "wand.svg"
     icon_size = QSize(10, 10)
@@ -77,11 +77,17 @@ class WinTextSearch(UMainWidget):
 
         btns_layout.addStretch(1)
 
-        self.format_button = UPushButton(Lng.enhance[JsonData.lng_index])
+        self.format_button = UPushButton(Lng.enhance_text[JsonData.lng_index])
         self.format_button.clicked.connect(self.format_input_text)
         self.format_button.setIconSize(self.icon_size)
         self.format_button.setIcon(self.wand_icon)
-        btns_layout.addWidget(self.format_button)
+        self.title_row.h_lay.addStretch()
+        self.title_row.h_lay.addWidget(self.format_button)
+        # btns_layout.addWidget(self.format_button)
+
+        close_btn = UPushButton(Lng.close[JsonData.lng_index])
+        close_btn.clicked.connect(self.deleteLater)
+        btns_layout.addWidget(close_btn)
 
         self.ok_btn = ActiveButton(Lng.search[JsonData.lng_index])
         self.ok_btn.setIcon(self.magnifier_icon)
