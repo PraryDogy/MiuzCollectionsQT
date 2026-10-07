@@ -268,9 +268,7 @@ class WinMain(UMainWindow):
         self.bar_path.update(dir)
 
     def on_hide_digits_clicked(self):
-        self.win_warn = WarningWindow(
-            Lng.hide_digits_full[JsonData.lng_index], 300, 105
-        )
+        self.win_warn = WarningWindow(Lng.hide_digits_full[JsonData.lng_index])
         self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
         self.win_warn.center_to_parent(self)
         self.win_warn.show()

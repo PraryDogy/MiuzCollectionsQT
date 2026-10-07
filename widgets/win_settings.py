@@ -614,10 +614,7 @@ class MfSettings(TransparentWidget):
         )
 
         if len(Mf.items) == 1:
-            win = WarningWindow(
-                Lng.at_least_one_folder_required[JsonData.lng_index],
-                280, 90
-            )
+            win = WarningWindow(Lng.at_least_one_folder_required[JsonData.lng_index])
         else:
             win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
             win.ok_clicked.connect(start_mf_remover)
@@ -657,10 +654,7 @@ class MfSettings(TransparentWidget):
             super_win.ok_clicked.connect(final)
             super_win.show()
         else:
-            win_warn = WarningWindow(
-                Lng.select_folder_path[JsonData.lng_index],
-                270, 80
-            )
+            win_warn = WarningWindow(Lng.select_folder_path[JsonData.lng_index])
             win_warn.center_to_parent(self.window())
             win_warn.ok_clicked.connect(win_warn.deleteLater)
             win_warn.show()
@@ -744,10 +738,7 @@ class NewMfSettings(TransparentWidget):
                 return None
             for i in Mf.items:
                 if i.mf_alias == mf_alias:
-                    win_warn = WarningWindow(
-                        Lng.alias_already_exists[JsonData.lng_index],
-                        270, 80
-                    )
+                    win_warn = WarningWindow(Lng.alias_already_exists[JsonData.lng_index])
                     win_warn.center_to_parent(self.window())
                     win_warn.ok_clicked.connect(win_warn.deleteLater)
                     win_warn.show()
