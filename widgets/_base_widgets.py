@@ -693,6 +693,11 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
+class ConfirmTitle(TransparentLabel):
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
+
+
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
@@ -733,7 +738,7 @@ class ConfirmWindow(UMainWidget):
         text_layout.setSpacing(5)
 
         if title_text:
-            title_text_wid = TitleTextLabel(title_text)
+            title_text_wid = ConfirmTitle(title_text)
             text_layout.addWidget(title_text_wid)
 
         self.text_wid = SelectableGrayLabel(text)
