@@ -17,34 +17,20 @@ from .win_text_search import WinTextSearch
 
 class SearchWidBaseSvg(QSvgWidget):
     clicked_ = pyqtSignal()
-    icon_path = None  # Переопределяется в наследниках
+    icon_path = None
     icon_size = 11
 
     def __init__(self, parent):
         super().__init__(parent)
         self.setFixedSize(self.icon_size, self.icon_size)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        if self.icon_path:
-            self.load(str(self.icon_path))
+        self.load(str(self.icon_path))
         self.hide()
 
-    def enable(self):
-        self.show()
-
-    def disable(self):
-        self.hide()
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
+    def mouseReleaseEvent(self, a0):
+        if a0.button() == Qt.MouseButton.LeftButton:
             self.clicked_.emit()
-
-    def enterEvent(self, event):
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        super().enterEvent(event)
-
-    def leaveEvent(self, event):
-        self.setCursor(Qt.CursorShape.ArrowCursor)
-        super().leaveEvent(event)
+        return super().mouseReleaseEvent(a0)
 
 
 class SearchWidClearSvg(SearchWidBaseSvg):
@@ -118,9 +104,9 @@ class SearchWidLineEdit(ULineEdit):
         ]
 
         if Dynamic.search_words_list:
-            self.clear_btn.enable()
+            self.clear_btn.show()
         else:
-            self.clear_btn.disable()
+            self.clear_btn.hide()
         # Поведение левой кнопки здесь больше не меняем, она всегда видима
 
     def delayed_search(self):
