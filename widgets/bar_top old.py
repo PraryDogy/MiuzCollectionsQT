@@ -49,10 +49,12 @@ class SearchWidBaseSvg(QSvgWidget):
 
 class SearchWidClearSvg(SearchWidBaseSvg):
     icon_path = Static.COMMON_ICONS / "cancel.svg"
+    right_margin = 8  # Отступ крайней кнопки от правого края
 
 
 class SearchWidTextSearchSvg(SearchWidBaseSvg):
     icon_path = Static.COMMON_ICONS / "text_edit.svg" 
+    spacing = 10  # Расстояние между этой кнопкой и кнопкой очистки
 
 
 class SearchWidLineEdit(ULineEdit):
@@ -70,10 +72,9 @@ class SearchWidLineEdit(ULineEdit):
         self.clear_btn = SearchWidClearSvg(self)
         self.clear_btn.clicked_.connect(self.clear_search)
 
-        # Кнопка текстового поиска (левая)
+        # Новая кнопка (левая)
         self.left_btn = SearchWidTextSearchSvg(self)
-        self.left_btn.clicked_.connect(self.open_win_text_search)
-        self.left_btn.show()  # Делаем кнопку видимой постоянно
+        self.left_btn.clicked_.connect(self.open_win_text_search) # Подключите ваш метод
 
         self.update_buttons_position()
 
@@ -102,15 +103,15 @@ class SearchWidLineEdit(ULineEdit):
         self.update_buttons_position()
 
     def update_buttons_position(self):
-        offset = 10
-        # Позиционируем правую кнопку (Clear) относительно правого края
-        clear_x = self.width() - self.clear_btn.width()
+        # Позиционируем правую кнопку (Clear)
+        clear_x = self.width() - self.clear_btn.width() - self.clear_btn.right_margin
         clear_y = (self.height() - self.clear_btn.height()) // 2
-        self.clear_btn.move(clear_x - offset, clear_y)
+        self.clear_btn.move(clear_x, clear_y)
 
-        # Позиционируем левую кнопку относительно левого края
+        # Позиционируем левую кнопку относительно правой кнопки
+        left_x = clear_x - self.left_btn.width() - self.left_btn.spacing
         left_y = (self.height() - self.left_btn.height()) // 2
-        self.left_btn.move(offset, left_y)
+        self.left_btn.move(left_x, left_y)
 
     def create_search(self, new_text: str):
         Dynamic.search_words_list = [
@@ -119,9 +120,10 @@ class SearchWidLineEdit(ULineEdit):
 
         if Dynamic.search_words_list:
             self.clear_btn.enable()
+            self.left_btn.enable()    # Поведение «такое же»: показываем вместе
         else:
             self.clear_btn.disable()
-        # Поведение левой кнопки здесь больше не меняем, она всегда видима
+            self.left_btn.disable()   # Скрываем вместе
 
     def delayed_search(self):
         self.reload_thumbnails.emit()

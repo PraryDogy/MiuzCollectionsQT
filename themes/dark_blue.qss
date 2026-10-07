@@ -374,7 +374,8 @@ TitleTextLabel {
 
 /* bar_top.py */
 SearchWidLineEdit {
-    padding-right: 45px;
+    padding-right: 25px;
+    padding-left: 25px;
 }
 /* bar_top.py */
 
