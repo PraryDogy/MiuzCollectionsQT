@@ -701,7 +701,7 @@ class ConfirmWindow(UMainWidget):
     min_width = 200
     max_text_wid_width = 300
 
-    def __init__(self, text: str, *args, **kwargs):
+    def __init__(self, text: str, title_text: str = None):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
@@ -709,7 +709,10 @@ class ConfirmWindow(UMainWidget):
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
         self.central_layout.setContentsMargins(15, 0, 10, 10)
-        self.central_layout.setSpacing(15)
+        self.central_layout.setSpacing(0)
+
+        # пространство после заголовка окна
+        self.central_layout.addSpacing(10)
 
         svg_text_container = TransparentWidget()
         self.central_layout.addWidget(svg_text_container)
@@ -729,8 +732,9 @@ class ConfirmWindow(UMainWidget):
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(5)
 
-        title_text_wid = TitleTextLabel(Lng.attention[JsonData.lng_index])
-        # text_layout.addWidget(title_text_wid)
+        if title_text:
+            title_text_wid = TitleTextLabel(title_text)
+            text_layout.addWidget(title_text_wid)
 
         self.text_wid = SelectableGrayLabel(text)
         self.text_wid.setWordWrap(True)
@@ -739,24 +743,27 @@ class ConfirmWindow(UMainWidget):
 
         svg_text_layout.addStretch(1)
 
+        # пространство над кнопками
+        self.central_layout.addSpacing(10)
+
         btn_widget = QWidget()
         self.central_layout.addWidget(btn_widget)
 
-        btn_layout = QHBoxLayout(btn_widget)
-        btn_layout.setContentsMargins(0, 0, 0, 0)
-        btn_layout.setSpacing(10)
+        self.btn_layout = QHBoxLayout(btn_widget)
+        self.btn_layout.setContentsMargins(0, 0, 0, 0)
+        self.btn_layout.setSpacing(10)
 
-        btn_layout.addStretch(1)
+        self.btn_layout.addStretch(1)
 
         self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(self.cancel_btn)
+        self.btn_layout.addWidget(self.cancel_btn)
 
         self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
         self.ok_btn.clicked.connect(self.ok_clicked.emit)
         self.ok_btn.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(self.ok_btn)
+        self.btn_layout.addWidget(self.ok_btn)
 
         self.setMinimumWidth(self.min_width)
         self.adjustSize()
@@ -787,15 +794,16 @@ class ConfirmWindow(UMainWidget):
 class SuperConfirmWindow(ConfirmWindow):
     icon_path = Static.COMMON_ICONS / "red_warning.svg"
 
-    def __init__(self, text: str):
-        super().__init__(text)
+    def __init__(self, text, title_text = None):
+        super().__init__(text, title_text)
         self.svg_widget.load(str(self.icon_path))
 
 
 class WarningWindow(ConfirmWindow):
-    def __init__(self, text):
-        super().__init__(text)
+    def __init__(self, text, title_text = None):
+        super().__init__(text, title_text)
         self.cancel_btn.setVisible(False)
+        self.ok_btn.setText(Lng.close[JsonData.lng_index])
 
 
 class InputTextWin(UMainWidget):
