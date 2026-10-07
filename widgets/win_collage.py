@@ -21,8 +21,10 @@ class WinCollage(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.resize(self.ww, self.hh)
+        self.setMinimumSize(400, 400)
         self.setWindowTitle(Lng.collage[JsonData.lng_index])
-        self.central_layout.setContentsMargins(0, 0, 0, 0)
+        self.insert_sep()
+        self.central_layout.setContentsMargins(5, 0, 5, 0)
 
         self.pixmaps: list[QPixmap] = [
             QPixmap.fromImage(i.qimages[-1])
