@@ -928,18 +928,6 @@ class MfAliasWidget(QWidget):
             win_warn.center_to_parent(self.window())
             win_warn.show()
             return None
-
-        for i in (
-            Lng.enter_alias_warning[self.lng_index],
-            f'{Lng.string_limit[self.lng_index]}',
-            f'{Lng.valid_message[self.lng_index]}'
-        ):
-            win_warn = WarningWindow(i)
-            win_warn.center_to_parent(self.window())
-            win_warn.show()
-
-            
-
         return mf_alias
 
 
