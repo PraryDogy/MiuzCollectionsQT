@@ -885,26 +885,21 @@ class MfAliasWidget(QWidget):
         v_layout.addWidget(self.line_edit)
 
     def validate(self):
-
-        def show_warn(text: str, w, h):
-            win_warn = WarningWindow(text, w, h)
-            win_warn.ok_clicked.connect(win_warn.deleteLater)
-            win_warn.setFixedSize(w, h)
-            win_warn.center_to_parent(self.window())
-            win_warn.show()
-
         pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
         mf_alias = self.line_edit.text()
-        result = None
+        error_text = None  # Переменная для хранения текста ошибки
         if not mf_alias:
-            show_warn(Lng.enter_alias_warning[self.lng_index], 260, 80)
+            error_text = Lng.enter_alias_warning[self.lng_index]
         elif len(mf_alias) < 5 or len(mf_alias) > 50:
-            show_warn(f'{Lng.string_limit[self.lng_index]}', 280, 80)
+            error_text = f'{Lng.string_limit[self.lng_index]}'
         elif not re.fullmatch(pattern, mf_alias):
-            show_warn(f'{Lng.valid_message[self.lng_index]}', 310, 80)
-        else:
-            result = mf_alias
-        return result
+            error_text = f'{Lng.valid_message[self.lng_index]}'
+        if error_text:
+            win_warn = WarningWindow(error_text)
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
+            return None
+        return mf_alias
 
 
 class MfPathWidget(UGroupBox):
@@ -1010,20 +1005,10 @@ class MfPathWidget(UGroupBox):
         self.show_ok_path()
 
     def validate(self):
-        def show_warn(text: str, w, h):
-            win_warn = WarningWindow(text, w, h)
-            win_warn.ok_clicked.connect(win_warn.deleteLater)
-            win_warn.setFixedSize(w, h)
+        if not self.mf_path or not os.path.exists(self.mf_path):
+            win_warn = WarningWindow(Lng.select_folder_path[self.lng_index])
             win_warn.center_to_parent(self.window())
             win_warn.show()
-
-        print(self.mf_path)
-
-        if not self.mf_path:
-            show_warn(Lng.select_folder_path[self.lng_index], 260, 80)
-            return None
-        if not os.path.exists(self.mf_path):
-            show_warn(Lng.select_folder_path[self.lng_index], 260, 80)
             return None
         return self.mf_path
 
