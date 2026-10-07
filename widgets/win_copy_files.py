@@ -10,7 +10,7 @@ from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (TransparentLabel, TransparentWidget, UMainWidget,
-                            UPushButton, WinProgressbar)
+                            UPushButton, WinProgressbar, WarningWindow)
 
 
 class ReplaceButton(UPushButton):
@@ -135,6 +135,12 @@ class ErrorWin(UMainWidget):
             if a0.key() == Qt.Key.Key_Q:
                 return
         return super().keyPressEvent(a0)
+
+
+class ErrorWin(WarningWindow):
+    def __init__(self):
+        super().__init__(Lng.copy_error[JsonData.lng_index])
+
     
 
 class WinCopyFiles(WinProgressbar):
@@ -144,16 +150,10 @@ class WinCopyFiles(WinProgressbar):
     def __init__(self, target_dir: str, files_to_copy: list[str]):
         super().__init__(Lng.copying[JsonData.lng_index])
 
-        # отладка
-        # self.rel = ReplaceFilesWin()
-        # self.er = ErrorWin()
-        # self.rel.show()
-        # self.er.show()
-        # self.above_label.setText("above label above label above label")
-        # self.below_label.setText("below label below label below label below label")
+        # отладка окон
+        QTimer.singleShot(300, self.show_all_wins)
+        return
 
-        # self.cancel.connect(self.stop_task)
-        # self.cancel.connect(self.deleteLater)
 
         dst_text = os.path.basename(target_dir)
         if not dst_text:
@@ -167,6 +167,10 @@ class WinCopyFiles(WinProgressbar):
         )
 
         self.dst_urls: list[str] = []
+
+        # отладка
+        # self.progressbar.setValue(50)
+        # return
 
         self.copy_task_item = CopyTaskItem(
             dst_dir=target_dir,
@@ -191,6 +195,18 @@ class WinCopyFiles(WinProgressbar):
         self.copy_timer.start(self.ms)
 
         self.progressbar.setMaximum(100)
+
+    def show_all_wins(self):
+        # отладка
+        self.rel = ReplaceFilesWin()
+        self.er = ErrorWin()
+        self.rel.show()
+        self.er.show()
+        self.above_label.setText("above label above label above label")
+        self.below_label.setText("below label below label below label below label")
+
+        self.cancel.connect(self.stop_task)
+        self.cancel.connect(self.deleteLater)
 
     def poll_task(self):
         self.copy_timer.stop()

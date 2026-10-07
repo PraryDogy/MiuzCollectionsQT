@@ -353,10 +353,6 @@ TitleTextLabel {
     font-size: 20px;
 }
 
-ConfirmTitle {
-    font-weight: bold;
-    font-size: 16px;
-}
 
 /* _base_widgets.py */
 

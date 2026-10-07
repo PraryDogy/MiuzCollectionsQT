@@ -231,7 +231,10 @@ class Lng:
     replace_all = ("Заменить все", "Replace all")
     stop = ("Стоп", "Stop")
     replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
-    copy_error = ("Произошла ошибка при копировании", "An error occurred while copying")
+    copy_error = (
+        "Произошла ошибка при копировании. Пожалуйста, попробуйте еще раз.",
+        "An error occurred while copying. Please try again."
+    )
     error = ("Ошибка", "Error")
     next_search = ("Поиск новых изображений через", "Search new images in")
     string_limit = (

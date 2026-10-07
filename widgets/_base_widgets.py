@@ -639,8 +639,10 @@ class WinProgressbar(UMainWidget):
         self.setWindowTitle(title)
         self.setFixedWidth(self.ww)
 
-        self.central_layout.setContentsMargins(10, 10, 10, 10)
+        self.central_layout.setContentsMargins(10, 0, 10, 10)
         self.central_layout.setSpacing(0)
+        self.insert_sep()
+        self.central_layout.addSpacing(10)
 
         h_wid = QWidget()
         self.central_layout.addWidget(h_wid)
@@ -649,7 +651,7 @@ class WinProgressbar(UMainWidget):
         h_lay.setSpacing(10)
 
         left_side_icon = QSvgWidget(str(self.files_icon_path))
-        left_side_icon.setFixedSize(50, 50)
+        left_side_icon.setFixedSize(40, 40)
         h_lay.addWidget(left_side_icon)
 
         right_side_wid = QWidget()
@@ -676,6 +678,7 @@ class WinProgressbar(UMainWidget):
 
         self.cancel_btn = QSvgWidget(str(self.cancel_icon_path))
         self.cancel_btn.setFixedSize(13, 13)
+        self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
         progressbar_lay.addWidget(self.cancel_btn)
 
@@ -693,118 +696,147 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
-class ConfirmTitle(TransparentLabel):
-    def __init__(self, text="", parent=None):
-        super().__init__(text, parent)
-
-
 class ConfirmWindow(UMainWidget):
-    ok_clicked = pyqtSignal()
-    cancel_clicked = pyqtSignal()
-    icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
-    icon_size = 40
-    ww = 300
+	ok_clicked = pyqtSignal()
+	cancel_clicked = pyqtSignal()
+	
+	icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
+	icon_size = 40
 
-    def __init__(self, text: str):
-        super().__init__()
-        self.set_always_on_top()
-        self.set_close_only()
-        self.insert_sep()
-        self.setWindowTitle(Lng.attention[JsonData.lng_index])
-        self.setFixedWidth(self.ww)
+	def __init__(self, text: str):
+		super().__init__()
+		self.set_always_on_top()
+		self.set_close_only()
+		self.insert_sep()
+		self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
-        self.central_layout.setContentsMargins(15, 0, 10, 10)
-        self.central_layout.setSpacing(0)
-        self.central_layout.addSpacing(10)
+		# 1. Создаем и компонуем все виджеты
+		self._setup_ui(text)
+		# 2. Даем layout первично рассчитаться
+		self.central_layout.activate()
+		# 3. Рассчитываем и фиксируем итоговые размеры на основе вашей логики с коэффициентом 1.15
+		self._adjust_window_size(text)
 
-        content_widget = TransparentWidget()
-        self.central_layout.addWidget(content_widget)
+	def _setup_ui(self, text: str):
+		self.central_layout.setContentsMargins(15, 0, 10, 10)
+		self.central_layout.setSpacing(0)
+		self.central_layout.addSpacing(10)
 
-        content_layout = QHBoxLayout(content_widget)
-        content_layout.setContentsMargins(0, 0, 0, 0)
-        content_layout.setSpacing(15)
+		self.content_widget = TransparentWidget()
+		self.central_layout.addWidget(self.content_widget)
 
-        self.svg_widget = QSvgWidget()
-        self.svg_widget.load(str(self.icon_path))
-        self.svg_widget.setFixedSize(self.icon_size, self.icon_size)
-        content_layout.addWidget(self.svg_widget)
+		content_layout = QHBoxLayout(self.content_widget)
+		content_layout.setContentsMargins(0, 0, 0, 0)
+		content_layout.setSpacing(15)
 
-        text_container = TransparentWidget()
-        content_layout.addWidget(text_container)
+		self.svg_widget = QSvgWidget()
+		self.svg_widget.load(str(self.icon_path))
+		self.svg_widget.setFixedSize(self.icon_size, self.icon_size)
+		content_layout.addWidget(self.svg_widget)
 
-        text_layout = QVBoxLayout(text_container)
-        text_layout.setContentsMargins(0, 0, 0, 0)
-        text_layout.setSpacing(5)
+		text_container = TransparentWidget()
+		content_layout.addWidget(text_container)
 
-        self.text_wid = SelectableGrayLabel(text)
-        self.text_wid.setWordWrap(True)
-        text_layout.addWidget(self.text_wid)
+		text_layout = QVBoxLayout(text_container)
+		text_layout.setContentsMargins(0, 0, 0, 0)
+		text_layout.setSpacing(5)
 
-        self.central_layout.addSpacing(10)
+		self.text_wid = SelectableGrayLabel(text)
+		self.text_wid.setWordWrap(True)
+		text_layout.addWidget(self.text_wid)
 
-        btn_widget = QWidget()
-        self.central_layout.addWidget(btn_widget)
+		self.central_layout.addSpacing(10)
 
-        self.btn_layout = QHBoxLayout(btn_widget)
-        self.btn_layout.setContentsMargins(0, 0, 0, 0)
-        self.btn_layout.setSpacing(10)
-        self.btn_layout.addStretch(1)
+		self.btn_widget = QWidget()
+		self.central_layout.addWidget(self.btn_widget)
 
-        self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
-        self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
-        self.cancel_btn.clicked.connect(self.deleteLater)
-        self.btn_layout.addWidget(self.cancel_btn)
+		self.btn_layout = QHBoxLayout(self.btn_widget)
+		self.btn_layout.setContentsMargins(0, 0, 0, 0)
+		self.btn_layout.setSpacing(10)
+		self.btn_layout.addStretch(1)
 
-        self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
-        self.ok_btn.clicked.connect(self.ok_clicked.emit)
-        self.ok_btn.clicked.connect(self.deleteLater)
-        self.btn_layout.addWidget(self.ok_btn)
+		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
+		self.cancel_btn.clicked.connect(self.deleteLater)
+		self.btn_layout.addWidget(self.cancel_btn)
 
-        # Даем layout рассчитаться
-        self.central_layout.activate()
+		self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
+		self.ok_btn.clicked.connect(self.ok_clicked.emit)
+		self.ok_btn.clicked.connect(self.deleteLater)
+		self.btn_layout.addWidget(self.ok_btn)
 
-        # Фиксируем ширину текста
-        text_width = self.ww - 15 - self.icon_size - 15 - 10
-        self.text_wid.setFixedWidth(text_width)
+	def _calculate_optimal_text_width(self, text: str) -> tuple[int, int]:
+		fm = self.text_wid.fontMetrics()
+		# Измеряем ширину текста, если бы он поместился в одну строку
+		single_line_width = fm.horizontalAdvance(text)
+		# Стартовая минимальная ширина окна для расчетов
+		test_width = 220
+		max_width = 800  # Ограничитель, чтобы окно не растянулось на весь экран
+		# Если текст короткий, сразу отдаем его ширину
+		if single_line_width <= test_width:
+			return single_line_width + 2, fm.height()
+		# Алгоритм подгонки: прибавляем по 10 пикселей, пока коэффициент > 1.15
+		while test_width < max_width:
+			rect = fm.boundingRect(
+				0, 0, test_width, 10000, 
+				Qt.TextFlag.TextWordWrap | Qt.AlignmentFlag.AlignLeft, 
+				text
+			)
+			real_text_width = rect.width()
+			if real_text_width == 0:
+				break
+			# Проверяем вашу пропорцию
+			ratio = test_width / real_text_width
+			if ratio <= 1.15:
+				return test_width, rect.height()
+			# Если пустот справа слишком много, расширяем допустимую ширину еще на 10px
+			test_width += 10
+		# На случай, если уперлись в max_width
+		final_rect = fm.boundingRect(
+			0, 0, test_width, 10000, 
+			Qt.TextFlag.TextWordWrap | Qt.AlignmentFlag.AlignLeft, 
+			text
+		)
+		return test_width, final_rect.height()
 
-        # Рассчитываем высоту контента
-        text_height = self.text_wid.heightForWidth(text_width)
-        content_height = max(self.icon_size, text_height)
+	def _adjust_window_size(self, text: str):
+		optimal_text_width, text_height = self._calculate_optimal_text_width(text)
+		# Применяем рассчитанную ширину к текстовому виджету
+		self.text_wid.setFixedWidth(optimal_text_width)
+		# Высота контентного блока (максимум между иконкой и высотой текста)
+		content_height = max(self.icon_size, text_height)
+		self.content_widget.setFixedHeight(content_height)
+		# Высота блока кнопок
+		btn_height = self.btn_widget.sizeHint().height()
+		self.btn_widget.setFixedHeight(btn_height)
+		# Ширина окна: ширина контента против минимально необходимой ширины для кнопок
+		content_width = 15 + self.icon_size + 15 + optimal_text_width + 10
+		min_btns_width = self.btn_widget.sizeHint().width() + 25 
+		final_window_width = max(content_width, min_btns_width)
+		# Итоговая высота окна
+		layout_height = (
+			getattr(self, 'bar_height', 0) +  # Подстраховка, если bar_height инициализируется в родительском классе
+			10 +
+			content_height +
+			10 +
+			btn_height +
+			10
+		)
 
-        content_widget.setFixedHeight(content_height)
+		central_widget = self.centralWidget()
+		if central_widget:
+			central_widget.setFixedHeight(layout_height)
 
-        # Высота кнопок
-        btn_height = btn_widget.sizeHint().height()
-        btn_widget.setFixedHeight(btn_height)
+		# Полностью блокируем ресайз с вычисленными значениями
+		self.setFixedWidth(final_window_width)
+		self.setFixedHeight(layout_height)
 
-        # Считаем высоту layout
-        layout_height = (
-            self.bar_height + 
-            10 +
-            content_height +
-            10 +
-            btn_height +
-            10
-        )
-
-        # Высота самого central widget
-        central_widget = self.centralWidget()
-        central_widget.setFixedHeight(layout_height)
-
-        # Высота окна = central widget + frame/header
-        self.adjustSize()
-        self.setFixedHeight(self.height())
-
-        # Полностью запрещаем resize
-        self.setFixedWidth(self.ww)
-        self.setFixedHeight(self.height())
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key.Key_Escape:
-            self.cancel_clicked.emit()
-            self.deleteLater()
-        else:
-            super().keyPressEvent(event)
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key.Key_Escape:
+			self.cancel_clicked.emit()
+			self.deleteLater()
+		else:
+			super().keyPressEvent(event)
 
     
 class WarningWindow(ConfirmWindow):
