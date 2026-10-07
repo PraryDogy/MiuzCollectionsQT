@@ -197,7 +197,7 @@ class WinMain(UMainWindow):
         self.bar_bottom = BarBottom()
         self.bar_bottom.layout().setContentsMargins(2, 0, 2, 0)
         self.bar_bottom.resize_thumbnails.connect(
-            lambda: self.grid.resize_thumbnails()
+            lambda: self.load_st_grid()
         )
         self.footer_layout.addWidget(self.bar_bottom)
 

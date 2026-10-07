@@ -563,14 +563,6 @@ class Grid(UScrollVerticalArea):
             self.clear_selected_widgets()
             self.wid_to_selected_widgets(wid)
 
-    def resize_thumbnails(self):
-        Thumb.calculate_size()
-        for _, wid in self.cell_to_wid.items():
-            wid.set_text_and_size()
-            if wid in self.selected_widgets:
-                wid.set_frame()
-        self.rearrange()
-
     def get_max_columns(self):
         try:
             # теперь виджет правильной ширины
