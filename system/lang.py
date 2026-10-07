@@ -320,6 +320,10 @@ class Lng:
         "Закрыть",
         "Close"
     )
+    got_it = (
+        "Понятно",
+        "Got it"
+    )
     only_color = (
         "Поддерживаются только цветные изображения",
         "Only color images are supported"

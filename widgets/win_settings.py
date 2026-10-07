@@ -652,10 +652,7 @@ class MfSettings(TransparentWidget):
 
         mf_path = self.path_widget.validate()
         if mf_path:
-            super_win = SuperConfirmWindow(
-                Lng.confirm_mf_path[JsonData.lng_index],
-                310, 105
-            )
+            super_win = SuperConfirmWindow(Lng.confirm_mf_path[JsonData.lng_index])
             super_win.center_to_parent(self.window())
             super_win.ok_clicked.connect(final)
             super_win.show()

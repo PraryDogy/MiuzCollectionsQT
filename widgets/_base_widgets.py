@@ -805,21 +805,26 @@ class ConfirmWindow(UMainWidget):
             self.deleteLater()
         else:
             super().keyPressEvent(event)
+
     
+class WarningWindow(ConfirmWindow):
+    def __init__(self, text: str):
+        super().__init__(text)
+        self.cancel_btn.setVisible(False)
+        self.ok_btn.setVisible(False)
+        self.got_it_btn = UPushButton(Lng.got_it[JsonData.lng_index])
+        self.got_it_btn.clicked.connect(self.deleteLater)
+        self.got_it_btn.setFixedWidth(150)
+        self.btn_layout.addWidget(self.got_it_btn)
+        self.btn_layout.addStretch(1)
+
 
 class SuperConfirmWindow(ConfirmWindow):
     icon_path = Static.COMMON_ICONS / "red_warning.svg"
 
-    def __init__(self, text, title_text = None):
-        super().__init__(text, title_text)
+    def __init__(self, text: str):
+        super().__init__(text)
         self.svg_widget.load(str(self.icon_path))
-
-
-class WarningWindow(ConfirmWindow):
-    def __init__(self, text, title_text = None):
-        super().__init__(text, title_text)
-        self.cancel_btn.setVisible(False)
-        self.ok_btn.setText(Lng.close[JsonData.lng_index])
 
 
 class InputTextWin(UMainWidget):
@@ -923,6 +928,18 @@ class MfAliasWidget(QWidget):
             win_warn.center_to_parent(self.window())
             win_warn.show()
             return None
+
+        for i in (
+            Lng.enter_alias_warning[self.lng_index],
+            f'{Lng.string_limit[self.lng_index]}',
+            f'{Lng.valid_message[self.lng_index]}'
+        ):
+            win_warn = WarningWindow(i)
+            win_warn.center_to_parent(self.window())
+            win_warn.show()
+
+            
+
         return mf_alias
 
 
