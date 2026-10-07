@@ -18,7 +18,7 @@ from .win_text_search import WinTextSearch
 class SearchWidBaseSvg(QSvgWidget):
     clicked_ = pyqtSignal()
     icon_path = None
-    icon_size = 11
+    icon_size = 13
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -88,7 +88,7 @@ class SearchWidLineEdit(ULineEdit):
         self.update_buttons_position()
 
     def update_buttons_position(self):
-        offset = 10
+        offset = 7
         # Позиционируем правую кнопку (Clear) относительно правого края
         clear_x = self.width() - self.clear_btn.width()
         clear_y = (self.height() - self.clear_btn.height()) // 2
