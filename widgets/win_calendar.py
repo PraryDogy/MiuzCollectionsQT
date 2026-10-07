@@ -247,12 +247,16 @@ class WinCalendar(UMainWidget):
 		self.btn_container_layout.addWidget(self.reset_button)
 
 		self.done_btn = ActiveButton(Lng.done[JsonData.lng_index])
-		self.done_btn.clicked.connect(self.deleteLater)
+		self.done_btn.clicked.connect(self.ok_btn_cmd)
 		self.btn_container_layout.addWidget(self.done_btn)
 
 		# Инициализация самой сетки чисел
 		self.create_calendar_widget()
 		self.update_calendar()
+
+	def ok_btn_cmd(self):
+		self.date_selected.emit(self.current_date)
+		self.deleteLater()
 
 	def reset_button_cmd(self):
 		self.current_date = self.base_date
@@ -350,7 +354,7 @@ class WinCalendar(UMainWidget):
 
 	def update_calendar(self):
 		self.update_dynamic_label()
-		self.date_selected.emit(self.current_date)
+		# self.date_selected.emit(self.current_date)
 
 		current_year = self.current_date.year()
 		current_month = self.current_date.month()
