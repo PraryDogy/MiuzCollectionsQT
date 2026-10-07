@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
                              QPushButton, QScrollArea, QSlider, QSpacerItem,
                              QSpinBox, QStackedWidget, QTextEdit, QTreeView,
                              QTreeWidget, QTreeWidgetItem, QVBoxLayout,
-                             QWidget)
+                             QWidget, QSizePolicy)
 from qframelesswindow import FramelessMainWindow, StandardTitleBar
 from typing_extensions import Optional
 
@@ -703,10 +703,10 @@ class ConfirmWindow(UMainWidget):
     cancel_clicked = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
     icon_size = 40
-    min_width = 200
-    max_text_wid_width = 300
+    min_width = 300
+    max_width = 350
 
-    def __init__(self, text: str, title_text: str = None):
+    def __init__(self, text: str):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
@@ -715,41 +715,34 @@ class ConfirmWindow(UMainWidget):
 
         self.central_layout.setContentsMargins(15, 0, 10, 10)
         self.central_layout.setSpacing(0)
+        self.central_layout.addSpacing(15)
 
-        # пространство после заголовка окна
-        self.central_layout.addSpacing(10)
+        content_widget = TransparentWidget()
+        self.central_layout.addWidget(content_widget)
 
-        svg_text_container = TransparentWidget()
-        self.central_layout.addWidget(svg_text_container)
-
-        svg_text_layout = QHBoxLayout(svg_text_container)
-        svg_text_layout.setContentsMargins(0, 0, 0, 0)
-        svg_text_layout.setSpacing(15)
+        content_layout = QHBoxLayout(content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(15)
+        content_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.icon_path))
         self.svg_widget.setFixedSize(self.icon_size, self.icon_size)
-        svg_text_layout.addWidget(self.svg_widget)
+        content_layout.addWidget(self.svg_widget)
 
         text_container = TransparentWidget()
-        svg_text_layout.addWidget(text_container)
+        content_layout.addWidget(text_container)
+
         text_layout = QVBoxLayout(text_container)
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(5)
 
-        if title_text:
-            title_text_wid = ConfirmTitle(title_text)
-            text_layout.addWidget(title_text_wid)
-
         self.text_wid = SelectableGrayLabel(text)
         self.text_wid.setWordWrap(True)
-        self._adjust_text_width(text)
+        self.text_wid.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         text_layout.addWidget(self.text_wid)
 
-        svg_text_layout.addStretch(1)
-
-        # пространство над кнопками
-        self.central_layout.addSpacing(10)
+        self.central_layout.addSpacing(20)
 
         btn_widget = QWidget()
         self.central_layout.addWidget(btn_widget)
@@ -757,7 +750,6 @@ class ConfirmWindow(UMainWidget):
         self.btn_layout = QHBoxLayout(btn_widget)
         self.btn_layout.setContentsMargins(0, 0, 0, 0)
         self.btn_layout.setSpacing(10)
-
         self.btn_layout.addStretch(1)
 
         self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
@@ -771,29 +763,15 @@ class ConfirmWindow(UMainWidget):
         self.btn_layout.addWidget(self.ok_btn)
 
         self.setMinimumWidth(self.min_width)
+        self.setMaximumWidth(self.max_width)
         self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
 
-    def _adjust_text_width(self, text: str):
-        """Интеллектуальный расчет габаритов текста с учетом переносов"""
-        fm = self.text_wid.fontMetrics()
-        # Симулируем отрисовку текста в коробке с ограничением max_width
-        # Высоту ставим с запасом (например, 10000), чтобы тексту было куда расти вниз
-        flags = Qt.TextFlag.TextWordWrap
-        bounding_rect = fm.boundingRect(QRect(0, 0, self.max_text_wid_width, 10000), flags, text)
-        # bounding_rect.width() вернет ширину самой длинной строки ПОСЛЕ переноса.
-        # Например, если лимит 400, но слово перенеслось так, что максимальная строка
-        # заняла 362 пикселя, метод вернет именно 362.
-        real_width = bounding_rect.width()
-        # Ставим ширину по реальному тексту + небольшой запас (от багов округления Qt)
-        self.text_wid.setFixedWidth(real_width + 10)
-
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.cancel_clicked.emit()
             self.deleteLater()
-        elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-            self.ok_clicked.emit()
-        return super().keyPressEvent(a0)
+        else:
+            super().keyPressEvent(event)
     
 
 class SuperConfirmWindow(ConfirmWindow):

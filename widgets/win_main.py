@@ -443,11 +443,7 @@ class WinMain(UMainWindow):
             text = f"{Lng.remove_file_question[JsonData.lng_index]}"
         else:
             text = f"{Lng.remove_files_question[JsonData.lng_index]}"
-        self.remove_files_win = ConfirmWindow(
-            text=text,
-            title_text=Lng.remove_file_title[JsonData.lng_index]
-            
-            )
+        self.remove_files_win = ConfirmWindow(text)
         file_remover = ProcessWorker(
                 target=FilesRemover.start,
                 args=(abs_paths, )
