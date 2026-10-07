@@ -516,3 +516,7 @@ class Lng:
         "Дата окончания",
         "End date",
     )
+    text_input = (
+        "Ввод текста",
+        "Text input"
+    )

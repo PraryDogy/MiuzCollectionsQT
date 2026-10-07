@@ -862,43 +862,59 @@ class SuperConfirmWindow(ConfirmWindow):
 class InputTextWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
     cancel_clicked = pyqtSignal()
+    svg_path = Static.COMMON_ICONS / "tags.svg"
 
-    def __init__(self, title: str, description: str, size: tuple):
+    def __init__(self, description: str):
         super().__init__()
-        self.setFixedSize(*size)
         self.set_always_on_top()
         self.set_close_only()
-        self.setWindowTitle(title)
+        self.setWindowTitle(Lng.text_input[JsonData.lng_index])
+        self.insert_sep()
+        self.central_layout.addSpacing(10)
+        self.central_layout.setContentsMargins(10, 0, 10, 10)
+        self.central_layout.setSpacing(0)
 
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
-        self.central_layout.setSpacing(5)
+        svg_text_widget = TransparentWidget()
+        self.central_layout.addWidget(svg_text_widget)
+        svg_text_layout = QHBoxLayout(svg_text_widget)
+        svg_text_layout.setContentsMargins(5, 0, 10, 0)
+        svg_text_layout.setSpacing(5)
 
-        self.description_label = TransparentLabel(description)
-        self.description_label.setWordWrap(True)
-        self.central_layout.addWidget(self.description_label)
+        svg_icon = QSvgWidget()
+        svg_icon.load(str(self.svg_path))
+        svg_icon.setFixedSize(20, 20)
+        svg_text_layout.addWidget(svg_icon)
+
+        self.description_label = GrayTextLabel(description)
+        svg_text_layout.addWidget(self.description_label)
+
+        self.central_layout.addSpacing(10)
 
         self.line_edit_widget = ULineEdit()
         self.line_edit_widget.setPlaceholderText(Lng.input_text[JsonData.lng_index])
         self.central_layout.addWidget(self.line_edit_widget)
 
+        self.central_layout.addSpacing(10)
+
         btn_widget = QWidget()
         self.central_layout.addWidget(btn_widget)
 
         btn_layout = QHBoxLayout(btn_widget)
-        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         btn_layout.setContentsMargins(0, 0, 0, 0)
         btn_layout.setSpacing(10)
 
-        self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
-        self.ok_btn.setFixedWidth(75)
-        self.ok_btn.clicked.connect(self.ok_clicked_cmd)
-        btn_layout.addWidget(self.ok_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btn_layout.addStretch()
 
         self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
-        self.cancel_btn.setFixedWidth(75)
         self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
         self.cancel_btn.clicked.connect(self.deleteLater)
-        btn_layout.addWidget(self.cancel_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        btn_layout.addWidget(self.cancel_btn)
+
+        self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
+        self.ok_btn.clicked.connect(self.ok_clicked_cmd)
+        btn_layout.addWidget(self.ok_btn)
+
+        self.adjustSize()
 
     def ok_clicked_cmd(self):
         text = self.line_edit_widget.text()

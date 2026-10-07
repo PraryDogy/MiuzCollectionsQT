@@ -490,20 +490,15 @@ class UserTags(TransparentWidget):
             if text:
                 Filters.items.append(text)
                 Filters.write_json_data()
-                tag = WordFiltersTagWidget(text)
+                # tag = WordFiltersTagWidget(text)
                 # tag.load_st_grid.connect(self.load_st_grid.emit)
                 # tag.on_trash_clicked.connect(
                 #     lambda w=tag: self.show_remove_tag_win(w)
                 # )
-
                 self.flow_layout.clear()
                 self._create_tags()
 
-        self.text_win = InputTextWin(
-            title=Lng.new_tag[JsonData.lng_index],
-            description=Lng.new_tag_desc[JsonData.lng_index],
-            size=(300, 100)
-        )
+        self.text_win = InputTextWin(Lng.new_tag_desc[JsonData.lng_index])
         self.text_win.center_to_parent(self.window())
         self.text_win.ok_clicked.connect(ok_clicked)
         self.text_win.show()
@@ -511,7 +506,7 @@ class UserTags(TransparentWidget):
     def show_remove_tag_win(self, widget: WordFiltersTagWidget):
 
         def ok_clicked():
-            text = widget.title.text() 
+            text = widget.text_widget.text() 
             Filters.items.remove(text)
             Filters.write_json_data()
             if text in Dynamic.word_tags_list:
