@@ -13,14 +13,9 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
                             UPushButton, USep, UTextEdit)
 
 
-class WinTextSearchTitle(TitleTextLabel):
-    def __init__(self):
-        super().__init__(Lng.text_editor[JsonData.lng_index])
-
-
 class WinTextSearchTitleRow(TransparentFrame):
     svg_path = Static.COMMON_ICONS / "text_edit.svg"
-    svg_size = (28, 28)
+    svg_size = (25, 25)
 
     def __init__(self):
         super().__init__()
@@ -34,7 +29,7 @@ class WinTextSearchTitleRow(TransparentFrame):
         self.svg_widget.setFixedSize(*self.svg_size)
         self.h_lay.addWidget(self.svg_widget)
 
-        self.title_label = WinTextSearchTitle()
+        self.title_label = TitleTextLabel(Lng.text_editor[JsonData.lng_index])
         self.h_lay.addWidget(self.title_label)
 
 
@@ -50,12 +45,13 @@ class WinTextSearch(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setFixedSize(*self.size_)
+        # self.insert_sep()
 
         self.magnifier_icon = QIcon(str(self.svg_magnifier))
         self.wand_icon = QIcon(str(self.svg_wand))
 
         self.central_layout.setSpacing(10)
-        self.central_layout.setContentsMargins(10, 5, 10, 10)
+        self.central_layout.setContentsMargins(10, 0, 10, 10)
 
         self.title_row = WinTextSearchTitleRow()
         self.central_layout.addWidget(self.title_row)

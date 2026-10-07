@@ -31,9 +31,7 @@ class AboutWin(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Static.APP_NAME)
-        self.insert_sep()
-        self.central_layout.addSpacing(5)
-        self.central_layout.setSpacing(0)
+        self.central_layout.setSpacing(5)
         self.central_layout.setContentsMargins(10, 0, 10, 10)
 
         h_container = TransparentWidget()
