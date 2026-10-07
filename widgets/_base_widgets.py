@@ -696,16 +696,17 @@ class WinProgressbar(UMainWidget):
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
-    icon_path = Static.COMMON_ICONS / "green_checkmark.svg"
+    icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
     icon_size = 40
-    min_width = 300
-    max_width = 350
+    min_width = 200
+    max_text_wid_width = 300
 
     def __init__(self, text: str, *args, **kwargs):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
         self.insert_sep()
+        self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
         self.central_layout.setContentsMargins(15, 0, 10, 10)
         self.central_layout.setSpacing(15)
@@ -729,7 +730,7 @@ class ConfirmWindow(UMainWidget):
         text_layout.setSpacing(5)
 
         title_text_wid = TitleTextLabel(Lng.attention[JsonData.lng_index])
-        text_layout.addWidget(title_text_wid)
+        # text_layout.addWidget(title_text_wid)
 
         self.text_wid = SelectableGrayLabel(text)
         self.text_wid.setWordWrap(True)
@@ -767,7 +768,7 @@ class ConfirmWindow(UMainWidget):
         # Симулируем отрисовку текста в коробке с ограничением max_width
         # Высоту ставим с запасом (например, 10000), чтобы тексту было куда расти вниз
         flags = Qt.TextFlag.TextWordWrap
-        bounding_rect = fm.boundingRect(QRect(0, 0, self.max_width, 10000), flags, text)
+        bounding_rect = fm.boundingRect(QRect(0, 0, self.max_text_wid_width, 10000), flags, text)
         # bounding_rect.width() вернет ширину самой длинной строки ПОСЛЕ переноса.
         # Например, если лимит 400, но слово перенеслось так, что максимальная строка
         # заняла 362 пикселя, метод вернет именно 362.
