@@ -703,8 +703,7 @@ class ConfirmWindow(UMainWidget):
     cancel_clicked = pyqtSignal()
     icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
     icon_size = 40
-    min_width = 300
-    max_width = 350
+    ww = 300
 
     def __init__(self, text: str):
         super().__init__()
@@ -712,10 +711,11 @@ class ConfirmWindow(UMainWidget):
         self.set_close_only()
         self.insert_sep()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
+        self.setFixedWidth(self.ww)
 
         self.central_layout.setContentsMargins(15, 0, 10, 10)
         self.central_layout.setSpacing(0)
-        self.central_layout.addSpacing(15)
+        self.central_layout.addSpacing(10)
 
         content_widget = TransparentWidget()
         self.central_layout.addWidget(content_widget)
@@ -723,7 +723,6 @@ class ConfirmWindow(UMainWidget):
         content_layout = QHBoxLayout(content_widget)
         content_layout.setContentsMargins(0, 0, 0, 0)
         content_layout.setSpacing(15)
-        content_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.icon_path))
@@ -739,10 +738,9 @@ class ConfirmWindow(UMainWidget):
 
         self.text_wid = SelectableGrayLabel(text)
         self.text_wid.setWordWrap(True)
-        self.text_wid.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         text_layout.addWidget(self.text_wid)
 
-        self.central_layout.addSpacing(20)
+        self.central_layout.addSpacing(10)
 
         btn_widget = QWidget()
         self.central_layout.addWidget(btn_widget)
@@ -762,9 +760,44 @@ class ConfirmWindow(UMainWidget):
         self.ok_btn.clicked.connect(self.deleteLater)
         self.btn_layout.addWidget(self.ok_btn)
 
-        self.setMinimumWidth(self.min_width)
-        self.setMaximumWidth(self.max_width)
+        # Даем layout рассчитаться
+        self.central_layout.activate()
+
+        # Фиксируем ширину текста
+        text_width = self.ww - 15 - self.icon_size - 15 - 10
+        self.text_wid.setFixedWidth(text_width)
+
+        # Рассчитываем высоту контента
+        text_height = self.text_wid.heightForWidth(text_width)
+        content_height = max(self.icon_size, text_height)
+
+        content_widget.setFixedHeight(content_height)
+
+        # Высота кнопок
+        btn_height = btn_widget.sizeHint().height()
+        btn_widget.setFixedHeight(btn_height)
+
+        # Считаем высоту layout
+        layout_height = (
+            self.bar_height + 
+            10 +
+            content_height +
+            10 +
+            btn_height +
+            10
+        )
+
+        # Высота самого central widget
+        central_widget = self.centralWidget()
+        central_widget.setFixedHeight(layout_height)
+
+        # Высота окна = central widget + frame/header
         self.adjustSize()
+        self.setFixedHeight(self.height())
+
+        # Полностью запрещаем resize
+        self.setFixedWidth(self.ww)
+        self.setFixedHeight(self.height())
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
