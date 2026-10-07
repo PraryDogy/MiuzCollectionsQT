@@ -221,19 +221,27 @@ USep {
 /* ==================== SLIDER ==================== */
 
 USlider::groove:horizontal {
-    background-color: #263440;
-    height: 3px;
-    border-radius: 1px;
-    margin: 0px;
+	/* Цвет самой линии (дорожки) */
+	background-color: #263440;
+	/* Толщина линии */
+	height: 3px;
+	/* Небольшое скругление краев линии */
+	border-radius: 1px;
+	margin: 0px;
 }
 
 USlider::handle:horizontal {
-    background-color: #8f9ba6;
-    height: 10px;
-    width: 10px;
-    border-radius: 5px;
-    margin: -4px 0;
-    padding: -4px 0px;
+	/* Цвет кружочка (ползунка) */
+	background-color: #8f9ba6;
+	/* Размеры задают квадрат 10x10 пикселей */
+	height: 10px;
+	width: 10px;
+	/* Радиус скругления, равный половине ширины/высоты (10/2 = 5), делает из квадрата идеальный круг */
+	border-radius: 5px;
+	/* Смещаем ползунок вверх и вниз за пределы тонкой дорожки. 
+	   Математика: (Высота ползунка 10px - Высота дорожки 3px) / 2 = 3.5px. 
+	   Округление до 4px (или 3px) центрирует кружок относительно линии. */
+	margin: -4px 0;
 }
 
 
