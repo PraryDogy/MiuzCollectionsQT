@@ -863,7 +863,7 @@ class InputTextWin(UMainWidget):
     ok_clicked = pyqtSignal(str)
     cancel_clicked = pyqtSignal()
 
-    def __init__(self, description: str, svg_icon: str = None):
+    def __init__(self, description: str, svg_path: str = None):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
@@ -879,9 +879,9 @@ class InputTextWin(UMainWidget):
         svg_text_layout.setContentsMargins(5, 0, 10, 0)
         svg_text_layout.setSpacing(5)
 
-        if svg_icon:
+        if svg_path:
             svg_icon = QSvgWidget()
-            svg_icon.load(svg_icon)
+            svg_icon.load(svg_path)
             svg_icon.setFixedSize(20, 20)
             svg_text_layout.addWidget(svg_icon)
 

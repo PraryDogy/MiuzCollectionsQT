@@ -491,17 +491,12 @@ class UserTags(TransparentWidget):
             if text:
                 Filters.items.append(text)
                 Filters.write_json_data()
-                # tag = WordFiltersTagWidget(text)
-                # tag.load_st_grid.connect(self.load_st_grid.emit)
-                # tag.on_trash_clicked.connect(
-                #     lambda w=tag: self.show_remove_tag_win(w)
-                # )
                 self.flow_layout.clear()
                 self._create_tags()
 
         self.text_win = InputTextWin(
             description=Lng.new_tag_desc[JsonData.lng_index],
-            svg_icon=str(self.svg_path)
+            svg_path=str(self.svg_path)
         )
         self.text_win.center_to_parent(self.window())
         self.text_win.ok_clicked.connect(ok_clicked)
