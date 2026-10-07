@@ -101,12 +101,12 @@ class Lng:
     save = ("Сохранить", "Save")
     new_folder = ("Новый каталог", "New catalog")
     enter_alias_warning = (
-        "Поле \"Имя\" обязательно для заполнения",
-        "Alias field is required"
+        "Пожалуйста, введите имя. Это поле не может быть пустым.",
+        "Please enter a name. This field cannot be left blank."
     )
     select_folder_path = (
-        "Укажите путь к каталогу с изображениями",
-        "Select path to the images catalog"
+        "Для продолжения работы необходимо указать путь к папке с изображениями.",
+        "You need to specify the path to the image folder to continue."
     )
     folder_path = ("Путь к каталогу", "Catalog path")
     general = ("Основные", "General")
@@ -155,8 +155,8 @@ class Lng:
     file_name = ("Имя файла", "File name")
     show_about = ("О приложении", "Аbout the app")
     alias_already_exists = (
-        "Имя каталога уже занято",
-        "The catalog name is already taken"
+        "Каталог с таким именем уже существует. Пожалуйста, выберите другое.",
+        "A catalog with this name already exists. Please choose a different one."
     )
     image = ("Изображение", "Image")
     sort_by_mod = ("По дате изменения", "Date modification")
