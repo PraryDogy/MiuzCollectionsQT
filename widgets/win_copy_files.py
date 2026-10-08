@@ -15,88 +15,128 @@ from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
                             WinProgressbar, UCheckBox)
 
 
-class ReplaceFilesWin(UMainWidget):
-    icon_size = 25
-    ww = 330
-    icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QFontMetrics
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
-    replace_one_press = pyqtSignal()
-    replace_all_press = pyqtSignal()
-    stop_pressed = pyqtSignal()
+# твои существующие импорты
+# from ... import UMainWidget, TransparentLabel, TransparentPushButton, QSvgWidget, Lng
 
-    def __init__(self, filename_: str):
-        super().__init__()
-        self.set_always_on_top()
-        self.set_close_only()
+
+class ElidedLabel(TransparentLabel):
+    """Однострочный QLabel с обрезкой текста по центру."""
+
+    def __init__(self, parent=None):
+        super().__init__(text="")
+        self._full_text = ""
+        self.setWordWrap(False)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+
+    def setFullText(self, text: str):
+        self._full_text = text
+        self.setToolTip(text)
+        self._update_text()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._update_text()
+
+    def _update_text(self):
+        if not self._full_text:
+            super().setText("")
+            return
+
+        metrics = QFontMetrics(self.font())
+        text = metrics.elidedText(
+            self._full_text,
+            Qt.TextElideMode.ElideMiddle,
+            self.width(),
+        )
+        super().setText(text)
+
+
+class ReplaceWin(UMainWidget):
+    replace_pressed = pyqtSignal()
+    skip_pressed = pyqtSignal()
+    cancel_pressed = pyqtSignal()
+    warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
+    warn_svg_size = (40, 40)
+
+    def __init__(self, filename: str, parent=None):
+        super().__init__(parent)
+        self.filename = filename
         self.setWindowTitle(Lng.replace[JsonData.lng_index])
-        # self.setFixedWidth(self.ww)
-        self.central_layout.setContentsMargins(10, 0, 10, 10)
-        self.central_layout.setSpacing(10)
+        self.setFixedWidth(430)
+        self._init_ui()
 
-        self.warn_text_widget = TransparentWidget()
-        self.central_layout.addWidget(self.warn_text_widget)
-        self.warn_text_layout = QHBoxLayout(self.warn_text_widget)
-        self.warn_text_layout.setContentsMargins(0, 0, 0, 0)
-        self.warn_text_layout.setSpacing(10)
+    def _init_ui(self):
+        icon_widget = TransparentWidget()
+        self.central_layout.addWidget(icon_widget)
+        icon_layout = QHBoxLayout(icon_widget)
+        icon_layout.setContentsMargins(0, 0, 0, 0)
+        icon_layout.setSpacing(10)
 
-        self.warn_svg_widget = QSvgWidget()
-        self.warn_svg_widget.load(str(self.icon_path))
-        self.warn_svg_widget.setFixedSize(self.icon_size, self.icon_size)
-        self.warn_text_layout.addWidget(self.warn_svg_widget)
+        icon = QSvgWidget()
+        icon.load(str(self.warn_svg))
+        icon.setFixedSize(*self.warn_svg_size)
+        icon_layout.addWidget(icon)
 
-        text = Lng.file_exists[JsonData.lng_index].format(filename=filename_)
-        self.warn_text_widget = TransparentLabel(text)
-        self.warn_text_layout.addWidget(self.warn_text_widget)
+        filename_label = ElidedLabel(self)
+        filename_label.setFullText(self.filename)
+        filename_text = filename_label.text()
 
 
-        btn_wid = TransparentWidget()
-        self.central_layout.addWidget(btn_wid)
+        message = TransparentLabel(
+            Lng.file_exists[JsonData.lng_index].format(filename=filename_text)
+        )
+        icon_layout.addWidget(message)
 
-        btn_lay = QHBoxLayout(btn_wid)
-        btn_lay.setContentsMargins(0, 0, 0, 0)
-        btn_lay.setSpacing(5)
 
-        self.checkbox_widget = UCheckBox(Lng.replace_all[JsonData.lng_index])
-        # self.checkbox_widget.setText(Lng.replace_all[JsonData.lng_index])
-        btn_lay.addWidget(self.checkbox_widget)
+        btns_widget = TransparentWidget()
+        self.central_layout.addWidget(btns_widget)
+        buttons_layout = QHBoxLayout(btns_widget)
+        buttons_layout.setContentsMargins(0, 0, 0, 0)
+        buttons_layout.setSpacing(5)
 
-        btn_lay.addSpacing(25)
-        btn_lay.addStretch()
+        self.replace_all_checkbox = UCheckBox(Lng.replace_all[JsonData.lng_index])
+        self.replace_all_checkbox.setChecked(False)
+        buttons_layout.addWidget(self.replace_all_checkbox)
 
-        stop_btn = UPushButton(Lng.cancel[JsonData.lng_index])
-        stop_btn.clicked.connect(lambda: self.stop_cmd())
-        btn_lay.addWidget(stop_btn)
+        buttons_layout.addStretch(1)
+        buttons_layout.addSpacing(20)
 
-        skip_btn = UPushButton(Lng.skip[JsonData.lng_index])
-        # skip_btn.clicked.connect(lambda: self.stop_cmd())
-        btn_lay.addWidget(skip_btn)
+        self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
+        self.cancel_button.clicked.connect(self._cancel)
+        buttons_layout.addWidget(self.cancel_button)
 
-        replace_one_btn = ActiveButton(Lng.replace_one[JsonData.lng_index])
-        replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
-        btn_lay.addWidget(replace_one_btn)
+        self.skip_button = UPushButton(Lng.skip[JsonData.lng_index])
+        self.skip_button.clicked.connect(self._skip)
+        buttons_layout.addWidget(self.skip_button)
 
-        for i in (stop_btn, skip_btn, replace_one_btn, self.checkbox_widget):
-            i.setFixedHeight(22)
-            i.ensurePolished()
-        
+        self.replace_button = ActiveButton(Lng.replace[JsonData.lng_index])
+        self.replace_button.clicked.connect(self._replace)
+        buttons_layout.addWidget(self.replace_button)
+
+        for i in (self.cancel_button, self.skip_button, self.replace_button):
+            i.setFixedHeight(23)
+
         self.adjustSize()
 
-    def replace_one_cmd(self):
-        self.replace_one_press.emit()
+    def _replace(self):
+        self.replace_pressed.emit()
 
-    def replace_all_cmd(self):
-        self.replace_all_press.emit()
+    def _skip(self):
+        self.skip_pressed.emit()
 
-    def stop_cmd(self):
-        self.stop_pressed.emit()
+    def _cancel(self):
+        self.cancel_pressed.emit()
 
-    def closeEvent(self, a0):
-        self.stop_cmd()
-        return super().closeEvent(a0)
+    def is_replace_all(self) -> bool:
+        return self.replace_all_checkbox.isChecked()
 
-    def deleteLater(self):
-        self.stop_cmd
-        return super().deleteLater()
+    def closeEvent(self, event):
+        self.cancel_pressed.emit()
+        event.accept()
     
 
 class WinCopyFiles(WinProgressbar):
@@ -115,9 +155,19 @@ class WinCopyFiles(WinProgressbar):
 
         self.set_close_only()
 
-        # отладка окон
-        # QTimer.singleShot(300, self.TEST)
-        # return
+        self.target_dir = target_dir
+        self.files_to_copy = files_to_copy
+
+        self.dst_urls: list[str] = []
+
+        self.copy_item: CopyTaskItem | None = None
+        self.replace_win: ReplaceWin | None = None
+
+        self.stopping = False
+
+        # --------------------------------------------------
+        # Labels
+        # --------------------------------------------------
 
         dst_text = os.path.basename(target_dir)
 
@@ -134,9 +184,9 @@ class WinCopyFiles(WinProgressbar):
             Lng.preparing[JsonData.lng_index]
         )
 
-        self.dst_urls: list[str] = []
-        self.copy_item: CopyTaskItem | None = None
-        self.stopping = False
+        # --------------------------------------------------
+        # Copy item
+        # --------------------------------------------------
 
         self.copy_item = CopyTaskItem(
             dst_dir=target_dir,
@@ -150,10 +200,18 @@ class WinCopyFiles(WinProgressbar):
             msg="none",
         )
 
+        # --------------------------------------------------
+        # Worker
+        # --------------------------------------------------
+
         self.copy_task = CopyTaskWorker(
             target=CopyTask.start,
             args=(self.copy_item,),
         )
+
+        # --------------------------------------------------
+        # Timer
+        # --------------------------------------------------
 
         self.copy_timer = QTimer(self)
         self.copy_timer.setSingleShot(True)
@@ -163,26 +221,16 @@ class WinCopyFiles(WinProgressbar):
 
         self.progressbar.setMaximum(100)
 
+        # --------------------------------------------------
+        # Start
+        # --------------------------------------------------
+
         self.copy_task.start()
         self.copy_timer.start(self.ms)
 
-
-    def TEST(self):
-        # отладка
-        self.progressbar.setValue(50)
-
-        self.above_label.setText("above label above label above label")
-        self.below_label.setText("below label below label below label below label")
-
-        self.rel = ReplaceFilesWin(filename_="test.jpg")
-        self.rel.stop_pressed.connect(lambda: os._exit(1))
-        self.rel.show()
-
-        # self.er = WarningWindow(Lng.copy_error[JsonData.lng_index])
-        # self.er.show()
-
-        # self.cancel.connect(self.stop_task)
-        # self.cancel.connect(self.deleteLater)
+    # ======================================================
+    # Queue
+    # ======================================================
 
     def poll_task(self):
         if self.stopping:
@@ -208,7 +256,9 @@ class WinCopyFiles(WinProgressbar):
                 return
 
             if copy_item.msg == "need_replace":
-                self.show_replace_window()
+                self.show_replace_window(
+                    copy_item
+                )
                 return
 
             if copy_item.msg == "finished":
@@ -222,6 +272,10 @@ class WinCopyFiles(WinProgressbar):
             return
 
         self.copy_timer.start(self.ms)
+
+    # ======================================================
+    # Progress
+    # ======================================================
 
     def update_progress(
         self,
@@ -242,59 +296,136 @@ class WinCopyFiles(WinProgressbar):
             " ".join(below_text)
         )
 
-    def show_replace_window(self):
-        self.replace_win = ReplaceFilesWin()
+    # ======================================================
+    # Replace window
+    # ======================================================
+
+    def show_replace_window(
+        self,
+        copy_item: CopyTaskItem,
+    ):
+        if self.stopping:
+            return
+
+        filename = ""
+
+        index = (
+            copy_item.current_file_count - 1
+        )
+
+        if 0 <= index < len(copy_item.src_urls):
+            filename = os.path.basename(
+                copy_item.src_urls[index]
+            )
+
+        self.replace_win = ReplaceWin(
+            filename=filename
+        )
 
         self.replace_win.center_to_parent(self)
 
-        self.replace_win.replace_all_press.connect(
-            self.replace_all
+        self.replace_win.replace_pressed.connect(
+            self.replace_file
         )
 
-        self.replace_win.replace_one_press.connect(
-            self.replace_one
+        self.replace_win.skip_pressed.connect(
+            self.skip_file
         )
 
-        self.replace_win.stop_pressed.connect(
-            self.stop_pressed
+        self.replace_win.cancel_pressed.connect(
+            self.cancel_from_replace
         )
 
         self.replace_win.show()
 
-    def replace_one(self):
+    # ======================================================
+    # Replace
+    # ======================================================
+
+    def replace_file(self):
         if self.stopping:
             return
 
-        self.replace_win.deleteLater()
+        replace_all = (
+            self.replace_win
+            and self.replace_win.replace_all_checkbox.isChecked()
+        )
 
-        self.copy_task.replace_one()
+        self.close_replace_window()
+
+        if replace_all:
+            self.copy_task.replace_all()
+        else:
+            self.copy_task.replace_one()
 
         self.copy_timer.start(self.ms)
 
-    def replace_all(self):
+    # ======================================================
+    # Skip
+    # ======================================================
+
+    def skip_file(self):
         if self.stopping:
             return
 
-        self.replace_win.deleteLater()
+        self.close_replace_window()
 
-        self.copy_task.replace_all()
+        self.copy_task.skip()
 
         self.copy_timer.start(self.ms)
 
-    def stop_pressed(self):
-        if hasattr(self, "replace_win"):
-            self.replace_win.deleteLater()
+    # ======================================================
+    # Cancel
+    # ======================================================
+
+    def cancel_from_replace(self):
+        if self.stopping:
+            return
+
+        self.close_replace_window()
 
         self.stop_task()
         self.deleteLater()
 
+    # ======================================================
+    # Close ReplaceWin
+    # ======================================================
+
+    def close_replace_window(self):
+        if self.replace_win is None:
+            return
+
+        self.replace_win.blockSignals(True)
+        self.replace_win.close()
+        self.replace_win.deleteLater()
+        self.replace_win = None
+
+    # ======================================================
+    # Error
+    # ======================================================
+
     def show_error(self):
-        self.error_win = WarningWindow(Lng.copy_error[JsonData.lng_index])
-        self.error_win.center_to_parent(self.window())
+        if self.stopping:
+            return
+
+        self.close_replace_window()
+
+        self.error_win = WarningWindow(
+            Lng.copy_error[JsonData.lng_index]
+        )
+
+        self.error_win.center_to_parent(
+            self.window()
+        )
+
         self.error_win.show()
 
         self.stop_task()
         self.deleteLater()
+
+    # ======================================================
+    # Finish
+    # ======================================================
 
     def finish_task(self):
         if self.stopping:
@@ -307,31 +438,52 @@ class WinCopyFiles(WinProgressbar):
         if self.copy_item:
             below_text = (
                 self.windowTitle(),
-                str(self.copy_item.total_file_count),
+                str(
+                    self.copy_item.total_file_count
+                ),
                 Lng.from_[JsonData.lng_index],
-                str(self.copy_item.total_file_count),
+                str(
+                    self.copy_item.total_file_count
+                ),
             )
 
             self.below_label.setText(
                 " ".join(below_text)
             )
 
-        self.finished_.emit(self.dst_urls)
+        self.finished_.emit(
+            self.dst_urls
+        )
 
         self.stop_task()
         self.deleteLater()
+
+    # ======================================================
+    # Stop
+    # ======================================================
 
     def stop_task(self):
         if self.stopping:
             return
 
         self.stopping = True
+
         self.copy_timer.stop()
+
+        if self.replace_win is not None:
+            self.replace_win.blockSignals(True)
+            self.replace_win.close()
+            self.replace_win.deleteLater()
+            self.replace_win = None
 
         if self.copy_task.is_alive():
             self.copy_task.cancel()
 
         self.copy_task.terminate_join()
+
+    # ======================================================
+    # Close
+    # ======================================================
 
     def closeEvent(self, event):
         self.stop_task()
