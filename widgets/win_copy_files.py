@@ -12,7 +12,7 @@ from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
                             UMainWidget, UPushButton, WarningWindow,
-                            WinProgressbar, UCheckBox)
+                            WinProgressbar, UCheckBox, GrayTextLabel)
 
 
 from PyQt6.QtCore import Qt, pyqtSignal
@@ -20,14 +20,26 @@ from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 
-class ElidedLabel(TransparentLabel):
-    """Однострочный QLabel с обрезкой текста по центру."""
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QFontMetrics
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QSizePolicy
 
-    def __init__(self, parent=None):
+
+class ElidedLabel(GrayTextLabel):
+    def __init__(self):
         super().__init__(text="")
+
         self._full_text = ""
+
         self.setWordWrap(False)
-        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+
+        self.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+        )
 
     def setFullText(self, text: str):
         self._full_text = text
@@ -43,12 +55,19 @@ class ElidedLabel(TransparentLabel):
             super().setText("")
             return
 
+        width = self.contentsRect().width()
+
+        if width <= 0:
+            return
+
         metrics = QFontMetrics(self.font())
+
         text = metrics.elidedText(
             self._full_text,
             Qt.TextElideMode.ElideMiddle,
-            self.width(),
+            width,
         )
+
         super().setText(text)
 
 
@@ -56,71 +75,193 @@ class ReplaceWin(UMainWidget):
     replace_pressed = pyqtSignal()
     skip_pressed = pyqtSignal()
     cancel_pressed = pyqtSignal()
+
     warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
-    warn_svg_size = (35, 35)
+    warn_svg_size = (45, 45)
+    ww = 360
 
     def __init__(self, filename: str, parent=None):
         super().__init__(parent)
+
         self.filename = filename
-        self.setWindowTitle(Lng.replace[JsonData.lng_index])
-        # self.setFixedWidth(350)
-        self.central_layout.setContentsMargins(10, 5, 10, 5)
+
+        self.setWindowTitle(
+            Lng.replace[JsonData.lng_index]
+        )
+
+        self.central_layout.setContentsMargins(
+            10, 5, 10, 5
+        )
         self.central_layout.setSpacing(5)
+
         self._init_ui()
+        self.set_close_only()
+        self.setFixedWidth(self.ww)
         self.adjustSize()
+        self.setFixedHeight(self.height())
 
     def _init_ui(self):
+        # =========================================================
+        # Верхняя часть: иконка + текст
+        # =========================================================
+
         icon_widget = TransparentWidget()
         self.central_layout.addWidget(icon_widget)
+
         icon_layout = QHBoxLayout(icon_widget)
         icon_layout.setContentsMargins(0, 0, 0, 0)
         icon_layout.setSpacing(10)
 
+        # ---------------------------------------------------------
+        # Warning icon
+        # ---------------------------------------------------------
+
         icon = QSvgWidget()
         icon.load(str(self.warn_svg))
         icon.setFixedSize(*self.warn_svg_size)
-        icon_layout.addWidget(icon)
+
+        icon_layout.addWidget(
+            icon,
+            alignment=Qt.AlignmentFlag.AlignTop,
+        )
+
+        # ---------------------------------------------------------
+        # Text
+        # ---------------------------------------------------------
 
         text_widget = TransparentWidget()
-        icon_layout.addWidget(text_widget)
+        text_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+
+        icon_layout.addWidget(
+            text_widget,
+            1,
+        )
+
         text_layout = QVBoxLayout(text_widget)
         text_layout.setContentsMargins(0, 0, 0, 0)
         text_layout.setSpacing(1)
 
-        filename_label = ElidedLabel()
-        filename_label.setFullText(f"\"{self.filename}\"")
-        text_layout.addWidget(filename_label)
+        # ---------------------------------------------------------
+        # Filename
+        # ---------------------------------------------------------
 
-        message = TransparentLabel(Lng.file_exists[JsonData.lng_index])
-        text_layout.addWidget(message) 
+        self.filename_label = ElidedLabel()
+
+        self.filename_label.setFullText(
+            self.filename
+        )
+
+        text_layout.addWidget(
+            self.filename_label
+        )
+
+        # ---------------------------------------------------------
+        # Message
+        # ---------------------------------------------------------
+
+        message = GrayTextLabel(
+            Lng.file_exists[JsonData.lng_index]
+        )
+
+        message.setWordWrap(False)
+
+        text_layout.addWidget(
+            message
+        )
+
+        # =========================================================
+        # Buttons
+        # =========================================================
 
         btns_widget = TransparentWidget()
         self.central_layout.addWidget(btns_widget)
+
         buttons_layout = QHBoxLayout(btns_widget)
         buttons_layout.setContentsMargins(0, 0, 0, 0)
         buttons_layout.setSpacing(5)
 
-        self.replace_all_checkbox = UCheckBox(Lng.replace_all[JsonData.lng_index])
+        # ---------------------------------------------------------
+        # Replace all
+        # ---------------------------------------------------------
+
+        self.replace_all_checkbox = UCheckBox(
+            Lng.replace_all[JsonData.lng_index]
+        )
+
         self.replace_all_checkbox.setChecked(False)
-        buttons_layout.addWidget(self.replace_all_checkbox)
+
+        buttons_layout.addWidget(
+            self.replace_all_checkbox
+        )
 
         buttons_layout.addStretch(1)
         buttons_layout.addSpacing(20)
 
-        self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
-        self.cancel_button.clicked.connect(self._cancel)
-        buttons_layout.addWidget(self.cancel_button)
+        # ---------------------------------------------------------
+        # Cancel
+        # ---------------------------------------------------------
 
-        self.skip_button = UPushButton(Lng.skip[JsonData.lng_index])
-        self.skip_button.clicked.connect(self._skip)
-        buttons_layout.addWidget(self.skip_button)
+        self.cancel_button = UPushButton(
+            Lng.cancel[JsonData.lng_index]
+        )
 
-        self.replace_button = ActiveButton(Lng.replace[JsonData.lng_index])
-        self.replace_button.clicked.connect(self._replace)
-        buttons_layout.addWidget(self.replace_button)
+        self.cancel_button.clicked.connect(
+            self._cancel
+        )
 
-        for i in (self.cancel_button, self.skip_button, self.replace_button):
-            i.setFixedHeight(23)
+        buttons_layout.addWidget(
+            self.cancel_button
+        )
+
+        # ---------------------------------------------------------
+        # Skip
+        # ---------------------------------------------------------
+
+        self.skip_button = UPushButton(
+            Lng.skip[JsonData.lng_index]
+        )
+
+        self.skip_button.clicked.connect(
+            self._skip
+        )
+
+        buttons_layout.addWidget(
+            self.skip_button
+        )
+
+        # ---------------------------------------------------------
+        # Replace
+        # ---------------------------------------------------------
+
+        self.replace_button = ActiveButton(
+            Lng.replace[JsonData.lng_index]
+        )
+
+        self.replace_button.clicked.connect(
+            self._replace
+        )
+
+        buttons_layout.addWidget(
+            self.replace_button
+        )
+
+        # ---------------------------------------------------------
+        # Button size
+        # ---------------------------------------------------------
+
+        for button in (
+            self.cancel_button,
+            self.skip_button,
+            self.replace_button,
+        ):
+            button.setFixedHeight(23)
+
+    # =============================================================
+    # Actions
+    # =============================================================
 
     def _replace(self):
         self.replace_pressed.emit()
@@ -131,8 +272,16 @@ class ReplaceWin(UMainWidget):
     def _cancel(self):
         self.cancel_pressed.emit()
 
+    # =============================================================
+    # Public API
+    # =============================================================
+
     def is_replace_all(self) -> bool:
         return self.replace_all_checkbox.isChecked()
+
+    # =============================================================
+    # Window events
+    # =============================================================
 
     def closeEvent(self, event):
         self.cancel_pressed.emit()
