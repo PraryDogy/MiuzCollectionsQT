@@ -12,7 +12,8 @@ class SettingsItem:
 
 @dataclass(slots=True)
 class DataItem:
-    qimage: QImage
+    src_qimage: QImage
+    resized_qimage: QImage
     rel_path: str
     fav: bool
     month_year: str

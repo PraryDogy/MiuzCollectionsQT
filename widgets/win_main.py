@@ -330,7 +330,7 @@ class WinMain(UMainWindow):
                         transformMode=Qt.TransformationMode.SmoothTransformation
                     )
                     qimage_scaled.setDevicePixelRatio(Utils.DPR)
-                    wid.data_item.qimage = qimage_scaled
+                    wid.data_item.resized_qimage = qimage_scaled
                     wid.set_pixmap_with_actual_size()
                     wid.img_wid.restore_image()
   

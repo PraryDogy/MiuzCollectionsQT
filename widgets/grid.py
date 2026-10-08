@@ -190,7 +190,7 @@ class Thumb(TransparentFrame):
             Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
     def set_pixmap_with_actual_size(self):
-        pixmap = QPixmap.fromImage(self.data_item.qimage)
+        pixmap = QPixmap.fromImage(self.data_item.resized_qimage)
         self.img_wid.clear()
         self.img_wid.setPixmap(pixmap)
 
@@ -1050,7 +1050,8 @@ class GridStandart(Grid):
         Thumb.calculate_size()
         for image_item in db_images:
             data_item = DataItem(
-                qimage=image_item.qimage,
+                src_qimage=image_item.src_qimage,
+                resized_qimage=image_item.resized_qimage,
                 rel_path=image_item.rel_img_path,
                 fav=image_item.fav,
                 month_year=image_item.month_year,

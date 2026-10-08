@@ -85,7 +85,8 @@ class DbImagesLoaderItem:
     rel_img_path: str
     rel_thumb_path: str
     fav: int
-    qimage: QImage
+    src_qimage: QImage
+    resized_qimage: QImage
     day_month_year: str
     month_year: str
 
@@ -133,17 +134,25 @@ class DbImagesLoader(URunnable):
             # qimages = []
             img_bgr = cv2.imread(abs_thumb_path_)
             img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+            # fitted_img = ImgUtils.fit_to_thumb(img_rgb, Static.THUMB_MAX_SIZE * 3)
 
             ind = Dynamic.current_pixmap_size_index
-            current_size = Static.THUMB_WID_PIXMAP_SIZE[ind] * Utils.DPR
+            current_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
 
-            qimage = Utils.pyqt_qimage_from_array(img_rgb)
-            qimage_scaled = qimage.scaled(
-                current_size, current_size,
+            src_qimage = Utils.pyqt_qimage_from_array(img_rgb)
+            # src_qimage = src_qimage.scaled(
+            #     Static.THUMB_MAX_SIZE * 2, Static.THUMB_MAX_SIZE * 2,
+            #     aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+            #     transformMode=Qt.TransformationMode.SmoothTransformation
+            # )
+            # src_qimage.setDevicePixelRatio(Utils.DPR)
+
+            resized_qimage = src_qimage.scaled(
+                current_size * 3, current_size * 3,
                 aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
                 transformMode=Qt.TransformationMode.SmoothTransformation
             )
-            qimage_scaled.setDevicePixelRatio(Utils.DPR)
+            resized_qimage.setDevicePixelRatio(3)
 
             date_ = datetime.fromtimestamp(mod).date()
             month_ = Lng.months[JsonData.lng_index][str(date_.month)]
@@ -155,7 +164,8 @@ class DbImagesLoader(URunnable):
                 rel_img_path=rel_img_path,
                 rel_thumb_path=rel_thumb_path,
                 fav=fav,
-                qimage=qimage_scaled,
+                resized_qimage=resized_qimage,
+                src_qimage=resized_qimage,
                 day_month_year=day_month_year,
                 month_year=month_year
             )
