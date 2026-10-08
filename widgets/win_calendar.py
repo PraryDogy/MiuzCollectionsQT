@@ -107,13 +107,14 @@ class WinCalendar(UMainWidget):
 	svg_previous_path = Static.COMMON_ICONS / "arrow_left.svg"
 	svg_next_path = Static.COMMON_ICONS / "arrow_right.svg"
 	svg_blue_circle_path = Static.COMMON_ICONS / "blue_circle.svg"
+	svg_gray_circle_path = Static.COMMON_ICONS / "gray_circle.svg"
 
 	min_year = 2015
 
 	cell_size = (45, 35)
 	svg_nav_size = (23, 23)
 	svg_calendar_size = (15, 15)
-	svg_blue_circle_size = (27, 27)
+	svg_circle_size = (27, 27)
 
 	def __init__(self, date: QDate):
 		super().__init__()
@@ -126,8 +127,12 @@ class WinCalendar(UMainWidget):
 			country = QLocale.Country.UnitedStates
 
 		qimg = QImage(str(self.svg_blue_circle_path))
-		qimg_scaled = Utils.qimage_scaled_high_dpi(qimg, self.svg_blue_circle_size[0])
+		qimg_scaled = Utils.qimage_scaled_high_dpi(qimg, self.svg_circle_size[0])
 		self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
+
+		qimg = QImage(str(self.svg_gray_circle_path))
+		qimg_scaled = Utils.qimage_scaled_high_dpi(qimg, self.svg_circle_size[0])
+		self.gray_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
 		self.base_date = date
 		self.q_locale = QLocale(lng, country)
@@ -423,6 +428,17 @@ class WinCalendar(UMainWidget):
 						btn_day = CalendarDaySelected(str(day_num), d_date)
 						btn_day.setFixedSize(*self.cell_size)
 						btn_day.setPixmap(self.blue_circle_pixmap)
+
+						btn_day_text = TransparentLabel(
+							text=str(day_num),
+							parent=btn_day
+						)
+						btn_day_text.setGeometry(btn_day.rect())
+						btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+					elif d_date == QDate.currentDate():
+						btn_day = CalendarDay(str(day_num), d_date)
+						btn_day.setFixedSize(*self.cell_size)
+						btn_day.setPixmap(self.gray_circle_pixmap)
 
 						btn_day_text = TransparentLabel(
 							text=str(day_num),
