@@ -1,5 +1,5 @@
 from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap
+from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
@@ -108,6 +108,7 @@ class WinCalendar(UMainWidget):
 	svg_next_path = Static.COMMON_ICONS / "arrow_right.svg"
 	svg_blue_circle_path = Static.COMMON_ICONS / "blue_circle.svg"
 	svg_gray_circle_path = Static.COMMON_ICONS / "gray_circle.svg"
+	svg_reset_path = Static.COMMON_ICONS / "reset.svg"
 
 	min_year = 2015
 
@@ -171,6 +172,12 @@ class WinCalendar(UMainWidget):
 		self.dynamic_label = TransparentLabel()
 		dynamic_container_lay.addWidget(self.dynamic_label)
 		dynamic_container_lay.addStretch(1)
+
+		reset_icon = QIcon(str(self.svg_reset_path))
+		self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
+		self.reset_button.clicked.connect(self.reset_button_cmd)
+		self.reset_button.setIcon(reset_icon)
+		dynamic_container_lay.addWidget(self.reset_button)
 
 		self.central_layout.addSpacing(spacing)
 		self.central_layout.addWidget(USep())
@@ -247,11 +254,11 @@ class WinCalendar(UMainWidget):
 		self.btn_container_layout.setSpacing(10)
 		self.btn_container_layout.addStretch(1)
 
-		self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
-		self.reset_button.clicked.connect(self.reset_button_cmd)
-		self.btn_container_layout.addWidget(self.reset_button)
+		cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		cancel_btn.clicked.connect(self.deleteLater)
+		self.btn_container_layout.addWidget(cancel_btn)
 
-		self.done_btn = ActiveButton(Lng.done[JsonData.lng_index])
+		self.done_btn = ActiveButton(Lng.apply[JsonData.lng_index])
 		self.done_btn.clicked.connect(self.ok_btn_cmd)
 		self.btn_container_layout.addWidget(self.done_btn)
 
