@@ -19,9 +19,6 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
-# твои существующие импорты
-# from ... import UMainWidget, TransparentLabel, TransparentPushButton, QSvgWidget, Lng
-
 
 class ElidedLabel(TransparentLabel):
     """Однострочный QLabel с обрезкой текста по центру."""
@@ -60,14 +57,17 @@ class ReplaceWin(UMainWidget):
     skip_pressed = pyqtSignal()
     cancel_pressed = pyqtSignal()
     warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
-    warn_svg_size = (40, 40)
+    warn_svg_size = (35, 35)
 
     def __init__(self, filename: str, parent=None):
         super().__init__(parent)
         self.filename = filename
         self.setWindowTitle(Lng.replace[JsonData.lng_index])
-        self.setFixedWidth(430)
+        # self.setFixedWidth(350)
+        self.central_layout.setContentsMargins(10, 5, 10, 5)
+        self.central_layout.setSpacing(5)
         self._init_ui()
+        self.adjustSize()
 
     def _init_ui(self):
         icon_widget = TransparentWidget()
@@ -81,16 +81,18 @@ class ReplaceWin(UMainWidget):
         icon.setFixedSize(*self.warn_svg_size)
         icon_layout.addWidget(icon)
 
-        filename_label = ElidedLabel(self)
-        filename_label.setFullText(self.filename)
-        filename_text = filename_label.text()
+        text_widget = TransparentWidget()
+        icon_layout.addWidget(text_widget)
+        text_layout = QVBoxLayout(text_widget)
+        text_layout.setContentsMargins(0, 0, 0, 0)
+        text_layout.setSpacing(1)
 
+        filename_label = ElidedLabel()
+        filename_label.setFullText(f"\"{self.filename}\"")
+        text_layout.addWidget(filename_label)
 
-        message = TransparentLabel(
-            Lng.file_exists[JsonData.lng_index].format(filename=filename_text)
-        )
-        icon_layout.addWidget(message)
-
+        message = TransparentLabel(Lng.file_exists[JsonData.lng_index])
+        text_layout.addWidget(message) 
 
         btns_widget = TransparentWidget()
         self.central_layout.addWidget(btns_widget)
@@ -119,8 +121,6 @@ class ReplaceWin(UMainWidget):
 
         for i in (self.cancel_button, self.skip_button, self.replace_button):
             i.setFixedHeight(23)
-
-        self.adjustSize()
 
     def _replace(self):
         self.replace_pressed.emit()

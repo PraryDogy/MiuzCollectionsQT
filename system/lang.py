@@ -232,8 +232,8 @@ class Lng:
     stop = ("Стоп", "Stop")
     replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
     file_exists = (
-        "Файл с именем {filename} уже существует", 
-        "A file named {filename} already exists",
+        "Файл с таким именем уже существует", 
+        "A file with this name already exists",
     )
     copy_error = (
         "Произошла ошибка при копировании. Пожалуйста, попробуйте еще раз.",
