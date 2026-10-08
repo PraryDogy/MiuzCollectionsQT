@@ -296,7 +296,8 @@ class WinImageView(UMainWidget):
             i.raise_()
 
     def load_thumb(self):
-        qimage = self.current_data_item.qimages[-1]
+        qimage = self.current_data_item.qimage
+        # qimage = qimage.scaled(5000, 5000, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio)
         pixmap = QPixmap.fromImage(qimage)
         self.restart_img_wid(pixmap)
 
