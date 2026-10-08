@@ -427,7 +427,7 @@ class TagsWidget(TransparentWidget):
         self._create_tags()
 
     def _create_tags(self):
-        if Dynamic.py_date_start:
+        if Dynamic.py_date_start or Dynamic.py_date_end:
             tag = GridDatesTag()
             tag.right_svg_clicked.connect(self.load_st_grid.emit)
             tag.text_clicked.connect(self.open_filters_win.emit)
@@ -535,6 +535,7 @@ class Grid(UScrollVerticalArea):
 
         has_filters = any((
             Dynamic.py_date_start,
+            Dynamic.py_date_end,
             Dynamic.word_tags_list,
             Dynamic.favs_tag_enabled,
             Dynamic.no_subfolders_tag_enabled,
