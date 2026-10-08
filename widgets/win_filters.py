@@ -53,23 +53,14 @@ class WinFiltersTitleWidget(QWidget):
             layout.addWidget(self.reset_button)
 
 
-class DatesButton(UPushButton):
-    def __init__(self, text=""):
-        super().__init__(text)
-        
-        # Правильный способ задать фиксированную ширину под дату
-        fm = self.fontMetrics()
-        # Берем строку с запасом (с пробелами), чтобы текст не прилипал к краям
-        max_width = fm.horizontalAdvance(Lng.not_selected[JsonData.lng_index])
-        
-        # Добавляем 20px на внутренние отступы (padding/borders) кнопки
-        self.setFixedWidth(max_width + 20)
-
-
-class WinFiltersDatesDynamic(TransparentLabel):
-
-    def __init__(self, text: str):
-        super().__init__(text)
+class CalendarTag(UTagWidget):
+    def __init__(self):
+        super().__init__(
+            text=Lng.not_selected[JsonData.lng_index],
+            qss_style=self.qss_gray,
+        )
+        self.adjustSize()
+        self.setFixedWidth(self.width())
 
 
 class DatesWidget(UGroupBox):
@@ -125,7 +116,7 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(5)
 
-        self.dynamic_label = WinFiltersDatesDynamic(Lng.selected_dates[JsonData.lng_index])
+        self.dynamic_label = TransparentLabel(Lng.selected_dates[JsonData.lng_index])
         dynamic_container_lay.addWidget(self.dynamic_label)
 
         self.main_layout.addWidget(dynamic_container)
@@ -156,18 +147,18 @@ class DatesWidget(UGroupBox):
         from_label = GrayTextLabel(Lng.start_date[ind])
         self.date_btns_layout.addWidget(from_label)
 
-        self.date_start_btn = DatesButton("")
-        self.date_start_btn.clicked.connect(lambda: self.show_calendar_win("start"))
-        self.date_btns_layout.addWidget(self.date_start_btn)
+        self.left_calendar_tag = CalendarTag()
+        self.left_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("start"))
+        self.date_btns_layout.addWidget(self.left_calendar_tag)
 
         self.date_btns_layout.addSpacing(10)
 
         to_label = GrayTextLabel(Lng.end_date[ind])
         self.date_btns_layout.addWidget(to_label)
 
-        self.date_end_btn = DatesButton("")
-        self.date_end_btn.clicked.connect(lambda: self.show_calendar_win("end"))
-        self.date_btns_layout.addWidget(self.date_end_btn)
+        self.right_calendar_tag = CalendarTag()
+        self.right_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("end"))
+        self.date_btns_layout.addWidget(self.right_calendar_tag)
 
         self.date_btns_layout.addStretch(1)
         self.main_layout.addWidget(self.date_btns_widget)
@@ -242,11 +233,15 @@ class DatesWidget(UGroupBox):
 
         if self.is_all_time():
             empty_text = Lng.not_selected[ind]
-            self.date_start_btn.setText(empty_text)
-            self.date_end_btn.setText(empty_text)
+            for i in (self.left_calendar_tag, self.right_calendar_tag):
+                i.text_widget.setText(empty_text)
+                i.text_widget.setText(empty_text)
+                i.set_qss_style(i.qss_gray)
         else:
-            self.date_start_btn.setText(self.date_digits(self.q_date_start))
-            self.date_end_btn.setText(self.date_digits(self.q_date_end))
+            for i in (self.left_calendar_tag, self.right_calendar_tag):
+                i.text_widget.setText(self.date_digits(self.q_date_start))
+                i.text_widget.setText(self.date_digits(self.q_date_end))
+                i.set_qss_style(i.qss_green)
 
     def update_readable_date_label(self):
         ind = JsonData.lng_index
@@ -297,26 +292,25 @@ class DatesWidget(UGroupBox):
         self.handle_preset_change()
 
 
-class WinFiltersTag(UTagWidget):
+class WinFiltersUserTag(UTagWidget):
     right_svg_path = Static.COMMON_ICONS / "trash.svg"
 
     def __init__(self, text: str, left_svg_path: str):
         super().__init__(
+            text=text,
             qss_style=UTagWidget.qss_gray,
             left_svg_path=left_svg_path,
-            text=text,
             right_svg_path=str(self.right_svg_path)
         )
 
 
-class WinFiltersStantartTag(WinFiltersTag):
+class WinFiltersStantartTag(UTagWidget):
     def __init__(self, text: str, left_svg_path: str):
         super().__init__(
             text=text,
+            qss_style=self.qss_gray,
             left_svg_path=left_svg_path
         )
-        self.right_svg_widget.setVisible(False)
-        self.set_low_right_spacing()
 
 
 class WinFiltersFavTag(WinFiltersStantartTag):
@@ -361,7 +355,7 @@ class SubfoldersTagWidget(WinFiltersStantartTag):
         return super().text_widget_cmd(*args)
 
 
-class WordFiltersTagWidget(WinFiltersTag):
+class WordFiltersTagWidget(WinFiltersUserTag):
     left_svg_path = Static.COMMON_ICONS / "tags.svg"
 
     def __init__(self, text):
@@ -382,19 +376,16 @@ class WordFiltersTagWidget(WinFiltersTag):
         return super().text_widget_cmd(*args)
 
 
-class AddTagWidget(WinFiltersTag):
+class AddTagWidget(UTagWidget):
     left_svg_path =  Static.COMMON_ICONS / "plus_simple.svg"
     left_svg_size = (12, 12)
 
     def __init__(self):
         super().__init__(
             text=Lng.new_tag[JsonData.lng_index],
+            qss_style=self.qss_transparent,
             left_svg_path=str(self.left_svg_path)
         )
-        self.set_qss_style(self.qss_transparent)
-        self.right_svg_widget.setVisible(False)
-        self.set_low_right_spacing()
-        self.left_svg_widget.setFixedSize(*self.left_svg_size)
 
 
 class StandartTags(TransparentWidget):

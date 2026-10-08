@@ -483,7 +483,12 @@ class UTagWidget(TransparentFrame):
     base_right_spacing = 7
     low_right_spacing = 3
 
-    def __init__(self, qss_style: str, left_svg_path: str, text: str, right_svg_path: str):
+    def __init__(
+              self, text: str,
+              qss_style: str,
+              left_svg_path: str = None,
+              right_svg_path: str = None
+            ):
         super().__init__()
         self.qss_style = qss_style
         self.setFixedHeight(self.tag_height)
@@ -494,28 +499,31 @@ class UTagWidget(TransparentFrame):
         self.h_lay = QHBoxLayout(self)
         self.h_lay.setContentsMargins(7, 2, self.base_right_spacing, 2)
         self.h_lay.setSpacing(6)
+        self.h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.left_svg_widget = QSvgWidget()
-        self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
-        self.left_svg_widget.load(left_svg_path)
-        self.left_svg_widget.setFixedSize(*self.left_svg_size)
-        self.h_lay.addWidget(self.left_svg_widget)
+        if left_svg_path:
+            self.left_svg_widget = QSvgWidget()
+            self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
+            self.left_svg_widget.load(left_svg_path)
+            self.left_svg_widget.setFixedSize(*self.left_svg_size)
+            self.h_lay.addWidget(self.left_svg_widget)
 
         self.text_widget = TransparentLabel(text)
         self.text_widget.mouseReleaseEvent = self.text_widget_cmd
         self.h_lay.addWidget(self.text_widget)
 
-        right_svg_wrapper = TransparentWidget()
-        self.h_lay.addWidget(right_svg_wrapper)
-        self.right_svg_lay = QVBoxLayout(right_svg_wrapper)
-        self.right_svg_lay.setContentsMargins(0, 0, 0, 0)
-        self.right_svg_lay.setSpacing(0)
+        if right_svg_path:
+            right_svg_wrapper = TransparentWidget()
+            self.h_lay.addWidget(right_svg_wrapper)
+            self.right_svg_lay = QVBoxLayout(right_svg_wrapper)
+            self.right_svg_lay.setContentsMargins(0, 0, 0, 0)
+            self.right_svg_lay.setSpacing(0)
 
-        self.right_svg_widget = QSvgWidget()
-        self.right_svg_widget.mouseReleaseEvent = self.right_svg_cmd
-        self.right_svg_widget.load(right_svg_path)
-        self.right_svg_widget.setFixedSize(*self.right_svg_size)
-        self.right_svg_lay.addWidget(self.right_svg_widget)
+            self.right_svg_widget = QSvgWidget()
+            self.right_svg_widget.mouseReleaseEvent = self.right_svg_cmd
+            self.right_svg_widget.load(right_svg_path)
+            self.right_svg_widget.setFixedSize(*self.right_svg_size)
+            self.right_svg_lay.addWidget(self.right_svg_widget)
 
     def set_qss_style(self, qss_style: str):
         self.qss_style = qss_style
