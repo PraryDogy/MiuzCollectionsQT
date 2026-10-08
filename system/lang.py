@@ -405,6 +405,7 @@ class Lng:
     )
     choose_period = ("Выбрать период", "Choose period")
     period = ("Период", "Period")
+    selected_dates = ("Выбранные даты", "Selected dates")
     all_time = ("За все время", "All time")
     from_text = ("С", "From")
     to_text = ("По", "To")

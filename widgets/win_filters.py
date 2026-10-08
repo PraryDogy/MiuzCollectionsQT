@@ -66,38 +66,10 @@ class DatesButton(UPushButton):
         self.setFixedWidth(max_width + 20)
 
 
-class WinFiltersDatesTag(UTagWidget):
-    right_svg_path = Static.COMMON_ICONS / "cancel.svg"
-    left_svg_path = Static.COMMON_ICONS / "tags.svg" 
-    right_svg_size = (12, 12)
+class WinFiltersDatesDynamic(TransparentLabel):
 
     def __init__(self, text: str):
-        super().__init__(
-            qss_style=self.qss_gray,
-            left_svg_path=str(self.left_svg_path),
-            text=text,
-            right_svg_path=str(self.right_svg_path)
-        )
-        self.right_svg_widget.setFixedSize(*self.right_svg_size)
-        self.right_svg_lay.setContentsMargins(0, 1, 0, 0)
-
-    def set_active(self, active: bool):
-        if active:
-            self.set_qss_style(self.qss_green)
-            self.set_base_right_spacing()
-        else:
-            self.set_qss_style(self.qss_gray)
-            self.set_low_right_spacing()
-        self.right_svg_widget.setVisible(active)
-
-    def clear_data(self):
-        Dynamic.py_date_start = None
-        Dynamic.py_date_end = None
-
-    def right_svg_cmd(self, *args):
-        self.clear_data()
-        self.set_active(False)
-        return super().right_svg_cmd(*args)
+        super().__init__(text)
 
 
 class DatesWidget(UGroupBox):
@@ -153,21 +125,11 @@ class DatesWidget(UGroupBox):
         dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
         dynamic_container_lay.setSpacing(5)
 
-        self.dates_period_tag = WinFiltersDatesTag(text="")
-        self.dates_period_tag.text_clicked.connect(self.show_tag_menu)
-        self.dates_period_tag.right_svg_clicked.connect(lambda: self.reset_all(True))
-        self.dates_period_tag.set_active(Dynamic.py_date_start is not None)
-
-        dynamic_container_lay.addWidget(self.dates_period_tag)
-        dynamic_container_lay.addStretch()
+        self.dynamic_label = WinFiltersDatesDynamic(Lng.selected_dates[JsonData.lng_index])
+        dynamic_container_lay.addWidget(self.dynamic_label)
 
         self.main_layout.addWidget(dynamic_container)
-        self.main_layout.addWidget(USep())
-
-        self.top_row_widget = TransparentWidget()
-        self.top_row_layout = QHBoxLayout(self.top_row_widget)
-        self.top_row_layout.setContentsMargins(0, 0, 0, 0)
-        self.top_row_layout.setSpacing(0)
+        self.main_layout.addSpacing(5)
 
         self.preset_menu = UMenu(parent=self)
 
@@ -178,44 +140,43 @@ class DatesWidget(UGroupBox):
             )
             self.preset_menu.addAction(action)
 
-        self.preset_menu.addSeparator()
-
-        action = QAction(Lng.reset[ind], self.preset_menu)
-        action.triggered.connect(lambda: self.reset_all(True))
-        self.preset_menu.addAction(action)
-
         # КНОПКИ КАЛЕНДАРЕЙ
 
+        self.date_btns_widget = TransparentWidget()
+        self.date_btns_layout = QHBoxLayout(self.date_btns_widget)
+        self.date_btns_layout.setContentsMargins(0, 0, 0, 0)
+        self.date_btns_layout.setSpacing(5)
+
+        dates_btn = UPushButton(Lng.period[JsonData.lng_index])
+        dates_btn.setMenu(self.preset_menu)
+        self.date_btns_layout.addWidget(dates_btn)
+
+        self.date_btns_layout.addSpacing(10)
+
         from_label = GrayTextLabel(Lng.start_date[ind])
-        self.top_row_layout.addWidget(from_label)
-        self.top_row_layout.addSpacing(5)
+        self.date_btns_layout.addWidget(from_label)
 
         self.date_start_btn = DatesButton("")
         self.date_start_btn.clicked.connect(lambda: self.show_calendar_win("start"))
-        self.top_row_layout.addWidget(self.date_start_btn)
+        self.date_btns_layout.addWidget(self.date_start_btn)
 
-        self.top_row_layout.addSpacing(30)
+        self.date_btns_layout.addSpacing(10)
 
         to_label = GrayTextLabel(Lng.end_date[ind])
-        self.top_row_layout.addWidget(to_label)
-        self.top_row_layout.addSpacing(5)
+        self.date_btns_layout.addWidget(to_label)
 
         self.date_end_btn = DatesButton("")
         self.date_end_btn.clicked.connect(lambda: self.show_calendar_win("end"))
-        self.top_row_layout.addWidget(self.date_end_btn)
+        self.date_btns_layout.addWidget(self.date_end_btn)
 
-        self.top_row_layout.addStretch(1)
-        self.main_layout.addWidget(self.top_row_widget)
+        self.date_btns_layout.addStretch(1)
+        self.main_layout.addWidget(self.date_btns_widget)
 
         self.update_readable_date_label()
         self.set_date_buttons_text()
 
     def is_all_time(self) -> bool:
         return (self.q_date_start, self.q_date_end) == self.all_time
-
-    def show_tag_menu(self):
-        pos = QCursor.pos() + QPoint(-20, 5)
-        self.preset_menu.exec(pos)
 
     def date_digits(self, q_date: QDate) -> str:
         return q_date.toString("dd.MM.yyyy")
@@ -310,9 +271,8 @@ class DatesWidget(UGroupBox):
             )
             active = True
 
-        text = f"{Lng.period[ind]}: {text.lower()}"
-        self.dates_period_tag.text_widget.setText(text)
-        self.dates_period_tag.set_active(active)
+        text = f"{Lng.selected_dates[ind]}: {text.lower()}"
+        self.dynamic_label.setText(text)
         DatesWidget.readable_date = text
 
     def apply_filter(self, load_st_grid: bool):
