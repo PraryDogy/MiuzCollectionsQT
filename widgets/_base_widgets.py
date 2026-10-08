@@ -477,7 +477,7 @@ class UTagWidget(TransparentFrame):
     qss_transparent = "transparent"
     qss_green = "green"
 
-    tag_height = 23
+    tag_height = 25
     right_svg_size = (14, 14)
     left_svg_size = (15, 15)
     base_right_spacing = 7

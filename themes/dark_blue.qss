@@ -307,7 +307,7 @@ UGroupBox {
 /* ==================== TAG ==================== */
 
 UTagWidget {
-    border-radius: 10px;
+    border-radius: 12px;
     color: #ffffff;
 }
 
