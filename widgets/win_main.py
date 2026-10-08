@@ -330,9 +330,9 @@ class WinMain(UMainWindow):
                         transformMode=Qt.TransformationMode.SmoothTransformation
                     )
                     qimage_scaled.setDevicePixelRatio(Static.DPR)
+                    wid.data_item.src_qimage = qimage
                     wid.data_item.resized_qimage = qimage_scaled
                     wid.set_pixmap_with_actual_size()
-                    wid.img_wid.restore_image()
   
             if not self.update_thumb_task.is_alive():
                 self.update_thumb_task.terminate_join()

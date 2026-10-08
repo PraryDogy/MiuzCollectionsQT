@@ -136,7 +136,6 @@ class ImgUtils:
             ".pgm", ".PGM",
             ".pbm", ".PBM",
             ".pnm", ".PNM",
-            ".gif", ".GIF",
             ".ico", ".ICO",
             ".heic", ".HEIC",
             ".heif", "HEIF"
@@ -154,6 +153,10 @@ class ImgUtils:
 
     ext_png = (
         ".png", ".PNG",
+    )
+
+    ext_gif = (
+        ".gif", ".GIF"
     )
 
     ext_raw = (
@@ -197,6 +200,7 @@ class ImgUtils:
         *ext_tiff,
         *ext_psd,
         *ext_png,
+        *ext_gif,
         *ext_raw,
         *ext_video,
         *ext_icns,
@@ -214,6 +218,12 @@ class ImgUtils:
         array_img = np.array(img)
         img.close()
         return array_img
+
+    @classmethod
+    def _read_gif(cls, src):
+        with Image.open(src) as img:
+            img.seek(0)
+            return np.array(img.convert("RGB"))
 
     @classmethod
     def _read_tiff(cls, path: str):
@@ -396,6 +406,8 @@ class ImgUtils:
             read_any_dict[i] = cls._read_icns
         for i in cls.ext_svg:
             read_any_dict[i] = cls._read_svg
+        for i in cls.ext_gif:
+            read_any_dict[i] = cls._read_gif
         fn = read_any_dict.get(ext)
         if fn:
             cls._read_any = fn
