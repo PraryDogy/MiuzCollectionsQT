@@ -231,6 +231,10 @@ class Lng:
     replace_all = ("Заменить все", "Replace all")
     stop = ("Стоп", "Stop")
     replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
+    file_exists = (
+        "Файл с именем {filename} уже существует", 
+        "A file named {filename} already exists",
+    )
     copy_error = (
         "Произошла ошибка при копировании. Пожалуйста, попробуйте еще раз.",
         "An error occurred while copying. Please try again."
@@ -524,4 +528,8 @@ class Lng:
     text_input = (
         "Ввод текста",
         "Text input"
+    )
+    skip = (
+        "Пропустить",
+        "Skip"
     )

@@ -7,10 +7,10 @@ from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
                          QIcon, QMouseEvent, QPainter, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QFileDialog, QFrame, QGroupBox, QHBoxLayout,
-                             QLabel, QLayout, QLineEdit, QListWidget,
-                             QListWidgetItem, QMainWindow, QMenu, QProgressBar,
-                             QPushButton, QScrollArea, QSizePolicy, QSlider,
+from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGroupBox,
+                             QHBoxLayout, QLabel, QLayout, QLineEdit,
+                             QListWidget, QListWidgetItem, QMainWindow, QMenu,
+                             QProgressBar, QPushButton, QScrollArea, QSlider,
                              QSpacerItem, QSpinBox, QStackedWidget, QTextEdit,
                              QTreeView, QTreeWidget, QTreeWidgetItem,
                              QVBoxLayout, QWidget)
@@ -454,6 +454,11 @@ class USpinBox(QSpinBox):
 class UGroupBox(UGroupBox):
     def __init__(self, title=None, parent=None):
         super().__init__(title, parent)
+
+
+class UCheckBox(QCheckBox):
+     def __init__(self, text: str, parent=None):
+          super().__init__(text, parent)
 
 
 class GrayTextLabel(TransparentLabel):

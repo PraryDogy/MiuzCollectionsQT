@@ -3,7 +3,7 @@ from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout
+from PyQt6.QtWidgets import QCheckBox, QHBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -16,7 +16,7 @@ from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
 
 
 class ReplaceFilesWin(UMainWidget):
-    icon_size = 40
+    icon_size = 25
     ww = 330
     icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
 
@@ -24,49 +24,60 @@ class ReplaceFilesWin(UMainWidget):
     replace_all_press = pyqtSignal()
     stop_pressed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, filename_: str):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.replace[JsonData.lng_index])
-        self.setFixedWidth(self.ww)
-        self.central_layout.setContentsMargins(15, 5, 10, 10)
+        # self.setFixedWidth(self.ww)
+        self.central_layout.setContentsMargins(10, 0, 10, 10)
+        self.central_layout.setSpacing(10)
 
-        h_wid = TransparentWidget()
-        self.central_layout.addWidget(h_wid)
+        self.warn_text_widget = TransparentWidget()
+        self.central_layout.addWidget(self.warn_text_widget)
+        self.warn_text_layout = QHBoxLayout(self.warn_text_widget)
+        self.warn_text_layout.setContentsMargins(0, 0, 0, 0)
+        self.warn_text_layout.setSpacing(10)
 
-        h_lay = QHBoxLayout(h_wid)
-        h_lay.setContentsMargins(0, 0, 0, 0)
-        h_lay.setSpacing(10)
+        self.warn_svg_widget = QSvgWidget()
+        self.warn_svg_widget.load(str(self.icon_path))
+        self.warn_svg_widget.setFixedSize(self.icon_size, self.icon_size)
+        self.warn_text_layout.addWidget(self.warn_svg_widget)
 
-        warn = QSvgWidget()
-        warn.load(str(self.icon_path))
-        warn.setFixedSize(self.icon_size, self.icon_size)
-        h_lay.addWidget(warn)
+        text = Lng.file_exists[JsonData.lng_index].format(filename=filename_)
+        self.warn_text_widget = TransparentLabel(text)
+        self.warn_text_layout.addWidget(self.warn_text_widget)
 
-        test_two = TransparentLabel(Lng.replace_existing_files[JsonData.lng_index])
-        test_two.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        h_lay.addWidget(test_two)
 
         btn_wid = TransparentWidget()
         self.central_layout.addWidget(btn_wid, alignment=Qt.AlignmentFlag.AlignRight)
 
         btn_lay = QHBoxLayout(btn_wid)
         btn_lay.setContentsMargins(0, 0, 0, 0)
-        btn_lay.setSpacing(10)
+        btn_lay.setSpacing(5)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = ActiveButton(Lng.replace_all[JsonData.lng_index])
-        replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
-        btn_lay.addWidget(replace_all_btn)
+        self.checkbox_widget = QCheckBox()
+        self.checkbox_widget.setText(Lng.replace_all[JsonData.lng_index])
+        btn_lay.addWidget(self.checkbox_widget)
 
-        replace_one_btn = UPushButton(Lng.replace_one[JsonData.lng_index])
+        btn_lay.addSpacing(15)
+
+        stop_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+        stop_btn.clicked.connect(lambda: self.stop_cmd())
+        btn_lay.addWidget(stop_btn)
+
+        skip_btn = UPushButton(Lng.skip[JsonData.lng_index])
+        # skip_btn.clicked.connect(lambda: self.stop_cmd())
+        btn_lay.addWidget(skip_btn)
+
+        replace_one_btn = ActiveButton(Lng.replace_one[JsonData.lng_index])
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = UPushButton(Lng.stop[JsonData.lng_index])
-        stop_btn.clicked.connect(lambda: self.stop_cmd())
-        btn_lay.addWidget(stop_btn)
+        for i in (stop_btn, skip_btn, replace_one_btn):
+            i.setFixedHeight(22)
+            i.ensurePolished()
         
         self.adjustSize()
 
@@ -164,15 +175,15 @@ class WinCopyFiles(WinProgressbar):
         self.above_label.setText("above label above label above label")
         self.below_label.setText("below label below label below label below label")
 
-        self.rel = ReplaceFilesWin()
+        self.rel = ReplaceFilesWin(filename_="test.jpg")
         self.rel.stop_pressed.connect(lambda: os._exit(1))
         self.rel.show()
 
-        self.er = WarningWindow(Lng.copy_error[JsonData.lng_index])
-        self.er.show()
+        # self.er = WarningWindow(Lng.copy_error[JsonData.lng_index])
+        # self.er.show()
 
-        self.cancel.connect(self.stop_task)
-        self.cancel.connect(self.deleteLater)
+        # self.cancel.connect(self.stop_task)
+        # self.cancel.connect(self.deleteLater)
 
     def poll_task(self):
         if self.stopping:
