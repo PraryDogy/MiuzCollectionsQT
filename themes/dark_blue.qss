@@ -512,8 +512,8 @@ WinImgSearchPreviewWidget {
 MenuLeftTreeWidget,
 MainWinRightWidget {
     background: #0f171f;
-    border: 1px solid #263440;
-    border: 1px solid transparent;
+    border: 1px solid #1c2833;
+    /* border: 1px solid transparent; */
     border-radius: 10px;
 }
 
