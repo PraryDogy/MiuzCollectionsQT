@@ -10,14 +10,9 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
-from ._base_widgets import (TransparentLabel, TransparentWidget, UMainWidget,
-                            UPushButton, WarningWindow, WinProgressbar)
-
-
-class ReplaceButton(UPushButton):
-    def __init__(self, text):
-        super().__init__(text)
-        self.setFixedSize(75, 17)
+from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
+                            UMainWidget, UPushButton, WarningWindow,
+                            WinProgressbar)
 
 
 class ReplaceFilesWin(UMainWidget):
@@ -61,15 +56,15 @@ class ReplaceFilesWin(UMainWidget):
         btn_lay.setSpacing(10)
         btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        replace_all_btn = ReplaceButton(Lng.replace_all[JsonData.lng_index])
+        replace_all_btn = ActiveButton(Lng.replace_all[JsonData.lng_index])
         replace_all_btn.clicked.connect(lambda: self.replace_all_cmd())
         btn_lay.addWidget(replace_all_btn)
 
-        replace_one_btn = ReplaceButton(Lng.replace_one[JsonData.lng_index])
+        replace_one_btn = UPushButton(Lng.replace_one[JsonData.lng_index])
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        stop_btn = ReplaceButton(Lng.stop[JsonData.lng_index])
+        stop_btn = UPushButton(Lng.stop[JsonData.lng_index])
         stop_btn.clicked.connect(lambda: self.stop_cmd())
         btn_lay.addWidget(stop_btn)
         
@@ -108,6 +103,11 @@ class WinCopyFiles(WinProgressbar):
         )
 
         self.set_close_only()
+
+        # отладка окон
+        QTimer.singleShot(300, self.TEST)
+        return
+
 
         dst_text = os.path.basename(target_dir)
 
@@ -155,6 +155,24 @@ class WinCopyFiles(WinProgressbar):
 
         self.copy_task.start()
         self.copy_timer.start(self.ms)
+
+
+    def TEST(self):
+        # отладка
+        self.progressbar.setValue(50)
+
+        self.above_label.setText("above label above label above label")
+        self.below_label.setText("below label below label below label below label")
+
+        self.rel = ReplaceFilesWin()
+        self.rel.stop_pressed.connect(lambda: os._exit(1))
+        self.rel.show()
+
+        self.er = WarningWindow(Lng.copy_error[JsonData.lng_index])
+        self.er.show()
+
+        self.cancel.connect(self.stop_task)
+        self.cancel.connect(self.deleteLater)
 
     def poll_task(self):
         if self.stopping:
