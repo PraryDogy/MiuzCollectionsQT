@@ -134,25 +134,17 @@ class DbImagesLoader(URunnable):
             # qimages = []
             img_bgr = cv2.imread(abs_thumb_path_)
             img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-            # fitted_img = ImgUtils.fit_to_thumb(img_rgb, Static.THUMB_MAX_SIZE * 3)
 
             ind = Dynamic.current_pixmap_size_index
             current_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
 
             src_qimage = Utils.pyqt_qimage_from_array(img_rgb)
-            # src_qimage = src_qimage.scaled(
-            #     Static.THUMB_MAX_SIZE * 2, Static.THUMB_MAX_SIZE * 2,
-            #     aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-            #     transformMode=Qt.TransformationMode.SmoothTransformation
-            # )
-            # src_qimage.setDevicePixelRatio(Utils.DPR)
-
-            resized_qimage = src_qimage.scaled(
-                current_size * 3, current_size * 3,
+            scaled_qimage = src_qimage.scaled(
+                current_size * Static.DPR, current_size * Static.DPR,
                 aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
                 transformMode=Qt.TransformationMode.SmoothTransformation
             )
-            resized_qimage.setDevicePixelRatio(3)
+            scaled_qimage.setDevicePixelRatio(Static.DPR)
 
             date_ = datetime.fromtimestamp(mod).date()
             month_ = Lng.months[JsonData.lng_index][str(date_.month)]
@@ -164,8 +156,8 @@ class DbImagesLoader(URunnable):
                 rel_img_path=rel_img_path,
                 rel_thumb_path=rel_thumb_path,
                 fav=fav,
-                resized_qimage=resized_qimage,
-                src_qimage=resized_qimage,
+                resized_qimage=scaled_qimage,
+                src_qimage=src_qimage,
                 day_month_year=day_month_year,
                 month_year=month_year
             )

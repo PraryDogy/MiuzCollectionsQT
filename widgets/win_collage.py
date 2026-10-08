@@ -27,7 +27,7 @@ class WinCollage(UMainWidget):
         self.central_layout.setContentsMargins(5, 0, 5, 0)
 
         self.pixmaps: list[QPixmap] = [
-            QPixmap.fromImage(i.resized_qimage)
+            QPixmap.fromImage(i.src_qimage)
             for i in data_items
         ]
         self.image_labels: list[TransparentLabel] = []

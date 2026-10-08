@@ -322,14 +322,14 @@ class WinMain(UMainWindow):
                 wid = self.grid.url_to_wid.get(update_thumb_item.rel_img_path)
                 if wid:
                     ind = Dynamic.current_pixmap_size_index
-                    current_size = Static.THUMB_WID_PIXMAP_SIZE[ind] * Utils.DPR
+                    current_size = Static.THUMB_WID_PIXMAP_SIZE[ind] * Static.DPR
                     qimage = Utils.pyqt_qimage_from_array(update_thumb_item.array)
                     qimage_scaled = qimage.scaled(
                         current_size, current_size,
                         aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
                         transformMode=Qt.TransformationMode.SmoothTransformation
                     )
-                    qimage_scaled.setDevicePixelRatio(Utils.DPR)
+                    qimage_scaled.setDevicePixelRatio(Static.DPR)
                     wid.data_item.resized_qimage = qimage_scaled
                     wid.set_pixmap_with_actual_size()
                     wid.img_wid.restore_image()
