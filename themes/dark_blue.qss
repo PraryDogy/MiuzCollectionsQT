@@ -304,6 +304,30 @@ UGroupBox {
 }
 
 
+/* ==================== CHECK BOX ==================== */
+
+UCheckBox {
+    background: transparent;
+    spacing: 5px;
+}
+
+UCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border-radius: 5px;
+    background: transparent;
+    border: 1px solid #182633;
+}
+
+UCheckBox::indicator:checked {
+    image: url(./icons/common/arrow_down.svg);
+}
+
+UCheckBox::indicator:unchecked {
+    image: none;
+}
+
+
 /* ==================== TAG ==================== */
 
 UTagWidget {

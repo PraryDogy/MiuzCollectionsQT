@@ -3,7 +3,7 @@ from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QCheckBox, QHBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -12,7 +12,7 @@ from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
                             UMainWidget, UPushButton, WarningWindow,
-                            WinProgressbar)
+                            WinProgressbar, UCheckBox)
 
 
 class ReplaceFilesWin(UMainWidget):
@@ -50,18 +50,18 @@ class ReplaceFilesWin(UMainWidget):
 
 
         btn_wid = TransparentWidget()
-        self.central_layout.addWidget(btn_wid, alignment=Qt.AlignmentFlag.AlignRight)
+        self.central_layout.addWidget(btn_wid)
 
         btn_lay = QHBoxLayout(btn_wid)
         btn_lay.setContentsMargins(0, 0, 0, 0)
         btn_lay.setSpacing(5)
-        btn_lay.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        self.checkbox_widget = QCheckBox()
-        self.checkbox_widget.setText(Lng.replace_all[JsonData.lng_index])
+        self.checkbox_widget = UCheckBox(Lng.replace_all[JsonData.lng_index])
+        # self.checkbox_widget.setText(Lng.replace_all[JsonData.lng_index])
         btn_lay.addWidget(self.checkbox_widget)
 
-        btn_lay.addSpacing(15)
+        btn_lay.addSpacing(25)
+        btn_lay.addStretch()
 
         stop_btn = UPushButton(Lng.cancel[JsonData.lng_index])
         stop_btn.clicked.connect(lambda: self.stop_cmd())
@@ -75,7 +75,7 @@ class ReplaceFilesWin(UMainWidget):
         replace_one_btn.clicked.connect(lambda: self.replace_one_cmd())
         btn_lay.addWidget(replace_one_btn)
 
-        for i in (stop_btn, skip_btn, replace_one_btn):
+        for i in (stop_btn, skip_btn, replace_one_btn, self.checkbox_widget):
             i.setFixedHeight(22)
             i.ensurePolished()
         
