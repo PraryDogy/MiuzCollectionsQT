@@ -116,9 +116,8 @@ class WinCopyFiles(WinProgressbar):
         self.set_close_only()
 
         # отладка окон
-        QTimer.singleShot(300, self.TEST)
-        return
-
+        # QTimer.singleShot(300, self.TEST)
+        # return
 
         dst_text = os.path.basename(target_dir)
 
