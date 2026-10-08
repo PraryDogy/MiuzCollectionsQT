@@ -9,8 +9,8 @@ from cfg import JsonData, Static
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
-                            TransparentFrame, TransparentWidget, UMainWidget,
-                            UPushButton, USep, UTextEdit)
+                            TransparentFrame, TransparentWidget, UGroupBox,
+                            UMainWidget, UPushButton, USep, UTextEdit)
 
 
 class WinTextSearchTitleRow(TransparentFrame):
@@ -53,15 +53,21 @@ class WinTextSearch(UMainWidget):
         self.central_layout.setSpacing(10)
         self.central_layout.setContentsMargins(10, 0, 10, 10)
 
-        self.title_row = WinTextSearchTitleRow()
-        self.central_layout.addWidget(self.title_row)
+        group_container = UGroupBox()
+        self.central_layout.addWidget(group_container)
+        group_layout = QVBoxLayout(group_container)
+        group_layout.setContentsMargins(5, 5, 5, 5)
+        group_layout.setSpacing(7)
 
-        self.central_layout.addWidget(USep())
+        self.title_row = WinTextSearchTitleRow()
+        group_layout.addWidget(self.title_row)
+
+        group_layout.addWidget(USep())
 
         # 1. Текст описания форматов (RU / EN)
         self.description_label = GrayTextLabel(Lng.text_search_descr[JsonData.lng_index])
         self.description_label.setWordWrap(True) 
-        self.central_layout.addWidget(self.description_label)
+        group_layout.addWidget(self.description_label)
 
         self.text_edit = UTextEdit()
         self.central_layout.addWidget(self.text_edit)

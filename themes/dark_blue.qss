@@ -89,7 +89,7 @@ UTextEdit {
     color: #ffffff;
     background: #151f29;
     border: 1px solid #263440;
-    border-radius: 6px;
+    border-radius: 10px;
     padding-left: 2px;
     padding-right: 2px;
 }
@@ -171,7 +171,7 @@ UPushButton {
     font-size: 11px;
     background: #18212a;
     border: 1px solid #263440;
-    border-radius: 6px;
+    border-radius: 8px;
     color: #ffffff;
     padding-right: 5px;
     padding-left: 5px;
