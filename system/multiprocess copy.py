@@ -3,10 +3,8 @@ import shutil
 import traceback
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 from multiprocessing import Process, Queue, shared_memory
 from pathlib import Path
-from queue import Empty
 from time import sleep
 
 import numpy as np
@@ -203,201 +201,105 @@ class CopyTaskItem:
     ]
 
 
-class CopyCommand(Enum):
-    REPLACE_ONE = "replace_one"
-    REPLACE_ALL = "replace_all"
-    CANCEL = "cancel"
-
-
 class CopyTaskWorker(BaseProcessWorker):
     def __init__(self, target, args):
         self.process_queue = Queue()
         self.gui_queue = Queue()
-
-        super().__init__(
-            target,
-            (*args, self.process_queue, self.gui_queue)
-        )
-
-    def replace_one(self):
-        self.gui_queue.put(CopyCommand.REPLACE_ONE)
-
-    def replace_all(self):
-        self.gui_queue.put(CopyCommand.REPLACE_ALL)
-
-    def cancel(self):
-        self.gui_queue.put(CopyCommand.CANCEL)
+        super().__init__(target, (*args, self.process_queue, self.gui_queue))
 
 
 class CopyTask:
-
     @staticmethod
-    def start(
-        copy_item: CopyTaskItem,
-        process_queue: Queue,
-        gui_queue: Queue,
-    ):
-        try:
-            src_dst_urls = CopyTask.get_another_dir_urls(copy_item)
+    def start(copy_item: CopyTaskItem, process_queue: Queue, que_queue: Queue):
 
-            copy_item.dst_urls = [
-                str(dst)
-                for _, dst in src_dst_urls
-            ]
+        src_dst_urls = CopyTask.get_another_dir_urls(copy_item)
+        copy_item.dst_urls = [dst for src, dst in src_dst_urls]
 
-            total_size = 0
-
-            for src, _ in src_dst_urls:
-                try:
-                    total_size += src.stat().st_size
-                except FileNotFoundError:
-                    continue
-
-            copy_item.total_bytes = total_size
-            copy_item.total_file_count = len(src_dst_urls)
-
-            replace_all = False
-
-            for count, (src, dest) in enumerate(
-                src_dst_urls,
-                start=1
-            ):
-                if src == dest:
-                    dest = CopyTask.set_count_name(dest)
-
-                if (
-                    not replace_all
-                    and dest.exists()
-                    and src.name == dest.name
-                ):
-                    copy_item.current_file_count = count
-                    copy_item.msg = "need_replace"
-
-                    process_queue.put(copy_item)
-
-                    command = CopyTask.wait_command(
-                        gui_queue
-                    )
-
-                    if command == CopyCommand.CANCEL:
-                        return
-
-                    if command == CopyCommand.REPLACE_ALL:
-                        replace_all = True
-
-                    elif command != CopyCommand.REPLACE_ONE:
-                        return
-
-                copy_item.current_file_count = count
-                copy_item.msg = "none"
-
-                result = CopyTask.copy_file_with_progress(
-                    process_queue,
-                    gui_queue,
-                    copy_item,
-                    src,
-                    dest,
-                )
-
-                if result == CopyCommand.CANCEL:
-                    return
-
-            copy_item.current_percent = 100
-            copy_item.msg = "finished"
-
-            process_queue.put(copy_item)
-
-        except Exception as e:
-            print("CopyTask copy error:", e)
-
-            copy_item.msg = "error"
-            process_queue.put(copy_item)
-
-    @staticmethod
-    def wait_command(gui_queue: Queue):
-        while True:
+        total_size = 0
+        for src, dest in src_dst_urls:
             try:
-                return gui_queue.get(timeout=0.1)
-            except Empty:
+                total_size += os.path.getsize(src)
+            except FileNotFoundError:
                 continue
 
-    @staticmethod
-    def check_command(gui_queue: Queue):
-        try:
-            while True:
-                command = gui_queue.get_nowait()
+        copy_item.total_bytes = total_size
+        copy_item.total_file_count = len(src_dst_urls)
+        replace_all = False
 
-                if command == CopyCommand.CANCEL:
-                    return command
+        for count, (src, dest) in enumerate(src_dst_urls, start=1):
 
-        except Empty:
-            return None
+            if src == dest:
+                dest = CopyTask.set_count_name(dest)
 
-    @staticmethod
-    def copy_file_with_progress(
-        process_queue: Queue,
-        gui_queue: Queue,
-        copy_item: CopyTaskItem,
-        src: Path,
-        dest: Path,
-    ):
-        block = 4 * 1024 * 1024
+            if not replace_all and dest.exists() and src.name == dest.name:
+                copy_item.msg = "need_replace"
+                process_queue.put(copy_item)
+                while True:
+                    sleep(1)
+                    if not que_queue.empty():
+                        new_copy_item: CopyTaskItem = que_queue.get()
+                        if new_copy_item.msg == "replace_one":
+                            break
+                        elif new_copy_item.msg == "replace_all":
+                            replace_all = True
+                            break
 
-        with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
-            while True:
-
-                command = CopyTask.check_command(
-                    gui_queue
-                )
-
-                if command == CopyCommand.CANCEL:
-                    return command
-
-                buf = fsrc.read(block)
-
-                if not buf:
-                    break
-
-                fdst.write(buf)
-
-                copy_item.copied_bytes += len(buf)
-
-                if copy_item.total_bytes:
-                    percent = (
-                        copy_item.copied_bytes * 100
-                    ) // copy_item.total_bytes
-
-                    if percent > copy_item.current_percent:
-                        copy_item.current_percent = percent
-                        process_queue.put(copy_item)
-
-        return None
+            copy_item.current_file_count = count
+            copy_item.msg = ""
+            try:
+                CopyTask.copy_file_with_progress(process_queue, copy_item, src, dest)
+            except Exception as e:
+                print("CopyTask copy error", e)
+                copy_item.msg = "error"
+                process_queue.put(copy_item)
+                return
+        
+        copy_item.msg = "finished"
+        process_queue.put(copy_item)
 
     @staticmethod
     def get_another_dir_urls(copy_item: CopyTaskItem):
+        src_dst_urls: list[tuple[Path, Path]] = []
         dst_dir = Path(copy_item.dst_dir)
-
-        return [
-            (
-                Path(src),
-                dst_dir / Path(src).name
-            )
-            for src in copy_item.src_urls
-        ]
-
+        for url in copy_item.src_urls:
+            url = Path(url)
+            new_path = dst_dir.joinpath(url.name)
+            src_dst_urls.append((url, new_path))
+        return src_dst_urls
+    
     @staticmethod
     def set_count_name(path: Path):
         counter = 2
-
         filename, ext = os.path.splitext(path.name)
-
-        while path.exists():
-            path = path.parent / (
-                f"{filename} ({counter}){ext}"
-            )
+        while os.path.exists(path):
+            new_filename = f"{filename} ({counter}){ext}"
+            path = os.path.join(path.parent, new_filename)
+            path = Path(path)
             counter += 1
-
         return path
+        
+    @staticmethod
+    def copy_file_with_progress(
+        process_queue: Queue,
+        copy_item: CopyTaskItem,
+        src: Path,
+        dest: Path
+    ):
+        block = 4 * 1024 * 1024  # 4 MB
+        with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
+            while True:
+                buf = fsrc.read(block)
+                if not buf:
+                    break
+                fdst.write(buf)
+
+                copy_item.copied_bytes += len(buf)
+                percent = (copy_item.copied_bytes * 100) // copy_item.total_bytes
+                if percent > copy_item.current_percent:
+                    copy_item.current_percent = percent
+                    # process_queue.put(copy_item)
+
+        process_queue.put(copy_item)
 
 
 class FilesRemover:
