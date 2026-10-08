@@ -64,217 +64,220 @@ class CalendarTag(UTagWidget):
 
 
 class DatesWidget(UGroupBox):
-	load_st_grid = pyqtSignal()
-	calendar_svg = Static.COMMON_ICONS / "calendar.svg"
-	svg_calendar_size = (15, 15)
-	readable_date = None
+    load_st_grid = pyqtSignal()
+    calendar_svg = Static.COMMON_ICONS / "calendar.svg"
+    svg_calendar_size = (15, 15)
+    readable_date = None
 
-	def __init__(self, parent=None):
-		super().__init__(parent)
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-		ind = JsonData.lng_index
-		_today = QDate.currentDate()
+        ind = JsonData.lng_index
+        _today = QDate.currentDate()
 
-		self.dates_dict = {
-			(_today, _today): Lng.preset_today[ind],
-			(_today.addDays(-1), _today.addDays(-1)): Lng.preset_yesterday[ind],
-			(_today.addDays(-7), _today): Lng.preset_week[ind],
-			(_today.addDays(-14), _today): Lng.preset_two_weeks[ind],
-			(_today.addMonths(-1), _today): Lng.preset_month[ind],
-			(_today.addYears(-1), _today): Lng.preset_year[ind],
-		}
+        self.dates_dict = {
+            (_today, _today): Lng.preset_today[ind],
+            (_today.addDays(-1), _today.addDays(-1)): Lng.preset_yesterday[ind],
+            (_today.addDays(-7), _today): Lng.preset_week[ind],
+            (_today.addDays(-14), _today): Lng.preset_two_weeks[ind],
+            (_today.addMonths(-1), _today): Lng.preset_month[ind],
+            (_today.addYears(-1), _today): Lng.preset_year[ind],
+        }
 
-		# Либо есть обе даты, либо ни одной (полный сброс)
-		if Dynamic.py_date_start and Dynamic.py_date_end:
-			dt_s = Dynamic.py_date_start
-			self.q_date_start = QDate(dt_s.year, dt_s.month, dt_s.day)
+        # Загружаем даты независимо друг от друга
+        if Dynamic.py_date_start:
+            dt_s = Dynamic.py_date_start
+            self.q_date_start = QDate(dt_s.year, dt_s.month, dt_s.day)
+        else:
+            self.q_date_start = None
 
-			dt_e = Dynamic.py_date_end
-			self.q_date_end = QDate(dt_e.year, dt_e.month, dt_e.day)
-		else:
-			self.q_date_start = None
-			self.q_date_end = None
+        if Dynamic.py_date_end:
+            dt_e = Dynamic.py_date_end
+            self.q_date_end = QDate(dt_e.year, dt_e.month, dt_e.day)
+        else:
+            self.q_date_end = None
 
-		self.py_date_start = Dynamic.py_date_start
-		self.py_date_end = Dynamic.py_date_end
+        self.py_date_start = Dynamic.py_date_start
+        self.py_date_end = Dynamic.py_date_end
 
-		self.main_layout = QVBoxLayout(self)
-		self.main_layout.setContentsMargins(5, 5, 5, 5)
-		self.main_layout.setSpacing(7)
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(5, 5, 5, 5)
+        self.main_layout.setSpacing(7)
 
-		self.title_widget = WinFiltersTitleWidget(
-			text=Lng.dates_management[ind],
-			svg_path=str(self.calendar_svg)
-		)
-		self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
-		self.main_layout.addWidget(self.title_widget)
-		self.main_layout.addWidget(USep())
+        self.title_widget = WinFiltersTitleWidget(
+            text=Lng.dates_management[ind],
+            svg_path=str(self.calendar_svg)
+        )
+        self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
+        self.main_layout.addWidget(self.title_widget)
+        self.main_layout.addWidget(USep())
 
-		dynamic_container = TransparentWidget()
-		dynamic_container_lay = QHBoxLayout(dynamic_container)
-		dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-		dynamic_container_lay.setSpacing(5)
+        dynamic_container = TransparentWidget()
+        dynamic_container_lay = QHBoxLayout(dynamic_container)
+        dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
+        dynamic_container_lay.setSpacing(5)
 
-		self.dynamic_label = TransparentLabel(Lng.selected_dates[JsonData.lng_index])
-		dynamic_container_lay.addWidget(self.dynamic_label)
+        self.dynamic_label = TransparentLabel(Lng.selected_dates[JsonData.lng_index])
+        dynamic_container_lay.addWidget(self.dynamic_label)
 
-		self.main_layout.addWidget(dynamic_container)
-		self.main_layout.addSpacing(5)
+        self.main_layout.addWidget(dynamic_container)
+        self.main_layout.addSpacing(5)
 
-		self.preset_menu = UMenu(parent=self)
+        self.preset_menu = UMenu(parent=self)
 
-		for qdates, text in self.dates_dict.items():
-			action = QAction(text, self.preset_menu)
-			action.triggered.connect(
-				lambda _, d=qdates: self.action_cmd(d[0], d[1])
-			)
-			self.preset_menu.addAction(action)
+        for qdates, text in self.dates_dict.items():
+            action = QAction(text, self.preset_menu)
+            action.triggered.connect(
+                lambda _, d=qdates: self.action_cmd(d[0], d[1])
+            )
+            self.preset_menu.addAction(action)
 
-		# КНОПКИ КАЛЕНДАРЕЙ
+        # КНОПКИ КАЛЕНДАРЕЙ
 
-		self.date_btns_widget = TransparentWidget()
-		self.date_btns_layout = QHBoxLayout(self.date_btns_widget)
-		self.date_btns_layout.setContentsMargins(0, 0, 0, 0)
-		self.date_btns_layout.setSpacing(5)
+        self.date_btns_widget = TransparentWidget()
+        self.date_btns_layout = QHBoxLayout(self.date_btns_widget)
+        self.date_btns_layout.setContentsMargins(0, 0, 0, 0)
+        self.date_btns_layout.setSpacing(5)
 
-		dates_btn = UPushButton(Lng.period[JsonData.lng_index])
-		dates_btn.setMenu(self.preset_menu)
-		self.date_btns_layout.addWidget(dates_btn)
+        dates_btn = UPushButton(Lng.period[JsonData.lng_index])
+        dates_btn.setMenu(self.preset_menu)
+        self.date_btns_layout.addWidget(dates_btn)
 
-		self.date_btns_layout.addSpacing(10)
+        self.date_btns_layout.addSpacing(10)
 
-		from_label = GrayTextLabel(Lng.start_date[ind])
-		self.date_btns_layout.addWidget(from_label)
+        from_label = GrayTextLabel(Lng.start_date[ind])
+        self.date_btns_layout.addWidget(from_label)
 
-		self.left_calendar_tag = CalendarTag()
-		self.left_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("start"))
-		self.date_btns_layout.addWidget(self.left_calendar_tag)
+        self.left_calendar_tag = CalendarTag()
+        self.left_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("start"))
+        self.date_btns_layout.addWidget(self.left_calendar_tag)
 
-		self.date_btns_layout.addSpacing(10)
+        self.date_btns_layout.addSpacing(10)
 
-		to_label = GrayTextLabel(Lng.end_date[ind])
-		self.date_btns_layout.addWidget(to_label)
+        to_label = GrayTextLabel(Lng.end_date[ind])
+        self.date_btns_layout.addWidget(to_label)
 
-		self.right_calendar_tag = CalendarTag()
-		self.right_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("end"))
-		self.date_btns_layout.addWidget(self.right_calendar_tag)
+        self.right_calendar_tag = CalendarTag()
+        self.right_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("end"))
+        self.date_btns_layout.addWidget(self.right_calendar_tag)
 
-		self.date_btns_layout.addStretch(1)
-		self.main_layout.addWidget(self.date_btns_widget)
+        self.date_btns_layout.addStretch(1)
+        self.main_layout.addWidget(self.date_btns_widget)
 
-		self.update_readable_date_label()
-		self.set_date_buttons_text()
+        self.update_readable_date_label()
+        self.set_date_buttons_text()
 
-	def is_all_time(self) -> bool:
-		# Если хотя бы одна None, значит фильтр сброшен
-		return self.q_date_start is None or self.q_date_end is None
+    def is_all_time(self) -> bool:
+        # Фильтр считается отключенным, ТОЛЬКО если обе даты None
+        return self.q_date_start is None and self.q_date_end is None
 
-	def date_digits(self, q_date: QDate) -> str:
-		return q_date.toString("dd.MM.yyyy")
+    def date_digits(self, q_date: QDate) -> str:
+        return q_date.toString("dd.MM.yyyy")
 
-	def show_calendar_win(self, flag: str):
-		if flag == "start":
-			qdate = self.q_date_start if self.q_date_start is not None else QDate.currentDate()
-		else:
-			qdate = self.q_date_end if self.q_date_end is not None else QDate.currentDate()
+    def show_calendar_win(self, flag: str):
+        if flag == "start":
+            qdate = self.q_date_start if self.q_date_start is not None else QDate.currentDate()
+        else:
+            qdate = self.q_date_end if self.q_date_end is not None else QDate.currentDate()
 
-		self.calendar_win = WinCalendar(qdate)
-		self.calendar_win.center_to_parent(self.window())
+        self.calendar_win = WinCalendar(qdate)
+        self.calendar_win.center_to_parent(self.window())
 
-		def on_date_selected(date: QDate):
-			today = QDate.currentDate()
+        def on_date_selected(date: QDate):
+            if flag == "start":
+                self.q_date_start = date
+                # Защита от конфликта: если конец ЕСТЬ, и он меньше старта -> сдвигаем конец
+                if self.q_date_end is not None and self.q_date_start > self.q_date_end:
+                    self.q_date_end = self.q_date_start
 
-			if flag == "start":
-				self.q_date_start = date
-				
-				# Автоматически проставляем конец
-				if self.q_date_end is None:
-					self.q_date_end = today if date <= today else date
-				elif self.q_date_start > self.q_date_end:
-					self.q_date_end = self.q_date_start
+            elif flag == "end":
+                self.q_date_end = date
+                # Защита от конфликта: если старт ЕСТЬ, и он больше конца -> сдвигаем старт
+                if self.q_date_start is not None and self.q_date_start > self.q_date_end:
+                    self.q_date_start = self.q_date_end
 
-			elif flag == "end":
-				self.q_date_end = date
-				
-				# Автоматически проставляем начало
-				if self.q_date_start is None:
-					self.q_date_start = date
-				elif self.q_date_start > self.q_date_end:
-					self.q_date_start = self.q_date_end
+            self.handle_preset_change()
+            self.apply_filter(True)
 
-			self.handle_preset_change()
-			self.apply_filter(True)
+        self.calendar_win.date_selected.connect(on_date_selected)
+        self.calendar_win.show()
 
-		self.calendar_win.date_selected.connect(on_date_selected)
-		self.calendar_win.show()
+    def action_cmd(self, q_date_start: QDate, q_date_end: QDate):
+        self.q_date_start = q_date_start
+        self.q_date_end = q_date_end
+        self.handle_preset_change()
+        self.apply_filter(True)
 
-	def action_cmd(self, q_date_start: QDate, q_date_end: QDate):
-		self.q_date_start = q_date_start
-		self.q_date_end = q_date_end
-		self.handle_preset_change()
-		self.apply_filter(True)
+    def handle_preset_change(self):
+        self.set_date_buttons_text()
+        self.update_readable_date_label()
 
-	def handle_preset_change(self):
-		self.set_date_buttons_text()
-		self.update_readable_date_label()
+    def set_date_buttons_text(self):
+        ind = JsonData.lng_index
+        empty_text = Lng.not_selected[ind]
 
-	def set_date_buttons_text(self):
-		ind = JsonData.lng_index
-		empty_text = Lng.not_selected[ind]
+        # Обрабатываем кнопку "Старт" независимо
+        if self.q_date_start is None:
+            self.left_calendar_tag.text_widget.setText(empty_text)
+            self.left_calendar_tag.set_qss_style(self.left_calendar_tag.qss_gray)
+        else:
+            self.left_calendar_tag.text_widget.setText(self.date_digits(self.q_date_start))
+            self.left_calendar_tag.set_qss_style(self.left_calendar_tag.qss_green)
 
-		# Либо рисуем серый "не выбрано" на обеих кнопках...
-		if self.is_all_time():
-			for i in (self.left_calendar_tag, self.right_calendar_tag):
-				i.text_widget.setText(empty_text)
-				i.set_qss_style(i.qss_gray)
-		# ...либо рисуем зеленые даты на обеих
-		else:
-			self.left_calendar_tag.text_widget.setText(self.date_digits(self.q_date_start))
-			self.left_calendar_tag.set_qss_style(self.left_calendar_tag.qss_green)
+        # Обрабатываем кнопку "Конец" независимо
+        if self.q_date_end is None:
+            self.right_calendar_tag.text_widget.setText(empty_text)
+            self.right_calendar_tag.set_qss_style(self.right_calendar_tag.qss_gray)
+        else:
+            self.right_calendar_tag.text_widget.setText(self.date_digits(self.q_date_end))
+            self.right_calendar_tag.set_qss_style(self.right_calendar_tag.qss_green)
 
-			self.right_calendar_tag.text_widget.setText(self.date_digits(self.q_date_end))
-			self.right_calendar_tag.set_qss_style(self.right_calendar_tag.qss_green)
+    def update_readable_date_label(self):
+        ind = JsonData.lng_index
+        locale = QLocale(
+            QLocale.Language.Russian if ind == 0 else QLocale.Language.English
+        )
 
-	def update_readable_date_label(self):
-		ind = JsonData.lng_index
-		locale = QLocale(
-			QLocale.Language.Russian if ind == 0 else QLocale.Language.English
-		)
+        if self.is_all_time():
+            text = Lng.all_time[ind]
+            
+        elif self.q_date_start is not None and self.q_date_end is not None and (self.q_date_start, self.q_date_end) in self.dates_dict:
+            text = self.dates_dict[self.q_date_start, self.q_date_end]
+            
+        elif self.q_date_start is not None and self.q_date_end is None:
+            str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+            text = f"{Lng.from_text[ind]} {str_from}"
+            
+        elif self.q_date_start is None and self.q_date_end is not None:
+            str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+            text = f"{Lng.to_text[ind]} {str_to}"
+            
+        else:
+            str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+            str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+            text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
 
-		if self.is_all_time():
-			text = Lng.all_time[ind]
-		elif (self.q_date_start, self.q_date_end) in self.dates_dict:
-			text = self.dates_dict[self.q_date_start, self.q_date_end]
-		else:
-			str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
-			str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-			text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
+        text = f"{Lng.selected_dates[ind]}: {text.lower()}"
+        self.dynamic_label.setText(text)
+        DatesWidget.readable_date = text
 
-		text = f"{Lng.selected_dates[ind]}: {text.lower()}"
-		self.dynamic_label.setText(text)
-		DatesWidget.readable_date = text
+    def apply_filter(self, load_st_grid: bool):
+        # Конвертируем по отдельности (каждый может быть None)
+        self.py_date_start = self.q_date_start.toPyDate() if self.q_date_start else None
+        self.py_date_end = self.q_date_end.toPyDate() if self.q_date_end else None
 
-	def apply_filter(self, load_st_grid: bool):
-		# Если сброшено, передаем None, чтобы БД поняла, что фильтр отключен
-		if self.is_all_time():
-			self.py_date_start = None
-			self.py_date_end = None
-		else:
-			self.py_date_start = self.q_date_start.toPyDate()
-			self.py_date_end = self.q_date_end.toPyDate()
+        Dynamic.py_date_start = self.py_date_start
+        Dynamic.py_date_end = self.py_date_end
 
-		Dynamic.py_date_start = self.py_date_start
-		Dynamic.py_date_end = self.py_date_end
+        if load_st_grid:
+            self.load_st_grid.emit()
 
-		if load_st_grid:
-			self.load_st_grid.emit()
+    def reset_all(self, load_st_grid: bool):
+        self.q_date_start = None
+        self.q_date_end = None
 
-	def reset_all(self, load_st_grid: bool):
-		self.q_date_start = None
-		self.q_date_end = None
-
-		self.apply_filter(load_st_grid)
-		self.handle_preset_change()
+        self.apply_filter(load_st_grid)
+        self.handle_preset_change()
 
 
 class WinFiltersUserTag(UTagWidget):

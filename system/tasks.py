@@ -1,7 +1,7 @@
 import os
 import traceback
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, date
 
 import cv2
 # import imagehash
@@ -217,17 +217,20 @@ class DbImagesLoader(URunnable):
 
         return stmt
 
-    def combine_dates(
-            self,
-            date_start: datetime,
-            date_end: datetime
-        ):
+    def combine_dates(self, date_start, date_end):
         """
         Преобразует даты в timestamp для фильтрации:
-        - date_start → 00:00:00
-        - date_end → 23:59:59
+        - Если нет date_start -> 01.01.1970 00:00:00
+        - Если нет date_end -> Сегодня 23:59:59
         Возвращает кортеж (start_timestamp, end_timestamp).
         """
+        # Если из UI пришел None, задаем крайние точки прямо перед запросом
+        if date_start is None:
+            date_start = date(1970, 1, 1)
+            
+        if date_end is None:
+            date_end = date.today()
+
         start = datetime.combine(
             date_start,
             datetime.min.time()
@@ -236,7 +239,9 @@ class DbImagesLoader(URunnable):
             date_end,
             datetime.max.time().replace(microsecond=0)
         )
-        return datetime.timestamp(start), datetime.timestamp(end)
+
+        # Вызов .timestamp() напрямую у объекта работает чище
+        return start.timestamp(), end.timestamp()
 
 
 class MfDataCleaner(URunnable):
