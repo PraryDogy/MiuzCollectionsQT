@@ -175,26 +175,36 @@ class DatesWidget(UGroupBox):
         return q_date.toString("dd.MM.yyyy")
 
     def show_calendar_win(self, flag: str):
+        # Просто передаем текущее значение (даже если это None)
         if flag == "start":
-            qdate = self.q_date_start if self.q_date_start is not None else QDate.currentDate()
+            qdate = self.q_date_start
         else:
-            qdate = self.q_date_end if self.q_date_end is not None else QDate.currentDate()
+            qdate = self.q_date_end
 
         self.calendar_win = WinCalendar(qdate)
         self.calendar_win.center_to_parent(self.window())
 
         def on_date_selected(date: QDate):
-            if flag == "start":
-                self.q_date_start = date
-                # Защита от конфликта: если конец ЕСТЬ, и он меньше старта -> сдвигаем конец
-                if self.q_date_end is not None and self.q_date_start > self.q_date_end:
-                    self.q_date_end = self.q_date_start
+            # Если пришла невалидная дата (нажали "Сбросить/Очистить")
+            if not date.isValid():
+                if flag == "start":
+                    self.q_date_start = None
+                elif flag == "end":
+                    self.q_date_end = None
+            
+            # Если пришла нормальная дата (нажали "Готово")
+            else:
+                if flag == "start":
+                    self.q_date_start = date
+                    # Защита от конфликта
+                    if self.q_date_end is not None and self.q_date_start > self.q_date_end:
+                        self.q_date_end = self.q_date_start
 
-            elif flag == "end":
-                self.q_date_end = date
-                # Защита от конфликта: если старт ЕСТЬ, и он больше конца -> сдвигаем старт
-                if self.q_date_start is not None and self.q_date_start > self.q_date_end:
-                    self.q_date_start = self.q_date_end
+                elif flag == "end":
+                    self.q_date_end = date
+                    # Защита от конфликта
+                    if self.q_date_start is not None and self.q_date_start > self.q_date_end:
+                        self.q_date_start = self.q_date_end
 
             self.handle_preset_change()
             self.apply_filter(True)

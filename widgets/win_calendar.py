@@ -117,7 +117,8 @@ class WinCalendar(UMainWidget):
 	svg_calendar_size = (15, 15)
 	svg_circle_size = (27, 27)
 
-	def __init__(self, date: QDate):
+	# Теперь принимаем date, который может быть невалидным или None
+	def __init__(self, date=None):
 		super().__init__()
 
 		if JsonData.lng_index == 0:
@@ -135,10 +136,16 @@ class WinCalendar(UMainWidget):
 		qimg_scaled = Utils.qimage_scaled_high_dpi(qimg, self.svg_circle_size[0])
 		self.gray_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
-		self.base_date = date
 		self.q_locale = QLocale(lng, country)
-		self.current_date = date
 		self.date_now = QDate.currentDate()
+
+		# --- РАЗДЕЛЕНИЕ ЛОГИКИ ---
+		if date is None or not date.isValid():
+			self.selected_date = None
+			self.view_date = self.date_now
+		else:
+			self.selected_date = date
+			self.view_date = date
 
 		self.setWindowTitle(Lng.calendar[JsonData.lng_index])
 		self.set_close_only()
@@ -155,7 +162,6 @@ class WinCalendar(UMainWidget):
 	def init_ui(self):
 		spacing = 10
 
-		# --- 1. ВЕРХНИЙ БЛОК (Иконка + Дата) ---
 		dynamic_container = TransparentWidget()
 		self.central_layout.addWidget(dynamic_container)
 
@@ -183,7 +189,6 @@ class WinCalendar(UMainWidget):
 		self.central_layout.addWidget(USep())
 		self.central_layout.addSpacing(spacing)
 
-		# --- 2. БЛОК НАВИГАЦИИ (Месяц, Год, Стрелки) ---
 		self.nav_widget = TransparentWidget()
 		self.central_layout.addWidget(self.nav_widget)
 
@@ -220,7 +225,6 @@ class WinCalendar(UMainWidget):
 		self.central_layout.addSpacing(spacing)
 		self.central_layout.addWidget(USep())
 
-		# --- 3. ШАПКА ДНЕЙ НЕДЕЛИ (Пн, Вт, Ср...) ---
 		header_widget = TransparentWidget()
 		header_layout = QHBoxLayout(header_widget)
 		header_layout.setContentsMargins(0, 0, 0, 0)
@@ -236,7 +240,6 @@ class WinCalendar(UMainWidget):
 		self.central_layout.addWidget(header_widget)
 		self.central_layout.addWidget(USep())
 
-		# --- 4. ПОСТОЯННЫЙ КОНТЕЙНЕР ДЛЯ СЕТКИ ЧИСЕЛ ---
 		self.calendar_container = TransparentWidget()
 		self.calendar_container_layout = QVBoxLayout(self.calendar_container)
 		self.calendar_container_layout.setContentsMargins(0, 0, 0, 0)
@@ -246,7 +249,6 @@ class WinCalendar(UMainWidget):
 		self.central_layout.addWidget(USep())
 		self.central_layout.addSpacing(spacing)
 
-		# --- 5. НИЖНИЙ БЛОК КНОПОК (Reset, Done) ---
 		self.btn_container = TransparentWidget()
 		self.central_layout.addWidget(self.btn_container)
 		self.btn_container_layout = QHBoxLayout(self.btn_container)
@@ -262,16 +264,19 @@ class WinCalendar(UMainWidget):
 		self.done_btn.clicked.connect(self.ok_btn_cmd)
 		self.btn_container_layout.addWidget(self.done_btn)
 
-		# Инициализация самой сетки чисел
 		self.create_calendar_widget()
 		self.update_calendar()
 
 	def ok_btn_cmd(self):
-		self.date_selected.emit(self.current_date)
+		# Отправляем выбранную дату, либо пустой (невалидный) QDate, если None
+		emit_date = self.selected_date if self.selected_date else QDate()
+		self.date_selected.emit(emit_date)
 		self.deleteLater()
 
 	def reset_button_cmd(self):
-		self.current_date = self.base_date
+		# Сбрасываем выделение и возвращаем сетку на текущий месяц
+		self.selected_date = None
+		self.view_date = self.date_now
 		self.update_calendar()
 
 	def create_calendar_widget(self):
@@ -279,8 +284,6 @@ class WinCalendar(UMainWidget):
 		self.calendar_layout = QVBoxLayout(self.calendar_widget)
 		self.calendar_layout.setContentsMargins(0, 0, 0, 0)
 		self.calendar_layout.setSpacing(0)
-		
-		# Добавляем в постоянный контейнер
 		self.calendar_container_layout.addWidget(self.calendar_widget)
 
 	def recreate_calendar_widget(self):
@@ -291,8 +294,12 @@ class WinCalendar(UMainWidget):
 		self.create_calendar_widget()
 
 	def update_dynamic_label(self):
-		readable_date = self.q_locale.toString(self.current_date, "d MMMM yyyy")
-		self.dynamic_label.setText(readable_date)
+		# Если дата выбрана — показываем ее, иначе пишем "Не выбрано"
+		if self.selected_date:
+			readable_date = self.q_locale.toString(self.selected_date, "d MMMM yyyy")
+			self.dynamic_label.setText(readable_date)
+		else:
+			self.dynamic_label.setText(Lng.not_selected[JsonData.lng_index])
 
 	def populate_months(self):
 		self.menu_month.clear()
@@ -324,53 +331,54 @@ class WinCalendar(UMainWidget):
 	def month_menu_selected(self):
 		action: QAction = self.sender()
 		selected_month = action.data()
-		year = self.current_date.year()
-		current_day = self.current_date.day()
+		year = self.view_date.year()
+		current_day = self.view_date.day()
 		days_in_new_month = QDate(year, selected_month, 1).daysInMonth()
 		target_day = min(current_day, days_in_new_month)
-		self.current_date = QDate(year, selected_month, target_day)
+		self.view_date = QDate(year, selected_month, target_day)
 		self.update_calendar()
 
 	def year_menu_selected(self):
 		action: QAction = self.sender()
 		selected_year = action.data()
-		current_month = self.current_date.month()
-		current_day = self.current_date.day()
+		current_month = self.view_date.month()
+		current_day = self.view_date.day()
 		days_in_new_month = QDate(selected_year, current_month, 1).daysInMonth()
 		target_day = min(current_day, days_in_new_month)
-		self.current_date = QDate(selected_year, current_month, target_day)
+		self.view_date = QDate(selected_year, current_month, target_day)
 		self.update_calendar()
 
 	def day_selected(self):
 		sender_button = self.sender()
-		self.current_date = sender_button.date
+		self.selected_date = sender_button.date
+		self.view_date = sender_button.date
 		self.update_calendar()
 
 	def inactive_day_clicked(self, clicked_date: QDate):
-		self.current_date = clicked_date
+		self.selected_date = clicked_date
+		self.view_date = clicked_date
 		self.update_calendar()
 
 	def prev_month(self):
 		min_date = QDate(self.min_year, 1, 1)
-		new_date = self.current_date.addMonths(-1)
+		new_date = self.view_date.addMonths(-1)
 		if new_date >= min_date:
-			self.current_date = new_date
+			self.view_date = new_date
 			self.update_calendar()
 
 	def next_month(self):
 		max_date = QDate(self.date_now.year(), 12, 31)
-		new_date = self.current_date.addMonths(1)
+		new_date = self.view_date.addMonths(1)
 		if new_date <= max_date:
-			self.current_date = new_date
+			self.view_date = new_date
 			self.update_calendar()
 
 	def update_calendar(self):
 		self.update_dynamic_label()
-		# self.date_selected.emit(self.current_date)
 
-		current_year = self.current_date.year()
-		current_month = self.current_date.month()
-		current_day_val = self.current_date.day()
+		# Отрисовываем сетку на основе view_date
+		current_year = self.view_date.year()
+		current_month = self.view_date.month()
 
 		month = self.q_locale.standaloneMonthName(
 			current_month,
@@ -391,7 +399,6 @@ class WinCalendar(UMainWidget):
 
 		self.recreate_calendar_widget()
 
-		# --- Расчет сетки дней (всегда 6 строк / 42 ячейки) ---
 		first_day = QDate(current_year, current_month, 1)
 		start_col = first_day.dayOfWeek() - 1
 		days_in_month = first_day.daysInMonth()
@@ -431,7 +438,8 @@ class WinCalendar(UMainWidget):
 					btn_day.setFixedSize(*self.cell_size)
 					btn_day.clicked.connect(self.inactive_day_clicked)
 				else:
-					if day_num == current_day_val:
+					# Если дата выбрана, рисуем синий круг
+					if self.selected_date is not None and d_date == self.selected_date:
 						btn_day = CalendarDaySelected(str(day_num), d_date)
 						btn_day.setFixedSize(*self.cell_size)
 						btn_day.setPixmap(self.blue_circle_pixmap)
@@ -442,7 +450,8 @@ class WinCalendar(UMainWidget):
 						)
 						btn_day_text.setGeometry(btn_day.rect())
 						btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-					elif d_date == QDate.currentDate():
+					# Если это сегодняшний день (но он не выбран явно), рисуем серый круг
+					elif d_date == self.date_now:
 						btn_day = CalendarDay(str(day_num), d_date)
 						btn_day.setFixedSize(*self.cell_size)
 						btn_day.setPixmap(self.gray_circle_pixmap)
@@ -453,6 +462,7 @@ class WinCalendar(UMainWidget):
 						)
 						btn_day_text.setGeometry(btn_day.rect())
 						btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+					# Обычный день
 					else:
 						btn_day = CalendarDay(str(day_num), d_date)
 						btn_day.setFixedSize(*self.cell_size)
