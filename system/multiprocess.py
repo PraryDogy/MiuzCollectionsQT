@@ -23,706 +23,453 @@ from .tasks import Utils
 
 
 class BaseProcessWorker:
-    _registry = []
+	_registry = []
 
-    def __init__(self, target: callable, args: tuple):
-        super().__init__()
-        self.process = Process(target=target, args=(*args, ))
-        self._queues: list[Queue] = [a for a in args if hasattr(a, 'put')]
-        BaseProcessWorker._registry.append(self)
+	def __init__(self, target: callable, args: tuple):
+		super().__init__()
+		self.process = Process(target=target, args=(*args, ))
+		self._queues: list[Queue] = [a for a in args if hasattr(a, 'put')]
+		BaseProcessWorker._registry.append(self)
 
-    def start(self):
-        self.process.start()
+	def start(self):
+		self.process.start()
 
-    def is_alive(self):
-        return self.process.is_alive()
-    
-    def terminate_join(self):
-        """
-        Корректно terminate с join
-        Завершает все очереди Queue
-        """
-        if self.process is not None:
-            self.process.terminate()
-            self.process.join(timeout=0.2)
-        else:
-            print("process is none")
+	def is_alive(self):
+		return self.process.is_alive()
+	
+	def terminate_join(self):
+		"""Корректно terminate с join. Завершает все очереди Queue."""
+		if self.process is not None:
+			self.process.terminate()
+			self.process.join(timeout=0.2)
+		else:
+			print("process is none")
 
-        for queue in self._queues:
-            queue.close()
-            queue.cancel_join_thread()
+		for queue in self._queues:
+			queue.close()
+			queue.cancel_join_thread()
 
-        if self.process.is_alive():
-            self.process.kill()
+		if self.process.is_alive():
+			self.process.kill()
 
-        if self in BaseProcessWorker._registry:
-            BaseProcessWorker._registry.remove(self)
+		if self in BaseProcessWorker._registry:
+			BaseProcessWorker._registry.remove(self)
 
-    @staticmethod
-    def stop_all():
-        for worker in BaseProcessWorker._registry.copy():
-            worker: BaseProcessWorker
-            worker.terminate_join()
+	@staticmethod
+	def stop_all():
+		for worker in BaseProcessWorker._registry.copy():
+			worker: BaseProcessWorker
+			worker.terminate_join()
 
 
 class ProcessWorker(BaseProcessWorker):
-    """
-        Передает в BaseProcessWorker args + self.proc (Queue)
-    """
-    def __init__(self, target: callable, args: tuple):
-        self.process_queue = Queue()
-        super().__init__(target, (*args, self.process_queue))
+	"""Передает в BaseProcessWorker args + self.proc (Queue)"""
+	def __init__(self, target: callable, args: tuple):
+		self.process_queue = Queue()
+		super().__init__(target, (*args, self.process_queue))
 
 
 @dataclass(slots=True)
 class ReadImgItem:
-    src: str
-    shm_name: str
-    shape: tuple[int, ...]
-    dtype: str
+	src: str
+	shm_name: str
+	shape: tuple[int, ...]
+	dtype: str
 
 
 class ReadImg:
-    @staticmethod
-    def start(src: str, size: int, queue: Queue):
-        img_array = ImgUtils.read_img(src)
-        if size > 0:
-            img_array = ImgUtils.resize(img_array, size)
-        shm = shared_memory.SharedMemory(create=True, size=img_array.nbytes)
-        buffer = np.ndarray(img_array.shape, dtype=img_array.dtype, buffer=shm.buf)
-        buffer[:] = img_array
-        item = ReadImgItem(
-            src=src,
-            shm_name=shm.name,
-            shape=img_array.shape,
-            dtype=img_array.dtype.str
-        )
-        queue.put(item)
-        shm.close()
+	@staticmethod
+	def start(src: str, size: int, queue: Queue):
+		img_array = ImgUtils.read_img(src)
+		if size > 0:
+			img_array = ImgUtils.resize(img_array, size)
+		
+		shm = shared_memory.SharedMemory(create=True, size=img_array.nbytes)
+		buffer = np.ndarray(
+			img_array.shape, dtype=img_array.dtype, buffer=shm.buf
+		)
+		buffer[:] = img_array
+		
+		item = ReadImgItem(
+			src=src, shm_name=shm.name, shape=img_array.shape,
+			dtype=img_array.dtype.str
+		)
+		queue.put(item)
+		shm.close()
 
 
 @dataclass(slots=True)
 class OneFileInfoItem:
-    type_: str
-    size: str
-    mod: str
-    res: str
+	type_: str
+	size: str
+	mod: str
+	res: str
 
 
 class OneFileInfo:
+	@staticmethod
+	def start(path: str, process_queue: Queue):
+		"""Возвращает в Queue либо dict либо str. Если str, процесс окончен"""
+		try:
+			info_item = OneFileInfo._gather_info(path)
+			process_queue.put(info_item)
 
-    @staticmethod
-    def start(path: str, process_queue: Queue):
-        """
-        Возвращает в Queue либо dict либо str
-        Если str, процесс окончен
-        """
-        try:
-            info_item = OneFileInfo._gather_info(path)
-            process_queue.put(info_item)
+			resol = ImgUtils.get_img_res(path)
+			if resol:
+				info_item.res = resol
+			process_queue.put(info_item)
+		except Exception as e:
+			print("multiprocess One file info error", e)
 
-            resol = ImgUtils.get_img_res(path)
-            if resol:
-                info_item.res = resol
-            process_queue.put(info_item)
-        except Exception as e:
-            print("multiprocess One file info error", e)
+	@staticmethod
+	def _gather_info(path: str) -> OneFileInfoItem:
+		name = os.path.basename(path)
+		_, type_ = os.path.splitext(name)
+		stats = os.stat(path)
+		size = SharedUtils.get_f_size(stats.st_size)
+		date_time = datetime.fromtimestamp(stats.st_mtime)
+		month = Lng.months_gen[JsonData.lng_index][str(date_time.month)]
+		mod = f"{date_time.day} {month} {date_time.year}"
+		return OneFileInfoItem(type_, size, mod, "")
 
-    @staticmethod
-    def _gather_info(path: str) -> OneFileInfoItem:
-        name = os.path.basename(path)
-        _, type_ = os.path.splitext(name)
-        stats = os.stat(path)
-        size = SharedUtils.get_f_size(stats.st_size)
-        date_time = datetime.fromtimestamp(stats.st_mtime)
-        month = Lng.months_gen[JsonData.lng_index][str(date_time.month)]
-        mod = f"{date_time.day} {month} {date_time.year}"
-        item = OneFileInfoItem(type_, size, mod, "")
-        return item
+	@staticmethod
+	def lined_text(text: str, max_row=50) -> str:
+		if len(text) > max_row:
+			return "\n".join(
+				text[i:i + max_row] for i in range(0, len(text), max_row)
+			)
+		return text
 
-    @staticmethod
-    def lined_text(text: str, max_row = 50) -> str:
-        if len(text) > max_row:
-            return "\n".join(
-                text[i:i + max_row]
-                for i in range(0, len(text), max_row)
-            )
-        return text
+	@staticmethod
+	def lined_path(text: str, max_row=50) -> str:
+		if len(text) <= max_row:
+			return text
+		
+		separator = os.sep
+		parts = text.split(separator)
+		lines = []
+		current_line = []
 
-    @staticmethod
-    def lined_path(text: str, max_row=50) -> str:
-        if len(text) <= max_row:
-            return text
-        separator = os.sep
-        parts = text.split(separator)
-        lines = []
-        current_line = []
+		for part in parts:
+			potential_len = len(part) + (len(separator) if current_line else 0)
+			curr_len = sum(len(p) for p in current_line)
+			
+			if curr_len + len(current_line) - 1 + potential_len > max_row:
+				if current_line:
+					lines.append(separator.join(current_line) + separator)
+					current_line = [part]
+				else:
+					lines.append(part + separator)
+			else:
+				current_line.append(part)
 
-        for part in parts:
-            # Считаем длину, которая получится, если добавить эту часть
-            # Прибавляем 1 для учета слэша (если это не первый элемент в строке)
-            potential_len = len(part) + (len(separator) if current_line else 0)
-            
-            if sum(len(p) for p in current_line) + len(current_line) - 1 + potential_len > max_row:
-                # Если превысили лимит, сохраняем текущую строку
-                if current_line:
-                    lines.append(separator.join(current_line) + separator)
-                    current_line = [part]
-                else:
-                    # Если одна папка длиннее max_row, то принудительно оставляем её на этой строке
-                    lines.append(part + separator)
-            else:
-                current_line.append(part)
-
-        # Добавляем остаток
-        if current_line:
-            lines.append(separator.join(current_line))
-
-        # Объединяем строки через стандартный перенос
-        return '\n'.join(lines)
-
+		if current_line:
+			lines.append(separator.join(current_line))
+		
+		return '\n'.join(lines)
 
 
 @dataclass(slots=True)
 class CopyTaskItem:
-    dst_dir: str
-    src_urls: list[str]
-
-    current_percent: int
-    copied_bytes: int
-    total_bytes: int
-
-    current_file_count: int
-    total_file_count: int
-
-    dst_urls: list[str]
-
-    msg: Literal[
-        "none",
-        "error",
-        "need_replace",
-        "finished",
-    ]
+	dst_dir: str
+	src_urls: list[str]
+	current_percent: int
+	copied_bytes: int
+	total_bytes: int
+	current_file_count: int
+	total_file_count: int
+	dst_urls: list[str]
+	msg: Literal["none", "error", "need_replace", "finished"]
 
 
 class CopyCommand(Enum):
-    REPLACE_ONE = "replace_one"
-    REPLACE_ALL = "replace_all"
-    SKIP = "skip"
-    CANCEL = "cancel"
+	REPLACE_ONE = "replace_one"
+	REPLACE_ALL = "replace_all"
+	SKIP = "skip"
+	CANCEL = "cancel"
 
 
 class CopyTaskWorker(BaseProcessWorker):
+	def __init__(self, target, args):
+		self.process_queue = Queue()
+		self.gui_queue = Queue()
+		super().__init__(
+			target, (*args, self.process_queue, self.gui_queue)
+		)
 
-    def __init__(self, target, args):
-        self.process_queue = Queue()
-        self.gui_queue = Queue()
+	def replace_one(self):
+		self.gui_queue.put(CopyCommand.REPLACE_ONE)
 
-        super().__init__(
-            target,
-            (
-                *args,
-                self.process_queue,
-                self.gui_queue,
-            ),
-        )
+	def replace_all(self):
+		self.gui_queue.put(CopyCommand.REPLACE_ALL)
 
-    def replace_one(self):
-        self.gui_queue.put(
-            CopyCommand.REPLACE_ONE
-        )
+	def skip(self):
+		self.gui_queue.put(CopyCommand.SKIP)
 
-    def replace_all(self):
-        self.gui_queue.put(
-            CopyCommand.REPLACE_ALL
-        )
-
-    def skip(self):
-        self.gui_queue.put(
-            CopyCommand.SKIP
-        )
-
-    def cancel(self):
-        self.gui_queue.put(
-            CopyCommand.CANCEL
-        )
+	def cancel(self):
+		self.gui_queue.put(CopyCommand.CANCEL)
 
 
 class CopyTask:
-
-    # ======================================================
-    # Main
-    # ======================================================
-
-    @staticmethod
-    def start(
-        copy_item: CopyTaskItem,
-        process_queue: Queue,
-        gui_queue: Queue,
-    ):
-        try:
-            src_dst_urls = (
-                CopyTask.get_another_dir_urls(
-                    copy_item
-                )
-            )
-
-            copy_item.dst_urls = [
-                str(dst)
-                for _, dst in src_dst_urls
-            ]
-
-            # ------------------------------------------------
-            # Total size
-            # ------------------------------------------------
-
-            total_size = 0
-
-            for src, _ in src_dst_urls:
-                try:
-                    total_size += (
-                        src.stat().st_size
-                    )
-                except FileNotFoundError:
-                    continue
-
-            copy_item.total_bytes = total_size
-            copy_item.total_file_count = (
-                len(src_dst_urls)
-            )
-
-            # ------------------------------------------------
-            # Replace all mode
-            # ------------------------------------------------
-
-            replace_all = False
-
-            # ------------------------------------------------
-            # Files
-            # ------------------------------------------------
-
-            for count, (src, dest) in enumerate(
-                src_dst_urls,
-                start=1,
-            ):
-                # --------------------------------------------
-                # Source == destination
-                # --------------------------------------------
-
-                if src == dest:
-                    dest = CopyTask.set_count_name(
-                        dest
-                    )
-
-                # --------------------------------------------
-                # Existing file
-                # --------------------------------------------
-
-                if (
-                    not replace_all
-                    and dest.exists()
-                    and src.name == dest.name
-                ):
-                    copy_item.current_file_count = (
-                        count
-                    )
-
-                    copy_item.msg = (
-                        "need_replace"
-                    )
-
-                    process_queue.put(
-                        copy_item
-                    )
-
-                    command = (
-                        CopyTask.wait_command(
-                            gui_queue
-                        )
-                    )
-
-                    # ----------------------------------------
-                    # Cancel
-                    # ----------------------------------------
-
-                    if command == (
-                        CopyCommand.CANCEL
-                    ):
-                        return
-
-                    # ----------------------------------------
-                    # Skip
-                    # ----------------------------------------
-
-                    if command == (
-                        CopyCommand.SKIP
-                    ):
-                        continue
-
-                    # ----------------------------------------
-                    # Replace all
-                    # ----------------------------------------
-
-                    if command == (
-                        CopyCommand.REPLACE_ALL
-                    ):
-                        replace_all = True
-
-                    # ----------------------------------------
-                    # Replace one
-                    # ----------------------------------------
-
-                    elif command != (
-                        CopyCommand.REPLACE_ONE
-                    ):
-                        return
-
-                # --------------------------------------------
-                # Current file
-                # --------------------------------------------
-
-                copy_item.current_file_count = (
-                    count
-                )
-
-                copy_item.msg = "none"
-
-                result = (
-                    CopyTask.copy_file_with_progress(
-                        process_queue,
-                        gui_queue,
-                        copy_item,
-                        src,
-                        dest,
-                    )
-                )
-
-                if result == CopyCommand.CANCEL:
-                    return
-
-            # ------------------------------------------------
-            # Finished
-            # ------------------------------------------------
-
-            copy_item.current_percent = 100
-            copy_item.msg = "finished"
-
-            process_queue.put(
-                copy_item
-            )
-
-        except Exception as e:
-            print(
-                "CopyTask copy error:",
-                e,
-            )
-
-            copy_item.msg = "error"
-
-            process_queue.put(
-                copy_item
-            )
-
-    # ======================================================
-    # Wait for GUI command
-    # ======================================================
-
-    @staticmethod
-    def wait_command(
-        gui_queue: Queue,
-    ):
-        while True:
-            try:
-                return gui_queue.get(
-                    timeout=0.1
-                )
-            except Empty:
-                continue
-
-    # ======================================================
-    # Check cancel
-    # ======================================================
-
-    @staticmethod
-    def check_command(
-        gui_queue: Queue,
-    ):
-        try:
-            while True:
-                command = gui_queue.get_nowait()
-
-                if command == (
-                    CopyCommand.CANCEL
-                ):
-                    return command
-
-        except Empty:
-            return None
-
-    # ======================================================
-    # Copy file
-    # ======================================================
-
-    @staticmethod
-    def copy_file_with_progress(
-        process_queue: Queue,
-        gui_queue: Queue,
-        copy_item: CopyTaskItem,
-        src: Path,
-        dest: Path,
-    ):
-        block = 4 * 1024 * 1024
-
-        with (
-            open(src, "rb") as fsrc,
-            open(dest, "wb") as fdst,
-        ):
-            while True:
-
-                command = (
-                    CopyTask.check_command(
-                        gui_queue
-                    )
-                )
-
-                if command == (
-                    CopyCommand.CANCEL
-                ):
-                    return command
-
-                buf = fsrc.read(block)
-
-                if not buf:
-                    break
-
-                fdst.write(buf)
-
-                copy_item.copied_bytes += (
-                    len(buf)
-                )
-
-                if copy_item.total_bytes:
-                    percent = (
-                        copy_item.copied_bytes
-                        * 100
-                    ) // copy_item.total_bytes
-
-                    if (
-                        percent
-                        > copy_item.current_percent
-                    ):
-                        copy_item.current_percent = (
-                            percent
-                        )
-
-                        process_queue.put(
-                            copy_item
-                        )
-
-        return None
-
-    # ======================================================
-    # Paths
-    # ======================================================
-
-    @staticmethod
-    def get_another_dir_urls(
-        copy_item: CopyTaskItem,
-    ):
-        dst_dir = Path(
-            copy_item.dst_dir
-        )
-
-        return [
-            (
-                Path(src),
-                dst_dir / Path(src).name,
-            )
-            for src in copy_item.src_urls
-        ]
-
-    # ======================================================
-    # Unique filename
-    # ======================================================
-
-    @staticmethod
-    def set_count_name(
-        path: Path,
-    ):
-        counter = 2
-
-        filename, ext = os.path.splitext(
-            path.name
-        )
-
-        while path.exists():
-            path = (
-                path.parent
-                / f"{filename} ({counter}){ext}"
-            )
-
-            counter += 1
-
-        return path
-
+	@staticmethod
+	def start(copy_item: CopyTaskItem, process_queue: Queue, gui_queue: Queue):
+		try:
+			src_dst_urls = CopyTask.get_another_dir_urls(copy_item)
+			copy_item.dst_urls = [str(dst) for _, dst in src_dst_urls]
+			total_size = 0
+
+			for src, _ in src_dst_urls:
+				try:
+					total_size += src.stat().st_size
+				except FileNotFoundError:
+					continue
+
+			copy_item.total_bytes = total_size
+			copy_item.total_file_count = len(src_dst_urls)
+			replace_all = False
+
+			for count, (src, dest) in enumerate(src_dst_urls, start=1):
+				if src == dest:
+					dest = CopyTask.set_count_name(dest)
+
+				if not replace_all and dest.exists() and src.name == dest.name:
+					copy_item.current_file_count = count
+					copy_item.msg = "need_replace"
+					process_queue.put(copy_item)
+					
+					command = CopyTask.wait_command(gui_queue)
+					
+					if command == CopyCommand.CANCEL:
+						return
+					if command == CopyCommand.SKIP:
+						continue
+					if command == CopyCommand.REPLACE_ALL:
+						replace_all = True
+					elif command != CopyCommand.REPLACE_ONE:
+						return
+
+				copy_item.current_file_count = count
+				copy_item.msg = "none"
+				
+				result = CopyTask.copy_file_with_progress(
+					process_queue, gui_queue, copy_item, src, dest
+				)
+
+				if result == CopyCommand.CANCEL:
+					return
+
+			copy_item.current_percent = 100
+			copy_item.msg = "finished"
+			process_queue.put(copy_item)
+
+		except Exception as e:
+			print("CopyTask copy error:", e)
+			copy_item.msg = "error"
+			process_queue.put(copy_item)
+
+	@staticmethod
+	def wait_command(gui_queue: Queue):
+		while True:
+			try:
+				return gui_queue.get(timeout=0.1)
+			except Empty:
+				continue
+
+	@staticmethod
+	def check_command(gui_queue: Queue):
+		try:
+			while True:
+				command = gui_queue.get_nowait()
+				if command == CopyCommand.CANCEL:
+					return command
+		except Empty:
+			return None
+
+	@staticmethod
+	def copy_file_with_progress(
+		process_queue: Queue, gui_queue: Queue, copy_item: CopyTaskItem,
+		src: Path, dest: Path
+	):
+		block = 4 * 1024 * 1024
+		
+		with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
+			while True:
+				command = CopyTask.check_command(gui_queue)
+				if command == CopyCommand.CANCEL:
+					return command
+
+				buf = fsrc.read(block)
+				if not buf:
+					break
+
+				fdst.write(buf)
+				copy_item.copied_bytes += len(buf)
+
+				if copy_item.total_bytes:
+					percent = (
+						copy_item.copied_bytes * 100
+					) // copy_item.total_bytes
+					
+					if percent > copy_item.current_percent:
+						copy_item.current_percent = percent
+						process_queue.put(copy_item)
+						
+		return None
+
+	@staticmethod
+	def get_another_dir_urls(copy_item: CopyTaskItem):
+		dst_dir = Path(copy_item.dst_dir)
+		return [
+			(Path(src), dst_dir / Path(src).name) for src in copy_item.src_urls
+		]
+
+	@staticmethod
+	def set_count_name(path: Path):
+		counter = 2
+		filename, ext = os.path.splitext(path.name)
+		
+		while path.exists():
+			path = path.parent / f"{filename} ({counter}){ext}"
+			counter += 1
+			
+		return path
 
 
 class FilesRemover:
-    @staticmethod
-    def start(paths: list[str], queue: Queue):
-        deleted_files = []
-        for path in paths:
-            try:
-                os.remove(path)
-                deleted_files.append(path)
-            except Exception as e:
-                print("FilesRemover error:", e)
-        queue.put(deleted_files)
-        
+	@staticmethod
+	def start(paths: list[str], queue: Queue):
+		deleted_files = []
+		for path in paths:
+			try:
+				os.remove(path)
+				deleted_files.append(path)
+			except Exception as e:
+				print("FilesRemover error:", e)
+		queue.put(deleted_files)
+		
 
 class MfRemover:
-    def start(mf_alias: str, queue: Queue):
-        with Dbase.create_engine().begin() as conn:
-            stmt = (
-                sqlalchemy.select(Thumbs.rel_thumb_path)
-                .where(Thumbs.mf_alias==mf_alias)
-            )
-            res = conn.execute(stmt).scalars().all()
+	@staticmethod
+	def start(mf_alias: str, queue: Queue):
+		with Dbase.create_engine().begin() as conn:
+			stmt = (
+				sqlalchemy.select(Thumbs.rel_thumb_path)
+				.where(Thumbs.mf_alias == mf_alias)
+			)
+			res = conn.execute(stmt).scalars().all()
 
-            for rel_thumb_path in res:
-                abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
-                try:
-                    os.remove(abs_thumb_path)
-                except (Exception, FileNotFoundError) as e:
-                    print(traceback.format_exc())
-                    continue
-                try:
-                    os.rmdir(os.path.dirname(abs_thumb_path))
-                except OSError:
-                    pass
-            stmt = (
-                sqlalchemy.delete(Thumbs.table)
-                .where(Thumbs.mf_alias == mf_alias)
-            )
-            conn.execute(stmt)
-            stmt = (
-                sqlalchemy.delete(Dirs.table)
-                .where(Dirs.mf_alias == mf_alias)
-            )
-            conn.execute(stmt)
+			for rel_thumb_path in res:
+				abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+				try:
+					os.remove(abs_thumb_path)
+				except (Exception, FileNotFoundError) as e:
+					print(traceback.format_exc())
+					continue
+				
+				try:
+					os.rmdir(os.path.dirname(abs_thumb_path))
+				except OSError:
+					pass
+					
+			stmt = sqlalchemy.delete(Thumbs.table).where(Thumbs.mf_alias == mf_alias)
+			conn.execute(stmt)
+			
+			stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias == mf_alias)
+			conn.execute(stmt)
 
 
 @dataclass(slots=True)
 class UpdateThumbItem:
-    rel_img_path: str
-    array: np.ndarray
+	rel_img_path: str
+	array: np.ndarray
 
 
 class UpdateThumb:
+	@staticmethod
+	def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
+		
+		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
+			img_array = ImgUtils.read_img(abs_img_path)
+			img_array = ImgUtils.fit_to_thumb(img_array, Static.THUMB_MAX_SIZE)
+			if ImgUtils.write_thumb(abs_thumb_path, img_array):
+				return img_array
+			return None
+		
+		def _get_values(abs_img_path: str, rel_img_path: str, rel_thumb_path: str):
+			try:
+				stats = os.stat(abs_img_path)
+				size = int(stats.st_size)
+				mod = int(stats.st_mtime)
+				root = os.path.dirname(rel_img_path)
+			except Exception as e:
+				print(traceback.format_exc())
+				return None
+				
+			properties = (
+				rel_img_path, rel_thumb_path, size, mod, root, mf.mf_alias
+			)
+			if None in properties:
+				return None
+				
+			return {
+				Thumbs.rel_img_path.name: rel_img_path,
+				Thumbs.rel_thumb_path.name: rel_thumb_path,
+				Thumbs.size.name: size,
+				Thumbs.birth.name: 0,
+				Thumbs.mod.name: mod,
+				Thumbs.root.name: root,
+				Thumbs.coll.name: "none",
+				Thumbs.fav.name: 0,
+				Thumbs.mf_alias.name: mf.mf_alias
+			}
 
-    @staticmethod
-    def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
+		update_thumb_items: list[UpdateThumbItem] = []
+		step = 10
+		chunked_rel_img_paths = [
+			rel_img_paths[i:i+step] for i in range(0, len(rel_img_paths), step)
+		]
+		
+		for chunk_rel_img_paths in chunked_rel_img_paths:
+			values_list: list[dict] = []
+			
+			for rel_img_path in chunk_rel_img_paths:
+				abs_img_path = Utils.add_mf_path(mf.mf_current_path, rel_img_path)
+				abs_thumb_path = Utils.create_abs_thumb_path(
+					rel_img_path, mf.mf_alias
+				)
+				rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+				
+				thumb = _write_thumb(abs_img_path, abs_thumb_path)
+				if thumb is not None:
+					result = _get_values(
+						abs_img_path, rel_img_path, rel_thumb_path
+					)
+					if result:
+						values_list.append(result)
+						item = UpdateThumbItem(rel_img_path, thumb)
+						queue.put(item)
 
-        def _write_thumb(abs_img_path: str, abs_thumb_path: str):
-            img_array = ImgUtils.read_img(abs_img_path)
-            img_array = ImgUtils.fit_to_thumb(img_array, Static.THUMB_MAX_SIZE)
-            if ImgUtils.write_thumb(abs_thumb_path, img_array):
-                return img_array
-            return None
-        
-        def _get_values(
-                abs_img_path: str,
-                rel_img_path: str,
-                rel_thumb_path: str
-            ):
-            try:
-                stats = os.stat(abs_img_path)
-                size = int(stats.st_size)
-                mod = int(stats.st_mtime)
-                root = os.path.dirname(rel_img_path)
-            except Exception as e:
-                print(traceback.format_exc())
-                return None
-            properties = (
-                rel_img_path,
-                rel_thumb_path,
-                size,
-                mod,
-                root,
-                mf.mf_alias
-            )
-            for i in properties:
-                if i is None:
-                    return None
-            return {
-                Thumbs.rel_img_path.name: rel_img_path,
-                Thumbs.rel_thumb_path.name: rel_thumb_path,
-                Thumbs.size.name: size,
-                Thumbs.birth.name: 0,
-                Thumbs.mod.name: mod,
-                Thumbs.root.name: root,
-                Thumbs.coll.name: "none",
-                Thumbs.fav.name: 0,
-                Thumbs.mf_alias.name: mf.mf_alias
-            }
-
-        update_thumb_items: list[UpdateThumbItem] = []
-        step = 10
-        chunked_rel_img_paths = [
-            rel_img_paths[i:i+step]
-            for i in range(0, len(rel_img_paths), step)
-        ]
-        for chunk_rel_img_paths in chunked_rel_img_paths:
-            values_list: list[dict] = []
-            for rel_img_path in chunk_rel_img_paths:
-                abs_img_path = Utils.add_mf_path(
-                    mf.mf_current_path,
-                    rel_img_path
-                )
-                abs_thumb_path = Utils.create_abs_thumb_path(
-                    rel_img_path,
-                    mf.mf_alias
-                )
-                rel_thumb_path = Utils.get_rel_thumb_path(
-                    abs_thumb_path
-                )
-                thumb = _write_thumb(abs_img_path, abs_thumb_path)
-                if thumb is not None:
-                    result = _get_values(
-                        abs_img_path,
-                        rel_img_path,
-                        rel_thumb_path
-                    )
-                    if result:
-                        values_list.append(result)
-                        item = UpdateThumbItem(rel_img_path, thumb)
-                        queue.put(item)
-
-            engine = Dbase.create_engine()
-            with engine.begin() as conn:
-                if chunk_rel_img_paths:
-                    stmt = sqlalchemy.delete(Thumbs.table)
-                    stmt = stmt.where(
-                        Thumbs.mf_alias == mf.mf_alias
-                    )
-                    stmt = stmt.where(
-                        Thumbs.rel_img_path.in_(chunk_rel_img_paths)
-                    )
-                    conn.execute(stmt)
-                if values_list:
-                    stmt = sqlalchemy.insert(Thumbs.table).values(
-                        values_list
-                    )
-                    conn.execute(stmt)
+			engine = Dbase.create_engine()
+			with engine.begin() as conn:
+				if chunk_rel_img_paths:
+					stmt = (
+						sqlalchemy.delete(Thumbs.table)
+						.where(Thumbs.mf_alias == mf.mf_alias)
+						.where(Thumbs.rel_img_path.in_(chunk_rel_img_paths))
+					)
+					conn.execute(stmt)
+				if values_list:
+					stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
+					conn.execute(stmt)
 
 
 class SmbChecker:
-
-    def start(mf: Mf, queue: Queue):
-        avaiable_path = mf.get_avaiable_mf_path()
-        while not avaiable_path:
-            avaiable_path = mf.get_avaiable_mf_path()
-            if avaiable_path:
-                queue.put(avaiable_path)
-                break
-            sleep(1)
+	@staticmethod
+	def start(mf: Mf, queue: Queue):
+		avaiable_path = mf.get_avaiable_mf_path()
+		while not avaiable_path:
+			avaiable_path = mf.get_avaiable_mf_path()
+			if avaiable_path:
+				queue.put(avaiable_path)
+				break
+			sleep(1)
