@@ -297,7 +297,9 @@ class CopyTask:
                 percent = (copy_item.copied_bytes * 100) // copy_item.total_bytes
                 if percent > copy_item.current_percent:
                     copy_item.current_percent = percent
-                    process_queue.put(copy_item)
+                    # process_queue.put(copy_item)
+
+        process_queue.put(copy_item)
 
 
 class FilesRemover:

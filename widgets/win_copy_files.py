@@ -149,11 +149,13 @@ class WinCopyFiles(WinProgressbar):
 
     def __init__(self, target_dir: str, files_to_copy: list[str]):
         super().__init__(Lng.copying[JsonData.lng_index])
+        # self.set_always_on_top()
+        self.set_close_only()
 
         # отладка окон
-        QTimer.singleShot(300, self.show_all_wins)
-        return
-
+        # self.progressbar.setValue(50)
+        # QTimer.singleShot(300, self.show_all_wins)
+        # return
 
         dst_text = os.path.basename(target_dir)
         if not dst_text:
@@ -167,10 +169,6 @@ class WinCopyFiles(WinProgressbar):
         )
 
         self.dst_urls: list[str] = []
-
-        # отладка
-        # self.progressbar.setValue(50)
-        # return
 
         self.copy_task_item = CopyTaskItem(
             dst_dir=target_dir,

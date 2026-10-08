@@ -633,8 +633,6 @@ class WinProgressbar(UMainWidget):
 
     def __init__(self, title: str):
         super().__init__()
-        self.set_always_on_top()
-        self.set_close_only()
         self.setWindowTitle(title)
         self.setFixedWidth(self.ww)
 
