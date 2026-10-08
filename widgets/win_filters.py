@@ -137,8 +137,8 @@ class DatesWidget(UGroupBox):
         self.py_date_end = Dynamic.py_date_end
 
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(*UGroupBox_margins)
-        self.main_layout.setSpacing(UGroupBox_spacing)
+        self.main_layout.setContentsMargins(5, 5, 5, 5)
+        self.main_layout.setSpacing(7)
 
         self.title_widget = WinFiltersTitleWidget(
             text=Lng.dates_management[ind],
@@ -536,8 +536,8 @@ class TagsWidget(UGroupBox):
     def __init__(self):
         super().__init__()
         self.v_lay = QVBoxLayout(self)
-        self.v_lay.setContentsMargins(*UGroupBox_margins)
-        self.v_lay.setSpacing(UGroupBox_spacing)
+        self.v_lay.setContentsMargins(5, 5, 5, 5)
+        self.v_lay.setSpacing(7)
 
         self.title_widget = WinFiltersTitleWidget(
             text=Lng.tag_management[JsonData.lng_index],
