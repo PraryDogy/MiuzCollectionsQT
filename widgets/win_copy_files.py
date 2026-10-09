@@ -22,12 +22,7 @@ class ElidedLabel(TransparentLabel):
 		super().__init__(text="")
 		self._full_text = ""
 		self.setWordWrap(False)
-		self.setSizePolicy(
-			QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
-		)
-		
-		flags = Qt.TextInteractionFlag.TextSelectableByMouse
-		self.setTextInteractionFlags(flags)
+		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
 	def setFullText(self, text: str):
 		self._full_text = text
@@ -61,14 +56,15 @@ class ReplaceWin(VerticalWindow):
 
 	warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 	warn_svg_size = (65, 65)
-	ww = 300
+	# ww = 280
 
 	def __init__(self, filename: str, parent=None):
 		super().__init__()
 		self.filename = filename
 		self.setWindowTitle(Lng.replace[JsonData.lng_index])
-		self.setFixedWidth(self.ww)
+		# self.setFixedWidth(self.ww)
 		self.set_close_only()
+		self.set_always_on_top()
 		self.show_titlebar_underline()
 		self._init_ui()
 		self.adjustSize()
@@ -85,6 +81,7 @@ class ReplaceWin(VerticalWindow):
 
 		# Filename
 		self.filename_label = ElidedLabel()
+		self.filename_label.setFixedWidth(message.sizeHint().width())
 		self.filename_label.setFullText(self.filename)
 		self.icon_text_layout.addWidget(self.filename_label)
 
@@ -103,6 +100,8 @@ class ReplaceWin(VerticalWindow):
 		self.skip_button = UPushButton(Lng.skip[JsonData.lng_index])
 		self.skip_button.clicked.connect(self._skip)
 		self.btn_layout.addWidget(self.skip_button)
+
+		self.btn_layout.addSpacing(5)
 
 		# Action buttons
 		self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
