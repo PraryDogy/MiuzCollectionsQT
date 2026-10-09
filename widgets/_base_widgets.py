@@ -140,75 +140,92 @@ class UTitleBar(StandardTitleBar):
 
 
 class UBaseWindow(FramelessMainWindow):
-	win_list: list[QWidget] = []
-	bar_height = 30
+    win_list: list[QWidget] = []
+    bar_height = 30
 
-	def __init__(self, parent: QWidget = None):
-		super().__init__(parent)
-		self.setup_window()
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+        self.setup_window()
 
-	def setup_window(self):
-		title_bar = UTitleBar(self)
-		self.setTitleBar(title_bar)
+    def setup_window(self):
+        title_bar = UTitleBar(self)
+        self.setTitleBar(title_bar)
 
-		central_widget = TransparentFrame()
-		self.setCentralWidget(central_widget)
+        central_widget = TransparentFrame()
+        self.setCentralWidget(central_widget)
 
-		self.central_layout = QVBoxLayout(central_widget)
-		self.central_layout.setContentsMargins(5, 5, 5, 5)
-		self.central_layout.setSpacing(0)
-		self.central_layout.addSpacing(self.bar_height)
+        # 1. --- ГЛАВНЫЙ МАКЕТ ОКНА (Каркас) ---
+        # Делаем нулевые отступы, чтобы сепаратор мог быть на всю ширину (если нужно)
+        self.window_layout = QVBoxLayout(central_widget)
+        self.window_layout.setContentsMargins(0, 0, 0, 0)
+        self.window_layout.setSpacing(0)
+        
+        # Отступ под кастомный TitleBar
+        self.window_layout.addSpacing(self.bar_height)
 
-		# macOS
-		if sys.platform == "darwin":
-			self.setSystemTitleBarButtonVisible(True)
-			self.titleBar.minBtn.hide()
-			self.titleBar.maxBtn.hide()
-			self.titleBar.closeBtn.hide()
+        # Инициализируем сепаратор сразу и добавляем в окно, но скрываем
+        self.separator = USep()
+        self.separator.hide()
+        self.window_layout.addWidget(self.separator)
 
-		self.register_window()
-		title_bar.raise_()
+        # 2. --- МАКЕТ ДЛЯ КОНТЕНТА ---
+        # Именно сюда будут добавляться элементы в наследниках (ConfirmWindow и др.)
+        self.central_layout = QVBoxLayout()
+        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setSpacing(0)
+        
+        # Добавляем макет контента в главный каркас
+        self.window_layout.addLayout(self.central_layout)
 
-	def insert_sep(self):
-		index = 1
-		sep = USep()
-		self.central_layout.insertWidget(index, sep)
+        # macOS
+        if sys.platform == "darwin":
+            self.setSystemTitleBarButtonVisible(True)
+            self.titleBar.minBtn.hide()
+            self.titleBar.maxBtn.hide()
+            self.titleBar.closeBtn.hide()
 
-	def get_titlebar_layout(self) -> QLayout:
-		return self.titleBar.layout()
+        self.register_window()
+        title_bar.raise_()
 
-	def register_window(self):
-		self.win_list.append(self)
+    def insert_sep(self):
+        # Теперь метод просто показывает сепаратор (название метода оставил для совместимости)
+        self.separator.show()
 
-	def unregister_window(self):
-		try:
-			self.win_list.remove(self)
-		except ValueError:
-			pass
+    def get_titlebar_layout(self) -> QLayout:
+        return self.titleBar.layout()
 
-	def center_to_parent(self, parent: QWidget):
-		try:
-			geo = self.geometry()
-			geo.moveCenter(parent.geometry().center())
-			self.setGeometry(geo)
-		except Exception as e:
-			print("center error:", e)
+    def register_window(self):
+        self.win_list.append(self)
 
-	def set_always_on_top(self):
-		self.setWindowModality(Qt.WindowModality.ApplicationModal)
+    def unregister_window(self):
+        try:
+            self.win_list.remove(self)
+        except ValueError:
+            pass
 
-	def set_close_only(self):
-		flags = Qt.WindowType.CustomizeWindowHint
-		flags |= Qt.WindowType.WindowCloseButtonHint
-		self.setWindowFlags(flags)
+    def center_to_parent(self, parent: QWidget):
+        try:
+            geo = self.geometry()
+            geo.moveCenter(parent.geometry().center())
+            self.setGeometry(geo)
+        except Exception as e:
+            print("center error:", e)
 
-	def closeEvent(self, event: QCloseEvent | None):
-		self.unregister_window()
-		return super().closeEvent(event)
+    def set_always_on_top(self):
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
-	def deleteLater(self):
-		self.unregister_window()
-		return super().deleteLater()
+    def set_close_only(self):
+        flags = Qt.WindowType.CustomizeWindowHint
+        flags |= Qt.WindowType.WindowCloseButtonHint
+        self.setWindowFlags(flags)
+
+    def closeEvent(self, event: QCloseEvent | None):
+        self.unregister_window()
+        return super().closeEvent(event)
+
+    def deleteLater(self):
+        self.unregister_window()
+        return super().deleteLater()
 
 
 class UMainWindow(UBaseWindow):
