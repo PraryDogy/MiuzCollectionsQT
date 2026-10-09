@@ -308,7 +308,7 @@ UGroupBox {
 
 UCheckBox {
     background: transparent;
-    spacing: 5px;
+    spacing: 6px;
 }
 
 UCheckBox::indicator {
