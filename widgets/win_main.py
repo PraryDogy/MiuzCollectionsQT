@@ -97,7 +97,7 @@ class WinMain(UMainWindow):
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
 
-        MAIN_MARGIN = 10
+        MAIN_MARGIN = 5
 
         # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
         # self.test.center_to_parent(self)
@@ -183,15 +183,17 @@ class WinMain(UMainWindow):
         self.footer_layout = QVBoxLayout(self.footer_container)
         
         # верхний маргин для отступа от сетки и меню
-        self.footer_layout.setContentsMargins(0, 10, 0, 0)
+        self.footer_layout.setContentsMargins(MAIN_MARGIN, 10, MAIN_MARGIN, 0)
         self.footer_layout.setSpacing(0)
 
         # нижний маргин для отступа от сепаратора барами
         # левый и правый маргин для красивого отступа
         self.bar_path = PathBar()
-        self.bar_path.layout().setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 5)
+        self.bar_path.h_layout.setContentsMargins(0, 0, 0, 0)
         self.path_bar_update("")
         self.footer_layout.addWidget(self.bar_path)
+
+        self.footer_layout.addSpacing(5)
 
         # 2. Добавляем горизонтальный разделитель
         bar_bottom_sep = USep()
@@ -199,7 +201,7 @@ class WinMain(UMainWindow):
 
         # левый и правый маргин для красивого отступа
         self.bar_bottom = BarBottom()
-        self.bar_bottom.layout().setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
+        self.bar_bottom.h_layout.setContentsMargins(0, 0, 0, 0)
         self.bar_bottom.resize_thumbnails.connect(
             lambda: self.load_st_grid()
         )

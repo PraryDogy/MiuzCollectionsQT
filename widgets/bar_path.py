@@ -73,9 +73,9 @@ class PathBar(TransparentWidget):
         super().__init__()
         self.current_path: str = None
 
-        self.main_lay = QHBoxLayout(self)
-        self.main_lay.setSpacing(5)
-        self.main_lay.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.h_layout = QHBoxLayout(self)
+        self.h_layout.setSpacing(5)
+        self.h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     def update(self, dir: str):
         """
@@ -102,7 +102,7 @@ class PathBar(TransparentWidget):
             path_item.del_fav.connect(self.del_fav.emit)
             path_item.add_arrow()
             path_items[x] = path_item
-            self.main_lay.addWidget(path_item)
+            self.h_layout.addWidget(path_item)
 
         path_items[1].img_wid.load(
             str(path_items[1].image_folder_svg)
