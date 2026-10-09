@@ -699,14 +699,6 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
-from PyQt6.QtCore import pyqtSignal, Qt
-from PyQt6.QtWidgets import QVBoxLayout, QWidget
-from PyQt6.QtSvgWidgets import QSvgWidget
-
-# Твои импорты кастомных виджетов (UMainWidget, Static, Lng, JsonData, 
-# TransparentWidget, SelectableGrayLabel, UPushButton, ActiveButton и т.д.)
-# ...
-
 class ConfirmWindow(UMainWidget):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
