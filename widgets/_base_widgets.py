@@ -741,7 +741,7 @@ class VerticalWindow(UMainWidget):
 
         self.btn_layout = QVBoxLayout(self.btn_widget)
         self.btn_layout.setContentsMargins(0, 0, 0, 0)
-        self.btn_layout.setSpacing(5)
+        self.btn_layout.setSpacing(6)
 
 
 class ConfirmWindow(VerticalWindow):
