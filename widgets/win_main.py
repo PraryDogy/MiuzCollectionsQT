@@ -111,10 +111,10 @@ class WinMain(UMainWindow):
 
         self.bar_top = BarTop()
         self.title_bar.set_custom_widget(self.bar_top) 
-        self.bar_top.h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.bar_top.h_layout.setContentsMargins(100, 5, 10, 0)
-        # self.title_bar.setFixedHeight(50)
-        self.title_bar.adjustSize()
+        # self.bar_top.h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.bar_top.h_layout.setContentsMargins(100, 0, 12, 0)
+        self.bar_top.setFixedHeight(self.bar_top.height() + 10)
+        self.set_titlebar_height(self.bar_top.height())
 
 
         self.bar_top.open_settings_win.connect(
