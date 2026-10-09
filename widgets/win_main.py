@@ -90,9 +90,9 @@ class WinMain(UMainWindow):
     ww, hh = 1050, 750
 
     def __init__(self, argv: list):
-        super().__init__()
+        super().__init__(show_title=False)
         self.central_layout.setContentsMargins(10, 5, 10, 5)
-        self.show_titlebar_underline()
+        # self.show_titlebar_underline()
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
@@ -109,9 +109,14 @@ class WinMain(UMainWindow):
         self.files_to_copy = set()
         self.stop_scaner = True
 
-        # Добавляем элементы в правую панель
         self.bar_top = BarTop()
-        self.bar_top.layout().setContentsMargins(5, 0, 5, 0)
+        self.title_bar.set_custom_widget(self.bar_top) 
+        self.bar_top.h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.bar_top.h_layout.setContentsMargins(100, 5, 10, 0)
+        # self.title_bar.setFixedHeight(50)
+        self.title_bar.adjustSize()
+
+
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
         )
@@ -129,12 +134,14 @@ class WinMain(UMainWindow):
         )
 
         # --- Создаем контейнер-обертку ---
-        self.top_bar_container = QWidget()
-        self.top_bar_layout = QHBoxLayout(self.top_bar_container)
-        self.top_bar_layout.setContentsMargins(0, 5, 0, 5)
-        self.top_bar_layout.setSpacing(0)
-        self.top_bar_layout.addWidget(self.bar_top)
-        self.central_layout.addWidget(self.top_bar_container)
+        # self.top_bar_container = TransparentFrame()
+        # self.top_bar_layout = QHBoxLayout(self.top_bar_container)
+        # self.top_bar_layout.setContentsMargins(0, 5, 0, 5)
+        # self.top_bar_layout.setSpacing(0)
+        # self.top_bar_layout.addWidget(self.bar_top)
+        # self.central_layout.addWidget(self.top_bar_container)
+
+        # self.top_bar_container.setParent(self.title_bar)
 
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)

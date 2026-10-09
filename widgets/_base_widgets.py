@@ -10,10 +10,10 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGroupBox,
                              QHBoxLayout, QLabel, QLayout, QLineEdit,
                              QListWidget, QListWidgetItem, QMainWindow, QMenu,
-                             QProgressBar, QPushButton, QScrollArea, QSlider,
-                             QSpacerItem, QSpinBox, QStackedWidget, QTextEdit,
-                             QTreeView, QTreeWidget, QTreeWidgetItem,
-                             QVBoxLayout, QWidget)
+                             QProgressBar, QPushButton, QScrollArea,
+                             QSizePolicy, QSlider, QSpacerItem, QSpinBox,
+                             QStackedWidget, QTextEdit, QTreeView, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 from qframelesswindow import FramelessMainWindow, StandardTitleBar
 from typing_extensions import Optional
 
@@ -125,62 +125,74 @@ class TransparentTreeView(QTreeView):
 class UTitleBar(StandardTitleBar):
     hh = 30
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, show_title: bool = True):
         super().__init__(parent)
         self.setFixedHeight(self.hh)
-        if hasattr(self, 'titleLabel'):
-            self.titleLabel.hide()
-        self.center_title = QLabel(self)
-        self.center_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.center_title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.titleLabel.hide()
+        self.center_title = None 
+        self.custom_widget = None 
+        if show_title:
+            self.center_title = QLabel(self)
+            self.center_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.center_title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+
+    def set_custom_widget(self, widget: QWidget):
+        self.custom_widget = widget
+        self.custom_widget.setParent(self)
+        self.custom_widget.show()
+        self._update_geometries()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        y_offset = -2
-        self.center_title.setGeometry(0, y_offset, self.width(), self.height())
+        self._update_geometries()
+
+    def _update_geometries(self):
+        if self.center_title is not None:
+            y_offset = -2
+            self.center_title.setGeometry(0, y_offset, self.width(), self.height())
+        if self.custom_widget is not None:
+            self.custom_widget.setGeometry(0, 0, self.width(), self.height())
 
     def setTitle(self, title: str):
-        self.center_title.setText(title)
+        if self.center_title is not None:
+            self.center_title.setText(title)
 
 
 class UBaseWindow(FramelessMainWindow):
     win_list: list[QWidget] = []
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent: QWidget = None, show_title: bool = True):
         super().__init__(parent)
+        self._show_title = show_title
         self.setup_window()
 
     def setup_window(self):
-        title_bar = UTitleBar(self)
-        self.setTitleBar(title_bar)
+        self.title_bar = UTitleBar(self, self._show_title)
+        self.setTitleBar(self.title_bar)
 
         central_widget = TransparentFrame()
         self.setCentralWidget(central_widget)
 
-        # 1. --- ГЛАВНЫЙ МАКЕТ ОКНА (Каркас) ---
-        # Делаем нулевые отступы, чтобы сепаратор мог быть на всю ширину (если нужно)
         self.window_layout = QVBoxLayout(central_widget)
         self.window_layout.setContentsMargins(0, 0, 0, 0)
         self.window_layout.setSpacing(0)
         
-        # Отступ под кастомный TitleBar
-        self.window_layout.addSpacing(title_bar.height())
+        # --- ИЗМЕНЕНИЕ ЗДЕСЬ ---
+        # Вместо addSpacing создаем QSpacerItem и сохраняем его в переменную
+        self.title_spacer = QSpacerItem(10, self.title_bar.height(), QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.window_layout.addItem(self.title_spacer)
+        # -----------------------
 
-        # Инициализируем сепаратор сразу и добавляем в окно, но скрываем
         self.separator = USep()
         self.separator.hide()
         self.window_layout.addWidget(self.separator)
 
-        # 2. --- МАКЕТ ДЛЯ КОНТЕНТА ---
-        # Именно сюда будут добавляться элементы в наследниках (ConfirmWindow и др.)
         self.central_layout = QVBoxLayout()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.central_layout.setSpacing(0)
         
-        # Добавляем макет контента в главный каркас
         self.window_layout.addLayout(self.central_layout)
 
-        # macOS
         if sys.platform == "darwin":
             self.setSystemTitleBarButtonVisible(True)
             self.titleBar.minBtn.hide()
@@ -188,7 +200,16 @@ class UBaseWindow(FramelessMainWindow):
             self.titleBar.closeBtn.hide()
 
         self.register_window()
-        title_bar.raise_()
+        self.title_bar.raise_()
+
+    # --- ДОБАВЛЯЕМ НОВЫЙ МЕТОД ---
+    def set_titlebar_height(self, h: int):
+        # Меняем высоту самого TitleBar
+        self.title_bar.setFixedHeight(h)
+        # Меняем высоту невидимого отступа под TitleBar в главном макете
+        self.title_spacer.changeSize(10, h, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        # Принудительно заставляем макет пересчитаться
+        self.window_layout.invalidate()
 
     def show_titlebar_underline(self):
         # Теперь метод просто показывает сепаратор (название метода оставил для совместимости)
