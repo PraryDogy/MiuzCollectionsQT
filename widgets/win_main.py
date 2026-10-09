@@ -90,12 +90,14 @@ class WinMain(UMainWindow):
     ww, hh = 1050, 750
 
     def __init__(self, argv: list):
-        super().__init__(show_title=False)
-        self.central_layout.setContentsMargins(10, 5, 10, 5)
-        # self.show_titlebar_underline()
+        super().__init__()
+        self.central_layout.setContentsMargins(10, 0, 10, 5)
+        self.show_titlebar_underline()
         self.setMinimumWidth(self.min_w)
         self.setWindowTitle(f"{Static.APP_NAME}")
         self.setMenuBar(BarMacos())
+
+        MAIN_MARGIN = 10
 
         # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
         # self.test.center_to_parent(self)
@@ -110,12 +112,8 @@ class WinMain(UMainWindow):
         self.stop_scaner = True
 
         self.bar_top = BarTop()
-        self.title_bar.set_custom_widget(self.bar_top) 
-        # self.bar_top.h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.bar_top.h_layout.setContentsMargins(100, 0, 12, 0)
+        self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
         self.bar_top.setFixedHeight(self.bar_top.height() + 10)
-        self.set_titlebar_height(self.bar_top.height())
-
 
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
@@ -132,16 +130,15 @@ class WinMain(UMainWindow):
         self.bar_top.mf_open.connect(
             lambda mf: self.on_mf_clicked(mf)
         )
+        self.central_layout.addWidget(self.bar_top)
 
-        # --- Создаем контейнер-обертку ---
+        # # --- Создаем контейнер-обертку ---
         # self.top_bar_container = TransparentFrame()
         # self.top_bar_layout = QHBoxLayout(self.top_bar_container)
         # self.top_bar_layout.setContentsMargins(0, 5, 0, 5)
         # self.top_bar_layout.setSpacing(0)
         # self.top_bar_layout.addWidget(self.bar_top)
         # self.central_layout.addWidget(self.top_bar_container)
-
-        # self.top_bar_container.setParent(self.title_bar)
 
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -192,7 +189,7 @@ class WinMain(UMainWindow):
         # нижний маргин для отступа от сепаратора барами
         # левый и правый маргин для красивого отступа
         self.bar_path = PathBar()
-        self.bar_path.layout().setContentsMargins(2, 0, 2, 5)
+        self.bar_path.layout().setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 5)
         self.path_bar_update("")
         self.footer_layout.addWidget(self.bar_path)
 
@@ -202,7 +199,7 @@ class WinMain(UMainWindow):
 
         # левый и правый маргин для красивого отступа
         self.bar_bottom = BarBottom()
-        self.bar_bottom.layout().setContentsMargins(2, 0, 2, 0)
+        self.bar_bottom.layout().setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
         self.bar_bottom.resize_thumbnails.connect(
             lambda: self.load_st_grid()
         )
