@@ -862,23 +862,6 @@ class WarningWindow(VerticalWindow):
             super().keyPressEvent(event)
 
 
-
-# class WarningWindow(ConfirmWindow):
-#     def __init__(self, text: str):
-#         super().__init__(text)
-
-#         self.cancel_btn.hide()
-#         self.ok_btn.hide()
-#         self.cancel_btn.deleteLater()
-#         self.ok_btn.deleteLater()
-
-#         self.got_it_btn = UPushButton(Lng.got_it[JsonData.lng_index])
-#         self.got_it_btn.clicked.connect(self.deleteLater)
-#         self.btn_layout.addWidget(self.got_it_btn)
-
-#         self._adjust_window_size(self.text_wid, text)
-
-
 class SuperConfirmWindow(ConfirmWindow):
     icon_path = Static.COMMON_ICONS / "red_warning.svg"
 
