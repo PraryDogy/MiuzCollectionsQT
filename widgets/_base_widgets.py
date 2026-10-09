@@ -716,7 +716,35 @@ class WinProgressbar(UMainWidget):
         return super().closeEvent(a0)
 
 
-class ConfirmWindow(UMainWidget):
+class VerticalWindow(UMainWidget):
+
+    def __init__(self):
+        """
+        Макет вертикального окна, где блок с кнопками чуть шире верхнего блока
+        с виджетами
+        """
+
+        super().__init__()
+
+        self.central_layout.setSpacing(10)
+        self.central_layout.setContentsMargins(10, 5, 10, 10)
+
+        self.icon_text_widget = TransparentWidget()
+        self.central_layout.addWidget(self.icon_text_widget)
+
+        self.icon_text_layout = QVBoxLayout(self.icon_text_widget)
+        self.icon_text_layout.setContentsMargins(10, 0, 10, 0)
+        self.icon_text_layout.setSpacing(5)
+
+        self.btn_widget = QWidget()
+        self.central_layout.addWidget(self.btn_widget)
+
+        self.btn_layout = QVBoxLayout(self.btn_widget)
+        self.btn_layout.setContentsMargins(0, 0, 0, 0)
+        self.btn_layout.setSpacing(5)
+
+
+class ConfirmWindow(VerticalWindow):
     ok_clicked = pyqtSignal()
     cancel_clicked = pyqtSignal()
     
@@ -730,38 +758,20 @@ class ConfirmWindow(UMainWidget):
         self.set_close_only()
         self.show_titlebar_underline()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
-        self.setFixedWidth(self.ww)
+        # self.setFixedWidth(self.ww)
         self._setup_ui(text)
         self.central_layout.activate()
         self._adjust_window_size(text)
 
     def _setup_ui(self, text: str):
-        self.central_layout.setSpacing(0)
-        self.central_layout.setContentsMargins(10, 0, 10, 5)
-        self.central_layout.addSpacing(5)
-
-        self.icon_text_widget = TransparentWidget()
-        self.central_layout.addWidget(self.icon_text_widget)
-
-        icon_text_layout = QVBoxLayout(self.icon_text_widget)
-        icon_text_layout.setContentsMargins(10, 0, 10, 0)
-        icon_text_layout.setSpacing(0)
-
         self.svg_widget = QSvgWidget()
         self.svg_widget.load(str(self.icon_path))
         self.svg_widget.setFixedSize(*self.icon_size)
-        icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.text_wid = SelectableGrayLabel(text)
         self.text_wid.setWordWrap(True)
-        icon_text_layout.addWidget(self.text_wid)
-
-        self.btn_widget = QWidget()
-        self.central_layout.addWidget(self.btn_widget)
-
-        self.btn_layout = QVBoxLayout(self.btn_widget)
-        self.btn_layout.setContentsMargins(0, 0, 0, 0)
-        self.btn_layout.setSpacing(5)
+        self.icon_text_layout.addWidget(self.text_wid)
 
         self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
         self.ok_btn.clicked.connect(self.ok_clicked.emit)

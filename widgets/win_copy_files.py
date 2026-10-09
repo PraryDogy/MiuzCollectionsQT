@@ -13,7 +13,8 @@ from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
                             TransparentWidget, UCheckBox, UMainWidget,
-                            UPushButton, WarningWindow, WinProgressbar)
+                            UPushButton, VerticalWindow, WarningWindow,
+                            WinProgressbar)
 
 
 class ElidedLabel(TransparentLabel):
@@ -53,80 +54,60 @@ class ElidedLabel(TransparentLabel):
 		super().setText(text)
 
 
-class ReplaceWin(UMainWidget):
+class ReplaceWin(VerticalWindow):
 	replace_pressed = pyqtSignal()
 	skip_pressed = pyqtSignal()
 	cancel_pressed = pyqtSignal()
 
 	warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 	warn_svg_size = (65, 65)
-	ww = 280
+	ww = 300
 
 	def __init__(self, filename: str, parent=None):
-		super().__init__(parent)
+		super().__init__()
 		self.filename = filename
 		self.setWindowTitle(Lng.replace[JsonData.lng_index])
-		self.setFixedWidth(350)
+		self.setFixedWidth(self.ww)
 		self.set_close_only()
 		self.show_titlebar_underline()
 		self._init_ui()
 		self.adjustSize()
 
 	def _init_ui(self):
-		self.central_layout.setSpacing(0)
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.addSpacing(5)
-
-		icon_text_widget = TransparentWidget()
-		self.central_layout.addWidget(icon_text_widget)
-		icon_text_layout = QVBoxLayout(icon_text_widget)
-		icon_text_layout.setContentsMargins(10, 0, 10, 0)
-		icon_text_layout.setSpacing(0)
-
 		# Warning icon
 		icon = QSvgWidget()
 		icon.load(str(self.warn_svg))
 		icon.setFixedSize(*self.warn_svg_size)
-		icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
-
-		icon_text_layout.addSpacing(10)
+		self.icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		message = TransparentLabel(Lng.file_exists[JsonData.lng_index])
-		icon_text_layout.addWidget(message)
+		self.icon_text_layout.addWidget(message)
 
 		# Filename
 		self.filename_label = ElidedLabel()
 		self.filename_label.setFullText(self.filename)
-		icon_text_layout.addWidget(self.filename_label)
+		self.icon_text_layout.addWidget(self.filename_label)
 
-		icon_text_layout.addSpacing(5)
+		self.icon_text_layout.addSpacing(5)
 
 		# Replace all checkbox
 		self.replace_all_checkbox = UCheckBox(Lng.apply_to_all_files[JsonData.lng_index])
 		self.replace_all_checkbox.clicked.connect(lambda: self._checkbox_clicked())
 		self.replace_all_checkbox.setChecked(False)
-		icon_text_layout.addWidget(self.replace_all_checkbox)
-
-		self.central_layout.addSpacing(10)
-
-		btn_widget = TransparentWidget()
-		self.central_layout.addWidget(btn_widget)
-		btn_layout = QVBoxLayout(btn_widget)
-		btn_layout.setContentsMargins(5, 0, 5, 0)
-		btn_layout.setSpacing(5)
+		self.icon_text_layout.addWidget(self.replace_all_checkbox)
 
 		self.replace_button = ActiveButton(Lng.replace[JsonData.lng_index])
 		self.replace_button.clicked.connect(self._replace)
-		btn_layout.addWidget(self.replace_button)
+		self.btn_layout.addWidget(self.replace_button)
 
 		self.skip_button = UPushButton(Lng.skip[JsonData.lng_index])
 		self.skip_button.clicked.connect(self._skip)
-		btn_layout.addWidget(self.skip_button)
+		self.btn_layout.addWidget(self.skip_button)
 
 		# Action buttons
 		self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
 		self.cancel_button.clicked.connect(self._cancel)
-		btn_layout.addWidget(self.cancel_button)
+		self.btn_layout.addWidget(self.cancel_button)
 
 	def _checkbox_clicked(self):
 		if self.replace_all_checkbox.isChecked():
