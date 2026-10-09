@@ -66,15 +66,15 @@ class ReplaceWin(UMainWidget):
 		super().__init__(parent)
 		self.filename = filename
 		self.setWindowTitle(Lng.replace[JsonData.lng_index])
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.setSpacing(0)
-		self.insert_sep()
 		self.setFixedWidth(350)
-		self._init_ui()
 		self.set_close_only()
+		self.insert_sep()
+		self._init_ui()
 		self.adjustSize()
 
 	def _init_ui(self):
+		self.central_layout.setSpacing(0)
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.addSpacing(5)
 
 		icon_text_widget = TransparentWidget()
