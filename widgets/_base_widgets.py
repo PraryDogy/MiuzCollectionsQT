@@ -171,7 +171,7 @@ class UBaseWindow(FramelessMainWindow):
         # 2. --- МАКЕТ ДЛЯ КОНТЕНТА ---
         # Именно сюда будут добавляться элементы в наследниках (ConfirmWindow и др.)
         self.central_layout = QVBoxLayout()
-        self.central_layout.setContentsMargins(5, 5, 5, 5)
+        self.central_layout.setContentsMargins(0, 0, 0, 0)
         self.central_layout.setSpacing(0)
         
         # Добавляем макет контента в главный каркас
@@ -187,7 +187,7 @@ class UBaseWindow(FramelessMainWindow):
         self.register_window()
         title_bar.raise_()
 
-    def insert_sep(self):
+    def show_titlebar_underline(self):
         # Теперь метод просто показывает сепаратор (название метода оставил для совместимости)
         self.separator.show()
 
@@ -661,7 +661,7 @@ class WinProgressbar(UMainWidget):
 
         self.central_layout.setContentsMargins(10, 0, 10, 10)
         self.central_layout.setSpacing(0)
-        self.insert_sep()
+        self.show_titlebar_underline()
         self.central_layout.addSpacing(10)
 
         h_wid = QWidget()
@@ -728,7 +728,7 @@ class ConfirmWindow(UMainWidget):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.insert_sep()
+        self.show_titlebar_underline()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
         self.setFixedWidth(self.ww)
         self._setup_ui(text)
@@ -893,7 +893,7 @@ class InputTextWin(UMainWidget):
         self.set_always_on_top()
         self.set_close_only()
         self.setWindowTitle(Lng.text_input[JsonData.lng_index])
-        self.insert_sep()
+        self.show_titlebar_underline()
         self.central_layout.addSpacing(10)
         self.central_layout.setContentsMargins(10, 0, 10, 10)
         self.central_layout.setSpacing(0)

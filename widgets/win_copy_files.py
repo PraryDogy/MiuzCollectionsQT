@@ -68,7 +68,7 @@ class ReplaceWin(UMainWidget):
 		self.setWindowTitle(Lng.replace[JsonData.lng_index])
 		self.setFixedWidth(350)
 		self.set_close_only()
-		self.insert_sep()
+		self.show_titlebar_underline()
 		self._init_ui()
 		self.adjustSize()
 
