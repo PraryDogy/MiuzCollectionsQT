@@ -727,7 +727,7 @@ class VerticalWindow(UMainWidget):
         super().__init__()
 
         self.central_layout.setSpacing(10)
-        self.central_layout.setContentsMargins(10, 5, 10, 10)
+        self.central_layout.setContentsMargins(15, 10, 15, 10)
 
         self.icon_text_widget = TransparentWidget()
         self.central_layout.addWidget(self.icon_text_widget)
@@ -843,7 +843,7 @@ class ConfirmWindow(VerticalWindow):
         min_btns_width = self.btn_widget.sizeHint().width()
         
         # Итоговая ширина (+ 30px на боковые отступы)
-        final_window_width = max(content_width, min_btns_width) + 30
+        final_window_width = max(content_width, min_btns_width) + 40
         
         # 3. ВЫСОТА ОКНА
         btn_height = self.btn_widget.sizeHint().height()
