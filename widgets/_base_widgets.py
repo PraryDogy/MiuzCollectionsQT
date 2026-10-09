@@ -123,17 +123,21 @@ class TransparentTreeView(QTreeView):
 
 
 class UTitleBar(StandardTitleBar):
+    hh = 30
+
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedHeight(30)
-
+        self.setFixedHeight(self.hh)
+        if hasattr(self, 'titleLabel'):
+            self.titleLabel.hide()
         self.center_title = QLabel(self)
         self.center_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.center_title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self.center_title.setGeometry(0, 0, self.width(), self.height())
+        y_offset = -2
+        self.center_title.setGeometry(0, y_offset, self.width(), self.height())
 
     def setTitle(self, title: str):
         self.center_title.setText(title)
@@ -141,7 +145,6 @@ class UTitleBar(StandardTitleBar):
 
 class UBaseWindow(FramelessMainWindow):
     win_list: list[QWidget] = []
-    bar_height = 30
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
@@ -161,7 +164,7 @@ class UBaseWindow(FramelessMainWindow):
         self.window_layout.setSpacing(0)
         
         # Отступ под кастомный TitleBar
-        self.window_layout.addSpacing(self.bar_height)
+        self.window_layout.addSpacing(title_bar.height())
 
         # Инициализируем сепаратор сразу и добавляем в окно, но скрываем
         self.separator = USep()
@@ -781,7 +784,7 @@ class ConfirmWindow(VerticalWindow):
         super().__init__()
         self.set_always_on_top()
         self.set_close_only()
-        self.show_titlebar_underline()
+        # self.show_titlebar_underline()
         self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
         self._setup_ui(text)
