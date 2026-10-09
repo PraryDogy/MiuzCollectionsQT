@@ -58,9 +58,10 @@ class ReplaceWin(VerticalWindow):
 	warn_svg_size = (65, 65)
 	# ww = 280
 
-	def __init__(self, filename: str, parent=None):
+	def __init__(self, filename: str, show_checkbox: bool):
 		super().__init__()
 		self.filename = filename
+		self.show_checkbox = show_checkbox
 		self.setWindowTitle(Lng.replace[JsonData.lng_index])
 		# self.setFixedWidth(self.ww)
 		self.set_close_only()
@@ -91,7 +92,8 @@ class ReplaceWin(VerticalWindow):
 		self.replace_all_checkbox = UCheckBox(Lng.apply_to_all_files[JsonData.lng_index])
 		self.replace_all_checkbox.clicked.connect(lambda: self._checkbox_clicked())
 		self.replace_all_checkbox.setChecked(False)
-		self.icon_text_layout.addWidget(self.replace_all_checkbox)
+		if self.show_checkbox:
+			self.icon_text_layout.addWidget(self.replace_all_checkbox)
 
 		self.replace_button = ActiveButton(Lng.replace[JsonData.lng_index])
 		self.replace_button.clicked.connect(self._replace)
@@ -236,7 +238,12 @@ class WinCopyFiles(WinProgressbar):
 		if 0 <= index < len(copy_item.src_urls):
 			filename = os.path.basename(copy_item.src_urls[index])
 
-		self.replace_win = ReplaceWin(filename=filename)
+		if len(copy_item.src_urls) > 1:
+			show_checkbox = True
+		else:
+			show_checkbox = False
+
+		self.replace_win = ReplaceWin(filename, show_checkbox)
 		self.replace_win.center_to_parent(self)
 
 		self.replace_win.replace_pressed.connect(self.replace_file)
