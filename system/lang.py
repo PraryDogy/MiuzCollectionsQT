@@ -229,6 +229,7 @@ class Lng:
     replace = ("Замена", "Replace")
     replace_one = ("Заменить", "Replace")
     replace_all = ("Заменить все", "Replace all")
+    apply_to_all_files = ("Применить ко всем файлам", "Apply to all files")
     stop = ("Стоп", "Stop")
     replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
     file_exists = (
