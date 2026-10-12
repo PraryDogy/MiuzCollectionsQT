@@ -63,13 +63,11 @@ class MacControlButton(QPushButton):
 		super().mouseReleaseEvent(event)
 
 
-class TitleBar(QWidget):
+class TitleBar(QWidget): # Или QWidget, смотря от чего наследуетесь
 	def __init__(self, parent):
 		super().__init__(parent)
 		self.parent = parent
 		
-		# Заменяем фиксированную высоту на минимальную, чтобы заголовок мог тянуться 
-		# за кастомным виджетом
 		self.setMinimumHeight(28) 
 
 		self.layout = QHBoxLayout(self)
@@ -81,6 +79,8 @@ class TitleBar(QWidget):
 		self.buttons_layout = QHBoxLayout(self.buttons_widget)
 		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
 		self.buttons_layout.setSpacing(8)
+		# Центрируем кнопки по вертикали ВНУТРИ их собственного макета
+		self.buttons_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
 		self.close_btn = MacControlButton('close')
 		self.min_btn = MacControlButton('minimize')
@@ -94,34 +94,36 @@ class TitleBar(QWidget):
 		self.buttons_layout.addWidget(self.min_btn)
 		self.buttons_layout.addWidget(self.max_btn)
 
-		# Добавляем кнопки с флагом AlignVCenter (всегда по центру по вертикали)
-		self.layout.addWidget(self.buttons_widget, alignment=Qt.AlignmentFlag.AlignVCenter)
+		# Добавляем кнопки БЕЗ флага alignment, чтобы они не ломали высоту TitleBar
+		self.layout.addWidget(self.buttons_widget)
 		
-		self.layout.addStretch(1)
+		# УБРАЛИ self.layout.addStretch(1)
 
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
 		self.content_container = QWidget()
+		# Разрешаем контейнеру расширяться во все стороны
+		self.content_container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+		
 		self.content_layout = QVBoxLayout(self.content_container)
 		self.content_layout.setContentsMargins(0, 0, 0, 0)
 		
-		# По умолчанию это обычный текст
 		self.title_label = QLabel()
 		self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.title_label.setStyleSheet("color: white;") # Настройте цвет по необходимости
+		self.title_label.setStyleSheet("color: white;")
 		self.content_layout.addWidget(self.title_label)
 		
-		self.layout.addWidget(self.content_container, alignment=Qt.AlignmentFlag.AlignVCenter)
+		# Добавляем БЕЗ флага alignment, чтобы виджет мог растягиваться по горизонтали
+		self.layout.addWidget(self.content_container)
 		
-		self.layout.addStretch(1)
+		# УБРАЛИ self.layout.addStretch(1)
 		
-		# --- 3. Пустышка справа для идеальной центровки ---
-		# (Ширина трех кнопок + отступы ~ 52px). Она нужна, чтобы текст 
-		# был ровно по центру окна, а не смещался из-за кнопок слева.
+		# --- 3. Пустышка справа ---
+		# Балансирует ширину кнопок слева (~52px), чтобы текстовый 
+		# заголовок по умолчанию стоял идеально по центру окна.
 		self.right_spacer = QWidget()
 		self.right_spacer.setFixedWidth(52)
 		self.layout.addWidget(self.right_spacer)
 
-		# Устанавливаем фильтр событий
 		self.close_btn.installEventFilter(self)
 		self.min_btn.installEventFilter(self)
 		self.max_btn.installEventFilter(self)

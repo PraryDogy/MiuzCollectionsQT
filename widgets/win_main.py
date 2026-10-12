@@ -113,15 +113,18 @@ class WinMain(UMainWindow):
 
 		self.bar_top = BarTop()
 		self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
-		# self.set_title_bar_widget(self.bar_top)
-		# self.set_titlebar_height(self.bar_top.height() + 10)
+		self.set_title_bar_widget(self.bar_top)
+		margin_top, margin_bottom = 7, 7
+		margins = margin_bottom + margin_top
+		self.set_titlebar_height(self.bar_top.height() + margins)
 
 		# test = TransparentFrame()
 		# test.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 		# test.setStyleSheet("background: red;")
+		# self.set_title_bar_widget(test)
 
-		self.bar_top.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-		self.set_title_bar_widget(self.bar_top)
+		# self.bar_top.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+		# self.set_title_bar_widget(self.bar_top)
 
 		self.bar_top.open_settings_win.connect(
 			lambda settings_item: self.open_settings_win(settings_item)
