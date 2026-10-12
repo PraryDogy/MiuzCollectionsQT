@@ -23,7 +23,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWindow, UMenu
+from ._base_widgets import UMainWindow, UMenu, USep
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
@@ -240,6 +240,8 @@ class WinImageView(UMainWindow):
 		self.current_data_item = img_view_item.start_data_item
 
 		self.set_window_style("black")
+		self.show_titlebar_sep()
+		self.set_titlebar_sep_style("dark_gray")
 		self.setMinimumSize(QSize(self.min_w, self.min_h))
 		self.installEventFilter(self)
 		self.central_layout.setContentsMargins(0, 0, 0, 0)

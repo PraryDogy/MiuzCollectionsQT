@@ -226,8 +226,12 @@ ActiveButton:pressed {
 
 /* ==================== SEPARATOR ==================== */
 
-USep {
+USep[style="default"] {
     background: #1c2833;
+}
+
+USep[style="dark_gray"] {
+    background: #2c2c2c;
 }
 
 

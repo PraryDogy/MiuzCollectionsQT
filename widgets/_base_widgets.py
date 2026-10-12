@@ -307,9 +307,18 @@ class ActiveButton(UPushButton):
 
 
 class USep(TransparentFrame):
+	property_name = "style"
+
 	def __init__(self):
 		super().__init__()
 		self.setFixedHeight(1)
+		self.set_style("default")
+
+	def set_style(self, style: Literal["default", "dark_gray"]):
+		self.setProperty(self.property_name, style)
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
 
 
 class USlider(QSlider):
@@ -555,9 +564,9 @@ class UMainWindowFrame(TransparentFrame):
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		self.set_window_style("default")
+		self.set_style("default")
 
-	def set_window_style(self, style: Literal["default", "black"]):
+	def set_style(self, style: Literal["default", "black"]):
 		self.setProperty(self.property_name, style)
 		self.style().unpolish(self)
 		self.style().polish(self)
@@ -590,7 +599,7 @@ class UMainWindow(QMainWindow):
 
 		self.sep_container = TransparentWidget()
 		self.sep_layout = QVBoxLayout(self.sep_container)
-		self.sep_layout.setContentsMargins(0, 1, 0, 1)
+		self.sep_layout.setContentsMargins(5, 1, 5, 1)
 		self.sep_layout.setSpacing(0)
 		self.sep = USep()
 		self.sep_layout.addWidget(self.sep)
@@ -607,12 +616,15 @@ class UMainWindow(QMainWindow):
 
 	def set_window_style(self, style: Literal["default", "black"]):
 		frame: UMainWindowFrame = self.centralWidget()
-		frame.set_window_style(style)
+		frame.set_style(style)
+
+	def set_titlebar_sep_style(self, style: Literal["default", "dark_gray"]):
+		self.sep.set_style(style)
 
 	def set_titlebar_height(self, h: int):
 		self.title_bar.setFixedHeight(h)
 
-	def show_titlebar_underline(self):
+	def show_titlebar_sep(self):
 		self.sep_container.setVisible(True)
 
 	def register_window(self):
@@ -833,7 +845,7 @@ class WinProgressbar(UMainWindow):
 
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(0)
-		self.show_titlebar_underline()
+		self.show_titlebar_sep()
 		self.central_layout.addSpacing(10)
 
 		h_wid = QWidget()
@@ -1002,7 +1014,7 @@ class WarningWindow(VerticalWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.show_titlebar_underline()
+		self.show_titlebar_sep()
 		self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
 		self._setup_ui(text)
@@ -1051,7 +1063,7 @@ class InputTextWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.text_input[JsonData.lng_index])
-		self.show_titlebar_underline()
+		self.show_titlebar_sep()
 		self.central_layout.addSpacing(10)
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(0)

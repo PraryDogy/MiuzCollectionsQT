@@ -66,7 +66,7 @@ class ReplaceWin(VerticalWindow):
 		# self.setFixedWidth(self.ww)
 		self.set_close_only()
 		self.set_always_on_top()
-		self.show_titlebar_underline()
+		self.show_titlebar_sep()
 		self._init_ui()
 		self.adjustSize()
 

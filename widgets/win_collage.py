@@ -23,7 +23,7 @@ class WinCollage(UMainWindow):
 		self.resize(self.ww, self.hh)
 		self.setMinimumSize(400, 400)
 		self.setWindowTitle(Lng.collage[JsonData.lng_index])
-		self.show_titlebar_underline()
+		self.show_titlebar_sep()
 		self.central_layout.setContentsMargins(5, 0, 5, 0)
 
 		self.pixmaps: list[QPixmap] = [
