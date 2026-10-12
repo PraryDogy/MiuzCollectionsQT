@@ -472,25 +472,32 @@ class TitleBar(QWidget):
 		self.max_btn.installEventFilter(self)
 
 	def set_custom_widget(self, widget: QWidget):
-		while self.content_layout.count():
-			item = self.content_layout.takeAt(0)
-			if item.widget():
-				item.widget().deleteLater()
+		# Прячем стандартный текст вместо его удаления
+		self.title_label.hide()
 		
+		# Безопасно удаляем старые кастомные виджеты, не трогая title_label
+		for i in reversed(range(self.content_layout.count())):
+			item = self.content_layout.itemAt(i)
+			w = item.widget()
+			if w and w != self.title_label:
+				self.content_layout.removeItem(item)
+				w.deleteLater()
+				
 		self.content_layout.addWidget(widget)
-		
-		# Скрываем пустышку, чтобы ваш виджет (например, BarTop) 
-		# мог занять всё доступное место вплоть до правого края окна
 		self.right_spacer.hide()
 
 	def set_title_text(self, text: str):
-		while self.content_layout.count():
-			item = self.content_layout.takeAt(0)
-			if item.widget():
-				item.widget().deleteLater()
-		self.content_layout.addWidget(self.title_label)
+		# Удаляем любые кастомные виджеты, если они были добавлены
+		for i in reversed(range(self.content_layout.count())):
+			item = self.content_layout.itemAt(i)
+			w = item.widget()
+			if w and w != self.title_label:
+				self.content_layout.removeItem(item)
+				w.deleteLater()
+				
+		# Снова показываем наш текстовый лейбл
 		self.title_label.setText(text)
-		# Возвращаем пустышку, чтобы текст снова встал по центру
+		self.title_label.show()
 		self.right_spacer.show()
 
 	def set_group_hovered(self, state: bool):
