@@ -92,6 +92,7 @@ class WinMain(UMainWindow):
 
 	def __init__(self, argv: list):
 		super().__init__()
+		# отступы от окна слева справа, кроме заголовка окна
 		self.central_layout.setContentsMargins(5, 0, 5, 0)
 		self.central_layout.setSpacing(0)
 		self.setMinimumWidth(self.min_w)
@@ -109,6 +110,7 @@ class WinMain(UMainWindow):
 		self.files_to_copy = set()
 		self.stop_scaner = True
 
+		# отступ справа в заголовке окна
 		self.bar_top = BarTop()
 		self.bar_top.h_layout.setContentsMargins(0, 0, 5, 0)
 		self.set_title_bar_widget(self.bar_top)

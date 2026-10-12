@@ -101,7 +101,7 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 		self.layout.addWidget(self.buttons_widget)
 
 		# отступ справа от кнопок
-		self.layout.addSpacing(10)
+		self.layout.addSpacing(15)
 		
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
 		self.content_container = QWidget()
