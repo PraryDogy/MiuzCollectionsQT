@@ -112,7 +112,7 @@ class WinMain(UMainWindow):
 
 		self.bar_top = BarTop()
 		# отступ справа в заголовке окна
-		self.bar_top.h_layout.setContentsMargins(0, 0, 5, 0)
+		self.bar_top.h_layout.setContentsMargins(0, 0, 10, 0)
 		self.set_title_bar_widget(self.bar_top)
 		self.set_titlebar_height(self.bar_top.height() + 8)
 
