@@ -453,7 +453,7 @@ class TitleBar(TransparentWidget):
 
 		self.h_layout.addWidget(self.buttons_widget)
 		self.buttons_widget.adjustSize()
-		self.TRAFFIC_LIGHT_WIDTH = self.buttons_widget.sizeHint().width()
+		TitleBar.TRAFFIC_LIGHT_WIDTH = self.buttons_widget.sizeHint().width()
 		
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
 		self.content_container = TransparentWidget()

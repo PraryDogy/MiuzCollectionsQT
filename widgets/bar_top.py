@@ -10,8 +10,8 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 
-from ._base_widgets import (GrayTextLabel, TransparentFrame, TransparentWidget,
-							ULineEdit, UMenu, UPushButton)
+from ._base_widgets import (GrayTextLabel, TitleBar, TransparentFrame,
+                            TransparentWidget, ULineEdit, UMenu, UPushButton)
 from .win_text_search import WinTextSearch
 
 
@@ -279,6 +279,12 @@ class BarTop(TransparentFrame):
 		self.search_wid = SearchWidLineEdit()
 		self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
 		self.h_layout.addWidget(self.search_wid)
+
+		# мы добавляем пустышку по длине виджета кнопок окна,
+		# чтобы был истинный центр
+		self.h_layout.addSpacing(TitleBar.TRAFFIC_LIGHT_WIDTH)
+		print(TitleBar.TRAFFIC_LIGHT_WIDTH)
+
 
 		self.h_layout.addStretch(0)
 
