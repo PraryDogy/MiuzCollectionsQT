@@ -4,9 +4,9 @@ from collections import defaultdict
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import (QCloseEvent, QGuiApplication, QIcon, QImage,
-                         QKeyEvent, QPixmap)
+						 QKeyEvent, QPixmap)
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QSplitter,
-                             QVBoxLayout, QWidget)
+							 QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -14,15 +14,15 @@ from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
-                                 UpdateThumbItem)
+								 UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
-                           ScanerWorker)
+						   ScanerWorker)
 from system.scaner_new import NewScanerProcess, NewScanerWorker
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
 from ._base_widgets import (ConfirmWindow, USep, UMainWindow, UPushButton,
-                            WarningWindow, TransparentFrame)
+							WarningWindow, TransparentFrame)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -42,819 +42,819 @@ from .win_upload import UploadWin
 
 
 class TestWid(QLabel):
-    def __init__(self, parent=None):
-        super().__init__(parent=parent, text="TEST")
-        self.setFixedHeight(50)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+	def __init__(self, parent=None):
+		super().__init__(parent=parent, text="TEST")
+		self.setFixedHeight(50)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    def reload(self):
-        from ._base_widgets import ConfirmWindow
-        self.confirm_win = ConfirmWindow(
-            text="Стандратное окно подтверждения, другая строка и другой текстовый текст"
-        )
-        self.confirm_win.center_to_parent(self.window())
-        self.confirm_win.show()
+	def reload(self):
+		from ._base_widgets import ConfirmWindow
+		self.confirm_win = ConfirmWindow(
+			text="Стандратное окно подтверждения, другая строка и другой текстовый текст"
+		)
+		self.confirm_win.center_to_parent(self.window())
+		self.confirm_win.show()
 
-    def mouseReleaseEvent(self, a0):
-        self.reload()
-        return super().mouseReleaseEvent(a0)
+	def mouseReleaseEvent(self, a0):
+		self.reload()
+		return super().mouseReleaseEvent(a0)
 
 
 class DangerWarn(ConfirmWindow):
-    icon_path = Static.COMMON_ICONS / "red_warning.svg"
+	icon_path = Static.COMMON_ICONS / "red_warning.svg"
 
-    def __init__(self, mf_alias: str, removed_images_count: int):
-        text = (
-            f"{Lng.dangerous_text[JsonData.lng_index]}".format(removed_images_count)
-        )
-        super().__init__(text)
-        self.svg_widget.load(str(self.icon_path))
-        self.ok_btn.setText(Lng.allow[JsonData.lng_index])
-        self.cancel_btn.setText(Lng.deny[JsonData.lng_index])
+	def __init__(self, mf_alias: str, removed_images_count: int):
+		text = (
+			f"{Lng.dangerous_text[JsonData.lng_index]}".format(removed_images_count)
+		)
+		super().__init__(text)
+		self.svg_widget.load(str(self.icon_path))
+		self.ok_btn.setText(Lng.allow[JsonData.lng_index])
+		self.cancel_btn.setText(Lng.deny[JsonData.lng_index])
 
-    def closeEvent(self, a0):
-        a0.ignore()
+	def closeEvent(self, a0):
+		a0.ignore()
 
-    def keyPressEvent(self, a0):
-        return
+	def keyPressEvent(self, a0):
+		return
 
 
 class MainWinRightWidget(TransparentFrame):
-    def __init__(self):
-        super().__init__()
+	def __init__(self):
+		super().__init__()
 
 
 class WinMain(UMainWindow):
-    min_w = 750
-    left_side_width = 250
-    ww, hh = 1050, 750
+	min_w = 750
+	left_side_width = 250
+	ww, hh = 1050, 750
 
-    def __init__(self, argv: list):
-        super().__init__()
-        self.central_layout.setContentsMargins(10, 0, 10, 5)
-        self.show_titlebar_underline()
-        self.setMinimumWidth(self.min_w)
-        self.setWindowTitle(f"{Static.APP_NAME}")
-        self.setMenuBar(BarMacos())
+	def __init__(self, argv: list):
+		super().__init__()
+		self.central_layout.setContentsMargins(10, 0, 10, 5)
+		self.show_titlebar_underline()
+		self.setMinimumWidth(self.min_w)
+		self.setWindowTitle(f"{Static.APP_NAME}")
+		self.setMenuBar(BarMacos())
 
-        MAIN_MARGIN = 5
+		MAIN_MARGIN = 5
 
-        # self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
-        # self.test.center_to_parent(self)
-        # self.test.show()
+		# self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
+		# self.test.center_to_parent(self)
+		# self.test.show()
 
-        # test_wid = TestWid()
-        # self.central_layout.addWidget(test_wid)
+		# test_wid = TestWid()
+		# self.central_layout.addWidget(test_wid)
 
-        self.forced_scaner_dirs = set()
-        self.go_to_url: str | None = None
-        self.files_to_copy = set()
-        self.stop_scaner = True
+		self.forced_scaner_dirs = set()
+		self.go_to_url: str | None = None
+		self.files_to_copy = set()
+		self.stop_scaner = True
 
-        self.bar_top = BarTop()
-        self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
-        # self.set_title_bar_widget(self.bar_top)
-        # self.set_titlebar_height(self.bar_top.height() + 10)
+		self.bar_top = BarTop()
+		self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
+		# self.set_title_bar_widget(self.bar_top)
+		# self.set_titlebar_height(self.bar_top.height() + 10)
 
-        # test = TransparentFrame()
-        # test.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        # test.setStyleSheet("background: red;")
+		# test = TransparentFrame()
+		# test.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+		# test.setStyleSheet("background: red;")
 
-        self.bar_top.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        self.set_title_bar_widget(self.bar_top)
+		self.bar_top.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+		self.set_title_bar_widget(self.bar_top)
 
-        self.bar_top.open_settings_win.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.bar_top.open_img_search_win.connect(
-            lambda: self.open_img_search_win()
-        )
-        self.bar_top.start_text_search.connect(
-            lambda: self.base_search_start()
-        )
-        self.bar_top.mf_new.connect(
-            lambda settings_item: self.open_settings_win(settings_item)
-        )
-        self.bar_top.mf_open.connect(
-            lambda mf: self.on_mf_clicked(mf)
-        )
+		self.bar_top.open_settings_win.connect(
+			lambda settings_item: self.open_settings_win(settings_item)
+		)
+		self.bar_top.open_img_search_win.connect(
+			lambda: self.open_img_search_win()
+		)
+		self.bar_top.start_text_search.connect(
+			lambda: self.base_search_start()
+		)
+		self.bar_top.mf_new.connect(
+			lambda settings_item: self.open_settings_win(settings_item)
+		)
+		self.bar_top.mf_open.connect(
+			lambda mf: self.on_mf_clicked(mf)
+		)
 
-        # Создаем QSplitter
-        self.splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.splitter.setHandleWidth(15)
-        self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.central_layout.addWidget(self.splitter)
+		# Создаем QSplitter
+		self.splitter = QSplitter(Qt.Orientation.Horizontal)
+		self.splitter.setHandleWidth(15)
+		self.splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+		self.central_layout.addWidget(self.splitter)
 
-        self.left_menu = MenuLeft()
-        self.left_menu.reveal.connect(
-            lambda rel_paths: self.reveal_in_finder(rel_paths)
-        )
-        self.left_menu.on_tree_clicked.connect(
-            lambda abs_path: self.on_tree_clicked(abs_path)
-        )
-        self.left_menu.on_mf_clicked.connect(
-            lambda mf: self.on_mf_clicked(mf)
-        )
-        self.left_menu.on_hide_digits_clicked.connect(
-            lambda: self.on_hide_digits_clicked()
-        )
-        self.left_menu.copy_path.connect(
-            lambda rel_paths: self.copy_path(rel_paths)
-        )
-        self.splitter.addWidget(self.left_menu)
+		self.left_menu = MenuLeft()
+		self.left_menu.reveal.connect(
+			lambda rel_paths: self.reveal_in_finder(rel_paths)
+		)
+		self.left_menu.on_tree_clicked.connect(
+			lambda abs_path: self.on_tree_clicked(abs_path)
+		)
+		self.left_menu.on_mf_clicked.connect(
+			lambda mf: self.on_mf_clicked(mf)
+		)
+		self.left_menu.on_hide_digits_clicked.connect(
+			lambda: self.on_hide_digits_clicked()
+		)
+		self.left_menu.copy_path.connect(
+			lambda rel_paths: self.copy_path(rel_paths)
+		)
+		self.splitter.addWidget(self.left_menu)
 
-        # Правый виджет
-        right_wid = MainWinRightWidget()
-        self.splitter.addWidget(right_wid)
-        self.right_layout = QVBoxLayout(right_wid)
-        self.right_layout.setContentsMargins(0, 10, 0, 10)
-        self.right_layout.setSpacing(0)
+		# Правый виджет
+		right_wid = MainWinRightWidget()
+		self.splitter.addWidget(right_wid)
+		self.right_layout = QVBoxLayout(right_wid)
+		self.right_layout.setContentsMargins(0, 10, 0, 10)
+		self.right_layout.setSpacing(0)
 
-        self.grid = Grid()
-        self.load_st_grid()
+		self.grid = Grid()
+		self.load_st_grid()
 
-        self.splitter.setStretchFactor(0, 0)
-        self.splitter.setStretchFactor(1, 1)
-        self.resize(self.ww, self.hh)
+		self.splitter.setStretchFactor(0, 0)
+		self.splitter.setStretchFactor(1, 1)
+		self.resize(self.ww, self.hh)
 
-        # --- Создаем единый контейнер для всего нижнего блока ---
-        self.footer_container = QWidget()
-        self.footer_layout = QVBoxLayout(self.footer_container)
-        
-        # верхний маргин для отступа от сетки и меню
-        self.footer_layout.setContentsMargins(MAIN_MARGIN, 10, MAIN_MARGIN, 0)
-        self.footer_layout.setSpacing(0)
+		# --- Создаем единый контейнер для всего нижнего блока ---
+		self.footer_container = QWidget()
+		self.footer_layout = QVBoxLayout(self.footer_container)
+		
+		# верхний маргин для отступа от сетки и меню
+		self.footer_layout.setContentsMargins(MAIN_MARGIN, 10, MAIN_MARGIN, 0)
+		self.footer_layout.setSpacing(0)
 
-        # нижний маргин для отступа от сепаратора барами
-        # левый и правый маргин для красивого отступа
-        self.bar_path = PathBar()
-        self.bar_path.h_layout.setContentsMargins(0, 0, 0, 0)
-        self.path_bar_update("")
-        self.footer_layout.addWidget(self.bar_path)
+		# нижний маргин для отступа от сепаратора барами
+		# левый и правый маргин для красивого отступа
+		self.bar_path = PathBar()
+		self.bar_path.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.path_bar_update("")
+		self.footer_layout.addWidget(self.bar_path)
 
-        self.footer_layout.addSpacing(5)
+		self.footer_layout.addSpacing(5)
 
-        # 2. Добавляем горизонтальный разделитель
-        bar_bottom_sep = USep()
-        self.footer_layout.addWidget(bar_bottom_sep)
+		# 2. Добавляем горизонтальный разделитель
+		bar_bottom_sep = USep()
+		self.footer_layout.addWidget(bar_bottom_sep)
 
-        # левый и правый маргин для красивого отступа
-        self.bar_bottom = BarBottom()
-        self.bar_bottom.h_layout.setContentsMargins(0, 0, 0, 0)
-        self.bar_bottom.resize_thumbnails.connect(
-            lambda: self.load_st_grid()
-        )
-        self.footer_layout.addWidget(self.bar_bottom)
+		# левый и правый маргин для красивого отступа
+		self.bar_bottom = BarBottom()
+		self.bar_bottom.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.bar_bottom.resize_thumbnails.connect(
+			lambda: self.load_st_grid()
+		)
+		self.footer_layout.addWidget(self.bar_bottom)
 
-        # --- Добавляем уже готовый собранный виджет в главный лэйаут ---
-        self.central_layout.addWidget(self.footer_container)
+		# --- Добавляем уже готовый собранный виджет в главный лэйаут ---
+		self.central_layout.addWidget(self.footer_container)
 
-        if "noscan" not in argv:
-            self.start_scaner_task()
-        else:
-            print("СКАНЕР ВЫКЛЮЧЕН")
-            self.bar_bottom.progress_bar.setText("noscan enabled")
+		if "noscan" not in argv:
+			self.start_scaner_task()
+		else:
+			print("СКАНЕР ВЫКЛЮЧЕН")
+			self.bar_bottom.progress_bar.setText("noscan enabled")
 
-    @staticmethod
-    def with_conn(fn: callable):
-        def wrapper(self: "WinMain", *args):
-            avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
-            if avaiable_mf_path:
-                Mf.current_mf.set_mf_current_path(avaiable_mf_path)
-                return fn(self, *args)
-            else:
-                self.open_win_smb(Mf.current_mf)
-        return wrapper
+	@staticmethod
+	def with_conn(fn: callable):
+		def wrapper(self: "WinMain", *args):
+			avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
+			if avaiable_mf_path:
+				Mf.current_mf.set_mf_current_path(avaiable_mf_path)
+				return fn(self, *args)
+			else:
+				self.open_win_smb(Mf.current_mf)
+		return wrapper
 
-    def set_no_img_search(self):
-        Dynamic.img_search_thumb_paths.clear()
-        self.bar_top.img_search_btn.set_base_style()
-        try:
-            self.win_img_search.deleteLater()
-        except (RuntimeError, AttributeError):
-            ...
+	def set_no_img_search(self):
+		Dynamic.img_search_thumb_paths.clear()
+		self.bar_top.img_search_btn.set_base_style()
+		try:
+			self.win_img_search.deleteLater()
+		except (RuntimeError, AttributeError):
+			...
 
-    def base_search_start(self):
-        self.left_menu.tree_wid.expand_to_path(os.sep)
-        self.load_st_grid()
+	def base_search_start(self):
+		self.left_menu.tree_wid.expand_to_path(os.sep)
+		self.load_st_grid()
 
-    def open_img_search_win(self):
-        def on_closed():
-            win = self.win_img_search
-            if not win.preview_widget.pixmap.isNull():
-                self.bar_top.img_search_btn.set_selected_style()
-                win.hide()
-            else:
-                self.bar_top.img_search_btn.set_base_style()
-                self.win_img_search = None
-                win.deleteLater()
+	def open_img_search_win(self):
+		def on_closed():
+			win = self.win_img_search
+			if not win.preview_widget.pixmap.isNull():
+				self.bar_top.img_search_btn.set_selected_style()
+				win.hide()
+			else:
+				self.bar_top.img_search_btn.set_base_style()
+				self.win_img_search = None
+				win.deleteLater()
 
-        self.bar_top.img_search_btn.set_selected_style()
+		self.bar_top.img_search_btn.set_selected_style()
 
-        if not getattr(self, "win_img_search", None):
-            self.win_img_search = WinImgSearch()
-            self.win_img_search.reload_thumbnails.connect(self.load_st_grid)
-            self.win_img_search.closed.connect(on_closed)
-            self.win_img_search.center_to_parent(self)
+		if not getattr(self, "win_img_search", None):
+			self.win_img_search = WinImgSearch()
+			self.win_img_search.reload_thumbnails.connect(self.load_st_grid)
+			self.win_img_search.closed.connect(on_closed)
+			self.win_img_search.center_to_parent(self)
 
-        self.win_img_search.show()
-        self.win_img_search.raise_()
-        self.win_img_search.activateWindow()
-    
-    def show_in_app(self, rel_path: str):
-        current_dir = os.path.dirname(rel_path)
-        Dynamic.current_dir = current_dir
-        self.go_to_url = rel_path
-        self.load_st_grid()
-        self.left_menu.tree_wid.expand_to_path(current_dir)
-    
-    def path_bar_update(self, path: str):
-        dir = f"/{Mf.current_mf.mf_alias}{path}"
-        self.bar_path.update(dir)
+		self.win_img_search.show()
+		self.win_img_search.raise_()
+		self.win_img_search.activateWindow()
+	
+	def show_in_app(self, rel_path: str):
+		current_dir = os.path.dirname(rel_path)
+		Dynamic.current_dir = current_dir
+		self.go_to_url = rel_path
+		self.load_st_grid()
+		self.left_menu.tree_wid.expand_to_path(current_dir)
+	
+	def path_bar_update(self, path: str):
+		dir = f"/{Mf.current_mf.mf_alias}{path}"
+		self.bar_path.update(dir)
 
-    def on_hide_digits_clicked(self):
-        self.win_warn = WarningWindow(Lng.hide_digits_full[JsonData.lng_index])
-        self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
-        self.win_warn.center_to_parent(self)
-        self.win_warn.show()
-        
-    def open_filters_win(self):
+	def on_hide_digits_clicked(self):
+		self.win_warn = WarningWindow(Lng.hide_digits_full[JsonData.lng_index])
+		self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
+		self.win_warn.center_to_parent(self)
+		self.win_warn.show()
+		
+	def open_filters_win(self):
 
-        def edit_filters():
-            settings_item = SettingsItem("filters", "")
-            self.open_settings_win(settings_item)
+		def edit_filters():
+			settings_item = SettingsItem("filters", "")
+			self.open_settings_win(settings_item)
 
-        self.filters_win = WinFilters()
-        self.filters_win.load_st_grid.connect(self.load_st_grid)
-        self.filters_win.edit_filters.connect(edit_filters)
-        self.filters_win.center_to_parent(self.window())
-        self.filters_win.show()
+		self.filters_win = WinFilters()
+		self.filters_win.load_st_grid.connect(self.load_st_grid)
+		self.filters_win.edit_filters.connect(edit_filters)
+		self.filters_win.center_to_parent(self.window())
+		self.filters_win.show()
 
-    def open_win_smb(self, mf: Mf):
-        self.win_smb = WinSmb(mf)
-        self.win_smb.center_to_parent(self.win_list[-2])
-        self.win_smb.show()
+	def open_win_smb(self, mf: Mf):
+		self.win_smb = WinSmb(mf)
+		self.win_smb.center_to_parent(self.win_list[-2])
+		self.win_smb.show()
 
-    def on_mf_clicked(self, mf: Mf):
-        Mf.current_mf = mf
-        Dynamic.current_dir = os.sep
-        self.path_bar_update(Dynamic.current_dir)
-        self.left_menu.tree_wid.abs_selected_path = os.sep
-        self.left_menu.tree_wid.init_ui()
-        self.load_st_grid()
+	def on_mf_clicked(self, mf: Mf):
+		Mf.current_mf = mf
+		Dynamic.current_dir = os.sep
+		self.path_bar_update(Dynamic.current_dir)
+		self.left_menu.tree_wid.abs_selected_path = os.sep
+		self.left_menu.tree_wid.init_ui()
+		self.load_st_grid()
 
-        mf_path = mf.get_avaiable_mf_path()
-        if not mf_path:
-            self.open_win_smb(mf)
+		mf_path = mf.get_avaiable_mf_path()
+		if not mf_path:
+			self.open_win_smb(mf)
  
-    @with_conn
-    def on_tree_clicked(self, abs_path: str):
-        rel_path = Utils.remove_mf_path(
-            mf_path=Mf.current_mf.mf_current_path,
-            abs_path=abs_path
-        )
-        Dynamic.current_dir = rel_path
-        self.load_st_grid()
-        self.path_bar_update(Dynamic.current_dir)
+	@with_conn
+	def on_tree_clicked(self, abs_path: str):
+		rel_path = Utils.remove_mf_path(
+			mf_path=Mf.current_mf.mf_current_path,
+			abs_path=abs_path
+		)
+		Dynamic.current_dir = rel_path
+		self.load_st_grid()
+		self.path_bar_update(Dynamic.current_dir)
 
-    @with_conn
-    def start_update_thumb(self, rel_paths: list[str]):
+	@with_conn
+	def start_update_thumb(self, rel_paths: list[str]):
 
-        def poll_task():
-            queue = self.update_thumb_task.process_queue
-            if not queue.empty():
-                update_thumb_item: UpdateThumbItem = queue.get()
-                wid = self.grid.url_to_wid.get(update_thumb_item.rel_img_path)
-                if wid:
-                    ind = Dynamic.current_pixmap_size_index
-                    current_size = Static.THUMB_WID_PIXMAP_SIZE[ind] * Static.DPR
-                    qimage = Utils.pyqt_qimage_from_array(update_thumb_item.array)
-                    qimage_scaled = qimage.scaled(
-                        current_size, current_size,
-                        aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-                        transformMode=Qt.TransformationMode.SmoothTransformation
-                    )
-                    qimage_scaled.setDevicePixelRatio(Static.DPR)
-                    wid.data_item.src_qimage = qimage
-                    wid.data_item.resized_qimage = qimage_scaled
-                    wid.set_pixmap_with_actual_size()
+		def poll_task():
+			queue = self.update_thumb_task.process_queue
+			if not queue.empty():
+				update_thumb_item: UpdateThumbItem = queue.get()
+				wid = self.grid.url_to_wid.get(update_thumb_item.rel_img_path)
+				if wid:
+					ind = Dynamic.current_pixmap_size_index
+					current_size = Static.THUMB_WID_PIXMAP_SIZE[ind] * Static.DPR
+					qimage = Utils.pyqt_qimage_from_array(update_thumb_item.array)
+					qimage_scaled = qimage.scaled(
+						current_size, current_size,
+						aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+						transformMode=Qt.TransformationMode.SmoothTransformation
+					)
+					qimage_scaled.setDevicePixelRatio(Static.DPR)
+					wid.data_item.src_qimage = qimage
+					wid.data_item.resized_qimage = qimage_scaled
+					wid.set_pixmap_with_actual_size()
   
-            if not self.update_thumb_task.is_alive():
-                self.update_thumb_task.terminate_join()
-            else:
-                QTimer.singleShot(700, poll_task)
+			if not self.update_thumb_task.is_alive():
+				self.update_thumb_task.terminate_join()
+			else:
+				QTimer.singleShot(700, poll_task)
 
-        for url, wid in self.grid.url_to_wid.items():
-            if url in rel_paths:
-                wid.img_wid.show_updating()
+		for url, wid in self.grid.url_to_wid.items():
+			if url in rel_paths:
+				wid.img_wid.show_updating()
 
-        self.update_thumb_task = ProcessWorker(
-            target=UpdateThumb.start,
-            args=(Mf.current_mf, rel_paths, )
-        )
-        self.update_thumb_task.start()
-        QTimer.singleShot(300, poll_task)
+		self.update_thumb_task = ProcessWorker(
+			target=UpdateThumb.start,
+			args=(Mf.current_mf, rel_paths, )
+		)
+		self.update_thumb_task.start()
+		QTimer.singleShot(300, poll_task)
 
-    @with_conn
-    def save_to_downloads(self, rel_paths: list[str]):
-        downloads = os.path.expanduser("~/Downloads")
-        abs_paths = [
-            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-            for i in rel_paths
-        ]
-        copy_files_win = self.copy_files_win(
-            files_to_copy=abs_paths,
-            dest=downloads
-        )
-        copy_files_win.finished_.connect(
-            Utils.macos_reveal_files
-        )
+	@with_conn
+	def save_to_downloads(self, rel_paths: list[str]):
+		downloads = os.path.expanduser("~/Downloads")
+		abs_paths = [
+			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			for i in rel_paths
+		]
+		copy_files_win = self.copy_files_win(
+			files_to_copy=abs_paths,
+			dest=downloads
+		)
+		copy_files_win.finished_.connect(
+			Utils.macos_reveal_files
+		)
 
-    @with_conn
-    def set_files_to_copy(self, rel_paths: tuple):
-        abs_files_to_copy = set(
-            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-            for i in rel_paths
-        )
+	@with_conn
+	def set_files_to_copy(self, rel_paths: tuple):
+		abs_files_to_copy = set(
+			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			for i in rel_paths
+		)
 
-        self.files_to_copy = abs_files_to_copy
-        self.grid.files_to_copy = abs_files_to_copy
+		self.files_to_copy = abs_files_to_copy
+		self.grid.files_to_copy = abs_files_to_copy
 
-    @with_conn
-    def paste_files(self, files_to_copy: list[str], dest: str):
-        """
-        files_to_copy, dest
-        """
-        copy_files_win = self.copy_files_win(
-            files_to_copy=files_to_copy,
-            dest=dest
-        )
-        copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
-        self.forced_scaner_dirs.add(dest)
-        self.files_to_copy.clear()
-        self.grid.files_to_copy.clear()
+	@with_conn
+	def paste_files(self, files_to_copy: list[str], dest: str):
+		"""
+		files_to_copy, dest
+		"""
+		copy_files_win = self.copy_files_win(
+			files_to_copy=files_to_copy,
+			dest=dest
+		)
+		copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
+		self.forced_scaner_dirs.add(dest)
+		self.files_to_copy.clear()
+		self.grid.files_to_copy.clear()
 
-    @with_conn
-    def open_in_app(self, rel_paths: list[str], app_path: str):
-        for i in rel_paths:
-            abs_path = Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-            if app_path:
-                subprocess.Popen(["open", "-a", app_path, abs_path])
-            else:
-                subprocess.Popen(["open", abs_path])
+	@with_conn
+	def open_in_app(self, rel_paths: list[str], app_path: str):
+		for i in rel_paths:
+			abs_path = Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			if app_path:
+				subprocess.Popen(["open", "-a", app_path, abs_path])
+			else:
+				subprocess.Popen(["open", abs_path])
 
-    @with_conn
-    def reveal_in_finder(self, rel_paths: list):
-        abs_paths = [
-            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-            for i in rel_paths
-        ]
-        if os.path.isdir(abs_paths[0]):
-            subprocess.Popen(["open", abs_paths[0]])
-        else:
-            Utils.macos_reveal_files(abs_paths)
+	@with_conn
+	def reveal_in_finder(self, rel_paths: list):
+		abs_paths = [
+			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			for i in rel_paths
+		]
+		if os.path.isdir(abs_paths[0]):
+			subprocess.Popen(["open", abs_paths[0]])
+		else:
+			Utils.macos_reveal_files(abs_paths)
 
-    @with_conn
-    def copy_path(self, rel_paths: list[str]):
-        abs_paths = [
-            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-            for i in rel_paths
-        ]
-        Utils.pyqt_copy_text("\n".join(abs_paths))
+	@with_conn
+	def copy_path(self, rel_paths: list[str]):
+		abs_paths = [
+			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			for i in rel_paths
+		]
+		Utils.pyqt_copy_text("\n".join(abs_paths))
 
-    @with_conn
-    def remove_files(self, rel_paths: list, ms = 300):
-        
-        def poll_file_remover():
-            if not file_remover.process_queue.empty():
-                file_remover.process_queue.get()
-            if not file_remover.is_alive():
-                file_remover.terminate_join()
-                for i in dirs_to_scan:
-                    self.forced_scaner_dirs.add(i)
+	@with_conn
+	def remove_files(self, rel_paths: list, ms = 300):
+		
+		def poll_file_remover():
+			if not file_remover.process_queue.empty():
+				file_remover.process_queue.get()
+			if not file_remover.is_alive():
+				file_remover.terminate_join()
+				for i in dirs_to_scan:
+					self.forced_scaner_dirs.add(i)
 
-                self.start_scaner_task()
-            else:
-                QTimer.singleShot(ms, poll_file_remover)
+				self.start_scaner_task()
+			else:
+				QTimer.singleShot(ms, poll_file_remover)
 
-        def start_file_remover():
-            file_remover.start()
-            QTimer.singleShot(ms, poll_file_remover)
+		def start_file_remover():
+			file_remover.start()
+			QTimer.singleShot(ms, poll_file_remover)
 
-        abs_paths = [
-            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-            for i in rel_paths
-        ]
-        dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
-        if len(abs_paths) == 1:
-            text = f"{Lng.remove_file_question[JsonData.lng_index]}"
-        else:
-            text = f"{Lng.remove_files_question[JsonData.lng_index]}"
-        self.remove_files_win = ConfirmWindow(text)
-        file_remover = ProcessWorker(
-                target=FilesRemover.start,
-                args=(abs_paths, )
-            )
-        self.remove_files_win.center_to_parent(self.window())
-        self.remove_files_win.ok_clicked.connect(start_file_remover)
-        self.remove_files_win.show()
-    
-    @with_conn
-    def upload_files(self, dropped_files: list[str]):
+		abs_paths = [
+			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			for i in rel_paths
+		]
+		dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
+		if len(abs_paths) == 1:
+			text = f"{Lng.remove_file_question[JsonData.lng_index]}"
+		else:
+			text = f"{Lng.remove_files_question[JsonData.lng_index]}"
+		self.remove_files_win = ConfirmWindow(text)
+		file_remover = ProcessWorker(
+				target=FilesRemover.start,
+				args=(abs_paths, )
+			)
+		self.remove_files_win.center_to_parent(self.window())
+		self.remove_files_win.ok_clicked.connect(start_file_remover)
+		self.remove_files_win.show()
+	
+	@with_conn
+	def upload_files(self, dropped_files: list[str]):
 
-        def fin(dest: str):
-            self.upload_win.deleteLater()
-            self.paste_files(dropped_files, dest)
+		def fin(dest: str):
+			self.upload_win.deleteLater()
+			self.paste_files(dropped_files, dest)
 
 
-        dropped_files = [
-            i
-            for i in dropped_files
-            if i.endswith(ImgUtils.ext_all)
-        ]
-        self.upload_win = UploadWin(
-            mf=Mf.current_mf,
-            current_dir=Dynamic.current_dir,
-            files_to_copy=dropped_files
-        )
-        self.upload_win.ok_clicked.connect(
-            lambda dest: fin(dest)
-        )
-        self.upload_win.center_to_parent(self)
-        self.upload_win.show()
+		dropped_files = [
+			i
+			for i in dropped_files
+			if i.endswith(ImgUtils.ext_all)
+		]
+		self.upload_win = UploadWin(
+			mf=Mf.current_mf,
+			current_dir=Dynamic.current_dir,
+			files_to_copy=dropped_files
+		)
+		self.upload_win.ok_clicked.connect(
+			lambda dest: fin(dest)
+		)
+		self.upload_win.center_to_parent(self)
+		self.upload_win.show()
 
-    @with_conn
-    def open_info_win(self, rel_paths: list[str]):
-        
-        abs_paths = [
-            Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-            for i in rel_paths
-        ]
-        self.info_win = WinInfo(abs_paths)
-        self.info_win.center_to_parent(UMainWindow.win_list[-2])
-        self.info_win.show()
+	@with_conn
+	def open_info_win(self, rel_paths: list[str]):
+		
+		abs_paths = [
+			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			for i in rel_paths
+		]
+		self.info_win = WinInfo(abs_paths)
+		self.info_win.center_to_parent(UMainWindow.win_list[-2])
+		self.info_win.show()
 
-    def open_settings_win(self, settings_item: SettingsItem):
-        self.bar_top.settings_btn.set_selected_style()
-        self.settings_win = WinSettings(settings_item)
-        self.settings_win.closed.connect(
-            self.bar_top.settings_btn.set_base_style
-        )
-        self.settings_win.center_to_parent(self.window())
-        self.settings_win.show()
+	def open_settings_win(self, settings_item: SettingsItem):
+		self.bar_top.settings_btn.set_selected_style()
+		self.settings_win = WinSettings(settings_item)
+		self.settings_win.closed.connect(
+			self.bar_top.settings_btn.set_base_style
+		)
+		self.settings_win.center_to_parent(self.window())
+		self.settings_win.show()
 
-    def load_st_grid(self, layout_index: int = 3):
+	def load_st_grid(self, layout_index: int = 3):
 
-        def finished():
-            self.grid.setFocus()
-            if self.go_to_url:
-                widget = self.grid.url_to_wid.get(self.go_to_url)
-                if not widget:
-                    return
-                self.grid.select_by_url(self.go_to_url)
-                QTimer.singleShot(
-                    100,
-                    lambda: self.grid.ensureWidgetVisible(widget)
-                )
-                self.go_to_url = str()
+		def finished():
+			self.grid.setFocus()
+			if self.go_to_url:
+				widget = self.grid.url_to_wid.get(self.go_to_url)
+				if not widget:
+					return
+				self.grid.select_by_url(self.go_to_url)
+				QTimer.singleShot(
+					100,
+					lambda: self.grid.ensureWidgetVisible(widget)
+				)
+				self.go_to_url = str()
 
-        self.bar_top.search_wid.update_placeholder()
-        Dynamic.loaded_thumbs = 0
-        self.grid.deleteLater()
-        self.grid = GridStandart()
-        self.grid.files_to_copy = self.files_to_copy
-        self.grid.restart_scaner.connect(
-            lambda: self.restart_scaner_task()
-        )
-        self.grid.remove_files.connect(
-            lambda rel_paths: self.remove_files(rel_paths)
-        )
-        self.grid.open_img_view.connect(
-            lambda: self.open_view_win(Mf.current_mf)
-        )
-        self.grid.save_files.connect(
-            lambda rel_paths: self.save_to_downloads(rel_paths)
-        )
-        self.grid.open_info_win.connect(
-            lambda rel_paths: self.open_info_win(rel_paths)
-        )
-        self.grid.copy_path.connect(
-            lambda rel_paths: self.copy_path(rel_paths)
-        )
-        self.grid.reveal_in_finder.connect(
-            lambda rel_paths: self.reveal_in_finder(rel_paths)
-        )
-        self.grid.set_fav.connect(
-            lambda data: self.set_fav(data)
-        )
-        self.grid.open_in_app.connect(
-            lambda data: self.open_in_app(*data)
-        )
-        # контекстное меню, берешь files_to_copy из буффера
-        self.grid.paste_files.connect(
-            lambda: self.paste_files(
-                self.files_to_copy,
-                os.path.join(Mf.current_mf.mf_current_path, Dynamic.current_dir.strip(os.sep))
-                )
-        )
-        self.grid.set_files_to_copy.connect(
-            lambda rel_paths: self.set_files_to_copy(rel_paths)
-        )
-        self.grid.setup_mf.connect(
-            lambda item: self.open_settings_win(item)
-        )
-        self.grid.path_bar_update.connect(
-            lambda rel_path: self.path_bar_update(rel_path)
-        )
-        self.grid.update_thumb.connect(
-            lambda rel_paths: self.start_update_thumb(rel_paths)
-        )
-        self.grid.show_in_app.connect(
-            self.show_in_app
-        )
-        self.grid.finished_.connect(
-            finished
-        )
-        self.grid.load_st_grid.connect(
-            self.load_st_grid
-        )
-        self.grid.upload_files.connect(
-            lambda abs_paths: self.upload_files(abs_paths)
-        )
-        self.grid.collage.connect(
-            lambda data_items: self.open_collage_win(data_items)
-        )
-        self.grid.open_filters_win.connect(
-            lambda: self.open_filters_win()
-        )
-        self.right_layout.addWidget(self.grid)
+		self.bar_top.search_wid.update_placeholder()
+		Dynamic.loaded_thumbs = 0
+		self.grid.deleteLater()
+		self.grid = GridStandart()
+		self.grid.files_to_copy = self.files_to_copy
+		self.grid.restart_scaner.connect(
+			lambda: self.restart_scaner_task()
+		)
+		self.grid.remove_files.connect(
+			lambda rel_paths: self.remove_files(rel_paths)
+		)
+		self.grid.open_img_view.connect(
+			lambda: self.open_view_win(Mf.current_mf)
+		)
+		self.grid.save_files.connect(
+			lambda rel_paths: self.save_to_downloads(rel_paths)
+		)
+		self.grid.open_info_win.connect(
+			lambda rel_paths: self.open_info_win(rel_paths)
+		)
+		self.grid.copy_path.connect(
+			lambda rel_paths: self.copy_path(rel_paths)
+		)
+		self.grid.reveal_in_finder.connect(
+			lambda rel_paths: self.reveal_in_finder(rel_paths)
+		)
+		self.grid.set_fav.connect(
+			lambda data: self.set_fav(data)
+		)
+		self.grid.open_in_app.connect(
+			lambda data: self.open_in_app(*data)
+		)
+		# контекстное меню, берешь files_to_copy из буффера
+		self.grid.paste_files.connect(
+			lambda: self.paste_files(
+				self.files_to_copy,
+				os.path.join(Mf.current_mf.mf_current_path, Dynamic.current_dir.strip(os.sep))
+				)
+		)
+		self.grid.set_files_to_copy.connect(
+			lambda rel_paths: self.set_files_to_copy(rel_paths)
+		)
+		self.grid.setup_mf.connect(
+			lambda item: self.open_settings_win(item)
+		)
+		self.grid.path_bar_update.connect(
+			lambda rel_path: self.path_bar_update(rel_path)
+		)
+		self.grid.update_thumb.connect(
+			lambda rel_paths: self.start_update_thumb(rel_paths)
+		)
+		self.grid.show_in_app.connect(
+			self.show_in_app
+		)
+		self.grid.finished_.connect(
+			finished
+		)
+		self.grid.load_st_grid.connect(
+			self.load_st_grid
+		)
+		self.grid.upload_files.connect(
+			lambda abs_paths: self.upload_files(abs_paths)
+		)
+		self.grid.collage.connect(
+			lambda data_items: self.open_collage_win(data_items)
+		)
+		self.grid.open_filters_win.connect(
+			lambda: self.open_filters_win()
+		)
+		self.right_layout.addWidget(self.grid)
 
-    @with_conn
-    def open_view_win(self, mf: Mf):
-        if len(self.grid.selected_widgets) == 1:
-            data_items = [i.data_item for i in self.grid.url_to_wid.values()]
-            is_selection = False
-        else:
-            data_items = [i.data_item for i in self.grid.selected_widgets]
-            is_selection = True
-        start_data_item = self.grid.selected_widgets[0].data_item
+	@with_conn
+	def open_view_win(self, mf: Mf):
+		if len(self.grid.selected_widgets) == 1:
+			data_items = [i.data_item for i in self.grid.url_to_wid.values()]
+			is_selection = False
+		else:
+			data_items = [i.data_item for i in self.grid.selected_widgets]
+			is_selection = True
+		start_data_item = self.grid.selected_widgets[0].data_item
 
-        item = ImgViewItem(
-            start_data_item=start_data_item,
-            data_items=data_items,
-            is_selection=is_selection
-        )
-        self.view_win = WinImageView(item)
-        self.view_win.open_win_info.connect(
-            lambda rel_paths: self.open_info_win(rel_paths)
-        )
-        self.view_win.copy_path.connect(
-            lambda rel_paths: self.copy_path(rel_paths)
-        )
-        self.view_win.reveal_in_finder.connect(
-            lambda rel_paths: self.reveal_in_finder(Mf.current_mf, rel_paths)
-        )
-        self.view_win.set_fav.connect(
-            self.set_fav
-        )
-        self.view_win.save_files.connect(
-            lambda rel_paths: self.save_to_downloads(rel_paths)
-        )
-        self.view_win.select_thumb.connect(
-            lambda path: self.grid.select_by_url(path)
-        )
-        self.view_win.open_in_app.connect(
-            lambda data: self.open_in_app(*data)
-        )
-        self.view_win.image_not_exists.connect(
-            lambda: self.open_win_smb(Mf.current_mf)
-        )
-        if WinImageView.xx == 0:
-            self.view_win.resize(self.ww, self.hh)
-            self.view_win.center_to_parent(self.window())
-        else:
-            self.view_win.resize(WinImageView.ww, WinImageView.hh)
-            self.view_win.move(WinImageView.xx, WinImageView.yy)
-        self.view_win.show()
+		item = ImgViewItem(
+			start_data_item=start_data_item,
+			data_items=data_items,
+			is_selection=is_selection
+		)
+		self.view_win = WinImageView(item)
+		self.view_win.open_win_info.connect(
+			lambda rel_paths: self.open_info_win(rel_paths)
+		)
+		self.view_win.copy_path.connect(
+			lambda rel_paths: self.copy_path(rel_paths)
+		)
+		self.view_win.reveal_in_finder.connect(
+			lambda rel_paths: self.reveal_in_finder(Mf.current_mf, rel_paths)
+		)
+		self.view_win.set_fav.connect(
+			self.set_fav
+		)
+		self.view_win.save_files.connect(
+			lambda rel_paths: self.save_to_downloads(rel_paths)
+		)
+		self.view_win.select_thumb.connect(
+			lambda path: self.grid.select_by_url(path)
+		)
+		self.view_win.open_in_app.connect(
+			lambda data: self.open_in_app(*data)
+		)
+		self.view_win.image_not_exists.connect(
+			lambda: self.open_win_smb(Mf.current_mf)
+		)
+		if WinImageView.xx == 0:
+			self.view_win.resize(self.ww, self.hh)
+			self.view_win.center_to_parent(self.window())
+		else:
+			self.view_win.resize(WinImageView.ww, WinImageView.hh)
+			self.view_win.move(WinImageView.xx, WinImageView.yy)
+		self.view_win.show()
 
-    def poll_scaner_task(self, ms: int = 3000):
+	def poll_scaner_task(self, ms: int = 3000):
 
-        def can_continue(can_continue: bool, mf_alias: str):
-            """
-            True = продолжить сканирование, False = прервать сканирование
-            """
-            self.win_warn.deleteLater()
-            self.scaner_task.response_queue.put(can_continue)
-            if not can_continue:
-                for mf in Mf.items:
-                    if mf.mf_alias == mf_alias:
-                        mf.set_mf_current_path(None)
-                        mf.mf_paths = ["", ]
-                        self.open_win_smb(mf)
+		def can_continue(can_continue: bool, mf_alias: str):
+			"""
+			True = продолжить сканирование, False = прервать сканирование
+			"""
+			self.win_warn.deleteLater()
+			self.scaner_task.response_queue.put(can_continue)
+			if not can_continue:
+				for mf in Mf.items:
+					if mf.mf_alias == mf_alias:
+						mf.set_mf_current_path(None)
+						mf.mf_paths = ["", ]
+						self.open_win_smb(mf)
 
-        if not hasattr(self, "scaner_task") or not self.scaner_task:
-            self.scaner_poll_timer.start(ms)
-            return
-        while not self.scaner_task.process_queue.empty():
-            data = self.scaner_task.process_queue.get()
+		if not hasattr(self, "scaner_task") or not self.scaner_task:
+			self.scaner_poll_timer.start(ms)
+			return
+		while not self.scaner_task.process_queue.empty():
+			data = self.scaner_task.process_queue.get()
 
-            if isinstance(data, tuple):
-                mf_alias, removed_images_count = data
-                self.win_warn = DangerWarn(mf_alias, removed_images_count)
-                self.win_warn.center_to_parent(self)
-                self.win_warn.ok_clicked.connect(lambda: can_continue(True, mf_alias))
-                self.win_warn.cancel_clicked.connect(lambda: can_continue(False, mf_alias))
-                self.win_warn.show()
+			if isinstance(data, tuple):
+				mf_alias, removed_images_count = data
+				self.win_warn = DangerWarn(mf_alias, removed_images_count)
+				self.win_warn.center_to_parent(self)
+				self.win_warn.ok_clicked.connect(lambda: can_continue(True, mf_alias))
+				self.win_warn.cancel_clicked.connect(lambda: can_continue(False, mf_alias))
+				self.win_warn.show()
 
-            else:
-                if self.bar_bottom.progress_bar.text() != data:
-                    self.bar_bottom.progress_bar.setText(data)
+			else:
+				if self.bar_bottom.progress_bar.text() != data:
+					self.bar_bottom.progress_bar.setText(data)
 
-        if not self.scaner_task.is_alive():
-            self.scaner_task.terminate_join()
-            self.bar_bottom.progress_bar.setText("")
-            self.bar_bottom.progress_bar.start_timer_text()
-            new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
-            if self.db_mtime != new_db_time:
-                self.load_st_grid()
-                self.left_menu.tree_wid.init_ui()
-        else:
-            self.scaner_poll_timer.start(ms)
+		if not self.scaner_task.is_alive():
+			self.scaner_task.terminate_join()
+			self.bar_bottom.progress_bar.setText("")
+			self.bar_bottom.progress_bar.start_timer_text()
+			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
+			if self.db_mtime != new_db_time:
+				self.load_st_grid()
+				self.left_menu.tree_wid.init_ui()
+		else:
+			self.scaner_poll_timer.start(ms)
 
-    def start_scaner_task(self, ms: int = 3000):
+	def start_scaner_task(self, ms: int = 3000):
 
-        if not hasattr(self, "scaner_task"):
-            # print("первая инициация сканера")
-            self.scaner_task = None
-            self.db_mtime = 0
+		if not hasattr(self, "scaner_task"):
+			# print("первая инициация сканера")
+			self.scaner_task = None
+			self.db_mtime = 0
 
-            self.scaner_check_timer = QTimer(self)
-            self.scaner_check_timer.setSingleShot(True)
-            self.scaner_check_timer.timeout.connect(
-                self.start_scaner_task
-            )
+			self.scaner_check_timer = QTimer(self)
+			self.scaner_check_timer.setSingleShot(True)
+			self.scaner_check_timer.timeout.connect(
+				self.start_scaner_task
+			)
 
-            self.scaner_poll_timer = QTimer(self)
-            self.scaner_poll_timer.setSingleShot(True)
-            self.scaner_poll_timer.timeout.connect(
-                self.poll_scaner_task
-            )
+			self.scaner_poll_timer = QTimer(self)
+			self.scaner_poll_timer.setSingleShot(True)
+			self.scaner_poll_timer.timeout.connect(
+				self.poll_scaner_task
+			)
 
-        can_start = False
-        alive = self.scaner_task.is_alive() if self.scaner_task else False
+		can_start = False
+		alive = self.scaner_task.is_alive() if self.scaner_task else False
 
-        # задача завершена
-        if not alive:
-            can_start = True
+		# задача завершена
+		if not alive:
+			can_start = True
 
-        if can_start:
-            if self.forced_scaner_dirs:
-                forced_scaner_item = ForcedScanerItem(
-                    mf=Mf.current_mf,
-                    dirs_to_scan=self.forced_scaner_dirs.copy(),
-                    lng_index=JsonData.lng_index
-                )
-                self.scaner_task = ScanerWorker(
-                    target=ForcedScaner.start,
-                    args=(forced_scaner_item, )
-                    )
-            else:
-                # print("штатно запускаю ОБЩИЙ сканер")
-                self.scaner_task = ScanerWorker(
-                    target=BaseScaner.start,
-                    args=(Mf.items, JsonData.lng_index, )
-                )
-            self.forced_scaner_dirs.clear()
-            self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
-            self.bar_bottom.progress_bar.stop_timer_text()
-            self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
-            self.scaner_task.start()
-            self.scaner_poll_timer.stop()
-            self.scaner_poll_timer.start(ms)
-            self.scaner_check_timer.stop()
-            self.scaner_check_timer.start(JsonData.scaner_minutes * 60 * 1000)
-        else:
-            # проверяем каждую минуту, что задача завершена
-            self.scaner_check_timer.stop()
-            self.scaner_check_timer.start(5000)
+		if can_start:
+			if self.forced_scaner_dirs:
+				forced_scaner_item = ForcedScanerItem(
+					mf=Mf.current_mf,
+					dirs_to_scan=self.forced_scaner_dirs.copy(),
+					lng_index=JsonData.lng_index
+				)
+				self.scaner_task = ScanerWorker(
+					target=ForcedScaner.start,
+					args=(forced_scaner_item, )
+					)
+			else:
+				# print("штатно запускаю ОБЩИЙ сканер")
+				self.scaner_task = ScanerWorker(
+					target=BaseScaner.start,
+					args=(Mf.items, JsonData.lng_index, )
+				)
+			self.forced_scaner_dirs.clear()
+			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
+			self.bar_bottom.progress_bar.stop_timer_text()
+			self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
+			self.scaner_task.start()
+			self.scaner_poll_timer.stop()
+			self.scaner_poll_timer.start(ms)
+			self.scaner_check_timer.stop()
+			self.scaner_check_timer.start(JsonData.scaner_minutes * 60 * 1000)
+		else:
+			# проверяем каждую минуту, что задача завершена
+			self.scaner_check_timer.stop()
+			self.scaner_check_timer.start(5000)
 
-    def restart_scaner_task(self):
-        try:
-            self.scaner_task.terminate_join()
-        except AttributeError as e:
-            print("Win main restart scaner task", e)
-        self.start_scaner_task()
-        
-    def center_screen(self):
-        # Получаем геометрию первичного (главного) экрана
-        screen = QGuiApplication.primaryScreen().geometry()
-        # Получаем геометрию текущего окна
-        size = self.geometry()
-        
-        # Вычисляем координаты центра
-        x = (screen.width() - size.width()) // 2
-        y = (screen.height() - size.height()) // 2
-        
-        # Перемещаем окно
-        self.move(x, y)
+	def restart_scaner_task(self):
+		try:
+			self.scaner_task.terminate_join()
+		except AttributeError as e:
+			print("Win main restart scaner task", e)
+		self.start_scaner_task()
+		
+	def center_screen(self):
+		# Получаем геометрию первичного (главного) экрана
+		screen = QGuiApplication.primaryScreen().geometry()
+		# Получаем геометрию текущего окна
+		size = self.geometry()
+		
+		# Вычисляем координаты центра
+		x = (screen.width() - size.width()) // 2
+		y = (screen.height() - size.height()) // 2
+		
+		# Перемещаем окно
+		self.move(x, y)
 
-    def on_exit(self):
-        try:
-            if hasattr(self, "scaner_task"):
-                self.scaner_task.terminate_join()
-            ProcessWorker.stop_all()
-        except Exception as e:
-            print("on exit main win terminate error", e)
-        JsonData.write_json_data()
-        Filters.write_json_data()
-        Mf.write_json_data()
-        os._exit(0)
+	def on_exit(self):
+		try:
+			if hasattr(self, "scaner_task"):
+				self.scaner_task.terminate_join()
+			ProcessWorker.stop_all()
+		except Exception as e:
+			print("on exit main win terminate error", e)
+		JsonData.write_json_data()
+		Filters.write_json_data()
+		Mf.write_json_data()
+		os._exit(0)
 
-    def open_collage_win(self, data_items: list[DataItem]):
-        self.collage_win = WinCollage(data_items)
-        self.collage_win.center_to_parent(self)
-        self.collage_win.show()
+	def open_collage_win(self, data_items: list[DataItem]):
+		self.collage_win = WinCollage(data_items)
+		self.collage_win.center_to_parent(self)
+		self.collage_win.show()
 
-    def set_fav(self, data: tuple[str, int]):
+	def set_fav(self, data: tuple[str, int]):
 
-        def finished(rel_path: str, value: int):
-            self.grid.set_thumb_fav(rel_path, value)
-            try:
-                self.view_win.set_title()
-            except AttributeError:
-                ...
+		def finished(rel_path: str, value: int):
+			self.grid.set_thumb_fav(rel_path, value)
+			try:
+				self.view_win.set_title()
+			except AttributeError:
+				...
 
-        rel_path, value = data
-        self.task = SetFav(rel_path, value)
-        self.task.sigs.finished_.connect(
-            lambda: finished(rel_path, value)
-        )
-        UThreadPool.start(self.task)
+		rel_path, value = data
+		self.task = SetFav(rel_path, value)
+		self.task.sigs.finished_.connect(
+			lambda: finished(rel_path, value)
+		)
+		UThreadPool.start(self.task)
 
-    def copy_files_win(self, files_to_copy: list[str], dest: str):
-        progress_win = WinCopyFiles(
-            files_to_copy=files_to_copy,
-            target_dir=dest
-        )
-        progress_win.center_to_parent(self)
-        progress_win.show()   
-        return progress_win
-    
-    def open_server_win(self):
-        self.server_win = ServersWin()
-        self.server_win.center_to_parent(self)
-        self.server_win.show()
+	def copy_files_win(self, files_to_copy: list[str], dest: str):
+		progress_win = WinCopyFiles(
+			files_to_copy=files_to_copy,
+			target_dir=dest
+		)
+		progress_win.center_to_parent(self)
+		progress_win.show()   
+		return progress_win
+	
+	def open_server_win(self):
+		self.server_win = ServersWin()
+		self.server_win.center_to_parent(self)
+		self.server_win.show()
 
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
-        self.hide()
-        a0.ignore()
-    
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        
-        if a0.key() == Qt.Key.Key_V:
-            if self.files_to_copy:
-                dest = os.path.join(
-                    Mf.current_mf.mf_current_path,
-                    Dynamic.current_dir.strip(os.sep)
-                )
-                self.paste_files(self.files_to_copy, dest)
-        
-        elif a0.key() == Qt.Key.Key_W:
-            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                self.hide()
+	def closeEvent(self, a0: QCloseEvent | None) -> None:
+		self.hide()
+		a0.ignore()
+	
+	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+		
+		if a0.key() == Qt.Key.Key_V:
+			if self.files_to_copy:
+				dest = os.path.join(
+					Mf.current_mf.mf_current_path,
+					Dynamic.current_dir.strip(os.sep)
+				)
+				self.paste_files(self.files_to_copy, dest)
+		
+		elif a0.key() == Qt.Key.Key_W:
+			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+				self.hide()
 
-        elif a0.key() == Qt.Key.Key_F:
-            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                self.bar_top.search_wid.setFocus()
+		elif a0.key() == Qt.Key.Key_F:
+			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+				self.bar_top.search_wid.setFocus()
 
-        elif a0.key() == Qt.Key.Key_K:
-            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                self.open_server_win()
+		elif a0.key() == Qt.Key.Key_K:
+			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+				self.open_server_win()
 
-        elif a0.key() == Qt.Key.Key_Escape:
-            if self.isFullScreen():
-                self.showNormal()
-                self.raise_()
-            else:
-                a0.ignore()
+		elif a0.key() == Qt.Key.Key_Escape:
+			if self.isFullScreen():
+				self.showNormal()
+				self.raise_()
+			else:
+				a0.ignore()
 
-        elif a0.key() == Qt.Key.Key_Equal:
-            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.current_pixmap_size_index < len(Static.THUMB_WID_PIXMAP_SIZE) - 1:
-                    Dynamic.current_pixmap_size_index += 1
-                    self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
+		elif a0.key() == Qt.Key.Key_Equal:
+			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+				if Dynamic.current_pixmap_size_index < len(Static.THUMB_WID_PIXMAP_SIZE) - 1:
+					Dynamic.current_pixmap_size_index += 1
+					self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
 
-        elif a0.key() == Qt.Key.Key_Minus:
-            if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-                if Dynamic.current_pixmap_size_index > 0:
-                    Dynamic.current_pixmap_size_index -= 1
-                    self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
-    
-    def resizeEvent(self, a0):
-        wid = self.splitter.widget(1)
-        self.bar_path.setMaximumWidth(wid.width())
-        return super().resizeEvent(a0)
-    
+		elif a0.key() == Qt.Key.Key_Minus:
+			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
+				if Dynamic.current_pixmap_size_index > 0:
+					Dynamic.current_pixmap_size_index -= 1
+					self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
+	
+	def resizeEvent(self, a0):
+		wid = self.splitter.widget(1)
+		self.bar_path.setMaximumWidth(wid.width())
+		return super().resizeEvent(a0)
+	
 
 # class WinMain(UMainWindow):
 #     def __init__(self, *args):
