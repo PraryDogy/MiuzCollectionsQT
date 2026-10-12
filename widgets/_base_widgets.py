@@ -177,11 +177,6 @@ class TitleBar(QWidget):
 		self._drag_pos = None
 		# return super().mouseReleaseEvent(a0)
 
-	def mouseDoubleClickEvent(self, a0):
-		if a0.button() == Qt.MouseButton.LeftButton:
-			self.toggle_maximize()
-		# return super().mouseDoubleClickEvent(a0)
-
 
 # стилизованный виджет, чтобы окно имело заливку + рамку + углы
 class UBaseWindowFrame(QFrame):
@@ -251,6 +246,7 @@ class UBaseWindow(QMainWindow):
 		self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
 	def set_close_only(self):
+		return
 		flags = Qt.WindowType.CustomizeWindowHint
 		flags |= Qt.WindowType.WindowCloseButtonHint
 		self.setWindowFlags(flags)
