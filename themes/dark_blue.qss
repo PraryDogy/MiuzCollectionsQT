@@ -16,9 +16,10 @@ TransparentTreeView {
     border: none;
 }
 
-UMainWindow,
-UMainWidget {
-    background: #0c1218;
+UBaseWindowFrame {
+    background: #ff0c1218;
+    border-radius: 10px;
+    border: 1px solid #ff1d2b38;
 }
 
 

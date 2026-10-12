@@ -163,7 +163,7 @@ class MacControlButton(QPushButton):
 		super().mouseReleaseEvent(event)
 
 
-class TitleBar(QWidget):
+class TitleBar(TransparentWidget):
 	def __init__(self, parent):
 		super().__init__(parent)
 		self.parent = parent
@@ -243,16 +243,27 @@ class TitleBar(QWidget):
 			self.toggle_maximize()
 
 
+class UBaseWindowFrame(TransparentFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+
+
 class UBaseWindow(QMainWindow):
     win_list: list[QWidget] = []
 
-    def __init__(self, parent: QWidget = None, show_title: bool = True):
+    def __init__(self, parent: QWidget = None):
         super().__init__(parent)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setup_window()
 
+    def setWindowTitle(self, a0):
+        print(a0.title())
+        return super().setWindowTitle(a0)
+
     def setup_window(self):
-        central_widget = TransparentFrame()
+        central_widget = UBaseWindowFrame()
         self.setCentralWidget(central_widget)
 
         self.window_layout = QVBoxLayout(central_widget)
