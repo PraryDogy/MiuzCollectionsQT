@@ -215,7 +215,7 @@ class UBaseWindow(QMainWindow):
 		self.title_bar.set_title_text(title)
 		return super().setWindowTitle(title)
 
-	def setTitleBarWidget(self, widget: QWidget):
+	def set_title_bar_widget(self, widget: QWidget):
 		# Интегрируем кастомный виджет в заголовок
 		self.title_bar.set_custom_widget(widget)
 
