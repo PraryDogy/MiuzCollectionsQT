@@ -8,8 +8,8 @@ from system.lang import Lng
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
-                            TransparentWidget, UMainWindow, UMenu, UPushButton,
-                            USep)
+							TransparentWidget, UMainWindow, UMenu, UPushButton,
+							USep)
 
 
 class CalendarBigDate(GrayTextLabel):

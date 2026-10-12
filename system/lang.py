@@ -1,536 +1,536 @@
 class Lng:
-    months = [
-        {
-            "1": "Январь",
-            "10": "Октябрь",
-            "11": "Ноябрь",
-            "12": "Декабрь",
-            "2": "Февраль",
-            "3": "Март",
-            "4": "Апрель",
-            "5": "Май",
-            "6": "Июнь",
-            "7": "Июль",
-            "8": "Август",
-            "9": "Сентябрь"
-        },
-        {
-            "1": "January",
-            "10": "October",
-            "11": "November",
-            "12": "December",
-            "2": "February",
-            "3": "March",
-            "4": "April",
-            "5": "May",
-            "6": "June",
-            "7": "July",
-            "8": "August",
-            "9": "September"
-        }
-    ]
-    months_gen = [
-        {
-            "1": "января",
-            "10": "октября",
-            "11": "ноября",
-            "12": "декабря",
-            "2": "февраля",
-            "3": "марта",
-            "4": "апреля",
-            "5": "мая",
-            "6": "июня",
-            "7": "июля",
-            "8": "августа",
-            "9": "сентября"
-        },
-        {
-            "1": "january",
-            "10": "october",
-            "11": "november",
-            "12": "december",
-            "2": "february",
-            "3": "march",
-            "4": "april",
-            "5": "may",
-            "6": "june",
-            "7": "july",
-            "8": "august",
-            "9": "september"
-        }
-    ]
-    file_size = ("Размер", "Size")
-    info = ("Инфо", "Info")
-    loading = ("Загрузка...", "Loading...")
-    no_photo = ("Нет фотографий", "No photos")
-    open_settings_window = ("Открыть настройки", "Open settings window")
-    paste = ("Вставить (⌘ + V)", "Paste (⌘ + V)")
-    scan_folder = ("Искать изображения", "Find images")
-    update_grid = ("Обновить", "Update")
-    reset = ("Сбросить", "Reset")
-    reset_all = ("Сбросить все", "Reset all")
-    resol = ("Разрешение", "Resolution")
-    reveal_in_finder = ("Показать в Finder", "Reveal in Finder")
-    save_to_downloads = ("Сохранить в загрузки", "Save to Downloads")
-    search = ("Поиск", "Search")
-    settings = ("Настройки", "Settings")
-    total_files = ("Всего файлов", "Total files")
-    type_ = ("Тип", "Type")
-    open = ("Открыть", "Open")
-    delete = ("Удалить", "Remove")
-    copy_name = ("Скопировать имя", "Copy filename")
-    copy_names = ("Скопировать имя объектов", "Copy object names")
-    attention = ("Внимание!", "Warning!")
-    remove_file_title = ("Безвозвратное удаление", "Permanent deletion")
-    remove_file_question = ("Вы действительно хотите безвозвратно удалить этот файл?", "Are you sure you want to permanently delete this file?")
-    remove_files_question = ("Вы действительно хотите безвозвратно удалить выбранные файлы?", "Are you sure you want to permanently delete these files?")
-    theme = ("Тема", "Theme")
-    theme_dark = ("Темная", "Dark")
-    theme_light = ("Светлая", "Light")
-    theme_auto = ("Авто", "Auto")
-    cut = ("Вырезать (⌘ + X)", "Cut (⌘ + X)")
-    filters = ("Фильтры", "Filters")
-    catalog = ("Каталог", "Catalog")
-    folder = ("Каталог изображений", "Image catalog")
-    open_default = ("Открыть по умолчанию", "Open by default")
-    open_in = ("Открыть в приложении", "Open in application")
-    alias_immutable = (
-        "Имя (нельзя изменить после сохранения)",
-        "Name (cannot be changed after saving)"
-    )
-    save = ("Сохранить", "Save")
-    new_folder = ("Новый каталог", "New catalog")
-    enter_alias_warning = (
-        "Пожалуйста, введите имя. Это поле не может быть пустым.",
-        "Please enter a name. This field cannot be left blank."
-    )
-    select_folder_path = (
-        "Для продолжения работы необходимо указать путь к папке с изображениями.",
-        "You need to specify the path to the image folder to continue."
-    )
-    folder_path = ("Путь к каталогу", "Catalog path")
-    general = ("Основные", "General")
-    at_least_one_folder_required = (
-        "Нужен хотя бы один каталог с изображениями",
-        "At least one image catalog is required"
-    )
-    images = ("Изображения", "Images")
-    menu = ("Меню", "Menu")
-    calendar = ("Календарь", "Calendar")
-    favorites = ("Избранное", "Favorites")
-    cancel = ("Отмена", "Cancel")
-    confirmation = ("Подтверждение", "Confirmation")
-    no_connection = ("Нет подключения", "No connection")
-    ok = ("Ок", "Ok")
-    alias = ("Имя", "Name")
-    ignore_list_descr = (
-        "Игнор лист: перетащите сюда папку или укажите имя с новой строки",
-        "Ignore list: drag a folder here or enter a name on a new line"
-    )
-    ignore_list = ("Игнор лист", "Ignore list")
-    minutes = ("минут", "minutes")
-    search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
-    show_system_files = ("Системные файлы в Finder", "System files in Finder")
-    russian = ("Русский", "English")
-    language_max = ("Сменить язык (Change language)", "Change language (Сменить язык)")
-    erase_data = ("Сбросить все данные", "Reset all data")
-    copying = ("Копирование", "Copying")
-    from_ = ("из", "from")
-    in_ = ("в", "in")
-    copy_file = ("Копировать файл (⌘ + C)", "Copy file (⌘ + C)")
-    copy_files = ("Копировать файлы (⌘ + C)", "Copy files (⌘ + C)")
-    copy = ("Cкопировать (⌘ + C)", "Copy (⌘ + C)")
-    copy_all = ("Копировать все", "Copy all")
-    add_to_favorites = ("Добавить в избранное", "Add to favorites")
-    remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
-    copy_filepath = ("Скопировать путь к файлу", "Copy filepath")
-    copy_dirpath = ("Скопировать путь", "Copy path")
-    copy_filepaths = ("Скопировать путь к файлам", "Copy file paths to files")
-    add = ("Добавить", "Add")
-    search_in = ("Поиск в каталоге", "Search in catalog")
-    indexing_files = ("Индексация файлов", "Indexing files")
-    indexing = ("Индексация", "Indexing")
-    changed = ("Изменен", "Changed")
-    changed_short = ("Изм.", "Mod.")
-    file_name = ("Имя файла", "File name")
-    show_about = ("О приложении", "Аbout the app")
-    alias_already_exists = (
-        "Каталог с таким именем уже существует. Пожалуйста, выберите другое.",
-        "A catalog with this name already exists. Please choose a different one."
-    )
-    image = ("Изображение", "Image")
-    sort_by_mod = ("По дате изменения", "Date modification")
-    sort_by_recent = ("По дате добавления", "Date added")
-    preparing = ("Подготовка", "Preparing")
-    save_text_long = (
-        "Изменения сохранены. Приложение будет перезапущено.",
-        "Changes saved. The application will restart."
-    )
-    filters_descr = (
-        "Фильтры:\n"
-        "• Показывают файлы, путь которых содержит указанный текст.\n"
-        "• Каждый фильтр вводится с новой строки.\n"
-        "Пример:\n"
-        "• Добавьте фильтр \".jpg\" и нажмите \"Сохранить\".\n"
-        "• В приложении выберите фильтр \".jpg\" — будут показаны все .jpg файлы.",
-        "Filters:\n"
-        "• Show files whose path contains the specified text.\n"
-        "• Enter each filter on a new line.\n"
-        "Example:\n"
-        "• Add the filter \".jpg\" and click \"Save\".\n"
-        "• In the app, select the \".jpg\" filter — all .jpg files will be displayed."
-    )
-    without_subfolders = ("Без подпапок", "Without subfolders")
-    hide_digits = ("Скрыть нумерацию", "Hide numbering")
-    show_digits = ("Показать нумерацию", "Show numbering")
-    expand_all = ("Развернуть всё", "Expand All")
-    collapse_all = ("Свернуть всё", "Collapse All")
-    data_size = ("Размер данных", "Data size")
-    calculating = ("Вычисление", "Calculating")
-    repair_mf = (
-        "Исправить ошибки в каталоге",
-        "Fix errors in the catalog"
-    )
-    app_will_restarted = (
-        "Приложение будет перезапущено. Нажмите ок, чтобы продолжить.",
-        "The application will restart. Click OK to continue."
-    )
-    remove_folder = (
-        "Удалить каталог изображений",
-        "Delete the image catalog"
-    )
-    reset_filters = (
-        "Фильтры по умолчанию",
-        "Default filters"
-    )
-    reset_filters_long = (
-        "Фильтры будут сброшены к значениям по умолчанию",
-        "All filters will be reset to their default values",
-    )
-    erase_data_long = (
-        "Все кэшированные изображения будут удалены, а настройки приложения "
-        "сброшены до значений по умолчанию",
-        "All cached images will be deleted and app settings will be reset "
-        "to defaults."
-    )
-    location = ("Расположение", "Location")
-    modified = ("Изменен", "Modified")
-    statistic = ("Статистика данных", "Data statistics")
-    connect_to_server = ("Подключение к серверу (⌘ + K)", "Connect to server (⌘ + K)")
-    connect = ("Подкл.", "Connect")
-    server = ("Адрес сервера", "Server address")
-    # server_favs = ("Избранные серверы", "Favorites")
-    login = ("логин", "login")
-    password = ("пароль", "password")
-    upload_in = ("Загрузить в ...", "Upload in ...")
-    clockwise = ("Повернуть по ч.с. (⌘ + →)", "Rotate cw (⌘ + →)")
-    counter_clockwise = ("Повернуть против ч.с. (⌘ + ←)", "Rotate ccw (⌘ + ←)")
+	months = [
+		{
+			"1": "Январь",
+			"10": "Октябрь",
+			"11": "Ноябрь",
+			"12": "Декабрь",
+			"2": "Февраль",
+			"3": "Март",
+			"4": "Апрель",
+			"5": "Май",
+			"6": "Июнь",
+			"7": "Июль",
+			"8": "Август",
+			"9": "Сентябрь"
+		},
+		{
+			"1": "January",
+			"10": "October",
+			"11": "November",
+			"12": "December",
+			"2": "February",
+			"3": "March",
+			"4": "April",
+			"5": "May",
+			"6": "June",
+			"7": "July",
+			"8": "August",
+			"9": "September"
+		}
+	]
+	months_gen = [
+		{
+			"1": "января",
+			"10": "октября",
+			"11": "ноября",
+			"12": "декабря",
+			"2": "февраля",
+			"3": "марта",
+			"4": "апреля",
+			"5": "мая",
+			"6": "июня",
+			"7": "июля",
+			"8": "августа",
+			"9": "сентября"
+		},
+		{
+			"1": "january",
+			"10": "october",
+			"11": "november",
+			"12": "december",
+			"2": "february",
+			"3": "march",
+			"4": "april",
+			"5": "may",
+			"6": "june",
+			"7": "july",
+			"8": "august",
+			"9": "september"
+		}
+	]
+	file_size = ("Размер", "Size")
+	info = ("Инфо", "Info")
+	loading = ("Загрузка...", "Loading...")
+	no_photo = ("Нет фотографий", "No photos")
+	open_settings_window = ("Открыть настройки", "Open settings window")
+	paste = ("Вставить (⌘ + V)", "Paste (⌘ + V)")
+	scan_folder = ("Искать изображения", "Find images")
+	update_grid = ("Обновить", "Update")
+	reset = ("Сбросить", "Reset")
+	reset_all = ("Сбросить все", "Reset all")
+	resol = ("Разрешение", "Resolution")
+	reveal_in_finder = ("Показать в Finder", "Reveal in Finder")
+	save_to_downloads = ("Сохранить в загрузки", "Save to Downloads")
+	search = ("Поиск", "Search")
+	settings = ("Настройки", "Settings")
+	total_files = ("Всего файлов", "Total files")
+	type_ = ("Тип", "Type")
+	open = ("Открыть", "Open")
+	delete = ("Удалить", "Remove")
+	copy_name = ("Скопировать имя", "Copy filename")
+	copy_names = ("Скопировать имя объектов", "Copy object names")
+	attention = ("Внимание!", "Warning!")
+	remove_file_title = ("Безвозвратное удаление", "Permanent deletion")
+	remove_file_question = ("Вы действительно хотите безвозвратно удалить этот файл?", "Are you sure you want to permanently delete this file?")
+	remove_files_question = ("Вы действительно хотите безвозвратно удалить выбранные файлы?", "Are you sure you want to permanently delete these files?")
+	theme = ("Тема", "Theme")
+	theme_dark = ("Темная", "Dark")
+	theme_light = ("Светлая", "Light")
+	theme_auto = ("Авто", "Auto")
+	cut = ("Вырезать (⌘ + X)", "Cut (⌘ + X)")
+	filters = ("Фильтры", "Filters")
+	catalog = ("Каталог", "Catalog")
+	folder = ("Каталог изображений", "Image catalog")
+	open_default = ("Открыть по умолчанию", "Open by default")
+	open_in = ("Открыть в приложении", "Open in application")
+	alias_immutable = (
+		"Имя (нельзя изменить после сохранения)",
+		"Name (cannot be changed after saving)"
+	)
+	save = ("Сохранить", "Save")
+	new_folder = ("Новый каталог", "New catalog")
+	enter_alias_warning = (
+		"Пожалуйста, введите имя. Это поле не может быть пустым.",
+		"Please enter a name. This field cannot be left blank."
+	)
+	select_folder_path = (
+		"Для продолжения работы необходимо указать путь к папке с изображениями.",
+		"You need to specify the path to the image folder to continue."
+	)
+	folder_path = ("Путь к каталогу", "Catalog path")
+	general = ("Основные", "General")
+	at_least_one_folder_required = (
+		"Нужен хотя бы один каталог с изображениями",
+		"At least one image catalog is required"
+	)
+	images = ("Изображения", "Images")
+	menu = ("Меню", "Menu")
+	calendar = ("Календарь", "Calendar")
+	favorites = ("Избранное", "Favorites")
+	cancel = ("Отмена", "Cancel")
+	confirmation = ("Подтверждение", "Confirmation")
+	no_connection = ("Нет подключения", "No connection")
+	ok = ("Ок", "Ok")
+	alias = ("Имя", "Name")
+	ignore_list_descr = (
+		"Игнор лист: перетащите сюда папку или укажите имя с новой строки",
+		"Ignore list: drag a folder here or enter a name on a new line"
+	)
+	ignore_list = ("Игнор лист", "Ignore list")
+	minutes = ("минут", "minutes")
+	search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
+	show_system_files = ("Системные файлы в Finder", "System files in Finder")
+	russian = ("Русский", "English")
+	language_max = ("Сменить язык (Change language)", "Change language (Сменить язык)")
+	erase_data = ("Сбросить все данные", "Reset all data")
+	copying = ("Копирование", "Copying")
+	from_ = ("из", "from")
+	in_ = ("в", "in")
+	copy_file = ("Копировать файл (⌘ + C)", "Copy file (⌘ + C)")
+	copy_files = ("Копировать файлы (⌘ + C)", "Copy files (⌘ + C)")
+	copy = ("Cкопировать (⌘ + C)", "Copy (⌘ + C)")
+	copy_all = ("Копировать все", "Copy all")
+	add_to_favorites = ("Добавить в избранное", "Add to favorites")
+	remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
+	copy_filepath = ("Скопировать путь к файлу", "Copy filepath")
+	copy_dirpath = ("Скопировать путь", "Copy path")
+	copy_filepaths = ("Скопировать путь к файлам", "Copy file paths to files")
+	add = ("Добавить", "Add")
+	search_in = ("Поиск в каталоге", "Search in catalog")
+	indexing_files = ("Индексация файлов", "Indexing files")
+	indexing = ("Индексация", "Indexing")
+	changed = ("Изменен", "Changed")
+	changed_short = ("Изм.", "Mod.")
+	file_name = ("Имя файла", "File name")
+	show_about = ("О приложении", "Аbout the app")
+	alias_already_exists = (
+		"Каталог с таким именем уже существует. Пожалуйста, выберите другое.",
+		"A catalog with this name already exists. Please choose a different one."
+	)
+	image = ("Изображение", "Image")
+	sort_by_mod = ("По дате изменения", "Date modification")
+	sort_by_recent = ("По дате добавления", "Date added")
+	preparing = ("Подготовка", "Preparing")
+	save_text_long = (
+		"Изменения сохранены. Приложение будет перезапущено.",
+		"Changes saved. The application will restart."
+	)
+	filters_descr = (
+		"Фильтры:\n"
+		"• Показывают файлы, путь которых содержит указанный текст.\n"
+		"• Каждый фильтр вводится с новой строки.\n"
+		"Пример:\n"
+		"• Добавьте фильтр \".jpg\" и нажмите \"Сохранить\".\n"
+		"• В приложении выберите фильтр \".jpg\" — будут показаны все .jpg файлы.",
+		"Filters:\n"
+		"• Show files whose path contains the specified text.\n"
+		"• Enter each filter on a new line.\n"
+		"Example:\n"
+		"• Add the filter \".jpg\" and click \"Save\".\n"
+		"• In the app, select the \".jpg\" filter — all .jpg files will be displayed."
+	)
+	without_subfolders = ("Без подпапок", "Without subfolders")
+	hide_digits = ("Скрыть нумерацию", "Hide numbering")
+	show_digits = ("Показать нумерацию", "Show numbering")
+	expand_all = ("Развернуть всё", "Expand All")
+	collapse_all = ("Свернуть всё", "Collapse All")
+	data_size = ("Размер данных", "Data size")
+	calculating = ("Вычисление", "Calculating")
+	repair_mf = (
+		"Исправить ошибки в каталоге",
+		"Fix errors in the catalog"
+	)
+	app_will_restarted = (
+		"Приложение будет перезапущено. Нажмите ок, чтобы продолжить.",
+		"The application will restart. Click OK to continue."
+	)
+	remove_folder = (
+		"Удалить каталог изображений",
+		"Delete the image catalog"
+	)
+	reset_filters = (
+		"Фильтры по умолчанию",
+		"Default filters"
+	)
+	reset_filters_long = (
+		"Фильтры будут сброшены к значениям по умолчанию",
+		"All filters will be reset to their default values",
+	)
+	erase_data_long = (
+		"Все кэшированные изображения будут удалены, а настройки приложения "
+		"сброшены до значений по умолчанию",
+		"All cached images will be deleted and app settings will be reset "
+		"to defaults."
+	)
+	location = ("Расположение", "Location")
+	modified = ("Изменен", "Modified")
+	statistic = ("Статистика данных", "Data statistics")
+	connect_to_server = ("Подключение к серверу (⌘ + K)", "Connect to server (⌘ + K)")
+	connect = ("Подкл.", "Connect")
+	server = ("Адрес сервера", "Server address")
+	# server_favs = ("Избранные серверы", "Favorites")
+	login = ("логин", "login")
+	password = ("пароль", "password")
+	upload_in = ("Загрузить в ...", "Upload in ...")
+	clockwise = ("Повернуть по ч.с. (⌘ + →)", "Rotate cw (⌘ + →)")
+	counter_clockwise = ("Повернуть против ч.с. (⌘ + ←)", "Rotate ccw (⌘ + ←)")
 
-    replace = ("Замена", "Replace")
-    replace_one = ("Заменить", "Replace")
-    replace_all = ("Заменить все", "Replace all")
-    apply_to_all_files = ("Применить ко всем файлам", "Apply to all files")
-    stop = ("Стоп", "Stop")
-    replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
-    file_exists = (
-        "Файл с таким именем уже существует", 
-        "A file with this name already exists",
-    )
-    copy_error = (
-        "Произошла ошибка при копировании. Пожалуйста, попробуйте еще раз.",
-        "An error occurred while copying. Please try again."
-    )
-    error = ("Ошибка", "Error")
-    next_search = ("Поиск новых изображений через", "Search new images in")
-    string_limit = (
-        "Длина имени должна составлять от 5 до 30 символов",
-        "The name length should be from 5 to 30 characters",
-    )
-    valid_message = (
-        "Имя может содержать только русские и английские буквы, "
-        "цифры и пробелы",
-        "The name may contain only Russian and English letters, "
-        "digits and spaces",
-    )
-    folder_name = (
-        "Имя:\n"
-        "• уникальное\n"
-        "• 5-30 символов\n"
-        "• русские и английские буквы, цифры и пробелы",
-        "Folder name:\n"
-        "• unique\n"
-        "• up to 5-30 characters\n"
-        "• Russian and English letters, digits, and spaces",
-    )
-    update_thumb = (
-        "Обновить изображение",
-        "Update image"
-    )
-    update_thumbs = (
-        "Обновить изображения",
-        "Update images"
-    )
-    edit = (
-        "Редактировать",
-        "Edit"
-    )
-    confirm_delete = (
-        "Вы уверены, что хотите удалить данные этого сервера?",
-        "Are you sure you want to delete this server's data?",
-    )
-    confirm = (
-        "Подтвердить",
-        "Confirm"
-    )
-    show_in_folder = (
-        "Перейти к папке",
-        "Go to folder"
-    )
-    path_hint_texts = (
-        "Перетащите каталог сюда или нажмите для выбора",
-        "Drag and drop a catalog here or click to browse"
-    )
-    access_error_text = (
-        "Нет доступа к каталогу изображений",
-        "Unable to access the image directory"  # Более технически точно
-    )
-    network_error_text = (
-        "Сетевой диск не подключен или неправильно указан путь.",
-        "Network drive not connected or the path is incorrect."
-    )
-    hide_digits_full = (
-        "Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",
-        "Hides numeric prefixes for top-level folders only. Numbering of nested subfolders remains unchanged."
-    )
-    confirm_mf_path = (
-        "Вы уверены, что правильно указали путь?"
-        "\nНеправильный путь приведет к удалению всего каталога.",
-        "Are you sure you specified the path correctly?"
-        "\nAn incorrect path will result in the deletion of the entire directory.",
-    )
-    progress = (
-        "Прогресс",
-        "Progress"
-    )
-    image_search = (
-        "Поиск изображений",
-        "Image search"
-    )
-    start = (
-        "Старт",
-        "Start"
-    )
-    image_search_drop = (
-        "Перетяните сюда цветное изображение",
-        "Drop color image here"
-    )
-    close = (
-        "Закрыть",
-        "Close"
-    )
-    got_it = (
-        "Понятно",
-        "Got it"
-    )
-    only_color = (
-        "Поддерживаются только цветные изображения",
-        "Only color images are supported"
-    )
-    accuracy = (
-        "Точность",
-        "Accuracy"
-    )
-    upload_list = (
-        "Список загружаемых файлов",
-        "Upload list"
-    )
-    dest_folder = (
-        "Целевая папка",
-        "Destination folder"
-    )
-    allow = (
-        "Разрешить",
-        "Allow"
-    )
+	replace = ("Замена", "Replace")
+	replace_one = ("Заменить", "Replace")
+	replace_all = ("Заменить все", "Replace all")
+	apply_to_all_files = ("Применить ко всем файлам", "Apply to all files")
+	stop = ("Стоп", "Stop")
+	replace_existing_files = ("Заменить существующие файлы?", "Replace existing files?")
+	file_exists = (
+		"Файл с таким именем уже существует", 
+		"A file with this name already exists",
+	)
+	copy_error = (
+		"Произошла ошибка при копировании. Пожалуйста, попробуйте еще раз.",
+		"An error occurred while copying. Please try again."
+	)
+	error = ("Ошибка", "Error")
+	next_search = ("Поиск новых изображений через", "Search new images in")
+	string_limit = (
+		"Длина имени должна составлять от 5 до 30 символов",
+		"The name length should be from 5 to 30 characters",
+	)
+	valid_message = (
+		"Имя может содержать только русские и английские буквы, "
+		"цифры и пробелы",
+		"The name may contain only Russian and English letters, "
+		"digits and spaces",
+	)
+	folder_name = (
+		"Имя:\n"
+		"• уникальное\n"
+		"• 5-30 символов\n"
+		"• русские и английские буквы, цифры и пробелы",
+		"Folder name:\n"
+		"• unique\n"
+		"• up to 5-30 characters\n"
+		"• Russian and English letters, digits, and spaces",
+	)
+	update_thumb = (
+		"Обновить изображение",
+		"Update image"
+	)
+	update_thumbs = (
+		"Обновить изображения",
+		"Update images"
+	)
+	edit = (
+		"Редактировать",
+		"Edit"
+	)
+	confirm_delete = (
+		"Вы уверены, что хотите удалить данные этого сервера?",
+		"Are you sure you want to delete this server's data?",
+	)
+	confirm = (
+		"Подтвердить",
+		"Confirm"
+	)
+	show_in_folder = (
+		"Перейти к папке",
+		"Go to folder"
+	)
+	path_hint_texts = (
+		"Перетащите каталог сюда или нажмите для выбора",
+		"Drag and drop a catalog here or click to browse"
+	)
+	access_error_text = (
+		"Нет доступа к каталогу изображений",
+		"Unable to access the image directory"  # Более технически точно
+	)
+	network_error_text = (
+		"Сетевой диск не подключен или неправильно указан путь.",
+		"Network drive not connected or the path is incorrect."
+	)
+	hide_digits_full = (
+		"Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",
+		"Hides numeric prefixes for top-level folders only. Numbering of nested subfolders remains unchanged."
+	)
+	confirm_mf_path = (
+		"Вы уверены, что правильно указали путь?"
+		"\nНеправильный путь приведет к удалению всего каталога.",
+		"Are you sure you specified the path correctly?"
+		"\nAn incorrect path will result in the deletion of the entire directory.",
+	)
+	progress = (
+		"Прогресс",
+		"Progress"
+	)
+	image_search = (
+		"Поиск изображений",
+		"Image search"
+	)
+	start = (
+		"Старт",
+		"Start"
+	)
+	image_search_drop = (
+		"Перетяните сюда цветное изображение",
+		"Drop color image here"
+	)
+	close = (
+		"Закрыть",
+		"Close"
+	)
+	got_it = (
+		"Понятно",
+		"Got it"
+	)
+	only_color = (
+		"Поддерживаются только цветные изображения",
+		"Only color images are supported"
+	)
+	accuracy = (
+		"Точность",
+		"Accuracy"
+	)
+	upload_list = (
+		"Список загружаемых файлов",
+		"Upload list"
+	)
+	dest_folder = (
+		"Целевая папка",
+		"Destination folder"
+	)
+	allow = (
+		"Разрешить",
+		"Allow"
+	)
 
-    deny = (
-        "Запретить",
-        "Deny"
-    )
-    dangerous_text = (
-        # [0] Русская версия
-        "Мы обнаружили подозрительные действия.\n"
-        "Будет удалено {} изображений.\n"
-        "Вероятно, путь к каталогу указан неправильно.\n"
-        "• Нажмите \"Запретить\", если вы изменили путь к каталогу изображений.\n"
-        "• Нажмите \"Разрешить\", если вы не совершали никаких действий.\n"
-        "Для вопросов свяжитесь с нами:\n"
-        "- Telegram: @evlosh\n"
-        "- Email: evlosh@gmail.com",
+	deny = (
+		"Запретить",
+		"Deny"
+	)
+	dangerous_text = (
+		# [0] Русская версия
+		"Мы обнаружили подозрительные действия.\n"
+		"Будет удалено {} изображений.\n"
+		"Вероятно, путь к каталогу указан неправильно.\n"
+		"• Нажмите \"Запретить\", если вы изменили путь к каталогу изображений.\n"
+		"• Нажмите \"Разрешить\", если вы не совершали никаких действий.\n"
+		"Для вопросов свяжитесь с нами:\n"
+		"- Telegram: @evlosh\n"
+		"- Email: evlosh@gmail.com",
 
-        # [1] Английская версия
-        "Suspicious activity detected.\n"
-        "{} images will be deleted.\n"
-        "The directory path is likely incorrect.\n"
-        "• Click \"Deny\" if you have changed the image directory path.\n"
-        "• Click \"Allow\" if you have not taken any action.\n"
-        "If you have any questions, please contact us:\n"
-        "- Telegram: @evlosh\n"
-        "- Email: evlosh@gmail.com"
-    )
+		# [1] Английская версия
+		"Suspicious activity detected.\n"
+		"{} images will be deleted.\n"
+		"The directory path is likely incorrect.\n"
+		"• Click \"Deny\" if you have changed the image directory path.\n"
+		"• Click \"Allow\" if you have not taken any action.\n"
+		"If you have any questions, please contact us:\n"
+		"- Telegram: @evlosh\n"
+		"- Email: evlosh@gmail.com"
+	)
 
-    sort_standart = (
-        "Стандартная сортировка",
-        "Default sorting"
-    )
-    sort_alphabet = (
-        "Сортировка по алфавиту",
-        "Alphabetical sorting"
-    )
-    collage = (
-        "Коллаж",
-        "Collage"
-    )
+	sort_standart = (
+		"Стандартная сортировка",
+		"Default sorting"
+	)
+	sort_alphabet = (
+		"Сортировка по алфавиту",
+		"Alphabetical sorting"
+	)
+	collage = (
+		"Коллаж",
+		"Collage"
+	)
 
-    app_lang = (
-        "Язык приложения",
-        "Application language"
-    )
-    rus = (
-        "Русский",
-        "Russian"
-    )
-    eng = (
-        "Английский",
-        "English"
-    )
-    miuz_diamonds = (
-        "MIUZ Diamonds",
-        "MIUZ Diamonds"
-    )
-    choose_period = ("Выбрать период", "Choose period")
-    period = ("Период", "Period")
-    selected_dates = ("Выбранные даты", "Selected dates")
-    all_time = ("За все время", "All time")
-    from_text = ("С", "From")
-    to_text = ("По", "To")
-    not_selected = ["Не выбрано", "Not set"]
+	app_lang = (
+		"Язык приложения",
+		"Application language"
+	)
+	rus = (
+		"Русский",
+		"Russian"
+	)
+	eng = (
+		"Английский",
+		"English"
+	)
+	miuz_diamonds = (
+		"MIUZ Diamonds",
+		"MIUZ Diamonds"
+	)
+	choose_period = ("Выбрать период", "Choose period")
+	period = ("Период", "Period")
+	selected_dates = ("Выбранные даты", "Selected dates")
+	all_time = ("За все время", "All time")
+	from_text = ("С", "From")
+	to_text = ("По", "To")
+	not_selected = ["Не выбрано", "Not set"]
 
-    # Пресеты меню
-    preset_today = ("Сегодня", "Today")
-    preset_yesterday = ("Вчера", "Yesterday")
-    preset_week = ("За неделю", "Past week")
-    preset_two_weeks = ("За две недели", "Past two weeks")
-    preset_month = ("За месяц", "Past month")
-    preset_year = ("За год", "Past year")
-    active_filters = ("Активные фильтры", "Active filters")
-    no = ("Нет", "None")
-    folders = (
-        "Папки",
-        "Folders"
-    )
-    sort = (
-        "Сортировка",
-        "Sort"
-    )
-    updating = (
-        "Обновление",
-        "Updating"
-    )
-    clear_tags = (
-        "Очистить все",
-        "Clear all"
-    )
-    apply = (
-        "Применить",
-        "Apply"
-    )
-    tag_management = (
-        "Управление тегами",
-        "Tag Management",
-    )
-    dates_management = (
-        "Управление датами",
-        "Dates management"
-    )
-    remove_tag_question = (
-        "Вы уверены, что хотите удалить этот тег из приложения навсегда?",
-        "Are you sure you want to permanently delete this tag from the app?"
-    )
-    new_tag = (
-        "Новый тег",
-        "New tag"
-    )
-    input_text = (
-        "Введите текст",
-        "Enter text"
-    )
-    new_tag_desc = (
-        "Придумайте название для нового тега",
-        "Create a name for the new tag"
-    )
-    recover_tags = (
-        "Восстановить теги",
-        "Reset tags"
-    )
-    standart_tags = (
-        "Стандартные теги",
-        "Standart "
-    )
-    user_tags = (
-        "Пользовательские теги",
-        "User tags"
-    )
-    enhance = (
-        "Улучшить",
-        "Enhance"
-    )
-    enhance_text = (
-        "Улучшить текст",
-        "Enhance text"
-    )
-    text_search_descr = (
-        "Для поиска нескольких слов введите их через запятую или с новой строки.",
-        "Separate search words with commas or line breaks."
-    )
-    text_editor = (
-        "Редактор текста",
-        "Text editor"
-    )
-    find_matches = (
-        "Найти совпадения",
-        "Find matches"
-    )
-    image_search_descr = (
-            "Поиск по цветовой гистограмме.\nЧем выше точность, тем меньше результатов.",
-            "Color histogram search.\nHigher accuracy means fewer results."
-        )
-    please_wait = (
-        "Пожалуйста, подождите",
-        "Wait, please"
-    )
-    hide = (
-        "Скрыть",
-        "Hide"
-    )
-    done = (
-        "Готово",
-        "Done"
-    )
-    start_date = (
-        "Дата начала",
-        "Start date",
-    )
+	# Пресеты меню
+	preset_today = ("Сегодня", "Today")
+	preset_yesterday = ("Вчера", "Yesterday")
+	preset_week = ("За неделю", "Past week")
+	preset_two_weeks = ("За две недели", "Past two weeks")
+	preset_month = ("За месяц", "Past month")
+	preset_year = ("За год", "Past year")
+	active_filters = ("Активные фильтры", "Active filters")
+	no = ("Нет", "None")
+	folders = (
+		"Папки",
+		"Folders"
+	)
+	sort = (
+		"Сортировка",
+		"Sort"
+	)
+	updating = (
+		"Обновление",
+		"Updating"
+	)
+	clear_tags = (
+		"Очистить все",
+		"Clear all"
+	)
+	apply = (
+		"Применить",
+		"Apply"
+	)
+	tag_management = (
+		"Управление тегами",
+		"Tag Management",
+	)
+	dates_management = (
+		"Управление датами",
+		"Dates management"
+	)
+	remove_tag_question = (
+		"Вы уверены, что хотите удалить этот тег из приложения навсегда?",
+		"Are you sure you want to permanently delete this tag from the app?"
+	)
+	new_tag = (
+		"Новый тег",
+		"New tag"
+	)
+	input_text = (
+		"Введите текст",
+		"Enter text"
+	)
+	new_tag_desc = (
+		"Придумайте название для нового тега",
+		"Create a name for the new tag"
+	)
+	recover_tags = (
+		"Восстановить теги",
+		"Reset tags"
+	)
+	standart_tags = (
+		"Стандартные теги",
+		"Standart "
+	)
+	user_tags = (
+		"Пользовательские теги",
+		"User tags"
+	)
+	enhance = (
+		"Улучшить",
+		"Enhance"
+	)
+	enhance_text = (
+		"Улучшить текст",
+		"Enhance text"
+	)
+	text_search_descr = (
+		"Для поиска нескольких слов введите их через запятую или с новой строки.",
+		"Separate search words with commas or line breaks."
+	)
+	text_editor = (
+		"Редактор текста",
+		"Text editor"
+	)
+	find_matches = (
+		"Найти совпадения",
+		"Find matches"
+	)
+	image_search_descr = (
+			"Поиск по цветовой гистограмме.\nЧем выше точность, тем меньше результатов.",
+			"Color histogram search.\nHigher accuracy means fewer results."
+		)
+	please_wait = (
+		"Пожалуйста, подождите",
+		"Wait, please"
+	)
+	hide = (
+		"Скрыть",
+		"Hide"
+	)
+	done = (
+		"Готово",
+		"Done"
+	)
+	start_date = (
+		"Дата начала",
+		"Start date",
+	)
 
-    end_date = (
-        "Дата окончания",
-        "End date",
-    )
-    text_input = (
-        "Ввод текста",
-        "Text input"
-    )
-    skip = (
-        "Пропустить",
-        "Skip"
-    )
+	end_date = (
+		"Дата окончания",
+		"End date",
+	)
+	text_input = (
+		"Ввод текста",
+		"Text input"
+	)
+	skip = (
+		"Пропустить",
+		"Skip"
+	)

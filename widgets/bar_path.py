@@ -13,123 +13,123 @@ from ._base_widgets import GrayTextLabel, TransparentWidget
 
 
 class PathItem(TransparentWidget):
-    min_wid = 5
-    new_history_item = pyqtSignal(str)
-    load_st_grid = pyqtSignal()
-    arrow_right = " \U0000203A" # ›
-    item_height = 15
-    info_win = pyqtSignal(list)
-    add_fav = pyqtSignal(str)
-    del_fav = pyqtSignal(str)
-    type_to_pixmap: dict = {}
-    base_folder_svg = Static.COMMON_ICONS / "base_folder.svg"
-    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-    img_svg = Static.COMMON_ICONS / "image_file.svg"
+	min_wid = 5
+	new_history_item = pyqtSignal(str)
+	load_st_grid = pyqtSignal()
+	arrow_right = " \U0000203A" # ›
+	item_height = 15
+	info_win = pyqtSignal(list)
+	add_fav = pyqtSignal(str)
+	del_fav = pyqtSignal(str)
+	type_to_pixmap: dict = {}
+	base_folder_svg = Static.COMMON_ICONS / "base_folder.svg"
+	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+	img_svg = Static.COMMON_ICONS / "image_file.svg"
 
-    def __init__(self, dir: str, name: str):
-        super().__init__()
-        self.item_dir = dir
+	def __init__(self, dir: str, name: str):
+		super().__init__()
+		self.item_dir = dir
 
-        item_layout = QHBoxLayout(self)
-        item_layout.setContentsMargins(0, 0, 0, 0)
-        item_layout.setSpacing(5)
+		item_layout = QHBoxLayout(self)
+		item_layout.setContentsMargins(0, 0, 0, 0)
+		item_layout.setSpacing(5)
 
-        self.img_wid = QSvgWidget()
-        self.img_wid.load(str(self.base_folder_svg))
-        self.img_wid.setFixedSize(self.item_height, self.item_height)
-        item_layout.addWidget(self.img_wid)
-        
-        self.text_wid = GrayTextLabel(text=name)
-        self.text_wid.set_font_size(11)
-        self.collapse()
-        item_layout.addWidget(self.text_wid)
+		self.img_wid = QSvgWidget()
+		self.img_wid.load(str(self.base_folder_svg))
+		self.img_wid.setFixedSize(self.item_height, self.item_height)
+		item_layout.addWidget(self.img_wid)
+		
+		self.text_wid = GrayTextLabel(text=name)
+		self.text_wid.set_font_size(11)
+		self.collapse()
+		item_layout.addWidget(self.text_wid)
 
-    def add_arrow(self):
-        t = self.text_wid.text() + " " + PathItem.arrow_right
-        self.text_wid.setText(t)
+	def add_arrow(self):
+		t = self.text_wid.text() + " " + PathItem.arrow_right
+		self.text_wid.setText(t)
 
-    def del_arrow(self):
-        t = self.text_wid.text().replace(PathItem.arrow_right, "")
-        self.text_wid.setText(t)
+	def del_arrow(self):
+		t = self.text_wid.text().replace(PathItem.arrow_right, "")
+		self.text_wid.setText(t)
 
-    def expand(self):
-        self.text_wid.setFixedWidth(self.text_wid.sizeHint().width())
+	def expand(self):
+		self.text_wid.setFixedWidth(self.text_wid.sizeHint().width())
  
 
-    def collapse(self):
-        if not self.text_wid.underMouse():
-            self.text_wid.setMinimumWidth(self.min_wid)
+	def collapse(self):
+		if not self.text_wid.underMouse():
+			self.text_wid.setMinimumWidth(self.min_wid)
 
 
 class PathBar(TransparentWidget):
-    new_history_item = pyqtSignal(str)
-    load_st_grid = pyqtSignal()
-    info_win = pyqtSignal(list)
-    add_fav = pyqtSignal(str)
-    del_fav = pyqtSignal(str)
-    last_item_limit = 40
+	new_history_item = pyqtSignal(str)
+	load_st_grid = pyqtSignal()
+	info_win = pyqtSignal(list)
+	add_fav = pyqtSignal(str)
+	del_fav = pyqtSignal(str)
+	last_item_limit = 40
 
-    def __init__(self):
-        super().__init__()
-        self.current_path: str = None
+	def __init__(self):
+		super().__init__()
+		self.current_path: str = None
 
-        self.h_layout = QHBoxLayout(self)
-        self.h_layout.setSpacing(5)
-        self.h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setSpacing(5)
+		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-    def update(self, dir: str):
-        """
-        Отобразить новый путь сетки / папки / файла     
-        src: путь сетки / папки / файла
-        """
-        if dir == self.current_path:
-            return
-        for i in self.findChildren(PathItem):
-            i.deleteLater()
-        self.current_path = dir
-        root = dir.strip(os.sep).split(os.sep)
-        path_items: dict[int, PathItem] = {}
+	def update(self, dir: str):
+		"""
+		Отобразить новый путь сетки / папки / файла     
+		src: путь сетки / папки / файла
+		"""
+		if dir == self.current_path:
+			return
+		for i in self.findChildren(PathItem):
+			i.deleteLater()
+		self.current_path = dir
+		root = dir.strip(os.sep).split(os.sep)
+		path_items: dict[int, PathItem] = {}
 
-        for x, name in enumerate(root, start=1):
-            dir = os.path.join(os.sep, *root[:x])
-            # name = self.shorten_filename(name)
-            path_item = PathItem(dir, name)
-            cmd_ = lambda dir: self.new_history_item.emit(dir)
-            path_item.new_history_item.connect(cmd_)
-            path_item.load_st_grid.connect(self.load_st_grid.emit)
-            path_item.info_win.connect(lambda lst: self.info_win.emit(lst))
-            path_item.add_fav.connect(self.add_fav.emit)
-            path_item.del_fav.connect(self.del_fav.emit)
-            path_item.add_arrow()
-            path_items[x] = path_item
-            self.h_layout.addWidget(path_item)
+		for x, name in enumerate(root, start=1):
+			dir = os.path.join(os.sep, *root[:x])
+			# name = self.shorten_filename(name)
+			path_item = PathItem(dir, name)
+			cmd_ = lambda dir: self.new_history_item.emit(dir)
+			path_item.new_history_item.connect(cmd_)
+			path_item.load_st_grid.connect(self.load_st_grid.emit)
+			path_item.info_win.connect(lambda lst: self.info_win.emit(lst))
+			path_item.add_fav.connect(self.add_fav.emit)
+			path_item.del_fav.connect(self.del_fav.emit)
+			path_item.add_arrow()
+			path_items[x] = path_item
+			self.h_layout.addWidget(path_item)
 
-        path_items[1].img_wid.load(
-            str(path_items[1].image_folder_svg)
-        )
+		path_items[1].img_wid.load(
+			str(path_items[1].image_folder_svg)
+		)
 
-        last_item = path_items.get(len(root))
-        if dir.endswith(ImgUtils.ext_all):
-            last_item.img_wid.load(
-                str(last_item.img_svg)
-            )
+		last_item = path_items.get(len(root))
+		if dir.endswith(ImgUtils.ext_all):
+			last_item.img_wid.load(
+				str(last_item.img_svg)
+			)
 
-        text_ = last_item.text_wid.text()
-        if len(text_) > PathBar.last_item_limit:
-            path_item.text_wid.setText(
-                # text_[:PathBar.last_item_limit] + "..."
-                self.shorten_filename(text_)
-            )
-        
-        if len(root) != 1:
-            last_item.del_arrow()
+		text_ = last_item.text_wid.text()
+		if len(text_) > PathBar.last_item_limit:
+			path_item.text_wid.setText(
+				# text_[:PathBar.last_item_limit] + "..."
+				self.shorten_filename(text_)
+			)
+		
+		if len(root) != 1:
+			last_item.del_arrow()
 
-    def shorten_filename(self, filename: str, max_len: int = 40) -> str:
-        name, ext = os.path.splitext(filename)
-        if len(filename) <= max_len:
-            return filename
-        # сколько символов оставить до "..." и после него
-        keep = max_len - 3 - len(ext)
-        start_len = keep // 2
-        end_len = keep - start_len
-        return f"{name[:start_len]}...{name[-end_len:]}{ext}"   
+	def shorten_filename(self, filename: str, max_len: int = 40) -> str:
+		name, ext = os.path.splitext(filename)
+		if len(filename) <= max_len:
+			return filename
+		# сколько символов оставить до "..." и после него
+		keep = max_len - 3 - len(ext)
+		start_len = keep // 2
+		end_len = keep - start_len
+		return f"{name[:start_len]}...{name[-end_len:]}{ext}"   

@@ -11,288 +11,288 @@ from system.lang import Lng
 from system.main_folder import Mf
 
 from ._base_widgets import (GrayTextLabel, TransparentFrame, TransparentWidget,
-                            ULineEdit, UMenu, UPushButton)
+							ULineEdit, UMenu, UPushButton)
 from .win_text_search import WinTextSearch
 
 
 class SearchWidBaseSvg(QSvgWidget):
-    clicked_ = pyqtSignal()
-    icon_path = None
-    icon_size = 13
+	clicked_ = pyqtSignal()
+	icon_path = None
+	icon_size = 13
 
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.setFixedSize(self.icon_size, self.icon_size)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.load(str(self.icon_path))
-        self.hide()
+	def __init__(self, parent):
+		super().__init__(parent)
+		self.setFixedSize(self.icon_size, self.icon_size)
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.load(str(self.icon_path))
+		self.hide()
 
-    def mouseReleaseEvent(self, a0):
-        if a0.button() == Qt.MouseButton.LeftButton:
-            self.clicked_.emit()
-        return super().mouseReleaseEvent(a0)
+	def mouseReleaseEvent(self, a0):
+		if a0.button() == Qt.MouseButton.LeftButton:
+			self.clicked_.emit()
+		return super().mouseReleaseEvent(a0)
 
 
 class SearchWidClearSvg(SearchWidBaseSvg):
-    icon_path = Static.COMMON_ICONS / "cancel.svg"
+	icon_path = Static.COMMON_ICONS / "cancel.svg"
 
 
 class SearchWidTextSearchSvg(SearchWidBaseSvg):
-    icon_path = Static.COMMON_ICONS / "text_edit.svg" 
+	icon_path = Static.COMMON_ICONS / "text_edit.svg" 
 
 
 class SearchWidLineEdit(ULineEdit):
-    reload_thumbnails = pyqtSignal()
-    ww = 162
+	reload_thumbnails = pyqtSignal()
+	ww = 162
 
-    def __init__(self):
-        super().__init__()
-        self.setMinimumWidth(self.ww)
-        self.setMaximumWidth(self.ww * 2)
+	def __init__(self):
+		super().__init__()
+		self.setMinimumWidth(self.ww)
+		self.setMaximumWidth(self.ww * 2)
 
-        self.textChanged.connect(self.create_search)
+		self.textChanged.connect(self.create_search)
 
-        # Кнопка Очистки (правая)
-        self.clear_btn = SearchWidClearSvg(self)
-        self.clear_btn.clicked_.connect(self.clear_search)
+		# Кнопка Очистки (правая)
+		self.clear_btn = SearchWidClearSvg(self)
+		self.clear_btn.clicked_.connect(self.clear_search)
 
-        # Кнопка текстового поиска (левая)
-        self.left_btn = SearchWidTextSearchSvg(self)
-        self.left_btn.clicked_.connect(self.open_win_text_search)
-        self.left_btn.show()  # Делаем кнопку видимой постоянно
+		# Кнопка текстового поиска (левая)
+		self.left_btn = SearchWidTextSearchSvg(self)
+		self.left_btn.clicked_.connect(self.open_win_text_search)
+		self.left_btn.show()  # Делаем кнопку видимой постоянно
 
-        self.update_buttons_position()
+		self.update_buttons_position()
 
-    def open_win_text_search(self):
-        text = ", ".join(Dynamic.search_words_list)
-        self.win_text_search = WinTextSearch(text)
-        self.win_text_search.ok_clicked.connect(self.win_text_search_cmd)
-        self.win_text_search.center_to_parent(self.window())
-        self.win_text_search.show()
+	def open_win_text_search(self):
+		text = ", ".join(Dynamic.search_words_list)
+		self.win_text_search = WinTextSearch(text)
+		self.win_text_search.ok_clicked.connect(self.win_text_search_cmd)
+		self.win_text_search.center_to_parent(self.window())
+		self.win_text_search.show()
 
-    def update_placeholder(self):
-        self.setPlaceholderText(
-            f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} {Mf.current_mf.mf_alias}"
-        )
+	def update_placeholder(self):
+		self.setPlaceholderText(
+			f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} {Mf.current_mf.mf_alias}"
+		)
 
-    def win_text_search_cmd(self, text: str):
-        if text:
-            self.setText(text)
-            self.create_search(text)
-            self.delayed_search()
-        else:
-            self.clear_search()
+	def win_text_search_cmd(self, text: str):
+		if text:
+			self.setText(text)
+			self.create_search(text)
+			self.delayed_search()
+		else:
+			self.clear_search()
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.update_buttons_position()
+	def resizeEvent(self, event):
+		super().resizeEvent(event)
+		self.update_buttons_position()
 
-    def update_buttons_position(self):
-        offset = 7
-        # Позиционируем правую кнопку (Clear) относительно правого края
-        clear_x = self.width() - self.clear_btn.width()
-        clear_y = (self.height() - self.clear_btn.height()) // 2
-        self.clear_btn.move(clear_x - offset, clear_y)
+	def update_buttons_position(self):
+		offset = 7
+		# Позиционируем правую кнопку (Clear) относительно правого края
+		clear_x = self.width() - self.clear_btn.width()
+		clear_y = (self.height() - self.clear_btn.height()) // 2
+		self.clear_btn.move(clear_x - offset, clear_y)
 
-        # Позиционируем левую кнопку относительно левого края
-        left_y = (self.height() - self.left_btn.height()) // 2
-        self.left_btn.move(offset, left_y)
+		# Позиционируем левую кнопку относительно левого края
+		left_y = (self.height() - self.left_btn.height()) // 2
+		self.left_btn.move(offset, left_y)
 
-    def create_search(self, new_text: str):
-        Dynamic.search_words_list = [
-            word for item in new_text.split(",") if (word := item.strip())
-        ]
+	def create_search(self, new_text: str):
+		Dynamic.search_words_list = [
+			word for item in new_text.split(",") if (word := item.strip())
+		]
 
-        if Dynamic.search_words_list:
-            self.clear_btn.show()
-        else:
-            self.clear_btn.hide()
-        # Поведение левой кнопки здесь больше не меняем, она всегда видима
+		if Dynamic.search_words_list:
+			self.clear_btn.show()
+		else:
+			self.clear_btn.hide()
+		# Поведение левой кнопки здесь больше не меняем, она всегда видима
 
-    def delayed_search(self):
-        self.reload_thumbnails.emit()
+	def delayed_search(self):
+		self.reload_thumbnails.emit()
 
-    def clear_search(self):
-        self.clear()
-        Dynamic.search_words_list.clear()
-        Dynamic.loaded_thumbs = 0
-        self.reload_thumbnails.emit()
+	def clear_search(self):
+		self.clear()
+		Dynamic.search_words_list.clear()
+		Dynamic.loaded_thumbs = 0
+		self.reload_thumbnails.emit()
 
-    def keyPressEvent(self, event: QKeyEvent | None):
-        if event.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
-            self.delayed_search()
-        elif event.key() == Qt.Key.Key_Escape:
-            self.clearFocus()
-        super().keyPressEvent(event)
+	def keyPressEvent(self, event: QKeyEvent | None):
+		if event.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+			self.delayed_search()
+		elif event.key() == Qt.Key.Key_Escape:
+			self.clearFocus()
+		super().keyPressEvent(event)
 
 
 class BarTopSvgBtn(QSvgWidget):
-    clicked_ = pyqtSignal()
+	clicked_ = pyqtSignal()
 
-    def __init__(self, base_svg: Path, selected_svg: Path):
-        super().__init__()
+	def __init__(self, base_svg: Path, selected_svg: Path):
+		super().__init__()
 
-        self.base_svg = self._load_svg_data(base_svg)
-        self.selected_svg = self._load_svg_data(selected_svg)
-        self.load(self.base_svg)
+		self.base_svg = self._load_svg_data(base_svg)
+		self.selected_svg = self._load_svg_data(selected_svg)
+		self.load(self.base_svg)
 
-        for path in (base_svg, selected_svg):
-            if not path.exists():
-                print("bar top btn icon not exists", path)
+		for path in (base_svg, selected_svg):
+			if not path.exists():
+				print("bar top btn icon not exists", path)
 
-    @staticmethod
-    def _load_svg_data(path: Path):
-        with open(path, "rb") as f:
-            return QByteArray(f.read())
+	@staticmethod
+	def _load_svg_data(path: Path):
+		with open(path, "rb") as f:
+			return QByteArray(f.read())
 
-    def set_selected_style(self):
-        self.load(self.selected_svg)
+	def set_selected_style(self):
+		self.load(self.selected_svg)
 
-    def set_base_style(self):
-        self.load(self.base_svg)
+	def set_base_style(self):
+		self.load(self.base_svg)
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.set_selected_style()
-        super().mousePressEvent(event)
+	def mousePressEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.set_selected_style()
+		super().mousePressEvent(event)
 
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.set_base_style()
-            self.clicked_.emit()
-        super().mouseReleaseEvent(event)
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.set_base_style()
+			self.clicked_.emit()
+		super().mouseReleaseEvent(event)
 
-    def enterEvent(self, event):
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        super().enterEvent(event)
+	def enterEvent(self, event):
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		super().enterEvent(event)
 
 
 class SettingsSvgBtn(BarTopSvgBtn):
-    base_svg = Static.COMMON_ICONS / "settings.svg"
-    selected_svg = Static.COMMON_ICONS / "settings_selected.svg"
+	base_svg = Static.COMMON_ICONS / "settings.svg"
+	selected_svg = Static.COMMON_ICONS / "settings_selected.svg"
 
-    def __init__(self):
-        super().__init__(self.base_svg, self.selected_svg)
+	def __init__(self):
+		super().__init__(self.base_svg, self.selected_svg)
 
 
 class ImgSearchSvgBtn(BarTopSvgBtn):
-    base_svg = Static.COMMON_ICONS / "camera.svg"
-    selected_svg = Static.COMMON_ICONS / "camera_selected.svg"
+	base_svg = Static.COMMON_ICONS / "camera.svg"
+	selected_svg = Static.COMMON_ICONS / "camera_selected.svg"
 
-    def __init__(self):
-        super().__init__(self.base_svg, self.selected_svg)
+	def __init__(self):
+		super().__init__(self.base_svg, self.selected_svg)
 
 
 class CatalogWidget(TransparentWidget):
-    image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-    new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-    mf_open = pyqtSignal(Mf)
-    mf_new = pyqtSignal(SettingsItem)
+	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+	new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
+	mf_open = pyqtSignal(Mf)
+	mf_new = pyqtSignal(SettingsItem)
 
-    def __init__(self):
-        super().__init__()
-        self.image_folder_icon = QIcon(str(self.image_folder_svg))
-        self.new_folder_icon = QIcon(str(self.new_folder_svg))
+	def __init__(self):
+		super().__init__()
+		self.image_folder_icon = QIcon(str(self.image_folder_svg))
+		self.new_folder_icon = QIcon(str(self.new_folder_svg))
 
-        self.h_lay = QHBoxLayout(self)
-        self.h_lay.setContentsMargins(0, 0, 0, 0)
-        self.h_lay.setSpacing(0)
+		self.h_lay = QHBoxLayout(self)
+		self.h_lay.setContentsMargins(0, 0, 0, 0)
+		self.h_lay.setSpacing(0)
 
-        self.title = GrayTextLabel(Lng.catalog[JsonData.lng_index])
-        self.h_lay.addWidget(self.title)
+		self.title = GrayTextLabel(Lng.catalog[JsonData.lng_index])
+		self.h_lay.addWidget(self.title)
 
-        self.h_lay.addSpacing(10)
+		self.h_lay.addSpacing(10)
 
-        self.button = UPushButton("")
-        self.catalog_btn_text(Mf.current_mf.mf_alias)
-        self.button.setFixedWidth(110)
-        self.button.setIconSize(QSize(15, 15))
-        self.button.setIcon(self.image_folder_icon)
-        self.h_lay.addWidget(self.button)
+		self.button = UPushButton("")
+		self.catalog_btn_text(Mf.current_mf.mf_alias)
+		self.button.setFixedWidth(110)
+		self.button.setIconSize(QSize(15, 15))
+		self.button.setIcon(self.image_folder_icon)
+		self.h_lay.addWidget(self.button)
 
-        self.button_menu = UMenu(parent=self)
-        self.button_menu.setMaximumWidth(200)
-        self.button.setMenu(self.button_menu)
+		self.button_menu = UMenu(parent=self)
+		self.button_menu.setMaximumWidth(200)
+		self.button.setMenu(self.button_menu)
 
-        for i in Mf.items:
-            action = QAction(i.mf_alias, self.button_menu)
-            action.setIcon(self.image_folder_icon)
-            action.setIconVisibleInMenu(True)
-            action.triggered.connect(
-                lambda e, mf=i: self.mf_open_cmd(mf)
-            )
-            self.button_menu.addAction(action)
+		for i in Mf.items:
+			action = QAction(i.mf_alias, self.button_menu)
+			action.setIcon(self.image_folder_icon)
+			action.setIconVisibleInMenu(True)
+			action.triggered.connect(
+				lambda e, mf=i: self.mf_open_cmd(mf)
+			)
+			self.button_menu.addAction(action)
 
-        self.button_menu.addSeparator()
+		self.button_menu.addSeparator()
 
-        new_folder_action = QAction(Lng.new_folder[JsonData.lng_index], self.button_menu)
-        new_folder_action.setIcon(self.new_folder_icon)
-        new_folder_action.setIconVisibleInMenu(True)
-        new_folder_action.triggered.connect(self.mf_new_cmd)
-        self.button_menu.addAction(new_folder_action)
+		new_folder_action = QAction(Lng.new_folder[JsonData.lng_index], self.button_menu)
+		new_folder_action.setIcon(self.new_folder_icon)
+		new_folder_action.setIconVisibleInMenu(True)
+		new_folder_action.triggered.connect(self.mf_new_cmd)
+		self.button_menu.addAction(new_folder_action)
 
-    def mf_new_cmd(self):
-        setting_item = SettingsItem(
-            type_="new_folder",
-            content=""
-        )
-        self.mf_new.emit(setting_item)
+	def mf_new_cmd(self):
+		setting_item = SettingsItem(
+			type_="new_folder",
+			content=""
+		)
+		self.mf_new.emit(setting_item)
 
-    def mf_open_cmd(self, mf: Mf):
-        self.catalog_btn_text(mf.mf_alias)
-        self.mf_open.emit(mf)
+	def mf_open_cmd(self, mf: Mf):
+		self.catalog_btn_text(mf.mf_alias)
+		self.mf_open.emit(mf)
 
-    def catalog_btn_text(self, text: str):
-        self.button.setText(text)
+	def catalog_btn_text(self, text: str):
+		self.button.setText(text)
 
 
 class BarTop(TransparentFrame):
-    open_settings_win = pyqtSignal(SettingsItem)
-    open_img_search_win = pyqtSignal()
-    start_text_search = pyqtSignal()
-    mf_open = pyqtSignal(Mf)
-    mf_new = pyqtSignal(SettingsItem)
+	open_settings_win = pyqtSignal(SettingsItem)
+	open_img_search_win = pyqtSignal()
+	start_text_search = pyqtSignal()
+	mf_open = pyqtSignal(Mf)
+	mf_new = pyqtSignal(SettingsItem)
 
-    def __init__(self):
-        super().__init__()
+	def __init__(self):
+		super().__init__()
 
-        self.h_layout = QHBoxLayout(self)
-        # маргины настроим в главном окне
-        self.h_layout.setContentsMargins(0, 0, 0, 0)
-        self.h_layout.setSpacing(0)
+		self.h_layout = QHBoxLayout(self)
+		# маргины настроим в главном окне
+		self.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.h_layout.setSpacing(0)
 
-        self.catalog_widget = CatalogWidget()
-        self.catalog_widget.mf_open.connect(self.mf_open.emit)
-        self.catalog_widget.mf_new.connect(self.mf_new.emit)
-        self.h_layout.addWidget(self.catalog_widget)
+		self.catalog_widget = CatalogWidget()
+		self.catalog_widget.mf_open.connect(self.mf_open.emit)
+		self.catalog_widget.mf_new.connect(self.mf_new.emit)
+		self.h_layout.addWidget(self.catalog_widget)
 
-        self.h_layout.addStretch()
+		self.h_layout.addStretch()
 
-        # --- Кнопка поиска по картинке ---
-        self.img_search_btn = ImgSearchSvgBtn()
-        self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
-        self.h_layout.addWidget(self.img_search_btn)
+		# --- Кнопка поиска по картинке ---
+		self.img_search_btn = ImgSearchSvgBtn()
+		self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
+		self.h_layout.addWidget(self.img_search_btn)
 
-        self.h_layout.addSpacing(5)
+		self.h_layout.addSpacing(5)
 
-        # --- Виджет поиска ---
-        self.search_wid = SearchWidLineEdit()
-        self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
-        self.h_layout.addWidget(self.search_wid)
+		# --- Виджет поиска ---
+		self.search_wid = SearchWidLineEdit()
+		self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
+		self.h_layout.addWidget(self.search_wid)
 
-        self.h_layout.addStretch(0)
+		self.h_layout.addStretch(0)
 
-        # --- Кнопка настроек ---
-        item = SettingsItem("general", "")
-        self.settings_btn = SettingsSvgBtn()
-        self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
-        self.h_layout.addWidget(self.settings_btn)
+		# --- Кнопка настроек ---
+		item = SettingsItem("general", "")
+		self.settings_btn = SettingsSvgBtn()
+		self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
+		self.h_layout.addWidget(self.settings_btn)
 
-        self.setFixedHeight(30)
-        for i in (self.img_search_btn, self.settings_btn):
-            i.setFixedSize(self.height() - 2, self.height() - 2)
-        self.search_wid.setFixedHeight(self.height() - 2)
+		self.setFixedHeight(30)
+		for i in (self.img_search_btn, self.settings_btn):
+			i.setFixedSize(self.height() - 2, self.height() - 2)
+		self.search_wid.setFixedHeight(self.height() - 2)
 
-    def mouseReleaseEvent(self, a0):
-        self.setFocus()
-        return super().mouseReleaseEvent(a0)
+	def mouseReleaseEvent(self, a0):
+		self.setFocus()
+		return super().mouseReleaseEvent(a0)

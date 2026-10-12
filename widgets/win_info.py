@@ -9,122 +9,122 @@ from system.lang import Lng
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 
 from ._base_widgets import (GrayTextLabel, SelectableLabel, TransparentWidget,
-                            UMainWindow)
+							UMainWindow)
 
 
 class WinInfoSelectableLabel(SelectableLabel):
-    def __init__(self, text: str):
-        super().__init__(text)
+	def __init__(self, text: str):
+		super().__init__(text)
 
-    def contextMenuEvent(self, ev):
-        selection = self.selectedText()
-        if len(selection) == 0:
-            self.setSelection(0, len(self.text()))
-        return super().contextMenuEvent(ev)
+	def contextMenuEvent(self, ev):
+		selection = self.selectedText()
+		if len(selection) == 0:
+			self.setSelection(0, len(self.text()))
+		return super().contextMenuEvent(ev)
 
 
 class WinInfo(UMainWindow):
-    finished_ = pyqtSignal()
+	finished_ = pyqtSignal()
 
-    def __init__(self, paths: list[str]):
-        super().__init__()
-        self.set_always_on_top()
-        self.set_close_only()
-        self.setWindowTitle(Lng.info[JsonData.lng_index])
-        self.path = paths[0]
+	def __init__(self, paths: list[str]):
+		super().__init__()
+		self.set_always_on_top()
+		self.set_close_only()
+		self.setWindowTitle(Lng.info[JsonData.lng_index])
+		self.path = paths[0]
 
-        wid = TransparentWidget()
-        self.central_layout.addWidget(wid)
+		wid = TransparentWidget()
+		self.central_layout.addWidget(wid)
 
-        self.grid_lay = QGridLayout(wid)
-        self.grid_lay.setSpacing(5)
-        self.grid_lay.setContentsMargins(5, 2, 5, 5)
+		self.grid_lay = QGridLayout(wid)
+		self.grid_lay.setSpacing(5)
+		self.grid_lay.setContentsMargins(5, 2, 5, 5)
 
-        self.data = {
-            Lng.file_name[JsonData.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
-            Lng.type_[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-            Lng.file_size[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-            Lng.location[JsonData.lng_index]: OneFileInfo.lined_path(self.path),
-            Lng.changed[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-            Lng.resol[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-        }
+		self.data = {
+			Lng.file_name[JsonData.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
+			Lng.type_[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+			Lng.file_size[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+			Lng.location[JsonData.lng_index]: OneFileInfo.lined_path(self.path),
+			Lng.changed[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+			Lng.resol[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+		}
 
-        selectable_labels: list[WinInfoSelectableLabel] = []
-        row = 0
-        l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
-        r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        for left_t, right_t in self.data.items():
-            left_lbl = GrayTextLabel(left_t + ":")
-            right_lbl = WinInfoSelectableLabel(right_t)
+		selectable_labels: list[WinInfoSelectableLabel] = []
+		row = 0
+		l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
+		r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+		for left_t, right_t in self.data.items():
+			left_lbl = GrayTextLabel(left_t + ":")
+			right_lbl = WinInfoSelectableLabel(right_t)
 
-            for i in left_lbl, right_lbl:
-                i.set_font_size(11)
+			for i in left_lbl, right_lbl:
+				i.set_font_size(11)
 
-            selectable_labels.append(right_lbl)
-            self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
-            self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
-            self.grid_lay.addWidget(right_lbl, row, 2, alignment=r_fl)
-            row += 1
+			selectable_labels.append(right_lbl)
+			self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
+			self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
+			self.grid_lay.addWidget(right_lbl, row, 2, alignment=r_fl)
+			row += 1
 
-        self.type_label = selectable_labels[1]
-        self.size_label = selectable_labels[2]
-        self.mod_label = selectable_labels[4]
-        self.res_label = selectable_labels[5]
-        self.load_info()
-        self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
+		self.type_label = selectable_labels[1]
+		self.size_label = selectable_labels[2]
+		self.mod_label = selectable_labels[4]
+		self.res_label = selectable_labels[5]
+		self.load_info()
+		self.adjustSize()
+		self.setFixedSize(self.width(), self.height())
 
-    def load_info(self):
+	def load_info(self):
 
-        def poll():
-            self.task_timer.stop()
-            queue = self.task_.process_queue
-            if not queue.empty():
-                info_item: OneFileInfoItem = queue.get()
-                self.single_img_fin(info_item)
+		def poll():
+			self.task_timer.stop()
+			queue = self.task_.process_queue
+			if not queue.empty():
+				info_item: OneFileInfoItem = queue.get()
+				self.single_img_fin(info_item)
 
-            if not self.task_.is_alive() and queue.empty():
-                self.task_.terminate_join()
-            else:
-                self.task_timer.start(500)
+			if not self.task_.is_alive() and queue.empty():
+				self.task_.terminate_join()
+			else:
+				self.task_timer.start(500)
 
-        self.task_ = ProcessWorker(target=OneFileInfo.start, args=(self.path, ))
-        self.task_timer = QTimer(self)
-        self.task_timer.setSingleShot(True)
-        self.task_timer.timeout.connect(poll)
+		self.task_ = ProcessWorker(target=OneFileInfo.start, args=(self.path, ))
+		self.task_timer = QTimer(self)
+		self.task_timer.setSingleShot(True)
+		self.task_timer.timeout.connect(poll)
 
-        self.task_timer.start(500)
-        self.task_.start()
+		self.task_timer.start(500)
+		self.task_.start()
 
-    def single_img_fin(self, info_item: OneFileInfoItem):
-        if info_item.res:
-            self.res_label.setText(info_item.res)
-        else:
-            self.type_label.setText(f"{Lng.image[JsonData.lng_index]} {info_item.type_[1:]}")
-            self.size_label.setText(info_item.size)
-            self.mod_label.setText(info_item.mod)
+	def single_img_fin(self, info_item: OneFileInfoItem):
+		if info_item.res:
+			self.res_label.setText(info_item.res)
+		else:
+			self.type_label.setText(f"{Lng.image[JsonData.lng_index]} {info_item.type_[1:]}")
+			self.size_label.setText(info_item.size)
+			self.mod_label.setText(info_item.mod)
 
-    def lined_text(self, text: str, max_row = 50) -> str:
-        if len(text) > max_row:
-            return "\n".join(
-                text[i:i + max_row]
-                for i in range(0, len(text), max_row)
-            )
-        return text
+	def lined_text(self, text: str, max_row = 50) -> str:
+		if len(text) > max_row:
+			return "\n".join(
+				text[i:i + max_row]
+				for i in range(0, len(text), max_row)
+			)
+		return text
 
-    def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-        if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-            self.deleteLater()
-        return super().keyPressEvent(a0)
+	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
+		if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
+			self.deleteLater()
+		return super().keyPressEvent(a0)
   
-    def deleteLater(self):
-        if self.task_.is_alive():
-            self.task_timer.stop()
-            self.task_.terminate_join()
-        return super().deleteLater()
+	def deleteLater(self):
+		if self.task_.is_alive():
+			self.task_timer.stop()
+			self.task_.terminate_join()
+		return super().deleteLater()
 
-    def closeEvent(self, a0):
-        if self.task_.is_alive():
-            self.task_timer.stop()
-            self.task_.terminate_join()
-        return super().closeEvent(a0)
+	def closeEvent(self, a0):
+		if self.task_.is_alive():
+			self.task_timer.stop()
+			self.task_.terminate_join()
+		return super().closeEvent(a0)

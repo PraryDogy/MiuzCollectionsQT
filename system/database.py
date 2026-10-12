@@ -12,122 +12,122 @@ METADATA = sqlalchemy.MetaData()
 
 
 _table_thumbs = sqlalchemy.Table(
-    "thumbs", METADATA,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("short_src", sqlalchemy.Text),
-    sqlalchemy.Column("short_hash", sqlalchemy.Text),
-    sqlalchemy.Column("size", sqlalchemy.Integer),
-    sqlalchemy.Column("birth", sqlalchemy.Integer),
-    sqlalchemy.Column("mod", sqlalchemy.Integer),
-    sqlalchemy.Column("resol", sqlalchemy.Text),
-    sqlalchemy.Column("coll", sqlalchemy.Text),
-    sqlalchemy.Column("fav", sqlalchemy.Integer),
-    sqlalchemy.Column("brand", sqlalchemy.Text),
+	"thumbs", METADATA,
+	sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+	sqlalchemy.Column("short_src", sqlalchemy.Text),
+	sqlalchemy.Column("short_hash", sqlalchemy.Text),
+	sqlalchemy.Column("size", sqlalchemy.Integer),
+	sqlalchemy.Column("birth", sqlalchemy.Integer),
+	sqlalchemy.Column("mod", sqlalchemy.Integer),
+	sqlalchemy.Column("resol", sqlalchemy.Text),
+	sqlalchemy.Column("coll", sqlalchemy.Text),
+	sqlalchemy.Column("fav", sqlalchemy.Integer),
+	sqlalchemy.Column("brand", sqlalchemy.Text),
 )
 
 
 class Thumbs:
 
-    table = _table_thumbs
-    id = _table_thumbs.c.id
-    rel_img_path = _table_thumbs.c.short_src
-    rel_thumb_path = _table_thumbs.c.short_hash
-    size = _table_thumbs.c.size
-    birth = _table_thumbs.c.birth
-    mod = _table_thumbs.c.mod
-    root = _table_thumbs.c.resol
-    coll = _table_thumbs.c.coll
-    fav = _table_thumbs.c.fav
-    mf_alias = _table_thumbs.c.brand
+	table = _table_thumbs
+	id = _table_thumbs.c.id
+	rel_img_path = _table_thumbs.c.short_src
+	rel_thumb_path = _table_thumbs.c.short_hash
+	size = _table_thumbs.c.size
+	birth = _table_thumbs.c.birth
+	mod = _table_thumbs.c.mod
+	root = _table_thumbs.c.resol
+	coll = _table_thumbs.c.coll
+	fav = _table_thumbs.c.fav
+	mf_alias = _table_thumbs.c.brand
 
 
 _table_dirs = sqlalchemy.Table(
-    "dirs", METADATA,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("short_src", sqlalchemy.Text),
-    sqlalchemy.Column("mod", sqlalchemy.Integer),
-    sqlalchemy.Column("brand", sqlalchemy.Text),
+	"dirs", METADATA,
+	sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+	sqlalchemy.Column("short_src", sqlalchemy.Text),
+	sqlalchemy.Column("mod", sqlalchemy.Integer),
+	sqlalchemy.Column("brand", sqlalchemy.Text),
 )
 
 
 class Dirs:
-    """
-    Класс-обёртка для колонок таблицы `dirs` в базе данных.   
-    Предоставляет удобный доступ к колонкам через атрибуты класса.
-    """
-    table = _table_dirs
-    id = _table_dirs.c.id
-    rel_dir_path = _table_dirs.c.short_src
-    mod = _table_dirs.c.mod
-    mf_alias = _table_dirs.c.brand
+	"""
+	Класс-обёртка для колонок таблицы `dirs` в базе данных.   
+	Предоставляет удобный доступ к колонкам через атрибуты класса.
+	"""
+	table = _table_dirs
+	id = _table_dirs.c.id
+	rel_dir_path = _table_dirs.c.short_src
+	mod = _table_dirs.c.mod
+	mf_alias = _table_dirs.c.brand
 
 
 _table_properties = sqlalchemy.Table(
-    "properties", METADATA,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column(
-        "thumb_id",
-        sqlalchemy.Integer,
-        sqlalchemy.ForeignKey("thumbs.id", ondelete="CASCADE"),
-        nullable=False
-    ),
-    sqlalchemy.Column("bytes_hist", sqlalchemy.BLOB)
+	"properties", METADATA,
+	sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+	sqlalchemy.Column(
+		"thumb_id",
+		sqlalchemy.Integer,
+		sqlalchemy.ForeignKey("thumbs.id", ondelete="CASCADE"),
+		nullable=False
+	),
+	sqlalchemy.Column("bytes_hist", sqlalchemy.BLOB)
 )
 
 
 class Properties:
-    table = _table_properties
-    id = _table_properties.c.id
-    thumb_id = _table_properties.c.thumb_id
-    bytes_hist = _table_properties.c.bytes_hist
+	table = _table_properties
+	id = _table_properties.c.id
+	thumb_id = _table_properties.c.thumb_id
+	bytes_hist = _table_properties.c.bytes_hist
 
 
 class Dbase:
-    main_engine: sqlalchemy.Engine = None
-    _timeout = 5
-    _echo = False
-    _same_thread = False
-    WAL_ = None
+	main_engine: sqlalchemy.Engine = None
+	_timeout = 5
+	_echo = False
+	_same_thread = False
+	WAL_ = None
 
-    @classmethod
-    def init(cls) -> sqlalchemy.Engine:
-        Dbase.main_engine = cls.create_engine()
-        cls.toggle_wal(False)
+	@classmethod
+	def init(cls) -> sqlalchemy.Engine:
+		Dbase.main_engine = cls.create_engine()
+		cls.toggle_wal(False)
 
-    @classmethod
-    def create_engine(cls):
-        if not Static.DB_FILE.exists():
-            t = "Нет пользовательского файла DB_FILE"
-            raise Exception(t)
+	@classmethod
+	def create_engine(cls):
+		if not Static.DB_FILE.exists():
+			t = "Нет пользовательского файла DB_FILE"
+			raise Exception(t)
 
-        engine = sqlalchemy.create_engine(
-            f"sqlite:///{Static.DB_FILE}",
-            echo=cls._echo,
-            connect_args={
-                "check_same_thread": cls._same_thread,
-                "timeout": cls._timeout
-                }
-                )
-        METADATA.create_all(engine)
-        return engine
-        
-    @classmethod
-    def toggle_wal(cls, value: bool):
-        conn = Dbase.main_engine.connect()
-        if value:
-            conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
-            cls.WAL_ = True
-        else:
-            conn.execute(sqlalchemy.text("PRAGMA journal_mode=DELETE"))
-            cls.WAL_ = False
-        conn.close()
+		engine = sqlalchemy.create_engine(
+			f"sqlite:///{Static.DB_FILE}",
+			echo=cls._echo,
+			connect_args={
+				"check_same_thread": cls._same_thread,
+				"timeout": cls._timeout
+				}
+				)
+		METADATA.create_all(engine)
+		return engine
+		
+	@classmethod
+	def toggle_wal(cls, value: bool):
+		conn = Dbase.main_engine.connect()
+		if value:
+			conn.execute(sqlalchemy.text("PRAGMA journal_mode=WAL"))
+			cls.WAL_ = True
+		else:
+			conn.execute(sqlalchemy.text("PRAGMA journal_mode=DELETE"))
+			cls.WAL_ = False
+		conn.close()
 
-    @classmethod
-    def vacuum(cls):
-        try:
-            # Добавляем AUTOCOMMIT, чтобы SQLite не открывал транзакцию неявно
-            with cls.main_engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
-                stmt = sqlalchemy.text("VACUUM")
-                conn.execute(stmt)
-        except Exception as e:
-            print("database vacuum error", e)
+	@classmethod
+	def vacuum(cls):
+		try:
+			# Добавляем AUTOCOMMIT, чтобы SQLite не открывал транзакцию неявно
+			with cls.main_engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
+				stmt = sqlalchemy.text("VACUUM")
+				conn.execute(stmt)
+		except Exception as e:
+			print("database vacuum error", e)

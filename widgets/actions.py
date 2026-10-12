@@ -10,109 +10,109 @@ from system.lang import Lng
 
 
 class OpenInView(QAction):
-    def __init__(self, rel_paths: list[str], parent_: QMenu):
-        if len(rel_paths) > 1:
-            end_text =  f" ({len(rel_paths)})"
-        else:
-            end_text = ""
-        super().__init__(parent=parent_, text=f"{Lng.open[JsonData.lng_index]}{end_text}")
+	def __init__(self, rel_paths: list[str], parent_: QMenu):
+		if len(rel_paths) > 1:
+			end_text =  f" ({len(rel_paths)})"
+		else:
+			end_text = ""
+		super().__init__(parent=parent_, text=f"{Lng.open[JsonData.lng_index]}{end_text}")
 
 
 class ScanerRestart(QAction):
-    def __init__(self, parent: QMenu):
-        super().__init__(parent=parent, text=Lng.scan_folder[JsonData.lng_index])
+	def __init__(self, parent: QMenu):
+		super().__init__(parent=parent, text=Lng.scan_folder[JsonData.lng_index])
 
 
 class WinInfoAction(QAction):
-    def __init__(self, parent: QMenu):
-        super().__init__(text=Lng.info[JsonData.lng_index], parent=parent)
+	def __init__(self, parent: QMenu):
+		super().__init__(text=Lng.info[JsonData.lng_index], parent=parent)
 
 
 class CopyPath(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        if total > 1:
-            text = f"{Lng.copy_filepaths[JsonData.lng_index]}"
-        else:
-            text = f"{Lng.copy_filepath[JsonData.lng_index]}"
-        super().__init__(parent=parent, text=text)
+	def __init__(self, parent: QMenu, total: int):
+		if total > 1:
+			text = f"{Lng.copy_filepaths[JsonData.lng_index]}"
+		else:
+			text = f"{Lng.copy_filepath[JsonData.lng_index]}"
+		super().__init__(parent=parent, text=text)
 
 
 class CopyName(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        if total > 1:
-            text = f"{Lng.copy_names[JsonData.lng_index]}"
-        else:
-            text = f"{Lng.copy_name[JsonData.lng_index]}"
-        super().__init__(parent=parent, text=text)
+	def __init__(self, parent: QMenu, total: int):
+		if total > 1:
+			text = f"{Lng.copy_names[JsonData.lng_index]}"
+		else:
+			text = f"{Lng.copy_name[JsonData.lng_index]}"
+		super().__init__(parent=parent, text=text)
 
 
 class RevealInFinder(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        text = f"{Lng.reveal_in_finder[JsonData.lng_index]}"
-        super().__init__(parent=parent, text=text)
+	def __init__(self, parent: QMenu, total: int):
+		text = f"{Lng.reveal_in_finder[JsonData.lng_index]}"
+		super().__init__(parent=parent, text=text)
 
 
 class SetFav(QAction):
-    def __init__(self, parent: QMenu, fav_value: int):
-        if not fav_value:
-            t = Lng.add_to_favorites[JsonData.lng_index]
-        else:
-            t = Lng.remove_from_favorites[JsonData.lng_index]
-        super().__init__(parent=parent, text=t)
+	def __init__(self, parent: QMenu, fav_value: int):
+		if not fav_value:
+			t = Lng.add_to_favorites[JsonData.lng_index]
+		else:
+			t = Lng.remove_from_favorites[JsonData.lng_index]
+		super().__init__(parent=parent, text=t)
 
 
 class Save(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        if total > 1:
-            text = f"{Lng.save_to_downloads[JsonData.lng_index]}"
-        else:
-            text = f"{Lng.save_to_downloads[JsonData.lng_index]}"
-        super().__init__(parent=parent, text=text)
+	def __init__(self, parent: QMenu, total: int):
+		if total > 1:
+			text = f"{Lng.save_to_downloads[JsonData.lng_index]}"
+		else:
+			text = f"{Lng.save_to_downloads[JsonData.lng_index]}"
+		super().__init__(parent=parent, text=text)
 
 
 class RemoveFiles(QAction):
-    def __init__(self, parent: QMenu, total: int):
-        if total > 1:
-            text_ = f"{Lng.delete[JsonData.lng_index]}"
-        else:
-            text_ = f"{Lng.delete[JsonData.lng_index]}"
-        super().__init__(text_, parent)
+	def __init__(self, parent: QMenu, total: int):
+		if total > 1:
+			text_ = f"{Lng.delete[JsonData.lng_index]}"
+		else:
+			text_ = f"{Lng.delete[JsonData.lng_index]}"
+		super().__init__(text_, parent)
 
 
 class CopyFiles(QAction):
-    def __init__(self, parent: QMenu, rel_paths: list[str]):
-        if len(rel_paths) == 1:
-            text = f"{Lng.copy_file[JsonData.lng_index]}"
-        else:
-            text = F"{Lng.copy_files[JsonData.lng_index]}"
-        super().__init__(text=text, parent=parent)
+	def __init__(self, parent: QMenu, rel_paths: list[str]):
+		if len(rel_paths) == 1:
+			text = f"{Lng.copy_file[JsonData.lng_index]}"
+		else:
+			text = F"{Lng.copy_files[JsonData.lng_index]}"
+		super().__init__(text=text, parent=parent)
 
 
 class PasteFiles(QAction):
-    def __init__(self, parent: QMenu):
-        super().__init__(text=Lng.paste[JsonData.lng_index], parent=parent)
+	def __init__(self, parent: QMenu):
+		super().__init__(text=Lng.paste[JsonData.lng_index], parent=parent)
 
 
 class UpdateThumbAction(QAction):
-    def __init__(self, parent: QMenu, rel_paths: list[str]):
-        if len(rel_paths) == 1:
-            text = Lng.update_thumb[JsonData.lng_index]
-        else:
-            text = Lng.update_thumbs[JsonData.lng_index]
-        super().__init__(text=text, parent=parent)
+	def __init__(self, parent: QMenu, rel_paths: list[str]):
+		if len(rel_paths) == 1:
+			text = Lng.update_thumb[JsonData.lng_index]
+		else:
+			text = Lng.update_thumbs[JsonData.lng_index]
+		super().__init__(text=text, parent=parent)
 
 
 class ShowInFolder(QAction):
-    def __init__(self, parent: QMenu):
-        super().__init__(
-            text=Lng.show_in_folder[JsonData.lng_index],
-            parent=parent
-        )
+	def __init__(self, parent: QMenu):
+		super().__init__(
+			text=Lng.show_in_folder[JsonData.lng_index],
+			parent=parent
+		)
 
 
 class CollageAction(QAction):
-    def __init__(self, parent: QMenu):
-        super().__init__(
-            text=Lng.collage[JsonData.lng_index],
-            parent=parent
-        )
+	def __init__(self, parent: QMenu):
+		super().__init__(
+			text=Lng.collage[JsonData.lng_index],
+			parent=parent
+		)

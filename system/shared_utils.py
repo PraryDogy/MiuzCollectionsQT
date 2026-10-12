@@ -18,557 +18,557 @@ from cfg import Static
 
 class SharedUtils:
 
-    @classmethod
-    def is_mounted(cls, server: str):
-        output = subprocess.check_output(["mount"]).decode()
-        return server in output
+	@classmethod
+	def is_mounted(cls, server: str):
+		output = subprocess.check_output(["mount"]).decode()
+		return server in output
 
-    @classmethod
-    def get_apps(cls, app_names: list[str]):
-        """
-        Возвращает на основе имен приложений:
-        - {путь к приложению: имя приложения, ...}
-        """
+	@classmethod
+	def get_apps(cls, app_names: list[str]):
+		"""
+		Возвращает на основе имен приложений:
+		- {путь к приложению: имя приложения, ...}
+		"""
 
-        def search_dir(directory):
-            try:
-                for entry in os.scandir(directory):
-                    if entry.name.endswith(".app"):
-                        name_lower = entry.name.lower()
-                        if any(k in name_lower for k in app_names):
-                            image_apps[entry.path] = entry.name
-                    elif entry.is_dir():
-                        search_dir(entry.path)
-            except PermissionError:
-                pass
+		def search_dir(directory):
+			try:
+				for entry in os.scandir(directory):
+					if entry.name.endswith(".app"):
+						name_lower = entry.name.lower()
+						if any(k in name_lower for k in app_names):
+							image_apps[entry.path] = entry.name
+					elif entry.is_dir():
+						search_dir(entry.path)
+			except PermissionError:
+				pass
 
-        app_dirs = [
-            "/Applications",
-            os.path.expanduser("~/Applications"),
-            "/System/Applications"
-        ]
-        image_apps: dict[str, str] = {}
-        for app_dir in app_dirs:
-            if os.path.exists(app_dir):
-                search_dir(app_dir)
-        return image_apps
+		app_dirs = [
+			"/Applications",
+			os.path.expanduser("~/Applications"),
+			"/System/Applications"
+		]
+		image_apps: dict[str, str] = {}
+		for app_dir in app_dirs:
+			if os.path.exists(app_dir):
+				search_dir(app_dir)
+		return image_apps
 
-    @classmethod
-    def get_sys_vol(cls):
-        """
-        Возвращает путь к системному диску /Volumes/Macintosh HD (или иное имя)
-        """
-        app_support = os.path.expanduser('~/Library/Application Support')
-        volumes = "/Volumes"
-        for i in os.scandir(volumes):
-            if os.path.exists(i.path + app_support):
-                return i.path
-            
-    @classmethod
-    def add_sys_vol(cls, path: str, sys_vol: str):
-        """
-        Добавляет /Volumes/Macintosh HD (или иное имя системного диска),
-        если директория локальная - т.е. начинается с /Users/Username/...
-        sys_vol - системный диск, обычно это /Volumes/Macintosh HD
-        """
-        if path.startswith(os.path.expanduser("~")):
-            return sys_vol + path
-        return path
-                    
-    @classmethod
-    def get_f_size(cls, bytes_size: int, round_value: int = 2) -> str:
-        def format_size(size: float) -> str:
-            if round_value == 0:
-                return str(int(round(size)))
-            return str(round(size, round_value))
+	@classmethod
+	def get_sys_vol(cls):
+		"""
+		Возвращает путь к системному диску /Volumes/Macintosh HD (или иное имя)
+		"""
+		app_support = os.path.expanduser('~/Library/Application Support')
+		volumes = "/Volumes"
+		for i in os.scandir(volumes):
+			if os.path.exists(i.path + app_support):
+				return i.path
+			
+	@classmethod
+	def add_sys_vol(cls, path: str, sys_vol: str):
+		"""
+		Добавляет /Volumes/Macintosh HD (или иное имя системного диска),
+		если директория локальная - т.е. начинается с /Users/Username/...
+		sys_vol - системный диск, обычно это /Volumes/Macintosh HD
+		"""
+		if path.startswith(os.path.expanduser("~")):
+			return sys_vol + path
+		return path
+					
+	@classmethod
+	def get_f_size(cls, bytes_size: int, round_value: int = 2) -> str:
+		def format_size(size: float) -> str:
+			if round_value == 0:
+				return str(int(round(size)))
+			return str(round(size, round_value))
 
-        if bytes_size < 1024:
-            return f"{bytes_size} байт"
-        elif bytes_size < pow(1024, 2):
-            return f"{format_size(bytes_size / 1024)} КБ"
-        elif bytes_size < pow(1024, 3):
-            return f"{format_size(bytes_size / pow(1024, 2))} МБ"
-        elif bytes_size < pow(1024, 4):
-            return f"{format_size(bytes_size / pow(1024, 3))} ГБ"
-        elif bytes_size < pow(1024, 5):
-            return f"{format_size(bytes_size / pow(1024, 4))} ТБ"
+		if bytes_size < 1024:
+			return f"{bytes_size} байт"
+		elif bytes_size < pow(1024, 2):
+			return f"{format_size(bytes_size / 1024)} КБ"
+		elif bytes_size < pow(1024, 3):
+			return f"{format_size(bytes_size / pow(1024, 2))} МБ"
+		elif bytes_size < pow(1024, 4):
+			return f"{format_size(bytes_size / pow(1024, 3))} ГБ"
+		elif bytes_size < pow(1024, 5):
+			return f"{format_size(bytes_size / pow(1024, 4))} ТБ"
 
-    @classmethod
-    def get_f_date(cls, timestamp_: int, date_only: bool = False) -> str:
-        date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
-        now = datetime.now()
-        today = now.date()
-        yesterday = today - timedelta(days=1)
+	@classmethod
+	def get_f_date(cls, timestamp_: int, date_only: bool = False) -> str:
+		date = datetime.fromtimestamp(timestamp_).replace(microsecond=0)
+		now = datetime.now()
+		today = now.date()
+		yesterday = today - timedelta(days=1)
 
-        if date.date() == today:
-            return f"сегодня {date.strftime('%H:%M')}"
-        elif date.date() == yesterday:
-            return f"вчера {date.strftime('%H:%M')}"
-        else:
-            return date.strftime("%d.%m.%y %H:%M")
-        
-    def insert_linebreaks(text: str, n: int = 35) -> str:
-        new_text = []
-        for i in range(0, len(text), n):
-            row = text[i:i+n]
-            if row[-1] == " ":
-                row = row.rstrip()
-            else:
-                row = row + "-"
-            new_text.append(row)
-        return "\n".join(new_text).rstrip("-")
+		if date.date() == today:
+			return f"сегодня {date.strftime('%H:%M')}"
+		elif date.date() == yesterday:
+			return f"вчера {date.strftime('%H:%M')}"
+		else:
+			return date.strftime("%d.%m.%y %H:%M")
+		
+	def insert_linebreaks(text: str, n: int = 35) -> str:
+		new_text = []
+		for i in range(0, len(text), n):
+			row = text[i:i+n]
+			if row[-1] == " ":
+				row = row.rstrip()
+			else:
+				row = row + "-"
+			new_text.append(row)
+		return "\n".join(new_text).rstrip("-")
 
 
 class ImgUtils:
-    pillow_heif.register_heif_opener() 
-    Image.MAX_IMAGE_PIXELS = None
+	pillow_heif.register_heif_opener() 
+	Image.MAX_IMAGE_PIXELS = None
 
 
-    ext_jpeg = (
-            ".jpg", ".JPG",
-            ".jpeg", ".JPEG",
-            ".jpe", ".JPE",
-            ".jfif", ".JFIF",
-            ".bmp", ".BMP",
-            ".dib", ".DIB",
-            ".webp", ".WEBP",
-            ".ppm", ".PPM",
-            ".pgm", ".PGM",
-            ".pbm", ".PBM",
-            ".pnm", ".PNM",
-            ".ico", ".ICO",
-            ".heic", ".HEIC",
-            ".heif", "HEIF"
-        )
+	ext_jpeg = (
+			".jpg", ".JPG",
+			".jpeg", ".JPEG",
+			".jpe", ".JPE",
+			".jfif", ".JFIF",
+			".bmp", ".BMP",
+			".dib", ".DIB",
+			".webp", ".WEBP",
+			".ppm", ".PPM",
+			".pgm", ".PGM",
+			".pbm", ".PBM",
+			".pnm", ".PNM",
+			".ico", ".ICO",
+			".heic", ".HEIC",
+			".heif", "HEIF"
+		)
 
-    ext_tiff = (
-        ".tif", ".TIF",
-        ".tiff", ".TIFF",
-    )
+	ext_tiff = (
+		".tif", ".TIF",
+		".tiff", ".TIFF",
+	)
 
-    ext_psd = (
-        ".psd", ".PSD",
-        ".psb", ".PSB",
-    )
+	ext_psd = (
+		".psd", ".PSD",
+		".psb", ".PSB",
+	)
 
-    ext_png = (
-        ".png", ".PNG",
-    )
+	ext_png = (
+		".png", ".PNG",
+	)
 
-    ext_gif = (
-        ".gif", ".GIF"
-    )
+	ext_gif = (
+		".gif", ".GIF"
+	)
 
-    ext_raw = (
-        ".nef", ".NEF",
-        ".cr2", ".CR2",
-        ".cr3", ".CR3",
-        ".arw", ".ARW",
-        ".raf", ".RAF",
-        ".dng", ".DNG",
-        ".rw2", ".RW2",
-        ".orf", ".ORF",
-        ".srw", ".SRW",
-        ".pef", ".PEF",
-        ".rwl", ".RWL",
-        ".mos", ".MOS",
-        ".kdc", ".KDC",
-        ".mrw", ".MRW",
-        ".x3f", ".X3F",
-    )
+	ext_raw = (
+		".nef", ".NEF",
+		".cr2", ".CR2",
+		".cr3", ".CR3",
+		".arw", ".ARW",
+		".raf", ".RAF",
+		".dng", ".DNG",
+		".rw2", ".RW2",
+		".orf", ".ORF",
+		".srw", ".SRW",
+		".pef", ".PEF",
+		".rwl", ".RWL",
+		".mos", ".MOS",
+		".kdc", ".KDC",
+		".mrw", ".MRW",
+		".x3f", ".X3F",
+	)
 
-    ext_video = (
-        ".avi", ".AVI",
-        ".mp4", ".MP4",
-        ".mov", ".MOV",
-        ".mkv", ".MKV",
-        ".wmv", ".WMV",
-        ".flv", ".FLV",
-        ".webm", ".WEBM",
-    )
+	ext_video = (
+		".avi", ".AVI",
+		".mp4", ".MP4",
+		".mov", ".MOV",
+		".mkv", ".MKV",
+		".wmv", ".WMV",
+		".flv", ".FLV",
+		".webm", ".WEBM",
+	)
 
-    ext_icns = (
-        ".icns", ".ICNS",
-    )
+	ext_icns = (
+		".icns", ".ICNS",
+	)
 
-    ext_svg = (
-        ".svg", ".SVG"
-    )
+	ext_svg = (
+		".svg", ".SVG"
+	)
 
-    ext_all = (
-        *ext_jpeg,
-        *ext_tiff,
-        *ext_psd,
-        *ext_png,
-        *ext_gif,
-        *ext_raw,
-        *ext_video,
-        *ext_icns,
-        *ext_svg,
-    )
+	ext_all = (
+		*ext_jpeg,
+		*ext_tiff,
+		*ext_psd,
+		*ext_png,
+		*ext_gif,
+		*ext_raw,
+		*ext_video,
+		*ext_icns,
+		*ext_svg,
+	)
 
-    @classmethod
-    def _get_broken_image(cls):
-        path = Static.JPEG_ICONS / "broken_image.jpg"
+	@classmethod
+	def _get_broken_image(cls):
+		path = Static.JPEG_ICONS / "broken_image.jpg"
 
-        if not path.exists():
-            raise Exception (f"Img Utils {path} not exists")
+		if not path.exists():
+			raise Exception (f"Img Utils {path} not exists")
 
-        img = Image.open(path)
-        array_img = np.array(img)
-        img.close()
-        return array_img
+		img = Image.open(path)
+		array_img = np.array(img)
+		img.close()
+		return array_img
 
-    @classmethod
-    def _read_gif(cls, src):
-        with Image.open(src) as img:
-            img.seek(0)
-            return np.array(img.convert("RGB"))
+	@classmethod
+	def _read_gif(cls, src):
+		with Image.open(src) as img:
+			img.seek(0)
+			return np.array(img.convert("RGB"))
 
-    @classmethod
-    def _read_tiff(cls, path: str):
+	@classmethod
+	def _read_tiff(cls, path: str):
 
-        def process_image(img: np.ndarray) -> np.ndarray:
-            if img.ndim == 3:
-                # Транспонируем, если каналы на первом месте
-                if min(img.shape) == img.shape[0]:
-                    img = img.transpose(1, 2, 0)
-                # Ограничиваем количество каналов до 3
-                if img.shape[2] > 3:
-                    img = img[:, :, :3]
-                # Преобразуем в uint8
-                if img.dtype != np.uint8:
-                    img = (img / 256).astype(np.uint8)
-            elif img.ndim == 2:
-                img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-            return img
-        readers = (
-            lambda path: tifffile.imread(path, is_ome=False),
-            lambda path: np.array(Image.open(path).convert("RGB")),
-            lambda path: cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
-        )
-        for loader in readers:
-            try:
-                return process_image(loader(path))
-            except Exception as e:
-                print(f"read tiff error", path, e)
-        return cls._get_broken_image()
+		def process_image(img: np.ndarray) -> np.ndarray:
+			if img.ndim == 3:
+				# Транспонируем, если каналы на первом месте
+				if min(img.shape) == img.shape[0]:
+					img = img.transpose(1, 2, 0)
+				# Ограничиваем количество каналов до 3
+				if img.shape[2] > 3:
+					img = img[:, :, :3]
+				# Преобразуем в uint8
+				if img.dtype != np.uint8:
+					img = (img / 256).astype(np.uint8)
+			elif img.ndim == 2:
+				img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+			return img
+		readers = (
+			lambda path: tifffile.imread(path, is_ome=False),
+			lambda path: np.array(Image.open(path).convert("RGB")),
+			lambda path: cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
+		)
+		for loader in readers:
+			try:
+				return process_image(loader(path))
+			except Exception as e:
+				print(f"read tiff error", path, e)
+		return cls._get_broken_image()
 
-    @classmethod
-    def _read_quicklook(cls, path: str, size: int = 5000, timeout: int = 120):
-        # Создаем уникальную временную папку для конкретного вызова
-        with tempfile.TemporaryDirectory() as tmp_dir_name:
-            tmp_dir = Path(tmp_dir_name)
-            try:
-                subprocess.run(
-                    ["qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), path],
-                    check=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    timeout=timeout
-                )
-            except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
-                # Возвращаем "пустую" картинку при ошибке или таймауте
-                return np.zeros((100, 100, 3), dtype=np.uint8)
+	@classmethod
+	def _read_quicklook(cls, path: str, size: int = 5000, timeout: int = 120):
+		# Создаем уникальную временную папку для конкретного вызова
+		with tempfile.TemporaryDirectory() as tmp_dir_name:
+			tmp_dir = Path(tmp_dir_name)
+			try:
+				subprocess.run(
+					["qlmanage", "-t", "-s", str(size), "-o", str(tmp_dir), path],
+					check=True,
+					stdout=subprocess.DEVNULL,
+					stderr=subprocess.DEVNULL,
+					timeout=timeout
+				)
+			except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
+				# Возвращаем "пустую" картинку при ошибке или таймауте
+				return np.zeros((100, 100, 3), dtype=np.uint8)
 
-            # Ищем файл только в нашей изолированной папке
-            generated_files = list(tmp_dir.glob("*.png"))
-            if not generated_files:
-                return cls._get_broken_image()
-            
-            generated = generated_files[0]
-            with Image.open(generated) as img:
-                arr = np.array(img.convert("RGB")) # Конвертируем, чтобы точно был 3-канальный массив
+			# Ищем файл только в нашей изолированной папке
+			generated_files = list(tmp_dir.glob("*.png"))
+			if not generated_files:
+				return cls._get_broken_image()
+			
+			generated = generated_files[0]
+			with Image.open(generated) as img:
+				arr = np.array(img.convert("RGB")) # Конвертируем, чтобы точно был 3-канальный массив
 
-            # Удалять файл вручную не нужно! 
-            # Контекстный менеджер 'with tempfile.TemporaryDirectory()' 
-            # сам удалит папку и всё содержимое при выходе из блока.
-            
-            return arr
+			# Удалять файл вручную не нужно! 
+			# Контекстный менеджер 'with tempfile.TemporaryDirectory()' 
+			# сам удалит папку и всё содержимое при выходе из блока.
+			
+			return arr
 
-    @classmethod
-    def _read_icns(cls, path: str):
-        return cls._read_png(path)
-        
-    @classmethod
-    def _read_svg(cls, path: str):
-        return cls._get_broken_image()
+	@classmethod
+	def _read_icns(cls, path: str):
+		return cls._read_png(path)
+		
+	@classmethod
+	def _read_svg(cls, path: str):
+		return cls._get_broken_image()
 
-    @classmethod
-    def _read_png(cls, path: str):
-        try:
-            img = Image.open(path)
-            if img.mode == "RGBA":
-                background = Image.new("RGBA", img.size, (255, 255, 255, 255))
-                img = Image.alpha_composite(background, img)
-                img = img.convert("RGB")
-            array_img = np.array(img)            
-            img.close()
-            return array_img
-        except Exception as e:
-            print(f"read png, PIL error: {e}")
-            return cls._get_broken_image()
+	@classmethod
+	def _read_png(cls, path: str):
+		try:
+			img = Image.open(path)
+			if img.mode == "RGBA":
+				background = Image.new("RGBA", img.size, (255, 255, 255, 255))
+				img = Image.alpha_composite(background, img)
+				img = img.convert("RGB")
+			array_img = np.array(img)            
+			img.close()
+			return array_img
+		except Exception as e:
+			print(f"read png, PIL error: {e}")
+			return cls._get_broken_image()
 
-    @classmethod
-    def _read_jpg(cls, path: str):
-        heics = (".heic", ".HEIC")
-        try:
-            if path.endswith(heics):
-                img = Image.open(path)
-                img = img.convert("RGB")
-                return np.array(img)
-            else:
-                img = cv2.imread(path, cv2.IMREAD_COLOR)
-                return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        except Exception as e:
-            print("read jpg error", e)
-            return cls._get_broken_image()
+	@classmethod
+	def _read_jpg(cls, path: str):
+		heics = (".heic", ".HEIC")
+		try:
+			if path.endswith(heics):
+				img = Image.open(path)
+				img = img.convert("RGB")
+				return np.array(img)
+			else:
+				img = cv2.imread(path, cv2.IMREAD_COLOR)
+				return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+		except Exception as e:
+			print("read jpg error", e)
+			return cls._get_broken_image()
 
-    @classmethod
-    def _read_raw(cls, path: str):
-        try:
-            # https://github.com/letmaik/rawpy
-            # Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:
-            # Открываем RAW-файл с помощью rawpy
-            with rawpy.imread(path) as raw:
-                # Извлекаем встроенный эскиз (thumbnail)
-                thumb = raw.extract_thumb()
-            # Проверяем формат извлечённого эскиза
-            if thumb.format == rawpy.ThumbFormat.JPEG:
-                # Если это JPEG — открываем как изображение через BytesIO
-                img = Image.open(io.BytesIO(thumb.data))
-                # Конвертируем в RGB (на случай, если изображение не в RGB)
-                img = img.convert("RGB")
-            elif thumb.format == rawpy.ThumbFormat.BITMAP:
-                # Если формат BITMAP — создаём изображение из массива
-                img: Image.Image = Image.fromarray(thumb.data)
-            try:
-                exif = img.getexif()
-                orientation_tag = 274  # Код тега Orientation
-                if orientation_tag in exif:
-                    orientation = exif[orientation_tag]
-                    # Коррекция поворота на основе EXIF-ориентации
-                    if orientation == 3:
-                        img = img.rotate(180, expand=True)
-                    elif orientation == 6:
-                        img = img.rotate(270, expand=True)
-                    elif orientation == 8:
-                        img = img.rotate(90, expand=True)
-            except Exception as e:
-                print("read raw, get exif error", e)
-            array_img = np.array(img)
-            img.close()
-            return array_img
-        except Exception as e:
-            print("read raw error", e)
-            return cls._get_broken_image()
+	@classmethod
+	def _read_raw(cls, path: str):
+		try:
+			# https://github.com/letmaik/rawpy
+			# Извлечение встроенного эскиза/превью из RAW-файла и преобразование в изображение:
+			# Открываем RAW-файл с помощью rawpy
+			with rawpy.imread(path) as raw:
+				# Извлекаем встроенный эскиз (thumbnail)
+				thumb = raw.extract_thumb()
+			# Проверяем формат извлечённого эскиза
+			if thumb.format == rawpy.ThumbFormat.JPEG:
+				# Если это JPEG — открываем как изображение через BytesIO
+				img = Image.open(io.BytesIO(thumb.data))
+				# Конвертируем в RGB (на случай, если изображение не в RGB)
+				img = img.convert("RGB")
+			elif thumb.format == rawpy.ThumbFormat.BITMAP:
+				# Если формат BITMAP — создаём изображение из массива
+				img: Image.Image = Image.fromarray(thumb.data)
+			try:
+				exif = img.getexif()
+				orientation_tag = 274  # Код тега Orientation
+				if orientation_tag in exif:
+					orientation = exif[orientation_tag]
+					# Коррекция поворота на основе EXIF-ориентации
+					if orientation == 3:
+						img = img.rotate(180, expand=True)
+					elif orientation == 6:
+						img = img.rotate(270, expand=True)
+					elif orientation == 8:
+						img = img.rotate(90, expand=True)
+			except Exception as e:
+				print("read raw, get exif error", e)
+			array_img = np.array(img)
+			img.close()
+			return array_img
+		except Exception as e:
+			print("read raw error", e)
+			return cls._get_broken_image()
 
-    @classmethod
-    def _read_movie(cls, path: str, time_sec=1):
-        try:
-            cap = cv2.VideoCapture(path)
-            cap.set(cv2.CAP_PROP_POS_MSEC, time_sec * 1000)
-            success, frame = cap.read()
-            cap.release()
-            if success:
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                return frame
-            else:
-                return cls._get_broken_image()
-        except Exception as e:
-            print("read movie error", e)
-            return cls._get_broken_image()
+	@classmethod
+	def _read_movie(cls, path: str, time_sec=1):
+		try:
+			cap = cv2.VideoCapture(path)
+			cap.set(cv2.CAP_PROP_POS_MSEC, time_sec * 1000)
+			success, frame = cap.read()
+			cap.release()
+			if success:
+				frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+				return frame
+			else:
+				return cls._get_broken_image()
+		except Exception as e:
+			print("read movie error", e)
+			return cls._get_broken_image()
 
-    @classmethod
-    def _read_any(cls, path: str) -> np.ndarray:
-        ...
+	@classmethod
+	def _read_any(cls, path: str) -> np.ndarray:
+		...
 
-    @classmethod
-    def read_img(cls, path: str):
-        path = str(path)
-        _, ext = os.path.splitext(path)
-        ext = ext.lower()
-        read_any_dict: dict[str, callable] = {}
+	@classmethod
+	def read_img(cls, path: str):
+		path = str(path)
+		_, ext = os.path.splitext(path)
+		ext = ext.lower()
+		read_any_dict: dict[str, callable] = {}
 
-        for i in cls.ext_psd:
-            read_any_dict[i] = cls._read_quicklook
-        for i in cls.ext_tiff:
-            read_any_dict[i] = cls._read_tiff
-        for i in cls.ext_raw:
-            read_any_dict[i] = cls._read_raw
-        for i in cls.ext_jpeg:
-            read_any_dict[i] = cls._read_jpg
-        for i in cls.ext_png:
-            read_any_dict[i] = cls._read_png
-        for i in cls.ext_video:
-            read_any_dict[i] = cls._read_movie
-        for i in cls.ext_icns:
-            read_any_dict[i] = cls._read_icns
-        for i in cls.ext_svg:
-            read_any_dict[i] = cls._read_svg
-        for i in cls.ext_gif:
-            read_any_dict[i] = cls._read_gif
-        fn = read_any_dict.get(ext)
-        if fn:
-            cls._read_any = fn
-            return cls._read_any(path)
-        else:
-            return cls._get_broken_image()
+		for i in cls.ext_psd:
+			read_any_dict[i] = cls._read_quicklook
+		for i in cls.ext_tiff:
+			read_any_dict[i] = cls._read_tiff
+		for i in cls.ext_raw:
+			read_any_dict[i] = cls._read_raw
+		for i in cls.ext_jpeg:
+			read_any_dict[i] = cls._read_jpg
+		for i in cls.ext_png:
+			read_any_dict[i] = cls._read_png
+		for i in cls.ext_video:
+			read_any_dict[i] = cls._read_movie
+		for i in cls.ext_icns:
+			read_any_dict[i] = cls._read_icns
+		for i in cls.ext_svg:
+			read_any_dict[i] = cls._read_svg
+		for i in cls.ext_gif:
+			read_any_dict[i] = cls._read_gif
+		fn = read_any_dict.get(ext)
+		if fn:
+			cls._read_any = fn
+			return cls._read_any(path)
+		else:
+			return cls._get_broken_image()
 
-    @classmethod
-    def get_psd_size(cls, path):
-        with open(path, "rb") as f:
-            header = f.read(26)
+	@classmethod
+	def get_psd_size(cls, path):
+		with open(path, "rb") as f:
+			header = f.read(26)
 
-        if header[:4] != b"8BPS":
-            raise ValueError("Не PSD")
+		if header[:4] != b"8BPS":
+			raise ValueError("Не PSD")
 
-        height, width = struct.unpack(">II", header[14:22])
-        return width, height
+		height, width = struct.unpack(">II", header[14:22])
+		return width, height
 
-    @classmethod
-    def resize(cls, image: np.ndarray, size: int) -> np.ndarray:
-        try:
-            if image is None:
-                return cls.resize(cls._get_broken_image(), size)
-            h, w = image.shape[:2]
-            if w > h:  # Горизонтальное изображение
-                new_w = size
-                new_h = int(h * (size / w))
-            elif h > w:  # Вертикальное изображение
-                new_h = size
-                new_w = int(w * (size / h))
-            else:  # Квадратное изображение
-                new_w, new_h = size, size
-            return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-        except Exception as e:
-            print("fit image error", e)
-            return cls.resize(cls._get_broken_image(), size)
+	@classmethod
+	def resize(cls, image: np.ndarray, size: int) -> np.ndarray:
+		try:
+			if image is None:
+				return cls.resize(cls._get_broken_image(), size)
+			h, w = image.shape[:2]
+			if w > h:  # Горизонтальное изображение
+				new_w = size
+				new_h = int(h * (size / w))
+			elif h > w:  # Вертикальное изображение
+				new_h = size
+				new_w = int(w * (size / h))
+			else:  # Квадратное изображение
+				new_w, new_h = size, size
+			return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+		except Exception as e:
+			print("fit image error", e)
+			return cls.resize(cls._get_broken_image(), size)
 
-    @classmethod
-    def read_icc(cls, path: str):
-        try:
-            with Image.open(path) as img:
-                icc_profile = img.info.get('icc_profile')
-                if icc_profile:
-                    return icc_profile  # уже байты
-        except Exception as e:
-            print("error profile read:", e)
-        return None
+	@classmethod
+	def read_icc(cls, path: str):
+		try:
+			with Image.open(path) as img:
+				icc_profile = img.info.get('icc_profile')
+				if icc_profile:
+					return icc_profile  # уже байты
+		except Exception as e:
+			print("error profile read:", e)
+		return None
 
-    @classmethod
-    def get_img_res(cls, path: str):
+	@classmethod
+	def get_img_res(cls, path: str):
 
-        def read(path: str):
-            img_ = ImgUtils.read_img(path)
-            if img_ is not None and len(img_.shape) > 1:
-                h, w = img_.shape[0], img_.shape[1]
-                resol= f"{w}x{h}"
-            else:
-                resol = None
-            return resol
+		def read(path: str):
+			img_ = ImgUtils.read_img(path)
+			if img_ is not None and len(img_.shape) > 1:
+				h, w = img_.shape[0], img_.shape[1]
+				resol= f"{w}x{h}"
+			else:
+				resol = None
+			return resol
 
-        def psd_read(path: str):
-            try:
-                w, h = ImgUtils.get_psd_size(path)
-                resol= f"{w}x{h}"
-            except Exception as e:
-                print("multiprocess > ImgRes psd error", e)
-                resol = None
-            return resol
+		def psd_read(path: str):
+			try:
+				w, h = ImgUtils.get_psd_size(path)
+				resol= f"{w}x{h}"
+			except Exception as e:
+				print("multiprocess > ImgRes psd error", e)
+				resol = None
+			return resol
 
-        if path.endswith(ImgUtils.ext_psd):
-            resol = psd_read(path)
-        else:
-            resol = read(path)
-        return resol
-    
-    @classmethod
-    def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray:
+		if path.endswith(ImgUtils.ext_psd):
+			resol = psd_read(path)
+		else:
+			resol = read(path)
+		return resol
+	
+	@classmethod
+	def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray:
 
-        cv2.INTER_CUBIC
-        cv2.INTER_LANCZOS4
-        cv2.INTER_AREA
+		cv2.INTER_CUBIC
+		cv2.INTER_LANCZOS4
+		cv2.INTER_AREA
 
-        try:
-            h, w = image.shape[:2]
-            if h == 0 or w == 0:
-                print("fit_to_thumb: пустое изображение")
-                return cls.fit_to_thumb(cls._get_broken_image(), size)
+		try:
+			h, w = image.shape[:2]
+			if h == 0 or w == 0:
+				print("fit_to_thumb: пустое изображение")
+				return cls.fit_to_thumb(cls._get_broken_image(), size)
 
-            scale = size / max(h, w)
-            new_w = max(1, int(w * scale))
-            new_h = max(1, int(h * scale))
+			scale = size / max(h, w)
+			new_w = max(1, int(w * scale))
+			new_h = max(1, int(h * scale))
 
-            return cv2.resize(
-                image,
-                (new_w, new_h),
-                interpolation=cv2.INTER_LANCZOS4
-            )
+			return cv2.resize(
+				image,
+				(new_w, new_h),
+				interpolation=cv2.INTER_LANCZOS4
+			)
 
-        except Exception as e:
-            print(f"fit_to_thumb: ошибка масштабирования: {e}")
-            return cls.fit_to_thumb(cls._get_broken_image(), size)
+		except Exception as e:
+			print(f"fit_to_thumb: ошибка масштабирования: {e}")
+			return cls.fit_to_thumb(cls._get_broken_image(), size)
 
-    @classmethod
-    def write_thumb(cls, thumb_path: str, thumb: np.ndarray):
-        try:
-            if len(thumb.shape) == 2:  # grayscale
-                img = thumb
-            elif thumb.shape[2] == 3:  # BGR
-                img = cv2.cvtColor(thumb, cv2.COLOR_BGR2RGB)
-            elif thumb.shape[2] == 4:  # BGRA
-                img = cv2.cvtColor(thumb, cv2.COLOR_BGRA2RGB)
-            else:
-                print(f"write_thumb: неподдерживаемое число каналов {thumb.shape}")
-                return False
-            cv2.imwrite(thumb_path, img)
-            return True
-        except Exception as e:
-            print(f"write_thumb: ошибка записи thumb на диск: {e}")
-            return False
+	@classmethod
+	def write_thumb(cls, thumb_path: str, thumb: np.ndarray):
+		try:
+			if len(thumb.shape) == 2:  # grayscale
+				img = thumb
+			elif thumb.shape[2] == 3:  # BGR
+				img = cv2.cvtColor(thumb, cv2.COLOR_BGR2RGB)
+			elif thumb.shape[2] == 4:  # BGRA
+				img = cv2.cvtColor(thumb, cv2.COLOR_BGRA2RGB)
+			else:
+				print(f"write_thumb: неподдерживаемое число каналов {thumb.shape}")
+				return False
+			cv2.imwrite(thumb_path, img)
+			return True
+		except Exception as e:
+			print(f"write_thumb: ошибка записи thumb на диск: {e}")
+			return False
 
-    @classmethod
-    def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
-        try:
-            if os.path.exists(thumb_path):
-                img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
-                return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            else:
-                print(f"read_thumb: файл не существует {thumb_path}")
-                return None
-        except Exception as e:
-            print(f"read_thumb: ошибка чтения thumb: {e}")
-            return None
-            
-    @classmethod
-    def desaturate_image(cls, image: np.ndarray, factor=0.2):
-        try:
-            # если 4 канала (RGBA), убираем альфу для операции
-            has_alpha = image.shape[2] == 4
-            img = image[:, :, :3] if has_alpha else image
+	@classmethod
+	def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
+		try:
+			if os.path.exists(thumb_path):
+				img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
+				return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+			else:
+				print(f"read_thumb: файл не существует {thumb_path}")
+				return None
+		except Exception as e:
+			print(f"read_thumb: ошибка чтения thumb: {e}")
+			return None
+			
+	@classmethod
+	def desaturate_image(cls, image: np.ndarray, factor=0.2):
+		try:
+			# если 4 канала (RGBA), убираем альфу для операции
+			has_alpha = image.shape[2] == 4
+			img = image[:, :, :3] if has_alpha else image
 
-            # преобразуем в серый
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+			# преобразуем в серый
+			gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+			gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
-            # объединяем с оригиналом
-            desat = cv2.addWeighted(img, 1 - factor, gray_bgr, factor, 0)
+			# объединяем с оригиналом
+			desat = cv2.addWeighted(img, 1 - factor, gray_bgr, factor, 0)
 
-            # если был альфа-канал, добавляем обратно
-            if has_alpha:
-                desat = np.dstack([desat, image[:, :, 3]])
+			# если был альфа-канал, добавляем обратно
+			if has_alpha:
+				desat = np.dstack([desat, image[:, :, 3]])
 
-            return desat
-        except Exception:
-            cls.print_error()
-            return image
+			return desat
+		except Exception:
+			cls.print_error()
+			return image
 
-    def is_grayscale(img: np.ndarray, saturation_threshold=3):
-        if len(img.shape) < 3 or img.shape[2] == 1:
-            return True
-        return False
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        _, s, _ = cv2.split(hsv)
-        mean_saturation = np.mean(s)
-        return mean_saturation < saturation_threshold
+	def is_grayscale(img: np.ndarray, saturation_threshold=3):
+		if len(img.shape) < 3 or img.shape[2] == 1:
+			return True
+		return False
+		hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+		_, s, _ = cv2.split(hsv)
+		mean_saturation = np.mean(s)
+		return mean_saturation < saturation_threshold
