@@ -18,8 +18,7 @@ from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGroupBox,
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
-
-
+from typing import Literal
 class TransparentButton(QPushButton):
 	def __init__(self, text="", parent=None):
 		super().__init__(text=text, parent=parent)
@@ -404,7 +403,7 @@ class MacControlButton(QPushButton):
 		return super().mouseReleaseEvent(e)
 
 
-class TitleBar(QWidget):
+class TitleBar(TransparentWidget):
 	min_height = 28
 
 	def __init__(self, parent: QMainWindow):
@@ -422,7 +421,7 @@ class TitleBar(QWidget):
 		self.h_layout.addSpacing(10)
 
 		# --- 1. Контейнер для кнопок-светофоров ---
-		self.buttons_widget = QWidget()
+		self.buttons_widget = TransparentWidget()
 		self.buttons_layout = QHBoxLayout(self.buttons_widget)
 		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
 		self.buttons_layout.setSpacing(8) # (8px * 2 = 16px)
@@ -446,7 +445,7 @@ class TitleBar(QWidget):
 		self.h_layout.addSpacing(15)
 		
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
-		self.content_container = QWidget()
+		self.content_container = TransparentWidget()
 		self.content_container.setSizePolicy(
 			QSizePolicy.Policy.Expanding,
 			QSizePolicy.Policy.Preferred
@@ -455,7 +454,7 @@ class TitleBar(QWidget):
 		self.content_layout = QVBoxLayout(self.content_container)
 		self.content_layout.setContentsMargins(0, 0, 0, 0)
 		
-		self.title_label = QLabel()
+		self.title_label = TransparentLabel()
 		self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.content_layout.addWidget(self.title_label)
 		
@@ -463,7 +462,7 @@ class TitleBar(QWidget):
 
 		# --- 3. Балансировочная пустышка справа ---
 		# Ширина: 10 + 36 + 16 + 15 = 77 пикселей
-		self.right_spacer = QWidget()
+		self.right_spacer = TransparentWidget()
 		self.right_spacer.setFixedWidth(77)
 		self.h_layout.addWidget(self.right_spacer)
 
@@ -551,9 +550,18 @@ class TitleBar(QWidget):
 
 
 # стилизованный виджет, чтобы окно имело заливку + рамку + углы
-class UBaseWindowFrame(QFrame):
+class UMainWindowFrame(TransparentFrame):
+	property_name = "style"
+
 	def __init__(self, parent=None):
 		super().__init__(parent)
+		self.set_window_style("default")
+
+	def set_window_style(self, style: Literal["default", "black"]):
+		self.setProperty(self.property_name, style)
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
 
 
 class UMainWindow(QMainWindow):
@@ -570,7 +578,7 @@ class UMainWindow(QMainWindow):
 		return super().setWindowTitle(title)
 
 	def setup_window(self):
-		central_widget = UBaseWindowFrame()
+		central_widget = UMainWindowFrame()
 		self.setCentralWidget(central_widget)
 
 		self.window_layout = QVBoxLayout(central_widget)
@@ -580,7 +588,7 @@ class UMainWindow(QMainWindow):
 		self.title_bar = TitleBar(self)
 		self.window_layout.addWidget(self.title_bar)
 
-		self.sep_container = QWidget()
+		self.sep_container = TransparentWidget()
 		self.sep_layout = QVBoxLayout(self.sep_container)
 		self.sep_layout.setContentsMargins(0, 1, 0, 1)
 		self.sep_layout.setSpacing(0)
@@ -596,6 +604,10 @@ class UMainWindow(QMainWindow):
 		self.window_layout.addLayout(self.central_layout)
 
 		self.register_window()
+
+	def set_window_style(self, style: Literal["default", "black"]):
+		frame: UMainWindowFrame = self.centralWidget()
+		frame.set_window_style(style)
 
 	def set_titlebar_height(self, h: int):
 		self.title_bar.setFixedHeight(h)

@@ -16,11 +16,18 @@ TransparentTreeView {
     border: none;
 }
 
-UBaseWindowFrame {
+UMainWindowFrame[style="default"] {
     background: #ff0c1218;
     border-radius: 10px;
     border: 1px solid #ff1d2b38;
 }
+
+UMainWindowFrame[style="black"] {
+    background: #000000;
+    border-radius: 10px;
+    border: 1px solid #2a2a2a;
+}
+
 
 MacControlButton {
     border: none;
