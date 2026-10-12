@@ -3,17 +3,18 @@ import re
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
                          QIcon, QMouseEvent, QPainter, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGroupBox,
-                             QHBoxLayout, QLabel, QLayout, QLineEdit,
-                             QListWidget, QListWidgetItem, QMainWindow, QMenu,
-                             QProgressBar, QPushButton, QScrollArea,
-                             QSizePolicy, QSlider, QSpacerItem, QSpinBox,
-                             QStackedWidget, QTextEdit, QTreeView, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
+                             QGroupBox, QHBoxLayout, QLabel, QLayout,
+                             QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QProgressBar, QPushButton,
+                             QScrollArea, QSizeGrip, QSizePolicy, QSlider,
+                             QSpacerItem, QSpinBox, QStackedWidget, QTextEdit,
+                             QTreeView, QTreeWidget, QTreeWidgetItem,
+                             QVBoxLayout, QWidget)
 from qframelesswindow import FramelessMainWindow, StandardTitleBar
 from typing_extensions import Optional
 
@@ -122,70 +123,186 @@ class TransparentTreeView(QTreeView):
         super().__init__(parent)
 
 
-class UTitleBar(StandardTitleBar):
-    hh = 30
+# class UTitleBar(StandardTitleBar):
+#     hh = 30
 
-    def __init__(self, parent=None, show_title: bool = True):
-        super().__init__(parent)
-        self.setFixedHeight(self.hh)
-        self.titleLabel.hide()
-        self.center_title = None 
-        self.custom_widget = None 
-        if show_title:
-            self.center_title = QLabel(self)
-            self.center_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.center_title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+#     def __init__(self, parent=None, show_title: bool = True):
+#         super().__init__(parent)
+#         self.setFixedHeight(self.hh)
+#         self.titleLabel.hide()
+#         self.center_title = None 
+#         self.custom_widget = None 
+#         if show_title:
+#             self.center_title = QLabel(self)
+#             self.center_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#             self.center_title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
-    def set_custom_widget(self, widget: QWidget):
-        self.custom_widget = widget
-        self.custom_widget.setParent(self)
-        self.custom_widget.show()
-        self._update_geometries()
+#     def set_custom_widget(self, widget: QWidget):
+#         self.custom_widget = widget
+#         self.custom_widget.setParent(self)
+#         self.custom_widget.show()
+#         self._update_geometries()
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self._update_geometries()
+#     def resizeEvent(self, event):
+#         super().resizeEvent(event)
+#         self._update_geometries()
 
-    def _update_geometries(self):
-        if self.center_title is not None:
-            y_offset = -2
-            self.center_title.setGeometry(0, y_offset, self.width(), self.height())
-        if self.custom_widget is not None:
-            self.custom_widget.setGeometry(0, 0, self.width(), self.height())
+#     def _update_geometries(self):
+#         if self.center_title is not None:
+#             y_offset = -2
+#             self.center_title.setGeometry(0, y_offset, self.width(), self.height())
+#         if self.custom_widget is not None:
+#             self.custom_widget.setGeometry(0, 0, self.width(), self.height())
 
-    def setTitle(self, title: str):
-        if self.center_title is not None:
-            self.center_title.setText(title)
+#     def setTitle(self, title: str):
+#         if self.center_title is not None:
+#             self.center_title.setText(title)
 
 
-class UBaseWindow(FramelessMainWindow):
+
+
+
+
+class MacControlButton(QPushButton):
+	def __init__(self, btn_type, parent=None):
+		super().__init__(parent)
+		self.btn_type = btn_type  # 'close', 'minimize', 'maximize'
+		self.base_path = "/Users/Loshkarev/Documents/_Projects/MiuzCollectionsQT/icons/traffic_lights"
+
+		self.setFixedSize(12, 12)
+		self.setStyleSheet("border: none; background: transparent;")
+
+		self.is_window_focused = True
+		self.is_group_hovered = False
+		self.is_pressed = False
+
+		self.update_icon()
+
+	def update_icon(self):
+		if not self.is_window_focused:
+			icon_path = f"{self.base_path}/unfocused.svg"
+		elif self.is_pressed:
+			icon_path = f"{self.base_path}/{self.btn_type}/active.svg"
+		elif self.is_group_hovered:
+			icon_path = f"{self.base_path}/{self.btn_type}/hover.svg"
+		else:
+			icon_path = f"{self.base_path}/{self.btn_type}/default.svg"
+
+		self.setIcon(QIcon(icon_path))
+		self.setIconSize(QSize(12, 12))
+
+	def mousePressEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.is_pressed = True
+			self.update_icon()
+		super().mousePressEvent(event)
+
+	def mouseReleaseEvent(self, event):
+		self.is_pressed = False
+		self.update_icon()
+		super().mouseReleaseEvent(event)
+
+
+class TitleBar(QWidget):
+	def __init__(self, parent):
+		super().__init__(parent)
+		self.parent = parent
+		self.setFixedHeight(28) # Стандартная высота заголовка macOS
+
+		self.layout = QHBoxLayout(self)
+		self.layout.setContentsMargins(8, 0, 0, 0)
+		self.layout.setSpacing(8)
+
+		self.close_btn = MacControlButton('close')
+		self.min_btn = MacControlButton('minimize')
+		self.max_btn = MacControlButton('maximize')
+
+		self.close_btn.clicked.connect(self.parent.close)
+		self.min_btn.clicked.connect(self.parent.showMinimized)
+		self.max_btn.clicked.connect(self.toggle_maximize)
+
+		self.layout.addWidget(self.close_btn)
+		self.layout.addWidget(self.min_btn)
+		self.layout.addWidget(self.max_btn)
+		self.layout.addStretch() # Прижимаем кнопки влево
+
+		# Устанавливаем фильтр событий, чтобы отслеживать hover для всей группы кнопок
+		self.close_btn.installEventFilter(self)
+		self.min_btn.installEventFilter(self)
+		self.max_btn.installEventFilter(self)
+
+		self._drag_pos = None
+
+	def eventFilter(self, obj, event):
+		if obj in (self.close_btn, self.min_btn, self.max_btn):
+			if event.type() == QEvent.Type.Enter:
+				self.set_group_hovered(True)
+			elif event.type() == QEvent.Type.Leave:
+				self.set_group_hovered(False)
+		return super().eventFilter(obj, event)
+
+	def set_group_hovered(self, state):
+		self.close_btn.is_group_hovered = state
+		self.min_btn.is_group_hovered = state
+		self.max_btn.is_group_hovered = state
+		self.close_btn.update_icon()
+		self.min_btn.update_icon()
+		self.max_btn.update_icon()
+
+	def set_window_focused(self, state):
+		self.close_btn.is_window_focused = state
+		self.min_btn.is_window_focused = state
+		self.max_btn.is_window_focused = state
+		self.close_btn.update_icon()
+		self.min_btn.update_icon()
+		self.max_btn.update_icon()
+
+	def toggle_maximize(self):
+		if self.parent.isMaximized():
+			self.parent.showNormal()
+		else:
+			self.parent.showMaximized()
+
+	# Обработка перетаскивания окна
+	def mousePressEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self._drag_pos = event.globalPosition().toPoint()
+
+	def mouseMoveEvent(self, event):
+		if self._drag_pos is not None:
+			delta = event.globalPosition().toPoint() - self._drag_pos
+			self.parent.move(self.parent.pos() + delta)
+			self._drag_pos = event.globalPosition().toPoint()
+
+	def mouseReleaseEvent(self, event):
+		self._drag_pos = None
+
+	# Двойной клик по заголовку
+	def mouseDoubleClickEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.toggle_maximize()
+
+
+
+
+class UBaseWindow(QMainWindow):
     win_list: list[QWidget] = []
 
     def __init__(self, parent: QWidget = None, show_title: bool = True):
         super().__init__(parent)
-        self._show_title = show_title
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setup_window()
 
     def setup_window(self):
-        self.title_bar = UTitleBar(self, self._show_title)
-        self.setTitleBar(self.title_bar)
-
         central_widget = TransparentFrame()
         self.setCentralWidget(central_widget)
 
         self.window_layout = QVBoxLayout(central_widget)
         self.window_layout.setContentsMargins(0, 0, 0, 0)
         self.window_layout.setSpacing(0)
-        
-        # --- ИЗМЕНЕНИЕ ЗДЕСЬ ---
-        # Вместо addSpacing создаем QSpacerItem и сохраняем его в переменную
-        self.title_spacer = QSpacerItem(10, self.title_bar.height(), QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        self.window_layout.addItem(self.title_spacer)
-        # -----------------------
 
-        self.separator = USep()
-        self.separator.hide()
-        self.window_layout.addWidget(self.separator)
+        self.title_bar = TitleBar(self)
+        self.window_layout.addWidget(self.title_bar)
 
         self.central_layout = QVBoxLayout()
         self.central_layout.setContentsMargins(0, 0, 0, 0)
@@ -193,30 +310,14 @@ class UBaseWindow(FramelessMainWindow):
         
         self.window_layout.addLayout(self.central_layout)
 
-        if sys.platform == "darwin":
-            self.setSystemTitleBarButtonVisible(True)
-            self.titleBar.minBtn.hide()
-            self.titleBar.maxBtn.hide()
-            self.titleBar.closeBtn.hide()
-
         self.register_window()
-        self.title_bar.raise_()
 
-    # --- ДОБАВЛЯЕМ НОВЫЙ МЕТОД ---
     def set_titlebar_height(self, h: int):
-        # Меняем высоту самого TitleBar
-        self.title_bar.setFixedHeight(h)
-        # Меняем высоту невидимого отступа под TitleBar в главном макете
-        self.title_spacer.changeSize(10, h, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        # Принудительно заставляем макет пересчитаться
-        self.window_layout.invalidate()
+        print("set title bar height")
 
     def show_titlebar_underline(self):
-        # Теперь метод просто показывает сепаратор (название метода оставил для совместимости)
-        self.separator.show()
+        print("show_titlebar_underline")
 
-    def get_titlebar_layout(self) -> QLayout:
-        return self.titleBar.layout()
 
     def register_window(self):
         self.win_list.append(self)
