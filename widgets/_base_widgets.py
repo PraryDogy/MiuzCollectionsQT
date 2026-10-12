@@ -20,256 +20,6 @@ from system.lang import Lng
 from system.utils import Utils
 
 
-class MacControlButton(QPushButton):
-	base_path = Static.ICONS / "traffic_lights"
-
-	def __init__(self, btn_type: str, parent=None):
-		super().__init__(parent)
-		self.btn_type = btn_type  # 'close', 'minimize', 'maximize'
-		self.setFixedSize(12, 12)
-
-		self.is_window_focused = True
-		self.is_group_hovered = False
-		self.is_pressed = False
-
-		self.update_icon()
-
-	def update_icon(self):
-		# Если окно не в фокусе ИЛИ кнопка отключена — ставим серую иконку
-		if not self.isEnabled() or not self.is_window_focused:
-			icon_path = f"{self.base_path}/unfocused.svg"
-		elif self.is_pressed:
-			icon_path = f"{self.base_path}/{self.btn_type}/active.svg"
-		elif self.is_group_hovered:
-			icon_path = f"{self.base_path}/{self.btn_type}/hover.svg"
-		else:
-			icon_path = f"{self.base_path}/{self.btn_type}/default.svg"
-
-		self.setIcon(QIcon(icon_path))
-		self.setIconSize(QSize(12, 12))
-
-	def mousePressEvent(self, e):
-		if e.button() == Qt.MouseButton.LeftButton:
-			self.is_pressed = True
-			self.update_icon()
-		return super().mousePressEvent(e)
-
-	def mouseReleaseEvent(self, e):
-		self.is_pressed = False
-		self.update_icon()
-		return super().mouseReleaseEvent(e)
-
-
-class TitleBar(QWidget):
-	min_height = 28
-
-	def __init__(self, parent: QMainWindow):
-		super().__init__(parent)
-		self.setFixedHeight(self.min_height)
-
-		self.parent_ = parent
-		self._drag_pos = None
-
-		self.h_layout = QHBoxLayout(self)
-		self.h_layout.setContentsMargins(0, 0, 0, 0)
-		self.h_layout.setSpacing(0)
-
-		# отступ слева от кнопок
-		self.h_layout.addSpacing(10)
-
-		# --- 1. Контейнер для кнопок-светофоров ---
-		self.buttons_widget = QWidget()
-		self.buttons_layout = QHBoxLayout(self.buttons_widget)
-		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
-		self.buttons_layout.setSpacing(8)
-		# Центрируем кнопки по вертикали ВНУТРИ их собственного макета
-		self.buttons_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-
-		self.close_btn = MacControlButton('close')
-		self.min_btn = MacControlButton('minimize')
-		self.max_btn = MacControlButton('maximize')
-
-		self.close_btn.clicked.connect(self.parent_.close)
-		self.min_btn.clicked.connect(self.parent_.showMinimized)
-		self.max_btn.clicked.connect(self.toggle_maximize)
-
-		self.buttons_layout.addWidget(self.close_btn)
-		self.buttons_layout.addWidget(self.min_btn)
-		self.buttons_layout.addWidget(self.max_btn)
-
-		self.h_layout.addWidget(self.buttons_widget)
-
-		# отступ справа от кнопок
-		self.h_layout.addSpacing(15)
-		
-		# --- 2. Контейнер для заголовка или кастомного виджета ---
-		self.content_container = QWidget()
-		# Разрешаем контейнеру расширяться во все стороны
-		self.content_container.setSizePolicy(
-			QSizePolicy.Policy.Expanding,
-			QSizePolicy.Policy.Preferred
-		)
-		
-		self.content_layout = QVBoxLayout(self.content_container)
-		self.content_layout.setContentsMargins(0, 0, 0, 0)
-		
-		self.title_label = QLabel()
-		self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.content_layout.addWidget(self.title_label)
-		
-		self.h_layout.addWidget(self.content_container)
-
-		self.close_btn.installEventFilter(self)
-		self.min_btn.installEventFilter(self)
-		self.max_btn.installEventFilter(self)
-
-	def set_custom_widget(self, widget: QWidget):
-		while self.content_layout.count():
-			item = self.content_layout.takeAt(0)
-			if item.widget():
-				item.widget().deleteLater()
-		self.content_layout.addWidget(widget)
-
-	def set_group_hovered(self, state: bool):
-		self.close_btn.is_group_hovered = state
-		self.min_btn.is_group_hovered = state
-		self.max_btn.is_group_hovered = state
-		self.close_btn.update_icon()
-		self.min_btn.update_icon()
-		self.max_btn.update_icon()
-
-	def set_window_focused(self, state: bool):
-		self.close_btn.is_window_focused = state
-		self.min_btn.is_window_focused = state
-		self.max_btn.is_window_focused = state
-		self.close_btn.update_icon()
-		self.min_btn.update_icon()
-		self.max_btn.update_icon()
-
-	def toggle_maximize(self):
-		if self.parent_.isMaximized():
-			self.parent_.showNormal()
-		else:
-			self.parent_.showMaximized()
-
-	def set_close_only(self):
-		self.min_btn.setEnabled(False)
-		self.max_btn.setEnabled(False)
-		self.min_btn.update_icon()
-		self.max_btn.update_icon()
-
-	def eventFilter(self, a0, a1):
-		if a0 in (self.close_btn, self.min_btn, self.max_btn):
-			if a1.type() == QEvent.Type.Enter:
-				self.set_group_hovered(True)
-			elif a1.type() == QEvent.Type.Leave:
-				self.set_group_hovered(False)
-		return super().eventFilter(a0, a1)
-
-	def mousePressEvent(self, a0):
-		if a0.button() == Qt.MouseButton.LeftButton:
-			self._drag_pos = a0.globalPosition().toPoint()
-		# return super().mousePressEvent(a0)
-
-	def mouseMoveEvent(self, a0):
-		if self._drag_pos is not None:
-			delta = a0.globalPosition().toPoint() - self._drag_pos
-			self.parent_.move(self.parent_.pos() + delta)
-			self._drag_pos = a0.globalPosition().toPoint()
-
-	def mouseReleaseEvent(self, a0):
-		self._drag_pos = None
-		# return super().mouseReleaseEvent(a0)
-
-
-# стилизованный виджет, чтобы окно имело заливку + рамку + углы
-class UBaseWindowFrame(QFrame):
-	def __init__(self, parent=None):
-		super().__init__(parent)
-
-
-class UBaseWindow(QMainWindow):
-	win_list: list[QWidget] = []
-
-	def __init__(self, parent: QWidget = None):
-		super().__init__(parent)
-		self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-		self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-		self.setup_window()
-
-	def setWindowTitle(self, title: str):
-		self.title_bar.title_label.setText(title)
-		return super().setWindowTitle(title)
-
-	def setup_window(self):
-		central_widget = UBaseWindowFrame()
-		self.setCentralWidget(central_widget)
-
-		self.window_layout = QVBoxLayout(central_widget)
-		self.window_layout.setContentsMargins(0, 0, 0, 0)
-		self.window_layout.setSpacing(0)
-
-		self.title_bar = TitleBar(self)
-		self.window_layout.addWidget(self.title_bar)
-
-		self.central_layout = QVBoxLayout()
-		self.central_layout.setContentsMargins(0, 0, 0, 0)
-		self.central_layout.setSpacing(0)
-		
-		self.window_layout.addLayout(self.central_layout)
-
-		self.register_window()
-
-	def set_titlebar_height(self, h: int):
-		self.title_bar.setMinimumHeight(h)
-
-	def show_titlebar_underline(self):
-		print("show_titlebar_underline")
-
-	def register_window(self):
-		self.win_list.append(self)
-
-	def unregister_window(self):
-		try:
-			self.win_list.remove(self)
-		except ValueError:
-			pass
-
-	def center_to_parent(self, parent: QWidget):
-		try:
-			geo = self.geometry()
-			geo.moveCenter(parent.geometry().center())
-			self.setGeometry(geo)
-		except Exception as e:
-			print("center error:", e)
-
-	def set_always_on_top(self):
-		self.setWindowModality(Qt.WindowModality.ApplicationModal)
-
-	def set_close_only(self):
-		self.title_bar.set_close_only()
-		return
-		flags = Qt.WindowType.CustomizeWindowHint
-		flags |= Qt.WindowType.WindowCloseButtonHint
-		self.setWindowFlags(flags)
-
-	def closeEvent(self, event: QCloseEvent | None):
-		self.unregister_window()
-		return super().closeEvent(event)
-
-	def deleteLater(self):
-		self.unregister_window()
-		return super().deleteLater()
-
-
-class UMainWindow(UBaseWindow):
-	pass
-
-
-class UMainWidget(UBaseWindow):
-	pass
-
-
 class TransparentButton(QPushButton):
 	def __init__(self, text="", parent=None):
 		super().__init__(text=text, parent=parent)
@@ -611,6 +361,262 @@ class UCheckBox(QCheckBox):
 	def __init__(self, text: str, parent=None):
 		super().__init__(text, parent)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+
+
+class MacControlButton(QPushButton):
+	base_path = Static.ICONS / "traffic_lights"
+
+	def __init__(self, btn_type: str, parent=None):
+		super().__init__(parent)
+		self.btn_type = btn_type  # 'close', 'minimize', 'maximize'
+		self.setFixedSize(12, 12)
+
+		self.is_window_focused = True
+		self.is_group_hovered = False
+		self.is_pressed = False
+
+		self.update_icon()
+
+	def update_icon(self):
+		# Если окно не в фокусе ИЛИ кнопка отключена — ставим серую иконку
+		if not self.isEnabled() or not self.is_window_focused:
+			icon_path = f"{self.base_path}/unfocused.svg"
+		elif self.is_pressed:
+			icon_path = f"{self.base_path}/{self.btn_type}/active.svg"
+		elif self.is_group_hovered:
+			icon_path = f"{self.base_path}/{self.btn_type}/hover.svg"
+		else:
+			icon_path = f"{self.base_path}/{self.btn_type}/default.svg"
+
+		self.setIcon(QIcon(icon_path))
+		self.setIconSize(QSize(12, 12))
+
+	def mousePressEvent(self, e):
+		if e.button() == Qt.MouseButton.LeftButton:
+			self.is_pressed = True
+			self.update_icon()
+		return super().mousePressEvent(e)
+
+	def mouseReleaseEvent(self, e):
+		self.is_pressed = False
+		self.update_icon()
+		return super().mouseReleaseEvent(e)
+
+
+class TitleBar(QWidget):
+	min_height = 28
+
+	def __init__(self, parent: QMainWindow):
+		super().__init__(parent)
+		self.setFixedHeight(self.min_height)
+
+		self.parent_ = parent
+		self._drag_pos = None
+
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.h_layout.setSpacing(0)
+
+		# отступ слева от кнопок
+		self.h_layout.addSpacing(10)
+
+		# --- 1. Контейнер для кнопок-светофоров ---
+		self.buttons_widget = QWidget()
+		self.buttons_layout = QHBoxLayout(self.buttons_widget)
+		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
+		self.buttons_layout.setSpacing(8)
+		# Центрируем кнопки по вертикали ВНУТРИ их собственного макета
+		self.buttons_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+
+		self.close_btn = MacControlButton('close')
+		self.min_btn = MacControlButton('minimize')
+		self.max_btn = MacControlButton('maximize')
+
+		self.close_btn.clicked.connect(self.parent_.close)
+		self.min_btn.clicked.connect(self.parent_.showMinimized)
+		self.max_btn.clicked.connect(self.toggle_maximize)
+
+		self.buttons_layout.addWidget(self.close_btn)
+		self.buttons_layout.addWidget(self.min_btn)
+		self.buttons_layout.addWidget(self.max_btn)
+
+		self.h_layout.addWidget(self.buttons_widget)
+
+		# отступ справа от кнопок
+		self.h_layout.addSpacing(15)
+		
+		# --- 2. Контейнер для заголовка или кастомного виджета ---
+		self.content_container = QWidget()
+		# Разрешаем контейнеру расширяться во все стороны
+		self.content_container.setSizePolicy(
+			QSizePolicy.Policy.Expanding,
+			QSizePolicy.Policy.Preferred
+		)
+		
+		self.content_layout = QVBoxLayout(self.content_container)
+		self.content_layout.setContentsMargins(0, 0, 0, 0)
+		
+		self.title_label = QLabel()
+		self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.content_layout.addWidget(self.title_label)
+		
+		self.h_layout.addWidget(self.content_container)
+
+		self.close_btn.installEventFilter(self)
+		self.min_btn.installEventFilter(self)
+		self.max_btn.installEventFilter(self)
+
+	def set_custom_widget(self, widget: QWidget):
+		while self.content_layout.count():
+			item = self.content_layout.takeAt(0)
+			if item.widget():
+				item.widget().deleteLater()
+		self.content_layout.addWidget(widget)
+
+	def set_group_hovered(self, state: bool):
+		self.close_btn.is_group_hovered = state
+		self.min_btn.is_group_hovered = state
+		self.max_btn.is_group_hovered = state
+		self.close_btn.update_icon()
+		self.min_btn.update_icon()
+		self.max_btn.update_icon()
+
+	def set_window_focused(self, state: bool):
+		self.close_btn.is_window_focused = state
+		self.min_btn.is_window_focused = state
+		self.max_btn.is_window_focused = state
+		self.close_btn.update_icon()
+		self.min_btn.update_icon()
+		self.max_btn.update_icon()
+
+	def toggle_maximize(self):
+		if self.parent_.isMaximized():
+			self.parent_.showNormal()
+		else:
+			self.parent_.showMaximized()
+
+	def set_close_only(self):
+		self.min_btn.setEnabled(False)
+		self.max_btn.setEnabled(False)
+		self.min_btn.update_icon()
+		self.max_btn.update_icon()
+
+	def eventFilter(self, a0, a1):
+		if a0 in (self.close_btn, self.min_btn, self.max_btn):
+			if a1.type() == QEvent.Type.Enter:
+				self.set_group_hovered(True)
+			elif a1.type() == QEvent.Type.Leave:
+				self.set_group_hovered(False)
+		return super().eventFilter(a0, a1)
+
+	def mousePressEvent(self, a0):
+		if a0.button() == Qt.MouseButton.LeftButton:
+			self._drag_pos = a0.globalPosition().toPoint()
+		# return super().mousePressEvent(a0)
+
+	def mouseMoveEvent(self, a0):
+		if self._drag_pos is not None:
+			delta = a0.globalPosition().toPoint() - self._drag_pos
+			self.parent_.move(self.parent_.pos() + delta)
+			self._drag_pos = a0.globalPosition().toPoint()
+
+	def mouseReleaseEvent(self, a0):
+		self._drag_pos = None
+		# return super().mouseReleaseEvent(a0)
+
+
+# стилизованный виджет, чтобы окно имело заливку + рамку + углы
+class UBaseWindowFrame(QFrame):
+	def __init__(self, parent=None):
+		super().__init__(parent)
+
+
+class UBaseWindow(QMainWindow):
+	win_list: list[QWidget] = []
+
+	def __init__(self, parent: QWidget = None):
+		super().__init__(parent)
+		self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+		self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+		self.setup_window()
+
+	def setWindowTitle(self, title: str):
+		self.title_bar.title_label.setText(title)
+		return super().setWindowTitle(title)
+
+	def setup_window(self):
+		central_widget = UBaseWindowFrame()
+		self.setCentralWidget(central_widget)
+
+		self.window_layout = QVBoxLayout(central_widget)
+		self.window_layout.setContentsMargins(0, 0, 0, 0)
+		self.window_layout.setSpacing(0)
+
+		self.title_bar = TitleBar(self)
+		self.window_layout.addWidget(self.title_bar)
+
+		self.window_layout.addSpacing(1)
+		self.sep = USep()
+		self.window_layout.addWidget(self.sep)
+		self.window_layout.addSpacing(1)
+
+		self.central_layout = QVBoxLayout()
+		self.central_layout.setContentsMargins(0, 0, 0, 0)
+		self.central_layout.setSpacing(0)
+		
+		self.window_layout.addLayout(self.central_layout)
+
+		self.register_window()
+
+	def set_titlebar_height(self, h: int):
+		self.title_bar.setMinimumHeight(h)
+
+	def show_titlebar_underline(self):
+		print("show_titlebar_underline")
+
+	def register_window(self):
+		self.win_list.append(self)
+
+	def unregister_window(self):
+		try:
+			self.win_list.remove(self)
+		except ValueError:
+			pass
+
+	def center_to_parent(self, parent: QWidget):
+		try:
+			geo = self.geometry()
+			geo.moveCenter(parent.geometry().center())
+			self.setGeometry(geo)
+		except Exception as e:
+			print("center error:", e)
+
+	def set_always_on_top(self):
+		self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+	def set_close_only(self):
+		self.title_bar.set_close_only()
+		return
+		flags = Qt.WindowType.CustomizeWindowHint
+		flags |= Qt.WindowType.WindowCloseButtonHint
+		self.setWindowFlags(flags)
+
+	def closeEvent(self, event: QCloseEvent | None):
+		self.unregister_window()
+		return super().closeEvent(event)
+
+	def deleteLater(self):
+		self.unregister_window()
+		return super().deleteLater()
+
+
+class UMainWindow(UBaseWindow):
+	pass
+
+
+class UMainWidget(UBaseWindow):
+	pass
 
 
 class GrayTextLabel(TransparentLabel):
