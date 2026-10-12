@@ -5,15 +5,15 @@ from pathlib import Path
 
 from PyQt6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QContextMenuEvent, QIcon,
-                         QMouseEvent)
+						 QMouseEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGroupBox,
-                             QHBoxLayout, QLabel, QLayout, QLineEdit,
-                             QListWidget, QListWidgetItem, QMainWindow, QMenu,
-                             QProgressBar, QPushButton, QScrollArea,
-                             QSizePolicy, QSlider, QSpinBox, QStackedWidget,
-                             QTextEdit, QTreeView, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+							 QHBoxLayout, QLabel, QLayout, QLineEdit,
+							 QListWidget, QListWidgetItem, QMainWindow, QMenu,
+							 QProgressBar, QPushButton, QScrollArea,
+							 QSizePolicy, QSlider, QSpinBox, QStackedWidget,
+							 QTextEdit, QTreeView, QTreeWidget,
+							 QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -35,7 +35,8 @@ class MacControlButton(QPushButton):
 		self.update_icon()
 
 	def update_icon(self):
-		if not self.is_window_focused:
+		# Если окно не в фокусе ИЛИ кнопка отключена — ставим серую иконку
+		if not self.isEnabled() or not self.is_window_focused:
 			icon_path = f"{self.base_path}/unfocused.svg"
 		elif self.is_pressed:
 			icon_path = f"{self.base_path}/{self.btn_type}/active.svg"
@@ -162,6 +163,14 @@ class TitleBar(QWidget):
 		else:
 			self.parent_.showMaximized()
 
+	def set_close_only(self):
+		self.min_btn.setEnabled(False)
+		self.max_btn.setEnabled(False)
+		
+		# Принудительно обновляем иконки, чтобы они сразу стали unfocused.svg
+		self.min_btn.update_icon()
+		self.max_btn.update_icon()
+
 	def mousePressEvent(self, a0):
 		if a0.button() == Qt.MouseButton.LeftButton:
 			self._drag_pos = a0.globalPosition().toPoint()
@@ -246,6 +255,7 @@ class UBaseWindow(QMainWindow):
 		self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
 	def set_close_only(self):
+		self.title_bar.set_close_only()
 		return
 		flags = Qt.WindowType.CustomizeWindowHint
 		flags |= Qt.WindowType.WindowCloseButtonHint
