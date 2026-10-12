@@ -65,7 +65,7 @@ class TitleBar(QWidget):
 
 	def __init__(self, parent: QMainWindow):
 		super().__init__(parent)
-		self.setMinimumHeight(self.min_height) 
+		self.setFixedHeight(self.min_height)
 
 		self.parent_ = parent
 		self._drag_pos = None
@@ -123,23 +123,12 @@ class TitleBar(QWidget):
 		self.min_btn.installEventFilter(self)
 		self.max_btn.installEventFilter(self)
 
-	def set_title_text(self, text: str):
-		self.title_label.setText(text)
-
 	def set_custom_widget(self, widget: QWidget):
 		while self.content_layout.count():
 			item = self.content_layout.takeAt(0)
 			if item.widget():
 				item.widget().deleteLater()
 		self.content_layout.addWidget(widget)
-	
-	def eventFilter(self, a0, a1):
-		if a0 in (self.close_btn, self.min_btn, self.max_btn):
-			if a1.type() == QEvent.Type.Enter:
-				self.set_group_hovered(True)
-			elif a1.type() == QEvent.Type.Leave:
-				self.set_group_hovered(False)
-		return super().eventFilter(a0, a1)
 
 	def set_group_hovered(self, state: bool):
 		self.close_btn.is_group_hovered = state
@@ -166,10 +155,16 @@ class TitleBar(QWidget):
 	def set_close_only(self):
 		self.min_btn.setEnabled(False)
 		self.max_btn.setEnabled(False)
-		
-		# Принудительно обновляем иконки, чтобы они сразу стали unfocused.svg
 		self.min_btn.update_icon()
 		self.max_btn.update_icon()
+
+	def eventFilter(self, a0, a1):
+		if a0 in (self.close_btn, self.min_btn, self.max_btn):
+			if a1.type() == QEvent.Type.Enter:
+				self.set_group_hovered(True)
+			elif a1.type() == QEvent.Type.Leave:
+				self.set_group_hovered(False)
+		return super().eventFilter(a0, a1)
 
 	def mousePressEvent(self, a0):
 		if a0.button() == Qt.MouseButton.LeftButton:
@@ -203,11 +198,8 @@ class UBaseWindow(QMainWindow):
 		self.setup_window()
 
 	def setWindowTitle(self, title: str):
-		self.title_bar.set_title_text(title)
+		self.title_bar.title_label.setText(title)
 		return super().setWindowTitle(title)
-
-	def set_title_bar_widget(self, widget: QWidget):
-		self.title_bar.set_custom_widget(widget)
 
 	def setup_window(self):
 		central_widget = UBaseWindowFrame()
