@@ -88,16 +88,14 @@ class WinMain(UMainWindow):
 	min_w = 750
 	left_side_width = 250
 	ww, hh = 1050, 750
+	FOOTER_MARGINS = 5
 
 	def __init__(self, argv: list):
 		super().__init__()
-		self.central_layout.setContentsMargins(10, 0, 10, 5)
-		self.show_titlebar_underline()
+		self.central_layout.setContentsMargins(5, 0, 5, 0)
+		self.central_layout.setSpacing(0)
 		self.setMinimumWidth(self.min_w)
-		self.setWindowTitle(f"{Static.APP_NAME}")
 		self.setMenuBar(BarMacos())
-
-		MAIN_MARGIN = 5
 
 		# self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
 		# self.test.center_to_parent(self)
@@ -112,10 +110,9 @@ class WinMain(UMainWindow):
 		self.stop_scaner = True
 
 		self.bar_top = BarTop()
-		# self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
+		self.bar_top.h_layout.setContentsMargins(0, 0, 5, 0)
 		self.set_title_bar_widget(self.bar_top)
 		self.set_titlebar_height(self.bar_top.height() + 8)
-		# self.bar_top.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
 		self.bar_top.open_settings_win.connect(
 			lambda settings_item: self.open_settings_win(settings_item)
@@ -176,7 +173,7 @@ class WinMain(UMainWindow):
 		self.footer_layout = QVBoxLayout(self.footer_container)
 		
 		# верхний маргин для отступа от сетки и меню
-		self.footer_layout.setContentsMargins(MAIN_MARGIN, 10, MAIN_MARGIN, 0)
+		self.footer_layout.setContentsMargins(self.FOOTER_MARGINS, 10, self.FOOTER_MARGINS, 0)
 		self.footer_layout.setSpacing(0)
 
 		# нижний маргин для отступа от сепаратора барами

@@ -71,8 +71,11 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 		self.setMinimumHeight(28) 
 
 		self.layout = QHBoxLayout(self)
-		self.layout.setContentsMargins(8, 0, 8, 0)
+		self.layout.setContentsMargins(0, 0, 0, 0)
 		self.layout.setSpacing(0)
+
+		# отступ слева от кнопок
+		self.layout.addSpacing(10)
 
 		# --- 1. Контейнер для кнопок-светофоров ---
 		self.buttons_widget = QWidget()
