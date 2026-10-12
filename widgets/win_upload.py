@@ -13,7 +13,7 @@ from system.shared_utils import ImgUtils, SharedUtils
 from ._base_widgets import (RowArrowWidget, UGroupBox,
                             TransparentLabel, TransparentWidget,
                             USep, UListWidget, UListWidgetItem,
-                            UMainWidget, UMenu, UPushButton, UTreeView)
+                            UMainWindow, UMenu, UPushButton, UTreeView)
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -91,7 +91,7 @@ class CustomTreeView(UTreeView):
             self.proxy_model.sort(0, Qt.SortOrder.AscendingOrder)
 
 
-class UploadWin(UMainWidget):
+class UploadWin(UMainWindow):
     ok_clicked = pyqtSignal(str)
     image_file_svg = Static.COMMON_ICONS / "image_file.svg"
     copy_files_svg = Static.COMMON_ICONS / "copy_files.svg"

@@ -10,10 +10,10 @@ from system.items import DataItem
 from system.lang import Lng
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
-                            TransparentScrollArea, UMainWidget)
+                            TransparentScrollArea, UMainWindow)
 
 
-class WinCollage(UMainWidget):
+class WinCollage(UMainWindow):
     ww, hh = 700, 700
 
     def __init__(self, data_items: list[DataItem]):

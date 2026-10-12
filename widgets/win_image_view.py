@@ -23,7 +23,7 @@ from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import UMainWidget, UMenu
+from ._base_widgets import UMainWindow, UMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
@@ -217,7 +217,7 @@ class NextButton(ImgViewSvg):
         self.load(str(self.svg_path))
 
 
-class WinImageView(UMainWidget):
+class WinImageView(UMainWindow):
     select_thumb = pyqtSignal(str)
     open_win_info = pyqtSignal(list)
     copy_path = pyqtSignal(list)

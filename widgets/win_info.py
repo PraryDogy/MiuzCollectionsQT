@@ -9,7 +9,7 @@ from system.lang import Lng
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 
 from ._base_widgets import (GrayTextLabel, SelectableLabel, TransparentWidget,
-                            UMainWidget)
+                            UMainWindow)
 
 
 class WinInfoSelectableLabel(SelectableLabel):
@@ -23,7 +23,7 @@ class WinInfoSelectableLabel(SelectableLabel):
         return super().contextMenuEvent(ev)
 
 
-class WinInfo(UMainWidget):
+class WinInfo(UMainWindow):
     finished_ = pyqtSignal()
 
     def __init__(self, paths: list[str]):

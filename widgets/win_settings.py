@@ -28,7 +28,7 @@ from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             UGroupBox, TransparentLabel,
                             TransparentWidget, USep, ULineEdit,
                             UListSpacerItem, UListWidget, UListWidgetItem,
-                            UMainWidget, UMenu, UPushButton, USpinBox,
+                            UMainWindow, UMenu, UPushButton, USpinBox,
                             UTextEdit, WarningWindow)
 
 
@@ -146,7 +146,7 @@ class RebootableSettings(UGroupBox):
         reset_win.show()
 
 
-class SizesWin(UMainWidget):
+class SizesWin(UMainWindow):
     ww = 500
     hh = 330
 
@@ -603,7 +603,7 @@ class MfSettings(TransparentWidget):
                 QTimer.singleShot(1000, poll_task)
 
         def start_mf_remover():
-            for i in UMainWidget.win_list:
+            for i in UMainWindow.win_list:
                 i.hide()
             self.mf_remover.start()
             QTimer.singleShot(1000, poll_task)
@@ -768,7 +768,7 @@ class NewMfSettings(TransparentWidget):
 # ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
 
 
-class WinSettings(UMainWidget):
+class WinSettings(UMainWindow):
     closed = pyqtSignal()
     
     image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"

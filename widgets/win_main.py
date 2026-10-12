@@ -848,7 +848,7 @@ class WinMain(UMainWindow):
 		return super().resizeEvent(a0)
 	
 
-# class WinMain(UMainWindow):
+# class WinMain(UBaseWindow):
 #     def __init__(self, *args):
 #         super().__init__()
 

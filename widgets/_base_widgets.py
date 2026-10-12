@@ -532,7 +532,7 @@ class UBaseWindowFrame(QFrame):
 		super().__init__(parent)
 
 
-class UBaseWindow(QMainWindow):
+class UMainWindow(QMainWindow):
 	win_list: list[QWidget] = []
 
 	def __init__(self, parent: QWidget = None):
@@ -613,14 +613,6 @@ class UBaseWindow(QMainWindow):
 	def deleteLater(self):
 		self.unregister_window()
 		return super().deleteLater()
-
-
-class UMainWindow(UBaseWindow):
-	pass
-
-
-class UMainWidget(UBaseWindow):
-	pass
 
 
 class GrayTextLabel(TransparentLabel):
@@ -792,7 +784,7 @@ class RowArrowWidget(TransparentWidget):
 
 
 
-class WinProgressbar(UMainWidget):
+class WinProgressbar(UMainWindow):
 	cancel = pyqtSignal()
 	files_icon_path = Static.COMMON_ICONS / "copy_files.svg"
 	cancel_icon_path = Static.COMMON_ICONS / "cancel.svg"
@@ -860,7 +852,7 @@ class WinProgressbar(UMainWidget):
 		return super().closeEvent(a0)
 
 
-class VerticalWindow(UMainWidget):
+class VerticalWindow(UMainWindow):
 	def __init__(self):
 		super().__init__()
 
@@ -1014,7 +1006,7 @@ class SuperConfirmWindow(ConfirmWindow):
 		self.svg_widget.load(str(self.icon_path))
 
 
-class InputTextWin(UMainWidget):
+class InputTextWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 	cancel_clicked = pyqtSignal()
 

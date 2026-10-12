@@ -20,12 +20,12 @@ from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
                             TitleTextLabel, TransparentFrame, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWidget,
+                            TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton, USep, USlider)
 
 
 
-class ProgressWin(UMainWidget):
+class ProgressWin(UMainWindow):
     stop_img_search = pyqtSignal()
     base_image_svg_path = Static.COMMON_ICONS / "base_image.svg"
     stop_svg_path = Static.COMMON_ICONS / "stop.svg"
@@ -311,7 +311,7 @@ class ControlsWidget(UGroupBox):
         self.v_layout.addWidget(descr)
 
 
-class WinImgSearch(UMainWidget):
+class WinImgSearch(UMainWindow):
     reload_thumbnails = pyqtSignal()
     closed = pyqtSignal()
     magnifier_svg_path = Static.COMMON_ICONS / "magnifier.svg"

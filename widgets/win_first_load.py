@@ -16,7 +16,7 @@ from system.tasks import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             RowArrowWidget, SaveRowArrowWidget,
-                            UGroupBox, UMainWidget, UMenu,
+                            UGroupBox, UMainWindow, UMenu,
                             UPushButton)
 
 
@@ -51,7 +51,7 @@ class ZipTask(URunnable):
 
 
 
-class FirstLoadWin(UMainWidget):
+class FirstLoadWin(UMainWindow):
     rus_flag = Static.COMMON_ICONS / "rus_flag.svg"
     eng_flag = Static.COMMON_ICONS / "eng_flag.svg"
     language_svg = Static.COMMON_ICONS / "language.svg"

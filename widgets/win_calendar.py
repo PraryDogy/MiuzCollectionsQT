@@ -8,7 +8,7 @@ from system.lang import Lng
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
-                            TransparentWidget, UMainWidget, UMenu, UPushButton,
+                            TransparentWidget, UMainWindow, UMenu, UPushButton,
                             USep)
 
 
@@ -100,7 +100,7 @@ class CalendarDaySelected(TransparentLabel):
 		super().mouseReleaseEvent(ev)
 
 
-class WinCalendar(UMainWidget):
+class WinCalendar(UMainWindow):
 	date_selected = pyqtSignal(QDate)
 
 	svg_calendar_path = Static.COMMON_ICONS / "calendar.svg"

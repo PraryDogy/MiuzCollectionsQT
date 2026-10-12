@@ -13,7 +13,7 @@ from system.lang import Lng
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             GrayTextLabel, InputTextWin, TitleTextLabel,
                             TransparentLabel, TransparentWidget, UGroupBox,
-                            UMainWidget, UMenu, UPushButton, USep, UTagWidget)
+                            UMainWindow, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
 
 UGroupBox_margins = (5, 5, 5, 5)
@@ -521,7 +521,7 @@ class TagsWidget(UGroupBox):
             self.load_st_grid.emit()
 
 
-class WinFilters(UMainWidget):
+class WinFilters(UMainWindow):
     reset_svg = Static.COMMON_ICONS / "reset.svg"
     edit_svg = Static.COMMON_ICONS / "edit.svg"
     closed_ = pyqtSignal()

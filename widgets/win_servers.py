@@ -15,7 +15,7 @@ from system.servers import Servers
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             ULineEdit, UListWidget, UListWidgetItem,
-                            UMainWidget, UMenu, UPushButton)
+                            UMainWindow, UMenu, UPushButton)
 
 
 @dataclass(slots=True)
@@ -123,7 +123,7 @@ class ServerLabel(TransparentLabel):
         self.setContentsMargins(2, 0, 0, 0)
 
 
-class LoginWin(UMainWidget):
+class LoginWin(UMainWindow):
     ok_pressed = pyqtSignal(ServerItem)
     ww = 300
 
@@ -246,7 +246,7 @@ class LoginWin(UMainWidget):
         return super().keyPressEvent(a0)
 
 
-class ServersWin(UMainWidget):
+class ServersWin(UMainWindow):
     def __init__(self):
         super().__init__()
         self.set_always_on_top()

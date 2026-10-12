@@ -12,7 +12,7 @@ from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
-                            TransparentWidget, UCheckBox, UMainWidget,
+                            TransparentWidget, UCheckBox, UMainWindow,
                             UPushButton, VerticalWindow, WarningWindow,
                             WinProgressbar)
 

@@ -10,7 +10,7 @@ from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
                             TransparentFrame, TransparentWidget, UGroupBox,
-                            UMainWidget, UPushButton, USep, UTextEdit)
+                            UMainWindow, UPushButton, USep, UTextEdit)
 
 
 class WinTextSearchTitleRow(TransparentFrame):
@@ -33,7 +33,7 @@ class WinTextSearchTitleRow(TransparentFrame):
         self.h_lay.addWidget(self.title_label)
 
 
-class WinTextSearch(UMainWidget):
+class WinTextSearch(UMainWindow):
     ok_clicked = pyqtSignal(str)
     size_ = (380, 330)  # Немного увеличил высоту, чтобы поместилось описание
     svg_magnifier = Static.COMMON_ICONS / "magnifier.svg"

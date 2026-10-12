@@ -11,7 +11,7 @@ from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 
 from ._base_widgets import (MfPathWidget, SuperConfirmWindow, TransparentLabel,
-                            TransparentWidget, UMainWidget, UPushButton)
+                            TransparentWidget, UMainWindow, UPushButton)
 
 
 def restart_app():
@@ -44,7 +44,7 @@ class WarnWidget(TransparentWidget):
         h_lay.addWidget(up_label)
 
 
-class WinSmb(UMainWidget):
+class WinSmb(UMainWindow):
 
     def __init__(self, mf: Mf):
         super().__init__()
