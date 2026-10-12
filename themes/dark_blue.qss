@@ -22,6 +22,11 @@ UBaseWindowFrame {
     border: 1px solid #ff1d2b38;
 }
 
+MacControlButton {
+    border: none;
+    background: transparent;
+}
+
 
 /* ==================== MENU ==================== */
 

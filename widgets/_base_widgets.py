@@ -15,8 +15,6 @@ from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
 							 QSpacerItem, QSpinBox, QStackedWidget, QTextEdit,
 							 QTreeView, QTreeWidget, QTreeWidgetItem,
 							 QVBoxLayout, QWidget)
-from qframelesswindow import FramelessMainWindow, StandardTitleBar
-from typing_extensions import Optional
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -24,13 +22,12 @@ from system.utils import Utils
 
 
 class MacControlButton(QPushButton):
-	def __init__(self, btn_type, parent=None):
+	base_path = Static.ICONS / "traffic_lights"
+
+	def __init__(self, btn_type: str, parent=None):
 		super().__init__(parent)
 		self.btn_type = btn_type  # 'close', 'minimize', 'maximize'
-		self.base_path = "/Users/Loshkarev/Documents/_Projects/MiuzCollectionsQT/icons/traffic_lights"
-
 		self.setFixedSize(12, 12)
-		self.setStyleSheet("border: none; background: transparent;")
 
 		self.is_window_focused = True
 		self.is_group_hovered = False
@@ -51,16 +48,16 @@ class MacControlButton(QPushButton):
 		self.setIcon(QIcon(icon_path))
 		self.setIconSize(QSize(12, 12))
 
-	def mousePressEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
+	def mousePressEvent(self, e):
+		if e.button() == Qt.MouseButton.LeftButton:
 			self.is_pressed = True
 			self.update_icon()
-		super().mousePressEvent(event)
+		return super().mousePressEvent(e)
 
-	def mouseReleaseEvent(self, event):
+	def mouseReleaseEvent(self, e):
 		self.is_pressed = False
 		self.update_icon()
-		super().mouseReleaseEvent(event)
+		return super().mouseReleaseEvent(e)
 
 
 class TitleBar(QWidget): # Или QWidget, смотря от чего наследуетесь
