@@ -113,7 +113,8 @@ class WinMain(UMainWindow):
 
         self.bar_top = BarTop()
         self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
-        self.bar_top.setFixedHeight(self.bar_top.height() + 10)
+        self.set_title_bar_widget(self.bar_top)
+        self.set_titlebar_height(self.bar_top.height() + 10)
 
         self.bar_top.open_settings_win.connect(
             lambda settings_item: self.open_settings_win(settings_item)
@@ -130,15 +131,6 @@ class WinMain(UMainWindow):
         self.bar_top.mf_open.connect(
             lambda mf: self.on_mf_clicked(mf)
         )
-        self.central_layout.addWidget(self.bar_top)
-
-        # # --- Создаем контейнер-обертку ---
-        # self.top_bar_container = TransparentFrame()
-        # self.top_bar_layout = QHBoxLayout(self.top_bar_container)
-        # self.top_bar_layout.setContentsMargins(0, 5, 0, 5)
-        # self.top_bar_layout.setSpacing(0)
-        # self.top_bar_layout.addWidget(self.bar_top)
-        # self.central_layout.addWidget(self.top_bar_container)
 
         # Создаем QSplitter
         self.splitter = QSplitter(Qt.Orientation.Horizontal)

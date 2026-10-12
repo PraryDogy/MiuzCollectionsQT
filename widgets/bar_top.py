@@ -264,7 +264,7 @@ class BarTop(TransparentFrame):
         self.catalog_widget.mf_new.connect(self.mf_new.emit)
         self.h_layout.addWidget(self.catalog_widget)
 
-        self.h_layout.addStretch(0)
+        self.h_layout.addStretch(1)
 
         # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchSvgBtn()
@@ -276,7 +276,7 @@ class BarTop(TransparentFrame):
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         self.h_layout.addWidget(self.search_wid)
 
-        self.h_layout.addStretch(0)
+        self.h_layout.addStretch(1)
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")
