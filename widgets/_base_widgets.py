@@ -123,46 +123,6 @@ class TransparentTreeView(QTreeView):
         super().__init__(parent)
 
 
-# class UTitleBar(StandardTitleBar):
-#     hh = 30
-
-#     def __init__(self, parent=None, show_title: bool = True):
-#         super().__init__(parent)
-#         self.setFixedHeight(self.hh)
-#         self.titleLabel.hide()
-#         self.center_title = None 
-#         self.custom_widget = None 
-#         if show_title:
-#             self.center_title = QLabel(self)
-#             self.center_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-#             self.center_title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-
-#     def set_custom_widget(self, widget: QWidget):
-#         self.custom_widget = widget
-#         self.custom_widget.setParent(self)
-#         self.custom_widget.show()
-#         self._update_geometries()
-
-#     def resizeEvent(self, event):
-#         super().resizeEvent(event)
-#         self._update_geometries()
-
-#     def _update_geometries(self):
-#         if self.center_title is not None:
-#             y_offset = -2
-#             self.center_title.setGeometry(0, y_offset, self.width(), self.height())
-#         if self.custom_widget is not None:
-#             self.custom_widget.setGeometry(0, 0, self.width(), self.height())
-
-#     def setTitle(self, title: str):
-#         if self.center_title is not None:
-#             self.center_title.setText(title)
-
-
-
-
-
-
 class MacControlButton(QPushButton):
 	def __init__(self, btn_type, parent=None):
 		super().__init__(parent)
@@ -281,8 +241,6 @@ class TitleBar(QWidget):
 	def mouseDoubleClickEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
 			self.toggle_maximize()
-
-
 
 
 class UBaseWindow(QMainWindow):
