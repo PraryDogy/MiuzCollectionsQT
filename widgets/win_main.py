@@ -624,6 +624,7 @@ class WinMain(UMainWindow):
 		if WinImageView.xx == 0:
 			self.view_win.resize(self.ww, self.hh)
 			self.view_win.center_to_parent(self.window())
+			self.view_win.move(self.view_win.x() + 10, self.view_win.y() + 10)
 		else:
 			self.view_win.resize(WinImageView.ww, WinImageView.hh)
 			self.view_win.move(WinImageView.xx, WinImageView.yy)
