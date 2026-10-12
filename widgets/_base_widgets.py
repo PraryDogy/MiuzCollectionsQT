@@ -4,17 +4,16 @@ import sys
 from pathlib import Path
 
 from PyQt6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-						 QIcon, QMouseEvent, QPainter, QPixmap)
+from PyQt6.QtGui import (QAction, QCloseEvent, QContextMenuEvent, QIcon,
+                         QMouseEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
-							 QGroupBox, QHBoxLayout, QLabel, QLayout,
-							 QLineEdit, QListWidget, QListWidgetItem,
-							 QMainWindow, QMenu, QProgressBar, QPushButton,
-							 QScrollArea, QSizeGrip, QSizePolicy, QSlider,
-							 QSpacerItem, QSpinBox, QStackedWidget, QTextEdit,
-							 QTreeView, QTreeWidget, QTreeWidgetItem,
-							 QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGroupBox,
+                             QHBoxLayout, QLabel, QLayout, QLineEdit,
+                             QListWidget, QListWidgetItem, QMainWindow, QMenu,
+                             QProgressBar, QPushButton, QScrollArea,
+                             QSizePolicy, QSlider, QSpinBox, QStackedWidget,
+                             QTextEdit, QTreeView, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -60,19 +59,22 @@ class MacControlButton(QPushButton):
 		return super().mouseReleaseEvent(e)
 
 
-class TitleBar(QWidget): # Или QWidget, смотря от чего наследуетесь
-	def __init__(self, parent):
-		super().__init__(parent)
-		self.parent = parent
-		
-		self.setMinimumHeight(28) 
+class TitleBar(QWidget):
+	min_height = 28
 
-		self.layout = QHBoxLayout(self)
-		self.layout.setContentsMargins(0, 0, 0, 0)
-		self.layout.setSpacing(0)
+	def __init__(self, parent: QMainWindow):
+		super().__init__(parent)
+		self.setMinimumHeight(self.min_height) 
+
+		self.parent_ = parent
+		self._drag_pos = None
+
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.h_layout.setSpacing(0)
 
 		# отступ слева от кнопок
-		self.layout.addSpacing(10)
+		self.h_layout.addSpacing(10)
 
 		# --- 1. Контейнер для кнопок-светофоров ---
 		self.buttons_widget = QWidget()
@@ -86,71 +88,59 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 		self.min_btn = MacControlButton('minimize')
 		self.max_btn = MacControlButton('maximize')
 
-		self.close_btn.clicked.connect(self.parent.close)
-		self.min_btn.clicked.connect(self.parent.showMinimized)
+		self.close_btn.clicked.connect(self.parent_.close)
+		self.min_btn.clicked.connect(self.parent_.showMinimized)
 		self.max_btn.clicked.connect(self.toggle_maximize)
 
 		self.buttons_layout.addWidget(self.close_btn)
 		self.buttons_layout.addWidget(self.min_btn)
 		self.buttons_layout.addWidget(self.max_btn)
 
-		# Добавляем кнопки БЕЗ флага alignment, чтобы они не ломали высоту TitleBar
-		self.layout.addWidget(self.buttons_widget)
+		self.h_layout.addWidget(self.buttons_widget)
 
 		# отступ справа от кнопок
-		self.layout.addSpacing(15)
+		self.h_layout.addSpacing(15)
 		
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
 		self.content_container = QWidget()
 		# Разрешаем контейнеру расширяться во все стороны
-		self.content_container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+		self.content_container.setSizePolicy(
+			QSizePolicy.Policy.Expanding,
+			QSizePolicy.Policy.Preferred
+		)
 		
 		self.content_layout = QVBoxLayout(self.content_container)
 		self.content_layout.setContentsMargins(0, 0, 0, 0)
 		
 		self.title_label = QLabel()
 		self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.title_label.setStyleSheet("color: white;")
 		self.content_layout.addWidget(self.title_label)
 		
-		# Добавляем БЕЗ флага alignment, чтобы виджет мог растягиваться по горизонтали
-		self.layout.addWidget(self.content_container)
-		
+		self.h_layout.addWidget(self.content_container)
 
 		self.close_btn.installEventFilter(self)
 		self.min_btn.installEventFilter(self)
 		self.max_btn.installEventFilter(self)
 
-		self._drag_pos = None
-
 	def set_title_text(self, text: str):
-		"""Устанавливает обычный текстовый заголовок"""
 		self.title_label.setText(text)
 
 	def set_custom_widget(self, widget: QWidget):
-		"""Заменяет текст на любой кастомный виджет"""
-		# Удаляем стандартный label или предыдущий виджет
 		while self.content_layout.count():
 			item = self.content_layout.takeAt(0)
 			if item.widget():
 				item.widget().deleteLater()
-		
 		self.content_layout.addWidget(widget)
-		# Если виджет должен растягиваться на весь заголовок (например, строка поиска),
-		# можно скрыть правую пустышку: self.right_spacer.hide()
-
-	# ... (Методы eventFilter, set_group_hovered, set_window_focused, 
-	# toggle_maximize, и обработка мыши остаются без изменений) ...
 	
-	def eventFilter(self, obj, event):
-		if obj in (self.close_btn, self.min_btn, self.max_btn):
-			if event.type() == QEvent.Type.Enter:
+	def eventFilter(self, a0, a1):
+		if a0 in (self.close_btn, self.min_btn, self.max_btn):
+			if a1.type() == QEvent.Type.Enter:
 				self.set_group_hovered(True)
-			elif event.type() == QEvent.Type.Leave:
+			elif a1.type() == QEvent.Type.Leave:
 				self.set_group_hovered(False)
-		return super().eventFilter(obj, event)
+		return super().eventFilter(a0, a1)
 
-	def set_group_hovered(self, state):
+	def set_group_hovered(self, state: bool):
 		self.close_btn.is_group_hovered = state
 		self.min_btn.is_group_hovered = state
 		self.max_btn.is_group_hovered = state
@@ -158,7 +148,7 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 		self.min_btn.update_icon()
 		self.max_btn.update_icon()
 
-	def set_window_focused(self, state):
+	def set_window_focused(self, state: bool):
 		self.close_btn.is_window_focused = state
 		self.min_btn.is_window_focused = state
 		self.max_btn.is_window_focused = state
@@ -167,27 +157,30 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 		self.max_btn.update_icon()
 
 	def toggle_maximize(self):
-		if self.parent.isMaximized():
-			self.parent.showNormal()
+		if self.parent_.isMaximized():
+			self.parent_.showNormal()
 		else:
-			self.parent.showMaximized()
+			self.parent_.showMaximized()
 
-	def mousePressEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			self._drag_pos = event.globalPosition().toPoint()
+	def mousePressEvent(self, a0):
+		if a0.button() == Qt.MouseButton.LeftButton:
+			self._drag_pos = a0.globalPosition().toPoint()
+		# return super().mousePressEvent(a0)
 
-	def mouseMoveEvent(self, event):
+	def mouseMoveEvent(self, a0):
 		if self._drag_pos is not None:
-			delta = event.globalPosition().toPoint() - self._drag_pos
-			self.parent.move(self.parent.pos() + delta)
-			self._drag_pos = event.globalPosition().toPoint()
+			delta = a0.globalPosition().toPoint() - self._drag_pos
+			self.parent_.move(self.parent_.pos() + delta)
+			self._drag_pos = a0.globalPosition().toPoint()
 
-	def mouseReleaseEvent(self, event):
+	def mouseReleaseEvent(self, a0):
 		self._drag_pos = None
+		# return super().mouseReleaseEvent(a0)
 
-	def mouseDoubleClickEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
+	def mouseDoubleClickEvent(self, a0):
+		if a0.button() == Qt.MouseButton.LeftButton:
 			self.toggle_maximize()
+		# return super().mouseDoubleClickEvent(a0)
 
 
 # стилизованный виджет, чтобы окно имело заливку + рамку + углы
