@@ -245,7 +245,6 @@ class UBaseWindow(QMainWindow):
 	def show_titlebar_underline(self):
 		print("show_titlebar_underline")
 
-
 	def register_window(self):
 		self.win_list.append(self)
 
