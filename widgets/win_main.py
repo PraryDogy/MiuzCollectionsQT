@@ -110,8 +110,8 @@ class WinMain(UMainWindow):
 		self.files_to_copy = set()
 		self.stop_scaner = True
 
-		# отступ справа в заголовке окна
 		self.bar_top = BarTop()
+		# отступ справа в заголовке окна
 		self.bar_top.h_layout.setContentsMargins(0, 0, 5, 0)
 		self.set_title_bar_widget(self.bar_top)
 		self.set_titlebar_height(self.bar_top.height() + 8)
@@ -174,12 +174,11 @@ class WinMain(UMainWindow):
 		self.footer_container = QWidget()
 		self.footer_layout = QVBoxLayout(self.footer_container)
 		
-		# верхний маргин для отступа от сетки и меню
-		self.footer_layout.setContentsMargins(self.FOOTER_MARGINS, 10, self.FOOTER_MARGINS, 0)
+		# слева справа доп отступы, чтобы быть уже, чем основные виджеты
+		# сетка и левое меню, отступ сверху от сетки и меню
+		self.footer_layout.setContentsMargins(self.FOOTER_MARGINS, 5, self.FOOTER_MARGINS, 0)
 		self.footer_layout.setSpacing(0)
 
-		# нижний маргин для отступа от сепаратора барами
-		# левый и правый маргин для красивого отступа
 		self.bar_path = PathBar()
 		self.bar_path.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.path_bar_update("")
