@@ -513,7 +513,6 @@ class TitleBar(QWidget):
 	def mousePressEvent(self, a0):
 		if a0.button() == Qt.MouseButton.LeftButton:
 			self._drag_pos = a0.globalPosition().toPoint()
-		# return super().mousePressEvent(a0)
 
 	def mouseMoveEvent(self, a0):
 		if self._drag_pos is not None:
@@ -523,7 +522,6 @@ class TitleBar(QWidget):
 
 	def mouseReleaseEvent(self, a0):
 		self._drag_pos = None
-		# return super().mouseReleaseEvent(a0)
 
 
 # стилизованный виджет, чтобы окно имело заливку + рамку + углы
