@@ -418,20 +418,19 @@ class TitleBar(QWidget):
 		self.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.h_layout.setSpacing(0)
 
-		# отступ слева от кнопок
+		# отступ слева от кнопок (10px)
 		self.h_layout.addSpacing(10)
 
 		# --- 1. Контейнер для кнопок-светофоров ---
 		self.buttons_widget = QWidget()
 		self.buttons_layout = QHBoxLayout(self.buttons_widget)
 		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
-		self.buttons_layout.setSpacing(8)
-		# Центрируем кнопки по вертикали ВНУТРИ их собственного макета
+		self.buttons_layout.setSpacing(8) # (8px * 2 = 16px)
 		self.buttons_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-		self.close_btn = MacControlButton('close')
-		self.min_btn = MacControlButton('minimize')
-		self.max_btn = MacControlButton('maximize')
+		self.close_btn = MacControlButton('close') # (12px)
+		self.min_btn = MacControlButton('minimize') # (12px)
+		self.max_btn = MacControlButton('maximize') # (12px)
 
 		self.close_btn.clicked.connect(self.parent_.close)
 		self.min_btn.clicked.connect(self.parent_.showMinimized)
@@ -443,12 +442,11 @@ class TitleBar(QWidget):
 
 		self.h_layout.addWidget(self.buttons_widget)
 
-		# отступ справа от кнопок
+		# отступ справа от кнопок (15px)
 		self.h_layout.addSpacing(15)
 		
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
 		self.content_container = QWidget()
-		# Разрешаем контейнеру расширяться во все стороны
 		self.content_container.setSizePolicy(
 			QSizePolicy.Policy.Expanding,
 			QSizePolicy.Policy.Preferred
@@ -463,6 +461,12 @@ class TitleBar(QWidget):
 		
 		self.h_layout.addWidget(self.content_container)
 
+		# --- 3. Балансировочная пустышка справа ---
+		# Ширина: 10 + 36 + 16 + 15 = 77 пикселей
+		self.right_spacer = QWidget()
+		self.right_spacer.setFixedWidth(77)
+		self.h_layout.addWidget(self.right_spacer)
+
 		self.close_btn.installEventFilter(self)
 		self.min_btn.installEventFilter(self)
 		self.max_btn.installEventFilter(self)
@@ -472,7 +476,22 @@ class TitleBar(QWidget):
 			item = self.content_layout.takeAt(0)
 			if item.widget():
 				item.widget().deleteLater()
+		
 		self.content_layout.addWidget(widget)
+		
+		# Скрываем пустышку, чтобы ваш виджет (например, BarTop) 
+		# мог занять всё доступное место вплоть до правого края окна
+		self.right_spacer.hide()
+
+	def set_title_text(self, text: str):
+		while self.content_layout.count():
+			item = self.content_layout.takeAt(0)
+			if item.widget():
+				item.widget().deleteLater()
+		self.content_layout.addWidget(self.title_label)
+		self.title_label.setText(text)
+		# Возвращаем пустышку, чтобы текст снова встал по центру
+		self.right_spacer.show()
 
 	def set_group_hovered(self, state: bool):
 		self.close_btn.is_group_hovered = state
@@ -540,7 +559,7 @@ class UMainWindow(QMainWindow):
 		self.setup_window()
 
 	def setWindowTitle(self, title: str):
-		self.title_bar.title_label.setText(title)
+		self.title_bar.set_title_text(title)
 		return super().setWindowTitle(title)
 
 	def setup_window(self):
