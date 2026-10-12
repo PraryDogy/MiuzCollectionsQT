@@ -199,12 +199,10 @@ class UBaseWindow(QMainWindow):
 		self.setup_window()
 
 	def setWindowTitle(self, title: str):
-		# Передаем текст в наш кастомный TitleBar
 		self.title_bar.set_title_text(title)
 		return super().setWindowTitle(title)
 
 	def set_title_bar_widget(self, widget: QWidget):
-		# Интегрируем кастомный виджет в заголовок
 		self.title_bar.set_custom_widget(widget)
 
 	def setup_window(self):
@@ -227,7 +225,6 @@ class UBaseWindow(QMainWindow):
 		self.register_window()
 
 	def set_titlebar_height(self, h: int):
-		# Изменяем минимальную высоту, кнопки при этом останутся по центру
 		self.title_bar.setMinimumHeight(h)
 
 	def show_titlebar_underline(self):
