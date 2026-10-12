@@ -556,10 +556,14 @@ class UBaseWindow(QMainWindow):
 		self.title_bar = TitleBar(self)
 		self.window_layout.addWidget(self.title_bar)
 
-		self.window_layout.addSpacing(1)
+		self.sep_container = QWidget()
+		self.sep_layout = QVBoxLayout(self.sep_container)
+		self.sep_layout.setContentsMargins(0, 1, 0, 1)
+		self.sep_layout.setSpacing(0)
 		self.sep = USep()
-		self.window_layout.addWidget(self.sep)
-		self.window_layout.addSpacing(1)
+		self.sep_layout.addWidget(self.sep)
+		self.window_layout.addWidget(self.sep_container)
+		self.sep_container.setVisible(False)
 
 		self.central_layout = QVBoxLayout()
 		self.central_layout.setContentsMargins(0, 0, 0, 0)
@@ -570,10 +574,10 @@ class UBaseWindow(QMainWindow):
 		self.register_window()
 
 	def set_titlebar_height(self, h: int):
-		self.title_bar.setMinimumHeight(h)
+		self.title_bar.setFixedHeight(h)
 
 	def show_titlebar_underline(self):
-		print("show_titlebar_underline")
+		self.sep_container.setVisible(True)
 
 	def register_window(self):
 		self.win_list.append(self)
