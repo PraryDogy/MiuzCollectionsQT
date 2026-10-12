@@ -112,17 +112,10 @@ class WinMain(UMainWindow):
 		self.stop_scaner = True
 
 		self.bar_top = BarTop()
-		self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
+		# self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
 		self.set_title_bar_widget(self.bar_top)
-		self.set_titlebar_height(self.bar_top.sizeHint().height())
-
-		# test = TransparentFrame()
-		# test.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-		# test.setStyleSheet("background: red;")
-		# self.set_title_bar_widget(test)
-
+		self.set_titlebar_height(self.bar_top.height() + 8)
 		# self.bar_top.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-		# self.set_title_bar_widget(self.bar_top)
 
 		self.bar_top.open_settings_win.connect(
 			lambda settings_item: self.open_settings_win(settings_item)

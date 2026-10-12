@@ -266,7 +266,7 @@ class BarTop(TransparentFrame):
         self.catalog_widget.mf_new.connect(self.mf_new.emit)
         self.h_layout.addWidget(self.catalog_widget)
 
-        # self.h_layout.addStretch(1)
+        self.h_layout.addStretch()
 
         # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchSvgBtn()
@@ -280,7 +280,7 @@ class BarTop(TransparentFrame):
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         self.h_layout.addWidget(self.search_wid)
 
-        # self.h_layout.addStretch(1)
+        self.h_layout.addStretch(0)
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")
@@ -292,7 +292,6 @@ class BarTop(TransparentFrame):
         for i in (self.img_search_btn, self.settings_btn):
             i.setFixedSize(self.height() - 2, self.height() - 2)
         self.search_wid.setFixedHeight(self.height() - 2)
-        # self.catalog_widget.button.setFixedHeight(self.height() - 6)
 
     def mouseReleaseEvent(self, a0):
         self.setFocus()

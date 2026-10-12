@@ -100,8 +100,6 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 		# отступ справа от кнопок
 		self.layout.addSpacing(10)
 		
-		# УБРАЛИ self.layout.addStretch(1)
-
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
 		self.content_container = QWidget()
 		# Разрешаем контейнеру расширяться во все стороны
@@ -118,14 +116,6 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 		# Добавляем БЕЗ флага alignment, чтобы виджет мог растягиваться по горизонтали
 		self.layout.addWidget(self.content_container)
 		
-		# УБРАЛИ self.layout.addStretch(1)
-		
-		# --- 3. Пустышка справа ---
-		# Балансирует ширину кнопок слева (~52px), чтобы текстовый 
-		# заголовок по умолчанию стоял идеально по центру окна.
-		self.right_spacer = QWidget()
-		self.right_spacer.setFixedWidth(52)
-		self.layout.addWidget(self.right_spacer)
 
 		self.close_btn.installEventFilter(self)
 		self.min_btn.installEventFilter(self)
