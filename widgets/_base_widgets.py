@@ -413,11 +413,12 @@ class MacControlButton(QPushButton):
 
 
 class TitleBar(TransparentWidget):
-	min_height = 28
+	HH = 28
+	TRAFFIC_LIGHT_WIDTH = 0
 
 	def __init__(self, parent: QMainWindow):
 		super().__init__(parent)
-		self.setFixedHeight(self.min_height)
+		self.setFixedHeight(self.HH)
 
 		self.parent_ = parent
 		self._drag_pos = None
@@ -426,14 +427,10 @@ class TitleBar(TransparentWidget):
 		self.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.h_layout.setSpacing(0)
 
-		# отступ слева от кнопок (10px)
-		self.h_layout.addSpacing(10)
-
+		
 		# --- 1. Контейнер для кнопок-светофоров ---
 		self.buttons_widget = TransparentWidget()
 		self.buttons_layout = QHBoxLayout(self.buttons_widget)
-		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
-		self.buttons_layout.setSpacing(8) # (8px * 2 = 16px)
 		self.buttons_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
 		self.close_btn = MacControlButton('close') # (12px)
@@ -444,14 +441,19 @@ class TitleBar(TransparentWidget):
 		self.min_btn.clicked.connect(self.parent_.showMinimized)
 		self.max_btn.clicked.connect(self.toggle_maximize)
 
+		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
+		self.buttons_layout.setSpacing(0)
+		self.buttons_layout.addSpacing(10)
 		self.buttons_layout.addWidget(self.close_btn)
+		self.buttons_layout.addSpacing(8)
 		self.buttons_layout.addWidget(self.min_btn)
+		self.buttons_layout.addSpacing(8)
 		self.buttons_layout.addWidget(self.max_btn)
+		self.buttons_layout.addSpacing(15)
 
 		self.h_layout.addWidget(self.buttons_widget)
-
-		# отступ справа от кнопок (15px)
-		self.h_layout.addSpacing(15)
+		self.buttons_widget.adjustSize()
+		self.TRAFFIC_LIGHT_WIDTH = self.buttons_widget.sizeHint().width()
 		
 		# --- 2. Контейнер для заголовка или кастомного виджета ---
 		self.content_container = TransparentWidget()
@@ -472,7 +474,7 @@ class TitleBar(TransparentWidget):
 		# --- 3. Балансировочная пустышка справа ---
 		# Ширина: 10 + 36 + 16 + 15 = 77 пикселей
 		self.right_spacer = TransparentWidget()
-		self.right_spacer.setFixedWidth(77)
+		self.right_spacer.setFixedWidth(self.TRAFFIC_LIGHT_WIDTH)
 		self.h_layout.addWidget(self.right_spacer)
 
 		self.close_btn.installEventFilter(self)
