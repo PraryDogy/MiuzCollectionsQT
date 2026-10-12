@@ -489,6 +489,7 @@ ImgViewSvg {
 
 WinImgViewGraphics, WinImageView {
     background: #000000;
+    border-radius: 10px;
 }
 
 
