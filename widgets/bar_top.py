@@ -257,26 +257,30 @@ class BarTop(TransparentFrame):
         super().__init__()
 
         self.h_layout = QHBoxLayout(self)
-        self.h_layout.setSpacing(10)
+        # маргины настроим в главном окне
+        self.h_layout.setContentsMargins(0, 0, 0, 0)
+        self.h_layout.setSpacing(0)
 
         self.catalog_widget = CatalogWidget()
         self.catalog_widget.mf_open.connect(self.mf_open.emit)
         self.catalog_widget.mf_new.connect(self.mf_new.emit)
         self.h_layout.addWidget(self.catalog_widget)
 
-        self.h_layout.addStretch(1)
+        # self.h_layout.addStretch(1)
 
         # --- Кнопка поиска по картинке ---
         self.img_search_btn = ImgSearchSvgBtn()
         self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
         self.h_layout.addWidget(self.img_search_btn)
 
+        self.h_layout.addSpacing(5)
+
         # --- Виджет поиска ---
         self.search_wid = SearchWidLineEdit()
         self.search_wid.reload_thumbnails.connect(self.start_text_search.emit)
         self.h_layout.addWidget(self.search_wid)
 
-        self.h_layout.addStretch(1)
+        # self.h_layout.addStretch(1)
 
         # --- Кнопка настроек ---
         item = SettingsItem("general", "")

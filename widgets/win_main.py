@@ -114,9 +114,7 @@ class WinMain(UMainWindow):
 		self.bar_top = BarTop()
 		self.bar_top.h_layout.setContentsMargins(MAIN_MARGIN, 0, MAIN_MARGIN, 0)
 		self.set_title_bar_widget(self.bar_top)
-		margin_top, margin_bottom = 7, 7
-		margins = margin_bottom + margin_top
-		self.set_titlebar_height(self.bar_top.height() + margins)
+		self.set_titlebar_height(self.bar_top.sizeHint().height())
 
 		# test = TransparentFrame()
 		# test.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)

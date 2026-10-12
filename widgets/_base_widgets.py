@@ -96,6 +96,9 @@ class TitleBar(QWidget): # Или QWidget, смотря от чего насле
 
 		# Добавляем кнопки БЕЗ флага alignment, чтобы они не ломали высоту TitleBar
 		self.layout.addWidget(self.buttons_widget)
+
+		# отступ справа от кнопок
+		self.layout.addSpacing(10)
 		
 		# УБРАЛИ self.layout.addStretch(1)
 
