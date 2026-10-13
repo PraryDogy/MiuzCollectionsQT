@@ -231,7 +231,7 @@ USep[style="default"] {
 }
 
 USep[style="dark_gray"] {
-    background: #2c2c2c;
+    background: #161616;
 }
 
 
