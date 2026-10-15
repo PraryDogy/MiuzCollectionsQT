@@ -422,7 +422,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_row_layout.addWidget(self.path_container, 1)
 
 		self.path_layout = QHBoxLayout(self.path_container)
-		self.path_layout.setContentsMargins(10, 10, 10, 10)
+		self.path_layout.setContentsMargins(10, 2, 10, 2)
 		self.path_layout.setSpacing(10)
 
 		self.path_svg = QSvgWidget()
@@ -432,7 +432,7 @@ class DestinyFolderWidget(UGroupBox):
 
 		current_dir = Mf.current_mf.mf_paths[0] + current_dir
 
-		self.path_label = PathLabel(current_dir)
+		self.path_label = PathLabel(current_dir, width=310)
 		self.path_layout.addWidget(self.path_label, 1)
 
 		self.copy_svg = SvgIconButton(self.copy_svg_path, (33, 33), (20, 20))
@@ -464,6 +464,8 @@ class UploadWin(UMainWindow):
 		self.destiny_widget = DestinyFolderWidget(mf, current_dir, files_to_copy)
 		self.central_layout.addWidget(self.destiny_widget)
 
+		self.adjustSize()
+		self.setFixedHeight(self.height())
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
