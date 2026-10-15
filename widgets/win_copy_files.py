@@ -200,8 +200,7 @@ class WinCopyFiles(WinProgressbar):
 				self.dst_urls = list(copy_item.dst_urls)
 
 			if copy_item.msg == "error":
-				print(copy_item.error_traceback)
-				self.show_error()
+				self.show_error(copy_item.error_traceback)
 				return
 			if copy_item.msg == "need_replace":
 				self.show_replace_window(copy_item)
@@ -297,12 +296,12 @@ class WinCopyFiles(WinProgressbar):
 
 		QTimer.singleShot(50, self.raise_)
 
-	def show_error(self):
+	def show_error(self, traceback: str):
 		if self.stopping:
 			return
 		
 		self.close_replace_window()
-		self.error_win = WarningWindow(Lng.copy_error[JsonData.lng_index])
+		self.error_win = WarningWindow(Lng.copy_error[JsonData.lng_index], traceback)
 		self.error_win.center_to_parent(self.window())
 		self.error_win.show()
 

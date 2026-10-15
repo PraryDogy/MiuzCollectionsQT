@@ -1014,18 +1014,18 @@ class WarningWindow(VerticalWindow):
 	icon_size = (65, 65)
 	ww = 280
 
-	def __init__(self, text: str):
+	def __init__(self, text: str, text_edit_text: str = None):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
 		self.setWindowTitle(Lng.attention[JsonData.lng_index])
 
-		self._setup_ui(text)
+		self._setup_ui(text, text_edit_text)
 		self.central_layout.activate()
 		self._adjust_window_size(self.text_wid, text)
 
-	def _setup_ui(self, text: str):
+	def _setup_ui(self, text: str, text_edit_text: str):
 		self.svg_widget = QSvgWidget()
 		self.svg_widget.load(str(self.icon_path))
 		self.svg_widget.setFixedSize(*self.icon_size)
@@ -1036,6 +1036,11 @@ class WarningWindow(VerticalWindow):
 		self.text_wid = SelectableGrayLabel(text)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
+
+		if text_edit_text:
+			self.text_edit_widget = UTextEdit()
+			self.text_edit_widget.setPlainText(text_edit_text)
+			self.icon_text_layout.addWidget(self.text_edit_widget)
 
 		self.cancel_btn = ActiveButton(Lng.got_it[JsonData.lng_index])
 		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
