@@ -98,6 +98,12 @@ ULineEdit {
     padding-bottom: 5px;
 }
 
+ULineEdit:hover {
+    background: #ff1a2733;
+    border: 1px solid #263440;
+}
+
+
 UTextEdit {
     color: #ffffff;
     background: #151f29;
