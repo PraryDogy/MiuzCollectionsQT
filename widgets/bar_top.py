@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 
 from ._base_widgets import (GrayTextLabel, TitleBar, TransparentFrame,
-                            TransparentWidget, ULineEdit, UMenu, UPushButton)
+							TransparentWidget, ULineEdit, UMenu, UPushButton)
 from .win_text_search import WinTextSearch
 
 
@@ -126,45 +126,42 @@ class SearchWidLineEdit(ULineEdit):
 		super().keyPressEvent(event)
 
 
-class BarTopSvgBtn(QSvgWidget):
+from pathlib import Path
+
+from PyQt6.QtCore import QSize, Qt, pyqtSignal
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QGridLayout, QLabel, QWidget
+
+
+class BarTopSvgBtn(QWidget):
 	clicked_ = pyqtSignal()
+	icon_size = (24, 24)
 
-	def __init__(self, base_svg: Path, selected_svg: Path):
+	def __init__(self, svg_path: Path):
 		super().__init__()
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		attr = (Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
-		self.base_svg = self._load_svg_data(base_svg)
-		self.selected_svg = self._load_svg_data(selected_svg)
-		self.load(self.base_svg)
+		# 1. Подложка (стилизуется через QSS)
+		self.label = QLabel(self)
+		self.label.setAttribute(*attr)
 
-		for path in (base_svg, selected_svg):
-			if not path.exists():
-				print("bar top btn icon not exists", path)
+		# 2. Фиксированная SVG-иконка
+		self.svg_widget = QSvgWidget(str(svg_path), self)
+		self.svg_widget.setFixedSize(*self.icon_size)
+		self.svg_widget.setAttribute(*attr)
 
-	@staticmethod
-	def _load_svg_data(path: Path):
-		with open(path, "rb") as f:
-			return QByteArray(f.read())
-
-	def set_selected_style(self):
-		self.load(self.selected_svg)
-
-	def set_base_style(self):
-		self.load(self.base_svg)
-
-	def mousePressEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			self.set_selected_style()
-		super().mousePressEvent(event)
+		# 3. Наслоение и центрирование
+		layout = QGridLayout(self)
+		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setSpacing(0)
+		layout.addWidget(self.label, 0, 0)
+		layout.addWidget(self.svg_widget, 0, 0, Qt.AlignmentFlag.AlignCenter)
 
 	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			self.set_base_style()
+		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
 			self.clicked_.emit()
 		super().mouseReleaseEvent(event)
-
-	def enterEvent(self, event):
-		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		super().enterEvent(event)
 
 
 class SettingsSvgBtn(BarTopSvgBtn):
