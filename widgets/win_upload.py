@@ -24,16 +24,18 @@ class CopyPathButton(SvgIconButton):
 		super().__init__(self.svg_path, (33, 33), (20, 20))
 		self.current_dir = current_dir
 
-	def restore_btn(self):
-		self.setEnabled(True)
-		self.svg_widget.load(str(self.svg_path))
+	# def restore_btn(self):
+	# 	self.setEnabled(True)
+	# 	self.svg_widget.load(str(self.svg_path))
 
-	def mouseReleaseEvent(self, event):
-		Utils.pyqt_copy_text(self.current_dir)
-		self.svg_widget.load(str(self.green_mark))
-		self.setEnabled(False)
-		QTimer.singleShot(500, self.restore_btn)
-		return super().mouseReleaseEvent(event)
+	# def mouseReleaseEvent(self, event):
+	# 	Utils.pyqt_copy_text(self.current_dir)
+	# 	self.svg_widget.load(str(self.green_mark))
+	# 	self.setEnabled(False)
+	# 	QTimer.singleShot(500, self.restore_btn)
+	# 	if self.underMouse():
+	# 		QTimer.singleShot(0, self.set_selected_style)
+	# 	return super().mouseReleaseEvent(event)
 
 
 
