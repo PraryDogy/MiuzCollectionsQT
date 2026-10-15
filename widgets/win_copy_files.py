@@ -95,9 +95,26 @@ class ReplaceWin(VerticalWindow):
 		if self.show_checkbox:
 			self.icon_text_layout.addWidget(self.replace_all_checkbox)
 
+
+# Создаем виджет-контейнер и горизонтальный лейаут
+		self.actions_widget = TransparentWidget()
+		self.actions_layout = QHBoxLayout(self.actions_widget)
+		self.actions_layout.setContentsMargins(0, 0, 0, 0) # Убираем внутренние отступы контейнера
+		self.actions_layout.setSpacing(5) # Задаем расстояние между кнопками в ряду
+
+		# Первая кнопка
 		self.replace_button = ActiveButton(Lng.replace[JsonData.lng_index])
 		self.replace_button.clicked.connect(self._replace)
-		self.btn_layout.addWidget(self.replace_button)
+		self.actions_layout.addWidget(self.replace_button)
+
+		# Вторая кнопка
+		self.skip_button = UPushButton("Оставить оба")
+		self.skip_button.clicked.connect(self._skip)
+		self.actions_layout.addWidget(self.skip_button)
+
+		# Добавляем собранный виджет с двумя кнопками в ваш основной лейаут
+		self.btn_layout.addWidget(self.actions_widget)
+
 
 		self.skip_button = UPushButton(Lng.skip[JsonData.lng_index])
 		self.skip_button.clicked.connect(self._skip)
@@ -111,6 +128,7 @@ class ReplaceWin(VerticalWindow):
 		self.btn_layout.addWidget(self.cancel_button)
 
 	def _checkbox_clicked(self):
+		return
 		if self.replace_all_checkbox.isChecked():
 			self.replace_button.setText(Lng.replace_all[JsonData.lng_index])
 		else:

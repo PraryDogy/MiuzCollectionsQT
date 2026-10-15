@@ -558,3 +558,7 @@ class Lng:
 		"Выбрано {files_count} файлов",
 		"{files_count} files selected",
 	)
+	keep_both = (
+		"Оставить оба",
+		"Keep both"
+	)
