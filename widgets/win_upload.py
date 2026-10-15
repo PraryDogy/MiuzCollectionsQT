@@ -311,7 +311,7 @@ class TitleWidget(UGroupBox):
 	svg_path = Static.COMMON_ICONS / "upload_file.svg"
 	svg_size = (45, 45)
 
-	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
+	def __init__(self, files_count: int):
 		super().__init__()
 
 		self.h_layout = QHBoxLayout(self)
@@ -329,9 +329,7 @@ class TitleWidget(UGroupBox):
 		self.text_layout.setContentsMargins(0, 0, 0, 0)
 		self.text_layout.setSpacing(5)
 
-		self.title_label = TitleTextLabel(
-			self.get_plural_text(len(files_to_copy))
-		)
+		self.title_label = TitleTextLabel(self.get_plural_text(files_count))
 		self.text_layout.addWidget(self.title_label)
 
 		self.description_label = GrayTextLabel(Lng.upload_files_description[JsonData.lng_index])
@@ -394,8 +392,10 @@ class DestinyFolderWidget(UGroupBox):
 	copy_svg_path = Static.COMMON_ICONS / "copy.svg"
 	svg_size = (20, 20)
 
-	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
+	def __init__(self, current_dir: str):
 		super().__init__()
+		self.current_dir = current_dir
+
 		self.main_layout = QVBoxLayout(self)
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
 		self.main_layout.setSpacing(10)
@@ -434,14 +434,12 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_svg.setFixedSize(*self.svg_size)
 		# self.path_layout.addWidget(self.path_svg)
 
-		current_dir = Mf.current_mf.mf_paths[0] + current_dir
-
-		self.path_label = PathLabel(current_dir, width=310)
+		self.path_label = PathLabel(self.current_dir, width=310)
 		self.path_layout.addWidget(self.path_label, 1)
 
 		self.copy_svg = SvgIconButton(self.copy_svg_path, (33, 33), (20, 20))
 		self.copy_svg.clicked_.connect(
-			lambda: Utils.pyqt_copy_text(current_dir)
+			lambda: Utils.pyqt_copy_text(self.current_dir)
 		)
 		self.path_layout.addWidget(self.copy_svg)
 
@@ -466,10 +464,10 @@ class UploadWin(UMainWindow):
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
 
-		self.title_widget = TitleWidget(mf, current_dir, files_to_copy)
+		self.title_widget = TitleWidget(len(files_to_copy))
 		self.central_layout.addWidget(self.title_widget)
 
-		self.destiny_widget = DestinyFolderWidget(mf, current_dir, files_to_copy)
+		self.destiny_widget = DestinyFolderWidget(self.current_dir)
 		self.central_layout.addWidget(self.destiny_widget)
 
 		self.button_widget = TransparentWidget()
@@ -485,7 +483,9 @@ class UploadWin(UMainWindow):
 		self.button_layout.addWidget(self.cancel_button)
 
 		self.ok_button = ActiveButton(Lng.confirm[JsonData.lng_index])
-		self.ok_button.clicked.connect(lambda e: self.ok_clicked.emit())
+		self.ok_button.clicked.connect(
+			lambda e: self.ok_clicked.emit(self.current_dir)
+		)
 		self.button_layout.addWidget(self.ok_button)
 
 		self.adjustSize()
@@ -494,6 +494,4 @@ class UploadWin(UMainWindow):
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
 			self.deleteLater()
-		elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
-			self.ok_clicked_cmd()
 		return super().keyPressEvent(a0)
