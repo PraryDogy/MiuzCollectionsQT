@@ -99,7 +99,7 @@ ULineEdit {
 }
 
 ULineEdit:hover {
-    background: #ff1a2733;
+    background: #ff17222c;
     border: 1px solid #263440;
 }
 
@@ -403,6 +403,32 @@ TitleTextLabel {
 }
 
 
+
+
+
+SvgIconButtonLabel[style="base"] {
+    background: transparent;
+    border-radius: 8px;
+}
+
+SvgIconButtonLabel:hover[style="base"] {
+    background: #283645;
+    border-radius: 8px;
+}
+
+SvgIconButtonLabel[style="selected"] {
+    background: #283645;
+    border-radius: 8px;
+}
+
+SvgIconButtonLabel[style="pressed"] {
+    background: #3A4B5E;
+    border-radius: 8px;
+}
+
+
+
+
 /* _base_widgets.py */
 
 /* actions.py */
@@ -426,27 +452,6 @@ SearchWidLineEdit {
     padding-right: 25px;
     padding-left: 25px;
 }
-
-SvgIconButtonLabel[style="base"] {
-    background: transparent;
-    border-radius: 8px;
-}
-
-SvgIconButtonLabel:hover[style="base"] {
-    background: #283645;
-    border-radius: 8px;
-}
-
-SvgIconButtonLabel[style="selected"] {
-    background: #283645;
-    border-radius: 8px;
-}
-
-SvgIconButtonLabel[style="pressed"] {
-    background: #3A4B5E;
-    border-radius: 8px;
-}
-
 /* bar_top.py */
 
 /* caledar_widget.py */
