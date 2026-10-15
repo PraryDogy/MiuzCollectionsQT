@@ -10,10 +10,10 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import ImgUtils, SharedUtils
 
-from ._base_widgets import (RowArrowWidget, UGroupBox,
-							TransparentLabel, TransparentWidget,
-							USep, UListWidget, UListWidgetItem,
-							UMainWindow, UMenu, UPushButton, UTreeView)
+from ._base_widgets import (RowArrowWidget, TransparentLabel,
+                            TransparentWidget, UGroupBox, UListWidget,
+                            UListWidgetItem, UMainWindow, UMenu, UPushButton,
+                            USep, UTreeView)
 
 
 class LetterFirstProxyModel(QSortFilterProxyModel):
@@ -298,10 +298,14 @@ class UploadWin(UMainWindow):
 		return super().dropEvent(a0)
 
 
-from ._base_widgets import UGroupBox, TitleTextLabel, GrayTextLabel, SvgIconButton
-from PyQt6.QtSvgWidgets import QSvgWidget
-from system.utils import Utils
 from PyQt6.QtGui import QFontMetrics
+from PyQt6.QtSvgWidgets import QSvgWidget
+
+from system.utils import Utils
+
+from ._base_widgets import (ActiveButton, GrayTextLabel, SvgIconButton,
+                            TitleTextLabel, UGroupBox, UPushButton)
+
 
 class TitleWidget(UGroupBox):
 	svg_path = Static.COMMON_ICONS / "upload_file.svg"
@@ -454,6 +458,14 @@ class UploadWin(UMainWindow):
 		self.setWindowTitle(Lng.upload_in[JsonData.lng_index])
 		self.setFixedWidth(500)
 		self.set_close_only()
+		self.set_always_on_top()
+
+
+		self.current_dir = (mf.mf_paths[0] + current_dir).rstrip(os.sep)
+
+		print(self.current_dir)
+
+
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
@@ -463,6 +475,22 @@ class UploadWin(UMainWindow):
 
 		self.destiny_widget = DestinyFolderWidget(mf, current_dir, files_to_copy)
 		self.central_layout.addWidget(self.destiny_widget)
+
+		self.button_widget = TransparentWidget()
+		self.central_layout.addWidget(self.button_widget)
+		self.button_layout = QHBoxLayout(self.button_widget)
+		self.button_layout.setContentsMargins(0, 0, 0, 0)
+		self.button_layout.setSpacing(10)
+
+		self.button_layout.addStretch()
+
+		self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_button.clicked.connect(self.deleteLater)
+		self.button_layout.addWidget(self.cancel_button)
+
+		self.ok_button = ActiveButton(Lng.confirm[JsonData.lng_index])
+		self.ok_button.clicked.connect(lambda e: self.ok_clicked.emit())
+		self.button_layout.addWidget(self.ok_button)
 
 		self.adjustSize()
 		self.setFixedHeight(self.height())
