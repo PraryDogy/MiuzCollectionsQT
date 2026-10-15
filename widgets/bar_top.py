@@ -166,18 +166,16 @@ class BarTopSvgBtn(QWidget):
 
 class SettingsSvgBtn(BarTopSvgBtn):
 	base_svg = Static.COMMON_ICONS / "settings.svg"
-	selected_svg = Static.COMMON_ICONS / "settings_selected.svg"
 
 	def __init__(self):
-		super().__init__(self.base_svg, self.selected_svg)
+		super().__init__(self.base_svg)
 
 
 class ImgSearchSvgBtn(BarTopSvgBtn):
 	base_svg = Static.COMMON_ICONS / "camera.svg"
-	selected_svg = Static.COMMON_ICONS / "camera_selected.svg"
 
 	def __init__(self):
-		super().__init__(self.base_svg, self.selected_svg)
+		super().__init__(self.base_svg)
 
 
 class CatalogWidget(TransparentWidget):
