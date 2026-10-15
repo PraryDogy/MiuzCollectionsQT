@@ -26,6 +26,8 @@ class CopyPathButton(SvgIconButton):
 
 	def mouseReleaseEvent(self, event):
 		Utils.pyqt_copy_text(self.current_dir)
+		self.clicked_.emit()
+		return super().mouseReleaseEvent(event)
 
 
 class TitleWidget(UGroupBox):
@@ -110,6 +112,7 @@ class PathLabel(TransparentLabel):
 
 class DestinyFolderWidget(UGroupBox):
 	dir_changed = pyqtSignal(str)
+	copy_path_clicked = pyqtSignal()
 
 	svg_path = Static.COMMON_ICONS / "folder_solid.svg"
 	svg_size = (20, 20)
@@ -160,6 +163,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_layout.addWidget(self.path_label, 1)
 
 		self.copy_path_button = CopyPathButton(self.current_dir)
+		self.copy_path_button.clicked_.connect(self.copy_path_clicked.emit)
 		self.path_layout.addWidget(self.copy_path_button)
 
 		# Кнопка вне GroupBox
@@ -181,12 +185,12 @@ class DestinyFolderWidget(UGroupBox):
 
 class NotiWidget(TransparentFrame):
 	svg_path = Static.COMMON_ICONS / "checkmark.svg"
-	svg_size = (10, 10)
+	svg_size = (15, 15)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.h_layout = QHBoxLayout(self)
-		self.h_layout.setContentsMargins(10, 2, 10, 2)
+		self.h_layout.setContentsMargins(5, 2, 5, 2)
 		self.h_layout.setSpacing(5)
 
 		self.svg_widget = QSvgWidget()
@@ -223,6 +227,7 @@ class UploadWin(UMainWindow):
 
 		self.destiny_widget = DestinyFolderWidget(self.current_dir)
 		self.destiny_widget.dir_changed.connect(self.dir_changed_cmd)
+		self.destiny_widget.copy_path_clicked.connect(self.copy_path_clicked_cmd)
 		self.central_layout.addWidget(self.destiny_widget)
 
 		self.button_widget = TransparentWidget()
@@ -248,8 +253,22 @@ class UploadWin(UMainWindow):
 
 		self.noti_widgeet = NotiWidget()
 		self.noti_widgeet.setParent(self)
-		self.noti_widgeet.move(10, 10)
-		self.noti_widgeet.show()
+		y = 6
+		x = (self.width() - self.noti_widgeet.width()) // 2
+		self.noti_widgeet.move(x, y)
+		self.noti_widgeet.setVisible(False)
+
+	def copy_path_clicked_cmd(self):
+		if not self.noti_widgeet.isVisible():
+			self.noti_widgeet.setVisible(True)
+			QTimer.singleShot(1000, self.show_noti_widget)
+
+	def show_noti_widget(self):
+		try:
+			self.noti_widgeet.setVisible(False)
+		except RuntimeError:
+			# значит окно было удалено раньше чем сработал таймер
+			pass
 
 	def dir_changed_cmd(self, path: str):
 		self.current_dir = path
