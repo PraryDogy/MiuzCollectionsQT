@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QVBoxLayout
@@ -14,6 +14,28 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, SvgIconButton,
                             TitleTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton)
+
+
+class CopyPathButton(SvgIconButton):
+	svg_path = Static.COMMON_ICONS / "copy.svg"
+	green_mark = Static.COMMON_ICONS / "green_checkmark.svg"
+
+	def __init__(self, current_dir: str):
+		super().__init__(self.svg_path, (33, 33), (20, 20))
+		self.current_dir = current_dir
+
+	def restore_btn(self):
+		self.setEnabled(True)
+		self.svg_widget.load(str(self.svg_path))
+
+	def mouseReleaseEvent(self, event):
+		Utils.pyqt_copy_text(self.current_dir)
+		self.svg_widget.load(str(self.green_mark))
+		self.setEnabled(False)
+		QTimer.singleShot(500, self.restore_btn)
+		return super().mouseReleaseEvent(event)
+
+
 
 
 class TitleWidget(UGroupBox):
@@ -100,7 +122,6 @@ class DestinyFolderWidget(UGroupBox):
 	dir_changed = pyqtSignal(str)
 
 	svg_path = Static.COMMON_ICONS / "folder_solid.svg"
-	copy_svg_path = Static.COMMON_ICONS / "copy.svg"
 	svg_size = (20, 20)
 
 	def __init__(self, current_dir: str):
@@ -148,11 +169,8 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_label = PathLabel(self.current_dir, width=310)
 		self.path_layout.addWidget(self.path_label, 1)
 
-		self.copy_svg = SvgIconButton(self.copy_svg_path, (33, 33), (20, 20))
-		self.copy_svg.clicked_.connect(
-			lambda: Utils.pyqt_copy_text(self.current_dir)
-		)
-		self.path_layout.addWidget(self.copy_svg)
+		self.copy_path_button = CopyPathButton(self.current_dir)
+		self.path_layout.addWidget(self.copy_path_button)
 
 		# Кнопка вне GroupBox
 		self.change_btn = UPushButton(Lng.change[JsonData.lng_index])
@@ -168,6 +186,7 @@ class DestinyFolderWidget(UGroupBox):
 			self.current_dir = url
 			self.path_label.setPath(self.current_dir)
 			self.dir_changed.emit(self.current_dir)
+			self.copy_path_button.current_dir = self.current_dir
 
 
 class UploadWin(UMainWindow):
