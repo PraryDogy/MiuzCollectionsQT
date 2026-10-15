@@ -300,6 +300,7 @@ class UploadWin(UMainWindow):
 
 from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QFileDialog
 
 from system.utils import Utils
 
@@ -388,6 +389,8 @@ class PathLabel(TransparentLabel):
 
 
 class DestinyFolderWidget(UGroupBox):
+	dir_changed = pyqtSignal(str)
+
 	svg_path = Static.COMMON_ICONS / "folder_solid.svg"
 	copy_svg_path = Static.COMMON_ICONS / "copy.svg"
 	svg_size = (20, 20)
@@ -445,7 +448,17 @@ class DestinyFolderWidget(UGroupBox):
 
 		# Кнопка вне GroupBox
 		self.change_btn = UPushButton(Lng.change[JsonData.lng_index])
+		self.change_btn.clicked.connect(self.change_dir)
 		self.path_row_layout.addWidget(self.change_btn)
+
+	def change_dir(self):
+		self.file_dialog = QFileDialog()
+		self.file_dialog.setDirectory(self.current_dir)
+		url = self.file_dialog.getExistingDirectory()
+		if url and url != self.current_dir:
+			url = url.rstrip()
+			self.current_dir = url
+			self.path_label.setPath(self.current_dir)
 
 
 class UploadWin(UMainWindow):
