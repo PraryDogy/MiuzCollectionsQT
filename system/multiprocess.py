@@ -171,9 +171,6 @@ class OneFileInfo:
 		return '\n'.join(lines)
 
 
-
-
-
 @dataclass(slots=True)
 class CopyTaskItem:
 	dst_dir: str
