@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QVBoxLayout
@@ -13,7 +13,7 @@ from system.utils import Utils
 from ._base_widgets import (ActiveButton, GrayTextLabel, SvgIconButton,
                             TitleTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, TransparentFrame)
+                            UPushButton, UTagWidget)
 
 
 class CopyPathButton(SvgIconButton):
@@ -183,27 +183,17 @@ class DestinyFolderWidget(UGroupBox):
 			self.copy_path_button.current_dir = self.current_dir
 
 
-class NotiWidget(TransparentFrame):
+class NotiWidget(UTagWidget):
 	svg_path = Static.COMMON_ICONS / "checkmark.svg"
-	svg_size = (13, 13)
 
-	def __init__(self, parent=None):
-		super().__init__(parent)
-		self.h_layout = QHBoxLayout(self)
-		self.h_layout.setContentsMargins(8, 2, 8, 2)
-		self.h_layout.setSpacing(5)
-
-		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(self.svg_path))
-		self.svg_widget.setFixedSize(*self.svg_size)
-		self.h_layout.addWidget(self.svg_widget)
-
-		self.text_label = TransparentLabel(Lng.text_copied[JsonData.lng_index])
-		self.h_layout.addWidget(self.text_label)
-
+	def __init__(self):
+		super().__init__(
+			Lng.text_copied[JsonData.lng_index],
+			self.qss_green,
+			str(self.svg_path),
+			None
+		)
 		self.adjustSize()
-		self.setFixedSize(self.width(), self.height())
-
 
 
 class UploadWin(UMainWindow):
@@ -253,7 +243,7 @@ class UploadWin(UMainWindow):
 
 		self.noti_widgeet = NotiWidget()
 		self.noti_widgeet.setParent(self)
-		y = 6
+		y = 5
 		x = (self.width() - self.noti_widgeet.width()) // 2
 		self.noti_widgeet.move(x, y)
 		self.noti_widgeet.setVisible(False)

@@ -593,7 +593,7 @@ MainWinRightWidget {
 /* win_upload.py */
 
 
-NotiWidget {
+/* NotiWidget {
     background: #16842c;
     border-radius: 7px;
 }
@@ -601,7 +601,7 @@ NotiWidget {
 NotiWidget TransparentLabel {
     font-weight: bold;
     font-size: 15px;
-}
+} */
 
 
 /* win_upload.py */
