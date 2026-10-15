@@ -927,7 +927,7 @@ class VerticalWindow(UMainWindow):
 
 	def _calculate_optimal_text_width(
 		self, text_wid: QLabel, text: str,
-		min_width: int = 190, max_width: int = 800,
+		min_width: int = 180, max_width: int = 800,
 	) -> int:
 		fm = text_wid.fontMetrics()
 		single_line_width = fm.horizontalAdvance(text)
