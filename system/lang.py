@@ -62,6 +62,7 @@ class Lng:
 	file_size = ("Размер", "Size")
 	info = ("Инфо", "Info")
 	loading = ("Загрузка...", "Loading...")
+	file_loading = ("Загрузка файлов", "File loading")
 	no_photo = ("Нет фотографий", "No photos")
 	open_settings_window = ("Открыть настройки", "Open settings window")
 	paste = ("Вставить (⌘ + V)", "Paste (⌘ + V)")
@@ -224,7 +225,7 @@ class Lng:
 	# server_favs = ("Избранные серверы", "Favorites")
 	login = ("логин", "login")
 	password = ("пароль", "password")
-	upload_in = ("Загрузить в ...", "Upload in ...")
+	upload = ("Загрузить", "Upload")
 	clockwise = ("Повернуть по ч.с. (⌘ + →)", "Rotate cw (⌘ + →)")
 	counter_clockwise = ("Повернуть против ч.с. (⌘ + ←)", "Rotate ccw (⌘ + ←)")
 

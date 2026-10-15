@@ -214,7 +214,7 @@ class UploadWin(UMainWindow):
 
 	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
 		super().__init__()
-		self.setWindowTitle(Lng.upload_in[JsonData.lng_index])
+		self.setWindowTitle(Lng.file_loading[JsonData.lng_index])
 		self.setFixedWidth(500)
 		self.set_close_only()
 		self.set_always_on_top()
@@ -245,7 +245,7 @@ class UploadWin(UMainWindow):
 		self.cancel_button.clicked.connect(self.deleteLater)
 		self.button_layout.addWidget(self.cancel_button)
 
-		self.ok_button = ActiveButton(Lng.confirm[JsonData.lng_index])
+		self.ok_button = ActiveButton(Lng.upload[JsonData.lng_index])
 		self.ok_button.clicked.connect(
 			lambda e: self.ok_clicked.emit(self.current_dir)
 		)
