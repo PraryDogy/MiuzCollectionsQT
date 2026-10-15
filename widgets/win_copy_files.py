@@ -103,7 +103,7 @@ class ReplaceWin(VerticalWindow):
 		self.skip_button.clicked.connect(self._skip)
 		self.btn_layout.addWidget(self.skip_button)
 
-		self.btn_layout.addSpacing(5)
+		# self.btn_layout.addSpacing(5)
 
 		# Action buttons
 		self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
@@ -190,7 +190,7 @@ class WinCopyFiles(WinProgressbar):
 
 		while True:
 			try:
-				copy_item = self.copy_task.process_queue.get_nowait()
+				copy_item: CopyTaskItem = self.copy_task.process_queue.get_nowait()
 			except Empty:
 				break
 
@@ -200,6 +200,7 @@ class WinCopyFiles(WinProgressbar):
 				self.dst_urls = list(copy_item.dst_urls)
 
 			if copy_item.msg == "error":
+				print(copy_item.error_traceback)
 				self.show_error()
 				return
 			if copy_item.msg == "need_replace":
