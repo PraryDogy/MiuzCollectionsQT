@@ -436,6 +436,9 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_layout.addWidget(self.path_label, 1)
 
 		self.copy_svg = SvgIconButton(self.copy_svg_path, (33, 33), (20, 20))
+		self.copy_svg.clicked_.connect(
+			lambda: Utils.pyqt_copy_text(current_dir)
+		)
 		self.path_layout.addWidget(self.copy_svg)
 
 		# Кнопка вне GroupBox
