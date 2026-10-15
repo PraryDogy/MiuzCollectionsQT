@@ -66,7 +66,7 @@ UMenu::indicator {
 }
 
 UMenu::indicator:checked {
-    image: url(./icons/common/arrow_down.svg);
+    image: url(./icons/common/checkmark_small.svg);
 }
 
 UMenu::indicator:unchecked {
@@ -177,7 +177,7 @@ UListWidget::indicator {
 }
 
 UListWidget::indicator:checked {
-    image: url(./icons/common/arrow_down.svg);
+    image: url(./icons/common/checkmark_small.svg);
 }
 
 UListWidget::indicator:disabled {
@@ -345,7 +345,7 @@ UCheckBox::indicator {
 }
 
 UCheckBox::indicator:checked {
-    image: url(./icons/common/arrow_down.svg);
+    image: url(./icons/common/checkmark_small.svg);
 }
 
 UCheckBox::indicator:unchecked {

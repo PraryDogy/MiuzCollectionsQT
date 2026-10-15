@@ -53,6 +53,7 @@ class ReplaceWin(VerticalWindow):
 	replace_pressed = pyqtSignal()
 	skip_pressed = pyqtSignal()
 	cancel_pressed = pyqtSignal()
+	keep_both = pyqtSignal()
 
 	warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 	warn_svg_size = (65, 65)
@@ -108,13 +109,12 @@ class ReplaceWin(VerticalWindow):
 		self.actions_layout.addWidget(self.replace_button)
 
 		# Вторая кнопка
-		self.skip_button = UPushButton("Оставить оба")
-		self.skip_button.clicked.connect(self._skip)
-		self.actions_layout.addWidget(self.skip_button)
+		self.keep_both_button = UPushButton(Lng.keep_both[JsonData.lng_index])
+		self.keep_both_button.clicked.connect(self._keep_both)
+		self.actions_layout.addWidget(self.keep_both_button)
 
 		# Добавляем собранный виджет с двумя кнопками в ваш основной лейаут
 		self.btn_layout.addWidget(self.actions_widget)
-
 
 		self.skip_button = UPushButton(Lng.skip[JsonData.lng_index])
 		self.skip_button.clicked.connect(self._skip)
@@ -128,11 +128,15 @@ class ReplaceWin(VerticalWindow):
 		self.btn_layout.addWidget(self.cancel_button)
 
 	def _checkbox_clicked(self):
-		return
 		if self.replace_all_checkbox.isChecked():
 			self.replace_button.setText(Lng.replace_all[JsonData.lng_index])
+			self.keep_both_button.setText(Lng.keep_all[JsonData.lng_index])
 		else:
 			self.replace_button.setText(Lng.replace[JsonData.lng_index])
+			self.keep_both_button.setText(Lng.keep_both[JsonData.lng_index])
+
+	def _keep_both(self):
+		self.keep_both.emit()
 
 	def _replace(self):
 		self.replace_pressed.emit()

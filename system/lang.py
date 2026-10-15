@@ -562,3 +562,7 @@ class Lng:
 		"Оставить оба",
 		"Keep both"
 	)
+	keep_all = (
+		"Оставить все",
+		"Keep all"
+	)
