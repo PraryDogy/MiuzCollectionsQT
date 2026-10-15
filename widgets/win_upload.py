@@ -346,6 +346,45 @@ class TitleWidget(UGroupBox):
 		return chosen_tuple[JsonData.lng_index].format(files_count=count)
 
 
+class DestinyFolderWidget(UGroupBox):
+	svg_path = Static.COMMON_ICONS / "folder_solid.svg"
+	copy_svg_path = Static.COMMON_ICONS / "copy.svg"
+	svg_size = (20, 20)
+
+	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
+		super().__init__()
+		self.main_layout = QVBoxLayout(self)
+		self.main_layout.setContentsMargins(10, 10, 10, 10)
+		self.main_layout.setSpacing(10)
+
+		self.title_container = TransparentWidget()
+		self.main_layout.addWidget(self.title_container)
+		self.title_layout = QHBoxLayout(self.title_container)
+		self.title_layout.setContentsMargins(0, 0, 0, 0)
+		self.title_layout.setSpacing(10)
+
+		self.title_svg = QSvgWidget()
+		self.title_svg.load(str(self.svg_path))
+		self.title_svg.setFixedSize(*self.svg_size)
+		self.title_layout.addWidget(self.title_svg)
+
+		self.title_label = TransparentLabel(Lng.dest_folder[JsonData.lng_index])
+		self.title_layout.addWidget(self.title_label)
+
+		self.path_container = UGroupBox()
+		self.main_layout.addWidget(self.path_container)
+		self.path_layout = QHBoxLayout(self.path_container)
+		self.path_layout.setContentsMargins(10, 10, 10, 10)
+
+		self.path_layout.addWidget(self.title_layout)
+
+		self.path_label = TransparentLabel(current_dir)
+		self.path_layout.addWidget(self.path_label)
+
+		self.copy_svg = QSvgWidget()
+
+
+
 class UploadWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 
@@ -354,9 +393,13 @@ class UploadWin(UMainWindow):
 		self.setWindowTitle(Lng.upload_in[JsonData.lng_index])
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setContentsMargins(10, 10, 10, 10)
+		self.central_layout.setSpacing(10)
 
 		self.title_widget = TitleWidget(mf, current_dir, files_to_copy)
 		self.central_layout.addWidget(self.title_widget)
+
+		self.destiny_widget = DestinyFolderWidget(mf, current_dir, files_to_copy)
+		self.central_layout.addWidget(self.destiny_widget)
 
 
 	def keyPressEvent(self, a0):

@@ -345,8 +345,8 @@ class Lng:
 		"Upload list"
 	)
 	dest_folder = (
-		"Целевая папка",
-		"Destination folder"
+		"Папка назначения",
+		"Destination folder",
 	)
 	allow = (
 		"Разрешить",
