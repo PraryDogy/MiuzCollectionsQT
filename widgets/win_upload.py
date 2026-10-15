@@ -298,10 +298,10 @@ class UploadWin(UMainWindow):
 		return super().dropEvent(a0)
 
 
-from ._base_widgets import UGroupBox, TitleTextLabel, GrayTextLabel
+from ._base_widgets import UGroupBox, TitleTextLabel, GrayTextLabel, SelectableLabel
 from PyQt6.QtSvgWidgets import QSvgWidget
-
-
+from system.utils import Utils
+from PyQt6.QtGui import QFontMetrics
 
 class TitleWidget(UGroupBox):
 	svg_path = Static.COMMON_ICONS / "upload_file.svg"
@@ -346,6 +346,40 @@ class TitleWidget(UGroupBox):
 		return chosen_tuple[JsonData.lng_index].format(files_count=count)
 
 
+class PathLabel(TransparentLabel):
+    def __init__(self, path: str, width: int = 350, parent=None):
+        super().__init__(parent)
+
+        self._path = path
+        self.setFixedWidth(width)
+        self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.setToolTip(path)
+        self._update_text()
+
+    def setPath(self, path: str):
+        """Установить новый путь."""
+        self._path = path
+        self.setToolTip(path)
+        self._update_text()
+
+    def path(self) -> str:
+        """Вернуть полный путь."""
+        return self._path
+
+    def _update_text(self):
+        metrics = QFontMetrics(self.font())
+
+        self.setText(
+            metrics.elidedText(
+                self._path,
+                Qt.TextElideMode.ElideMiddle,
+                self.width()
+                - self.contentsMargins().left()
+                - self.contentsMargins().right()
+            )
+        )
+
+
 class DestinyFolderWidget(UGroupBox):
 	svg_path = Static.COMMON_ICONS / "folder_solid.svg"
 	copy_svg_path = Static.COMMON_ICONS / "copy.svg"
@@ -376,12 +410,19 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_layout = QHBoxLayout(self.path_container)
 		self.path_layout.setContentsMargins(10, 10, 10, 10)
 
-		self.path_layout.addWidget(self.title_layout)
+		self.path_layout.addWidget(self.title_svg)
 
-		self.path_label = TransparentLabel(current_dir)
+		current_dir = Mf.current_mf.mf_paths[0] + current_dir
+
+		self.path_label = PathLabel(current_dir)
 		self.path_layout.addWidget(self.path_label)
 
+		# тут нам понадобится bar top btn
 		self.copy_svg = QSvgWidget()
+		self.copy_svg.load(str(self.copy_svg_path))
+		self.copy_svg.setFixedSize(*self.svg_size)
+		self.copy_svg.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.path_layout.addWidget(self.copy_svg)
 
 
 
@@ -391,8 +432,9 @@ class UploadWin(UMainWindow):
 	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
 		super().__init__()
 		self.setWindowTitle(Lng.upload_in[JsonData.lng_index])
+		self.setFixedWidth(500)
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
 
 		self.title_widget = TitleWidget(mf, current_dir, files_to_copy)
