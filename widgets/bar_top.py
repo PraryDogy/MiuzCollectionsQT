@@ -162,7 +162,7 @@ class BarTopSvgBtn(TransparentWidget):
 	def __init__(
 		self,
 		svg_path: Path | str,
-		icon_size: QSize = QSize(24, 24),
+		icon_size: QSize = QSize(26, 26),
 		parent: QWidget | None = None,
 	):
 		super().__init__(parent)
