@@ -245,6 +245,7 @@ class UpBtn(TransparentWidget):
 	def __init__(self, parent: TransparentWidget | None = None):
 		super().__init__(parent)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.setFixedSize(*UpBtnLabel.widget_size)
 
 		# 1. Отдельный класс подложки
 		self.label = UpBtnLabel()
@@ -808,15 +809,20 @@ class Grid(UScrollVerticalArea):
 			self.clear_selected_widgets()
 			self.wid_to_selected_widgets(self.wid_under_mouse)
 
+	def position_up_btn(self):
+		vp = self.viewport()
+
+		self.up_btn.move(
+			vp.width() - self.up_btn.width() - 20,
+			vp.height() - self.up_btn.height() - 20
+		)
+
 	def resizeEvent(self, a0: QResizeEvent | None) -> None:
+		super().resizeEvent(a0)
 		self.resize_timer.stop()
 		self.resize_timer.start(self.resize_ms)
 
-		self.up_btn.move(
-			self.viewport().width() - self.up_btn.width() - 20,
-			self.viewport().height() - self.up_btn.height() - 20
-		)
-		return super().resizeEvent(a0)
+		QTimer.singleShot(0, self.position_up_btn)
 
 	def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
 		"""Создаёт контекстное меню для пустой области или выбранных виджетов."""
