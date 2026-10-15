@@ -346,7 +346,6 @@ class TitleWidget(UGroupBox):
 		return chosen_tuple[JsonData.lng_index].format(files_count=count)
 
 
-
 class UploadWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 
