@@ -263,7 +263,8 @@ class CopyTask:
 			process_queue.put(copy_item)
 
 		except Exception as e:
-			print("CopyTask copy error:", e)
+			# print("CopyTask copy error:", e)
+			print(traceback.format_exc())
 			copy_item.msg = "error"
 			process_queue.put(copy_item)
 
@@ -314,6 +315,10 @@ class CopyTask:
 						copy_item.current_percent = percent
 						process_queue.put(copy_item)
 						
+		# shutil.copystat(src, dest, follow_symlinks=True)  # можно убрать
+
+		stat = src.stat()
+		os.utime(dest, ns=(stat.st_atime_ns, stat.st_mtime_ns))
 		return None
 
 	@staticmethod
