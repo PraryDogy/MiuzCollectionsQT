@@ -6,15 +6,15 @@ from typing import Literal
 
 from PyQt6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QContextMenuEvent, QIcon,
-                         QMouseEvent)
+						 QMouseEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
-                             QGroupBox, QHBoxLayout, QLabel, QLayout,
-                             QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
-                             QStackedWidget, QTextEdit, QTreeView, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+							 QGroupBox, QHBoxLayout, QLabel, QLayout,
+							 QLineEdit, QListWidget, QListWidgetItem,
+							 QMainWindow, QMenu, QProgressBar, QPushButton,
+							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
+							 QStackedWidget, QTextEdit, QTreeView, QTreeWidget,
+							 QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -1428,90 +1428,87 @@ class FlowLayout(QLayout):
 
 
 class SvgIconButtonLabel(TransparentLabel):
-    qss_base_style = "base"
-    qss_selected_style = "selected"
-    qss_pressed_style = "pressed"
-    attr_name = "style"
+	qss_base_style = "base"
+	qss_selected_style = "selected"
+	qss_pressed_style = "pressed"
+	attr_name = "style"
 
-    def __init__(self):
-        super().__init__()
-        self.set_base()
+	def __init__(self):
+		super().__init__()
+		self.set_base()
 
-    def set_style_state(self, state: str):
-        if self.property(self.attr_name) != state:
-            self.setProperty(self.attr_name, state)
-            self.style().unpolish(self)
-            self.style().polish(self)
-            self.update()
+	def set_style_state(self, state: str):
+		if self.property(self.attr_name) != state:
+			self.setProperty(self.attr_name, state)
+			self.style().unpolish(self)
+			self.style().polish(self)
+			self.update()
 
-    def set_base(self):
-        self.set_style_state(self.qss_base_style)
+	def set_base(self):
+		self.set_style_state(self.qss_base_style)
 
-    def set_selected(self):
-        self.set_style_state(self.qss_selected_style)
+	def set_selected(self):
+		self.set_style_state(self.qss_selected_style)
 
-    def set_pressed(self):
-        self.set_style_state(self.qss_pressed_style)
+	def set_pressed(self):
+		self.set_style_state(self.qss_pressed_style)
 
-    def mousePressEvent(self, ev):
-        ev.ignore()
+	def mousePressEvent(self, ev):
+		ev.ignore()
 
-    def mouseReleaseEvent(self, ev):
-        ev.ignore()
+	def mouseReleaseEvent(self, ev):
+		ev.ignore()
 
 
 class SvgIconButton(TransparentWidget):
-    clicked_ = pyqtSignal()
+	clicked_ = pyqtSignal()
 
-    def __init__(self, svg_path: Path, label_size: tuple, icon_size: tuple):
-        super().__init__()
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
+	def __init__(self, svg_path: Path, label_size: tuple, icon_size: tuple):
+		super().__init__()
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-        # Фоновая подложка с заданным размером
-        self.label = SvgIconButtonLabel()
-        self.label.setFixedSize(*label_size)
+		# Фоновая подложка с заданным размером
+		self.label = SvgIconButtonLabel()
+		self.label.setFixedSize(*label_size)
 
-        # SVG-иконка с заданным размером
-        self.svg_widget = QSvgWidget(str(svg_path), self)
-        self.svg_widget.setFixedSize(*icon_size)
-        self.svg_widget.setAttribute(
-            Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
-        )
+		# SVG-иконка с заданным размером
+		self.svg_widget = QSvgWidget(str(svg_path), self)
+		self.svg_widget.setFixedSize(*icon_size)
+		self.svg_widget.setAttribute(
+			Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
+		)
 
-        # Наложение иконки на фон
-        layout = QGridLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+		# Наложение иконки на фон
+		layout = QGridLayout(self)
+		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setSpacing(0)
 
-        layout.addWidget(self.label, 0, 0)
-        layout.addWidget(
-            self.svg_widget, 0, 0,
-            Qt.AlignmentFlag.AlignCenter
-        )
+		layout.addWidget(self.label, 0, 0)
+		layout.addWidget(
+			self.svg_widget, 0, 0,
+			Qt.AlignmentFlag.AlignCenter
+		)
 
-        self.label.stackUnder(self.svg_widget)
-        self.svg_widget.raise_()
+		self.label.stackUnder(self.svg_widget)
+		self.svg_widget.raise_()
 
-    def set_selected_style(self):
-        self.label.set_selected()
+	def set_selected_style(self):
+		self.label.set_selected()
 
-    def set_base_style(self):
-        self.label.set_base()
+	def set_base_style(self):
+		self.label.set_base()
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.label.set_pressed()
+	def mousePressEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.label.set_pressed()
 
-        super().mousePressEvent(event)
+		super().mousePressEvent(event)
 
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            if self.rect().contains(event.pos()):
-                self.clicked_.emit()
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			if self.rect().contains(event.pos()):
+				self.clicked_.emit()
 
-            if self.label.underMouse():
-                self.label.set_selected()
-            else:
-                self.label.set_base()
+			self.label.set_base()
 
-        super().mouseReleaseEvent(event)
+		super().mouseReleaseEvent(event)
