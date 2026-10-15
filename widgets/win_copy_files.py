@@ -294,6 +294,8 @@ class WinCopyFiles(WinProgressbar):
 		self.replace_win.deleteLater()
 		self.replace_win = None
 
+		QTimer.singleShot(50, self.raise_)
+
 	def show_error(self):
 		if self.stopping:
 			return
