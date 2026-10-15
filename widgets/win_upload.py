@@ -435,8 +435,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_label = PathLabel(current_dir)
 		self.path_layout.addWidget(self.path_label, 1)
 
-		self.copy_svg = SvgIconButton(self.copy_svg_path)
-		self.copy_svg.svg_widget.setFixedSize(*self.svg_size)
+		self.copy_svg = SvgIconButton(self.copy_svg_path, (33, 33), (20, 20))
 		self.path_layout.addWidget(self.copy_svg)
 		# self.copy_svg = QSvgWidget()
 		# self.copy_svg.load(str(self.copy_svg_path))

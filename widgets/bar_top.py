@@ -127,18 +127,25 @@ class SearchWidLineEdit(ULineEdit):
 		super().keyPressEvent(event)
 
 
-class SettingsSvgBtn(SvgIconButton):
-	base_svg = Static.COMMON_ICONS / "settings.svg"
+class CommonSvgIconButton(SvgIconButton):
+    label_size = (28, 28)
+    icon_size = (26, 26)
+    base_svg: Path
 
-	def __init__(self):
-		super().__init__(self.base_svg)
+    def __init__(self):
+        super().__init__(
+            svg_path=self.base_svg,
+            label_size=self.label_size,
+            icon_size=self.icon_size,
+        )
 
 
-class ImgSearchSvgBtn(SvgIconButton):
-	base_svg = Static.COMMON_ICONS / "camera.svg"
+class SettingsSvgBtn(CommonSvgIconButton):
+    base_svg = Static.COMMON_ICONS / "settings.svg"
 
-	def __init__(self):
-		super().__init__(self.base_svg)
+
+class ImgSearchSvgBtn(CommonSvgIconButton):
+    base_svg = Static.COMMON_ICONS / "camera.svg"
 
 
 class CatalogWidget(TransparentWidget):

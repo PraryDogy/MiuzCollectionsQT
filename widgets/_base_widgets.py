@@ -1461,60 +1461,57 @@ class SvgIconButtonLabel(TransparentLabel):
 
 
 class SvgIconButton(TransparentWidget):
-	clicked_ = pyqtSignal()
-	icon_size = (26, 26)
+    clicked_ = pyqtSignal()
 
-	def __init__(self, svg_path: Path):
-		super().__init__()
-		self.setCursor(Qt.CursorShape.PointingHandCursor)
+    def __init__(self, svg_path: Path, label_size: tuple, icon_size: tuple):
+        super().__init__()
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-		# 1. Фоновая подложка
-		self.label = SvgIconButtonLabel()
+        # Фоновая подложка с заданным размером
+        self.label = SvgIconButtonLabel()
+        self.label.setFixedSize(*label_size)
 
-		# 2. Фиксированная центрированная SVG-иконка
-		self.svg_widget = QSvgWidget(str(svg_path), self)
-		self.svg_widget.setFixedSize(*self.icon_size)
-		# Прозрачна для мыши, чтобы ховер под курсором оставался у label
-		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        # SVG-иконка с заданным размером
+        self.svg_widget = QSvgWidget(str(svg_path), self)
+        self.svg_widget.setFixedSize(*icon_size)
+        self.svg_widget.setAttribute(
+            Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
+        )
 
-		# 3. Наслоение через единую ячейку сетки
-		layout = QGridLayout(self)
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setSpacing(0)
-		layout.addWidget(self.label, 0, 0)
-		layout.addWidget(self.svg_widget, 0, 0, Qt.AlignmentFlag.AlignCenter)
+        # Наложение иконки на фон
+        layout = QGridLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
-		# ВАЖНО: Фиксируем z-порядок. 
-		# label всегда должен находиться ПОД svg_widget:
-		self.label.stackUnder(self.svg_widget)
-		self.svg_widget.raise_()
+        layout.addWidget(self.label, 0, 0)
+        layout.addWidget(
+            self.svg_widget, 0, 0,
+            Qt.AlignmentFlag.AlignCenter
+        )
 
-	def set_selected_style(self):
-		self.label.set_selected()
+        self.label.stackUnder(self.svg_widget)
+        self.svg_widget.raise_()
 
-	def set_base_style(self):
-		self.label.set_base()
+    def set_selected_style(self):
+        self.label.set_selected()
 
-	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			if self.rect().contains(event.pos()):
-				self.clicked_.emit()
-		super().mouseReleaseEvent(event)
+    def set_base_style(self):
+        self.label.set_base()
 
-	def mousePressEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			self.label.set_pressed()
-		super().mousePressEvent(event)
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.label.set_pressed()
 
-	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			if self.rect().contains(event.pos()):
-				self.clicked_.emit()
+        super().mousePressEvent(event)
 
-			# Возвращаем состояние после отпускания
-			if self.label.underMouse():
-				self.label.set_selected()
-			else:
-				self.label.set_base()
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            if self.rect().contains(event.pos()):
+                self.clicked_.emit()
 
-		super().mouseReleaseEvent(event)
+            if self.label.underMouse():
+                self.label.set_selected()
+            else:
+                self.label.set_base()
+
+        super().mouseReleaseEvent(event)
