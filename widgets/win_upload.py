@@ -185,12 +185,12 @@ class DestinyFolderWidget(UGroupBox):
 
 class NotiWidget(TransparentFrame):
 	svg_path = Static.COMMON_ICONS / "checkmark.svg"
-	svg_size = (15, 15)
+	svg_size = (13, 13)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.h_layout = QHBoxLayout(self)
-		self.h_layout.setContentsMargins(5, 2, 5, 2)
+		self.h_layout.setContentsMargins(8, 2, 8, 2)
 		self.h_layout.setSpacing(5)
 
 		self.svg_widget = QSvgWidget()
