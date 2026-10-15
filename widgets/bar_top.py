@@ -126,46 +126,35 @@ class SearchWidLineEdit(ULineEdit):
 		super().keyPressEvent(event)
 
 
-from pathlib import Path
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
-from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout
-from PyQt6.QtSvgWidgets import QSvgWidget
+class BarTopSvgLabel(TransparentLabel):
+	qss_base_style = "base"
+	qss_selected_style = "selected"
+	attr_name = "style"
 
-
-class BarTopSvgLabel(QLabel):
-	"""
-	Подложка под иконку. 
-	Управляет динамическим свойством 'style' для селекторов QSS.
-	"""
-	def __init__(self, parent: QWidget | None = None):
-		super().__init__(parent)
+	def __init__(self):
+		super().__init__()
 		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 		self.set_base()
 
 	def set_style_state(self, state: str):
-		if self.property("style") != state:
-			self.setProperty("style", state)
-			# Принудительно заставляем Qt применить новые стили для динамического свойства
+		if self.property(self.attr_name) != state:
+			self.setProperty(self.attr_name, state)
 			self.style().unpolish(self)
 			self.style().polish(self)
 
 	def set_base(self):
-		self.set_style_state("base")
+		self.set_style_state(self.qss_base_style)
 
 	def set_selected(self):
-		self.set_style_state("selected")
+		self.set_style_state(self.qss_selected_style)
 
 
 class BarTopSvgBtn(TransparentWidget):
 	clicked_ = pyqtSignal()
+	icon_size = (26, 26)
 
-	def __init__(
-		self,
-		svg_path: Path | str,
-		icon_size: QSize = QSize(26, 26),
-		parent: QWidget | None = None,
-	):
-		super().__init__(parent)
+	def __init__(self, svg_path: Path):
+		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		# 1. Вынесенный кастомный лейбл
@@ -173,7 +162,7 @@ class BarTopSvgBtn(TransparentWidget):
 
 		# 2. Фиксированная SVG-иконка
 		self.svg_widget = QSvgWidget(str(svg_path), self)
-		self.svg_widget.setFixedSize(icon_size)
+		self.svg_widget.setFixedSize(*self.icon_size)
 		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
 		# 3. Наслоение

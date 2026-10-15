@@ -424,6 +424,12 @@ BarTopSvgLabel[style="base"] {
     border-radius: 5px;
 }
 
+BarTopSvgLabel:hover[style="base"] {
+    background: #283645;
+    border-radius: 5px;
+}
+
+
 BarTopSvgLabel[style="selected"] {
     background: #283645;
     border-radius: 8px;
