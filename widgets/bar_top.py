@@ -127,31 +127,36 @@ class SearchWidLineEdit(ULineEdit):
 
 
 class BarTopSvgLabel(TransparentLabel):
-	qss_base_style = "base"
-	qss_selected_style = "selected"
-	attr_name = "style"
+    qss_base_style = "base"
+    qss_selected_style = "selected"
+    qss_pressed_style = "pressed"
+    attr_name = "style"
 
-	def __init__(self):
-		super().__init__()
-		self.set_base()
+    def __init__(self):
+        super().__init__()
+        self.set_base()
 
-	def set_style_state(self, state: str):
-		if self.property(self.attr_name) != state:
-			self.setProperty(self.attr_name, state)
-			self.style().unpolish(self)
-			self.style().polish(self)
+    def set_style_state(self, state: str):
+        if self.property(self.attr_name) != state:
+            self.setProperty(self.attr_name, state)
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.update()
 
-	def set_base(self):
-		self.set_style_state(self.qss_base_style)
+    def set_base(self):
+        self.set_style_state(self.qss_base_style)
 
-	def set_selected(self):
-		self.set_style_state(self.qss_selected_style)
+    def set_selected(self):
+        self.set_style_state(self.qss_selected_style)
 
-	def  mousePressEvent(self, ev):
-		ev.ignore()
+    def set_pressed(self):
+        self.set_style_state(self.qss_pressed_style)
 
-	def mouseReleaseEvent(self, ev):
-		ev.ignore()
+    def mousePressEvent(self, ev):
+        ev.ignore()
+
+    def mouseReleaseEvent(self, ev):
+        ev.ignore()
 
 
 class BarTopSvgBtn(TransparentWidget):
@@ -193,6 +198,24 @@ class BarTopSvgBtn(TransparentWidget):
 		if event.button() == Qt.MouseButton.LeftButton:
 			if self.rect().contains(event.pos()):
 				self.clicked_.emit()
+		super().mouseReleaseEvent(event)
+
+	def mousePressEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.label.set_pressed()
+		super().mousePressEvent(event)
+
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			if self.rect().contains(event.pos()):
+				self.clicked_.emit()
+
+			# Возвращаем состояние после отпускания
+			if self.label.underMouse():
+				self.label.set_selected()
+			else:
+				self.label.set_base()
+
 		super().mouseReleaseEvent(event)
 
 
