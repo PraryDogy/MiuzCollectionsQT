@@ -437,11 +437,6 @@ class DestinyFolderWidget(UGroupBox):
 
 		self.copy_svg = SvgIconButton(self.copy_svg_path, (33, 33), (20, 20))
 		self.path_layout.addWidget(self.copy_svg)
-		# self.copy_svg = QSvgWidget()
-		# self.copy_svg.load(str(self.copy_svg_path))
-		# self.copy_svg.setFixedSize(*self.svg_size)
-		# self.copy_svg.setCursor(Qt.CursorShape.PointingHandCursor)
-		# self.path_layout.addWidget(self.copy_svg)
 
 		# Кнопка вне GroupBox
 		self.change_btn = UPushButton(Lng.change[JsonData.lng_index])
@@ -455,6 +450,7 @@ class UploadWin(UMainWindow):
 		super().__init__()
 		self.setWindowTitle(Lng.upload_in[JsonData.lng_index])
 		self.setFixedWidth(500)
+		self.set_close_only()
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
