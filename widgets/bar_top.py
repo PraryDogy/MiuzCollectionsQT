@@ -283,8 +283,6 @@ class BarTop(TransparentFrame):
 		# мы добавляем пустышку по длине виджета кнопок окна,
 		# чтобы был истинный центр
 		self.h_layout.addSpacing(TitleBar.TRAFFIC_LIGHT_WIDTH)
-		print(TitleBar.TRAFFIC_LIGHT_WIDTH)
-
 
 		self.h_layout.addStretch(0)
 

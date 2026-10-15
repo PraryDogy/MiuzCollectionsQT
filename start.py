@@ -141,6 +141,7 @@ class App(QApplication):
             self.first_load_win.show()
 
     def create_app(self):
+        # System_.show_prints()
         self.win_main = WinMain(self.argv)
         self.win_main.center_screen()
         self.win_main.show()
