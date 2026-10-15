@@ -927,7 +927,7 @@ class VerticalWindow(UMainWindow):
 
 	def _calculate_optimal_text_width(
 		self, text_wid: QLabel, text: str,
-		min_width: int = 220, max_width: int = 800,
+		min_width: int = 190, max_width: int = 800,
 	) -> int:
 		fm = text_wid.fontMetrics()
 		single_line_width = fm.horizontalAdvance(text)
@@ -935,13 +935,13 @@ class VerticalWindow(UMainWindow):
 		if single_line_width <= min_width:
 			return single_line_width + 2
 
-		for width in range(min_width, max_width + 1, 10):
+		for width in range(min_width, max_width + 1, 5):
 			rect = fm.boundingRect(
 				0, 0, width, 10000,
 				Qt.TextFlag.TextWordWrap | Qt.AlignmentFlag.AlignLeft,
 				text,
 			)
-			if rect.width() > 0 and width / rect.width() <= 1.15:
+			if rect.height() > 0 and width / rect.width() <= 1.05:
 				return width
 
 		return max_width

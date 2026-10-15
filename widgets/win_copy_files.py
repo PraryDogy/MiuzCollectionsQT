@@ -71,6 +71,7 @@ class ReplaceWin(VerticalWindow):
 
     def __init__(self, filename: str, show_checkbox: bool):
         super().__init__()
+        # self.setFixedWidth(270)
 
         self.filename = filename
         self.show_checkbox = show_checkbox
