@@ -460,11 +460,7 @@ class UploadWin(UMainWindow):
 		self.set_close_only()
 		self.set_always_on_top()
 
-
 		self.current_dir = (mf.mf_paths[0] + current_dir).rstrip(os.sep)
-
-		print(self.current_dir)
-
 
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
