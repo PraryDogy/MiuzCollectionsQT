@@ -133,7 +133,6 @@ class BarTopSvgLabel(TransparentLabel):
 
 	def __init__(self):
 		super().__init__()
-		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 		self.set_base()
 
 	def set_style_state(self, state: str):
@@ -148,6 +147,12 @@ class BarTopSvgLabel(TransparentLabel):
 	def set_selected(self):
 		self.set_style_state(self.qss_selected_style)
 
+	def  mousePressEvent(self, ev):
+		ev.ignore()
+
+	def mouseReleaseEvent(self, ev):
+		ev.ignore()
+
 
 class BarTopSvgBtn(TransparentWidget):
 	clicked_ = pyqtSignal()
@@ -157,20 +162,26 @@ class BarTopSvgBtn(TransparentWidget):
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-		# 1. Вынесенный кастомный лейбл
-		self.label = BarTopSvgLabel(self)
+		# 1. Фоновая подложка
+		self.label = BarTopSvgLabel()
 
-		# 2. Фиксированная SVG-иконка
+		# 2. Фиксированная центрированная SVG-иконка
 		self.svg_widget = QSvgWidget(str(svg_path), self)
 		self.svg_widget.setFixedSize(*self.icon_size)
+		# Прозрачна для мыши, чтобы ховер под курсором оставался у label
 		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
-		# 3. Наслоение
+		# 3. Наслоение через единую ячейку сетки
 		layout = QGridLayout(self)
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setSpacing(0)
 		layout.addWidget(self.label, 0, 0)
 		layout.addWidget(self.svg_widget, 0, 0, Qt.AlignmentFlag.AlignCenter)
+
+		# ВАЖНО: Фиксируем z-порядок. 
+		# label всегда должен находиться ПОД svg_widget:
+		self.label.stackUnder(self.svg_widget)
+		self.svg_widget.raise_()
 
 	def set_selected_style(self):
 		self.label.set_selected()
@@ -180,7 +191,8 @@ class BarTopSvgBtn(TransparentWidget):
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
-			self.clicked_.emit()
+			if self.rect().contains(event.pos()):
+				self.clicked_.emit()
 		super().mouseReleaseEvent(event)
 
 

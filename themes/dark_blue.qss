@@ -426,7 +426,7 @@ BarTopSvgLabel[style="base"] {
 
 BarTopSvgLabel:hover[style="base"] {
     background: #283645;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 

@@ -237,7 +237,6 @@ class WinMain(UMainWindow):
 				self.bar_top.img_search_btn.set_selected_style()
 				win.hide()
 			else:
-				print("img search bar top btn base style")
 				self.bar_top.img_search_btn.set_base_style()
 				self.win_img_search = None
 				win.deleteLater()
