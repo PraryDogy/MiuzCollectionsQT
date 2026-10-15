@@ -135,6 +135,7 @@ class Lng:
 	language_max = ("Сменить язык (Change language)", "Change language (Сменить язык)")
 	erase_data = ("Сбросить все данные", "Reset all data")
 	copying = ("Копирование", "Copying")
+	text_copied = ("Текст скопирован", "Text copied")
 	from_ = ("из", "from")
 	in_ = ("в", "in")
 	copy_file = ("Копировать файл (⌘ + C)", "Copy file (⌘ + C)")

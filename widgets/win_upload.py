@@ -13,7 +13,7 @@ from system.utils import Utils
 from ._base_widgets import (ActiveButton, GrayTextLabel, SvgIconButton,
                             TitleTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton)
+                            UPushButton, TransparentFrame)
 
 
 class CopyPathButton(SvgIconButton):
@@ -179,6 +179,29 @@ class DestinyFolderWidget(UGroupBox):
 			self.copy_path_button.current_dir = self.current_dir
 
 
+class NotiWidget(TransparentFrame):
+	svg_path = Static.COMMON_ICONS / "checkmark.svg"
+	svg_size = (10, 10)
+
+	def __init__(self, parent=None):
+		super().__init__(parent)
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setContentsMargins(10, 2, 10, 2)
+		self.h_layout.setSpacing(5)
+
+		self.svg_widget = QSvgWidget()
+		self.svg_widget.load(str(self.svg_path))
+		self.svg_widget.setFixedSize(*self.svg_size)
+		self.h_layout.addWidget(self.svg_widget)
+
+		self.text_label = TransparentLabel(Lng.text_copied[JsonData.lng_index])
+		self.h_layout.addWidget(self.text_label)
+
+		self.adjustSize()
+		self.setFixedSize(self.width(), self.height())
+
+
+
 class UploadWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 
@@ -222,6 +245,11 @@ class UploadWin(UMainWindow):
 
 		self.adjustSize()
 		self.setFixedHeight(self.height())
+
+		self.noti_widgeet = NotiWidget()
+		self.noti_widgeet.setParent(self)
+		self.noti_widgeet.move(10, 10)
+		self.noti_widgeet.show()
 
 	def dir_changed_cmd(self, path: str):
 		self.current_dir = path

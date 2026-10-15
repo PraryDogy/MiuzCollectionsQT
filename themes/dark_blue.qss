@@ -591,4 +591,11 @@ MainWinRightWidget {
 /* win_text_search.py */
 
 /* win_upload.py */
+
+
+NotiWidget {
+    background: #16842c;
+    border-radius: 5px;
+}
+
 /* win_upload.py */
