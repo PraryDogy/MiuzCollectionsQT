@@ -228,20 +228,46 @@ class Thumb(TransparentFrame):
 		self.white_text_wid.set_text(Thumb.wid_width)
 
 
-class UpBtn(QSvgWidget):
-	scroll_to_top = pyqtSignal()
-	icon_path = Static.COMMON_ICONS / "scroll_up.svg"
-	icon_size = 35
 
-	def __init__(self, parent: TransparentWidget):
+class UpBtnLabel(TransparentLabel):
+	widget_size = (36, 36)
+	def __init__(self):
+		super().__init__()
+		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+		self.setFixedSize(*self.widget_size)
+
+
+class UpBtn(TransparentWidget):
+	scroll_to_top = pyqtSignal()
+	icon_path = Static.COMMON_ICONS / "arrow_up.svg"
+	icon_size = (28, 28)
+
+	def __init__(self, parent: TransparentWidget | None = None):
 		super().__init__(parent)
-		self.setFixedSize(self.icon_size, self.icon_size)
-		self.load(str(self.icon_path))
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
+		# 1. Отдельный класс подложки
+		self.label = UpBtnLabel()
+
+		# 2. Фиксированная SVG-иконка
+		self.svg_widget = QSvgWidget(str(self.icon_path), self)
+		self.svg_widget.setFixedSize(*self.icon_size)
+		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+
+		# 3. Наслоение через сетку
+		layout = QGridLayout(self)
+		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setSpacing(0)
+		layout.addWidget(self.label, 0, 0)
+		layout.addWidget(self.svg_widget, 0, 0, Qt.AlignmentFlag.AlignCenter)
+
+		# Гарантируем, что подложка всегда строго под SVG
+		self.label.stackUnder(self.svg_widget)
+
 	def mouseReleaseEvent(self, ev: QMouseEvent | None) -> None:
-		if ev.button() == Qt.MouseButton.LeftButton:
-			self.scroll_to_top.emit()
+		if ev and ev.button() == Qt.MouseButton.LeftButton:
+			if self.rect().contains(ev.pos()):
+				self.scroll_to_top.emit()
 		super().mouseReleaseEvent(ev)
 
 

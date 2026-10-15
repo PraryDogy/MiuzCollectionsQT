@@ -482,6 +482,13 @@ ThumbMiuzBlueTextWidget {
     font-size: 11px;
 }
 
+UpBtnLabel {
+    /* 36 размер UpBtnLabel */
+    border-radius: 18px;
+    /* border: 1px solid #6E6E6E; */
+    background: rgba(40, 54, 69, 191);
+}
+
 
 /* grid.py */
 
