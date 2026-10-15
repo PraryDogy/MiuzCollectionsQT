@@ -155,12 +155,12 @@ UTreeWidget::item:selected:!active {
 
 UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
-    image: url(./icons/common/plus.svg);
+    image: url(./icons/common/expand.svg);
 }
 
 UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
-    image: url(./icons/common/minus.svg);
+    image: url(./icons/common/collapse.svg);
 }
 
 UTreeView::branch:selected,

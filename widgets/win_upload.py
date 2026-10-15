@@ -296,3 +296,23 @@ class UploadWin(UMainWindow):
 				os.path.isfile(i.toLocalFile())
 			]
 		return super().dropEvent(a0)
+
+
+from ._base_widgets import UGroupBox
+
+
+
+class TitleWidget(UGroupBox):
+	def __init__(self, parent=None):
+		super().__init__(parent)
+
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.h_layout.setSpacing(0)
+
+
+
+class UploadWin(UMainWindow):
+	def __init__(self, parent = None):
+		super().__init__(parent)
+
