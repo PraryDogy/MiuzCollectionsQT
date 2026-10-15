@@ -2,23 +2,25 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import Literal
 
 from PyQt6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QContextMenuEvent, QIcon,
-						 QMouseEvent)
+                         QMouseEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGroupBox,
-							 QHBoxLayout, QLabel, QLayout, QLineEdit,
-							 QListWidget, QListWidgetItem, QMainWindow, QMenu,
-							 QProgressBar, QPushButton, QScrollArea,
-							 QSizePolicy, QSlider, QSpinBox, QStackedWidget,
-							 QTextEdit, QTreeView, QTreeWidget,
-							 QTreeWidgetItem, QVBoxLayout, QWidget)
+                             QHBoxLayout, QLabel, QLayout, QLineEdit,
+                             QListWidget, QListWidgetItem, QMainWindow, QMenu,
+                             QProgressBar, QPushButton, QScrollArea,
+                             QSizePolicy, QSlider, QSpinBox, QStackedWidget,
+                             QTextEdit, QTreeView, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
-from typing import Literal
+
+
 class TransparentButton(QPushButton):
 	def __init__(self, text="", parent=None):
 		super().__init__(text=text, parent=parent)
