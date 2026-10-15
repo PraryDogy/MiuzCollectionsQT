@@ -11,9 +11,9 @@ from system.main_folder import Mf
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, SvgIconButton,
-							TitleTextLabel, TransparentLabel,
-							TransparentWidget, UGroupBox, UMainWindow,
-							UPushButton, UTagWidget)
+                            TitleTextLabel, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWindow,
+                            UPushButton, UTagWidget)
 
 
 class CopyPathButton(SvgIconButton):
