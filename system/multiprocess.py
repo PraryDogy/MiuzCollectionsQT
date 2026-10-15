@@ -128,8 +128,9 @@ class OneFileInfo:
 		stats = os.stat(path)
 		size = SharedUtils.get_f_size(stats.st_size)
 		date_time = datetime.fromtimestamp(stats.st_mtime)
+		clock = date_time.time().replace(microsecond=0)
 		month = Lng.months_gen[JsonData.lng_index][str(date_time.month)]
-		mod = f"{date_time.day} {month} {date_time.year}"
+		mod = f"{date_time.day} {month} {date_time.year} {clock}"
 		return OneFileInfoItem(type_, size, mod, "")
 
 	@staticmethod
