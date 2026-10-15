@@ -151,6 +151,7 @@ class Lng:
 	indexing_files = ("Индексация файлов", "Indexing files")
 	indexing = ("Индексация", "Indexing")
 	changed = ("Изменен", "Changed")
+	change = ("Изменить", "Change")
 	changed_short = ("Изм.", "Mod.")
 	file_name = ("Имя файла", "File name")
 	show_about = ("О приложении", "Аbout the app")

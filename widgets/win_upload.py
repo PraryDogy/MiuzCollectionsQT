@@ -410,24 +410,40 @@ class DestinyFolderWidget(UGroupBox):
 		self.title_label = TransparentLabel(Lng.dest_folder[JsonData.lng_index])
 		self.title_layout.addWidget(self.title_label)
 
+		self.path_row = TransparentWidget()
+		self.path_row_layout = QHBoxLayout(self.path_row)
+		self.path_row_layout.setContentsMargins(0, 0, 0, 0)
+		self.path_row_layout.setSpacing(10)
+
+		self.main_layout.addWidget(self.path_row)
+
+		# GroupBox с путём
 		self.path_container = UGroupBox()
-		self.main_layout.addWidget(self.path_container)
+		self.path_row_layout.addWidget(self.path_container, 1)
+
 		self.path_layout = QHBoxLayout(self.path_container)
 		self.path_layout.setContentsMargins(10, 10, 10, 10)
+		self.path_layout.setSpacing(10)
 
-		self.path_layout.addWidget(self.title_svg)
+		self.path_svg = QSvgWidget()
+		self.path_svg.load(str(self.svg_path))
+		self.path_svg.setFixedSize(*self.svg_size)
+		# self.path_layout.addWidget(self.path_svg)
 
 		current_dir = Mf.current_mf.mf_paths[0] + current_dir
 
 		self.path_label = PathLabel(current_dir)
-		self.path_layout.addWidget(self.path_label)
+		self.path_layout.addWidget(self.path_label, 1)
 
-		# тут нам понадобится bar top btn
 		self.copy_svg = QSvgWidget()
 		self.copy_svg.load(str(self.copy_svg_path))
 		self.copy_svg.setFixedSize(*self.svg_size)
 		self.copy_svg.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.path_layout.addWidget(self.copy_svg)
+
+		# Кнопка вне GroupBox
+		self.change_btn = UPushButton(Lng.change[JsonData.lng_index])
+		self.path_row_layout.addWidget(self.change_btn)
 
 
 class UploadWin(UMainWindow):
