@@ -347,37 +347,42 @@ class TitleWidget(UGroupBox):
 
 
 class PathLabel(TransparentLabel):
-    def __init__(self, path: str, width: int = 350, parent=None):
-        super().__init__(parent)
+	def __init__(self, path: str, width: int = 350, parent=None):
+		super().__init__(parent)
 
-        self._path = path
-        self.setFixedWidth(width)
-        self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.setToolTip(path)
-        self._update_text()
+		self._path = path
+		self.setFixedWidth(width)
+		self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+		self.setToolTip(path)
+		self._update_text()
 
-    def setPath(self, path: str):
-        """Установить новый путь."""
-        self._path = path
-        self.setToolTip(path)
-        self._update_text()
+	def setPath(self, path: str):
+		self._path = path
+		self.setToolTip(path)
+		self._update_text()
 
-    def path(self) -> str:
-        """Вернуть полный путь."""
-        return self._path
+	def path(self) -> str:
+		return self._path
 
-    def _update_text(self):
-        metrics = QFontMetrics(self.font())
+	def _update_text(self):
+		metrics = QFontMetrics(self.font())
 
-        self.setText(
-            metrics.elidedText(
-                self._path,
-                Qt.TextElideMode.ElideMiddle,
-                self.width()
-                - self.contentsMargins().left()
-                - self.contentsMargins().right()
-            )
-        )
+		widget_width = self.width()
+		margins = self.contentsMargins()
+
+		available_width = (
+			widget_width
+			- margins.left()
+			- margins.right()
+		)
+
+		shortened_path = metrics.elidedText(
+			self._path,
+			Qt.TextElideMode.ElideMiddle,
+			available_width
+		)
+
+		self.setText(shortened_path)
 
 
 class DestinyFolderWidget(UGroupBox):
@@ -423,7 +428,6 @@ class DestinyFolderWidget(UGroupBox):
 		self.copy_svg.setFixedSize(*self.svg_size)
 		self.copy_svg.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.path_layout.addWidget(self.copy_svg)
-
 
 
 class UploadWin(UMainWindow):
