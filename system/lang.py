@@ -534,3 +534,24 @@ class Lng:
 		"Пропустить",
 		"Skip"
 	)
+	upload_files_description = (
+		"Файлы будут загружены в указанную папку.",
+		"Files will be uploaded to the specified folder.",
+	)
+	# 1 файл (например: 1, 21, 31, 101)
+	chosen_x_files = (
+		"Выбран {files_count} файл",
+		"{files_count} file selected",
+	)
+
+	# 2-4 файла (например: 2, 3, 4, 22, 33)
+	chosen_xx_files = (
+		"Выбрано {files_count} файла",
+		"{files_count} files selected",
+	)
+
+	# 5-20 файлов (например: 0, 5, 11, 19, 20, 25)
+	chosen_xxx_files = (
+		"Выбрано {files_count} файлов",
+		"{files_count} files selected",
+	)

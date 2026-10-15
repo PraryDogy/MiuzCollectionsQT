@@ -298,21 +298,71 @@ class UploadWin(UMainWindow):
 		return super().dropEvent(a0)
 
 
-from ._base_widgets import UGroupBox
+from ._base_widgets import UGroupBox, TitleTextLabel, GrayTextLabel
+from PyQt6.QtSvgWidgets import QSvgWidget
 
 
 
 class TitleWidget(UGroupBox):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	svg_path = Static.COMMON_ICONS / "upload_file.svg"
+	svg_size = (45, 45)
+
+	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
+		super().__init__()
 
 		self.h_layout = QHBoxLayout(self)
-		self.h_layout.setContentsMargins(0, 0, 0, 0)
-		self.h_layout.setSpacing(0)
+		self.h_layout.setContentsMargins(10, 10, 10, 10)
+		self.h_layout.setSpacing(10)
+
+		self.svg_widget = QSvgWidget()
+		self.svg_widget.load(str(self.svg_path))
+		self.svg_widget.setFixedSize(*self.svg_size)
+		self.h_layout.addWidget(self.svg_widget)
+
+		self.text_container = TransparentWidget()
+		self.h_layout.addWidget(self.text_container)
+		self.text_layout = QVBoxLayout(self.text_container)
+		self.text_layout.setContentsMargins(0, 0, 0, 0)
+		self.text_layout.setSpacing(5)
+
+		self.title_label = TitleTextLabel(
+			self.get_plural_text(len(files_to_copy))
+		)
+		self.text_layout.addWidget(self.title_label)
+
+		self.description_label = GrayTextLabel(Lng.upload_files_description[JsonData.lng_index])
+		self.text_layout.addWidget(self.description_label)
+
+	def get_plural_text(self, count):
+		# 1. Определяем, какой кортеж использовать на основе правил русского языка
+		if count % 10 == 1 and count % 100 != 11:
+			chosen_tuple = Lng.chosen_x_files   # ... 1 файл
+		elif 2 <= count % 10 <= 4 and not (12 <= count % 100 <= 14):
+			chosen_tuple = Lng.chosen_xx_files  # ... 2-4 файла
+		else:
+			chosen_tuple = Lng.chosen_xxx_files # ... 5-20 файлов
+
+		# 2. Берем строку под нужный язык и сразу подставляем число
+		return chosen_tuple[JsonData.lng_index].format(files_count=count)
 
 
 
 class UploadWin(UMainWindow):
-	def __init__(self, parent = None):
-		super().__init__(parent)
+	ok_clicked = pyqtSignal(str)
 
+	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
+		super().__init__()
+		self.setWindowTitle(Lng.upload_in[JsonData.lng_index])
+		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+		self.central_layout.setContentsMargins(10, 10, 10, 10)
+
+		self.title_widget = TitleWidget(mf, current_dir, files_to_copy)
+		self.central_layout.addWidget(self.title_widget)
+
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		elif a0.key() in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+			self.ok_clicked_cmd()
+		return super().keyPressEvent(a0)
