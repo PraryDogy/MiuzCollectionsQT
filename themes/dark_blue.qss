@@ -427,22 +427,22 @@ SearchWidLineEdit {
     padding-left: 25px;
 }
 
-BarTopSvgLabel[style="base"] {
+SvgIconButtonLabel[style="base"] {
     background: transparent;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
-BarTopSvgLabel:hover[style="base"] {
+SvgIconButtonLabel:hover[style="base"] {
     background: #283645;
     border-radius: 8px;
 }
 
-BarTopSvgLabel[style="selected"] {
+SvgIconButtonLabel[style="selected"] {
     background: #283645;
     border-radius: 8px;
 }
 
-BarTopSvgLabel[style="pressed"] {
+SvgIconButtonLabel[style="pressed"] {
     background: #3A4B5E;
     border-radius: 8px;
 }

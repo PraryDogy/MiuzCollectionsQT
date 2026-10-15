@@ -298,7 +298,7 @@ class UploadWin(UMainWindow):
 		return super().dropEvent(a0)
 
 
-from ._base_widgets import UGroupBox, TitleTextLabel, GrayTextLabel, SelectableLabel
+from ._base_widgets import UGroupBox, TitleTextLabel, GrayTextLabel, SvgIconButton
 from PyQt6.QtSvgWidgets import QSvgWidget
 from system.utils import Utils
 from PyQt6.QtGui import QFontMetrics
@@ -435,11 +435,14 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_label = PathLabel(current_dir)
 		self.path_layout.addWidget(self.path_label, 1)
 
-		self.copy_svg = QSvgWidget()
-		self.copy_svg.load(str(self.copy_svg_path))
-		self.copy_svg.setFixedSize(*self.svg_size)
-		self.copy_svg.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.copy_svg = SvgIconButton(self.copy_svg_path)
+		self.copy_svg.svg_widget.setFixedSize(*self.svg_size)
 		self.path_layout.addWidget(self.copy_svg)
+		# self.copy_svg = QSvgWidget()
+		# self.copy_svg.load(str(self.copy_svg_path))
+		# self.copy_svg.setFixedSize(*self.svg_size)
+		# self.copy_svg.setCursor(Qt.CursorShape.PointingHandCursor)
+		# self.path_layout.addWidget(self.copy_svg)
 
 		# Кнопка вне GroupBox
 		self.change_btn = UPushButton(Lng.change[JsonData.lng_index])

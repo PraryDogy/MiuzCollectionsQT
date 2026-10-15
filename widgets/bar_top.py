@@ -3,15 +3,16 @@ from pathlib import Path
 from PyQt6.QtCore import QByteArray, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QGridLayout
+from PyQt6.QtWidgets import QGridLayout, QHBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 
-from ._base_widgets import (GrayTextLabel, TitleBar, TransparentFrame,
-							TransparentWidget, ULineEdit, UMenu, UPushButton, TransparentLabel)
+from ._base_widgets import (GrayTextLabel, SvgIconButton, TitleBar,
+                            TransparentFrame, TransparentWidget, ULineEdit,
+                            UMenu, UPushButton)
 from .win_text_search import WinTextSearch
 
 
@@ -126,107 +127,14 @@ class SearchWidLineEdit(ULineEdit):
 		super().keyPressEvent(event)
 
 
-class BarTopSvgLabel(TransparentLabel):
-    qss_base_style = "base"
-    qss_selected_style = "selected"
-    qss_pressed_style = "pressed"
-    attr_name = "style"
-
-    def __init__(self):
-        super().__init__()
-        self.set_base()
-
-    def set_style_state(self, state: str):
-        if self.property(self.attr_name) != state:
-            self.setProperty(self.attr_name, state)
-            self.style().unpolish(self)
-            self.style().polish(self)
-            self.update()
-
-    def set_base(self):
-        self.set_style_state(self.qss_base_style)
-
-    def set_selected(self):
-        self.set_style_state(self.qss_selected_style)
-
-    def set_pressed(self):
-        self.set_style_state(self.qss_pressed_style)
-
-    def mousePressEvent(self, ev):
-        ev.ignore()
-
-    def mouseReleaseEvent(self, ev):
-        ev.ignore()
-
-
-class BarTopSvgBtn(TransparentWidget):
-	clicked_ = pyqtSignal()
-	icon_size = (26, 26)
-
-	def __init__(self, svg_path: Path):
-		super().__init__()
-		self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-		# 1. Фоновая подложка
-		self.label = BarTopSvgLabel()
-
-		# 2. Фиксированная центрированная SVG-иконка
-		self.svg_widget = QSvgWidget(str(svg_path), self)
-		self.svg_widget.setFixedSize(*self.icon_size)
-		# Прозрачна для мыши, чтобы ховер под курсором оставался у label
-		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-
-		# 3. Наслоение через единую ячейку сетки
-		layout = QGridLayout(self)
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setSpacing(0)
-		layout.addWidget(self.label, 0, 0)
-		layout.addWidget(self.svg_widget, 0, 0, Qt.AlignmentFlag.AlignCenter)
-
-		# ВАЖНО: Фиксируем z-порядок. 
-		# label всегда должен находиться ПОД svg_widget:
-		self.label.stackUnder(self.svg_widget)
-		self.svg_widget.raise_()
-
-	def set_selected_style(self):
-		self.label.set_selected()
-
-	def set_base_style(self):
-		self.label.set_base()
-
-	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			if self.rect().contains(event.pos()):
-				self.clicked_.emit()
-		super().mouseReleaseEvent(event)
-
-	def mousePressEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			self.label.set_pressed()
-		super().mousePressEvent(event)
-
-	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			if self.rect().contains(event.pos()):
-				self.clicked_.emit()
-
-			# Возвращаем состояние после отпускания
-			if self.label.underMouse():
-				self.label.set_selected()
-			else:
-				self.label.set_base()
-
-		super().mouseReleaseEvent(event)
-
-
-class SettingsSvgBtn(BarTopSvgBtn):
+class SettingsSvgBtn(SvgIconButton):
 	base_svg = Static.COMMON_ICONS / "settings.svg"
 
 	def __init__(self):
 		super().__init__(self.base_svg)
 
 
-class ImgSearchSvgBtn(BarTopSvgBtn):
+class ImgSearchSvgBtn(SvgIconButton):
 	base_svg = Static.COMMON_ICONS / "camera.svg"
 
 	def __init__(self):
