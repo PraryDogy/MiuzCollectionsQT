@@ -3,11 +3,12 @@ import shutil
 import traceback
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+from enum import Enum, auto
 from multiprocessing import Process, Queue, shared_memory
 from pathlib import Path
 from queue import Empty
 from time import sleep
+from typing import Literal
 
 import numpy as np
 import sqlalchemy
@@ -170,24 +171,7 @@ class OneFileInfo:
 		return '\n'.join(lines)
 
 
-import os
-import traceback
-from dataclasses import dataclass
-from enum import Enum
-from pathlib import Path
-from typing import Literal
-from multiprocessing import Queue
-from queue import Empty
 
-
-import os
-import traceback
-from dataclasses import dataclass
-from enum import Enum
-from pathlib import Path
-from typing import Literal
-from multiprocessing import Queue
-from queue import Empty
 
 
 @dataclass(slots=True)
@@ -205,10 +189,12 @@ class CopyTaskItem:
 
 
 class CopyCommand(Enum):
-	REPLACE_ONE = "replace_one"
-	REPLACE_ALL = "replace_all"
-	SKIP = "skip"
-	CANCEL = "cancel"
+	REPLACE_ONE = auto()
+	REPLACE_ALL = auto()
+	SKIP = auto()
+	CANCEL = auto()
+	KEEP_BOTH = auto()
+	KEEP_ALL = auto()
 
 
 class CopyTaskWorker(BaseProcessWorker):
@@ -231,6 +217,12 @@ class CopyTaskWorker(BaseProcessWorker):
 	def cancel(self):
 		self.gui_queue.put(CopyCommand.CANCEL)
 
+	def keep_both(self):
+		self.gui_queue.put(CopyCommand.KEEP_BOTH)
+
+	def keep_all(self):
+		self.gui_queue.put(CopyCommand.KEEP_ALL)
+
 
 class CopyTask:
 	@staticmethod
@@ -241,8 +233,8 @@ class CopyTask:
 	):
 		try:
 			src_dst_urls = CopyTask.get_another_dir_urls(copy_item)
-			copy_item.dst_urls = [str(dst) for _, dst in src_dst_urls]
 
+			copy_item.dst_urls = []
 			copy_item.total_bytes = sum(
 				src.stat().st_size
 				for src, _ in src_dst_urls
@@ -251,37 +243,45 @@ class CopyTask:
 			copy_item.total_file_count = len(src_dst_urls)
 
 			replace_all = False
+			keep_all = False
 
 			for count, (src, dest) in enumerate(src_dst_urls, start=1):
 				if src.resolve() == dest.resolve():
 					dest = CopyTask.set_count_name(dest)
 
-				if (
-					not replace_all
-					and dest.exists()
-					and src.name == dest.name
-				):
-					copy_item.current_file_count = count
-					copy_item.msg = "need_replace"
-					process_queue.put(copy_item)
+				if dest.exists() and src.name == dest.name:
+					if keep_all:
+						dest = CopyTask.set_count_name(dest)
 
-					command = CopyTask.wait_command(gui_queue)
+					elif not replace_all:
+						copy_item.current_file_count = count
+						copy_item.msg = "need_replace"
+						process_queue.put(copy_item)
 
-					if command == CopyCommand.CANCEL:
-						return
+						command = CopyTask.wait_command(gui_queue)
 
-					if command == CopyCommand.SKIP:
-						continue
+						if command == CopyCommand.CANCEL:
+							return
 
-					if command == CopyCommand.REPLACE_ALL:
-						replace_all = True
-					elif command != CopyCommand.REPLACE_ONE:
-						return
+						if command == CopyCommand.SKIP:
+							continue
+
+						elif command == CopyCommand.REPLACE_ALL:
+							replace_all = True
+
+						elif command == CopyCommand.KEEP_ALL:
+							keep_all = True
+							dest = CopyTask.set_count_name(dest)
+
+						elif command == CopyCommand.KEEP_BOTH:
+							dest = CopyTask.set_count_name(dest)
+
+						elif command != CopyCommand.REPLACE_ONE:
+							return
 
 				copy_item.current_file_count = count
 				copy_item.msg = "none"
 				copy_item.error_traceback = ""
-
 				result = CopyTask.copy_file_with_progress(
 					process_queue,
 					gui_queue,
@@ -292,6 +292,8 @@ class CopyTask:
 
 				if result == CopyCommand.CANCEL:
 					return
+
+				copy_item.dst_urls.append(str(dest))
 
 			copy_item.current_percent = 100
 			copy_item.msg = "finished"
@@ -322,8 +324,10 @@ class CopyTask:
 		try:
 			while True:
 				command = gui_queue.get_nowait()
+
 				if command == CopyCommand.CANCEL:
 					return command
+
 		except Empty:
 			return None
 
@@ -338,15 +342,13 @@ class CopyTask:
 		block = 4 * 1024 * 1024
 		backup = None
 
-		# raise OSError("Тестовая ошибка копирования SMB")
-
 		try:
-			# Временно сохраняем существующий файл.
+			# Если файл существует, временно сохраняем его.
 			if dest.exists():
 				backup = CopyTask.set_count_name(dest)
 				dest.rename(backup)
 
-			# Копируем новый файл.
+			# Копируем файл с обновлением прогресса.
 			with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
 				while True:
 					command = CopyTask.check_command(gui_queue)
@@ -380,7 +382,7 @@ class CopyTask:
 				ns=(stat.st_atime_ns, stat.st_mtime_ns),
 			)
 
-			# Новый файл записан успешно — удаляем резервную копию.
+			# Удаляем резервную копию после успешного копирования.
 			if backup is not None:
 				backup.unlink()
 				backup = None
@@ -400,7 +402,7 @@ class CopyTask:
 					+ traceback.format_exc()
 				)
 
-			# Восстанавливаем старый файл.
+			# Восстанавливаем резервную копию.
 			if backup is not None and backup.exists():
 				try:
 					backup.rename(dest)
@@ -419,6 +421,7 @@ class CopyTask:
 	@staticmethod
 	def get_another_dir_urls(copy_item: CopyTaskItem):
 		dst_dir = Path(copy_item.dst_dir)
+
 		return [
 			(Path(src), dst_dir / Path(src).name)
 			for src in copy_item.src_urls
@@ -428,9 +431,10 @@ class CopyTask:
 	def set_count_name(path: Path):
 		counter = 2
 		filename, ext = os.path.splitext(path.name)
+		parent = path.parent
 
 		while path.exists():
-			path = path.parent / f"{filename} ({counter}){ext}"
+			path = parent / f"{filename} ({counter}){ext}"
 			counter += 1
 
 		return path

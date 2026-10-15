@@ -4,369 +4,442 @@ from queue import Empty
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
-							TransparentWidget, UCheckBox, UMainWindow,
-							UPushButton, VerticalWindow, WarningWindow,
-							WinProgressbar)
+from ._base_widgets import (
+    ActiveButton,
+    TransparentLabel,
+    TransparentWidget,
+    UCheckBox,
+    UPushButton,
+    VerticalWindow,
+    WarningWindow,
+    WinProgressbar,
+)
 
 
 class ElidedLabel(TransparentLabel):
-	def __init__(self):
-		super().__init__(text="")
-		self._full_text = ""
-		self.setWordWrap(False)
-		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+    def __init__(self):
+        super().__init__(text="")
+        self._full_text = ""
+        self.setWordWrap(False)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
 
-	def setFullText(self, text: str):
-		self._full_text = text
-		self.setToolTip(text)
-		self._update_text()
+    def setFullText(self, text: str):
+        self._full_text = text
+        self.setToolTip(text)
+        self._update_text()
 
-	def resizeEvent(self, event):
-		super().resizeEvent(event)
-		self._update_text()
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._update_text()
 
-	def _update_text(self):
-		if not self._full_text:
-			super().setText("")
-			return
+    def _update_text(self):
+        if not self._full_text:
+            super().setText("")
+            return
 
-		width = self.contentsRect().width()
-		if width <= 0:
-			return
+        width = self.contentsRect().width()
+        if width <= 0:
+            return
 
-		metrics = QFontMetrics(self.font())
-		text = metrics.elidedText(
-			self._full_text, Qt.TextElideMode.ElideMiddle, width
-		)
-		super().setText(text)
+        metrics = QFontMetrics(self.font())
+        text = metrics.elidedText(
+            self._full_text,
+            Qt.TextElideMode.ElideMiddle,
+            width,
+        )
+        super().setText(text)
 
 
 class ReplaceWin(VerticalWindow):
-	replace_pressed = pyqtSignal()
-	skip_pressed = pyqtSignal()
-	cancel_pressed = pyqtSignal()
-	keep_both = pyqtSignal()
+    replace_pressed = pyqtSignal()
+    skip_pressed = pyqtSignal()
+    cancel_pressed = pyqtSignal()
+    keep_both = pyqtSignal()
 
-	warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
-	warn_svg_size = (65, 65)
-	# ww = 280
+    warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
+    warn_svg_size = (65, 65)
 
-	def __init__(self, filename: str, show_checkbox: bool):
-		super().__init__()
-		self.filename = filename
-		self.show_checkbox = show_checkbox
-		self.setWindowTitle(Lng.replace[JsonData.lng_index])
-		# self.setFixedWidth(self.ww)
-		self.set_close_only()
-		self.set_always_on_top()
-		self.show_titlebar_sep()
-		self._init_ui()
-		self.adjustSize()
+    def __init__(self, filename: str, show_checkbox: bool):
+        super().__init__()
 
-	def _init_ui(self):
-		# Warning icon
-		icon = QSvgWidget()
-		icon.load(str(self.warn_svg))
-		icon.setFixedSize(*self.warn_svg_size)
-		self.icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.filename = filename
+        self.show_checkbox = show_checkbox
 
-		message = TransparentLabel(Lng.file_exists[JsonData.lng_index])
-		self.icon_text_layout.addWidget(message)
+        self.setWindowTitle(Lng.replace[JsonData.lng_index])
+        self.set_close_only()
+        self.set_always_on_top()
+        self.show_titlebar_sep()
 
-		# Filename
-		self.filename_label = ElidedLabel()
-		self.filename_label.setFixedWidth(message.sizeHint().width())
-		self.filename_label.setFullText(self.filename)
-		self.icon_text_layout.addWidget(self.filename_label)
+        self._init_ui()
+        self.adjustSize()
 
-		self.icon_text_layout.addSpacing(5)
+    def _init_ui(self):
+        icon = QSvgWidget()
+        icon.load(str(self.warn_svg))
+        icon.setFixedSize(*self.warn_svg_size)
 
-		# Replace all checkbox
-		self.replace_all_checkbox = UCheckBox(Lng.apply_to_all_files[JsonData.lng_index])
-		self.replace_all_checkbox.clicked.connect(lambda: self._checkbox_clicked())
-		self.replace_all_checkbox.setChecked(False)
-		if self.show_checkbox:
-			self.icon_text_layout.addWidget(self.replace_all_checkbox)
+        self.icon_text_layout.addWidget(
+            icon,
+            alignment=Qt.AlignmentFlag.AlignCenter,
+        )
 
+        message = TransparentLabel(
+            Lng.file_exists[JsonData.lng_index]
+        )
+        self.icon_text_layout.addWidget(message)
 
-# Создаем виджет-контейнер и горизонтальный лейаут
-		self.actions_widget = TransparentWidget()
-		self.actions_layout = QHBoxLayout(self.actions_widget)
-		self.actions_layout.setContentsMargins(0, 0, 0, 0) # Убираем внутренние отступы контейнера
-		self.actions_layout.setSpacing(5) # Задаем расстояние между кнопками в ряду
+        self.filename_label = ElidedLabel()
+        self.filename_label.setFixedWidth(
+            message.sizeHint().width()
+        )
+        self.filename_label.setFullText(self.filename)
+        self.icon_text_layout.addWidget(self.filename_label)
 
-		# Первая кнопка
-		self.replace_button = ActiveButton(Lng.replace[JsonData.lng_index])
-		self.replace_button.clicked.connect(self._replace)
-		self.actions_layout.addWidget(self.replace_button)
+        self.icon_text_layout.addSpacing(5)
 
-		# Вторая кнопка
-		self.keep_both_button = UPushButton(Lng.keep_both[JsonData.lng_index])
-		self.keep_both_button.clicked.connect(self._keep_both)
-		self.actions_layout.addWidget(self.keep_both_button)
+        self.replace_all_checkbox = UCheckBox(
+            Lng.apply_to_all_files[JsonData.lng_index]
+        )
+        self.replace_all_checkbox.clicked.connect(
+            self._checkbox_clicked
+        )
+        self.replace_all_checkbox.setChecked(False)
 
-		# Добавляем собранный виджет с двумя кнопками в ваш основной лейаут
-		self.btn_layout.addWidget(self.actions_widget)
+        if self.show_checkbox:
+            self.icon_text_layout.addWidget(
+                self.replace_all_checkbox
+            )
 
-		self.skip_button = UPushButton(Lng.skip[JsonData.lng_index])
-		self.skip_button.clicked.connect(self._skip)
-		self.btn_layout.addWidget(self.skip_button)
+        self.actions_widget = TransparentWidget()
+        self.actions_layout = QHBoxLayout(self.actions_widget)
+        self.actions_layout.setContentsMargins(0, 0, 0, 0)
+        self.actions_layout.setSpacing(5)
 
-		# self.btn_layout.addSpacing(5)
+        self.replace_button = ActiveButton(
+            Lng.replace[JsonData.lng_index]
+        )
+        self.replace_button.clicked.connect(self._replace)
+        self.actions_layout.addWidget(self.replace_button)
 
-		# Action buttons
-		self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
-		self.cancel_button.clicked.connect(self._cancel)
-		self.btn_layout.addWidget(self.cancel_button)
+        self.keep_both_button = UPushButton(
+            Lng.keep_both[JsonData.lng_index]
+        )
+        self.keep_both_button.clicked.connect(self._keep_both)
+        self.actions_layout.addWidget(self.keep_both_button)
 
-	def _checkbox_clicked(self):
-		if self.replace_all_checkbox.isChecked():
-			self.replace_button.setText(Lng.replace_all[JsonData.lng_index])
-			self.keep_both_button.setText(Lng.keep_all[JsonData.lng_index])
-		else:
-			self.replace_button.setText(Lng.replace[JsonData.lng_index])
-			self.keep_both_button.setText(Lng.keep_both[JsonData.lng_index])
+        self.btn_layout.addWidget(self.actions_widget)
 
-	def _keep_both(self):
-		self.keep_both.emit()
+        self.skip_button = UPushButton(
+            Lng.skip[JsonData.lng_index]
+        )
+        self.skip_button.clicked.connect(self._skip)
+        self.btn_layout.addWidget(self.skip_button)
 
-	def _replace(self):
-		self.replace_pressed.emit()
+        self.cancel_button = UPushButton(
+            Lng.cancel[JsonData.lng_index]
+        )
+        self.cancel_button.clicked.connect(self._cancel)
+        self.btn_layout.addWidget(self.cancel_button)
 
-	def _skip(self):
-		self.skip_pressed.emit()
+    def _checkbox_clicked(self):
+        if self.replace_all_checkbox.isChecked():
+            self.replace_button.setText(
+                Lng.replace_all[JsonData.lng_index]
+            )
+            self.keep_both_button.setText(
+                Lng.keep_all[JsonData.lng_index]
+            )
+        else:
+            self.replace_button.setText(
+                Lng.replace[JsonData.lng_index]
+            )
+            self.keep_both_button.setText(
+                Lng.keep_both[JsonData.lng_index]
+            )
 
-	def _cancel(self):
-		self.cancel_pressed.emit()
+    def _keep_both(self):
+        self.keep_both.emit()
 
-	def is_replace_all(self) -> bool:
-		return self.replace_all_checkbox.isChecked()
+    def _replace(self):
+        self.replace_pressed.emit()
 
-	def closeEvent(self, event):
-		self.cancel_pressed.emit()
-		event.accept()
+    def _skip(self):
+        self.skip_pressed.emit()
+
+    def _cancel(self):
+        self.cancel_pressed.emit()
+
+    def is_replace_all(self) -> bool:
+        return self.replace_all_checkbox.isChecked()
+
+    def closeEvent(self, event):
+        self.cancel_pressed.emit()
+        event.accept()
 
 
 class WinCopyFiles(WinProgressbar):
-	finished_ = pyqtSignal(list)
-	ms = 100
+    finished_ = pyqtSignal(list)
+    ms = 100
 
-	def __init__(self, target_dir: str, files_to_copy: list[str]):
-		super().__init__(Lng.copying[JsonData.lng_index])
-		self.set_close_only()
-		self.adjustSize()
-		self.setFixedHeight(self.height())
+    def __init__(
+        self,
+        target_dir: str,
+        files_to_copy: list[str],
+    ):
+        super().__init__(Lng.copying[JsonData.lng_index])
 
-		self.target_dir = target_dir
-		self.files_to_copy = files_to_copy
-		self.dst_urls: list[str] = []
+        self.set_close_only()
+        self.adjustSize()
+        self.setFixedHeight(self.height())
 
-		self.copy_item: CopyTaskItem | None = None
-		self.replace_win: ReplaceWin | None = None
-		self.stopping = False
+        self.target_dir = target_dir
+        self.files_to_copy = files_to_copy
+        self.dst_urls: list[str] = []
 
-		# Labels
-		dst_text = os.path.basename(target_dir)
-		if not dst_text:
-			dst_text = Mf.current_mf.mf_alias
+        self.copy_item: CopyTaskItem | None = None
+        self.replace_win: ReplaceWin | None = None
+        self.stopping = False
 
-		self.above_label.setText(
-			f'{Lng.copying[JsonData.lng_index]} '
-			f'{Lng.in_[JsonData.lng_index]} "{dst_text}"'
-		)
-		self.below_label.setText(Lng.preparing[JsonData.lng_index])
+        dst_text = os.path.basename(target_dir)
+        if not dst_text:
+            dst_text = Mf.current_mf.mf_alias
 
-		# Copy item setup
-		self.copy_item = CopyTaskItem(
-			dst_dir=target_dir, src_urls=files_to_copy, current_percent=0,
-			copied_bytes=0, total_bytes=0, current_file_count=0,
-			total_file_count=0, dst_urls=[], msg="none",
-		)
+        self.above_label.setText(
+            f'{Lng.copying[JsonData.lng_index]} '
+            f'{Lng.in_[JsonData.lng_index]} "{dst_text}"'
+        )
+        self.below_label.setText(
+            Lng.preparing[JsonData.lng_index]
+        )
 
-		# Worker
-		self.copy_task = CopyTaskWorker(
-			target=CopyTask.start, args=(self.copy_item,)
-		)
+        self.copy_item = CopyTaskItem(
+            dst_dir=target_dir,
+            src_urls=files_to_copy,
+            current_percent=0,
+            copied_bytes=0,
+            total_bytes=0,
+            current_file_count=0,
+            total_file_count=0,
+            dst_urls=[],
+            msg="none",
+        )
 
-		# Timer
-		self.copy_timer = QTimer(self)
-		self.copy_timer.setSingleShot(True)
-		self.copy_timer.timeout.connect(self.poll_task)
-		self.progressbar.setMaximum(100)
+        self.copy_task = CopyTaskWorker(
+            target=CopyTask.start,
+            args=(self.copy_item,),
+        )
 
-		# Start
-		self.copy_task.start()
-		self.copy_timer.start(self.ms)
+        self.copy_timer = QTimer(self)
+        self.copy_timer.setSingleShot(True)
+        self.copy_timer.timeout.connect(self.poll_task)
 
-	def poll_task(self):
-		if self.stopping:
-			return
+        self.progressbar.setMaximum(100)
 
-		while True:
-			try:
-				copy_item: CopyTaskItem = self.copy_task.process_queue.get_nowait()
-			except Empty:
-				break
+        self.copy_task.start()
+        self.copy_timer.start(self.ms)
 
-			self.copy_item = copy_item
+    def poll_task(self):
+        if self.stopping:
+            return
 
-			if copy_item.dst_urls:
-				self.dst_urls = list(copy_item.dst_urls)
+        while True:
+            try:
+                copy_item: CopyTaskItem = (
+                    self.copy_task.process_queue.get_nowait()
+                )
+            except Empty:
+                break
 
-			if copy_item.msg == "error":
-				self.show_error(copy_item.error_traceback)
-				return
-			if copy_item.msg == "need_replace":
-				self.show_replace_window(copy_item)
-				return
-			if copy_item.msg == "finished":
-				self.finish_task()
-				return
+            self.copy_item = copy_item
 
-			self.update_progress(copy_item)
+            if copy_item.dst_urls:
+                self.dst_urls = list(copy_item.dst_urls)
 
-		if not self.copy_task.is_alive():
-			self.finish_task()
-			return
+            if copy_item.msg == "error":
+                self.show_error(copy_item.error_traceback)
+                return
 
-		self.copy_timer.start(self.ms)
+            if copy_item.msg == "need_replace":
+                self.show_replace_window(copy_item)
+                return
 
-	def update_progress(self, copy_item: CopyTaskItem):
-		self.progressbar.setValue(copy_item.current_percent)
+            if copy_item.msg == "finished":
+                self.finish_task()
+                return
 
-		below_text = (
-			self.windowTitle(),
-			str(copy_item.current_file_count),
-			Lng.from_[JsonData.lng_index],
-			str(copy_item.total_file_count),
-		)
-		self.below_label.setText(" ".join(below_text))
+            self.update_progress(copy_item)
 
-	def show_replace_window(self, copy_item: CopyTaskItem):
-		if self.stopping:
-			return
+        if not self.copy_task.is_alive():
+            self.finish_task()
+            return
 
-		filename = ""
-		index = copy_item.current_file_count - 1
+        self.copy_timer.start(self.ms)
 
-		if 0 <= index < len(copy_item.src_urls):
-			filename = os.path.basename(copy_item.src_urls[index])
+    def update_progress(self, copy_item: CopyTaskItem):
+        self.progressbar.setValue(copy_item.current_percent)
 
-		if len(copy_item.src_urls) > 1:
-			show_checkbox = True
-		else:
-			show_checkbox = False
+        below_text = (
+            self.windowTitle(),
+            str(copy_item.current_file_count),
+            Lng.from_[JsonData.lng_index],
+            str(copy_item.total_file_count),
+        )
+        self.below_label.setText(" ".join(below_text))
 
-		self.replace_win = ReplaceWin(filename, show_checkbox)
-		self.replace_win.center_to_parent(self)
+    def show_replace_window(self, copy_item: CopyTaskItem):
+        if self.stopping:
+            return
 
-		self.replace_win.replace_pressed.connect(self.replace_file)
-		self.replace_win.skip_pressed.connect(self.skip_file)
-		self.replace_win.cancel_pressed.connect(self.cancel_from_replace)
-		
-		self.replace_win.show()
+        index = copy_item.current_file_count - 1
+        filename = ""
 
-	def replace_file(self):
-		if self.stopping:
-			return
+        if 0 <= index < len(copy_item.src_urls):
+            filename = os.path.basename(
+                copy_item.src_urls[index]
+            )
 
-		replace_all = (
-			self.replace_win
-			and self.replace_win.replace_all_checkbox.isChecked()
-		)
-		self.close_replace_window()
+        self.replace_win = ReplaceWin(
+            filename,
+            len(copy_item.src_urls) > 1,
+        )
+        self.replace_win.center_to_parent(self)
 
-		if replace_all:
-			self.copy_task.replace_all()
-		else:
-			self.copy_task.replace_one()
+        self.replace_win.replace_pressed.connect(
+            self.replace_file
+        )
+        self.replace_win.keep_both.connect(
+            self.keep_both_file
+        )
+        self.replace_win.skip_pressed.connect(
+            self.skip_file
+        )
+        self.replace_win.cancel_pressed.connect(
+            self.cancel_from_replace
+        )
 
-		self.copy_timer.start(self.ms)
+        self.replace_win.show()
 
-	def skip_file(self):
-		if self.stopping:
-			return
-		
-		self.close_replace_window()
-		self.copy_task.skip()
-		self.copy_timer.start(self.ms)
+    def replace_file(self):
+        if self.stopping or self.replace_win is None:
+            return
 
-	def cancel_from_replace(self):
-		if self.stopping:
-			return
-		
-		self.close_replace_window()
-		self.stop_task()
-		self.deleteLater()
+        replace_all = self.replace_win.is_replace_all()
 
-	def close_replace_window(self):
-		if self.replace_win is None:
-			return
-		
-		self.replace_win.blockSignals(True)
-		self.replace_win.close()
-		self.replace_win.deleteLater()
-		self.replace_win = None
+        self.close_replace_window()
 
-		QTimer.singleShot(50, self.raise_)
+        if replace_all:
+            self.copy_task.replace_all()
+        else:
+            self.copy_task.replace_one()
 
-	def show_error(self, traceback: str):
-		if self.stopping:
-			return
-		
-		self.close_replace_window()
-		self.error_win = WarningWindow(Lng.copy_error[JsonData.lng_index], traceback)
-		self.error_win.center_to_parent(self.window())
-		self.error_win.show()
+        self.copy_timer.start(self.ms)
 
-		self.stop_task()
-		self.deleteLater()
+    def keep_both_file(self):
+        if self.stopping or self.replace_win is None:
+            return
 
-	def finish_task(self):
-		if self.stopping:
-			return
+        keep_all = self.replace_win.is_replace_all()
 
-		self.progressbar.setValue(self.progressbar.maximum())
+        self.close_replace_window()
 
-		if self.copy_item:
-			below_text = (
-				self.windowTitle(),
-				str(self.copy_item.total_file_count),
-				Lng.from_[JsonData.lng_index],
-				str(self.copy_item.total_file_count),
-			)
-			self.below_label.setText(" ".join(below_text))
+        if keep_all:
+            self.copy_task.keep_all()
+        else:
+            self.copy_task.keep_both()
 
-		self.finished_.emit(self.dst_urls)
-		self.stop_task()
-		self.deleteLater()
+        self.copy_timer.start(self.ms)
 
-	def stop_task(self):
-		if self.stopping:
-			return
+    def skip_file(self):
+        if self.stopping or self.replace_win is None:
+            return
 
-		self.stopping = True
-		self.copy_timer.stop()
+        self.close_replace_window()
+        self.copy_task.skip()
+        self.copy_timer.start(self.ms)
 
-		if self.replace_win is not None:
-			self.replace_win.blockSignals(True)
-			self.replace_win.close()
-			self.replace_win.deleteLater()
-			self.replace_win = None
+    def cancel_from_replace(self):
+        if self.stopping:
+            return
 
-		if self.copy_task.is_alive():
-			self.copy_task.cancel()
+        self.close_replace_window()
+        self.stop_task()
+        self.deleteLater()
 
-		self.copy_task.terminate_join()
+    def close_replace_window(self):
+        if self.replace_win is None:
+            return
 
-	def closeEvent(self, event):
-		self.stop_task()
-		super().closeEvent(event)
+        window = self.replace_win
+        self.replace_win = None
+
+        window.blockSignals(True)
+        window.close()
+        window.deleteLater()
+
+        QTimer.singleShot(50, self.raise_)
+
+    def show_error(self, traceback_text: str):
+        if self.stopping:
+            return
+
+        self.close_replace_window()
+
+        self.error_win = WarningWindow(
+            Lng.copy_error[JsonData.lng_index],
+            traceback_text,
+        )
+        self.error_win.center_to_parent(self.window())
+        self.error_win.show()
+
+        self.stop_task()
+        self.deleteLater()
+
+    def finish_task(self):
+        if self.stopping:
+            return
+
+        self.progressbar.setValue(
+            self.progressbar.maximum()
+        )
+
+        if self.copy_item:
+            below_text = (
+                self.windowTitle(),
+                str(self.copy_item.total_file_count),
+                Lng.from_[JsonData.lng_index],
+                str(self.copy_item.total_file_count),
+            )
+            self.below_label.setText(" ".join(below_text))
+
+        self.finished_.emit(self.dst_urls)
+
+        self.stop_task()
+        self.deleteLater()
+
+    def stop_task(self):
+        if self.stopping:
+            return
+
+        self.stopping = True
+        self.copy_timer.stop()
+
+        self.close_replace_window()
+
+        if self.copy_task.is_alive():
+            self.copy_task.cancel()
+
+        self.copy_task.terminate_join()
+
+    def closeEvent(self, event):
+        self.stop_task()
+        super().closeEvent(event)
