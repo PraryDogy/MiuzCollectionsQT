@@ -418,6 +418,17 @@ SearchWidLineEdit {
     padding-right: 25px;
     padding-left: 25px;
 }
+
+BarTopSvgLabel[style="base"] {
+    background: transparent;
+    border-radius: 5px;
+}
+
+BarTopSvgLabel[style="selected"] {
+    background: #283645;
+    border-radius: 8px;
+}
+
 /* bar_top.py */
 
 /* caledar_widget.py */

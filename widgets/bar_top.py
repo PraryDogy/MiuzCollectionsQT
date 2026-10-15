@@ -3,7 +3,7 @@ from pathlib import Path
 from PyQt6.QtCore import QByteArray, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QMouseEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QGridLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.items import SettingsItem
@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 
 from ._base_widgets import (GrayTextLabel, TitleBar, TransparentFrame,
-							TransparentWidget, ULineEdit, UMenu, UPushButton)
+							TransparentWidget, ULineEdit, UMenu, UPushButton, TransparentLabel)
 from .win_text_search import WinTextSearch
 
 
@@ -127,39 +127,70 @@ class SearchWidLineEdit(ULineEdit):
 
 
 from pathlib import Path
-
-from PyQt6.QtCore import QSize, Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtWidgets import QWidget, QLabel, QGridLayout
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QGridLayout, QLabel, QWidget
 
 
-class BarTopSvgBtn(QWidget):
+class BarTopSvgLabel(QLabel):
+	"""
+	Подложка под иконку. 
+	Управляет динамическим свойством 'style' для селекторов QSS.
+	"""
+	def __init__(self, parent: QWidget | None = None):
+		super().__init__(parent)
+		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+		self.set_base()
+
+	def set_style_state(self, state: str):
+		if self.property("style") != state:
+			self.setProperty("style", state)
+			# Принудительно заставляем Qt применить новые стили для динамического свойства
+			self.style().unpolish(self)
+			self.style().polish(self)
+
+	def set_base(self):
+		self.set_style_state("base")
+
+	def set_selected(self):
+		self.set_style_state("selected")
+
+
+class BarTopSvgBtn(TransparentWidget):
 	clicked_ = pyqtSignal()
-	icon_size = (24, 24)
 
-	def __init__(self, svg_path: Path):
-		super().__init__()
+	def __init__(
+		self,
+		svg_path: Path | str,
+		icon_size: QSize = QSize(24, 24),
+		parent: QWidget | None = None,
+	):
+		super().__init__(parent)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		attr = (Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
-		# 1. Подложка (стилизуется через QSS)
-		self.label = QLabel(self)
-		self.label.setAttribute(*attr)
+		# 1. Вынесенный кастомный лейбл
+		self.label = BarTopSvgLabel(self)
 
 		# 2. Фиксированная SVG-иконка
 		self.svg_widget = QSvgWidget(str(svg_path), self)
-		self.svg_widget.setFixedSize(*self.icon_size)
-		self.svg_widget.setAttribute(*attr)
+		self.svg_widget.setFixedSize(icon_size)
+		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
-		# 3. Наслоение и центрирование
+		# 3. Наслоение
 		layout = QGridLayout(self)
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setSpacing(0)
 		layout.addWidget(self.label, 0, 0)
 		layout.addWidget(self.svg_widget, 0, 0, Qt.AlignmentFlag.AlignCenter)
 
+	def set_selected_style(self):
+		self.label.set_selected()
+
+	def set_base_style(self):
+		self.label.set_base()
+
 	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
+		if event.button() == Qt.MouseButton.LeftButton:
 			self.clicked_.emit()
 		super().mouseReleaseEvent(event)
 

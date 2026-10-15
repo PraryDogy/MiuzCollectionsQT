@@ -234,15 +234,15 @@ class WinMain(UMainWindow):
 		def on_closed():
 			win = self.win_img_search
 			if not win.preview_widget.pixmap.isNull():
-				# self.bar_top.img_search_btn.set_selected_style()
-				print("img search bar top btn selected style")
+				self.bar_top.img_search_btn.set_selected_style()
 				win.hide()
 			else:
 				print("img search bar top btn base style")
+				self.bar_top.img_search_btn.set_base_style()
 				self.win_img_search = None
 				win.deleteLater()
 
-		print("img search bar top btn selected style")
+		self.bar_top.img_search_btn.set_selected_style()
 
 		if not getattr(self, "win_img_search", None):
 			self.win_img_search = WinImgSearch()
