@@ -71,7 +71,6 @@ class ReplaceWin(VerticalWindow):
 
     def __init__(self, filename: str, show_checkbox: bool):
         super().__init__()
-        # self.setFixedWidth(270)
 
         self.filename = filename
         self.show_checkbox = show_checkbox
@@ -83,6 +82,7 @@ class ReplaceWin(VerticalWindow):
 
         self._init_ui()
         self.adjustSize()
+        self.setFixedSize(self.width(), self.height())
 
     def _init_ui(self):
         icon = QSvgWidget()

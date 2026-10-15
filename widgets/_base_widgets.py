@@ -909,7 +909,7 @@ class VerticalWindow(UMainWindow):
 		super().__init__()
 
 		self.central_layout.setSpacing(10)
-		self.central_layout.setContentsMargins(15, 10, 15, 10)
+		self.central_layout.setContentsMargins(15, 10, 15, 15)
 
 		self.icon_text_widget = TransparentWidget()
 		self.central_layout.addWidget(self.icon_text_widget)
