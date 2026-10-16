@@ -12,7 +12,7 @@ from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget, SuperConfirmWindow, 
-							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, USep)
+							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, USep, UGroupBox)
 from .win_servers import ServersWin
 from system.servers import Servers
 
@@ -45,6 +45,12 @@ class WinSmb(UMainWindow):
 		self.central_layout.setContentsMargins(15, 10, 15, 15)
 		self.central_layout.setSpacing(12)
 
+		# --- Группа для сетевой ошибки ---
+		error_group = UGroupBox()
+		error_lay = QVBoxLayout(error_group)
+		error_lay.setContentsMargins(10, 10, 10, 10)  # Настройте отступы внутри группы по вкусу
+		error_lay.setSpacing(10)
+
 		# --- Шапка окна (иконка + заголовок) ---
 		header_wid = TransparentWidget()
 		header_lay = QHBoxLayout(header_wid)
@@ -58,16 +64,21 @@ class WinSmb(UMainWindow):
 
 		title_lbl = TitleTextLabel(Lng.catalog_unavaiable[JsonData.lng_index])
 		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
-		
+
 		header_lay.addStretch()
-		self.central_layout.addWidget(header_wid)
+		error_lay.addWidget(header_wid)  # Добавляем шапку в слой группы
 
 		# --- Разделитель ---
-		self.central_layout.addWidget(USep())
+		error_lay.addWidget(USep())  # Добавляем разделитель в слой группы
 
+		# --- Описание ошибки ---
 		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
 		descr_lbl.setWordWrap(True)
-		self.central_layout.addWidget(descr_lbl)
+		error_lay.addWidget(descr_lbl)  # Добавляем описание в слой группы
+
+		# --- Добавление группы в главный контейнер ---
+		self.central_layout.addWidget(error_group)
+
 
 		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(JsonData.lng_index, mf.mf_current_path)
