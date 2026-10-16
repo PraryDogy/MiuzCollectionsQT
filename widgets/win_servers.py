@@ -196,7 +196,7 @@ class LoginWin(UMainWindow):
 		# Логин
 		form_lay.addWidget(ServerLabel(Lng.login[JsonData.lng_index].capitalize()))
 		self.login = ULineEdit()
-		self.login.setPlaceholderText("Loshkarev@mjf.lan")
+		self.login.setPlaceholderText("login@name.lan")
 		form_lay.addWidget(self.login)
 
 		form_lay.addSpacing(4)
@@ -280,7 +280,7 @@ class ServersWin(UMainWindow):
 		header_lay.setContentsMargins(0, 0, 0, 0)
 		header_lay.setSpacing(8)
 
-		icon = QSvgWidget(str(Static.COMMON_ICONS / "hdd.svg"))
+		icon = QSvgWidget(str(Static.COMMON_ICONS / "servers.svg"))
 		icon.setFixedSize(24, 24)
 		header_lay.addWidget(icon)
 
