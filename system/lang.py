@@ -307,8 +307,8 @@ class Lng:
 	)
 	network_error_text = (
 		"Сетевой диск не подключен или указан неправильный путь к каталогу.\n"
-		"• Нажмите «Серверы», чтобы подключить диск\n"
-		"• Укажите путь к каталогу",
+		"• Укажите путь к каталогу\n"
+		"• Нажмите «Серверы», чтобы подключить диск",
 		
 		"The network drive is not connected or the catalog path is incorrect.\n"
 		"• Click \"Servers\" to connect the drive\n"
