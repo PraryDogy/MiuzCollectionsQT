@@ -6,15 +6,15 @@ from typing import Literal
 
 from PyQt6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QCloseEvent, QContextMenuEvent, QFontMetrics,
-                         QIcon, QMouseEvent)
+						 QIcon, QMouseEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
-                             QGroupBox, QHBoxLayout, QLabel, QLayout,
-                             QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
-                             QStackedWidget, QTextEdit, QTreeView, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+							 QGroupBox, QHBoxLayout, QLabel, QLayout,
+							 QLineEdit, QListWidget, QListWidgetItem,
+							 QMainWindow, QMenu, QProgressBar, QPushButton,
+							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
+							 QStackedWidget, QTextEdit, QTreeView, QTreeWidget,
+							 QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -27,103 +27,104 @@ class TransparentButton(QPushButton):
 
 
 class TransparentLabel(QLabel):
-    sym_line_feed = "\u000a"
-    sym_paragraph_sep = "\u2029"
+	sym_line_feed = "\u000a"
+	sym_paragraph_sep = "\u2029"
 
-    def __init__(self, text="", parent=None):
-        super().__init__(text, parent)
+	def __init__(self, text="", parent=None):
+		super().__init__(text, parent)
 
-        self._original_text = text
-        self._elide_enabled = False
-        self._context_menu_enabled = False
+		self._original_text = text
+		self._elide_enabled = False
+		self._context_menu_enabled = False
 
-    def setText(self, text: str):
-        self._original_text = text
-        self._update_text()
+	def setText(self, text: str):
+		self._original_text = text
+		self._update_text()
 
-    def set_font_size(self, value_px: int):
-        font = self.font()
-        font.setPixelSize(value_px)
-        self.setFont(font)
+	def set_font_size(self, value_px: int):
+		font = self.font()
+		font.setPixelSize(value_px)
+		self.setFont(font)
 
-    def set_selectable(self, enabled: bool):
-        if enabled:
-            self.setTextInteractionFlags(
-                Qt.TextInteractionFlag.TextSelectableByMouse
-            )
-            self.setCursor(Qt.CursorShape.IBeamCursor)
-        else:
-            self.setTextInteractionFlags(
-                Qt.TextInteractionFlag.NoTextInteraction
-            )
-            self.unsetCursor()
+	def set_selectable(self, enabled: bool):
+		if enabled:
+			self.setTextInteractionFlags(
+				Qt.TextInteractionFlag.TextSelectableByMouse
+			)
+			self.setCursor(Qt.CursorShape.IBeamCursor)
+			self.set_context_menu(True)
+		else:
+			self.setTextInteractionFlags(
+				Qt.TextInteractionFlag.NoTextInteraction
+			)
+			self.unsetCursor()
 
-    def set_context_menu(self, enabled: bool):
-        self._context_menu_enabled = enabled
+	def set_context_menu(self, enabled: bool):
+		self._context_menu_enabled = enabled
 
-    def set_elide(self, enabled: bool = True):
-        self._elide_enabled = enabled
-        self._update_text()
+	def set_elide(self, enabled: bool = True):
+		self._elide_enabled = enabled
+		self._update_text()
 
-    def get_elided_text(self):
-        metrics = QFontMetrics(self.font())
-        return metrics.elidedText(
-            self._original_text,
-            Qt.TextElideMode.ElideMiddle,
-            self.contentsRect().width(),
-        )
+	def get_elided_text(self):
+		metrics = QFontMetrics(self.font())
+		return metrics.elidedText(
+			self._original_text,
+			Qt.TextElideMode.ElideMiddle,
+			self.contentsRect().width(),
+		)
 
-    def _update_text(self):
-        text = (
-            self.get_elided_text()
-            if self._elide_enabled
-            else self._original_text
-        )
+	def _update_text(self):
+		text = (
+			self.get_elided_text()
+			if self._elide_enabled
+			else self._original_text
+		)
 
-        QLabel.setText(self, text)
+		QLabel.setText(self, text)
 
-        self.setToolTip(
-            self._original_text
-            if self._elide_enabled and text != self._original_text
-            else ""
-        )
+		self.setToolTip(
+			self._original_text
+			if self._elide_enabled and text != self._original_text
+			else ""
+		)
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
+	def resizeEvent(self, event):
+		super().resizeEvent(event)
 
-        if self._elide_enabled:
-            self._update_text()
+		if self._elide_enabled:
+			self._update_text()
 
-    def contextMenuEvent(self, ev: QContextMenuEvent):
-        if not self._context_menu_enabled:
-            return super().contextMenuEvent(ev)
+	def contextMenuEvent(self, ev: QContextMenuEvent):
+		if not self._context_menu_enabled:
+			return super().contextMenuEvent(ev)
 
-        text = self.selectedText().replace(
-            self.sym_paragraph_sep, ""
-        ).replace(self.sym_line_feed, "")
+		text = self.selectedText().replace(
+			self.sym_paragraph_sep, ""
+		).replace(self.sym_line_feed, "")
 
-        full_text = self._original_text.replace(
-            self.sym_paragraph_sep, ""
-        ).replace(self.sym_line_feed, "")
+		full_text = self._original_text.replace(
+			self.sym_paragraph_sep, ""
+		).replace(self.sym_line_feed, "")
 
-        menu = UMenu(parent=self)
+		menu = UMenu(parent=self)
 
-        copy_action = QAction(Lng.copy[JsonData.lng_index], menu)
-        copy_action.triggered.connect(
-            lambda: Utils.pyqt_copy_text(text)
-        )
-        menu.addAction(copy_action)
+		copy_action = QAction(Lng.copy[JsonData.lng_index], menu)
+		copy_action.triggered.connect(
+			lambda: Utils.pyqt_copy_text(text)
+		)
+		menu.addAction(copy_action)
 
-        if os.path.isfile(full_text) or os.path.isdir(full_text):
-            reveal_action = QAction(
-                Lng.reveal_in_finder[JsonData.lng_index], menu
-            )
-            reveal_action.triggered.connect(
-                lambda: Utils.macos_reveal_files([full_text])
-            )
-            menu.addAction(reveal_action)
+		if os.path.isfile(full_text) or os.path.isdir(full_text):
+			reveal_action = QAction(
+				Lng.reveal_in_finder[JsonData.lng_index], menu
+			)
+			reveal_action.triggered.connect(
+				lambda: Utils.macos_reveal_files([full_text])
+			)
+			menu.addAction(reveal_action)
 
-        menu.show_menu_under_cursor(ev)
+		menu.show_menu_under_cursor(ev)
 
 
 class TransparentFrame(QFrame):
