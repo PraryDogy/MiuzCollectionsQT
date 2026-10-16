@@ -1327,10 +1327,10 @@ class MfPathWidget(UGroupBox):
 
 		self.ok_path_label = GrayTextLabel("")
 		self.ok_path_label.set_elide(True)
+
 		label_layout.addWidget(self.ok_path_label)
 		label_layout.addStretch()
 		h_lay.addWidget(label_widget)
-		h_lay.addStretch()
 
 		self.stack.addWidget(widget)
 
