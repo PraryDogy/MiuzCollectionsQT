@@ -1242,8 +1242,7 @@ class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
 	magnifier = Static.COMMON_ICONS / "magnifier.svg"
 	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
-	hh = 70
-	icon_size = 35
+	icon_size = 40
 
 	def __init__(self, lng_index: int, mf_path: str = None):
 		super().__init__()
@@ -1258,7 +1257,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 	
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(20, 10, 10, 10)
+		self.main_lay.setContentsMargins(10, 20, 10, 20)
 		self.main_lay.setSpacing(0)
 
 		# Используем QStackedWidget для безопасного переключения экранов
@@ -1275,25 +1274,32 @@ class MfPathWidget(UGroupBox):
 			self.show_no_path()
 
 		self.adjustSize()
-		self.setFixedHeight(self.height())
+		# self.setFixedHeight(self.height())
 
 	def init_no_path_ui(self):
 		"""Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
 		widget = QWidget()
 		h_lay = QHBoxLayout(widget)
 		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(20)
-
-		right_btn = QSvgWidget()
-		right_btn.load(str(self.magnifier))
-		right_btn.setFixedSize(self.icon_size, self.icon_size)
-		h_lay.addWidget(right_btn)
-		
-		self.no_path_label = TransparentLabel(Lng.path_hint_texts[self.lng_index])
-		self.no_path_label.setWordWrap(True)
-		h_lay.addWidget(self.no_path_label)
-		h_lay.addStretch()
-		
+		h_lay.setSpacing(10)
+		magnifier_svg_widget = QSvgWidget()
+		magnifier_svg_widget.load(str(self.magnifier))
+		magnifier_svg_widget.setFixedSize(self.icon_size, self.icon_size)
+		h_lay.addWidget(magnifier_svg_widget)
+		# Контейнер для текста
+		label_widget = QWidget()
+		label_layout = QVBoxLayout(label_widget)
+		label_layout.setContentsMargins(0, 0, 0, 0)
+		label_layout.setSpacing(2)
+		label_layout.addStretch()
+		title = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
+		label_layout.addWidget(title)
+		self.no_path_label = GrayTextLabel(
+			Lng.path_hint_texts[self.lng_index]
+		)
+		label_layout.addWidget(self.no_path_label)
+		label_layout.addStretch()
+		h_lay.addWidget(label_widget)
 		self.stack.addWidget(widget)
 
 	def init_ok_path_ui(self):
@@ -1301,19 +1307,29 @@ class MfPathWidget(UGroupBox):
 		widget = QWidget()
 		h_lay = QHBoxLayout(widget)
 		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(20)
+		h_lay.setSpacing(10)
 
-		right_btn = QSvgWidget()
-		right_btn.load(str(self.green_checkmark))
-		right_btn.setFixedSize(self.icon_size, self.icon_size)
-		h_lay.addWidget(right_btn)
+		green_checkmark_widget = QSvgWidget()
+		green_checkmark_widget.load(str(self.green_checkmark))
+		green_checkmark_widget.setFixedSize(self.icon_size, self.icon_size)
+		h_lay.addWidget(green_checkmark_widget)
 
-		catalog_path = TransparentLabel(Lng.folder_path[self.lng_index])
+		# Контейнер для текста
+		label_widget = QWidget()
+		label_layout = QVBoxLayout(label_widget)
+		label_layout.setContentsMargins(0, 0, 0, 0)
+		label_layout.setSpacing(2)
 
+		label_layout.addStretch()
 
-		self.ok_path_label = SelectableLabel("")
+		title = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
+		label_layout.addWidget(title)
+
+		self.ok_path_label = GrayTextLabel("")
 		self.ok_path_label.set_elide(True)
-		h_lay.addWidget(self.ok_path_label)
+		label_layout.addWidget(self.ok_path_label)
+		label_layout.addStretch()
+		h_lay.addWidget(label_widget)
 		h_lay.addStretch()
 
 		self.stack.addWidget(widget)

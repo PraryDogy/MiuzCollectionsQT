@@ -4,19 +4,17 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLayout, QVBoxLayout
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
-from system.servers import Servers
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget,
-                            SuperConfirmWindow, TitleTextLabel,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, USep)
+from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget, SuperConfirmWindow, 
+							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, USep)
 from .win_servers import ServersWin
+from system.servers import Servers
 
 
 def restart_app():
@@ -47,12 +45,6 @@ class WinSmb(UMainWindow):
 		self.central_layout.setContentsMargins(15, 10, 15, 15)
 		self.central_layout.setSpacing(12)
 
-		# --- Группа для сетевой ошибки ---
-		error_group = UGroupBox()
-		error_lay = QVBoxLayout(error_group)
-		error_lay.setContentsMargins(10, 10, 10, 10)  # Настройте отступы внутри группы по вкусу
-		error_lay.setSpacing(10)
-
 		# --- Шапка окна (иконка + заголовок) ---
 		header_wid = TransparentWidget()
 		header_lay = QHBoxLayout(header_wid)
@@ -66,29 +58,16 @@ class WinSmb(UMainWindow):
 
 		title_lbl = TitleTextLabel(Lng.catalog_unavaiable[JsonData.lng_index])
 		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
-
+		
 		header_lay.addStretch()
-
-		if len(Servers.items) > 0:
-			self.servers_btn = UPushButton(Lng.servers[JsonData.lng_index])
-			self.servers_btn.setIcon(QIcon(str(self.connect_svg_path)))
-			self.servers_btn.clicked.connect(self.open_servers)
-			header_lay.addWidget(self.servers_btn)
-
-
-		error_lay.addWidget(header_wid)  # Добавляем шапку в слой группы
+		self.central_layout.addWidget(header_wid)
 
 		# --- Разделитель ---
-		error_lay.addWidget(USep())  # Добавляем разделитель в слой группы
+		self.central_layout.addWidget(USep())
 
-		# --- Описание ошибки ---
 		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
 		descr_lbl.setWordWrap(True)
-		error_lay.addWidget(descr_lbl)  # Добавляем описание в слой группы
-
-		# --- Добавление группы в главный контейнер ---
-		self.central_layout.addWidget(error_group)
-
+		self.central_layout.addWidget(descr_lbl)
 
 		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(JsonData.lng_index, mf.mf_current_path)
@@ -100,6 +79,13 @@ class WinSmb(UMainWindow):
 		btns_lay = QHBoxLayout(btns_wid)
 		btns_lay.setContentsMargins(0, 0, 0, 0)
 		btns_lay.setSpacing(10)
+
+		if Servers.items:
+
+			self.servers_btn = UPushButton(Lng.servers[JsonData.lng_index])
+			self.servers_btn.setIcon(QIcon(str(self.connect_svg_path)))
+			self.servers_btn.clicked.connect(self.open_servers)
+			btns_lay.addWidget(self.servers_btn)
 
 		btns_lay.addStretch()
 		
