@@ -5,16 +5,17 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
-							ULineEdit, UListWidget, UListWidgetItem,
+from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel, 
+							TitleTextLabel, TransparentLabel, TransparentWidget,
+							UGroupBox, ULineEdit, UListWidget, UListWidgetItem,
 							UMainWindow, UMenu, UPushButton)
 
 
@@ -38,14 +39,9 @@ class EyeSvg(QSvgWidget):
 
 	def __init__(self):
 		super().__init__()
-		self.setFixedSize(18, 18)
+		self.setFixedSize(16, 16)
 		self.load(str(self.eye_off))
-
-	def enterEvent(self, a0):
-		self.setCursor(
-			Qt.CursorShape.ArrowCursor
-		)
-		return super().enterEvent(a0)
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
 	
 
 class ServerList(UListWidget):
@@ -54,7 +50,7 @@ class ServerList(UListWidget):
 	connect_server = pyqtSignal()
 	evlosh_data_loaded = pyqtSignal(list)
 
-	def __init__(self, parent = None):
+	def __init__(self, parent=None):
 		super().__init__()
 		self.evlosh_servers_path = Path("./_miuz_servers.json")
 
@@ -107,8 +103,8 @@ class ServerList(UListWidget):
 
 		# Это действие показывается ВСЕГДА (и на айтеме, и на пустом месте), если есть файл
 		if self.evlosh_servers_path.exists():
-			evlosh_action = QAction("Добавить данные evlosh", self.menu_) # добавил self.menu_ в предка
-			evlosh_action.triggered.connect(self.add_evlosh_servers) # не забудьте привязать метод
+			evlosh_action = QAction("Добавить данные evlosh", self.menu_)
+			evlosh_action.triggered.connect(self.add_evlosh_servers)
 			self.menu_.addAction(evlosh_action)
 
 		# Отображаем меню, только если в нём есть хотя бы одно действие
@@ -116,8 +112,37 @@ class ServerList(UListWidget):
 			self.menu_.show_menu_under_cursor(a0)
 
 
+class PassLineEdit(ULineEdit):
+	def __init__(self, parent=None):
+		super().__init__()
+		self.setEchoMode(ULineEdit.EchoMode.Password)
+		
+		self.eye_svg = EyeSvg()
+		self.eye_svg.setParent(self)
+		self.eye_svg.show()
+		self.eye_svg.mouseReleaseEvent = self.show_hide_pass
+		
+		# Задаем отступы справа, чтобы текст не налезал на иконку глазика
+		self.setTextMargins(2, 0, 24, 0)
 
-class ServerLabel(TransparentLabel):
+	def resizeEvent(self, e):
+		super().resizeEvent(e)
+		# Автоматически позиционируем глазик по правому краю
+		self.eye_svg.move(
+			self.width() - self.eye_svg.width() - 8,
+			(self.height() - self.eye_svg.height()) // 2
+		)
+
+	def show_hide_pass(self, *args):
+		if self.echoMode() == ULineEdit.EchoMode.Password:
+			self.setEchoMode(ULineEdit.EchoMode.Normal)
+			self.eye_svg.load(str(self.eye_svg.eye_on))
+		else:
+			self.setEchoMode(ULineEdit.EchoMode.Password)
+			self.eye_svg.load(str(self.eye_svg.eye_off))
+
+
+class ServerLabel(GrayTextLabel):
 	def __init__(self, text: str):
 		super().__init__(text=text)
 		self.setContentsMargins(2, 0, 0, 0)
@@ -128,73 +153,76 @@ class LoginWin(UMainWindow):
 	ww = 300
 
 	def __init__(self, server_item: ServerItem = None):
-
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setFixedWidth(self.ww)
-
-		alias_label = ServerLabel(text=Lng.alias[JsonData.lng_index].capitalize())
-		self.central_layout.addWidget(alias_label)
-		self.central_layout.addSpacing(5)
-
-		self.alias = ULineEdit()
-		self.alias.setPlaceholderText(Lng.alias[JsonData.lng_index].capitalize())
-		self.central_layout.addWidget(self.alias)
-		self.central_layout.addSpacing(10)
-
-
-
-		server_label = ServerLabel(text=Lng.server[JsonData.lng_index].capitalize())
-		self.central_layout.addWidget(server_label)
-		self.central_layout.addSpacing(5)
-
-		self.server = ULineEdit()
-		self.server.setPlaceholderText(Lng.server[JsonData.lng_index].capitalize())
-		self.central_layout.addWidget(self.server)
-		self.central_layout.addSpacing(10)
-
-
-
-		login_label = ServerLabel(text=Lng.login[JsonData.lng_index].capitalize())
-		self.central_layout.addWidget(login_label)
-		self.central_layout.addSpacing(5)
 		
+		# Убрали сепаратор по правилу: если UGroupBox (или рамка) рядом с заголовком, сепаратор не нужен
+		
+		is_edit = server_item is not None
+		title_word = Lng.edit[JsonData.lng_index] if is_edit else Lng.add[JsonData.lng_index]
+		self.setWindowTitle(f"{title_word}")
 
+		# Уменьшили рамки вокруг виджетов
+		self.central_layout.setContentsMargins(10, 10, 10, 10)
+		self.central_layout.setSpacing(10)
+
+		# --- GroupBox для формы ---
+		group = UGroupBox()
+		self.central_layout.addWidget(group)
+		
+		form_lay = QVBoxLayout(group)
+		# Сделали внутренние отступы и промежутки аккуратнее
+		form_lay.setContentsMargins(10, 10, 10, 10)
+		form_lay.setSpacing(6)
+
+		# Псевдоним
+		form_lay.addWidget(ServerLabel(Lng.alias[JsonData.lng_index].capitalize()))
+		self.alias = ULineEdit()
+		self.alias.setPlaceholderText("Например: Studio")
+		form_lay.addWidget(self.alias)
+
+		form_lay.addSpacing(4)
+
+		# Сервер
+		form_lay.addWidget(ServerLabel(Lng.server[JsonData.lng_index].capitalize()))
+		self.server = ULineEdit()
+		self.server.setPlaceholderText("smb://192.168.x.x/shares")
+		form_lay.addWidget(self.server)
+
+		form_lay.addSpacing(4)
+
+		# Логин
+		form_lay.addWidget(ServerLabel(Lng.login[JsonData.lng_index].capitalize()))
 		self.login = ULineEdit()
-		self.login.setPlaceholderText(Lng.login[JsonData.lng_index].capitalize())
-		self.central_layout.addWidget(self.login)
-		self.central_layout.addSpacing(10)
+		self.login.setPlaceholderText("Loshkarev@mjf.lan")
+		form_lay.addWidget(self.login)
 
+		form_lay.addSpacing(4)
 
+		# Пароль
+		form_lay.addWidget(ServerLabel(Lng.password[JsonData.lng_index].capitalize()))
+		self.pass_ = PassLineEdit()
+		self.pass_.setPlaceholderText("••••••••")
+		form_lay.addWidget(self.pass_)
 
-		pass_label = ServerLabel(text=Lng.password[JsonData.lng_index].capitalize())
-		self.central_layout.addWidget(pass_label)
-		self.central_layout.addSpacing(5)
+		# --- Кнопки ---
+		btn_layout = QHBoxLayout()
+		btn_layout.setContentsMargins(0, 0, 0, 0)
+		btn_layout.setSpacing(10)
+		self.central_layout.addLayout(btn_layout)
 
-		self.pass_ = ULineEdit()
-		self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
-		self.pass_.setPlaceholderText(f"{Lng.password[JsonData.lng_index].capitalize()}")
-		self.central_layout.addWidget(self.pass_)
-		self.central_layout.addSpacing(10)
-
-		self.btn_layout = QHBoxLayout()
-		self.btn_layout.setSpacing(10)
-		self.central_layout.addLayout(self.btn_layout)
-
-		self.btn_layout.addStretch()
-
-		self.ok_btn = UPushButton(Lng.ok[JsonData.lng_index])
-		self.ok_btn.clicked.connect(self.ok_cmd)
-		self.btn_layout.addWidget(self.ok_btn)
+		btn_layout.addStretch()
 
 		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
 		self.cancel_btn.clicked.connect(self.deleteLater)
-		self.btn_layout.addWidget(self.cancel_btn)
+		btn_layout.addWidget(self.cancel_btn)
 
-		self.btn_layout.addStretch()
-
-		self.central_layout.addSpacing(5)
+		btn_text = Lng.save[JsonData.lng_index] if is_edit else Lng.add[JsonData.lng_index]
+		self.ok_btn = ActiveButton(btn_text)
+		self.ok_btn.clicked.connect(self.ok_cmd)
+		btn_layout.addWidget(self.ok_btn)
 
 		if server_item:
 			self.alias.setText(server_item.alias)
@@ -203,23 +231,7 @@ class LoginWin(UMainWindow):
 			self.pass_.setText(server_item.password)
 
 		self.adjustSize()
-
-		self.eye_svg = EyeSvg()
-		self.eye_svg.setParent(self.pass_)
-		self.eye_svg.move(
-			self.ww - 45,
-			5
-		)
-		self.eye_svg.show()
-		self.eye_svg.mouseReleaseEvent = self.show_hide_pass
-
-	def show_hide_pass(self, *args):
-		if self.pass_.echoMode() == ULineEdit.EchoMode.Password:
-			self.pass_.setEchoMode(ULineEdit.EchoMode.Normal)
-			self.eye_svg.load(str(self.eye_svg.eye_on))
-		else:
-			self.pass_.setEchoMode(ULineEdit.EchoMode.Password)
-			self.eye_svg.load(str(self.eye_svg.eye_off))
+		self.setFixedHeight(self.height())
 
 	def ok_cmd(self):
 		stmt = all((
@@ -251,43 +263,66 @@ class ServersWin(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.connect_to_server[JsonData.lng_index])
+		
+		# Очищаем заголовок от текста с горячей клавишей "(⌘ + K)"
+		title = Lng.connect_to_server[JsonData.lng_index].split("(")[0].strip()
+		self.setWindowTitle(title)
 		self.setFixedWidth(350)
+		
+		# Сепаратор включаем, так как под ним будет заголовок, а не UGroupBox
+		self.show_titlebar_sep()
 
-		favs = ServerLabel(Lng.favorites[JsonData.lng_index])
-		self.central_layout.addWidget(favs)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
+		self.central_layout.setSpacing(10)
 
-		self.central_layout.addSpacing(5)
+		# --- Шапка окна "Избранное" ---
+		header_wid = TransparentWidget()
+		header_lay = QHBoxLayout(header_wid)
+		header_lay.setContentsMargins(0, 0, 0, 0)
+		header_lay.setSpacing(8)
 
+		icon = QSvgWidget(str(Static.COMMON_ICONS / "hdd.svg"))
+		icon.setFixedSize(24, 24)
+		header_lay.addWidget(icon)
+
+		title_lbl = TitleTextLabel(Lng.favorites[JsonData.lng_index])
+		header_lay.addWidget(title_lbl)
+		header_lay.addStretch()
+
+		self.central_layout.addWidget(header_wid)
+
+		# --- Список серверов напрямую ---
 		self.v_list = ServerList()
+		self.v_list.setMinimumHeight(150)
 		self.v_list.edit_server.connect(self.show_login_win)
 		self.v_list.remove_server.connect(self.remove_cmd)
 		self.v_list.connect_server.connect(self.connect_cmd)
 		self.v_list.evlosh_data_loaded.connect(self.evlosh_data_added)
 		self.central_layout.addWidget(self.v_list)
 
-		self.central_layout.addSpacing(10)
-
-		# Кнопки
-		btn_widget = TransparentWidget()
-		btn_layout = QHBoxLayout(btn_widget)
+		# --- Кнопки ---
+		btn_layout = QHBoxLayout()
 		btn_layout.setContentsMargins(0, 0, 0, 0)
 		btn_layout.setSpacing(10)
-		self.central_layout.addWidget(btn_widget)
+		self.central_layout.addLayout(btn_layout)
 
-		self.central_layout.addSpacing(5)
+		self.add_btn = UPushButton(Lng.add[JsonData.lng_index])
+		self.add_btn.setIcon(QIcon(str(Static.COMMON_ICONS / "plus_simple.svg")))
+		self.add_btn.clicked.connect(self.show_login_win)
+		btn_layout.addWidget(self.add_btn)
 
 		btn_layout.addStretch()
 
-		btn_add = UPushButton(Lng.add[JsonData.lng_index])
-		btn_add.clicked.connect(self.show_login_win)
-		btn_layout.addWidget(btn_add)
+		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_btn.clicked.connect(self.deleteLater)
+		btn_layout.addWidget(self.cancel_btn)
 
-		btn_connect = UPushButton(Lng.connect[JsonData.lng_index])
-		btn_connect.clicked.connect(self.connect_cmd)
-		btn_layout.addWidget(btn_connect)
+		self.connect_btn = ActiveButton(Lng.connect[JsonData.lng_index])
+		self.connect_btn.clicked.connect(self.connect_cmd)
+		btn_layout.addWidget(self.connect_btn)
 
 		self.adjustSize()
+		self.setFixedHeight(self.height())
 		self.setFocus()
 		self.init_data()
 
@@ -407,4 +442,3 @@ class ServersWin(UMainWindow):
 		if a0.key() == Qt.Key.Key_Escape:
 			self.deleteLater()
 		return super().keyPressEvent(a0)
-	
