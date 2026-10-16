@@ -2,7 +2,6 @@ import os
 from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy
 
@@ -11,53 +10,20 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
-from ._base_widgets import (
-    ActiveButton,
-    TransparentLabel,
-    TransparentWidget,
-    UCheckBox,
-    UPushButton,
-    VerticalWindow,
-    WarningWindow,
-    WinProgressbar,
-)
+from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
+                            UCheckBox, UPushButton, VerticalWindow,
+                            WarningWindow, WinProgressbar)
 
 
-class ElidedLabel(TransparentLabel):
-    def __init__(self):
-        super().__init__(text="")
-        self._full_text = ""
-        self.setWordWrap(False)
-        self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Fixed,
-        )
+class FilenameLabel(TransparentLabel):
+    def __init__(self, filename: str):
+        super().__init__(text=filename)
+    #     self.full_filename = filename
+    #     self.setToolTip(filename)
 
-    def setFullText(self, text: str):
-        self._full_text = text
-        self.setToolTip(text)
-        self._update_text()
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self._update_text()
-
-    def _update_text(self):
-        if not self._full_text:
-            super().setText("")
-            return
-
-        width = self.contentsRect().width()
-        if width <= 0:
-            return
-
-        metrics = QFontMetrics(self.font())
-        text = metrics.elidedText(
-            self._full_text,
-            Qt.TextElideMode.ElideMiddle,
-            width,
-        )
-        super().setText(text)
+    # def resizeEvent(self, event):
+    #     super().resizeEvent(event)
+    #     self.setText(self.get_elided_text())
 
 
 class ReplaceWin(VerticalWindow):
@@ -99,11 +65,8 @@ class ReplaceWin(VerticalWindow):
         )
         self.icon_text_layout.addWidget(message)
 
-        self.filename_label = ElidedLabel()
-        self.filename_label.setFixedWidth(
-            message.sizeHint().width()
-        )
-        self.filename_label.setFullText(self.filename)
+        self.filename_label = FilenameLabel(self.filename)
+        self.filename_label.setFixedWidth(message.sizeHint().width())
         self.icon_text_layout.addWidget(self.filename_label)
 
         self.icon_text_layout.addSpacing(5)

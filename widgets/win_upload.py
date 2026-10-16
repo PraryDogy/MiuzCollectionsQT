@@ -84,45 +84,6 @@ class TitleWidget(UGroupBox):
 		return chosen_tuple[JsonData.lng_index].format(files_count=count)
 
 
-class PathLabel(TransparentLabel):
-	def __init__(self, path: str, width: int = 350, parent=None):
-		super().__init__(parent)
-
-		self._path = path
-		self.setFixedWidth(width)
-		self.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-		self.setToolTip(path)
-		self._update_text()
-
-	def setPath(self, path: str):
-		self._path = path
-		self.setToolTip(path)
-		self._update_text()
-
-	def path(self) -> str:
-		return self._path
-
-	def _update_text(self):
-		metrics = QFontMetrics(self.font())
-
-		widget_width = self.width()
-		margins = self.contentsMargins()
-
-		available_width = (
-			widget_width
-			- margins.left()
-			- margins.right()
-		)
-
-		shortened_path = metrics.elidedText(
-			self._path,
-			Qt.TextElideMode.ElideMiddle,
-			available_width
-		)
-
-		self.setText(shortened_path)
-
-
 class DestinyFolderWidget(UGroupBox):
 	dir_changed = pyqtSignal(str)
 	copy_path_clicked = pyqtSignal()
@@ -172,7 +133,8 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_svg.setFixedSize(*self.svg_size)
 		# self.path_layout.addWidget(self.path_svg)
 
-		self.path_label = PathLabel(self.current_dir, width=310)
+		self.path_label = TransparentLabel(self.current_dir)
+		self.path_label.set_elide(True)
 		self.path_layout.addWidget(self.path_label, 1)
 
 		self.copy_path_button = CopyPathButton(self.current_dir)
@@ -191,7 +153,7 @@ class DestinyFolderWidget(UGroupBox):
 		if url and url != self.current_dir:
 			url = url.rstrip()
 			self.current_dir = url
-			self.path_label.setPath(self.current_dir)
+			self.path_label.setText(self.current_dir)
 			self.dir_changed.emit(self.current_dir)
 			self.copy_path_button.current_dir = self.current_dir
 
