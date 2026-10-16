@@ -4,7 +4,7 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -12,7 +12,7 @@ from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget, SuperConfirmWindow, 
-							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton)
+							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, USep)
 from .win_servers import ServersWin
 
 
@@ -30,44 +30,48 @@ class WinSmb(UMainWindow):
 
 		self.set_close_only()
 		self.set_always_on_top()
-		self.setWindowTitle(Lng.no_connection[JsonData.lng_index])
+		self.setWindowTitle(Lng.attention[JsonData.lng_index])
 		
 		self.show_titlebar_sep()
 		
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
-		self.central_layout.setSpacing(15)
+		# Задаем фиксированную ширину
+		# self.setFixedWidth(440)
+		
+		# Делаем отступы аккуратными
+		self.central_layout.setContentsMargins(15, 10, 15, 15)
+		self.central_layout.setSpacing(12)
 
-		# --- Шапка окна (иконка + заголовок + серое описание) ---
+		# --- Шапка окна (иконка + заголовок) ---
 		header_wid = TransparentWidget()
 		header_lay = QHBoxLayout(header_wid)
 		header_lay.setContentsMargins(0, 0, 0, 0)
-		header_lay.setSpacing(15)
+		header_lay.setSpacing(10)
 
 		icon = QSvgWidget(str(Static.COMMON_ICONS / "yellow_warning.svg"))
-		icon.setFixedSize(40, 40)
-		# Прижимаем иконку к верхнему краю, чтобы она стояла ровно напротив заголовка
-		header_lay.addWidget(icon, alignment=Qt.AlignmentFlag.AlignTop)
+		icon.setFixedSize(24, 24)
+		header_lay.addWidget(icon, alignment=Qt.AlignmentFlag.AlignVCenter)
 
-		text_cont = TransparentWidget()
-		text_lay = QVBoxLayout(text_cont)
-		text_lay.setContentsMargins(0, 0, 0, 0)
-		text_lay.setSpacing(2)
-
-		# Жестко прописали заголовок, как ты и просил
-		title_str = "Каталог изображений недоступен" if JsonData.lng_index == 0 else "Image catalog is unavailable"
+		# Идеальный короткий заголовок
+		title_str = "Каталог недоступен" if JsonData.lng_index == 0 else "Catalog is unavailable"
 		title_lbl = TitleTextLabel(title_str)
-		title_lbl.setWordWrap(True)
-		text_lay.addWidget(title_lbl)
+		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
+		
+		header_lay.addStretch()
+		self.central_layout.addWidget(header_wid)
 
-		# Формируем описание: "Имя каталога" — Сетевой диск не подключен...
-		descr_text = f"\"{mf.mf_alias}\" — {Lng.network_error_text[JsonData.lng_index].lower()}"
+		# --- Разделитель ---
+		self.central_layout.addWidget(USep())
+
+		# --- Серое описание со списком ---
+		# Теперь текст будет выглядеть так: "Для «miuz» сетевой диск не подключен..." + буллиты
+		prefix_ru = f"Для «{mf.mf_alias}» "
+		prefix_en = f"For \"{mf.mf_alias}\" "
+		prefix = prefix_ru if JsonData.lng_index == 0 else prefix_en
+		
+		descr_text = prefix + Lng.network_error_text[JsonData.lng_index]
 		descr_lbl = GrayTextLabel(descr_text)
 		descr_lbl.setWordWrap(True)
-		text_lay.addWidget(descr_lbl)
-
-		header_lay.addWidget(text_cont)
-
-		self.central_layout.addWidget(header_wid)
+		self.central_layout.addWidget(descr_lbl)
 
 		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(JsonData.lng_index, mf.mf_current_path)
@@ -80,7 +84,6 @@ class WinSmb(UMainWindow):
 		btns_lay.setContentsMargins(0, 0, 0, 0)
 		btns_lay.setSpacing(10)
 
-		# Добавили кнопку "Серверы" слева
 		servers_btn_text = "Серверы" if JsonData.lng_index == 0 else "Servers"
 		self.servers_btn = UPushButton(servers_btn_text)
 		self.servers_btn.setIcon(QIcon(str(Static.COMMON_ICONS / "hdd.svg")))
@@ -98,10 +101,8 @@ class WinSmb(UMainWindow):
 		self.ok_btn.clicked.connect(self.ok_cmd)
 		btns_lay.addWidget(self.ok_btn)
 
-		# Чуть-чуть расширили окно, чтобы комфортно влезли 3 кнопки
-		# self.setFixedWidth(420)
-		self.adjustSize()
-		# self.setFixedHeight(self.height())
+		# Жестко связываем размер окна с размером его контента
+		self.window_layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
 	def open_servers(self):
 		self.servers_win = ServersWin()
