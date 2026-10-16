@@ -1248,7 +1248,6 @@ class MfPathWidget(UGroupBox):
 	def __init__(self, lng_index: int, mf_path: str = None):
 		super().__init__()
 		self.setAcceptDrops(True)
-		# self.setFixedHeight(self.hh)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		self.mf_path = mf_path
@@ -1259,7 +1258,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 	
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(20, 20, 20, 20)
+		self.main_lay.setContentsMargins(20, 10, 10, 10)
 		self.main_lay.setSpacing(0)
 
 		# Используем QStackedWidget для безопасного переключения экранов
@@ -1290,11 +1289,7 @@ class MfPathWidget(UGroupBox):
 		right_btn.setFixedSize(self.icon_size, self.icon_size)
 		h_lay.addWidget(right_btn)
 		
-		lines = (
-			f"{Lng.folder_path[self.lng_index]}:",
-			Lng.path_hint_texts[self.lng_index].lower()
-		)
-		self.no_path_label = QLabel("\n".join(lines))
+		self.no_path_label = TransparentLabel(Lng.path_hint_texts[self.lng_index])
 		self.no_path_label.setWordWrap(True)
 		h_lay.addWidget(self.no_path_label)
 		h_lay.addStretch()
@@ -1313,7 +1308,11 @@ class MfPathWidget(UGroupBox):
 		right_btn.setFixedSize(self.icon_size, self.icon_size)
 		h_lay.addWidget(right_btn)
 
+		catalog_path = TransparentLabel(Lng.folder_path[self.lng_index])
+
+
 		self.ok_path_label = SelectableLabel("")
+		self.ok_path_label.set_elide(True)
 		h_lay.addWidget(self.ok_path_label)
 		h_lay.addStretch()
 
@@ -1328,8 +1327,7 @@ class MfPathWidget(UGroupBox):
 	def show_ok_path(self):
 		"""Включение режима успешного пути"""
 		self.watch_timer.stop()  # Важно: останавливаем таймер сразу
-		lines = (f"{Lng.folder_path[self.lng_index]}:", self.mf_path)
-		self.ok_path_label.setText('\n'.join(lines))
+		self.ok_path_label.setText(self.mf_path)
 		self.stack.setCurrentIndex(1)
 
 	def check_path_by_timer(self):
