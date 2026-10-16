@@ -103,6 +103,7 @@ class WinSmb(UMainWindow):
 
 		# Жестко связываем размер окна с размером его контента
 		self.window_layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+		self.adjustSize()
 
 	def open_servers(self):
 		self.servers_win = ServersWin()
