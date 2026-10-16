@@ -301,12 +301,12 @@ class Lng:
 		"Unable to access the image directory"  # Более технически точно
 	)
 	network_error_text = (
-			"сетевой диск не подключен или путь указан неверно.\n\n"
+			"сетевой диск не подключен или путь указан неверно.\n"
 			"Что можно сделать:\n"
 			"• Нажмите «Серверы», чтобы подключить диск\n"
 			"• Выберите новый путь к каталогу ниже",
 			
-			"the network drive is not connected or the path is incorrect.\n\n"
+			"the network drive is not connected or the path is incorrect.\n"
 			"What you can do:\n"
 			"• Click \"Servers\" to reconnect the drive\n"
 			"• Select a new catalog path below"
