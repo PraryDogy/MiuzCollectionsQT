@@ -165,7 +165,7 @@ class LoginWin(UMainWindow):
 		self.setWindowTitle(f"{title_word}")
 
 		# Уменьшили рамки вокруг виджетов
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(10)
 
 		# --- GroupBox для формы ---
@@ -264,8 +264,7 @@ class ServersWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		
-		# Очищаем заголовок от текста с горячей клавишей "(⌘ + K)"
-		title = Lng.connect_to_server[JsonData.lng_index].split("(")[0].strip()
+		title = Lng.connect_to_server_title[JsonData.lng_index]
 		self.setWindowTitle(title)
 		self.setFixedWidth(350)
 		
@@ -285,7 +284,7 @@ class ServersWin(UMainWindow):
 		icon.setFixedSize(24, 24)
 		header_lay.addWidget(icon)
 
-		title_lbl = TitleTextLabel(Lng.favorites[JsonData.lng_index])
+		title_lbl = TitleTextLabel(Lng.favorite_servers[JsonData.lng_index])
 		header_lay.addWidget(title_lbl)
 		header_lay.addStretch()
 
