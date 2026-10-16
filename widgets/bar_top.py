@@ -13,6 +13,7 @@ from system.main_folder import Mf
 from ._base_widgets import (GrayTextLabel, SvgIconButton, TitleBar,
                             TransparentFrame, TransparentWidget, ULineEdit,
                             UMenu, UPushButton)
+from .win_servers import ServersWin
 from .win_text_search import WinTextSearch
 
 
@@ -128,24 +129,30 @@ class SearchWidLineEdit(ULineEdit):
 
 
 class CommonSvgIconButton(SvgIconButton):
-    label_size = (28, 28)
-    icon_size = (26, 26)
-    base_svg: Path
+	label_size = (28, 28)
+	icon_size = (26, 26)
+	base_svg: Path
 
-    def __init__(self):
-        super().__init__(
-            svg_path=self.base_svg,
-            label_size=self.label_size,
-            icon_size=self.icon_size,
-        )
+	def __init__(self):
+		super().__init__(
+			svg_path=self.base_svg,
+			label_size=self.label_size,
+			icon_size=self.icon_size,
+		)
 
 
 class SettingsSvgBtn(CommonSvgIconButton):
-    base_svg = Static.COMMON_ICONS / "settings.svg"
+	base_svg = Static.COMMON_ICONS / "settings.svg"
+
+
+class ConnectServerSvgBtn(CommonSvgIconButton):
+	base_svg = Static.COMMON_ICONS / "connect.svg"
+	icon_size = (16, 16)  # Уменьшили размер иконки (по умолчанию 26x26), чтобы визуально сравнять с настройками
+	# 17 17 идентичен шестеренке но тогда доминирует
 
 
 class ImgSearchSvgBtn(CommonSvgIconButton):
-    base_svg = Static.COMMON_ICONS / "camera.svg"
+	base_svg = Static.COMMON_ICONS / "camera.svg"
 
 
 class CatalogWidget(TransparentWidget):
@@ -251,6 +258,13 @@ class BarTop(TransparentFrame):
 
 		self.h_layout.addStretch(0)
 
+		# --- Кнопка подключения к серверам ---
+		self.connect_btn = ConnectServerSvgBtn()
+		self.connect_btn.clicked_.connect(self.open_server_window)
+		self.h_layout.addWidget(self.connect_btn)
+
+		self.h_layout.addSpacing(5)
+
 		# --- Кнопка настроек ---
 		item = SettingsItem("general", "")
 		self.settings_btn = SettingsSvgBtn()
@@ -258,10 +272,15 @@ class BarTop(TransparentFrame):
 		self.h_layout.addWidget(self.settings_btn)
 
 		self.setFixedHeight(30)
-		for i in (self.img_search_btn, self.settings_btn):
+		for i in (self.img_search_btn, self.connect_btn, self.settings_btn):
 			i.setFixedSize(self.height() - 2, self.height() - 2)
 		self.search_wid.setFixedHeight(self.height() - 2)
 
 	def mouseReleaseEvent(self, a0):
 		self.setFocus()
 		return super().mouseReleaseEvent(a0)
+
+	def open_server_window(self):
+		self.server_win = ServersWin()
+		self.server_win.center_to_parent(self.window())
+		self.server_win.show()
