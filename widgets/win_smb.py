@@ -68,6 +68,14 @@ class WinSmb(UMainWindow):
 		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
 
 		header_lay.addStretch()
+
+		if len(Servers.items) > 0:
+			self.servers_btn = UPushButton(Lng.servers[JsonData.lng_index])
+			self.servers_btn.setIcon(QIcon(str(self.connect_svg_path)))
+			self.servers_btn.clicked.connect(self.open_servers)
+			header_lay.addWidget(self.servers_btn)
+
+
 		error_lay.addWidget(header_wid)  # Добавляем шапку в слой группы
 
 		# --- Разделитель ---
@@ -92,12 +100,6 @@ class WinSmb(UMainWindow):
 		btns_lay = QHBoxLayout(btns_wid)
 		btns_lay.setContentsMargins(0, 0, 0, 0)
 		btns_lay.setSpacing(10)
-
-		if len(Servers.items) > 0:
-			self.servers_btn = UPushButton(Lng.servers[JsonData.lng_index])
-			self.servers_btn.setIcon(QIcon(str(self.connect_svg_path)))
-			self.servers_btn.clicked.connect(self.open_servers)
-			btns_lay.addWidget(self.servers_btn)
 
 		btns_lay.addStretch()
 		
