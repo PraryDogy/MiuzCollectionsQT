@@ -280,8 +280,8 @@ class ServersWin(UMainWindow):
 		header_lay.setContentsMargins(0, 0, 0, 0)
 		header_lay.setSpacing(8)
 
-		icon = QSvgWidget(str(Static.COMMON_ICONS / "servers.svg"))
-		icon.setFixedSize(24, 24)
+		icon = QSvgWidget(str(Static.COMMON_ICONS / "connect.svg"))
+		icon.setFixedSize(20, 20)
 		header_lay.addWidget(icon)
 
 		title_lbl = TitleTextLabel(Lng.favorite_servers[JsonData.lng_index])
