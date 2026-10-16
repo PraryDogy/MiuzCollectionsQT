@@ -15,17 +15,6 @@ from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
                             WarningWindow, WinProgressbar)
 
 
-class FilenameLabel(TransparentLabel):
-    def __init__(self, filename: str):
-        super().__init__(text=filename)
-    #     self.full_filename = filename
-    #     self.setToolTip(filename)
-
-    # def resizeEvent(self, event):
-    #     super().resizeEvent(event)
-    #     self.setText(self.get_elided_text())
-
-
 class ReplaceWin(VerticalWindow):
     replace_pressed = pyqtSignal()
     skip_pressed = pyqtSignal()
@@ -65,8 +54,9 @@ class ReplaceWin(VerticalWindow):
         )
         self.icon_text_layout.addWidget(message)
 
-        self.filename_label = FilenameLabel(self.filename)
+        self.filename_label = TransparentLabel(self.filename)
         self.filename_label.setFixedWidth(message.sizeHint().width())
+        self.filename_label.set_elide(True)
         self.icon_text_layout.addWidget(self.filename_label)
 
         self.icon_text_layout.addSpacing(5)
