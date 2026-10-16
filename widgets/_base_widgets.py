@@ -1238,6 +1238,13 @@ class MfAliasWidget(QWidget):
 		return mf_alias
 
 
+
+class MfPathTitle(TitleTextLabel):
+	def __init__(self, text="", parent=None):
+		super().__init__(text, parent)
+
+
+
 class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
 	magnifier = Static.COMMON_ICONS / "magnifier.svg"
@@ -1292,7 +1299,7 @@ class MfPathWidget(UGroupBox):
 		label_layout.setContentsMargins(0, 0, 0, 0)
 		label_layout.setSpacing(2)
 		label_layout.addStretch()
-		title = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
+		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
 		label_layout.addWidget(title)
 		self.no_path_label = GrayTextLabel(
 			Lng.path_hint_texts[self.lng_index]
@@ -1322,7 +1329,7 @@ class MfPathWidget(UGroupBox):
 
 		label_layout.addStretch()
 
-		title = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
+		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
 		label_layout.addWidget(title)
 
 		self.ok_path_label = GrayTextLabel("")

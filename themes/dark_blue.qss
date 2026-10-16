@@ -387,6 +387,7 @@ MfPathWidget {
 }
 
 
+
 /* ==================== TOOLTIP ==================== */
 
 QToolTip {
@@ -406,6 +407,10 @@ GrayTextLabel {
 TitleTextLabel {
     font-weight: bold;
     font-size: 20px;
+}
+
+MfPathTitle {
+    font-size: 15px;
 }
 
 

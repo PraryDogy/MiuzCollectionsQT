@@ -306,15 +306,12 @@ class Lng:
 		"Unable to access the image directory"  # Более технически точно
 	)
 	network_error_text = (
-		"Сетевой диск не подключен или указан неправильный путь к каталогу.\n"
 		"• Укажите путь к каталогу\n"
 		"• Нажмите «Серверы», чтобы подключить диск",
 		
-		"The network drive is not connected or the catalog path is incorrect.\n"
-		"• Click \"Servers\" to connect the drive\n"
-		"• Specify the path to the catalog"
+		"• Specify the path to the catalog\n"
+		"• Click \"Servers\" to connect the drive"
 	)
-
 	hide_digits_full = (
 		"Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",
 		"Hides numeric prefixes for top-level folders only. Numbering of nested subfolders remains unchanged."

@@ -43,7 +43,7 @@ class WinSmb(UMainWindow):
 		
 		# Делаем отступы аккуратными
 		self.central_layout.setContentsMargins(15, 10, 15, 15)
-		self.central_layout.setSpacing(12)
+		self.central_layout.setSpacing(5)
 
 		# --- Шапка окна (иконка + заголовок) ---
 		header_wid = TransparentWidget()
@@ -63,15 +63,19 @@ class WinSmb(UMainWindow):
 		self.central_layout.addWidget(header_wid)
 
 		# --- Разделитель ---
-		self.central_layout.addWidget(USep())
+		# self.central_layout.addWidget(USep())
 
 		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
 		descr_lbl.setWordWrap(True)
 		self.central_layout.addWidget(descr_lbl)
 
+		self.central_layout.addSpacing(5)
+
 		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(JsonData.lng_index, mf.mf_current_path)
 		self.central_layout.addWidget(self.path_widget)
+
+		self.central_layout.addSpacing(5)
 
 		# --- Кнопки ---
 		btns_wid = TransparentWidget()
