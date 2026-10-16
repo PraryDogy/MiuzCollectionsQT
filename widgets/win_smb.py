@@ -14,6 +14,7 @@ from system.multiprocess import ProcessWorker
 from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget, SuperConfirmWindow, 
 							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, USep)
 from .win_servers import ServersWin
+from system.servers import Servers
 
 
 def restart_app():
@@ -23,6 +24,9 @@ def restart_app():
 
 
 class WinSmb(UMainWindow):
+	yellow_warning_path = Static.COMMON_ICONS / "yellow_warning.svg"
+	yellow_waring_size = (24, 24)
+	connect_svg_path = Static.COMMON_ICONS / "connect.svg"
 
 	def __init__(self, mf: Mf):
 		super().__init__()
@@ -47,13 +51,12 @@ class WinSmb(UMainWindow):
 		header_lay.setContentsMargins(0, 0, 0, 0)
 		header_lay.setSpacing(10)
 
-		icon = QSvgWidget(str(Static.COMMON_ICONS / "yellow_warning.svg"))
-		icon.setFixedSize(24, 24)
-		header_lay.addWidget(icon, alignment=Qt.AlignmentFlag.AlignVCenter)
+		icon = QSvgWidget()
+		icon.load(str(self.yellow_warning_path))
+		icon.setFixedSize(*self.yellow_waring_size)
+		header_lay.addWidget(icon)
 
-		# Идеальный короткий заголовок
-		title_str = "Каталог недоступен" if JsonData.lng_index == 0 else "Catalog is unavailable"
-		title_lbl = TitleTextLabel(title_str)
+		title_lbl = TitleTextLabel(Lng.catalog_unavaiable[JsonData.lng_index])
 		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
 		
 		header_lay.addStretch()
@@ -62,9 +65,7 @@ class WinSmb(UMainWindow):
 		# --- Разделитель ---
 		self.central_layout.addWidget(USep())
 
-		
-		descr_text = Lng.network_error_text[JsonData.lng_index]
-		descr_lbl = GrayTextLabel(descr_text)
+		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
 		descr_lbl.setWordWrap(True)
 		self.central_layout.addWidget(descr_lbl)
 
@@ -79,11 +80,11 @@ class WinSmb(UMainWindow):
 		btns_lay.setContentsMargins(0, 0, 0, 0)
 		btns_lay.setSpacing(10)
 
-		servers_btn_text = "Серверы" if JsonData.lng_index == 0 else "Servers"
-		self.servers_btn = UPushButton(servers_btn_text)
-		self.servers_btn.setIcon(QIcon(str(Static.COMMON_ICONS / "hdd.svg")))
-		self.servers_btn.clicked.connect(self.open_servers)
-		btns_lay.addWidget(self.servers_btn)
+		if len(Servers.items) > 0:
+			self.servers_btn = UPushButton(Lng.servers[JsonData.lng_index])
+			self.servers_btn.setIcon(QIcon(str(self.connect_svg_path)))
+			self.servers_btn.clicked.connect(self.open_servers)
+			btns_lay.addWidget(self.servers_btn)
 
 		btns_lay.addStretch()
 		
@@ -91,13 +92,10 @@ class WinSmb(UMainWindow):
 		cancel_btn.clicked.connect(self.deleteLater)
 		btns_lay.addWidget(cancel_btn)
 		
-		btn_text = "Применить" if JsonData.lng_index == 0 else "Apply"
-		self.ok_btn = ActiveButton(btn_text)
+		self.ok_btn = ActiveButton(Lng.apply[JsonData.lng_index])
 		self.ok_btn.clicked.connect(self.ok_cmd)
 		btns_lay.addWidget(self.ok_btn)
 
-		# Жестко связываем размер окна с размером его контента
-		# self.window_layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 		self.adjustSize()
 		self.setFixedHeight(self.height())
 

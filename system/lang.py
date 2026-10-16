@@ -93,6 +93,10 @@ class Lng:
 	filters = ("Фильтры", "Filters")
 	catalog = ("Каталог", "Catalog")
 	folder = ("Каталог изображений", "Image catalog")
+	catalog_unavaiable = (
+		"Каталог недоступен",
+		"Catalog unavaiable"
+	)
 	open_default = ("Открыть по умолчанию", "Open by default")
 	open_in = ("Открыть в приложении", "Open in application")
 	alias_immutable = (
@@ -120,6 +124,7 @@ class Lng:
 	calendar = ("Календарь", "Calendar")
 	favorites = ("Избранное", "Favorites")
 	favorite_servers = ("Избранные серверы", "Favorite servers")
+	servers = ("Серверы", "Servers")
 	cancel = ("Отмена", "Cancel")
 	confirmation = ("Подтверждение", "Confirmation")
 	no_connection = ("Нет подключения", "No connection")
