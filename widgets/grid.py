@@ -35,14 +35,6 @@ class ThumbBaseLabel(TransparentLabel):
 		super().__init__("")
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-	def get_shorten_text(self, text: str, parent_width: int, offset=5):
-		metrics = QFontMetrics(self.font())
-		return metrics.elidedText(
-			text,
-			Qt.TextElideMode.ElideMiddle,
-			max(0, parent_width - offset)
-		)
-
 
 class ThumbImgWidget(ThumbBaseLabel):
 	def __init__(self):
@@ -81,12 +73,10 @@ class ThumbImgWidget(ThumbBaseLabel):
 class ThumbWhiteTextWid(ThumbBaseLabel):
 	def __init__(self, data_item: DataItem):
 		super().__init__()
+		self.setText(data_item.filename)
 		self.data_item = data_item
 		self.set_no_frame_style()
-
-	def set_text(self, parent_width: int):
-		text = self.get_shorten_text(self.data_item.filename, parent_width)
-		self.setText(text)
+		self.set_elide(True)
 
 	def set_framed_style(self):
 		"""Включает стиль с рамкой через QSS свойство."""
@@ -103,17 +93,14 @@ class ThumbWhiteTextWid(ThumbBaseLabel):
 		self.style().unpolish(self)
 		self.style().polish(self)
 		self.update()
-
 	
 
 class ThumbBlueTextWidget(ThumbBaseLabel):
 	def __init__(self, data_item: DataItem):
 		super().__init__()
-		self.data_item = data_item
-
-	def set_text(self, parent_width: int):
-		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
+		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
 		self.setText(day_month_year)
+		self.data_item = data_item
 
 
 class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
@@ -125,7 +112,6 @@ class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
 		super().__init__()
 		self.data_item = data_item
 
-	def set_text(self, parent_width: int):
 		root = os.path.dirname(self.data_item.rel_path)
 		if len(root) == 1:
 			miuz_collection_name = Mf.current_mf.mf_alias
@@ -133,7 +119,6 @@ class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
 			paths_list = root.split(os.sep)
 			miuz_collection_name = paths_list[1]
 
-		miuz_collection_name = self.get_shorten_text(miuz_collection_name, parent_width)
 		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
 		self.setText(f"{day_month_year}\n{miuz_collection_name}")
 
@@ -201,8 +186,6 @@ class Thumb(TransparentFrame):
 		self.setFixedWidth(Thumb.wid_width)
 		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
 
-		self.white_text_wid.set_text(Thumb.wid_width)
-		self.blue_text_wid.set_text(Thumb.wid_width)
 		self.set_pixmap_with_actual_size()
 
 	def set_frame(self):
@@ -225,7 +208,7 @@ class Thumb(TransparentFrame):
 			)
 
 		self.white_text_wid.data_item.filename = self.data_item.filename
-		self.white_text_wid.set_text(Thumb.wid_width)
+		self.white_text_wid.setText(self.data_item.filename)
 
 
 
