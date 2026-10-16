@@ -8,13 +8,14 @@ from cfg import JsonData
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 
-from ._base_widgets import (GrayTextLabel, SelectableLabel, TransparentWidget,
-							UMainWindow)
+from ._base_widgets import (GrayTextLabel, TransparentWidget,
+							UMainWindow, TransparentLabel)
 
 
-class WinInfoSelectableLabel(SelectableLabel):
+class WinInfoSelectableLabel(TransparentLabel):
 	def __init__(self, text: str):
 		super().__init__(text)
+		self.set_selectable(True)
 
 	def contextMenuEvent(self, ev):
 		selection = self.selectedText()

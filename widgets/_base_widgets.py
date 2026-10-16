@@ -805,20 +805,6 @@ class UTagWidget(TransparentFrame):
 		self.text_clicked.emit()
 
 
-class SelectableLabel(TransparentLabel):
-	def __init__(self, text: str):
-		super().__init__(text)
-		self.set_selectable(True)
-		self.set_context_menu(True)
-
-
-class SelectableGrayLabel(GrayTextLabel):
-	def __init__(self, text: str):
-		super().__init__(text)
-		self.set_selectable(True)
-		self.set_context_menu(True)
-
-
 class RowArrowWidget(TransparentWidget):
 	clicked = pyqtSignal()
 	arrow_svg = Static.COMMON_ICONS / "next.svg"
@@ -1039,7 +1025,8 @@ class ConfirmWindow(VerticalWindow):
 			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
 		)
 
-		self.text_wid = SelectableGrayLabel(text)
+		self.text_wid = GrayTextLabel(text)
+		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
 
@@ -1088,7 +1075,8 @@ class WarningWindow(VerticalWindow):
 			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
 		)
 
-		self.text_wid = SelectableGrayLabel(text)
+		self.text_wid = GrayTextLabel(text)
+		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
 
