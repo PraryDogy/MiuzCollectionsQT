@@ -35,7 +35,7 @@ class WinSmb(UMainWindow):
 		self.show_titlebar_sep()
 		
 		# Задаем фиксированную ширину
-		# self.setFixedWidth(440)
+		self.setFixedWidth(440)
 		
 		# Делаем отступы аккуратными
 		self.central_layout.setContentsMargins(15, 10, 15, 15)
@@ -62,13 +62,8 @@ class WinSmb(UMainWindow):
 		# --- Разделитель ---
 		self.central_layout.addWidget(USep())
 
-		# --- Серое описание со списком ---
-		# Теперь текст будет выглядеть так: "Для «miuz» сетевой диск не подключен..." + буллиты
-		prefix_ru = f"Для «{mf.mf_alias}» "
-		prefix_en = f"For \"{mf.mf_alias}\" "
-		prefix = prefix_ru if JsonData.lng_index == 0 else prefix_en
 		
-		descr_text = prefix + Lng.network_error_text[JsonData.lng_index]
+		descr_text = Lng.network_error_text[JsonData.lng_index]
 		descr_lbl = GrayTextLabel(descr_text)
 		descr_lbl.setWordWrap(True)
 		self.central_layout.addWidget(descr_lbl)
@@ -102,8 +97,9 @@ class WinSmb(UMainWindow):
 		btns_lay.addWidget(self.ok_btn)
 
 		# Жестко связываем размер окна с размером его контента
-		self.window_layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+		# self.window_layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 		self.adjustSize()
+		self.setFixedHeight(self.height())
 
 	def open_servers(self):
 		self.servers_win = ServersWin()
