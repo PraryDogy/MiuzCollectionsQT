@@ -1193,7 +1193,8 @@ class MfPathWidget(UGroupBox):
 	def __init__(self, lng_index: int, mf_path: str = None):
 		super().__init__()
 		self.setAcceptDrops(True)
-		self.setFixedHeight(self.hh)
+		# self.setFixedHeight(self.hh)
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		self.mf_path = mf_path
 		self.lng_index = lng_index
@@ -1203,7 +1204,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 	
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(10, 2, 2, 2)
+		self.main_lay.setContentsMargins(20, 20, 20, 20)
 		self.main_lay.setSpacing(0)
 
 		# Используем QStackedWidget для безопасного переключения экранов
@@ -1219,12 +1220,15 @@ class MfPathWidget(UGroupBox):
 		else:
 			self.show_no_path()
 
+		self.adjustSize()
+		self.setFixedHeight(self.height())
+
 	def init_no_path_ui(self):
 		"""Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
 		widget = QWidget()
 		h_lay = QHBoxLayout(widget)
 		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(10)
+		h_lay.setSpacing(20)
 
 		right_btn = QSvgWidget()
 		right_btn.load(str(self.magnifier))
@@ -1247,11 +1251,11 @@ class MfPathWidget(UGroupBox):
 		widget = QWidget()
 		h_lay = QHBoxLayout(widget)
 		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(10)
+		h_lay.setSpacing(20)
 
 		right_btn = QSvgWidget()
 		right_btn.load(str(self.green_checkmark))
-		right_btn.setFixedSize(35, 35)
+		right_btn.setFixedSize(self.icon_size, self.icon_size)
 		h_lay.addWidget(right_btn)
 
 		self.ok_path_label = SelectableLabel("")
