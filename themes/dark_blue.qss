@@ -381,6 +381,12 @@ UTagWidget[style="green"] {
 }
 
 
+
+MfPathWidget {
+    border: 2px dashed #263440;
+}
+
+
 /* ==================== TOOLTIP ==================== */
 
 QToolTip {

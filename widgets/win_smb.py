@@ -4,17 +4,19 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QLayout
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLayout, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
-
-from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget, SuperConfirmWindow, 
-							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, USep, UGroupBox)
-from .win_servers import ServersWin
 from system.servers import Servers
+
+from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget,
+                            SuperConfirmWindow, TitleTextLabel,
+                            TransparentWidget, UGroupBox, UMainWindow,
+                            UPushButton, USep)
+from .win_servers import ServersWin
 
 
 def restart_app():
