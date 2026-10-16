@@ -147,7 +147,7 @@ class SettingsSvgBtn(CommonSvgIconButton):
 
 class ConnectServerSvgBtn(CommonSvgIconButton):
 	base_svg = Static.COMMON_ICONS / "connect.svg"
-	icon_size = (16, 16)  # Уменьшили размер иконки (по умолчанию 26x26), чтобы визуально сравнять с настройками
+	icon_size = (14, 14)  # Уменьшили размер иконки (по умолчанию 26x26), чтобы визуально сравнять с настройками
 	# 17 17 идентичен шестеренке но тогда доминирует
 
 
