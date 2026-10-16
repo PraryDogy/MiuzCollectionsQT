@@ -207,6 +207,8 @@ class WinMain(UMainWindow):
 			print("СКАНЕР ВЫКЛЮЧЕН")
 			self.bar_bottom.progress_bar.setText("noscan enabled")
 
+		QTimer.singleShot(100, lambda: self.open_win_smb(Mf.current_mf))
+
 	@staticmethod
 	def with_conn(fn: callable):
 		def wrapper(self: "WinMain", *args):
