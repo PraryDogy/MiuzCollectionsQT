@@ -290,6 +290,12 @@ class ServersWin(UMainWindow):
 
 		self.central_layout.addWidget(header_wid)
 
+		text = "Добавляйте и сохраняйте данные SMB-серверов так же, как в macOS. Выберите сервер и нажмите «Подключиться» для быстрого монтирования диска. Поддерживаются только SMB-подключения."
+		description_label = GrayTextLabel(text)
+		description_label.setWordWrap(True)
+		self.central_layout.addWidget(description_label)
+
+
 		# --- Список серверов напрямую ---
 		self.v_list = ServerList()
 		self.v_list.setMinimumHeight(150)
