@@ -583,3 +583,11 @@ class Lng:
 		"Подключение 1",
 		"Connection 1",
 	)
+	active = (
+		"Активен",
+		"Active"
+	)
+	inactive = (
+		"Неактивен",
+		"Inactive"
+	)

@@ -1468,7 +1468,7 @@ class CopyTextSvgWidget(SvgBgWidget):
 
 class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
-	folder_magnifier = Static.COMMON_ICONS / "image_folder.svg"
+	folder_magnifier = Static.COMMON_ICONS / "folder_magnifier.svg"
 	magnifier = Static.COMMON_ICONS / "magnifier.svg"
 	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
 	copy = Static.COMMON_ICONS / "copy.svg"
@@ -1603,7 +1603,7 @@ class MfPathWidget(UGroupBox):
 		first_row_layout.setSpacing(10)
 		
 		green_checkmark_widget = QSvgWidget()
-		green_checkmark_widget.load(str(self.folder_magnifier))
+		green_checkmark_widget.load(str(self.green_checkmark))
 		green_checkmark_widget.setFixedSize(*self.icon_size)
 		first_row_layout.addWidget(green_checkmark_widget)
 		
@@ -1628,6 +1628,7 @@ class MfPathWidget(UGroupBox):
 		self.copy_path_btn = UPushButton("")
 		self.copy_path_btn.clicked.connect(self.copy_path)
 		self.copy_path_btn.setIcon(QIcon(str(self.copy)))
+		self.copy_path_btn.setToolTip(Lng.copy_dirpath[JsonData.lng_index])
 		mf_path_layout.addWidget(self.copy_path_btn)
 
 		# СТРОКА 3: Нижние кнопки управления
