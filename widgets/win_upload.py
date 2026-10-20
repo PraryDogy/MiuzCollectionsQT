@@ -131,19 +131,6 @@ class DestinyFolderWidget(UGroupBox):
 			self.copy_path_button.current_text = self.current_dir
 
 
-class NotiWidget(UTagWidget):
-	svg_path = Static.COMMON_ICONS / "checkmark.svg"
-
-	def __init__(self):
-		super().__init__(
-			Lng.text_copied[JsonData.lng_index],
-			self.qss_green,
-			str(self.svg_path),
-			None
-		)
-		self.adjustSize()
-
-
 class UploadWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 
@@ -165,7 +152,6 @@ class UploadWin(UMainWindow):
 
 		self.destiny_widget = DestinyFolderWidget(self.current_dir)
 		self.destiny_widget.dir_changed.connect(self.dir_changed_cmd)
-		self.destiny_widget.copy_path_clicked.connect(self.copy_path_clicked_cmd)
 		self.central_layout.addWidget(self.destiny_widget)
 
 		self.button_widget = TransparentWidget()
@@ -188,25 +174,6 @@ class UploadWin(UMainWindow):
 
 		self.adjustSize()
 		self.setFixedHeight(self.height())
-
-		self.noti_widgeet = NotiWidget()
-		self.noti_widgeet.setParent(self)
-		y = 5
-		x = (self.width() - self.noti_widgeet.width()) // 2
-		self.noti_widgeet.move(x, y)
-		self.noti_widgeet.setVisible(False)
-
-	def copy_path_clicked_cmd(self):
-		if not self.noti_widgeet.isVisible():
-			self.noti_widgeet.setVisible(True)
-			QTimer.singleShot(1000, self.show_noti_widget)
-
-	def show_noti_widget(self):
-		try:
-			self.noti_widgeet.setVisible(False)
-		except RuntimeError:
-			# значит окно было удалено раньше чем сработал таймер
-			pass
 
 	def dir_changed_cmd(self, path: str):
 		self.current_dir = path
