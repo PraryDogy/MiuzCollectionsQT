@@ -307,11 +307,8 @@ class Lng:
 		"Unable to access the image directory"  # Более технически точно
 	)
 	network_error_text = (
-		"• Укажите путь к каталогу\n"
-		"• Нажмите «Серверы», чтобы подключить диск",
-		
-		"• Specify the path to the catalog\n"
-		"• Click \"Servers\" to connect the drive"
+		"Нет подключения к диску или неправильно указан путь",
+		"No drive connection or invalid path"
 	)
 	hide_digits_full = (
 		"Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",

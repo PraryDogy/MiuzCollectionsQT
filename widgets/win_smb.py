@@ -34,12 +34,12 @@ class WinSmb(UMainWindow):
 
 		self.set_close_only()
 		self.set_always_on_top()
-		self.setWindowTitle(Lng.no_connection[JsonData.lng_index])
+		self.setWindowTitle(Lng.attention[JsonData.lng_index])
 		
 		self.show_titlebar_sep()
 
 		# Делаем отступы аккуратными
-		self.central_layout.setContentsMargins(15, 0, 15, 15)
+		self.central_layout.setContentsMargins(15, 5, 15, 15)
 		self.central_layout.setSpacing(10)
 
 		# Создаем QGroupBox вместо TransparentWidget
@@ -59,15 +59,14 @@ class WinSmb(UMainWindow):
 		icon.setFixedSize(*self.yellow_waring_size)
 		header_lay.addWidget(icon)
 
-		title_lbl = TitleTextLabel(Lng.catalog_unavaiable[JsonData.lng_index])
+		title_lbl = TitleTextLabel(Lng.no_connection[JsonData.lng_index])
 		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
 		
 		# Добавляем заголовок в вертикальный макет GroupBox
 		group_lay.addWidget(header_wid)
 
 		# Описание добавляем туда же, под заголовок
-		text = "Нет подключения к диску или неправильно указан путь"
-		descr_lbl = GrayTextLabel(text)
+		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
 		group_lay.addWidget(descr_lbl)
 
 		# Сам QGroupBox добавляем в ваш главный макет central_layout
