@@ -1482,7 +1482,7 @@ class MfPathWidget(UGroupBox):
 	def __init__(self, lng_index: int, mf_path: str = None):
 		super().__init__()
 		self.setAcceptDrops(True)
-		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		# self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		self.mf_path = mf_path
 		self.lng_index = lng_index
@@ -1550,31 +1550,42 @@ class MfPathWidget(UGroupBox):
 		h_lay.addWidget(green_checkmark_widget)
 
 		# Контейнер для текста
-		label_widget = QWidget()
-		label_layout = QVBoxLayout(label_widget)
-		label_layout.setContentsMargins(0, 0, 0, 0)
-		label_layout.setSpacing(5)
+		all_texts = QWidget()
+		all_texts_layout = QVBoxLayout(all_texts)
+		all_texts_layout.setContentsMargins(0, 0, 0, 0)
+		all_texts_layout.setSpacing(5)
 
-		label_layout.addStretch()
+		all_texts_layout.addStretch(1)
 
-		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
-		label_layout.addWidget(title)
+		first_row = TransparentWidget()
+		all_texts_layout.addWidget(first_row)
+		first_row_layout = QHBoxLayout(first_row)
+		first_row_layout.setContentsMargins(0, 0, 0, 0)
+		first_row_layout.setSpacing(10)
 
-		mf_path_container = UGroupBox()
-		mf_path_layout = QHBoxLayout(mf_path_container)
+		title_first_row = MfPathTitle(Lng.folder_path[JsonData.lng_index])
+		first_row_layout.addWidget(title_first_row)
+
+		change_btn = UPushButton(Lng.change[JsonData.lng_index])
+		first_row_layout.addWidget(change_btn)
+
+		first_row_layout.addStretch()
+
+		second_row = UGroupBox()
+		mf_path_layout = QHBoxLayout(second_row)
 		mf_path_layout.setContentsMargins(10, 5, 10, 5)
 		mf_path_layout.setSpacing(0)
-		label_layout.addWidget(mf_path_container)
+		all_texts_layout.addWidget(second_row)
+		all_texts_layout.addStretch(1)
 
 		self.mf_path_label = GrayTextLabel("")
 		self.mf_path_label.set_elide(True)
 		mf_path_layout.addWidget(self.mf_path_label, stretch=1)
 
 		self.copy_text_svg_widget = CopyTextSvgWidget(self.mf_path)
-		# mf_path_layout.addWidget(self.copy_text_svg_widget, alignment=Qt.AlignmentFlag.AlignRight)
+		mf_path_layout.addWidget(self.copy_text_svg_widget, alignment=Qt.AlignmentFlag.AlignRight)
 
-		h_lay.addWidget(label_widget)
-
+		h_lay.addWidget(all_texts)
 		self.stack.addWidget(widget)
 
 	def show_no_path(self):
@@ -1610,16 +1621,6 @@ class MfPathWidget(UGroupBox):
 			return None
 		return self.mf_path
 
-	def mouseReleaseEvent(self, a0: QMouseEvent):
-		if a0.button() != Qt.MouseButton.LeftButton:  # Исправлена проверка кнопки мыши
-			return super().mouseReleaseEvent(a0)
-		
-		dialog = QFileDialog()
-		url = dialog.getExistingDirectory()
-		if url and os.path.isdir(url):
-			self.update_path(url)
-		return super().mouseReleaseEvent(a0)
-		
 	def dropEvent(self, a0):
 		if a0.mimeData().hasUrls():
 			url = a0.mimeData().urls()[0].toLocalFile()
