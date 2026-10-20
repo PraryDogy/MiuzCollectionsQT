@@ -1485,7 +1485,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 	
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(10, 8, 10, 8)
+		self.main_lay.setContentsMargins(15, 8, 15, 8)
 		self.main_lay.setSpacing(0)
 
 		# Используем QStackedWidget для безопасного переключения экранов
@@ -1502,7 +1502,6 @@ class MfPathWidget(UGroupBox):
 			self.show_no_path()
 
 		self.adjustSize()
-		# self.setFixedHeight(self.height())
 
 	def init_no_path_ui(self):
 		"""Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
@@ -1517,8 +1516,6 @@ class MfPathWidget(UGroupBox):
 		all_texts_layout = QVBoxLayout(all_texts)
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
 		all_texts_layout.setSpacing(8)
-
-		all_texts_layout.addStretch()
 
 		first_row_container = TransparentWidget()
 		all_texts_layout.addWidget(first_row_container)
@@ -1538,13 +1535,10 @@ class MfPathWidget(UGroupBox):
 		all_texts_layout.addWidget(USep())
 
 		self.no_path_label = GrayTextLabel(Lng.path_hint_texts[self.lng_index])
-		# self.no_path_label.setWordWrap(True)
 		all_texts_layout.addWidget(self.no_path_label)
 
-		all_texts_layout.addStretch()
-
 		buttons_container = TransparentWidget()
-		main_h_layout.addWidget(buttons_container)
+		all_texts_layout.addWidget(buttons_container)
 		buttons_layout = QHBoxLayout(buttons_container)
 		buttons_layout.setContentsMargins(0, 0, 0, 0)
 		buttons_layout.setSpacing(10)
@@ -1552,9 +1546,6 @@ class MfPathWidget(UGroupBox):
 		choose_folder = UPushButton(Lng.choose_folder[JsonData.lng_index])
 		choose_folder.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(choose_folder)
-
-		# (Кнопка CopyTextSvgWidget здесь пропущена, т.к. пути еще нет, 
-		# но при необходимости ее можно легко добавить в hint_layout)
 
 		self.stack.addWidget(widget)
 
@@ -1571,8 +1562,6 @@ class MfPathWidget(UGroupBox):
 		all_texts_layout = QVBoxLayout(all_texts)
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
 		all_texts_layout.setSpacing(8)
-
-		all_texts_layout.addStretch()
 
 		first_row_container = TransparentWidget()
 		all_texts_layout.addWidget(first_row_container)
@@ -1602,20 +1591,15 @@ class MfPathWidget(UGroupBox):
 		self.mf_path_label.set_elide(True)
 		mf_path_layout.addWidget(self.mf_path_label, stretch=1)
 
-		all_texts_layout.addStretch()
-
 		# Блок для кнопок (справа)
 		buttons_container = TransparentWidget()
-		main_h_layout.addWidget(buttons_container)
+		all_texts_layout.addWidget(buttons_container)
 		buttons_layout = QHBoxLayout(buttons_container)
 		buttons_layout.setContentsMargins(0, 0, 0, 0)
 		buttons_layout.setSpacing(10)
 
-		self.copy_text_svg_widget = UPushButton("")
-		self.copy_text_svg_widget.setIcon(QIcon(str(self.copy)))
-		self.copy_text_svg_widget.clicked.connect(
-			lambda: Utils.pyqt_copy_text(self.mf_path)
-		)
+		self.copy_text_svg_widget = UPushButton(Lng.copy_dirpath[JsonData.lng_index])
+		self.copy_text_svg_widget.clicked.connect(lambda: Utils.pyqt_copy_text(self.mf_path))
 		buttons_layout.addWidget(self.copy_text_svg_widget)
 
 		change_btn = UPushButton(Lng.change[JsonData.lng_index])
@@ -1657,7 +1641,8 @@ class MfPathWidget(UGroupBox):
 		return self.mf_path
 
 	def dialog_dir(self):
-		url = QFileDialog.getExistingDirectory()
+		self.dialog = QFileDialog()
+		url = self.dialog.getExistingDirectory()
 		if url and os.path.isdir(url):
 			self.update_path(url)
 
