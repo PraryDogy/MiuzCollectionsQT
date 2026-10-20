@@ -1503,7 +1503,7 @@ class MfPathWidget(UGroupBox):
 			self.show_no_path()
 
 		self.adjustSize()
-		OFFSET = 60
+		OFFSET = 20
 		self.setMinimumWidth(self.width() + OFFSET)
 
 		self.copy_path_btn_locked = False

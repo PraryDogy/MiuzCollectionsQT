@@ -12,7 +12,7 @@ from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget, SuperConfirmWindow, 
-							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, USep)
+							TitleTextLabel, TransparentWidget, UMainWindow, UPushButton, UGroupBox)
 from .win_servers import ServersWin
 from system.servers import Servers
 
@@ -25,7 +25,7 @@ def restart_app():
 
 class WinSmb(UMainWindow):
 	yellow_warning_path = Static.COMMON_ICONS / "yellow_warning.svg"
-	yellow_waring_size = (24, 24)
+	yellow_waring_size = (20, 20)
 	connect_svg_path = Static.COMMON_ICONS / "connect.svg"
 
 	def __init__(self, mf: Mf):
@@ -34,18 +34,21 @@ class WinSmb(UMainWindow):
 
 		self.set_close_only()
 		self.set_always_on_top()
-		self.setWindowTitle(Lng.attention[JsonData.lng_index])
+		self.setWindowTitle(Lng.no_connection[JsonData.lng_index])
 		
 		self.show_titlebar_sep()
-		
-		# Задаем фиксированную ширину
-		# self.setFixedWidth(440)
-		
-		# Делаем отступы аккуратными
-		self.central_layout.setContentsMargins(15, 10, 15, 15)
-		self.central_layout.setSpacing(5)
 
-		# --- Шапка окна (иконка + заголовок) ---
+		# Делаем отступы аккуратными
+		self.central_layout.setContentsMargins(15, 0, 15, 15)
+		self.central_layout.setSpacing(10)
+
+		# Создаем QGroupBox вместо TransparentWidget
+		self.group_box = TransparentWidget()
+		group_lay = QVBoxLayout(self.group_box)
+		group_lay.setContentsMargins(0, 0, 0, 0)
+		group_lay.setSpacing(5)
+
+		# Первая строка внутри GroupBox (Иконка + Заголовок)
 		header_wid = TransparentWidget()
 		header_lay = QHBoxLayout(header_wid)
 		header_lay.setContentsMargins(0, 0, 0, 0)
@@ -59,20 +62,20 @@ class WinSmb(UMainWindow):
 		title_lbl = TitleTextLabel(Lng.catalog_unavaiable[JsonData.lng_index])
 		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
 		
-		header_lay.addStretch()
-		self.central_layout.addWidget(header_wid)
+		# Добавляем заголовок в вертикальный макет GroupBox
+		group_lay.addWidget(header_wid)
 
-		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
-		descr_lbl.setWordWrap(True)
-		self.central_layout.addWidget(descr_lbl)
+		# Описание добавляем туда же, под заголовок
+		text = "Нет подключения к диску или неправильно указан путь"
+		descr_lbl = GrayTextLabel(text)
+		group_lay.addWidget(descr_lbl)
 
-		self.central_layout.addSpacing(5)
-
+		# Сам QGroupBox добавляем в ваш главный макет central_layout
+		self.central_layout.addWidget(self.group_box)
+		
 		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(JsonData.lng_index, mf.mf_current_path)
 		self.central_layout.addWidget(self.path_widget)
-
-		self.central_layout.addSpacing(5)
 
 		# --- Кнопки ---
 		btns_wid = TransparentWidget()
