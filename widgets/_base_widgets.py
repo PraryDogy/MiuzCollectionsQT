@@ -1516,7 +1516,7 @@ class MfPathWidget(UGroupBox):
 		main_h_layout.addWidget(all_texts)
 		all_texts_layout = QVBoxLayout(all_texts)
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
-		all_texts_layout.setSpacing(5)
+		all_texts_layout.setSpacing(8)
 
 		all_texts_layout.addStretch()
 
@@ -1571,7 +1571,7 @@ class MfPathWidget(UGroupBox):
 		main_h_layout.addWidget(all_texts)
 		all_texts_layout = QVBoxLayout(all_texts)
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
-		all_texts_layout.setSpacing(5)
+		all_texts_layout.setSpacing(8)
 
 		all_texts_layout.addStretch()
 
