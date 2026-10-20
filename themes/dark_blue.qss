@@ -417,22 +417,22 @@ MfPathTitle {
 
 
 
-SvgIconButtonLabel[style="base"] {
+_SvgIconButtonContainer[style="base"] {
     background: transparent;
     border-radius: 8px;
 }
 
-SvgIconButtonLabel:hover[style="base"] {
+_SvgIconButtonContainer:hover[style="base"] {
     background: #283645;
     border-radius: 8px;
 }
 
-SvgIconButtonLabel[style="selected"] {
+_SvgIconButtonContainer[style="selected"] {
     background: #283645;
     border-radius: 8px;
 }
 
-SvgIconButtonLabel[style="pressed"] {
+_SvgIconButtonContainer[style="pressed"] {
     background: #3A4B5E;
     border-radius: 8px;
 }

@@ -1365,7 +1365,6 @@ class _SvgIconButtonContainer(TransparentLabel):
 
 	def set_selected(self):
 		self.set_style_state(self.qss_selected_style)
-		print("123")
 
 	def set_pressed(self):
 		self.set_style_state(self.qss_pressed_style)
