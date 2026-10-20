@@ -1561,55 +1561,73 @@ class MfPathWidget(UGroupBox):
 	def init_ok_path_ui(self):
 		"""Создание панели 'Путь корректен' (индекс 1 в стеке)"""
 		widget = QWidget()
-		h_lay = QHBoxLayout(widget)
-		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(10)
+		main_h_layout = QHBoxLayout(widget)
+		main_h_layout.setContentsMargins(0, 0, 0, 0)
+		main_h_layout.setSpacing(10)
 
+		# Контейнер для текста
+		all_texts = TransparentWidget()
+		main_h_layout.addWidget(all_texts)
+		all_texts_layout = QVBoxLayout(all_texts)
+		all_texts_layout.setContentsMargins(0, 0, 0, 0)
+		all_texts_layout.setSpacing(5)
+
+		all_texts_layout.addStretch()
+
+		first_row_container = TransparentWidget()
+		all_texts_layout.addWidget(first_row_container)
+		first_row_layout = QHBoxLayout(first_row_container)
+		first_row_layout.setContentsMargins(0, 0, 0, 0)
+		first_row_layout.setSpacing(10)
+		first_row_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+		
+		# Иконка галочки
 		green_checkmark_widget = QSvgWidget()
 		green_checkmark_widget.load(str(self.green_checkmark))
 		green_checkmark_widget.setFixedSize(*self.icon_size)
-		h_lay.addWidget(green_checkmark_widget)
-
-		# Контейнер для текста
-		all_texts = QWidget()
-		all_texts_layout = QVBoxLayout(all_texts)
-		all_texts_layout.setContentsMargins(0, 0, 0, 0)
-		all_texts_layout.setSpacing(0)
-
-		first_row = TransparentWidget()
-		all_texts_layout.addWidget(first_row)
-		first_row_layout = QHBoxLayout(first_row)
-		first_row_layout.setContentsMargins(0, 0, 0, 0)
-		first_row_layout.setSpacing(10)
+		first_row_layout.addWidget(green_checkmark_widget)
+		
 		title_first_row = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
 		first_row_layout.addWidget(title_first_row)
-		change_btn = UPushButton(Lng.change[JsonData.lng_index])
-		first_row_layout.addWidget(change_btn)
-		first_row_layout.addStretch()
 
-		all_texts_layout.addSpacing(5)
 		all_texts_layout.addWidget(USep())
-		all_texts_layout.addSpacing(3)
 
+		# Строка для пути и кнопки копирования
 		second_row = TransparentWidget()
+		all_texts_layout.addWidget(second_row)
 		mf_path_layout = QHBoxLayout(second_row)
 		mf_path_layout.setContentsMargins(0, 0, 0, 0)
 		mf_path_layout.setSpacing(0)
-		all_texts_layout.addWidget(second_row)
-		all_texts_layout.addStretch(1)
 
 		self.mf_path_label = GrayTextLabel("")
 		self.mf_path_label.set_elide(True)
 		mf_path_layout.addWidget(self.mf_path_label, stretch=1)
 
-		self.copy_text_svg_widget = CopyTextSvgWidget(
-			self.mf_path,
-			container_size=(25, 25),
-			svg_size=(15, 15)
-		)
-		mf_path_layout.addWidget(self.copy_text_svg_widget, alignment=Qt.AlignmentFlag.AlignRight)
+		all_texts_layout.addStretch()
 
-		h_lay.addWidget(all_texts)
+		# Блок для кнопок (справа)
+		buttons_container = TransparentWidget()
+		main_h_layout.addWidget(buttons_container)
+		buttons_layout = QHBoxLayout(buttons_container)
+		buttons_layout.setContentsMargins(0, 0, 0, 0)
+		buttons_layout.setSpacing(10)
+
+		# self.copy_text_svg_widget = CopyTextSvgWidget(
+		# 	self.mf_path,
+		# 	container_size=(25, 25),
+		# 	svg_size=(15, 15)
+		# )
+
+		self.copy_text_svg_widget = UPushButton("")
+		self.copy_text_svg_widget.setIcon(QIcon(str(self.copy)))
+		self.copy_text_svg_widget.clicked.connect(
+			lambda: Utils.pyqt_copy_text(self.mf_path)
+		)
+		buttons_layout.addWidget(self.copy_text_svg_widget)
+
+		change_btn = UPushButton(Lng.change[JsonData.lng_index])
+		buttons_layout.addWidget(change_btn)
+
 		self.stack.addWidget(widget)
 
 	def show_no_path(self):
@@ -1622,7 +1640,6 @@ class MfPathWidget(UGroupBox):
 		"""Включение режима успешного пути"""
 		self.watch_timer.stop()  # Важно: останавливаем таймер сразу
 		self.mf_path_label.setText(self.mf_path)
-		self.copy_text_svg_widget.set_current_text(self.mf_path)
 		self.stack.setCurrentIndex(1)
 
 	def check_path_by_timer(self):
