@@ -1551,6 +1551,7 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.setSpacing(10)
 
 		choose_folder = UPushButton(Lng.choose_folder[JsonData.lng_index])
+		choose_folder.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(choose_folder)
 
 		# (Кнопка CopyTextSvgWidget здесь пропущена, т.к. пути еще нет, 
@@ -1612,12 +1613,6 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.setContentsMargins(0, 0, 0, 0)
 		buttons_layout.setSpacing(10)
 
-		# self.copy_text_svg_widget = CopyTextSvgWidget(
-		# 	self.mf_path,
-		# 	container_size=(25, 25),
-		# 	svg_size=(15, 15)
-		# )
-
 		self.copy_text_svg_widget = UPushButton("")
 		self.copy_text_svg_widget.setIcon(QIcon(str(self.copy)))
 		self.copy_text_svg_widget.clicked.connect(
@@ -1626,6 +1621,7 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.addWidget(self.copy_text_svg_widget)
 
 		change_btn = UPushButton(Lng.change[JsonData.lng_index])
+		change_btn.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(change_btn)
 
 		self.stack.addWidget(widget)
@@ -1661,6 +1657,11 @@ class MfPathWidget(UGroupBox):
 			win_warn.show()
 			return None
 		return self.mf_path
+
+	def dialog_dir(self):
+		url = QFileDialog.getExistingDirectory()
+		if url and os.path.isdir(url):
+			self.update_path(url)
 
 	def dropEvent(self, a0):
 		if a0.mimeData().hasUrls():
