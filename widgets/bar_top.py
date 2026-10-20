@@ -136,7 +136,7 @@ class CommonSvgIconButton(SvgIconButton):
 	def __init__(self):
 		super().__init__(
 			svg_path=self.base_svg,
-			label_size=self.label_size,
+			container_size=self.label_size,
 			icon_size=self.icon_size,
 		)
 

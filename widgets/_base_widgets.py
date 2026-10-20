@@ -1238,6 +1238,7 @@ class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
 	magnifier = Static.COMMON_ICONS / "magnifier.svg"
 	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
+	copy = Static.COMMON_ICONS / "copy.svg"
 	icon_size = 40
 
 	def __init__(self, lng_index: int, mf_path: str = None):
@@ -1314,18 +1315,28 @@ class MfPathWidget(UGroupBox):
 		label_widget = QWidget()
 		label_layout = QVBoxLayout(label_widget)
 		label_layout.setContentsMargins(0, 0, 0, 0)
-		label_layout.setSpacing(2)
+		label_layout.setSpacing(5)
 
 		label_layout.addStretch()
 
 		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
 		label_layout.addWidget(title)
 
-		self.ok_path_label = GrayTextLabel("")
-		self.ok_path_label.set_elide(True)
-
-		label_layout.addWidget(self.ok_path_label)
+		mf_path_container = UGroupBox()
+		mf_path_layout = QHBoxLayout(mf_path_container)
+		mf_path_layout.setContentsMargins(10, 10, 10, 10)
+		mf_path_layout.setSpacing(0)
+		label_layout.addWidget(mf_path_container)
 		label_layout.addStretch()
+
+		self.mf_path_label = GrayTextLabel("")
+		self.mf_path_label.set_elide(True)
+		mf_path_layout.addWidget(self.mf_path_label)
+
+		copy_svg_button = SvgIconButton(str(self.copy))
+		copy_svg_button.setFixedSize(20, 20)
+		mf_path_layout.addWidget(copy_svg_button)
+
 		h_lay.addWidget(label_widget)
 
 		self.stack.addWidget(widget)
@@ -1339,7 +1350,7 @@ class MfPathWidget(UGroupBox):
 	def show_ok_path(self):
 		"""Включение режима успешного пути"""
 		self.watch_timer.stop()  # Важно: останавливаем таймер сразу
-		self.ok_path_label.setText(self.mf_path)
+		self.mf_path_label.setText(self.mf_path)
 		self.stack.setCurrentIndex(1)
 
 	def check_path_by_timer(self):
@@ -1501,7 +1512,7 @@ class FlowLayout(QLayout):
 
 
 
-class SvgIconButtonLabel(TransparentLabel):
+class _SvgIconButtonContainer(TransparentLabel):
 	qss_base_style = "base"
 	qss_selected_style = "selected"
 	qss_pressed_style = "pressed"
@@ -1537,13 +1548,13 @@ class SvgIconButtonLabel(TransparentLabel):
 class SvgIconButton(TransparentWidget):
 	clicked_ = pyqtSignal()
 
-	def __init__(self, svg_path: Path, label_size: tuple, icon_size: tuple):
+	def __init__(self, svg_path: Path, container_size: tuple, icon_size: tuple):
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		# Фоновая подложка с заданным размером
-		self.label = SvgIconButtonLabel()
-		self.label.setFixedSize(*label_size)
+		self.label = _SvgIconButtonContainer()
+		self.label.setFixedSize(*container_size)
 
 		# SVG-иконка с заданным размером
 		self.svg_widget = QSvgWidget(str(svg_path), self)
