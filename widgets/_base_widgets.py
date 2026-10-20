@@ -1607,7 +1607,7 @@ class MfPathWidget(UGroupBox):
 		green_checkmark_widget.setFixedSize(*self.icon_size)
 		first_row_layout.addWidget(green_checkmark_widget)
 		
-		title_first_row = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
+		title_first_row = TitleTextLabel(Lng.catalog[JsonData.lng_index])
 		first_row_layout.addWidget(title_first_row)
 
 		# РАЗДЕЛИТЕЛЬ

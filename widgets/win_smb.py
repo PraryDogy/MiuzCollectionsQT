@@ -31,11 +31,9 @@ class WinSmb(UMainWindow):
 	def __init__(self, mf: Mf):
 		super().__init__()
 		self.mf = mf
-
 		self.set_close_only()
 		self.set_always_on_top()
 		self.setWindowTitle(Lng.attention[JsonData.lng_index])
-		
 		self.show_titlebar_sep()
 
 		# Делаем отступы аккуратными
@@ -101,7 +99,7 @@ class WinSmb(UMainWindow):
 		btns_lay.addWidget(self.ok_btn)
 
 		self.adjustSize()
-		self.setFixedHeight(self.height())
+		self.setFixedSize(self.width(), self.height())
 
 	def open_servers(self):
 		self.servers_win = ServersWin()

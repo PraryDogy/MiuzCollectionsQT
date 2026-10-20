@@ -62,7 +62,7 @@ class Lng:
 	file_size = ("Размер", "Size")
 	info = ("Инфо", "Info")
 	loading = ("Загрузка...", "Loading...")
-	file_loading = ("Загрузка файлов", "File loading")
+	file_loading = ("Загрузка файлов", "Loading files")
 	no_photo = ("Нет фотографий", "No photos")
 	open_settings_window = ("Открыть настройки", "Open settings window")
 	paste = ("Вставить (⌘ + V)", "Paste (⌘ + V)")
@@ -72,10 +72,10 @@ class Lng:
 	)
 	update_grid = ("Обновить", "Update")
 	reset = ("Сбросить", "Reset")
-	reset_all = ("Сбросить все", "Reset all")
+	reset_all = ("Сбросить всё", "Reset all")
 	resol = ("Разрешение", "Resolution")
 	reveal_in_finder = ("Показать в Finder", "Reveal in Finder")
-	save_to_downloads = ("Сохранить в загрузки", "Save to Downloads")
+	save_to_downloads = ("Сохранить в папку «Загрузки»", "Save to Downloads")
 	search = ("Поиск", "Search")
 	settings = ("Настройки", "Settings")
 	total_files = ("Всего файлов", "Total files")
@@ -83,13 +83,13 @@ class Lng:
 	open = ("Открыть", "Open")
 	delete = ("Удалить", "Remove")
 	copy_name = ("Скопировать имя", "Copy filename")
-	copy_names = ("Скопировать имя объектов", "Copy object names")
+	copy_names = ("Скопировать имена объектов", "Copy object names")
 	attention = ("Внимание!", "Warning!")
 	remove_file_title = ("Безвозвратное удаление", "Permanent deletion")
 	remove_file_question = ("Вы действительно хотите безвозвратно удалить этот файл?", "Are you sure you want to permanently delete this file?")
 	remove_files_question = ("Вы действительно хотите безвозвратно удалить выбранные файлы?", "Are you sure you want to permanently delete these files?")
 	theme = ("Тема", "Theme")
-	theme_dark = ("Темная", "Dark")
+	theme_dark = ("Тёмная", "Dark")
 	theme_light = ("Светлая", "Light")
 	theme_auto = ("Авто", "Auto")
 	cut = ("Вырезать (⌘ + X)", "Cut (⌘ + X)")
@@ -98,7 +98,7 @@ class Lng:
 	folder = ("Каталог изображений", "Image catalog")
 	catalog_unavaiable = (
 		"Каталог недоступен",
-		"Catalog unavaiable"
+		"Catalog unavailable"
 	)
 	open_default = ("Открыть по умолчанию", "Open by default")
 	open_in = ("Открыть в приложении", "Open in application")
@@ -131,13 +131,13 @@ class Lng:
 	cancel = ("Отмена", "Cancel")
 	confirmation = ("Подтверждение", "Confirmation")
 	no_connection = ("Нет подключения", "No connection")
-	ok = ("Ок", "Ok")
+	ok = ("ОК", "OK")
 	alias = ("Имя", "Name")
 	ignore_list_descr = (
-		"Игнор лист: перетащите сюда папку или укажите имя с новой строки",
-		"Ignore list: drag a folder here or enter a name on a new line"
+		"Список исключений: перетащите сюда папку или укажите имя с новой строки.",
+		"Ignore list: drag a folder here or enter a name on a new line."
 	)
-	ignore_list = ("Игнор лист", "Ignore list")
+	ignore_list = ("Список исключений", "Ignore list")
 	minutes = ("минут", "minutes")
 	search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
 	show_system_files = ("Системные файлы в Finder", "System files in Finder")
@@ -157,7 +157,7 @@ class Lng:
 	remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
 	copy_filepath = ("Скопировать путь к файлу", "Copy filepath")
 	copy_dirpath = ("Скопировать путь", "Copy path")
-	copy_filepaths = ("Скопировать путь к файлам", "Copy file paths to files")
+	copy_filepaths = ("Скопировать пути к файлам", "Copy file paths")
 	add = ("Добавить", "Add")
 	search_in = ("Поиск в каталоге", "Search in catalog")
 	indexing_files = ("Индексация файлов", "Indexing files")
@@ -166,13 +166,13 @@ class Lng:
 	change = ("Изменить", "Change")
 	changed_short = ("Изм.", "Mod.")
 	file_name = ("Имя файла", "File name")
-	show_about = ("О приложении", "Аbout the app")
+	show_about = ("О приложении", "About the app")
 	alias_already_exists = (
 		"Каталог с таким именем уже существует. Пожалуйста, выберите другое.",
 		"A catalog with this name already exists. Please choose a different one."
 	)
 	image = ("Изображение", "Image")
-	sort_by_mod = ("По дате изменения", "Date modification")
+	sort_by_mod = ("По дате изменения", "Date modified")
 	sort_by_recent = ("По дате добавления", "Date added")
 	preparing = ("Подготовка", "Preparing")
 	save_text_long = (
@@ -193,7 +193,7 @@ class Lng:
 		"• Add the filter \".jpg\" and click \"Save\".\n"
 		"• In the app, select the \".jpg\" filter — all .jpg files will be displayed."
 	)
-	without_subfolders = ("Без подпапок", "Without subfolders")
+	without_subfolders = ("Без вложенных папок", "Without subfolders")
 	hide_digits = ("Скрыть нумерацию", "Hide numbering")
 	show_digits = ("Показать нумерацию", "Show numbering")
 	expand_all = ("Развернуть всё", "Expand All")
@@ -209,8 +209,8 @@ class Lng:
 		"The application will restart. Click OK to continue."
 	)
 	remove_folder = (
-		"Удалить каталог изображений",
-		"Delete the image catalog"
+		"Удалить каталог",
+		"Delete catalog"
 	)
 	reset_filters = (
 		"Фильтры по умолчанию",
@@ -222,7 +222,7 @@ class Lng:
 	)
 	erase_data_long = (
 		"Все кэшированные изображения будут удалены, а настройки приложения "
-		"сброшены до значений по умолчанию",
+		"сброшены до значений по умолчанию.",
 		"All cached images will be deleted and app settings will be reset "
 		"to defaults."
 	)
@@ -235,11 +235,11 @@ class Lng:
 	connect = ("Подключиться", "Connect")
 	server = ("Адрес сервера", "Server address")
 	# server_favs = ("Избранные серверы", "Favorites")
-	login = ("логин", "login")
-	password = ("пароль", "password")
+	login = ("Логин", "Username")
+	password = ("Пароль", "Password")
 	upload = ("Загрузить", "Upload")
-	clockwise = ("Повернуть по ч.с. (⌘ + →)", "Rotate cw (⌘ + →)")
-	counter_clockwise = ("Повернуть против ч.с. (⌘ + ←)", "Rotate ccw (⌘ + ←)")
+	clockwise = ("Повернуть по часовой стрелке (⌘ + →)", "Rotate clockwise (⌘ + →)")
+	counter_clockwise = ("Повернуть против часовой стрелки (⌘ + ←)", "Rotate counterclockwise (⌘ + ←)")
 
 	replace = ("Замена", "Replace")
 	replace_one = ("Заменить", "Replace")
@@ -252,29 +252,29 @@ class Lng:
 		"A file with this name already exists",
 	)
 	copy_error = (
-		"Произошла ошибка при копировании. Пожалуйста, попробуйте еще раз.",
+		"Произошла ошибка при копировании. Пожалуйста, попробуйте ещё раз.",
 		"An error occurred while copying. Please try again."
 	)
 	error = ("Ошибка", "Error")
 	next_search = ("Поиск новых изображений через", "Search new images in")
 	string_limit = (
 		"Длина имени должна составлять от 5 до 30 символов",
-		"The name length should be from 5 to 30 characters",
+		"The name must be between 5 and 30 characters long.",
 	)
 	valid_message = (
 		"Имя может содержать только русские и английские буквы, "
-		"цифры и пробелы",
+		"цифры и пробелы.",
 		"The name may contain only Russian and English letters, "
-		"digits and spaces",
+		"digits, and spaces.",
 	)
 	folder_name = (
 		"Имя:\n"
 		"• уникальное\n"
-		"• 5-30 символов\n"
+		"• от 5 до 30 символов\n"
 		"• русские и английские буквы, цифры и пробелы",
 		"Folder name:\n"
 		"• unique\n"
-		"• up to 5-30 characters\n"
+		"• 5–30 characters\n"
 		"• Russian and English letters, digits, and spaces",
 	)
 	update_thumb = (
@@ -302,24 +302,24 @@ class Lng:
 		"Go to folder"
 	)
 	path_hint_texts = (
-		"Перетащите папку сюда или выберите вручную",
-		"Drag and drop a catalog here or click change button"
+		"Перетащите папку сюда или выберите её вручную.",
+		"Drag a folder here or choose one manually."
 	)
 	access_error_text = (
-		"Нет доступа к каталогу изображений",
-		"Unable to access the image directory"  # Более технически точно
+		"Нет доступа к папке с изображениями.",
+		"Unable to access the image folder."  # Более технически точно
 	)
 	network_error_text = (
-		"Нет подключения к диску или неправильно указан путь к каталогу.",
-		"No drive connection or invalid path to catalog."
+		"Нет подключения к диску или указан неверный путь к каталогу.",
+		"The drive is unavailable or the catalog path is invalid."
 	)
 	hide_digits_full = (
 		"Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",
 		"Hides numeric prefixes for top-level folders only. Numbering of nested subfolders remains unchanged."
 	)
 	confirm_mf_path = (
-		"Вы уверены, что правильно указали путь?"
-		"\nНеправильный путь приведет к удалению всего каталога.",
+		"Вы уверены, что указали правильный путь?"
+		"\nНеверный путь приведёт к удалению всего каталога.",
 		"Are you sure you specified the path correctly?"
 		"\nAn incorrect path will result in the deletion of the entire directory.",
 	)
@@ -336,8 +336,8 @@ class Lng:
 		"Start"
 	)
 	image_search_drop = (
-		"Перетяните сюда цветное изображение",
-		"Drop color image here"
+		"Перетащите сюда цветное изображение.",
+		"Drop a color image here."
 	)
 	close = (
 		"Закрыть",
@@ -348,8 +348,8 @@ class Lng:
 		"Got it"
 	)
 	only_color = (
-		"Поддерживаются только цветные изображения",
-		"Only color images are supported"
+		"Поддерживаются только цветные изображения.",
+		"Only color images are supported."
 	)
 	accuracy = (
 		"Точность",
@@ -467,7 +467,7 @@ class Lng:
 	)
 	dates_management = (
 		"Управление датами",
-		"Dates management"
+		"Date management"
 	)
 	remove_tag_question = (
 		"Вы уверены, что хотите удалить этот тег из приложения навсегда?",
@@ -483,15 +483,15 @@ class Lng:
 	)
 	new_tag_desc = (
 		"Придумайте название для нового тега",
-		"Create a name for the new tag"
+		"Choose a name for the new tag"
 	)
 	recover_tags = (
 		"Восстановить теги",
-		"Reset tags"
+		"Restore default tags"
 	)
 	standart_tags = (
 		"Стандартные теги",
-		"Standart "
+		"Standard tags"
 	)
 	user_tags = (
 		"Пользовательские теги",
@@ -519,11 +519,11 @@ class Lng:
 	)
 	image_search_descr = (
 			"Поиск по цветовой гистограмме.\nЧем выше точность, тем меньше результатов.",
-			"Color histogram search.\nHigher accuracy means fewer results."
+			"Color histogram search.\nHigher accuracy returns fewer results."
 		)
 	please_wait = (
-		"Пожалуйста, подождите",
-		"Wait, please"
+		"Пожалуйста, подождите.",
+		"Please wait."
 	)
 	hide = (
 		"Скрыть",
