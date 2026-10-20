@@ -1435,8 +1435,8 @@ class CopyTextSvgWidget(SvgBgWidget):
 	green_mark = Static.COMMON_ICONS / "green_checkmark.svg"
 	CLICK_COOLDOWN = 500  # мс
 
-	def __init__(self, current_text: str):
-		super().__init__(self.svg_path, (33, 33), (20, 20))
+	def __init__(self, current_text: str, container_size: tuple, svg_size: tuple):
+		super().__init__(self.svg_path, container_size, svg_size)
 
 		self.setToolTip(Lng.copy_text[JsonData.lng_index])
 
@@ -1466,12 +1466,6 @@ class CopyTextSvgWidget(SvgBgWidget):
 		super().mouseReleaseEvent(event)
 
 
-class MfPathTitle(TitleTextLabel):
-	def __init__(self, text="", parent=None):
-		super().__init__(text, parent)
-
-
-
 class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
 	magnifier = Static.COMMON_ICONS / "magnifier.svg"
@@ -1482,7 +1476,6 @@ class MfPathWidget(UGroupBox):
 	def __init__(self, lng_index: int, mf_path: str = None):
 		super().__init__()
 		self.setAcceptDrops(True)
-		# self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		self.mf_path = mf_path
 		self.lng_index = lng_index
@@ -1492,7 +1485,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 	
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(10, 20, 10, 20)
+		self.main_lay.setContentsMargins(10, 10, 10, 10)
 		self.main_lay.setSpacing(0)
 
 		# Используем QStackedWidget для безопасного переключения экранов
@@ -1527,7 +1520,7 @@ class MfPathWidget(UGroupBox):
 		label_layout.setContentsMargins(0, 0, 0, 0)
 		label_layout.setSpacing(2)
 		label_layout.addStretch()
-		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
+		title = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
 		label_layout.addWidget(title)
 		self.no_path_label = GrayTextLabel(
 			Lng.path_hint_texts[self.lng_index]
@@ -1553,27 +1546,28 @@ class MfPathWidget(UGroupBox):
 		all_texts = QWidget()
 		all_texts_layout = QVBoxLayout(all_texts)
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
-		all_texts_layout.setSpacing(5)
+		all_texts_layout.setSpacing(0)
 
-		all_texts_layout.addStretch(1)
+		# all_texts_layout.addStretch(1)
 
 		first_row = TransparentWidget()
 		all_texts_layout.addWidget(first_row)
 		first_row_layout = QHBoxLayout(first_row)
 		first_row_layout.setContentsMargins(0, 0, 0, 0)
 		first_row_layout.setSpacing(10)
-
-		title_first_row = MfPathTitle(Lng.folder_path[JsonData.lng_index])
+		title_first_row = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
 		first_row_layout.addWidget(title_first_row)
-
 		change_btn = UPushButton(Lng.change[JsonData.lng_index])
 		first_row_layout.addWidget(change_btn)
-
 		first_row_layout.addStretch()
 
-		second_row = UGroupBox()
+		all_texts_layout.addSpacing(5)
+		all_texts_layout.addWidget(USep())
+		all_texts_layout.addSpacing(3)
+
+		second_row = TransparentWidget()
 		mf_path_layout = QHBoxLayout(second_row)
-		mf_path_layout.setContentsMargins(10, 5, 10, 5)
+		mf_path_layout.setContentsMargins(0, 0, 0, 0)
 		mf_path_layout.setSpacing(0)
 		all_texts_layout.addWidget(second_row)
 		all_texts_layout.addStretch(1)
@@ -1582,7 +1576,11 @@ class MfPathWidget(UGroupBox):
 		self.mf_path_label.set_elide(True)
 		mf_path_layout.addWidget(self.mf_path_label, stretch=1)
 
-		self.copy_text_svg_widget = CopyTextSvgWidget(self.mf_path)
+		self.copy_text_svg_widget = CopyTextSvgWidget(
+			self.mf_path,
+			container_size=(25, 25),
+			svg_size=(15, 15)
+		)
 		mf_path_layout.addWidget(self.copy_text_svg_widget, alignment=Qt.AlignmentFlag.AlignRight)
 
 		h_lay.addWidget(all_texts)

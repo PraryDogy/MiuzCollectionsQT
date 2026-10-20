@@ -110,7 +110,11 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_label.set_elide(True)
 		self.path_layout.addWidget(self.path_label, 1)
 
-		self.copy_path_button = CopyTextSvgWidget(self.current_dir)
+		self.copy_path_button = CopyTextSvgWidget(
+			self.current_dir,
+			container_size=(30, 30),
+			svg_size=(15, 15)
+		)
 		self.copy_path_button.clicked_.connect(self.copy_path_clicked.emit)
 		self.path_layout.addWidget(self.copy_path_button)
 
