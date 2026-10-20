@@ -1668,6 +1668,10 @@ class MfPathWidget(UGroupBox):
 			url = a0.mimeData().urls()[0].toLocalFile()
 			if url and os.path.isdir(url):
 				self.update_path(url)
+
+			print(url)
+
+
 		return super().dropEvent(a0)
 	
 	def dragEnterEvent(self, a0):
