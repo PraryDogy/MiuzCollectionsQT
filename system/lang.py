@@ -66,7 +66,10 @@ class Lng:
 	no_photo = ("Нет фотографий", "No photos")
 	open_settings_window = ("Открыть настройки", "Open settings window")
 	paste = ("Вставить (⌘ + V)", "Paste (⌘ + V)")
-	scan_folder = ("Искать изображения", "Find images")
+	scan_folder = (
+		"Искать изображения в каталоге",
+		"Scan catalog for images"
+	)
 	update_grid = ("Обновить", "Update")
 	reset = ("Сбросить", "Reset")
 	reset_all = ("Сбросить все", "Reset all")
@@ -307,8 +310,8 @@ class Lng:
 		"Unable to access the image directory"  # Более технически точно
 	)
 	network_error_text = (
-		"Нет подключения к диску или неправильно указан путь",
-		"No drive connection or invalid path"
+		"Нет подключения к диску или неправильно указан путь к каталогу.",
+		"No drive connection or invalid path to catalog."
 	)
 	hide_digits_full = (
 		"Скрывает числовые префиксы только у папок первого уровня. Нумерация вложенных подпапок сохраняется.",
