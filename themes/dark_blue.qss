@@ -380,6 +380,9 @@ UTagWidget[style="green"] {
     border: 1px solid #10B981;
 }
 
+MfPathWidget {
+    border: 2px dashed #263440;
+}
 
 /* ==================== TOOLTIP ==================== */
 
