@@ -39,7 +39,7 @@ class WinSmb(UMainWindow):
 		self.show_titlebar_sep()
 		
 		# Задаем фиксированную ширину
-		self.setFixedWidth(440)
+		# self.setFixedWidth(440)
 		
 		# Делаем отступы аккуратными
 		self.central_layout.setContentsMargins(15, 10, 15, 15)
@@ -61,9 +61,6 @@ class WinSmb(UMainWindow):
 		
 		header_lay.addStretch()
 		self.central_layout.addWidget(header_wid)
-
-		# --- Разделитель ---
-		# self.central_layout.addWidget(USep())
 
 		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
 		descr_lbl.setWordWrap(True)

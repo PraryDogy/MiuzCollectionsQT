@@ -299,8 +299,8 @@ class Lng:
 		"Go to folder"
 	)
 	path_hint_texts = (
-		"Перетащите каталог сюда или нажмите для выбора",
-		"Drag and drop a catalog here or click to browse"
+		"Перетащите папку сюда или выберите вручную",
+		"Drag and drop a catalog here or click change button"
 	)
 	access_error_text = (
 		"Нет доступа к каталогу изображений",
@@ -424,6 +424,7 @@ class Lng:
 		"MIUZ Diamonds"
 	)
 	choose_period = ("Выбрать период", "Choose period")
+	choose_folder = ("Выбрать папку", "Choose folder")
 	period = ("Период", "Period")
 	selected_dates = ("Выбранные даты", "Selected dates")
 	all_time = ("За все время", "All time")

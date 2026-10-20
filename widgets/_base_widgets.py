@@ -1468,10 +1468,10 @@ class CopyTextSvgWidget(SvgBgWidget):
 
 class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
-	magnifier = Static.COMMON_ICONS / "magnifier.svg"
+	magnifier = Static.COMMON_ICONS / "folder_magnifier.svg"
 	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
 	copy = Static.COMMON_ICONS / "copy.svg"
-	icon_size = 40
+	icon_size = (25, 25)
 
 	def __init__(self, lng_index: int, mf_path: str = None):
 		super().__init__()
@@ -1507,27 +1507,55 @@ class MfPathWidget(UGroupBox):
 	def init_no_path_ui(self):
 		"""Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
 		widget = QWidget()
-		h_lay = QHBoxLayout(widget)
-		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(10)
+		main_h_layout = QHBoxLayout(widget)
+		main_h_layout.setContentsMargins(0, 0, 0, 0)
+		main_h_layout.setSpacing(10)
+
+		# Контейнер для текста (структура скопирована из ok_path_ui)
+		all_texts = TransparentWidget()
+		main_h_layout.addWidget(all_texts)
+		all_texts_layout = QVBoxLayout(all_texts)
+		all_texts_layout.setContentsMargins(0, 0, 0, 0)
+		all_texts_layout.setSpacing(5)
+
+		all_texts_layout.addStretch()
+
+		first_row_container = TransparentWidget()
+		all_texts_layout.addWidget(first_row_container)
+		first_row_layout = QHBoxLayout(first_row_container)
+		first_row_layout.setContentsMargins(0, 0, 0, 0)
+		first_row_layout.setSpacing(10)
+		first_row_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+		
+		# Иконка лупы
 		magnifier_svg_widget = QSvgWidget()
 		magnifier_svg_widget.load(str(self.magnifier))
-		magnifier_svg_widget.setFixedSize(self.icon_size, self.icon_size)
-		h_lay.addWidget(magnifier_svg_widget)
-		# Контейнер для текста
-		label_widget = QWidget()
-		label_layout = QVBoxLayout(label_widget)
-		label_layout.setContentsMargins(0, 0, 0, 0)
-		label_layout.setSpacing(2)
-		label_layout.addStretch()
-		title = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
-		label_layout.addWidget(title)
-		self.no_path_label = GrayTextLabel(
-			Lng.path_hint_texts[self.lng_index]
-		)
-		label_layout.addWidget(self.no_path_label)
-		label_layout.addStretch()
-		h_lay.addWidget(label_widget)
+		magnifier_svg_widget.setFixedSize(*self.icon_size)
+		first_row_layout.addWidget(magnifier_svg_widget)
+		
+		title_first_row = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
+		first_row_layout.addWidget(title_first_row)
+
+		all_texts_layout.addWidget(USep())
+
+		self.no_path_label = GrayTextLabel(Lng.path_hint_texts[self.lng_index])
+		# self.no_path_label.setWordWrap(True)
+		all_texts_layout.addWidget(self.no_path_label)
+
+		all_texts_layout.addStretch()
+
+		buttons_container = TransparentWidget()
+		main_h_layout.addWidget(buttons_container)
+		buttons_layout = QHBoxLayout(buttons_container)
+		buttons_layout.setContentsMargins(0, 0, 0, 0)
+		buttons_layout.setSpacing(10)
+
+		choose_folder = UPushButton(Lng.choose_folder[JsonData.lng_index])
+		buttons_layout.addWidget(choose_folder)
+
+		# (Кнопка CopyTextSvgWidget здесь пропущена, т.к. пути еще нет, 
+		# но при необходимости ее можно легко добавить в hint_layout)
+
 		self.stack.addWidget(widget)
 
 	def init_ok_path_ui(self):
@@ -1539,7 +1567,7 @@ class MfPathWidget(UGroupBox):
 
 		green_checkmark_widget = QSvgWidget()
 		green_checkmark_widget.load(str(self.green_checkmark))
-		green_checkmark_widget.setFixedSize(self.icon_size, self.icon_size)
+		green_checkmark_widget.setFixedSize(*self.icon_size)
 		h_lay.addWidget(green_checkmark_widget)
 
 		# Контейнер для текста
@@ -1547,8 +1575,6 @@ class MfPathWidget(UGroupBox):
 		all_texts_layout = QVBoxLayout(all_texts)
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
 		all_texts_layout.setSpacing(0)
-
-		# all_texts_layout.addStretch(1)
 
 		first_row = TransparentWidget()
 		all_texts_layout.addWidget(first_row)
