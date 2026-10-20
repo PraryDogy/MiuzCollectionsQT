@@ -577,3 +577,7 @@ class Lng:
 		"Оставить все",
 		"Keep all"
 	)
+	server_alias_placeholder = (
+		"Подключение 1",
+		"Connection 1",
+	)

@@ -180,7 +180,7 @@ class LoginWin(UMainWindow):
 		# Псевдоним
 		form_lay.addWidget(ServerLabel(Lng.alias[JsonData.lng_index].capitalize()))
 		self.alias = ULineEdit()
-		self.alias.setPlaceholderText("Например: Studio")
+		self.alias.setPlaceholderText(Lng.server_alias_placeholder[JsonData.lng_index])
 		form_lay.addWidget(self.alias)
 
 		form_lay.addSpacing(4)
@@ -188,7 +188,7 @@ class LoginWin(UMainWindow):
 		# Сервер
 		form_lay.addWidget(ServerLabel(Lng.server[JsonData.lng_index].capitalize()))
 		self.server = ULineEdit()
-		self.server.setPlaceholderText("smb://192.168.x.x/shares")
+		self.server.setPlaceholderText("smb://shares/design/")
 		form_lay.addWidget(self.server)
 
 		form_lay.addSpacing(4)
