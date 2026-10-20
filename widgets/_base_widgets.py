@@ -1468,7 +1468,8 @@ class CopyTextSvgWidget(SvgBgWidget):
 
 class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
-	magnifier = Static.COMMON_ICONS / "folder_magnifier.svg"
+	folder_magnifier = Static.COMMON_ICONS / "image_folder.svg"
+	magnifier = Static.COMMON_ICONS / "magnifier.svg"
 	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
 	copy = Static.COMMON_ICONS / "copy.svg"
 	icon_size = (23, 23)
@@ -1502,6 +1503,10 @@ class MfPathWidget(UGroupBox):
 			self.show_no_path()
 
 		self.adjustSize()
+		OFFSET = 60
+		self.setMinimumWidth(self.width() + OFFSET)
+
+		self.copy_path_btn_locked = False
 
 	def init_no_path_ui(self):
 		"""Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
@@ -1510,33 +1515,55 @@ class MfPathWidget(UGroupBox):
 		main_h_layout.setContentsMargins(0, 0, 0, 0)
 		main_h_layout.setSpacing(10)
 
-		# Контейнер для текста (структура скопирована из ok_path_ui)
+		# Контейнер для текста
 		all_texts = TransparentWidget()
 		main_h_layout.addWidget(all_texts)
 		all_texts_layout = QVBoxLayout(all_texts)
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
 		all_texts_layout.setSpacing(8)
 
+		all_texts_layout.addStretch()
+
+		# СТРОКА 1: Заголовок
 		first_row_container = TransparentWidget()
 		all_texts_layout.addWidget(first_row_container)
 		first_row_layout = QHBoxLayout(first_row_container)
 		first_row_layout.setContentsMargins(0, 0, 0, 0)
 		first_row_layout.setSpacing(10)
 		
-		# Иконка лупы
 		magnifier_svg_widget = QSvgWidget()
-		magnifier_svg_widget.load(str(self.magnifier))
+		magnifier_svg_widget.load(str(self.folder_magnifier))
 		magnifier_svg_widget.setFixedSize(*self.icon_size)
 		first_row_layout.addWidget(magnifier_svg_widget)
 		
 		title_first_row = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
 		first_row_layout.addWidget(title_first_row)
 
+		# РАЗДЕЛИТЕЛЬ
 		all_texts_layout.addWidget(USep())
+		all_texts_layout.addSpacing(2)
+
+		# СТРОКА 2: Путь / Подсказка + Кнопка копирования (заглушка)
+		second_row = TransparentWidget()
+		all_texts_layout.addWidget(second_row)
+		mf_path_layout = QHBoxLayout(second_row)
+		mf_path_layout.setContentsMargins(0, 0, 0, 0)
+		mf_path_layout.setSpacing(0)
 
 		self.no_path_label = GrayTextLabel(Lng.path_hint_texts[self.lng_index])
-		all_texts_layout.addWidget(self.no_path_label)
+		mf_path_layout.addWidget(self.no_path_label, stretch=1)
 
+		# Невидимая кнопка-заглушка, удерживающая место
+		self.fake_copy_btn = UPushButton("")
+		self.fake_copy_btn.setIcon(QIcon(str(self.copy)))
+		# Заставляем Qt сохранять геометрию кнопки, даже когда она скрыта
+		sp = self.fake_copy_btn.sizePolicy()
+		sp.setRetainSizeWhenHidden(True)
+		self.fake_copy_btn.setSizePolicy(sp)
+		self.fake_copy_btn.setVisible(False)
+		mf_path_layout.addWidget(self.fake_copy_btn)
+
+		# СТРОКА 3: Нижние кнопки управления
 		buttons_container = TransparentWidget()
 		all_texts_layout.addWidget(buttons_container)
 		buttons_layout = QHBoxLayout(buttons_container)
@@ -1544,8 +1571,11 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.setSpacing(10)
 
 		choose_folder = UPushButton(Lng.choose_folder[JsonData.lng_index])
+		choose_folder.setIcon(QIcon(str(self.magnifier)))
 		choose_folder.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(choose_folder)
+
+		all_texts_layout.addStretch()
 
 		self.stack.addWidget(widget)
 
@@ -1563,24 +1593,28 @@ class MfPathWidget(UGroupBox):
 		all_texts_layout.setContentsMargins(0, 0, 0, 0)
 		all_texts_layout.setSpacing(8)
 
+		all_texts_layout.addStretch()
+
+		# СТРОКА 1: Заголовок
 		first_row_container = TransparentWidget()
 		all_texts_layout.addWidget(first_row_container)
 		first_row_layout = QHBoxLayout(first_row_container)
 		first_row_layout.setContentsMargins(0, 0, 0, 0)
 		first_row_layout.setSpacing(10)
 		
-		# Иконка галочки
 		green_checkmark_widget = QSvgWidget()
-		green_checkmark_widget.load(str(self.green_checkmark))
+		green_checkmark_widget.load(str(self.folder_magnifier))
 		green_checkmark_widget.setFixedSize(*self.icon_size)
 		first_row_layout.addWidget(green_checkmark_widget)
 		
 		title_first_row = TitleTextLabel(Lng.folder_path[JsonData.lng_index])
 		first_row_layout.addWidget(title_first_row)
 
+		# РАЗДЕЛИТЕЛЬ
 		all_texts_layout.addWidget(USep())
+		all_texts_layout.addSpacing(2)
 
-		# Строка для пути и кнопки копирования
+		# СТРОКА 2: Путь / Подсказка + Кнопка копирования (активная)
 		second_row = TransparentWidget()
 		all_texts_layout.addWidget(second_row)
 		mf_path_layout = QHBoxLayout(second_row)
@@ -1591,22 +1625,46 @@ class MfPathWidget(UGroupBox):
 		self.mf_path_label.set_elide(True)
 		mf_path_layout.addWidget(self.mf_path_label, stretch=1)
 
-		# Блок для кнопок (справа)
+		self.copy_path_btn = UPushButton("")
+		self.copy_path_btn.clicked.connect(self.copy_path)
+		self.copy_path_btn.setIcon(QIcon(str(self.copy)))
+		mf_path_layout.addWidget(self.copy_path_btn)
+
+		# СТРОКА 3: Нижние кнопки управления
 		buttons_container = TransparentWidget()
 		all_texts_layout.addWidget(buttons_container)
 		buttons_layout = QHBoxLayout(buttons_container)
 		buttons_layout.setContentsMargins(0, 0, 0, 0)
 		buttons_layout.setSpacing(10)
 
-		self.copy_text_svg_widget = UPushButton(Lng.copy_dirpath[JsonData.lng_index])
-		self.copy_text_svg_widget.clicked.connect(lambda: Utils.pyqt_copy_text(self.mf_path))
-		buttons_layout.addWidget(self.copy_text_svg_widget)
-
-		change_btn = UPushButton(Lng.change[JsonData.lng_index])
+		change_btn = UPushButton(Lng.choose_folder[JsonData.lng_index])
+		change_btn.setIcon(QIcon(str(self.magnifier)))
 		change_btn.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(change_btn)
 
+		all_texts_layout.addStretch()
+
 		self.stack.addWidget(widget)
+
+
+
+	def copy_path(self):
+
+		def unlock():
+			self.set_copy_path_btn_locked(False)
+			self.copy_path_btn.setIcon(QIcon(str(self.copy)))
+
+		if self.copy_path_btn_locked:
+			return
+
+		Utils.pyqt_copy_text(self.mf_path)
+		self.copy_path_btn.setIcon(QIcon(str(self.green_checkmark)))
+		self.set_copy_path_btn_locked(True)
+
+		QTimer.singleShot(1000, unlock)
+
+	def set_copy_path_btn_locked(self, value: bool):
+		self.copy_path_btn_locked = value
 
 	def show_no_path(self):
 		"""Включение режима ожидания пути"""
@@ -1641,7 +1699,11 @@ class MfPathWidget(UGroupBox):
 		return self.mf_path
 
 	def dialog_dir(self):
-		self.dialog = QFileDialog()
+		if not self.mf_path:
+			directory = os.path.expanduser("~/Downloads")
+		else:
+			directory = self.mf_path
+		self.dialog = QFileDialog(directory=directory)
 		url = self.dialog.getExistingDirectory()
 		if url and os.path.isdir(url):
 			self.update_path(url)
