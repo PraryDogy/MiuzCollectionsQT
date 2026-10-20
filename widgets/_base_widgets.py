@@ -1471,7 +1471,7 @@ class MfPathWidget(UGroupBox):
 	magnifier = Static.COMMON_ICONS / "folder_magnifier.svg"
 	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
 	copy = Static.COMMON_ICONS / "copy.svg"
-	icon_size = (25, 25)
+	icon_size = (23, 23)
 
 	def __init__(self, lng_index: int, mf_path: str = None):
 		super().__init__()
@@ -1485,7 +1485,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 	
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(10, 15, 10, 15)
+		self.main_lay.setContentsMargins(10, 8, 10, 8)
 		self.main_lay.setSpacing(0)
 
 		# Используем QStackedWidget для безопасного переключения экранов
@@ -1525,7 +1525,6 @@ class MfPathWidget(UGroupBox):
 		first_row_layout = QHBoxLayout(first_row_container)
 		first_row_layout.setContentsMargins(0, 0, 0, 0)
 		first_row_layout.setSpacing(10)
-		first_row_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 		
 		# Иконка лупы
 		magnifier_svg_widget = QSvgWidget()
@@ -1580,7 +1579,6 @@ class MfPathWidget(UGroupBox):
 		first_row_layout = QHBoxLayout(first_row_container)
 		first_row_layout.setContentsMargins(0, 0, 0, 0)
 		first_row_layout.setSpacing(10)
-		first_row_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 		
 		# Иконка галочки
 		green_checkmark_widget = QSvgWidget()
