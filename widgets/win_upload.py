@@ -10,37 +10,10 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, SvgIconButton,
+from ._base_widgets import (ActiveButton, GrayTextLabel, CopyTextSvgWidget,
                             TitleTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton, UTagWidget)
-
-
-class CopyPathButton(SvgIconButton):
-	svg_path = Static.COMMON_ICONS / "copy.svg"
-	green_mark = Static.COMMON_ICONS / "green_checkmark.svg"
-	CLICK_COOLDOWN = 500  # мс
-
-	def __init__(self, current_dir: str):
-		super().__init__(self.svg_path, (33, 33), (20, 20))
-		self.current_dir = current_dir
-		self._click_locked = False
-
-		self._cooldown_timer = QTimer(self)
-		self._cooldown_timer.setSingleShot(True)
-		self._cooldown_timer.setInterval(self.CLICK_COOLDOWN)
-		self._cooldown_timer.timeout.connect(self._unlock_click)
-
-	def _unlock_click(self):
-		self._click_locked = False
-
-	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			if not self._click_locked:
-				self._click_locked = True
-				self._cooldown_timer.start()
-				Utils.pyqt_copy_text(self.current_dir)
-		super().mouseReleaseEvent(event)
 
 
 class TitleWidget(UGroupBox):
@@ -137,7 +110,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_label.set_elide(True)
 		self.path_layout.addWidget(self.path_label, 1)
 
-		self.copy_path_button = CopyPathButton(self.current_dir)
+		self.copy_path_button = CopyTextSvgWidget(self.current_dir)
 		self.copy_path_button.clicked_.connect(self.copy_path_clicked.emit)
 		self.path_layout.addWidget(self.copy_path_button)
 
@@ -155,7 +128,7 @@ class DestinyFolderWidget(UGroupBox):
 			self.current_dir = url
 			self.path_label.setText(self.current_dir)
 			self.dir_changed.emit(self.current_dir)
-			self.copy_path_button.current_dir = self.current_dir
+			self.copy_path_button.current_text = self.current_dir
 
 
 class NotiWidget(UTagWidget):

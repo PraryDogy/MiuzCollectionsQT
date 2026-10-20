@@ -1227,175 +1227,6 @@ class MfAliasWidget(QWidget):
 		return mf_alias
 
 
-
-class MfPathTitle(TitleTextLabel):
-	def __init__(self, text="", parent=None):
-		super().__init__(text, parent)
-
-
-
-class MfPathWidget(UGroupBox):
-	changed = pyqtSignal()
-	magnifier = Static.COMMON_ICONS / "magnifier.svg"
-	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
-	copy = Static.COMMON_ICONS / "copy.svg"
-	icon_size = 40
-
-	def __init__(self, lng_index: int, mf_path: str = None):
-		super().__init__()
-		self.setAcceptDrops(True)
-		self.setCursor(Qt.CursorShape.PointingHandCursor)
-
-		self.mf_path = mf_path
-		self.lng_index = lng_index
-		
-		# Таймер инициализируем один раз как атрибут класса
-		self.watch_timer = QTimer(self)
-		self.watch_timer.timeout.connect(self.check_path_by_timer)
-	
-		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(10, 20, 10, 20)
-		self.main_lay.setSpacing(0)
-
-		# Используем QStackedWidget для безопасного переключения экранов
-		self.stack = QStackedWidget()
-		self.main_lay.addWidget(self.stack)
-
-		# Создаем обе панели заранее
-		self.init_no_path_ui()
-		self.init_ok_path_ui()
-
-		if self.mf_path and os.path.exists(self.mf_path):
-			self.show_ok_path()
-		else:
-			self.show_no_path()
-
-		self.adjustSize()
-		# self.setFixedHeight(self.height())
-
-	def init_no_path_ui(self):
-		"""Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
-		widget = QWidget()
-		h_lay = QHBoxLayout(widget)
-		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(10)
-		magnifier_svg_widget = QSvgWidget()
-		magnifier_svg_widget.load(str(self.magnifier))
-		magnifier_svg_widget.setFixedSize(self.icon_size, self.icon_size)
-		h_lay.addWidget(magnifier_svg_widget)
-		# Контейнер для текста
-		label_widget = QWidget()
-		label_layout = QVBoxLayout(label_widget)
-		label_layout.setContentsMargins(0, 0, 0, 0)
-		label_layout.setSpacing(2)
-		label_layout.addStretch()
-		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
-		label_layout.addWidget(title)
-		self.no_path_label = GrayTextLabel(
-			Lng.path_hint_texts[self.lng_index]
-		)
-		label_layout.addWidget(self.no_path_label)
-		label_layout.addStretch()
-		h_lay.addWidget(label_widget)
-		self.stack.addWidget(widget)
-
-	def init_ok_path_ui(self):
-		"""Создание панели 'Путь корректен' (индекс 1 в стеке)"""
-		widget = QWidget()
-		h_lay = QHBoxLayout(widget)
-		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(10)
-
-		green_checkmark_widget = QSvgWidget()
-		green_checkmark_widget.load(str(self.green_checkmark))
-		green_checkmark_widget.setFixedSize(self.icon_size, self.icon_size)
-		h_lay.addWidget(green_checkmark_widget)
-
-		# Контейнер для текста
-		label_widget = QWidget()
-		label_layout = QVBoxLayout(label_widget)
-		label_layout.setContentsMargins(0, 0, 0, 0)
-		label_layout.setSpacing(5)
-
-		label_layout.addStretch()
-
-		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
-		label_layout.addWidget(title)
-
-		mf_path_container = UGroupBox()
-		mf_path_layout = QHBoxLayout(mf_path_container)
-		mf_path_layout.setContentsMargins(10, 10, 10, 10)
-		mf_path_layout.setSpacing(0)
-		label_layout.addWidget(mf_path_container)
-		label_layout.addStretch()
-
-		self.mf_path_label = GrayTextLabel("")
-		self.mf_path_label.set_elide(True)
-		mf_path_layout.addWidget(self.mf_path_label)
-
-		copy_svg_button = SvgIconButton(str(self.copy))
-		copy_svg_button.setFixedSize(20, 20)
-		mf_path_layout.addWidget(copy_svg_button)
-
-		h_lay.addWidget(label_widget)
-
-		self.stack.addWidget(widget)
-
-	def show_no_path(self):
-		"""Включение режима ожидания пути"""
-		self.stack.setCurrentIndex(0)
-		if not self.watch_timer.isActive():
-			self.watch_timer.start(1000)  # Проверка каждую секунду
-
-	def show_ok_path(self):
-		"""Включение режима успешного пути"""
-		self.watch_timer.stop()  # Важно: останавливаем таймер сразу
-		self.mf_path_label.setText(self.mf_path)
-		self.stack.setCurrentIndex(1)
-
-	def check_path_by_timer(self):
-		"""Срабатывание таймера"""
-		if self.mf_path and os.path.exists(self.mf_path):
-			self.changed.emit()
-			self.show_ok_path()
-
-	def update_path(self, new_path: str):
-		"""Единый метод обновления пути из любых событий"""
-		self.mf_path = new_path.rstrip(os.sep)
-		self.changed.emit()
-		self.show_ok_path()
-
-	def validate(self):
-		if not self.mf_path or not os.path.exists(self.mf_path):
-			win_warn = WarningWindow(Lng.select_folder_path[self.lng_index])
-			win_warn.center_to_parent(self.window())
-			win_warn.show()
-			return None
-		return self.mf_path
-
-	def mouseReleaseEvent(self, a0: QMouseEvent):
-		if a0.button() != Qt.MouseButton.LeftButton:  # Исправлена проверка кнопки мыши
-			return super().mouseReleaseEvent(a0)
-		
-		dialog = QFileDialog()
-		url = dialog.getExistingDirectory()
-		if url and os.path.isdir(url):
-			self.update_path(url)
-		return super().mouseReleaseEvent(a0)
-		
-	def dropEvent(self, a0):
-		if a0.mimeData().hasUrls():
-			url = a0.mimeData().urls()[0].toLocalFile()
-			if url and os.path.isdir(url):
-				self.update_path(url)
-		return super().dropEvent(a0)
-	
-	def dragEnterEvent(self, a0):
-		if a0.mimeData().hasUrls():  # Принимаем дроп только если это ссылки/файлы
-			a0.accept()
-		return super().dragEnterEvent(a0)
-
-
 class MfStopListWidget(QWidget):
 	changed = pyqtSignal()
 
@@ -1534,6 +1365,7 @@ class _SvgIconButtonContainer(TransparentLabel):
 
 	def set_selected(self):
 		self.set_style_state(self.qss_selected_style)
+		print("123")
 
 	def set_pressed(self):
 		self.set_style_state(self.qss_pressed_style)
@@ -1545,7 +1377,7 @@ class _SvgIconButtonContainer(TransparentLabel):
 		ev.ignore()
 
 
-class SvgIconButton(TransparentWidget):
+class SvgBgWidget(TransparentWidget):
 	clicked_ = pyqtSignal()
 
 	def __init__(self, svg_path: Path, container_size: tuple, icon_size: tuple):
@@ -1597,3 +1429,206 @@ class SvgIconButton(TransparentWidget):
 			self.label.set_base()
 
 		super().mouseReleaseEvent(event)
+
+
+class CopyTextSvgWidget(SvgBgWidget):
+	svg_path = Static.COMMON_ICONS / "copy.svg"
+	green_mark = Static.COMMON_ICONS / "green_checkmark.svg"
+	CLICK_COOLDOWN = 500  # мс
+
+	def __init__(self, current_text: str):
+		super().__init__(self.svg_path, (33, 33), (20, 20))
+
+		self.setToolTip(Lng.copy_text[JsonData.lng_index])
+
+		self.current_text = current_text
+		self._click_locked = False
+
+		self._cooldown_timer = QTimer(self)
+		self._cooldown_timer.setSingleShot(True)
+		self._cooldown_timer.setInterval(self.CLICK_COOLDOWN)
+		self._cooldown_timer.timeout.connect(self._unlock_click)
+
+	def set_current_text(self, text: str):
+		self.current_text = text
+
+	def _unlock_click(self):
+		self._click_locked = False
+		self.svg_widget.load(str(self.svg_path))
+
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			if not self._click_locked:
+				self._click_locked = True
+				self._cooldown_timer.start()
+				Utils.pyqt_copy_text(self.current_text)
+				self.svg_widget.load(str(self.green_mark))
+
+		super().mouseReleaseEvent(event)
+
+
+class MfPathTitle(TitleTextLabel):
+	def __init__(self, text="", parent=None):
+		super().__init__(text, parent)
+
+
+
+class MfPathWidget(UGroupBox):
+	changed = pyqtSignal()
+	magnifier = Static.COMMON_ICONS / "magnifier.svg"
+	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
+	copy = Static.COMMON_ICONS / "copy.svg"
+	icon_size = 40
+
+	def __init__(self, lng_index: int, mf_path: str = None):
+		super().__init__()
+		self.setAcceptDrops(True)
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+		self.mf_path = mf_path
+		self.lng_index = lng_index
+		
+		# Таймер инициализируем один раз как атрибут класса
+		self.watch_timer = QTimer(self)
+		self.watch_timer.timeout.connect(self.check_path_by_timer)
+	
+		self.main_lay = QVBoxLayout(self)
+		self.main_lay.setContentsMargins(10, 20, 10, 20)
+		self.main_lay.setSpacing(0)
+
+		# Используем QStackedWidget для безопасного переключения экранов
+		self.stack = QStackedWidget()
+		self.main_lay.addWidget(self.stack)
+
+		# Создаем обе панели заранее
+		self.init_no_path_ui()
+		self.init_ok_path_ui()
+
+		if self.mf_path and os.path.exists(self.mf_path):
+			self.show_ok_path()
+		else:
+			self.show_no_path()
+
+		self.adjustSize()
+		# self.setFixedHeight(self.height())
+
+	def init_no_path_ui(self):
+		"""Создание панели 'Путь не выбран' (индекс 0 в стеке)"""
+		widget = QWidget()
+		h_lay = QHBoxLayout(widget)
+		h_lay.setContentsMargins(0, 0, 0, 0)
+		h_lay.setSpacing(10)
+		magnifier_svg_widget = QSvgWidget()
+		magnifier_svg_widget.load(str(self.magnifier))
+		magnifier_svg_widget.setFixedSize(self.icon_size, self.icon_size)
+		h_lay.addWidget(magnifier_svg_widget)
+		# Контейнер для текста
+		label_widget = QWidget()
+		label_layout = QVBoxLayout(label_widget)
+		label_layout.setContentsMargins(0, 0, 0, 0)
+		label_layout.setSpacing(2)
+		label_layout.addStretch()
+		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
+		label_layout.addWidget(title)
+		self.no_path_label = GrayTextLabel(
+			Lng.path_hint_texts[self.lng_index]
+		)
+		label_layout.addWidget(self.no_path_label)
+		label_layout.addStretch()
+		h_lay.addWidget(label_widget)
+		self.stack.addWidget(widget)
+
+	def init_ok_path_ui(self):
+		"""Создание панели 'Путь корректен' (индекс 1 в стеке)"""
+		widget = QWidget()
+		h_lay = QHBoxLayout(widget)
+		h_lay.setContentsMargins(0, 0, 0, 0)
+		h_lay.setSpacing(10)
+
+		green_checkmark_widget = QSvgWidget()
+		green_checkmark_widget.load(str(self.green_checkmark))
+		green_checkmark_widget.setFixedSize(self.icon_size, self.icon_size)
+		h_lay.addWidget(green_checkmark_widget)
+
+		# Контейнер для текста
+		label_widget = QWidget()
+		label_layout = QVBoxLayout(label_widget)
+		label_layout.setContentsMargins(0, 0, 0, 0)
+		label_layout.setSpacing(5)
+
+		label_layout.addStretch()
+
+		title = MfPathTitle(Lng.folder_path[JsonData.lng_index])
+		label_layout.addWidget(title)
+
+		mf_path_container = UGroupBox()
+		mf_path_layout = QHBoxLayout(mf_path_container)
+		mf_path_layout.setContentsMargins(10, 5, 10, 5)
+		mf_path_layout.setSpacing(0)
+		label_layout.addWidget(mf_path_container)
+
+		self.mf_path_label = GrayTextLabel("")
+		self.mf_path_label.set_elide(True)
+		mf_path_layout.addWidget(self.mf_path_label, stretch=1)
+
+		self.copy_text_svg_widget = CopyTextSvgWidget(self.mf_path)
+		# mf_path_layout.addWidget(self.copy_text_svg_widget, alignment=Qt.AlignmentFlag.AlignRight)
+
+		h_lay.addWidget(label_widget)
+
+		self.stack.addWidget(widget)
+
+	def show_no_path(self):
+		"""Включение режима ожидания пути"""
+		self.stack.setCurrentIndex(0)
+		if not self.watch_timer.isActive():
+			self.watch_timer.start(1000)  # Проверка каждую секунду
+
+	def show_ok_path(self):
+		"""Включение режима успешного пути"""
+		self.watch_timer.stop()  # Важно: останавливаем таймер сразу
+		self.mf_path_label.setText(self.mf_path)
+		self.copy_text_svg_widget.set_current_text(self.mf_path)
+		self.stack.setCurrentIndex(1)
+
+	def check_path_by_timer(self):
+		"""Срабатывание таймера"""
+		if self.mf_path and os.path.exists(self.mf_path):
+			self.changed.emit()
+			self.show_ok_path()
+
+	def update_path(self, new_path: str):
+		"""Единый метод обновления пути из любых событий"""
+		self.mf_path = new_path.rstrip(os.sep)
+		self.changed.emit()
+		self.show_ok_path()
+
+	def validate(self):
+		if not self.mf_path or not os.path.exists(self.mf_path):
+			win_warn = WarningWindow(Lng.select_folder_path[self.lng_index])
+			win_warn.center_to_parent(self.window())
+			win_warn.show()
+			return None
+		return self.mf_path
+
+	def mouseReleaseEvent(self, a0: QMouseEvent):
+		if a0.button() != Qt.MouseButton.LeftButton:  # Исправлена проверка кнопки мыши
+			return super().mouseReleaseEvent(a0)
+		
+		dialog = QFileDialog()
+		url = dialog.getExistingDirectory()
+		if url and os.path.isdir(url):
+			self.update_path(url)
+		return super().mouseReleaseEvent(a0)
+		
+	def dropEvent(self, a0):
+		if a0.mimeData().hasUrls():
+			url = a0.mimeData().urls()[0].toLocalFile()
+			if url and os.path.isdir(url):
+				self.update_path(url)
+		return super().dropEvent(a0)
+	
+	def dragEnterEvent(self, a0):
+		if a0.mimeData().hasUrls():  # Принимаем дроп только если это ссылки/файлы
+			a0.accept()
+		return super().dragEnterEvent(a0)

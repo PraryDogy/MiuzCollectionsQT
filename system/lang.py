@@ -148,6 +148,7 @@ class Lng:
 	copy_file = ("Копировать файл (⌘ + C)", "Copy file (⌘ + C)")
 	copy_files = ("Копировать файлы (⌘ + C)", "Copy files (⌘ + C)")
 	copy = ("Cкопировать (⌘ + C)", "Copy (⌘ + C)")
+	copy_text = ("Скопировать текст", "Copy text")
 	copy_all = ("Копировать все", "Copy all")
 	add_to_favorites = ("Добавить в избранное", "Add to favorites")
 	remove_from_favorites = ("Удалить из избранного", "Remove from favorites")
