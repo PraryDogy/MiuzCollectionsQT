@@ -10,10 +10,9 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, CopyTextSvgWidget,
-                            TitleTextLabel, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, USep)
+from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UMainWindow, UPushButton, USep)
 
 
 class TitleWidget(UGroupBox):
@@ -72,7 +71,7 @@ class DestinyFolderWidget(UGroupBox):
 
 		self.main_layout = QVBoxLayout(self)
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
-		self.main_layout.setSpacing(10)
+		self.main_layout.setSpacing(5)
 
 		self.title_container = TransparentWidget()
 		self.main_layout.addWidget(self.title_container)
@@ -88,6 +87,10 @@ class DestinyFolderWidget(UGroupBox):
 		self.title_label = TitleTextLabel(Lng.dest_folder[JsonData.lng_index])
 		self.title_layout.addWidget(self.title_label)
 
+		# с обычным spacing виджет под сепаратором будет как бы дальше
+		# из-за высоты кнопки, поэтому заголовок над сепаратором
+		# ощущается ближе к сепаратору, для этого мы добавляем смещение
+		self.main_layout.addSpacing(3)
 		self.main_layout.addWidget(USep())
 
 		self.path_row = TransparentWidget()

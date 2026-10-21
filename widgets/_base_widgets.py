@@ -1376,7 +1376,7 @@ class _SvgIconButtonContainer(TransparentLabel):
 		ev.ignore()
 
 
-class SvgBgWidget(TransparentWidget):
+class SvgWithBgWidget(TransparentWidget):
 	clicked_ = pyqtSignal()
 
 	def __init__(self, svg_path: Path, container_size: tuple, icon_size: tuple):
@@ -1426,42 +1426,6 @@ class SvgBgWidget(TransparentWidget):
 				self.clicked_.emit()
 
 			self.label.set_base()
-
-		super().mouseReleaseEvent(event)
-
-
-class CopyTextSvgWidget(SvgBgWidget):
-	svg_path = Static.COMMON_ICONS / "copy.svg"
-	green_mark = Static.COMMON_ICONS / "green_checkmark.svg"
-	CLICK_COOLDOWN = 500  # мс
-
-	def __init__(self, current_text: str, container_size: tuple, svg_size: tuple):
-		super().__init__(self.svg_path, container_size, svg_size)
-
-		self.setToolTip(Lng.copy_text[JsonData.lng_index])
-
-		self.current_text = current_text
-		self._click_locked = False
-
-		self._cooldown_timer = QTimer(self)
-		self._cooldown_timer.setSingleShot(True)
-		self._cooldown_timer.setInterval(self.CLICK_COOLDOWN)
-		self._cooldown_timer.timeout.connect(self._unlock_click)
-
-	def set_current_text(self, text: str):
-		self.current_text = text
-
-	def _unlock_click(self):
-		self._click_locked = False
-		self.svg_widget.load(str(self.svg_path))
-
-	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton:
-			if not self._click_locked:
-				self._click_locked = True
-				self._cooldown_timer.start()
-				Utils.pyqt_copy_text(self.current_text)
-				self.svg_widget.load(str(self.green_mark))
 
 		super().mouseReleaseEvent(event)
 
