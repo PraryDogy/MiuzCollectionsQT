@@ -16,7 +16,7 @@ from system.main_folder import Mf
 from system.multiprocess import BaseProcessWorker
 from system.shared_utils import ImgUtils
 from system.utils import Utils
-
+from queue import Empty
 
 class Tools:    
 	@staticmethod
@@ -609,6 +609,17 @@ class DirImagesUpdater(ScanerParent):
 		# Сохраняем список директорий для сканирования как свойство экземпляра
 		self.dirs_to_scan = dirs_to_scan
 
+	@staticmethod
+	def wait_for_answer(scaner: BaseScanerItem, timeout_sec: int = 600) -> bool:
+		"""
+		Ждёт решения пользователя из GUI (продолжить или отменить).
+		Нет ответа за timeout_sec секунд = отмена, ничего не удаляем.
+		"""
+		try:
+			return bool(scaner.response_queue.get(timeout=timeout_sec))
+		except Empty:
+			return False
+
 	def start(self):
 		"""
 		На основе сохраненного списка добавляются и удаляются миниатюры в "hashdir",
@@ -637,13 +648,9 @@ class DirImagesUpdater(ScanerParent):
 		if stmt:
 			data = (scaner.mf.mf_alias, len(removed_images))
 			scaner.process_queue.put(data)
-			while True:
-				if not scaner.response_queue.empty():
-					can_continue = scaner.response_queue.get()
-					if can_continue:
-						break
-					else:
-						return
+			can_continue = self.wait_for_answer(scaner)
+			if not can_continue:
+				return
 
 		# общий счет для отображения в GUI
 		scaner.total_count = len(removed_images) + len(new_images)
