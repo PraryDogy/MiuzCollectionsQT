@@ -555,7 +555,7 @@ class MfSettings(TransparentWidget):
 		self.mf_stop_list.text_edit.textChanged.connect(
 			lambda: self.mf_save_widget.show_warning()
 		)
-		# main_lay.addWidget(self.mf_stop_list)
+		main_lay.addWidget(self.mf_stop_list)
 
 		general_wid = UGroupBox()
 		# main_lay.addWidget(general_wid)

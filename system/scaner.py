@@ -30,6 +30,11 @@ class Tools:
 		except Exception as e:
 			print("scaner py, Tools, log, error", e)
 
+	@staticmethod
+	def escape_like(text: str) -> str:
+		"""Экранирует спецсимволы LIKE, чтобы путь сравнивался буквально."""
+		return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
 
 class ScanerWorker(BaseProcessWorker):
 	def __init__(self, target: callable, args: tuple):
@@ -355,12 +360,13 @@ class ImgLoader(ScanerParent):
 					.where(Thumbs.rel_img_path.not_ilike(two_slash))
 				)
 			else:
-				one_slash = f"{dir_item.rel_path}/%"
-				two_slash = f"{dir_item.rel_path}/%/%"
+				prefix = Tools.escape_like(dir_item.rel_path)
+				one_slash = f"{prefix}/%"
+				two_slash = f"{prefix}/%/%"
 				stmt = (
 					stmt
-					.where(Thumbs.rel_img_path.ilike(one_slash))
-					.where(Thumbs.rel_img_path.not_ilike(two_slash))
+					.where(Thumbs.rel_img_path.ilike(one_slash, escape="\\"))
+					.where(Thumbs.rel_img_path.not_ilike(two_slash, escape="\\"))
 				)
 				
 			for rel_thumb_path, rel_path, size, mod in conn.execute(stmt):
@@ -665,10 +671,11 @@ class RemovedDirsCleaner(ScanerParent):
 		scaner = self.scaner_item
 
 		def _get_thumbs(conn: sqlalchemy.Connection, dir_item: DirItem):
-			one_slash = f"{dir_item.rel_path}/%"
+			prefix = Tools.escape_like(dir_item.rel_path)
+			one_slash = f"{prefix}/%"
 			stmt_thumbs_to_remove = (
 				sqlalchemy.select(Thumbs.rel_thumb_path)
-				.where(Thumbs.rel_img_path.ilike(one_slash))
+				.where(Thumbs.rel_img_path.ilike(one_slash, escape="\\"))
 				.where(Thumbs.mf_alias == scaner.mf.mf_alias)
 			)
 			return conn.execute(stmt_thumbs_to_remove).scalars().all()
