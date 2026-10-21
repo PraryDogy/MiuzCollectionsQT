@@ -550,7 +550,7 @@ class MfSettings(TransparentWidget):
 
 		self.mf_stop_list = MfStopListWidget(
 			lng_index=JsonData.lng_index,
-			mf_stop_list=self.mf.mf_stop_list.copy()
+			mf_stop_list=self.mf.mf_stop_list
 		)
 		# НОВЫЙ СИГНАЛ ОБ ИЗМЕНЕНИИ
 		# self.mf_stop_list.text_edit.textChanged.connect(
