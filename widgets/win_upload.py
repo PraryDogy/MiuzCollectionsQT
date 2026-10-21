@@ -13,7 +13,7 @@ from system.utils import Utils
 from ._base_widgets import (ActiveButton, GrayTextLabel, CopyTextSvgWidget,
                             TitleTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, UTagWidget)
+                            UPushButton, USep)
 
 
 class TitleWidget(UGroupBox):
@@ -88,6 +88,8 @@ class DestinyFolderWidget(UGroupBox):
 		self.title_label = TitleTextLabel(Lng.dest_folder[JsonData.lng_index])
 		self.title_layout.addWidget(self.title_label)
 
+		self.main_layout.addWidget(USep())
+
 		self.path_row = TransparentWidget()
 		self.path_row_layout = QHBoxLayout(self.path_row)
 		self.path_row_layout.setContentsMargins(0, 0, 0, 0)
@@ -140,7 +142,7 @@ class UploadWin(UMainWindow):
 	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
 		super().__init__()
 		self.setWindowTitle(Lng.file_loading[JsonData.lng_index])
-		self.setFixedWidth(500)
+		self.setFixedWidth(450)
 		self.set_close_only()
 		self.set_always_on_top()
 
