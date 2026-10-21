@@ -1634,7 +1634,11 @@ class MfPathWidget(UGroupBox):
 
 		def unlock():
 			self.set_copy_path_btn_locked(False)
-			self.copy_path_btn.setIcon(QIcon(str(self.copy)))
+			try:
+				self.copy_path_btn.setIcon(QIcon(str(self.copy)))
+			except RuntimeError:
+				# на случай если окно уничтожилось раньше действия
+				pass
 
 		if self.copy_path_btn_locked:
 			return
