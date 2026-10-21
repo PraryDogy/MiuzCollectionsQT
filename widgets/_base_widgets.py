@@ -1448,13 +1448,18 @@ class MfPathWidget(UGroupBox):
 	def __init__(self, lng_index: int, mf: Mf = None):
 		super().__init__()
 		self.setAcceptDrops(True)
+		self.setSizePolicy(
+			QSizePolicy.Policy.Preferred,
+			QSizePolicy.Policy.Maximum,
+		)
 
+		self.copy_path_btn_locked = False
 		self.mf = mf
 		self.lng_index = lng_index
 
 		if mf:
 			self.mf_path = mf.mf_paths[0]
-			self.title_ = mf.mf_alias * 20
+			self.title_ = mf.mf_alias
 		else:
 			self.mf_path = None
 			self.title_ = Lng.catalog[JsonData.lng_index]
@@ -1505,7 +1510,6 @@ class MfPathWidget(UGroupBox):
 		texts_layout = QVBoxLayout(texts)
 		texts_layout.setContentsMargins(0, 0, 0, 0)
 		texts_layout.setSpacing(8)
-		texts_layout.addStretch()
 
 		return texts_layout
 
@@ -1558,7 +1562,6 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.addWidget(choose_folder)
 
 		texts_layout.addWidget(buttons_container)
-		texts_layout.addStretch()
 
 		self.stack.addWidget(widget)
 
@@ -1609,7 +1612,6 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.addWidget(change_btn)
 
 		texts_layout.addWidget(buttons_container)
-		texts_layout.addStretch()
 
 		self.stack.addWidget(widget)
 
