@@ -559,7 +559,7 @@ class MfSettings(TransparentWidget):
 		main_lay.addWidget(self.mf_stop_list)
 
 		general_wid = UGroupBox()
-		# main_lay.addWidget(general_wid)
+		main_lay.addWidget(general_wid)
 		general_wid_lay = QVBoxLayout(general_wid)
 		general_wid_lay.setContentsMargins(*RowArrowWidget.group_margings)
 		general_wid_lay.setSpacing(RowArrowWidget.group_spacing)
@@ -567,9 +567,9 @@ class MfSettings(TransparentWidget):
 		repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
 		repair_widget.set_left_icon(self.repair_svg)
 		repair_widget.clicked.connect(self.repair_mf)
-		# general_wid_lay.addWidget(repair_widget)
+		general_wid_lay.addWidget(repair_widget)
 
-		# general_wid_lay.addWidget(USep())
+		general_wid_lay.addWidget(USep())
 
 
 		# if len(Mf.items) > 1:
@@ -577,9 +577,9 @@ class MfSettings(TransparentWidget):
 		remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
 		remove_wid.set_left_icon(self.trash_svg)
 		remove_wid.clicked.connect(self.remove_mf)
-		# general_wid_lay.addWidget(remove_wid)
+		general_wid_lay.addWidget(remove_wid)
 
-		# general_wid_lay.addWidget(USep())
+		general_wid_lay.addWidget(USep())
 
 		self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
 		self.mf_save_widget.clicked.connect(self.save_mf_settings)
