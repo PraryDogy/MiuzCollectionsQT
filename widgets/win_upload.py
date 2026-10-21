@@ -1,7 +1,7 @@
 import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QFontMetrics
+from PyQt6.QtGui import QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QVBoxLayout
 
@@ -59,14 +59,16 @@ class TitleWidget(UGroupBox):
 
 class DestinyFolderWidget(UGroupBox):
 	dir_changed = pyqtSignal(str)
-	copy_path_clicked = pyqtSignal()
-
+	copy = Static.COMMON_ICONS / "copy.svg"
+	magnifier = Static.COMMON_ICONS / "magnifier.svg"
 	svg_path = Static.COMMON_ICONS / "folder_solid.svg"
+	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
 	svg_size = (20, 20)
 
 	def __init__(self, current_dir: str):
 		super().__init__()
 		self.current_dir = current_dir
+		self.copy_path_btn_locked = False
 
 		self.main_layout = QVBoxLayout(self)
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
@@ -83,52 +85,49 @@ class DestinyFolderWidget(UGroupBox):
 		self.title_svg.setFixedSize(*self.svg_size)
 		self.title_layout.addWidget(self.title_svg)
 
-		self.title_label = TransparentLabel(Lng.dest_folder[JsonData.lng_index])
+		self.title_label = TitleTextLabel(Lng.dest_folder[JsonData.lng_index])
 		self.title_layout.addWidget(self.title_label)
 
 		self.path_row = TransparentWidget()
 		self.path_row_layout = QHBoxLayout(self.path_row)
 		self.path_row_layout.setContentsMargins(0, 0, 0, 0)
 		self.path_row_layout.setSpacing(10)
-
 		self.main_layout.addWidget(self.path_row)
 
-		# GroupBox с путём
-		self.path_container = UGroupBox()
-		self.path_row_layout.addWidget(self.path_container, 1)
-
-		self.path_layout = QHBoxLayout(self.path_container)
-		self.path_layout.setContentsMargins(10, 2, 10, 2)
-		self.path_layout.setSpacing(10)
-
-		self.path_svg = QSvgWidget()
-		self.path_svg.load(str(self.svg_path))
-		self.path_svg.setFixedSize(*self.svg_size)
-		# self.path_layout.addWidget(self.path_svg)
-
-		self.path_label = TransparentLabel(self.current_dir)
+		self.path_label = GrayTextLabel(self.current_dir)
 		self.path_label.set_elide(True)
-		self.path_layout.addWidget(self.path_label, 1)
+		self.path_row_layout.addWidget(self.path_label, 1)
 
-		self.copy_path_button = CopyTextSvgWidget(
-			self.current_dir,
-			container_size=(30, 30),
-			svg_size=(15, 15)
-		)
-		self.copy_path_button.clicked_.connect(self.copy_path_clicked.emit)
-		self.path_layout.addWidget(self.copy_path_button)
+		self.copy_path_button = UPushButton("")
+		self.copy_path_button.setIcon(QIcon(str(self.copy)))
+		self.copy_path_button.clicked.connect(self.copy_path)
+		self.path_row_layout.addWidget(self.copy_path_button)
 
 		# Кнопка вне GroupBox
-		self.change_btn = UPushButton(Lng.change[JsonData.lng_index])
+		self.change_btn = UPushButton(Lng.choose_folder[JsonData.lng_index])
+		self.change_btn.setIcon(QIcon(str(self.magnifier)))
 		self.change_btn.clicked.connect(self.change_dir)
-		self.path_row_layout.addWidget(self.change_btn)
+		self.main_layout.addWidget(self.change_btn)
+
+	def copy_path(self):
+
+		def unlock():
+			self.copy_path_btn_locked = False
+			self.copy_path_button.setIcon(QIcon(str(self.copy)))
+
+		if self.copy_path_btn_locked:
+			return
+		Utils.pyqt_copy_text(self.current_dir)
+		self.copy_path_button.setIcon(QIcon(str(self.green_checkmark)))
+		self.copy_path_btn_locked = True
+		QTimer.singleShot(1000, unlock)
 
 	def change_dir(self):
 		self.file_dialog = QFileDialog()
 		self.file_dialog.setDirectory(self.current_dir)
 		url = self.file_dialog.getExistingDirectory()
 		if url and url != self.current_dir:
-			url = url.rstrip()
+			url = url.rstrip(os.sep)
 			self.current_dir = url
 			self.path_label.setText(self.current_dir)
 			self.dir_changed.emit(self.current_dir)

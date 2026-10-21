@@ -1647,8 +1647,6 @@ class MfPathWidget(UGroupBox):
 
 		self.stack.addWidget(widget)
 
-
-
 	def copy_path(self):
 
 		def unlock():
