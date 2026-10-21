@@ -1494,7 +1494,6 @@ class MfPathWidget(UGroupBox):
 
 		title = TitleTextLabel(self.title_)
 		title.set_elide(True)
-
 		layout.addWidget(title)
 
 		return layout
@@ -1502,14 +1501,14 @@ class MfPathWidget(UGroupBox):
 	def _create_base_layout(self, widget: QWidget):
 		main_layout = QHBoxLayout(widget)
 		main_layout.setContentsMargins(0, 0, 0, 0)
-		main_layout.setSpacing(10)
+		main_layout.setSpacing(0)
 
 		texts = TransparentWidget()
 		main_layout.addWidget(texts)
 
 		texts_layout = QVBoxLayout(texts)
 		texts_layout.setContentsMargins(0, 0, 0, 0)
-		texts_layout.setSpacing(8)
+		texts_layout.setSpacing(3)
 
 		return texts_layout
 
@@ -1519,23 +1518,35 @@ class MfPathWidget(UGroupBox):
 
 		# Заголовок
 		title_container = TransparentWidget()
-		title_container.setLayout(self._create_title(self.folder_magnifier))
+		title_container.setLayout(
+			self._create_title(self.folder_magnifier)
+		)
 		texts_layout.addWidget(title_container)
 
 		# Разделитель
 		texts_layout.addWidget(USep())
-		texts_layout.addSpacing(2)
 
-		# Подсказка и невидимая кнопка копирования
+		# Два лейбла слева, кнопка копирования справа
 		second_row = TransparentWidget()
 		path_layout = QHBoxLayout(second_row)
 		path_layout.setContentsMargins(0, 0, 0, 0)
 		path_layout.setSpacing(0)
 
+		labels_layout = QVBoxLayout()
+		labels_layout.setContentsMargins(0, 0, 0, 0)
+		labels_layout.setSpacing(2)
+
+		descr_label = GrayTextLabel(
+			Lng.catalog_path[JsonData.lng_index]
+		)
+		labels_layout.addWidget(descr_label)
+
 		self.no_path_label = GrayTextLabel(
 			Lng.path_hint_texts[self.lng_index]
 		)
-		path_layout.addWidget(self.no_path_label, 1)
+		labels_layout.addWidget(self.no_path_label)
+
+		path_layout.addLayout(labels_layout, 1)
 
 		self.fake_copy_btn = UPushButton("")
 		self.fake_copy_btn.setIcon(QIcon(str(self.copy)))
@@ -1546,6 +1557,7 @@ class MfPathWidget(UGroupBox):
 		self.fake_copy_btn.hide()
 
 		path_layout.addWidget(self.fake_copy_btn)
+
 		texts_layout.addWidget(second_row)
 
 		# Кнопки управления
@@ -1571,22 +1583,34 @@ class MfPathWidget(UGroupBox):
 
 		# Заголовок
 		title_container = TransparentWidget()
-		title_container.setLayout(self._create_title(self.green_checkmark))
+		title_container.setLayout(
+			self._create_title(self.green_checkmark)
+		)
 		texts_layout.addWidget(title_container)
 
 		# Разделитель
 		texts_layout.addWidget(USep())
-		texts_layout.addSpacing(2)
 
-		# Путь и кнопка копирования
+		# Лейблы вертикально слева, кнопка копирования справа
 		second_row = TransparentWidget()
 		path_layout = QHBoxLayout(second_row)
 		path_layout.setContentsMargins(0, 0, 0, 0)
 		path_layout.setSpacing(0)
 
+		labels_layout = QVBoxLayout()
+		labels_layout.setContentsMargins(0, 0, 0, 0)
+		labels_layout.setSpacing(2)
+
+		descr_label = GrayTextLabel(
+			Lng.catalog_path[JsonData.lng_index]
+		)
+		labels_layout.addWidget(descr_label)
+
 		self.mf_path_label = GrayTextLabel("")
 		self.mf_path_label.set_elide(True)
-		path_layout.addWidget(self.mf_path_label, 1)
+		labels_layout.addWidget(self.mf_path_label)
+
+		path_layout.addLayout(labels_layout, 1)
 
 		self.copy_path_btn = UPushButton("")
 		self.copy_path_btn.setIcon(QIcon(str(self.copy)))

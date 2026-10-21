@@ -116,7 +116,7 @@ class Lng:
 		"Для продолжения работы необходимо указать путь к папке с изображениями.",
 		"You need to specify the path to the image folder to continue."
 	)
-	folder_path = ("Папка с изображениями", "Image folder")
+	catalog_path = ("Путь к каталогу.", "Catalog path.")
 	general = ("Основные", "General")
 	at_least_one_folder_required = (
 		"Нужен хотя бы один каталог с изображениями",
