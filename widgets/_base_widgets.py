@@ -1512,6 +1512,21 @@ class MfPathWidget(UGroupBox):
 
 		return texts_layout
 
+	def _create_buttons_layout(self) -> TransparentWidget:
+		buttons_container = TransparentWidget()
+		buttons_layout = QHBoxLayout(buttons_container)
+		buttons_layout.setContentsMargins(0, 5, 0, 0)
+		buttons_layout.setSpacing(10)
+
+		button = UPushButton(
+			Lng.choose_folder[JsonData.lng_index]
+		)
+		button.setIcon(QIcon(str(self.magnifier)))
+		button.clicked.connect(self.dialog_dir)
+		buttons_layout.addWidget(button)
+
+		return buttons_container
+
 	def init_no_path_ui(self):
 		widget = QWidget()
 		texts_layout = self._create_base_layout(widget)
@@ -1560,19 +1575,7 @@ class MfPathWidget(UGroupBox):
 
 		texts_layout.addWidget(second_row)
 
-		# Кнопки управления
-		buttons_container = TransparentWidget()
-		buttons_layout = QHBoxLayout(buttons_container)
-		buttons_layout.setContentsMargins(0, 0, 0, 0)
-		buttons_layout.setSpacing(10)
-
-		choose_folder = UPushButton(
-			Lng.choose_folder[JsonData.lng_index]
-		)
-		choose_folder.setIcon(QIcon(str(self.magnifier)))
-		choose_folder.clicked.connect(self.dialog_dir)
-		buttons_layout.addWidget(choose_folder)
-
+		buttons_container = self._create_buttons_layout()
 		texts_layout.addWidget(buttons_container)
 
 		self.stack.addWidget(widget)
@@ -1622,19 +1625,7 @@ class MfPathWidget(UGroupBox):
 
 		texts_layout.addWidget(second_row)
 
-		# Кнопки управления
-		buttons_container = TransparentWidget()
-		buttons_layout = QHBoxLayout(buttons_container)
-		buttons_layout.setContentsMargins(0, 0, 0, 0)
-		buttons_layout.setSpacing(10)
-
-		change_btn = UPushButton(
-			Lng.choose_folder[JsonData.lng_index]
-		)
-		change_btn.setIcon(QIcon(str(self.magnifier)))
-		change_btn.clicked.connect(self.dialog_dir)
-		buttons_layout.addWidget(change_btn)
-
+		buttons_container = self._create_buttons_layout()
 		texts_layout.addWidget(buttons_container)
 
 		self.stack.addWidget(widget)
