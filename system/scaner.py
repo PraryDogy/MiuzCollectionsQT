@@ -24,7 +24,11 @@ class Tools:
 		filepath = Static.APP_DATA_DIR / "log.txt"
 		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		log_entry = f"[{timestamp}] {text}\n"
-		filepath.write_text(log_entry, encoding="utf-8", mode="a")
+		try:
+			with open(filepath, "a", encoding="utf-8") as f:
+				f.write(log_entry)
+		except Exception as e:
+			print("scaner py, Tools, log, error", e)
 
 
 class ScanerWorker(BaseProcessWorker):

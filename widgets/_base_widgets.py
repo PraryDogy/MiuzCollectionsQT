@@ -1233,32 +1233,6 @@ class MfAliasWidget(QWidget):
 		return mf_alias
 
 
-class MfStopListWidget(QWidget):
-	changed = pyqtSignal()
-
-	def __init__(self, lng_index: int, mf_stop_list: list[str]):
-		super().__init__()
-		self.lng_index = lng_index
-
-		v_layout = QVBoxLayout(self)
-		v_layout.setContentsMargins(0, 0, 0, 0)
-		v_layout.setSpacing(0)
-
-		name_text = QLabel(Lng.ignore_list_descr[lng_index])
-		name_text.setContentsMargins(2, 0, 2, 0)
-		v_layout.addWidget(name_text)
-
-		v_layout.addSpacing(10)
-
-		self.text_edit = UTextEdit()
-		self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
-		self.text_edit.textChanged.connect(self.changed.emit)
-		v_layout.addWidget(self.text_edit)
-
-		if mf_stop_list:
-			self.text_edit.setPlainText("\n".join(mf_stop_list))
-
-
 class FlowLayout(QLayout):
 	def __init__(self, parent=None, spacing=7):
 		super().__init__(parent)
@@ -1705,3 +1679,30 @@ class MfPathWidget(UGroupBox):
 		if a0.mimeData().hasUrls():  # Принимаем дроп только если это ссылки/файлы
 			a0.accept()
 		return super().dragEnterEvent(a0)
+
+
+
+class MfStopListWidget(QWidget):
+	changed = pyqtSignal()
+
+	def __init__(self, lng_index: int, mf_stop_list: list[str]):
+		super().__init__()
+		self.lng_index = lng_index
+
+		v_layout = QVBoxLayout(self)
+		v_layout.setContentsMargins(0, 0, 0, 0)
+		v_layout.setSpacing(0)
+
+		name_text = QLabel(Lng.ignore_list_descr[lng_index])
+		name_text.setContentsMargins(2, 0, 2, 0)
+		v_layout.addWidget(name_text)
+
+		v_layout.addSpacing(10)
+
+		self.text_edit = UTextEdit()
+		self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
+		self.text_edit.textChanged.connect(self.changed.emit)
+		v_layout.addWidget(self.text_edit)
+
+		if mf_stop_list:
+			self.text_edit.setPlainText("\n".join(mf_stop_list))
