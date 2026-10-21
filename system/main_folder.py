@@ -127,5 +127,4 @@ class Mf:
 			for i in cls.items:
 				i.repair_ignore_list()
 				data.append(i.get_data())
-			print(data)
 			json.dump(data, file, ensure_ascii=False, indent=4)

@@ -552,10 +552,9 @@ class MfSettings(TransparentWidget):
 			lng_index=JsonData.lng_index,
 			mf_stop_list=self.mf.mf_stop_list
 		)
-		# НОВЫЙ СИГНАЛ ОБ ИЗМЕНЕНИИ
-		# self.mf_stop_list.text_edit.textChanged.connect(
-		# 	lambda: self.mf_save_widget.show_warning()
-		# )
+		self.mf_stop_list.changed.connect(
+			lambda: self.mf_save_widget.show_warning()
+		)
 		main_lay.addWidget(self.mf_stop_list)
 
 		general_wid = UGroupBox()
@@ -641,7 +640,7 @@ class MfSettings(TransparentWidget):
 				if i.mf_alias == self.mf.mf_alias:
 					current_mf = i
 					break
-			mf_stop_list = self.mf_stop_list.text_edit.toPlainText().split("\n")
+			mf_stop_list = self.mf_stop_list.get_stop_list()
 			current_mf.mf_paths = [self.path_widget.mf_path, ]
 			current_mf.mf_current_path = self.path_widget.mf_path
 			current_mf.mf_stop_list = mf_stop_list
@@ -695,9 +694,9 @@ class NewMfSettings(TransparentWidget):
 			lng_index=JsonData.lng_index,
 			mf_stop_list=[]
 		)
-		# self.mf_stop_list.text_edit.textChanged.connect(
-		# 	lambda: self.mf_save_widget.show_warning()
-		# )
+		self.mf_stop_list.changed.connect(
+			lambda: self.mf_save_widget.show_warning()
+		)
 		main_lay.addWidget(self.mf_stop_list)
 
 		save_group = UGroupBox()
@@ -748,7 +747,7 @@ class NewMfSettings(TransparentWidget):
 
 		mf_path = self.mf_path_widget.validate()
 		mf_alias = get_mf_alias()
-		mf_stop_list = self.mf_stop_list.text_edit.toPlainText().split("\n")
+		mf_stop_list = self.mf_stop_list.get_stop_list()
 
 		if mf_path and mf_alias:
 			super_win = SuperConfirmWindow(

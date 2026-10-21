@@ -1692,7 +1692,7 @@ class MfStopListWidget(UGroupBox):
 	def __init__(self, lng_index: int, mf_stop_list: list[str]):
 		super().__init__()
 		self.lng_index = lng_index
-		self.mf_stop_list = mf_stop_list
+		self.draft_stop_list = list(mf_stop_list)
 
 		v_layout = QVBoxLayout(self)
 		v_layout.setContentsMargins(10, 10, 10, 10)
@@ -1728,38 +1728,6 @@ class MfStopListWidget(UGroupBox):
 		self.reload_tags()
 		self.adjustSize()
 
-	def create_tags_layout(self):
-		lay = FlowLayout(self.tags_container)
-		lay.setContentsMargins(0, 0, 0, 0)
-		# lay.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-
-		# self.mf_stop_list = (
-		# 	"Анна",
-		# 	"Дмитрий",
-		# 	"Test",
-		# 	"Иви",
-		# 	"Вика",
-		# 	"светофор",
-		# 	"кодинг",
-		# 	"vibe coding"
-		# )
-
-		for i in self.mf_stop_list:
-			tag = UTagWidget(
-				text=i,
-				qss_style=UTagWidget.qss_gray,
-				right_svg_path=str(self.trash_svg)
-			)
-			lay.addWidget(tag)
-
-		add_tag = UTagWidget(
-			text="Добавить__",
-			qss_style=UTagWidget.qss_transparent,
-			left_svg_path=str(self.plus_svg)
-		)
-		add_tag.text_clicked.connect(self.add_tag)
-		lay.addWidget(add_tag)
-
 	def clear_tags_container(self):
 		while self.tags_layout.count():
 			item = self.tags_layout.takeAt(0)
@@ -1771,7 +1739,7 @@ class MfStopListWidget(UGroupBox):
 	def reload_tags(self):
 		self.clear_tags_container()
 
-		for name in self.mf_stop_list:
+		for name in self.draft_stop_list:
 			if not name:
 				continue
 
@@ -1794,43 +1762,35 @@ class MfStopListWidget(UGroupBox):
 	def remove_tag(self, text: str):
 
 		def finished():
-			self.mf_stop_list.remove(text)
+			if text in self.draft_stop_list:
+				self.draft_stop_list.remove(text)
 			self.reload_tags()
+			self.changed.emit()
 
 		self.confirm_win = ConfirmWindow(
-			"Вы уверены, что хотите удалить тег?__"
+			"Вы уверены, что хотите удалить тег?"
 		)
 		self.confirm_win.center_to_parent(self.window())
 		self.confirm_win.ok_clicked.connect(finished)
 		self.confirm_win.show()
 
 	def add_tag(self):
-		# верификация имени
-		# тег по пути а не имени?
 
 		def finished(text: str):
-			self.mf_stop_list.append(text)
+			text = text.strip()
+			if not text or text in self.draft_stop_list:
+				return
+			self.draft_stop_list.append(text)
 			self.reload_tags()
+			self.changed.emit()
 
 		self.text_win = InputTextWin(
-			description="Имя папки__",
+			description="Имя папки",
 			svg_path=str(self.trash_svg)
 		)
 		self.text_win.center_to_parent(self.window())
 		self.text_win.ok_clicked.connect(finished)
 		self.text_win.show()
 
-
-		# name_text = QLabel(Lng.ignore_list_descr[lng_index])
-		# name_text.setContentsMargins(2, 0, 2, 0)
-		# v_layout.addWidget(name_text)
-
-		# v_layout.addSpacing(10)
-
-		# self.text_edit = UTextEdit()
-		# self.text_edit.setPlaceholderText(Lng.ignore_list[lng_index])
-		# self.text_edit.textChanged.connect(self.changed.emit)
-		# v_layout.addWidget(self.text_edit)
-
-		# if mf_stop_list:
-		# 	self.text_edit.setPlainText("\n".join(mf_stop_list))
+	def get_stop_list(self) -> list[str]:
+		return list(self.draft_stop_list)
