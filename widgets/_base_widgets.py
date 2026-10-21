@@ -1745,9 +1745,6 @@ class MfStopListWidget(UGroupBox):
 		# )
 
 		for i in self.mf_stop_list:
-			if not i:
-				print("base widgets стоп лист пустые кавычки")
-				continue
 			tag = UTagWidget(
 				text=i,
 				qss_style=UTagWidget.qss_gray,

@@ -117,8 +117,15 @@ class Mf:
 	def get_data(self):
 		return {i: getattr(self, i) for i in self.__slots__}
 
+	def repair_ignore_list(self):
+		self.mf_stop_list = [i for i in self.mf_stop_list if i]
+
 	@classmethod
 	def write_json_data(cls):
 		with open(Static.MF_JSON, "w", encoding="utf-8") as file:
-			data = [i.get_data() for i in cls.items]
+			data = []
+			for i in cls.items:
+				i.repair_ignore_list()
+				data.append(i.get_data())
+			print(data)
 			json.dump(data, file, ensure_ascii=False, indent=4)
