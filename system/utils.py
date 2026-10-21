@@ -151,9 +151,7 @@ class Utils:
 				widget.setParent(None)
 				widget.deleteLater()
 
-	@classmethod
-	def print_error(cls):
-		print()
-		print("Исключение обработано")
-		print(traceback.format_exc())
-		print()
+	@staticmethod
+	def escape_like(text: str) -> str:
+		"""Экранирует спецсимволы LIKE, чтобы путь сравнивался буквально."""
+		return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")

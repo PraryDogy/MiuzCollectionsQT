@@ -24,16 +24,8 @@ class Tools:
 		filepath = Static.APP_DATA_DIR / "log.txt"
 		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		log_entry = f"[{timestamp}] {text}\n"
-		try:
-			with open(filepath, "a", encoding="utf-8") as f:
-				f.write(log_entry)
-		except Exception as e:
-			print("scaner py, Tools, log, error", e)
-
-	@staticmethod
-	def escape_like(text: str) -> str:
-		"""Экранирует спецсимволы LIKE, чтобы путь сравнивался буквально."""
-		return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+		with open(filepath, "a", encoding="utf-8") as f:
+			f.write(log_entry)
 
 
 class ScanerWorker(BaseProcessWorker):
@@ -360,7 +352,7 @@ class ImgLoader(ScanerParent):
 					.where(Thumbs.rel_img_path.not_ilike(two_slash))
 				)
 			else:
-				prefix = Tools.escape_like(dir_item.rel_path)
+				prefix = Utils.escape_like(dir_item.rel_path)
 				one_slash = f"{prefix}/%"
 				two_slash = f"{prefix}/%/%"
 				stmt = (
@@ -678,7 +670,7 @@ class RemovedDirsCleaner(ScanerParent):
 		scaner = self.scaner_item
 
 		def _get_thumbs(conn: sqlalchemy.Connection, dir_item: DirItem):
-			prefix = Tools.escape_like(dir_item.rel_path)
+			prefix = Utils.escape_like(dir_item.rel_path)
 			one_slash = f"{prefix}/%"
 			stmt_thumbs_to_remove = (
 				sqlalchemy.select(Thumbs.rel_thumb_path)

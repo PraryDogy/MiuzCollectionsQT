@@ -176,7 +176,7 @@ class DbImagesLoader(URunnable):
 				Thumbs.fav
 			)
 			.where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
-			.where(Thumbs.rel_img_path.ilike(f"{rel_path}/%"))
+			.where(Thumbs.rel_img_path.ilike(f"{Utils.escape_like(rel_path)}/%", escape="\\"))
 			.order_by(-Thumbs.mod if Dynamic.sort_by_mod_enabled else -Thumbs.id)
 			.limit(Static.THUMBS_LOAD_LIMIT)
 			.offset(Dynamic.loaded_thumbs)
@@ -186,10 +186,10 @@ class DbImagesLoader(URunnable):
 			stmt = stmt.where(Thumbs.fav == 1)
 
 		if Dynamic.no_subfolders_tag_enabled:
-			two_slash = f"{rel_path}/%/%"
+			two_slash = f"{Utils.escape_like(rel_path)}/%/%"
 			stmt = (
 				stmt
-				.where(Thumbs.rel_img_path.not_ilike(two_slash))
+				.where(Thumbs.rel_img_path.not_ilike(two_slash, escape="\\"))
 			)
 
 		if Dynamic.word_tags_list:
