@@ -323,55 +323,37 @@ class ImgLoader(ScanerParent):
 
 	def get_db_images(self) -> list[ImgItem]:
 		"""
-		Возвращает информацию об изображениях в БД из указанных директорий:
-		- db_images список ImgItem
+		Возвращает записи об изображениях из БД для изменённых папок.
+		Один запрос на весь Mf, дальше фильтрация по родительской папке.
 		"""
-		# Используем self.scaner_item напрямую
 		scaner = self.scaner_item
-		conn = scaner.engine.connect()
-		db_images: list[ImgItem] = []
-		
-		# Используем сохраненный в self список директорий
-		for dir_item in self.dirs_to_scan:
-			stmt = (
-				sqlalchemy.select(
-					Thumbs.rel_thumb_path,
-					Thumbs.rel_img_path,
-					Thumbs.size,
-					Thumbs.mod
-				)
-				.where(Thumbs.mf_alias == scaner.mf.mf_alias)
+		wanted_dirs = {dir_item.rel_path for dir_item in self.dirs_to_scan}
+
+		stmt = (
+			sqlalchemy.select(
+				Thumbs.rel_thumb_path,
+				Thumbs.rel_img_path,
+				Thumbs.size,
+				Thumbs.mod,
 			)
-			
-			if dir_item.rel_path == os.sep:
-				one_slash = "/%"
-				two_slash = "/%/%"
-				stmt = (
-					stmt
-					.where(Thumbs.rel_img_path.ilike(one_slash))
-					.where(Thumbs.rel_img_path.not_ilike(two_slash))
-				)
-			else:
-				prefix = Utils.escape_like(dir_item.rel_path)
-				one_slash = f"{prefix}/%"
-				two_slash = f"{prefix}/%/%"
-				stmt = (
-					stmt
-					.where(Thumbs.rel_img_path.ilike(one_slash, escape="\\"))
-					.where(Thumbs.rel_img_path.not_ilike(two_slash, escape="\\"))
-				)
-				
+			.where(Thumbs.mf_alias == scaner.mf.mf_alias)
+		)
+
+		db_images: list[ImgItem] = []
+		with scaner.engine.connect() as conn:
 			for rel_thumb_path, rel_path, size, mod in conn.execute(stmt):
+				# файл принадлежит папке, если его родительская папка есть в списке
+				folder = os.path.dirname(rel_path)
+				if folder not in wanted_dirs:
+					continue
 				abs_img_path = Utils.add_mf_path(
 					mf_path=scaner.mf.mf_current_path,
 					rel_path=rel_path
 				)
-				img_item = ImgItem(
-					abs_img_path, size, mod, rel_thumb_path
+				db_images.append(
+					ImgItem(abs_img_path, size, mod, rel_thumb_path)
 				)
-				db_images.append(img_item)
-				
-		conn.close()
+
 		return db_images
 
 
