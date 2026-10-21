@@ -534,14 +534,14 @@ class MfSettings(TransparentWidget):
 		self.name_wid = WinSettingsMfAliasTitle(text)
 		
 		# header_lay.addWidget(self.icon_wid)
-		header_lay.addWidget(self.name_wid)
+		# header_lay.addWidget(self.name_wid)
 		header_lay.addStretch()
 
 		main_lay.addWidget(header_container)
 
 		self.path_widget = MfPathWidget(
 			lng_index=JsonData.lng_index,
-			mf_path=self.mf.mf_current_path
+			mf=self.mf
 		)
 		self.path_widget.changed.connect(
 			lambda: self.mf_save_widget.show_warning()
@@ -555,10 +555,10 @@ class MfSettings(TransparentWidget):
 		self.mf_stop_list.text_edit.textChanged.connect(
 			lambda: self.mf_save_widget.show_warning()
 		)
-		main_lay.addWidget(self.mf_stop_list)
+		# main_lay.addWidget(self.mf_stop_list)
 
 		general_wid = UGroupBox()
-		main_lay.addWidget(general_wid)
+		# main_lay.addWidget(general_wid)
 		general_wid_lay = QVBoxLayout(general_wid)
 		general_wid_lay.setContentsMargins(*RowArrowWidget.group_margings)
 		general_wid_lay.setSpacing(RowArrowWidget.group_spacing)
@@ -566,9 +566,9 @@ class MfSettings(TransparentWidget):
 		repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
 		repair_widget.set_left_icon(self.repair_svg)
 		repair_widget.clicked.connect(self.repair_mf)
-		general_wid_lay.addWidget(repair_widget)
+		# general_wid_lay.addWidget(repair_widget)
 
-		general_wid_lay.addWidget(USep())
+		# general_wid_lay.addWidget(USep())
 
 
 		# if len(Mf.items) > 1:
@@ -576,13 +576,13 @@ class MfSettings(TransparentWidget):
 		remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
 		remove_wid.set_left_icon(self.trash_svg)
 		remove_wid.clicked.connect(self.remove_mf)
-		general_wid_lay.addWidget(remove_wid)
+		# general_wid_lay.addWidget(remove_wid)
 
-		general_wid_lay.addWidget(USep())
+		# general_wid_lay.addWidget(USep())
 
 		self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
 		self.mf_save_widget.clicked.connect(self.save_mf_settings)
-		general_wid_lay.addWidget(self.mf_save_widget)
+		# general_wid_lay.addWidget(self.mf_save_widget)
 
 		main_lay.addStretch()
 
@@ -683,7 +683,7 @@ class NewMfSettings(TransparentWidget):
 
 		self.mf_path_widget = MfPathWidget(
 			lng_index=JsonData.lng_index,
-			mf_path=mf_path
+			mf=None
 		)
 		self.mf_path_widget.changed.connect(
 			lambda: self.mf_path_widget_changed()
