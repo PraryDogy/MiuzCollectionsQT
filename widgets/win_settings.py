@@ -518,27 +518,6 @@ class MfSettings(TransparentWidget):
 		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
 
-		header_container = TransparentWidget()
-		header_lay = QHBoxLayout(header_container)
-		header_lay.setAlignment(Qt.AlignmentFlag.AlignBottom)
-		header_lay.setContentsMargins(2, 0, 2, 0)
-		header_lay.setSpacing(10)
-
-		# header_container.setStyleSheet("background: red;")
-
-		self.icon_wid = QSvgWidget(str(self.image_folder_svg))
-		self.icon_wid.setFixedSize(*self.image_folder_size)
-
-		text = f"{Lng.alias[JsonData.lng_index]}: {self.mf.mf_alias}"
-		text = f"{self.mf.mf_alias}"
-		self.name_wid = WinSettingsMfAliasTitle(text)
-		
-		# header_lay.addWidget(self.icon_wid)
-		# header_lay.addWidget(self.name_wid)
-		header_lay.addStretch()
-
-		main_lay.addWidget(header_container)
-
 		self.path_widget = MfPathWidget(
 			lng_index=JsonData.lng_index,
 			mf=self.mf
