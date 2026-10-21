@@ -26,10 +26,10 @@ from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
 							MfStopListWidget, RowArrowWidget,
 							SaveRowArrowWidget, SuperConfirmWindow,
 							UGroupBox, TransparentLabel,
-							TransparentWidget, USep, ULineEdit,
+							TransparentWidget, USep, GrayTextLabel,
 							UListSpacerItem, UListWidget, UListWidgetItem,
 							UMainWindow, UMenu, UPushButton, USpinBox,
-							UTextEdit, WarningWindow)
+							ActiveButton, WarningWindow)
 
 
 def restart_app():
@@ -506,6 +506,7 @@ class MfSettings(TransparentWidget):
 	repair_svg = Static.COMMON_ICONS / "repair.svg"
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
 	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+	save_svg = Static.COMMON_ICONS / "save.svg"
 	image_folder_size = (23, 23)
 
 	def __init__(self, mf_index: int):
@@ -532,38 +533,40 @@ class MfSettings(TransparentWidget):
 			mf_stop_list=self.mf.mf_stop_list
 		)
 		self.mf_stop_list.changed.connect(
-			lambda: self.mf_save_widget.show_warning()
+			lambda: self.show_warning()
 		)
 		main_lay.addWidget(self.mf_stop_list)
 
-		general_wid = UGroupBox()
-		main_lay.addWidget(general_wid)
-		general_wid_lay = QVBoxLayout(general_wid)
-		general_wid_lay.setContentsMargins(*RowArrowWidget.group_margings)
-		general_wid_lay.setSpacing(RowArrowWidget.group_spacing)
+		self.buttons_container = TransparentWidget()
+		main_lay.addWidget(self.buttons_container)
+		self.buttons_layout = QHBoxLayout(self.buttons_container)
+		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
+		self.buttons_layout.setSpacing(5)
 
-		repair_widget = RowArrowWidget(Lng.repair_mf[JsonData.lng_index])
-		repair_widget.set_left_icon(self.repair_svg)
-		repair_widget.clicked.connect(self.repair_mf)
-		general_wid_lay.addWidget(repair_widget)
+		self.buttons_layout.addStretch()
 
-		general_wid_lay.addWidget(USep())
+		self.repair_button = UPushButton(Lng.repair_mf[JsonData.lng_index])
+		self.repair_button.setIcon(QIcon(str(self.repair_svg)))
+		self.buttons_layout.addWidget(self.repair_button)
 
+		self.remove_folder = UPushButton(Lng.remove_folder[JsonData.lng_index])
+		self.remove_folder.setIcon(QIcon(str(self.trash_svg)))
+		self.buttons_layout.addWidget(self.remove_folder)
 
-		# if len(Mf.items) > 1:
+		# self.buttons_layout.addStretch()
 
-		remove_wid = RowArrowWidget(Lng.remove_folder[JsonData.lng_index])
-		remove_wid.set_left_icon(self.trash_svg)
-		remove_wid.clicked.connect(self.remove_mf)
-		general_wid_lay.addWidget(remove_wid)
+		self.save_text = GrayTextLabel("Есть несохраненные изменения")
+		# self.buttons_layout.addWidget(self.save_text)
+		self.save_text.hide()
 
-		general_wid_lay.addWidget(USep())
-
-		self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
-		self.mf_save_widget.clicked.connect(self.save_mf_settings)
-		general_wid_lay.addWidget(self.mf_save_widget)
+		self.save_button = ActiveButton(Lng.save[JsonData.lng_index])
+		self.save_button.setIcon(QIcon(str(self.save_svg)))
+		self.buttons_layout.addWidget(self.save_button)
 
 		main_lay.addStretch()
+
+	def show_warning(self):
+		self.save_text.show()
 
 	def remove_mf(self, *args):
 		
