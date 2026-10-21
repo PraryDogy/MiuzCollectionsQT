@@ -552,9 +552,10 @@ class MfSettings(TransparentWidget):
 			lng_index=JsonData.lng_index,
 			mf_stop_list=self.mf.mf_stop_list
 		)
-		self.mf_stop_list.text_edit.textChanged.connect(
-			lambda: self.mf_save_widget.show_warning()
-		)
+		# НОВЫЙ СИГНАЛ ОБ ИЗМЕНЕНИИ
+		# self.mf_stop_list.text_edit.textChanged.connect(
+		# 	lambda: self.mf_save_widget.show_warning()
+		# )
 		main_lay.addWidget(self.mf_stop_list)
 
 		general_wid = UGroupBox()
@@ -582,7 +583,7 @@ class MfSettings(TransparentWidget):
 
 		self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
 		self.mf_save_widget.clicked.connect(self.save_mf_settings)
-		# general_wid_lay.addWidget(self.mf_save_widget)
+		general_wid_lay.addWidget(self.mf_save_widget)
 
 		main_lay.addStretch()
 
@@ -694,9 +695,9 @@ class NewMfSettings(TransparentWidget):
 			lng_index=JsonData.lng_index,
 			mf_stop_list=[]
 		)
-		self.mf_stop_list.text_edit.textChanged.connect(
-			lambda: self.mf_save_widget.show_warning()
-		)
+		# self.mf_stop_list.text_edit.textChanged.connect(
+		# 	lambda: self.mf_save_widget.show_warning()
+		# )
 		main_lay.addWidget(self.mf_stop_list)
 
 		save_group = UGroupBox()
