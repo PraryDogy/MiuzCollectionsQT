@@ -1,3 +1,4 @@
+import functools
 import os
 import subprocess
 from collections import defaultdict
@@ -40,6 +41,85 @@ from .win_settings import WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
 
+
+# =============================================================================
+# БИЗНЕС-ЛОГИКА (без зависимостей от виджетов Qt)
+# =============================================================================
+
+SUPPORTED_EXT_LOWER = tuple(ext.lower() for ext in ImgUtils.ext_all)
+
+
+def to_abs_paths(mf_current_path: str, rel_paths) -> list[str]:
+	"""Относительные пути грида -> абсолютные пути на диске."""
+	return [Utils.add_mf_path(mf_current_path, i) for i in rel_paths]
+
+
+def destination_dir(mf_current_path: str, current_dir: str) -> str:
+	"""Каталог, куда вставляются файлы из буфера."""
+	return os.path.join(mf_current_path, current_dir.strip(os.sep))
+
+
+def dirs_to_rescan(abs_paths) -> set[str]:
+	"""Каталоги, которые нужно пересканировать после изменения файлов."""
+	return {os.path.dirname(p) for p in abs_paths}
+
+
+def remove_confirm_key(files_count: int) -> str:
+	"""Ключ текста подтверждения удаления в Lng."""
+	return "remove_file_question" if files_count == 1 else "remove_files_question"
+
+
+def filter_supported(paths) -> list[str]:
+	"""Оставляет файлы с поддерживаемыми расширениями (без учёта регистра)."""
+	return [p for p in paths if p.lower().endswith(SUPPORTED_EXT_LOWER)]
+
+
+def view_selection(selected: list, all_items: list) -> tuple[list, bool]:
+	"""Что листать в просмотрщике: одиночный выбор -> вся сетка, иначе только выбранное.
+	Возвращает (элементы, is_selection). selected должен быть не пуст."""
+	if len(selected) == 1:
+		return all_items, False
+	return selected, True
+
+
+def next_size_index(current: int, sizes_count: int, step: int) -> int:
+	"""Новый индекс размера миниатюр с ограничением по краям. step: +1 или -1."""
+	return max(0, min(current + step, sizes_count - 1))
+
+
+def db_changed(previous_mtime: int, current_mtime: int) -> bool:
+	"""Нужно ли перезагрузить сетку и дерево после сканирования."""
+	return previous_mtime != current_mtime
+
+
+def reset_mf_after_rejection(mf) -> None:
+	"""Пользователь отказался от найденных опасных файлов: сбрасываем хранилище в корень."""
+	mf.set_mf_current_path(None)
+	mf.mf_paths = [""]
+
+
+class ForcedDirsRegistry:
+	"""Каталоги, которые нужно пересканировать принудительно."""
+
+	def __init__(self):
+		self._dirs: set[str] = set()
+
+	def add(self, *dirs: str) -> None:
+		self._dirs.update(dirs)
+
+	def take(self) -> set[str]:
+		"""Забирает накопленные каталоги и очищает реестр."""
+		dirs = self._dirs.copy()
+		self._dirs.clear()
+		return dirs
+
+	def __bool__(self) -> bool:
+		return bool(self._dirs)
+
+
+# =============================================================================
+# UI
+# =============================================================================
 
 class TestWid(QLabel):
 	def __init__(self, parent=None):
@@ -105,7 +185,7 @@ class WinMain(UMainWindow):
 		# test_wid = TestWid()
 		# self.central_layout.addWidget(test_wid)
 
-		self.forced_scaner_dirs = set()
+		self.forced_scaner_dirs = ForcedDirsRegistry()
 		self.go_to_url: str | None = None
 		self.files_to_copy = set()
 		self.stop_scaner = True
@@ -211,13 +291,14 @@ class WinMain(UMainWindow):
 
 	@staticmethod
 	def with_conn(fn: callable):
+		@functools.wraps(fn)
 		def wrapper(self: "WinMain", *args):
 			avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
 			if avaiable_mf_path:
 				Mf.current_mf.set_mf_current_path(avaiable_mf_path)
 				return fn(self, *args)
-			else:
-				self.open_win_smb(Mf.current_mf)
+			self.open_win_smb(Mf.current_mf)
+			return None
 		return wrapper
 
 	def set_no_img_search(self):
@@ -316,7 +397,7 @@ class WinMain(UMainWindow):
 
 		def poll_task():
 			queue = self.update_thumb_task.process_queue
-			if not queue.empty():
+			while not queue.empty():
 				update_thumb_item: UpdateThumbItem = queue.get()
 				wid = self.grid.url_to_wid.get(update_thumb_item.rel_img_path)
 				if wid:
@@ -338,8 +419,9 @@ class WinMain(UMainWindow):
 			else:
 				QTimer.singleShot(700, poll_task)
 
+		rel_set = set(rel_paths)
 		for url, wid in self.grid.url_to_wid.items():
-			if url in rel_paths:
+			if url in rel_set:
 				wid.img_wid.show_updating()
 
 		self.update_thumb_task = ProcessWorker(
@@ -379,11 +461,12 @@ class WinMain(UMainWindow):
 		"""
 		files_to_copy, dest
 		"""
+		# копия списка: буфер очищается ниже, а окно копирования читает его позже
 		copy_files_win = self.copy_files_win(
-			files_to_copy=files_to_copy,
+			files_to_copy=list(files_to_copy),
 			dest=dest
 		)
-		copy_files_win.finished_.connect(lambda x: self.start_scaner_task())
+		copy_files_win.finished_.connect(lambda *_: self.start_scaner_task())
 		self.forced_scaner_dirs.add(dest)
 		self.files_to_copy.clear()
 		self.grid.files_to_copy.clear()
@@ -399,10 +482,9 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def reveal_in_finder(self, rel_paths: list):
-		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-			for i in rel_paths
-		]
+		abs_paths = to_abs_paths(Mf.current_mf.mf_current_path, rel_paths)
+		if not abs_paths:
+			return
 		if os.path.isdir(abs_paths[0]):
 			subprocess.Popen(["open", abs_paths[0]])
 		else:
@@ -435,15 +517,11 @@ class WinMain(UMainWindow):
 			file_remover.start()
 			QTimer.singleShot(ms, poll_file_remover)
 
-		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-			for i in rel_paths
-		]
-		dirs_to_scan = list(set(os.path.dirname(i) for i in abs_paths))
-		if len(abs_paths) == 1:
-			text = f"{Lng.remove_file_question[JsonData.lng_index]}"
-		else:
-			text = f"{Lng.remove_files_question[JsonData.lng_index]}"
+		abs_paths = to_abs_paths(Mf.current_mf.mf_current_path, rel_paths)
+		if not abs_paths:
+			return
+		dirs_to_scan = dirs_to_rescan(abs_paths)
+		text = getattr(Lng, remove_confirm_key(len(abs_paths)))[JsonData.lng_index]
 		self.remove_files_win = ConfirmWindow(text)
 		file_remover = ProcessWorker(
 				target=FilesRemover.start,
@@ -461,11 +539,7 @@ class WinMain(UMainWindow):
 			self.paste_files(dropped_files, dest)
 
 
-		dropped_files = [
-			i
-			for i in dropped_files
-			if i.endswith(ImgUtils.ext_all)
-		]
+		dropped_files = filter_supported(dropped_files)
 		self.upload_win = UploadWin(
 			mf=Mf.current_mf,
 			current_dir=Dynamic.current_dir,
@@ -502,15 +576,15 @@ class WinMain(UMainWindow):
 		def finished():
 			self.grid.setFocus()
 			if self.go_to_url:
-				widget = self.grid.url_to_wid.get(self.go_to_url)
+				target_url, self.go_to_url = self.go_to_url, str()
+				widget = self.grid.url_to_wid.get(target_url)
 				if not widget:
 					return
-				self.grid.select_by_url(self.go_to_url)
+				self.grid.select_by_url(target_url)
 				QTimer.singleShot(
 					100,
 					lambda: self.grid.ensureWidgetVisible(widget)
 				)
-				self.go_to_url = str()
 
 		self.bar_top.search_wid.update_placeholder()
 		Dynamic.loaded_thumbs = 0
@@ -548,8 +622,8 @@ class WinMain(UMainWindow):
 		self.grid.paste_files.connect(
 			lambda: self.paste_files(
 				self.files_to_copy,
-				os.path.join(Mf.current_mf.mf_current_path, Dynamic.current_dir.strip(os.sep))
-				)
+				destination_dir(Mf.current_mf.mf_current_path, Dynamic.current_dir)
+			)
 		)
 		self.grid.set_files_to_copy.connect(
 			lambda rel_paths: self.set_files_to_copy(rel_paths)
@@ -585,13 +659,12 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def open_view_win(self, mf: Mf):
-		if len(self.grid.selected_widgets) == 1:
-			data_items = [i.data_item for i in self.grid.url_to_wid.values()]
-			is_selection = False
-		else:
-			data_items = [i.data_item for i in self.grid.selected_widgets]
-			is_selection = True
-		start_data_item = self.grid.selected_widgets[0].data_item
+		if not self.grid.selected_widgets:
+			return
+		all_items = [i.data_item for i in self.grid.url_to_wid.values()]
+		selected_items = [i.data_item for i in self.grid.selected_widgets]
+		data_items, is_selection = view_selection(selected_items, all_items)
+		start_data_item = selected_items[0]
 
 		item = ImgViewItem(
 			start_data_item=start_data_item,
@@ -606,7 +679,7 @@ class WinMain(UMainWindow):
 			lambda rel_paths: self.copy_path(rel_paths)
 		)
 		self.view_win.reveal_in_finder.connect(
-			lambda rel_paths: self.reveal_in_finder(Mf.current_mf, rel_paths)
+			lambda rel_paths: self.reveal_in_finder(rel_paths)
 		)
 		self.view_win.set_fav.connect(
 			self.set_fav
@@ -641,11 +714,10 @@ class WinMain(UMainWindow):
 			self.win_warn.deleteLater()
 			self.scaner_task.response_queue.put(can_continue)
 			if not can_continue:
-				for mf in Mf.items:
-					if mf.mf_alias == mf_alias:
-						mf.set_mf_current_path(None)
-						mf.mf_paths = ["", ]
-						self.open_win_smb(mf)
+				mf = next((m for m in Mf.items if m.mf_alias == mf_alias), None)
+				if mf:
+					reset_mf_after_rejection(mf)
+					self.open_win_smb(mf)
 
 		if not hasattr(self, "scaner_task") or not self.scaner_task:
 			self.scaner_poll_timer.start(ms)
@@ -670,7 +742,7 @@ class WinMain(UMainWindow):
 			self.bar_bottom.progress_bar.setText("")
 			self.bar_bottom.progress_bar.start_timer_text()
 			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
-			if self.db_mtime != new_db_time:
+			if db_changed(self.db_mtime, new_db_time):
 				self.load_st_grid()
 				self.left_menu.tree_wid.init_ui()
 		else:
@@ -703,10 +775,11 @@ class WinMain(UMainWindow):
 			can_start = True
 
 		if can_start:
-			if self.forced_scaner_dirs:
+			forced_dirs = self.forced_scaner_dirs.take()
+			if forced_dirs:
 				forced_scaner_item = ForcedScanerItem(
 					mf=Mf.current_mf,
-					dirs_to_scan=self.forced_scaner_dirs.copy(),
+					dirs_to_scan=forced_dirs,
 					lng_index=JsonData.lng_index
 				)
 				self.scaner_task = ScanerWorker(
@@ -719,7 +792,6 @@ class WinMain(UMainWindow):
 					target=BaseScaner.start,
 					args=(Mf.items, JsonData.lng_index, )
 				)
-			self.forced_scaner_dirs.clear()
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
 			self.bar_bottom.progress_bar.stop_timer_text()
 			self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
@@ -807,13 +879,10 @@ class WinMain(UMainWindow):
 	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 		
 		if a0.key() == Qt.Key.Key_V:
-			if self.files_to_copy:
-				dest = os.path.join(
-					Mf.current_mf.mf_current_path,
-					Dynamic.current_dir.strip(os.sep)
-				)
+			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier and self.files_to_copy:
+				dest = destination_dir(Mf.current_mf.mf_current_path, Dynamic.current_dir)
 				self.paste_files(self.files_to_copy, dest)
-		
+
 		elif a0.key() == Qt.Key.Key_W:
 			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
 				self.hide()
@@ -833,17 +902,17 @@ class WinMain(UMainWindow):
 			else:
 				a0.ignore()
 
-		elif a0.key() == Qt.Key.Key_Equal:
+		elif a0.key() in (Qt.Key.Key_Equal, Qt.Key.Key_Minus):
 			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-				if Dynamic.current_pixmap_size_index < len(Static.THUMB_WID_PIXMAP_SIZE) - 1:
-					Dynamic.current_pixmap_size_index += 1
-					self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
-
-		elif a0.key() == Qt.Key.Key_Minus:
-			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
-				if Dynamic.current_pixmap_size_index > 0:
-					Dynamic.current_pixmap_size_index -= 1
-					self.bar_bottom.slider._on_value_changed(Dynamic.current_pixmap_size_index)
+				step = 1 if a0.key() == Qt.Key.Key_Equal else -1
+				new_index = next_size_index(
+					Dynamic.current_pixmap_size_index,
+					len(Static.THUMB_WID_PIXMAP_SIZE),
+					step
+				)
+				if new_index != Dynamic.current_pixmap_size_index:
+					Dynamic.current_pixmap_size_index = new_index
+					self.bar_bottom.slider._on_value_changed(new_index)
 	
 	def resizeEvent(self, a0):
 		wid = self.splitter.widget(1)
