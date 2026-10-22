@@ -1708,6 +1708,76 @@ class MfStopListTagsGroup(UGroupBox):
 		super().__init__(title, parent)
 
 
+class MfStopListEditTag(UMainWindow):
+	text_edit = Static.COMMON_ICONS / "text_edit.svg"
+	remove_clicked = pyqtSignal()
+	ok_clicked = pyqtSignal(str)
+
+	def __init__(self, text: str):
+		super().__init__()
+		self.setFixedWidth(330)
+		self.set_always_on_top()
+		self.set_close_only()
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
+		self.central_layout.setSpacing(10)
+
+		title_container = TransparentWidget()
+		self.central_layout.addWidget(title_container)
+		title_layout = QHBoxLayout(title_container)
+		title_layout.setContentsMargins(0, 0, 0, 0)
+		title_layout.setSpacing(10)
+
+		title_svg = QSvgWidget(str(self.text_edit))
+		title_svg.setFixedSize(*TitleTextLabel.icon_size)
+		title_layout.addWidget(title_svg)
+
+		title_label = TitleTextLabel(Lng.text_editor[JsonData.lng_index])
+		title_layout.addWidget(title_label)
+
+		self.central_layout.addWidget(USep())
+
+		description = TransparentLabel("Задайте имя папки, все папки с такими именем будут игнорироваться в данном каталоге")
+		description.setWordWrap(True)
+		m = self.central_layout.contentsMargins()
+		text_width = 300 - m.left() - m.right()
+		description.setFixedHeight(description.heightForWidth(text_width))
+		self.central_layout.addWidget(description)
+
+		self.line_edit = ULineEdit()
+		self.line_edit.setText(text)
+		self.central_layout.addWidget(self.line_edit)
+
+		buttons_container = TransparentWidget()
+		self.central_layout.addWidget(buttons_container)
+		buttons_layout = QHBoxLayout(buttons_container)
+		buttons_layout.setContentsMargins(0, 0, 0, 0)
+		buttons_layout.setSpacing(5)
+
+		rem_button = UPushButton(Lng.delete[JsonData.lng_index])
+		rem_button.clicked.connect(self.remove_clicked.emit)
+		buttons_layout.addWidget(rem_button)
+		buttons_layout.addStretch(1)
+
+		cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
+		cancel_button.clicked.connect(self.deleteLater)
+		buttons_layout.addWidget(cancel_button)
+
+		apply_button = ActiveButton(Lng.apply[JsonData.lng_index])
+		apply_button.clicked.connect(self.ok_clicked_cmd)
+		buttons_layout.addWidget(apply_button)
+
+		self.adjustSize()
+
+	def ok_clicked_cmd(self):
+		self.ok_clicked.emit(self.line_edit.text())
+		self.deleteLater()
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		return super().keyPressEvent(a0)
+
+
 class MfStopListTag(UTagWidget):
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
 	max_width = 150
@@ -1804,11 +1874,10 @@ class MfStopListWidget(UGroupBox):
 			return
 
 		self.create_tags_widget()
-		tags = []
 		for name in self.draft_stop_list:
 			tag = MfStopListTag(name)
-			tags.append(tag)
 			tag.right_svg_clicked.connect(lambda t=name: self.remove_tag(t))
+			tag.text_clicked.connect(lambda t=name: self.edit_tag(t))
 			self.tags_flow_layout.addWidget(tag)
 
 	def remove_tag(self, text: str):
@@ -1818,6 +1887,9 @@ class MfStopListWidget(UGroupBox):
 				self.draft_stop_list.remove(text)
 			self.reload_tags()
 			self.changed.emit()
+
+			if hasattr(self, "edit_text_win"):
+				self.edit_text_win.deleteLater()
 
 		self.confirm_win = ConfirmWindow(
 			"Вы уверены, что хотите удалить тег?"
@@ -1844,6 +1916,20 @@ class MfStopListWidget(UGroupBox):
 		self.text_win.center_to_parent(self.window())
 		self.text_win.ok_clicked.connect(finished)
 		self.text_win.show()
+
+	def edit_tag(self, text: str):
+
+		def finished(new_text: str):
+			old_text_index = self.draft_stop_list.index(text)
+			self.draft_stop_list.remove(text)
+			self.draft_stop_list.insert(old_text_index, new_text)
+			self.reload_tags()
+
+		self.edit_text_win = MfStopListEditTag(text)
+		self.edit_text_win.center_to_parent(self.window())
+		self.edit_text_win.ok_clicked.connect(finished)
+		self.edit_text_win.remove_clicked.connect(lambda: self.remove_tag(text))
+		self.edit_text_win.show()
 
 	def get_stop_list(self) -> list[str]:
 		return list(self.draft_stop_list)

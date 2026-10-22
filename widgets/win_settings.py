@@ -561,6 +561,7 @@ class MfSettings(TransparentWidget):
 
 		self.save_button = ActiveButton(Lng.save[JsonData.lng_index])
 		self.save_button.setIcon(QIcon(str(self.save_svg)))
+		self.save_button.clicked.connect(self.save_mf_settings)
 		self.buttons_layout.addWidget(self.save_button)
 
 		main_lay.addStretch()
