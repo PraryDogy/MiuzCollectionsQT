@@ -73,11 +73,15 @@ class TransparentLabel(QLabel):
 		self._update_text()
 
 	def get_elided_text(self):
+		width = self.contentsRect().width()
+		if width <= 0:
+			return self._original_text
+
 		metrics = QFontMetrics(self.font())
 		return metrics.elidedText(
 			self._original_text,
 			Qt.TextElideMode.ElideMiddle,
-			self.contentsRect().width(),
+			width,
 		)
 
 	def _update_text(self):
@@ -97,7 +101,6 @@ class TransparentLabel(QLabel):
 
 	def resizeEvent(self, event):
 		super().resizeEvent(event)
-
 		if self._elide_enabled:
 			self._update_text()
 
@@ -1688,6 +1691,21 @@ class MfStopListTagsGroup(UGroupBox):
 		super().__init__(title, parent)
 
 
+class MfStopListTag(UTagWidget):
+	trash_svg = Static.COMMON_ICONS / "trash.svg"
+
+	def __init__(self, text):
+		super().__init__("", self.qss_gray, right_svg_path=str(self.trash_svg))
+		self.setToolTip(text)
+		self.text_widget.set_elide(True)
+		self.setMaximumWidth(150)
+		self.text_widget.setSizePolicy(
+			QSizePolicy.Policy.Expanding,
+			QSizePolicy.Policy.Fixed,
+		)
+		self.text_widget.setText(text)
+
+
 class MfStopListWidget(UGroupBox):
 	changed = pyqtSignal()
 	ignore_svg = Static.COMMON_ICONS / "ignore.svg"
@@ -1759,7 +1777,6 @@ class MfStopListWidget(UGroupBox):
 		self.tags_flow_layout.setSpacing(0)
 
 	def reload_tags(self):
-
 		self.tags_widget.deleteLater()
 
 		if not self.get_stop_list():
@@ -1770,12 +1787,10 @@ class MfStopListWidget(UGroupBox):
 			return
 
 		self.create_tags_widget()
+		tags = []
 		for name in self.draft_stop_list:
-			tag = UTagWidget(
-				text=name,
-				qss_style=UTagWidget.qss_gray,
-				right_svg_path=str(self.trash_svg),
-			)
+			tag = MfStopListTag(name)
+			tags.append(tag)
 			tag.right_svg_clicked.connect(lambda t=name: self.remove_tag(t))
 			self.tags_flow_layout.addWidget(tag)
 
