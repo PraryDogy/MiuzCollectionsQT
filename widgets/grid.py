@@ -154,15 +154,19 @@ class Thumb(TransparentFrame):
 		self.blue_text_wid = self.blue_text_class(self.data_item)
 		self.v_lay.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
+		filename = (
+			f"{Lng.file_name[JsonData.lng_index]}: "
+			f"{self.data_item.filename}"
+		)
 		location = (
 			f"{Lng.location[JsonData.lng_index]}: "
 			f"{Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
 		)
 		modified = (
 			f"{Lng.modified[JsonData.lng_index]}: "
-			f"{self.data_item.day_month_year}"
+			f"{self.data_item.day_month_year} {self.data_item.hour_min_sec}"
 		)
-		self.setToolTip("\n".join([location, modified, ]))
+		self.setToolTip("\n".join([filename, location, modified, ]))
 
 		self.set_text_and_size()
 
