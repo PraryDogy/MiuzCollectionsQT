@@ -1832,7 +1832,7 @@ class MfStopListWidget(UGroupBox):
 		v_layout.addSpacing(5)
 
 		self.tags_container = TransparentWidget()
-		self.tags_container.setFixedHeight(100)
+		self.tags_container.setFixedHeight(105)
 		v_layout.addWidget(self.tags_container)
 
 		self.tags_container_layout = QVBoxLayout(self.tags_container)
