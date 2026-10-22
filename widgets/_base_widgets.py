@@ -1224,7 +1224,7 @@ class MfAliasWidget(QWidget):
 		v_layout.setContentsMargins(0, 0, 0, 0)
 		v_layout.setSpacing(0)
 
-		name_text = QLabel(Lng.folder_name[lng_index])
+		name_text = QLabel(Lng.folder_name_full[lng_index])
 		name_text.setContentsMargins(2, 0, 2, 0)
 		v_layout.addWidget(name_text)
 
@@ -1715,14 +1715,23 @@ class MfStopListEditTag(UMainWindow):
 
 	def __init__(self, text: str):
 		super().__init__()
-		self.setFixedWidth(330)
+		self.setFixedWidth(350)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
+		self.setWindowTitle(Lng.text_editor[JsonData.lng_index])
+		self.central_layout.setContentsMargins(5, 5, 5, 10)
 		self.central_layout.setSpacing(10)
 
+		group_box = UGroupBox()
+		self.central_layout.addWidget(group_box)
+
+		group_layout = QVBoxLayout(group_box)
+		group_layout.setContentsMargins(5, 5, 5, 5)
+		group_layout.setSpacing(10)
+
 		title_container = TransparentWidget()
-		self.central_layout.addWidget(title_container)
+		group_layout.addWidget(title_container)
+
 		title_layout = QHBoxLayout(title_container)
 		title_layout.setContentsMargins(0, 0, 0, 0)
 		title_layout.setSpacing(10)
@@ -1731,21 +1740,22 @@ class MfStopListEditTag(UMainWindow):
 		title_svg.setFixedSize(*TitleTextLabel.icon_size)
 		title_layout.addWidget(title_svg)
 
-		title_label = TitleTextLabel(Lng.text_editor[JsonData.lng_index])
+		title_label = TitleTextLabel(Lng.folder_name[JsonData.lng_index])
 		title_layout.addWidget(title_label)
 
-		self.central_layout.addWidget(USep())
+		group_layout.addWidget(USep())
 
-		description = TransparentLabel("Задайте имя папки, все папки с такими именем будут игнорироваться в данном каталоге")
+		description = TransparentLabel(
+			Lng.stop_list_description[JsonData.lng_index]
+		)
 		description.setWordWrap(True)
-		m = self.central_layout.contentsMargins()
-		text_width = 300 - m.left() - m.right()
-		description.setFixedHeight(description.heightForWidth(text_width))
-		self.central_layout.addWidget(description)
+		group_layout.addWidget(description)
 
 		self.line_edit = ULineEdit()
 		self.line_edit.setText(text)
-		self.central_layout.addWidget(self.line_edit)
+		group_layout.addWidget(self.line_edit)
+
+		# self.central_layout.addSpacing(10)
 
 		buttons_container = TransparentWidget()
 		self.central_layout.addWidget(buttons_container)
@@ -1767,6 +1777,11 @@ class MfStopListEditTag(UMainWindow):
 		buttons_layout.addWidget(apply_button)
 
 		self.adjustSize()
+		self.setFixedHeight(self.height())
+
+	def mouseReleaseEvent(self, a0):
+		self.setFocus()
+		return super().mouseReleaseEvent(a0)
 
 	def ok_clicked_cmd(self):
 		self.ok_clicked.emit(self.line_edit.text())

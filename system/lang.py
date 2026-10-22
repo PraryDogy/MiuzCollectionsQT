@@ -267,7 +267,7 @@ class Lng:
 		"The name may contain only Russian and English letters, "
 		"digits, and spaces.",
 	)
-	folder_name = (
+	folder_name_full = (
 		"Имя:\n"
 		"• уникальное\n"
 		"• от 5 до 30 символов\n"
@@ -590,4 +590,13 @@ class Lng:
 	inactive = (
 		"Неактивен",
 		"Inactive"
+	)
+
+	stop_list_description =	(
+			"Укажите имя папки. Все папки с таким именем будут игнорироваться в данном каталоге.",
+			"Enter a folder name. All folders with this name will be ignored in this directory."
+		)
+	folder_name = (
+		"Имя папки",
+		"Folder name"
 	)
