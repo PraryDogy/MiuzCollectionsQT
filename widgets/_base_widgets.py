@@ -1614,6 +1614,9 @@ class MfPathWidget(UGroupBox):
 			Lng.copy_dirpath[JsonData.lng_index]
 		)
 		self.copy_path_btn.clicked.connect(self.copy_path)
+
+		# пространство перед кнопкой чтобы виджет пути не был близко
+		path_layout.addSpacing(10)
 		path_layout.addWidget(self.copy_path_btn)
 
 		texts_layout.addWidget(second_row)

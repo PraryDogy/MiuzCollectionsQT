@@ -524,7 +524,7 @@ class MfSettings(TransparentWidget):
 			mf=self.mf
 		)
 		self.path_widget.changed.connect(
-			lambda: self.mf_save_widget.show_warning()
+			lambda: self.show_warning()
 		)
 		main_lay.addWidget(self.path_widget)
 
