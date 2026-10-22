@@ -1720,16 +1720,19 @@ class MfStopListWidget(UGroupBox):
 
 		v_layout.addSpacing(5)
 
-		self.scroll_area = UScrollVerticalArea()
-		self.scroll_area.setFixedHeight(90)
-		v_layout.addWidget(self.scroll_area)
 		self.tags_container = TransparentWidget()
-		self.scroll_area.setWidget(self.tags_container)
+		v_layout.addWidget(self.tags_container)
 
 		self.tags_layout = FlowLayout(self.tags_container)
 		self.tags_layout.setContentsMargins(0, 0, 0, 0)
 		self.reload_tags()
 		self.adjustSize()
+
+	def calculate_height(self):
+		max_widget_height = 172
+		if self.height() > max_widget_height:
+			pass
+		# МЕНЯЕМ ПРОСТОЙ ВИДЖЕТ С ТЕГАМИ НА ВИДЖЕТ СО СКРОЛЛ ТЕГАМИ ВЫСОТОЙ 172
 
 	def clear_tags_container(self):
 		while self.tags_layout.count():
@@ -1761,6 +1764,8 @@ class MfStopListWidget(UGroupBox):
 		)
 		add_tag.text_clicked.connect(self.add_tag)
 		self.tags_layout.addWidget(add_tag)
+
+		self.calculate_height()
 
 	def remove_tag(self, text: str):
 
