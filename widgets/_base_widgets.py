@@ -1697,8 +1697,8 @@ class MfStopListTag(UTagWidget):
 	def __init__(self, text):
 		super().__init__(text, self.qss_gray, right_svg_path=str(self.trash_svg))
 		self.setToolTip(text)
-		self.text_widget.set_elide(True)
 		self.setMaximumWidth(150)
+		self.text_widget.set_elide(True)
 		self.text_widget.setSizePolicy(
 			QSizePolicy.Policy.Expanding,
 			QSizePolicy.Policy.Fixed,
