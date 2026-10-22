@@ -1171,6 +1171,7 @@ class InputTextWin(UMainWindow):
 		btn_layout.addWidget(self.ok_btn)
 
 		self.adjustSize()
+		self.setFixedSize(self.width(), self.height())
 
 	def ok_clicked_cmd(self):
 		text = self.line_edit_widget.text()
@@ -1682,6 +1683,10 @@ class MfPathWidget(UGroupBox):
 		return super().dragEnterEvent(a0)
 
 
+class MfStopListTagsGroup(UGroupBox):
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+
 
 class MfStopListWidget(UGroupBox):
 	changed = pyqtSignal()
@@ -1721,51 +1726,58 @@ class MfStopListWidget(UGroupBox):
 		v_layout.addSpacing(5)
 
 		self.tags_container = TransparentWidget()
+		self.tags_container.setFixedHeight(100)
 		v_layout.addWidget(self.tags_container)
 
-		self.tags_layout = FlowLayout(self.tags_container)
-		self.tags_layout.setContentsMargins(0, 0, 0, 0)
+		self.tags_container_layout = QVBoxLayout(self.tags_container)
+		self.tags_container_layout.setContentsMargins(0, 0, 0, 0)
+		self.tags_container_layout.setSpacing(0)
+
+		self.tags_widget = TransparentWidget()
+
+		v_layout.addSpacing(5)
+
+		add_button = UPushButton("Добавить")
+		add_button.setIcon(QIcon(str(self.plus_svg)))
+		add_button.clicked.connect(self.add_tag)
+		v_layout.addWidget(add_button)
+
 		self.reload_tags()
-		self.adjustSize()
 
-	def calculate_height(self):
-		max_widget_height = 172
-		if self.height() > max_widget_height:
-			pass
-		# МЕНЯЕМ ПРОСТОЙ ВИДЖЕТ С ТЕГАМИ НА ВИДЖЕТ СО СКРОЛЛ ТЕГАМИ ВЫСОТОЙ 172
+	def create_tags_widget(self):
+		self.tags_widget = MfStopListTagsGroup()
+		self.tags_container_layout.addWidget(self.tags_widget)
+		self.tags_flow_layout = FlowLayout(self.tags_widget)
+		self.tags_flow_layout.setContentsMargins(5, 5, 5, 5)
+		self.tags_flow_layout.setSpacing(0)
 
-	def clear_tags_container(self):
-		while self.tags_layout.count():
-			item = self.tags_layout.takeAt(0)
-			widget = item.widget()
-
-			if widget:
-				widget.deleteLater()
+	def create_no_tags_widget(self):
+		self.tags_widget = MfStopListTagsGroup()
+		self.tags_container_layout.addWidget(self.tags_widget)
+		self.tags_flow_layout = QVBoxLayout(self.tags_widget)
+		self.tags_flow_layout.setContentsMargins(0, 0, 0, 0)
+		self.tags_flow_layout.setSpacing(0)
 
 	def reload_tags(self):
-		self.clear_tags_container()
 
+		self.tags_widget.deleteLater()
+
+		if not self.get_stop_list():
+			self.create_no_tags_widget()
+			label = GrayTextLabel("Список исключений пуст")
+			self.tags_flow_layout.addWidget(label)
+			self.tags_flow_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+			return
+
+		self.create_tags_widget()
 		for name in self.draft_stop_list:
-			if not name:
-				continue
-
 			tag = UTagWidget(
 				text=name,
 				qss_style=UTagWidget.qss_gray,
 				right_svg_path=str(self.trash_svg),
 			)
 			tag.right_svg_clicked.connect(lambda t=name: self.remove_tag(t))
-			self.tags_layout.addWidget(tag)
-
-		add_tag = UTagWidget(
-			text="Добавить__",
-			qss_style=UTagWidget.qss_transparent,
-			left_svg_path=str(self.plus_svg),
-		)
-		add_tag.text_clicked.connect(self.add_tag)
-		self.tags_layout.addWidget(add_tag)
-
-		self.calculate_height()
+			self.tags_flow_layout.addWidget(tag)
 
 	def remove_tag(self, text: str):
 
@@ -1796,6 +1808,7 @@ class MfStopListWidget(UGroupBox):
 			description="Имя папки",
 			svg_path=str(self.trash_svg)
 		)
+		self.text_win.setFixedWidth(300)
 		self.text_win.center_to_parent(self.window())
 		self.text_win.ok_clicked.connect(finished)
 		self.text_win.show()

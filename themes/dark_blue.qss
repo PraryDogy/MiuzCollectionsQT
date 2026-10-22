@@ -380,9 +380,15 @@ UTagWidget[style="green"] {
     border: 1px solid #10B981;
 }
 
-MfPathWidget {
+/* MfPathWidget {
     border: 2px dashed #263440;
+} */
+
+MfStopListTagsGroup {
+    border-radius: 14px;
+    background: #151f29;
 }
+
 
 /* ==================== TOOLTIP ==================== */
 
