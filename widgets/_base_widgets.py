@@ -1720,9 +1720,14 @@ class MfStopListWidget(UGroupBox):
 
 		v_layout.addSpacing(5)
 
+		self.scroll_area = UScrollVerticalArea()
+		v_layout.addWidget(self.scroll_area)
 
 		self.tags_container = TransparentWidget()
-		v_layout.addWidget(self.tags_container)
+		self.tags_container.setFixedHeight(150)
+		self.scroll_area.setWidget(self.tags_container)
+		# v_layout.addWidget(self.tags_container)
+
 		self.tags_layout = FlowLayout(self.tags_container)
 		self.tags_layout.setContentsMargins(0, 0, 0, 0)
 		self.reload_tags()
