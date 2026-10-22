@@ -1718,6 +1718,7 @@ class MfStopListTag(UTagWidget):
 			self.qss_gray,
 			right_svg_path=str(self.trash_svg),
 		)
+		self.text_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.setToolTip(text)
 		self.setMaximumWidth(150)
 		self.text_widget.set_elide(True, ignore_width=False)
