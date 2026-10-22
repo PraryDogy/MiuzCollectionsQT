@@ -137,7 +137,7 @@ class Lng:
 		"Список исключений: перетащите сюда папку или укажите имя с новой строки.",
 		"Ignore list: drag a folder here or enter a name on a new line."
 	)
-	ignore_list = ("Список исключений", "Ignore list")
+	stop_list = ("Споп лист", "Stop list")
 	minutes = ("минут", "minutes")
 	search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
 	show_system_files = ("Системные файлы в Finder", "System files in Finder")
@@ -599,4 +599,16 @@ class Lng:
 	folder_name = (
 		"Имя папки",
 		"Folder name"
+	)
+	stop_list_descr_short = (
+		"Папки с указанными именами будут игнорироваться в этом каталоге.",
+		"Folders with the specified names will be ignored in this directory."
+	)
+	stop_list_empty = (
+		"Список пуст",
+		"The list is empty",
+	)
+	stop_list_remove_confirm = (
+		"Удалить этот элемент из стоп-листа?",
+		"Remove this item from the stop list?",
 	)

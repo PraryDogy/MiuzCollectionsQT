@@ -89,7 +89,7 @@ UMenu::right-arrow:selected {
 
 ULineEdit {
     color: #ffffff;
-    background: #151f29;
+    background: #18212a;
     border: 1px solid #263440;
     border-radius: 6px;
     padding-left: 2px;
@@ -386,7 +386,7 @@ UTagWidget[style="green"] {
 
 MfStopListTagsGroup {
     border-radius: 14px;
-    background: #151f29;
+    background: #18212a;
 }
 
 
@@ -618,3 +618,10 @@ NotiWidget TransparentLabel {
 
 
 /* win_upload.py */
+
+
+
+/* базовый цвет самая нижняя подложка */
+/* #0d1218 */
+
+/*  */

@@ -1835,14 +1835,12 @@ class MfStopListWidget(UGroupBox):
 		title_svg.setFixedSize(18, 18)
 		title_layout.addWidget(title_svg)
 
-		title_label = TitleTextLabel(Lng.ignore_list[JsonData.lng_index])
+		title_label = TitleTextLabel(Lng.stop_list[JsonData.lng_index])
 		title_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())
 
-		description = GrayTextLabel(
-			"Папки с этими именами будут игнорироваться в этом каталоге"
-		)
+		description = GrayTextLabel(Lng.stop_list_descr_short[JsonData.lng_index])
 		v_layout.addWidget(description)
 
 		v_layout.addSpacing(5)
@@ -1859,7 +1857,7 @@ class MfStopListWidget(UGroupBox):
 
 		v_layout.addSpacing(5)
 
-		add_button = UPushButton("Добавить")
+		add_button = UPushButton(Lng.add[JsonData.lng_index])
 		add_button.setIcon(QIcon(str(self.plus_svg)))
 		add_button.clicked.connect(self.add_tag)
 		v_layout.addWidget(add_button)
@@ -1894,7 +1892,7 @@ class MfStopListWidget(UGroupBox):
 
 		if not self.get_stop_list():
 			self.create_no_tags_widget()
-			label = GrayTextLabel("Список исключений пуст")
+			label = GrayTextLabel(Lng.stop_list_empty[JsonData.lng_index])
 			self.tags_flow_layout.addWidget(label)
 			self.tags_flow_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			return
@@ -1917,9 +1915,7 @@ class MfStopListWidget(UGroupBox):
 			if hasattr(self, "edit_text_win"):
 				self.edit_text_win.deleteLater()
 
-		self.confirm_win = ConfirmWindow(
-			"Вы уверены, что хотите удалить тег?"
-		)
+		self.confirm_win = ConfirmWindow(Lng.stop_list_remove_confirm[JsonData.lng_index])
 		self.confirm_win.center_to_parent(self.window())
 		self.confirm_win.ok_clicked.connect(finished)
 		self.confirm_win.show()
@@ -1935,7 +1931,7 @@ class MfStopListWidget(UGroupBox):
 			self.changed.emit()
 
 		self.text_win = InputTextWin(
-			description="Имя папки",
+			description=Lng.folder_name[JsonData.lng_index],
 			svg_path=str(self.trash_svg)
 		)
 		self.text_win.setFixedWidth(300)
