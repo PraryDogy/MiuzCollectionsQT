@@ -1852,7 +1852,17 @@ class MfStopListWidget(UGroupBox):
 	def create_tags_widget(self):
 		self.tags_widget = MfStopListTagsGroup()
 		self.tags_container_layout.addWidget(self.tags_widget)
-		self.tags_flow_layout = FlowLayout(self.tags_widget)
+		tags_layout = QVBoxLayout(self.tags_widget)
+		tags_layout.setContentsMargins(0, 0, 5, 0)
+		tags_layout.setSpacing(0)
+
+		scroll_area = UScrollVerticalArea()
+		tags_layout.addWidget(scroll_area)
+
+		scroll_widget = TransparentWidget()
+		scroll_area.setWidget(scroll_widget)
+
+		self.tags_flow_layout = FlowLayout(scroll_widget)
 		self.tags_flow_layout.setContentsMargins(5, 5, 5, 5)
 		self.tags_flow_layout.setSpacing(0)
 
