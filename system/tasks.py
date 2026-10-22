@@ -88,7 +88,7 @@ class DbImagesLoaderItem:
 	src_qimage: QImage
 	resized_qimage: QImage
 	day_month_year: str
-	month_year: str
+	hour_min_sec: str
 
 
 class DbImagesLoader(URunnable):
@@ -146,11 +146,13 @@ class DbImagesLoader(URunnable):
 			)
 			scaled_qimage.setDevicePixelRatio(Static.DPR)
 
-			date_ = datetime.fromtimestamp(mod).date()
-			month_ = Lng.months[JsonData.lng_index][str(date_.month)]
+			mod_time = datetime.fromtimestamp(mod)
+			date_ = mod_time.date()
+			time_ = mod_time.time()
 			month_gen_ = Lng.months_gen[JsonData.lng_index][str(date_.month)]
+
 			day_month_year = f"{date_.day} {month_gen_} {date_.year}"
-			month_year = f"{month_} {date_.year}"
+			hour_min_sec = str(time_)
 
 			item = DbImagesLoaderItem(
 				rel_img_path=rel_img_path,
@@ -159,7 +161,7 @@ class DbImagesLoader(URunnable):
 				resized_qimage=scaled_qimage,
 				src_qimage=src_qimage,
 				day_month_year=day_month_year,
-				month_year=month_year
+				hour_min_sec=hour_min_sec
 			)
 			thumbs.append(item)
 		return thumbs

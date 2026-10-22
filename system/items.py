@@ -16,6 +16,6 @@ class DataItem:
 	resized_qimage: QImage
 	rel_path: str
 	fav: bool
-	month_year: str
 	day_month_year: str
+	hour_min_sec: str
 	filename: str

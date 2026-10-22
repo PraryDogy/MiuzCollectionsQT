@@ -1069,8 +1069,8 @@ class GridStandart(Grid):
 				resized_qimage=image_item.resized_qimage,
 				rel_path=image_item.rel_img_path,
 				fav=image_item.fav,
-				month_year=image_item.month_year,
 				day_month_year=image_item.day_month_year,
+				hour_min_sec=image_item.hour_min_sec,
 				filename=os.path.basename(image_item.rel_img_path)
 			)
 			thumbnail = Thumb(data_item)
