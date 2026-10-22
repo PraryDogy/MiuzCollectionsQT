@@ -1695,7 +1695,7 @@ class MfStopListTag(UTagWidget):
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
 
 	def __init__(self, text):
-		super().__init__("", self.qss_gray, right_svg_path=str(self.trash_svg))
+		super().__init__(text, self.qss_gray, right_svg_path=str(self.trash_svg))
 		self.setToolTip(text)
 		self.text_widget.set_elide(True)
 		self.setMaximumWidth(150)
@@ -1703,7 +1703,6 @@ class MfStopListTag(UTagWidget):
 			QSizePolicy.Policy.Expanding,
 			QSizePolicy.Policy.Fixed,
 		)
-		self.text_widget.setText(text)
 
 
 class MfStopListWidget(UGroupBox):
@@ -1759,7 +1758,6 @@ class MfStopListWidget(UGroupBox):
 		add_button.setIcon(QIcon(str(self.plus_svg)))
 		add_button.clicked.connect(self.add_tag)
 		v_layout.addWidget(add_button)
-
 		self.reload_tags()
 
 	def create_tags_widget(self):
