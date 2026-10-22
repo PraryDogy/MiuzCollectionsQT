@@ -62,15 +62,29 @@ class TransparentLabel(QLabel):
 	def set_context_menu(self, enabled: bool):
 		self._context_menu_enabled = enabled
 
-	def set_elide(self, enabled: bool = True):
+	def set_elide(self, enabled: bool = True, ignore_width: bool = True):
 		self._elide_enabled = enabled
 		if enabled:
 			self.setMinimumWidth(0)
-			self.setSizePolicy(
-				QSizePolicy.Policy.Ignored,
-				QSizePolicy.Policy.Preferred,
-			)
+			policy = (QSizePolicy.Policy.Ignored if ignore_width
+					  else QSizePolicy.Policy.Preferred)
+			self.setSizePolicy(policy, QSizePolicy.Policy.Preferred)
 		self._update_text()
+
+	def sizeHint(self):
+		hint = super().sizeHint()
+		if self._elide_enabled:
+			fm = QFontMetrics(self.font())
+			shown_w = fm.horizontalAdvance(self.text())
+			full_w = fm.horizontalAdvance(self._original_text)
+			hint.setWidth(hint.width() - shown_w + full_w)
+		return hint
+
+	def minimumSizeHint(self):
+		hint = super().minimumSizeHint()
+		if self._elide_enabled:
+			hint.setWidth(0)
+		return hint
 
 	def get_elided_text(self):
 		width = self.contentsRect().width()
@@ -1693,16 +1707,17 @@ class MfStopListTagsGroup(UGroupBox):
 
 class MfStopListTag(UTagWidget):
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
+	max_width = 150
 
 	def __init__(self, text):
-		super().__init__(text, self.qss_gray, right_svg_path=str(self.trash_svg))
+		super().__init__(
+			text,
+			self.qss_gray,
+			right_svg_path=str(self.trash_svg),
+		)
 		self.setToolTip(text)
 		self.setMaximumWidth(150)
-		self.text_widget.set_elide(True)
-		self.text_widget.setSizePolicy(
-			QSizePolicy.Policy.Expanding,
-			QSizePolicy.Policy.Fixed,
-		)
+		self.text_widget.set_elide(True, ignore_width=False)
 
 
 class MfStopListWidget(UGroupBox):
