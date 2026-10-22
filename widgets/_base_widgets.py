@@ -1745,7 +1745,7 @@ class MfStopListEditTag(UMainWindow):
 
 		group_layout.addWidget(USep())
 
-		description = TransparentLabel(
+		description = GrayTextLabel(
 			Lng.stop_list_description[JsonData.lng_index]
 		)
 		description.setWordWrap(True)
