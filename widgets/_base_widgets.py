@@ -1719,7 +1719,7 @@ class MfStopListEditTag(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.text_editor[JsonData.lng_index])
-		self.central_layout.setContentsMargins(5, 5, 5, 10)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
 
 		group_box = UGroupBox()
@@ -1778,6 +1778,7 @@ class MfStopListEditTag(UMainWindow):
 
 		self.adjustSize()
 		self.setFixedHeight(self.height())
+		self.setFocus()
 
 	def mouseReleaseEvent(self, a0):
 		self.setFocus()
