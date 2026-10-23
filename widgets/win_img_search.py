@@ -7,7 +7,7 @@ import sqlalchemy
 from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QCursor, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget  # Не забудьте импортировать
-from PyQt6.QtWidgets import QHBoxLayout, QStackedWidget, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QHBoxLayout, QStackedWidget, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng

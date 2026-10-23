@@ -3,7 +3,7 @@ import os
 from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QCursor, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters

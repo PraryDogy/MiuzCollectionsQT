@@ -1,13 +1,10 @@
 import functools
 import os
 import subprocess
-from collections import defaultdict
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import (QCloseEvent, QGuiApplication, QIcon, QImage,
-						 QKeyEvent, QPixmap)
-from PyQt6.QtWidgets import (QHBoxLayout, QSizePolicy, QSplitter,
-							 QVBoxLayout, QWidget)
+from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeyEvent
+from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
@@ -15,15 +12,14 @@ from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
-								 UpdateThumbItem)
+                                 UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
-						   ScanerWorker)
-from system.scaner_new import NewScanerProcess, NewScanerWorker
+                           ScanerWorker)
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import (ConfirmWindow, USep, UMainWindow, UGroupBox,
-							WarningWindow, TransparentLabel)
+from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
+                            UGroupBox, UMainWindow, USep, WarningWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -40,7 +36,6 @@ from .win_servers import ServersWin
 from .win_settings import WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
-
 
 # =============================================================================
 # БИЗНЕС-ЛОГИКА (без зависимостей от виджетов Qt)
@@ -246,7 +241,7 @@ class WinMain(UMainWindow):
 		self.resize(self.ww, self.hh)
 
 		# --- Создаем единый контейнер для всего нижнего блока ---
-		self.footer_container = QWidget()
+		self.footer_container = TransparentWidget()
 		self.footer_layout = QVBoxLayout(self.footer_container)
 		
 		# слева справа доп отступы, чтобы быть уже, чем основные виджеты

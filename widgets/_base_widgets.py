@@ -553,7 +553,7 @@ class TitleBar(TransparentWidget):
 		self.min_btn.installEventFilter(self)
 		self.max_btn.installEventFilter(self)
 
-	def set_custom_widget(self, widget: QWidget):
+	def set_custom_widget(self, widget: TransparentWidget):
 		# Прячем стандартный текст вместо его удаления
 		self.title_label.hide()
 		
@@ -643,9 +643,9 @@ class UBlackFrame(TransparentFrame):
 
 
 class UMainWindow(QMainWindow):
-	win_list: list[QWidget] = []
+	win_list: list[TransparentWidget] = []
 
-	def __init__(self, parent: QWidget = None):
+	def __init__(self, parent: TransparentWidget = None):
 		super().__init__(parent)
 		self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 		self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -698,7 +698,7 @@ class UMainWindow(QMainWindow):
 		except ValueError:
 			pass
 
-	def center_to_parent(self, parent: QWidget):
+	def center_to_parent(self, parent: TransparentWidget):
 		try:
 			geo = self.geometry()
 			geo.moveCenter(parent.geometry().center())
@@ -870,7 +870,7 @@ class RowArrowWidget(TransparentWidget):
 		self.left_icon.load(str(svg_path))
 		self.left_icon.show()
 
-	def replace_arrow_widget(self, widget: QWidget):
+	def replace_arrow_widget(self, widget: TransparentWidget):
 		self.arrow_wid.hide()
 		self.main_layout.addWidget(widget)
 
@@ -912,7 +912,7 @@ class WinProgressbar(UMainWindow):
 		self.show_titlebar_sep()
 		self.central_layout.addSpacing(10)
 
-		h_wid = QWidget()
+		h_wid = TransparentWidget()
 		self.central_layout.addWidget(h_wid)
 		h_lay = QHBoxLayout(h_wid)
 		h_lay.setContentsMargins(0, 0, 0, 0)
@@ -922,7 +922,7 @@ class WinProgressbar(UMainWindow):
 		left_side_icon.setFixedSize(40, 40)
 		h_lay.addWidget(left_side_icon)
 
-		right_side_wid = QWidget()
+		right_side_wid = TransparentWidget()
 		right_side_lay = QVBoxLayout(right_side_wid)
 		right_side_lay.setContentsMargins(0, 0, 0, 0)
 		right_side_lay.setSpacing(2)
@@ -931,7 +931,7 @@ class WinProgressbar(UMainWindow):
 		self.above_label = TransparentLabel()
 		right_side_lay.addWidget(self.above_label)
 
-		progressbar_row = QWidget()
+		progressbar_row = TransparentWidget()
 		right_side_lay.addWidget(progressbar_row)
 		progressbar_lay = QHBoxLayout(progressbar_row)
 		progressbar_lay.setContentsMargins(0, 0, 0, 0)
@@ -978,7 +978,7 @@ class VerticalWindow(UMainWindow):
 		self.icon_text_layout.setContentsMargins(10, 0, 10, 0)
 		self.icon_text_layout.setSpacing(5)
 
-		self.btn_widget = QWidget()
+		self.btn_widget = TransparentWidget()
 		self.central_layout.addWidget(self.btn_widget)
 
 		self.btn_layout = QVBoxLayout(self.btn_widget)
@@ -1162,7 +1162,7 @@ class InputTextWin(UMainWindow):
 
 		self.central_layout.addSpacing(10)
 
-		btn_widget = QWidget()
+		btn_widget = TransparentWidget()
 		self.central_layout.addWidget(btn_widget)
 
 		btn_layout = QHBoxLayout(btn_widget)
@@ -1206,7 +1206,7 @@ class SaveRowArrowWidget(RowArrowWidget):
 		self.set_left_icon(self.save_svg)
 
 
-class MfAliasWidget(QWidget):
+class MfAliasWidget(TransparentWidget):
 	changed = pyqtSignal()
 
 	def __init__(self, lng_index: int):
@@ -1473,7 +1473,7 @@ class MfPathWidget(UGroupBox):
 		title.text_widget.set_elide(True)
 		return title
 
-	def _create_base_layout(self, widget: QWidget):
+	def _create_base_layout(self, widget: TransparentWidget):
 		main_layout = QHBoxLayout(widget)
 		main_layout.setContentsMargins(0, 0, 0, 0)
 		main_layout.setSpacing(0)
@@ -1503,7 +1503,7 @@ class MfPathWidget(UGroupBox):
 		return buttons_container
 
 	def init_no_path_ui(self):
-		widget = QWidget()
+		widget = TransparentWidget()
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
@@ -1553,7 +1553,7 @@ class MfPathWidget(UGroupBox):
 		self.stack.addWidget(widget)
 
 	def init_ok_path_ui(self):
-		widget = QWidget()
+		widget = TransparentWidget()
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
