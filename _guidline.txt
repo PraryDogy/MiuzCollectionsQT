@@ -4,5 +4,5 @@
 
 qmanin window, qframe
 qgroupbox, qlist widget, qtree view widget, qtree widgets
-pushbutton, qline edit, text edit, svg with bg widget, ???usep???
+pushbutton, qline edit, text edit, svg with bg widget, ???usep???, umenu
 tags
