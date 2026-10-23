@@ -162,7 +162,7 @@ class DangerWarn(ConfirmWindow):
 class WinMain(UMainWindow):
 	min_w = 750
 	left_side_width = 250
-	ww, hh = 1050, 750
+	ww, hh = 1300, 950
 	FOOTER_MARGINS = 5
 
 	def __init__(self, argv: list):

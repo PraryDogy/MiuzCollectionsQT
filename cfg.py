@@ -89,7 +89,7 @@ class Dynamic:
     py_date_start: datetime = None
     py_date_end: datetime = None
     loaded_thumbs: int = 0
-    current_pixmap_size_index: int = 1
+    current_pixmap_size_index: int = 2
     current_dir: str = os.sep
     sort_by_mod_enabled: bool = True
     word_tags_list: list[str] = []
