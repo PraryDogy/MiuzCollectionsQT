@@ -5,10 +5,9 @@ import cv2
 import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QIcon, QImage, QPixmap, QCursor
+from PyQt6.QtGui import QCursor, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget  # Не забудьте импортировать
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QStackedWidget,
-							 QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import QHBoxLayout, QStackedWidget, QVBoxLayout, QWidget
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
@@ -19,10 +18,9 @@ from system.tasks import ImagePreviewTask, ImageSearcher, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
-							TitleTextLabel, TransparentFrame, TransparentLabel,
-							TransparentWidget, UGroupBox, UMainWindow,
-							UPushButton, USep, USlider)
-
+                            TitleTextLabel, TransparentFrame, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWindow,
+                            UPushButton, USep, USlider)
 
 
 class ProgressWin(UMainWindow):
@@ -219,7 +217,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 		self.setFixedSize(*DROP_WIDGET_SIZE)
 
 		self.pixmap = QPixmap()
-		self.image_label = QLabel(Lng.loading[JsonData.lng_index])
+		self.image_label = TransparentLabel(Lng.loading[JsonData.lng_index])
 		self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		layout = QVBoxLayout(self)
 		layout.setContentsMargins(0, 0, 0, 0)

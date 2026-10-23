@@ -3,17 +3,16 @@ import os
 from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QCursor, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout,
-							 QWidget)
+from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
 
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
-							GrayTextLabel, InputTextWin, TitleTextLabel,
-							TransparentLabel, TransparentWidget, UGroupBox,
-							UMainWindow, UMenu, UPushButton, USep, UTagWidget)
+                            GrayTextLabel, InputTextWin, TitleTextLabel,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UMainWindow, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
 
 UGroupBox_margins = (5, 5, 5, 5)

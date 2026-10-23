@@ -6,7 +6,7 @@ from collections import defaultdict
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import (QCloseEvent, QGuiApplication, QIcon, QImage,
 						 QKeyEvent, QPixmap)
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QSplitter,
+from PyQt6.QtWidgets import (QHBoxLayout, QSizePolicy, QSplitter,
 							 QVBoxLayout, QWidget)
 
 from cfg import Dynamic, JsonData, Static
@@ -23,7 +23,7 @@ from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
 from ._base_widgets import (ConfirmWindow, USep, UMainWindow, UGroupBox,
-							WarningWindow, TransparentFrame)
+							WarningWindow, TransparentLabel)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_path import PathBar
@@ -121,7 +121,7 @@ class ForcedDirsRegistry:
 # UI
 # =============================================================================
 
-class TestWid(QLabel):
+class TestWid(TransparentLabel):
 	def __init__(self, parent=None):
 		super().__init__(parent=parent, text="TEST")
 		self.setFixedHeight(50)
