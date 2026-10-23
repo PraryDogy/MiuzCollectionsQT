@@ -46,22 +46,8 @@ class WinSmb(UMainWindow):
 		group_lay.setContentsMargins(0, 0, 0, 0)
 		group_lay.setSpacing(5)
 
-		# Первая строка внутри GroupBox (Иконка + Заголовок)
-		header_wid = TransparentWidget()
-		header_lay = QHBoxLayout(header_wid)
-		header_lay.setContentsMargins(0, 0, 0, 0)
-		header_lay.setSpacing(10)
-
-		icon = QSvgWidget()
-		icon.load(str(self.yellow_warning_path))
-		icon.setFixedSize(*self.yellow_waring_size)
-		header_lay.addWidget(icon)
-
-		title_lbl = TitleTextLabel(Lng.no_connection[JsonData.lng_index])
-		header_lay.addWidget(title_lbl, alignment=Qt.AlignmentFlag.AlignVCenter)
-		
-		# Добавляем заголовок в вертикальный макет GroupBox
-		group_lay.addWidget(header_wid)
+		title_lbl = TitleTextLabel(Lng.no_connection[JsonData.lng_index], str(self.yellow_warning_path))
+		group_lay.addWidget(title_lbl)
 
 		# Описание добавляем туда же, под заголовок
 		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])

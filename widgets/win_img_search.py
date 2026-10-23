@@ -295,8 +295,6 @@ class ControlsWidget(UGroupBox):
 
 	def __init__(self):
 		super().__init__()
-		self.reset_icon = QIcon(str(self.reset_svg))
-
 		self.v_layout = QVBoxLayout(self)
 		self.v_layout.setContentsMargins(5, 5, 5, 15)
 		self.v_layout.setSpacing(0)

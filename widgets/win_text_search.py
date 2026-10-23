@@ -13,32 +13,14 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
 							UMainWindow, UPushButton, USep, UTextEdit)
 
 
-class WinTextSearchTitleRow(TransparentFrame):
-	svg_path = Static.COMMON_ICONS / "text_edit_color.svg"
-	svg_size = (25, 25)
-
-	def __init__(self):
-		super().__init__()
-		self.h_lay = QHBoxLayout(self)
-		self.h_lay.setContentsMargins(0, 0, 0, 0)
-		self.h_lay.setSpacing(10)
-		self.h_lay.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-
-		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(self.svg_path))
-		self.svg_widget.setFixedSize(*TitleTextLabel.icon_size)
-		self.h_lay.addWidget(self.svg_widget)
-
-		self.title_label = TitleTextLabel(Lng.text_editor[JsonData.lng_index])
-		self.h_lay.addWidget(self.title_label)
-
-
 class WinTextSearch(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 	size_ = (380, 330)  # Немного увеличил высоту, чтобы поместилось описание
 	svg_magnifier = Static.COMMON_ICONS / "magnifier.svg"
 	svg_wand = Static.COMMON_ICONS / "wand.svg"
 	icon_size = QSize(10, 10)
+	svg_text_edit_color = Static.COMMON_ICONS / "text_edit_color.svg"
+
 
 	def __init__(self, text: str):
 		super().__init__()
@@ -59,7 +41,7 @@ class WinTextSearch(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(7)
 
-		self.title_row = WinTextSearchTitleRow()
+		self.title_row = TitleTextLabel(Lng.text_editor[JsonData.lng_index], str(self.svg_text_edit_color))
 		group_layout.addWidget(self.title_row)
 
 		group_layout.addWidget(USep())
@@ -88,8 +70,8 @@ class WinTextSearch(UMainWindow):
 		self.format_button.clicked.connect(self.format_input_text)
 		self.format_button.setIconSize(self.icon_size)
 		self.format_button.setIcon(self.wand_icon)
-		self.title_row.h_lay.addStretch()
-		self.title_row.h_lay.addWidget(self.format_button)
+		self.title_row.h_layout.addStretch()
+		self.title_row.h_layout.addWidget(self.format_button)
 		# btns_layout.addWidget(self.format_button)
 
 		close_btn = UPushButton(Lng.close[JsonData.lng_index])

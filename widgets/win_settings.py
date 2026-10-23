@@ -733,10 +733,7 @@ class NewMfSettings(TransparentWidget):
 		mf_stop_list = self.mf_stop_list.get_stop_list()
 
 		if mf_path and mf_alias:
-			super_win = SuperConfirmWindow(
-				Lng.confirm_mf_path[JsonData.lng_index],
-				310, 105
-			)
+			super_win = SuperConfirmWindow(Lng.confirm_mf_path[JsonData.lng_index])
 			super_win.ok_clicked.connect(
 				lambda: save_mf(mf_alias, mf_path, mf_stop_list)
 			)

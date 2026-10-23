@@ -20,37 +20,19 @@ UGroupBox_margins = (5, 5, 5, 5)
 UGroupBox_spacing = 10
 
 
-class WinFiltersTitleWidget(QWidget):
+class WinFiltersTitleWidget(TitleTextLabel):
 	reset_clicked = pyqtSignal()
 	reset_svg_path = Static.COMMON_ICONS / "reset.svg"
 
-	def __init__(self, text: str, svg_path: str, show_reset: bool = True):
-		super().__init__()
-
+	def __init__(self, text: str, svg_path: str):
+		super().__init__(text, svg_path)
 		self.reset_icon = QIcon(str(self.reset_svg_path))
-		
-		# 1. Создаем главное горизонтальное выравнивание
-		layout = QHBoxLayout(self)
-		layout.setContentsMargins(0, 0, 0, 0)  # Убираем внешние отступы
-		layout.setSpacing(8)                  # Отступ между иконкой и текстом
-		
-		# 2. Создаем SVG-виджет для иконки
-		self.icon_widget = QSvgWidget(svg_path)
-		self.icon_widget.setFixedSize(QSize(24, 24))  # Задайте нужный размер иконки
-		
-		# 3. Создаем лейбл для текста
-		self.label = TitleTextLabel(text)
-		
-		# 4. Добавляем виджеты в слой
-		layout.addWidget(self.icon_widget)
-		layout.addWidget(self.label)
-		layout.addStretch(1)
+		self.h_layout.addStretch(1)
 
-		if show_reset:
-			self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
-			self.reset_button.setIcon(self.reset_icon)
-			self.reset_button.clicked.connect(self.reset_clicked.emit)
-			layout.addWidget(self.reset_button)
+		self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
+		self.reset_button.setIcon(self.reset_icon)
+		self.reset_button.clicked.connect(self.reset_clicked.emit)
+		self.h_layout.addWidget(self.reset_button)
 
 
 class CalendarTag(UTagWidget):

@@ -260,6 +260,8 @@ class LoginWin(UMainWindow):
 
 
 class ServersWin(UMainWindow):
+	connect_color = str(Static.COMMON_ICONS / "connect_color.svg")
+
 	def __init__(self):
 		super().__init__()
 		self.set_always_on_top()
@@ -279,22 +281,11 @@ class ServersWin(UMainWindow):
 		group_lay = QVBoxLayout(group)
 		group_lay.setContentsMargins(12, 12, 12, 12)
 		group_lay.setSpacing(8)
-
-		# --- Шапка окна "Избранное" ---
-		header_wid = TransparentWidget()
-		header_lay = QHBoxLayout(header_wid)
-		header_lay.setContentsMargins(0, 0, 0, 0)
-		header_lay.setSpacing(8)
-
-		icon = QSvgWidget(str(Static.COMMON_ICONS / "connect_color.svg"))
-		icon.setFixedSize(30, 30)
-		header_lay.addWidget(icon)
-
-		title_lbl = TitleTextLabel(Lng.favorite_servers[JsonData.lng_index])
-		header_lay.addWidget(title_lbl)
-		header_lay.addStretch()
-
-		group_lay.addWidget(header_wid)
+		title_lbl = TitleTextLabel(
+			Lng.favorite_servers[JsonData.lng_index],
+			str(self.connect_color)
+		)
+		group_lay.addWidget(title_lbl)
 
 		group_lay.addWidget(USep())
 

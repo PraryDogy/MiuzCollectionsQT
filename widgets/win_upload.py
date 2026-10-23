@@ -73,19 +73,8 @@ class DestinyFolderWidget(UGroupBox):
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
 		self.main_layout.setSpacing(5)
 
-		self.title_container = TransparentWidget()
-		self.main_layout.addWidget(self.title_container)
-		self.title_layout = QHBoxLayout(self.title_container)
-		self.title_layout.setContentsMargins(0, 0, 0, 0)
-		self.title_layout.setSpacing(10)
-
-		self.title_svg = QSvgWidget()
-		self.title_svg.load(str(self.svg_path))
-		self.title_svg.setFixedSize(*self.svg_size)
-		self.title_layout.addWidget(self.title_svg)
-
-		self.title_label = TitleTextLabel(Lng.dest_folder[JsonData.lng_index])
-		self.title_layout.addWidget(self.title_label)
+		self.title_label = TitleTextLabel(Lng.dest_folder[JsonData.lng_index], str(self.svg_path))
+		self.main_layout.addWidget(self.title_label)
 
 		# с обычным spacing виджет под сепаратором будет как бы дальше
 		# из-за высоты кнопки, поэтому заголовок над сепаратором

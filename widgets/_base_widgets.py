@@ -732,11 +732,22 @@ class GrayTextLabel(TransparentLabel):
 
 
 # если переименовываешь, не забудь qss
-class TitleTextLabel(TransparentLabel):
+class TitleTextLabel(TransparentWidget):
 	icon_size = (23, 23)
 
-	def __init__(self, text="", parent=None):
-		super().__init__(text, parent)
+	def __init__(self, text: str, svg_path: str = None):
+		super().__init__()
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setSpacing(10)
+		self.h_layout.setContentsMargins(0, 0, 0, 0)
+
+		if svg_path:
+			self.svg_widget = QSvgWidget(str(svg_path))
+			self.svg_widget.setFixedSize(*self.icon_size)
+			self.h_layout.addWidget(self.svg_widget)
+
+		self.text_widget = TransparentLabel(text)
+		self.h_layout.addWidget(self.text_widget)
 
 
 # если переименовываешь, не забудь qss
@@ -1458,20 +1469,9 @@ class MfPathWidget(UGroupBox):
 			self.show_no_path()
 
 	def _create_title(self, icon_path: Path) -> QHBoxLayout:
-		layout = QHBoxLayout()
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setSpacing(10)
-
-		icon = QSvgWidget()
-		icon.load(str(icon_path))
-		icon.setFixedSize(*TitleTextLabel.icon_size)
-		layout.addWidget(icon)
-
-		title = TitleTextLabel(self.title_)
-		title.set_elide(True)
-		layout.addWidget(title)
-
-		return layout
+		title = TitleTextLabel(self.title_, str(icon_path))
+		title.text_widget.set_elide(True)
+		return title
 
 	def _create_base_layout(self, widget: QWidget):
 		main_layout = QHBoxLayout(widget)
@@ -1507,11 +1507,8 @@ class MfPathWidget(UGroupBox):
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
-		title_container = TransparentWidget()
-		title_container.setLayout(
-			self._create_title(self.folder_magnifier)
-		)
-		texts_layout.addWidget(title_container)
+		title = self._create_title(self.folder_magnifier)
+		texts_layout.addWidget(title)
 
 		# Разделитель
 		texts_layout.addWidget(USep())
@@ -1560,11 +1557,8 @@ class MfPathWidget(UGroupBox):
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
-		title_container = TransparentWidget()
-		title_container.setLayout(
-			self._create_title(self.green_checkmark)
-		)
-		texts_layout.addWidget(title_container)
+		title = self._create_title(self.green_checkmark)
+		texts_layout.addWidget(title)
 
 		# Разделитель
 		texts_layout.addWidget(USep())
@@ -1706,19 +1700,8 @@ class MfStopListEditTag(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(10)
 
-		title_container = TransparentWidget()
-		group_layout.addWidget(title_container)
-
-		title_layout = QHBoxLayout(title_container)
-		title_layout.setContentsMargins(0, 0, 0, 0)
-		title_layout.setSpacing(10)
-
-		title_svg = QSvgWidget(str(self.text_edit))
-		title_svg.setFixedSize(*TitleTextLabel.icon_size)
-		title_layout.addWidget(title_svg)
-
-		title_label = TitleTextLabel(Lng.folder_name[JsonData.lng_index])
-		title_layout.addWidget(title_label)
+		title_label = TitleTextLabel(Lng.folder_name[JsonData.lng_index], str(self.text_edit))
+		group_layout.addWidget(title_label)
 
 		group_layout.addWidget(USep())
 
@@ -1802,18 +1785,8 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
 
-		title_container = TransparentWidget()
-		v_layout.addWidget(title_container)
-		title_layout = QHBoxLayout(title_container)
-		title_layout.setContentsMargins(0, 0, 0, 0)
-		title_layout.setSpacing(10)
-
-		title_svg = QSvgWidget(str(self.ignore_svg))
-		title_svg.setFixedSize(18, 18)
-		title_layout.addWidget(title_svg)
-
-		title_label = TitleTextLabel(Lng.stop_list[JsonData.lng_index])
-		title_layout.addWidget(title_label)
+		title_label = TitleTextLabel(Lng.stop_list[JsonData.lng_index], str(self.ignore_svg))
+		v_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())
 
