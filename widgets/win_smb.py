@@ -40,7 +40,6 @@ class WinSmb(UMainWindow):
 		self.central_layout.setContentsMargins(15, 5, 15, 15)
 		self.central_layout.setSpacing(10)
 
-		# Создаем QGroupBox вместо TransparentWidget
 		self.group_box = TransparentWidget()
 		group_lay = QVBoxLayout(self.group_box)
 		group_lay.setContentsMargins(0, 0, 0, 0)
@@ -53,7 +52,6 @@ class WinSmb(UMainWindow):
 		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
 		group_lay.addWidget(descr_lbl)
 
-		# Сам QGroupBox добавляем в ваш главный макет central_layout
 		self.central_layout.addWidget(self.group_box)
 		
 		# --- Виджет пути ---
