@@ -480,7 +480,7 @@ class UserTags(TransparentWidget):
 
 class TagsWidget(UGroupBox):
 	load_st_grid = pyqtSignal()
-	svg_path = Static.COMMON_ICONS / "tags.svg"
+	svg_path = Static.COMMON_ICONS / "tags_color.svg"
 
 	def __init__(self):
 		super().__init__()
