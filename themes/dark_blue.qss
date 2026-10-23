@@ -16,6 +16,11 @@ TransparentTreeView {
     border: none;
 }
 
+
+
+
+/* РАЗДЕЛИ НА ДВА КЛАССА, ДИНАМИКА НЕАКТУАЛЬНА */
+
 UMainWindowFrame[style="default"] {
     background: #ff0c1218;
     border-radius: 10px;

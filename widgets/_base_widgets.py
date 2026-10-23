@@ -1864,7 +1864,7 @@ class MfStopListWidget(UGroupBox):
 		self.reload_tags()
 
 	def create_tags_widget(self):
-		self.tags_widget = MfStopListTagsGroup()
+		self.tags_widget = UGroupBox()
 		self.tags_container_layout.addWidget(self.tags_widget)
 		tags_layout = QVBoxLayout(self.tags_widget)
 		tags_layout.setContentsMargins(0, 0, 5, 0)
@@ -1881,7 +1881,7 @@ class MfStopListWidget(UGroupBox):
 		self.tags_flow_layout.setSpacing(0)
 
 	def create_no_tags_widget(self):
-		self.tags_widget = MfStopListTagsGroup()
+		self.tags_widget = UGroupBox()
 		self.tags_container_layout.addWidget(self.tags_widget)
 		self.tags_flow_layout = QVBoxLayout(self.tags_widget)
 		self.tags_flow_layout.setContentsMargins(0, 0, 0, 0)

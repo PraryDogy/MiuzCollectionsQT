@@ -1,0 +1,8 @@
+Общие цвета, цвета бордеров и рамок должны совпадать
+от темного к светлому
+все виджеты должны располагаться внутри group box
+
+qmanin window, qframe
+qgroupbox, qlist widget, qtree view widget, qtree widgets
+pushbutton, qline edit, text edit, svg with bg widget, ???usep???
+tags
