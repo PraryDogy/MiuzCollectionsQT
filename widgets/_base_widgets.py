@@ -725,11 +725,13 @@ class UMainWindow(QMainWindow):
 		return super().deleteLater()
 
 
+# если переименовываешь, не забудь qss
 class GrayTextLabel(TransparentLabel):
 	def __init__(self, text: str):
 		super().__init__(text)
 
 
+# если переименовываешь, не забудь qss
 class TitleTextLabel(TransparentLabel):
 	icon_size = (23, 23)
 
@@ -737,6 +739,7 @@ class TitleTextLabel(TransparentLabel):
 		super().__init__(text, parent)
 
 
+# если переименовываешь, не забудь qss
 class UTagWidget(TransparentFrame):
 	right_svg_clicked = pyqtSignal()
 	text_clicked = pyqtSignal()
@@ -1680,11 +1683,6 @@ class MfPathWidget(UGroupBox):
 		if a0.mimeData().hasUrls():  # Принимаем дроп только если это ссылки/файлы
 			a0.accept()
 		return super().dragEnterEvent(a0)
-
-
-class MfStopListTagsGroup(UGroupBox):
-	def __init__(self, title=None, parent=None):
-		super().__init__(title, parent)
 
 
 class MfStopListEditTag(UMainWindow):
