@@ -13,10 +13,11 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.servers import Servers
 
-from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel, 
-							TitleTextLabel, TransparentLabel, TransparentWidget,
-							UGroupBox, ULineEdit, UListWidget, UListWidgetItem,
-							UMainWindow, UMenu, UPushButton)
+from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
+                            TitleTextLabel, TransparentLabel,
+                            TransparentWidget, UGroupBox, ULineEdit,
+                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
+                            UPushButton, USep)
 
 
 @dataclass(slots=True)
@@ -266,13 +267,18 @@ class ServersWin(UMainWindow):
 		
 		title = Lng.connect_to_server_title[JsonData.lng_index]
 		self.setWindowTitle(title)
-		self.setFixedWidth(350)
+		self.setFixedWidth(400)
 		
 		# Сепаратор включаем, так как под ним будет заголовок, а не UGroupBox
-		self.show_titlebar_sep()
 
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
+
+		# --- Группа "Избранное" ---
+		group = UGroupBox()
+		group_lay = QVBoxLayout(group)
+		group_lay.setContentsMargins(12, 12, 12, 12)
+		group_lay.setSpacing(8)
 
 		# --- Шапка окна "Избранное" ---
 		header_wid = TransparentWidget()
@@ -280,20 +286,24 @@ class ServersWin(UMainWindow):
 		header_lay.setContentsMargins(0, 0, 0, 0)
 		header_lay.setSpacing(8)
 
-		icon = QSvgWidget(str(Static.COMMON_ICONS / "connect.svg"))
-		icon.setFixedSize(20, 20)
+		icon = QSvgWidget(str(Static.COMMON_ICONS / "connect_color.svg"))
+		icon.setFixedSize(30, 30)
 		header_lay.addWidget(icon)
 
 		title_lbl = TitleTextLabel(Lng.favorite_servers[JsonData.lng_index])
 		header_lay.addWidget(title_lbl)
 		header_lay.addStretch()
 
-		self.central_layout.addWidget(header_wid)
+		group_lay.addWidget(header_wid)
 
-		text = "Добавляйте и сохраняйте данные SMB-серверов так же, как в macOS. Выберите сервер и нажмите «Подключиться» для быстрого монтирования диска. Поддерживаются только SMB-подключения."
-		description_label = GrayTextLabel(text)
+		group_lay.addWidget(USep())
+
+		# --- Описание ---
+		description_label = GrayTextLabel(Lng.servers_description[JsonData.lng_index])
 		description_label.setWordWrap(True)
-		self.central_layout.addWidget(description_label)
+		group_lay.addWidget(description_label)
+
+		self.central_layout.addWidget(group)
 
 
 		# --- Список серверов напрямую ---

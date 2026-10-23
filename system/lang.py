@@ -612,3 +612,12 @@ class Lng:
 		"Удалить этот элемент из стоп-листа?",
 		"Remove this item from the stop list?",
 	)
+	servers_description = (
+		"Добавляйте и сохраняйте данные SMB-серверов так же, как в macOS. "
+		"Выберите сервер и нажмите «Подключиться» для быстрого монтирования диска. "
+		"Поддерживаются только SMB-подключения.",
+
+		"Add and save SMB server details just like in macOS. "
+		"Select a server and click “Connect” to quickly mount the disk. "
+		"Only SMB connections are supported.",
+	)
