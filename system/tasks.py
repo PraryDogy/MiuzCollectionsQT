@@ -119,7 +119,7 @@ class DbImagesLoader(URunnable):
 				self.sigs.finished_.emit([])
 		except Exception as e:
 			print(traceback.format_exc())
-			self.sigs.finished_.emit({})
+			self.sigs.finished_.emit([])
 
 	def create_dict(self, res: list[tuple]):
 		# thumbs_dict = defaultdict(list[DbImagesItem])

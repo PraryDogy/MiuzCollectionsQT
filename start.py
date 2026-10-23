@@ -5,7 +5,7 @@ import traceback
 from PyQt6.QtCore import QEvent, QObject
 from PyQt6.QtWidgets import (QApplication, QDialog, QPushButton, QTextEdit,
                              QVBoxLayout)
-from typing_extensions import Literal
+from typing import Literal
 
 from cfg import JsonData, Static
 from system.database import Dbase
@@ -49,7 +49,6 @@ class System_:
 
         l.addWidget(QPushButton("Закрыть", clicked=d.close))
         d.resize(500, 400)
-        d.setFocus()
         d.exec()
 
     def catch_error_in_proj(exctype, value, tb):
@@ -68,7 +67,7 @@ class System_:
         #lib folder appears when we pack this project to .app with py2app
         if os.path.exists("lib"): 
             ver = f"{sys.version_info.major}.{sys.version_info.minor}"
-            plugin_path = f"lib/python{ver}/PyQt6/Qt5/plugins"
+            plugin_path = f"lib/python{ver}/PyQt6/Qt6/plugins"
             os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
             return True
         else:
@@ -89,7 +88,7 @@ class System_:
 
 
 class App(QApplication):
-    def __init__(self, argv: list[Literal["noscan", ""]]) -> None:
+    def __init__(self, argv: list) -> None:
         super().__init__(argv)
         self.argv = argv
         self.validate()
@@ -126,7 +125,7 @@ class App(QApplication):
         # mf,самое важное
         Static.MF_JSON.touch(exist_ok=True)
         data = Mf.validate_json()
-        if data:
+        if data is not None:
             Mf.json_to_app(data)
             Mf.current_mf = Mf.items[0]
             # инициация приложения
@@ -145,22 +144,18 @@ class App(QApplication):
         self.win_main = WinMain(self.argv)
         self.win_main.center_screen()
         self.win_main.show()
-        self.installEventFilter(self)
         self.aboutToQuit.connect(lambda: self.win_main.on_exit())
         # icon = QIcon(str(Static.APP_ICONS / "icon.png"))
         # self.setWindowIcon(icon)
 
-    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
-        if a1.type() == QEvent.Type.ApplicationActivate:
-            win_list = [
-                i
-                for i in UMainWindow.win_list
-                if not isinstance(i, WinImgSearch)
-            ]
-            for i in win_list:
-                i.raise_()
-                i.show()
-        return super().eventFilter(a0, a1)
+    def event(self, e: QEvent) -> bool:
+        if e.type() == QEvent.Type.ApplicationActivate:
+            for win in UMainWindow.win_list:
+                if isinstance(win, WinImgSearch):
+                    continue
+                win.raise_()
+                win.show()
+        return super().event(e)
 
 
 if "print" in sys.argv:
@@ -172,4 +167,4 @@ if System_.set_plugin_path():
 
 if __name__ == "__main__":
     app = App(argv=sys.argv)
-    app.exec()
+    sys.exit(app.exec())

@@ -105,13 +105,14 @@ class TransparentLabel(QLabel):
 			else self._original_text
 		)
 
-		TransparentLabel.setText(self, text)
+		QLabel.setText(self, text)
 
 		self.setToolTip(
 			self._original_text
 			if self._elide_enabled and text != self._original_text
 			else ""
 		)
+
 
 	def resizeEvent(self, event):
 		super().resizeEvent(event)

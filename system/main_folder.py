@@ -37,21 +37,21 @@ class Mf:
 				data: list[dict] = json.load(file)
 		except Exception as e:
 			print("Mf, error reading file", e)
-			return False
+			return None
 
 		if not isinstance(data, list):
 			print("Mf: json data не является списком")
-			return False
+			return None
 
 		if len(data) == 0:
 			print("Mf: json data список пуст")
-			return False
+			return None
 
 		# валидация по списку словарей
 		mf_dicts = (i for i in data if isinstance(i, dict))
 		if not mf_dicts:
 			print("Mf: список пуст, нет словарей в списке")
-			return False
+			return None
 
 		# валидация по ключам
 		slots_set = set(Mf.__slots__)
@@ -62,7 +62,7 @@ class Mf:
 				all_slots_dicts.append(cleaned_dict)
 		if not all_slots_dicts:
 			print("Mf: список пуст по валидации по ключам")
-			return False
+			return None
 
 		# валидация по типу данных
 		all_types_dicts = []
@@ -82,7 +82,7 @@ class Mf:
 					all_types_dicts.append(d)
 		if not all_types_dicts:
 			print("Mf: список пуст по валидации по типу данных")
-			return False
+			return None
 
 		# валидация по mf_alias
 		unique_mf= {}
@@ -92,7 +92,7 @@ class Mf:
 		unique_mf = list(unique_mf.values())
 		if not unique_mf:
 			print("Mf: не пройдена проверка по уникальности mf_alias")
-			return False
+			return None
 
 		return unique_mf
 
