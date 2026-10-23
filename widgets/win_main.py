@@ -22,7 +22,7 @@ from system.scaner_new import NewScanerProcess, NewScanerWorker
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils
 
-from ._base_widgets import (ConfirmWindow, USep, UMainWindow, UPushButton,
+from ._base_widgets import (ConfirmWindow, USep, UMainWindow, UGroupBox,
 							WarningWindow, TransparentFrame)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -159,11 +159,6 @@ class DangerWarn(ConfirmWindow):
 		return
 
 
-class MainWinRightWidget(TransparentFrame):
-	def __init__(self):
-		super().__init__()
-
-
 class WinMain(UMainWindow):
 	min_w = 750
 	left_side_width = 250
@@ -237,7 +232,7 @@ class WinMain(UMainWindow):
 		self.splitter.addWidget(self.left_menu)
 
 		# Правый виджет
-		right_wid = MainWinRightWidget()
+		right_wid = UGroupBox()
 		self.splitter.addWidget(right_wid)
 		self.right_layout = QVBoxLayout(right_wid)
 		self.right_layout.setContentsMargins(0, 10, 0, 10)

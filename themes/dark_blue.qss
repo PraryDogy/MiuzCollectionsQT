@@ -27,7 +27,7 @@ UFrame {
 }
 
 UBlackFrame {
-    background: #0000000;
+    background: #000000;
     border: 1px solid transparent;
     border-radius: 10px;
 }
@@ -47,9 +47,9 @@ UTreeView::item, UListWidget::item, UTreeWidget::item, UMenu::item {
 }
 
 
-/* светлые виджеты */
+/* светлые виджеты должны выделяться на фоне group box, так как виджеты помещены всегда на group box */
 
-UPushButton, ULineEdit, UTextEdit, USep, UMenu {
+UPushButton, ULineEdit, UTextEdit, USep, UMenu, USpinBox {
     background: #18212a;
     border: 1px solid #263440;
     color: #ffffff;
@@ -68,14 +68,23 @@ UTreeView::branch:selected, UTreeWidget::branch:selected {
 }
 
 
-/* еще светлее виджеты */
 
-UPushButton:hover, ULineEdit:hover, UTextEdit:hover {
-    background: #1d2833;
-    border: 1px solid #30404f;
+
+
+/* НЕПОНЯТНО КУДА */
+USpinBox::up-button,
+USpinBox::down-button {
+    background: #18212a;
 }
 
 
+
+/* еще светлее виджеты */
+
+UPushButton:hover, ULineEdit:hover, UTextEdit:hover, USpinBox::up-button:hover, USpinBox::down-button:hover {
+    background: #1d2833;
+    border: 1px solid #30404f;
+}
 
 
 UListWidget::indicator, UListWidget::indicator:disabled {
@@ -91,7 +100,7 @@ UCheckBox::indicator {
 
 
 /* еще еще светлее виджеты */
-UPushButton:pressed {
+UPushButton:pressed, USpinBox::up-button:pressed, USpinBox::down-button:pressed {
     background: #202c38;
     border: 1px solid #30404f;
 }
@@ -284,10 +293,9 @@ USlider::handle:horizontal {
 
 /* ==================== SPINBOX ==================== */
 
+
+
 USpinBox {
-    background: #151f29;
-    color: #ffffff;
-    border: 1px solid #263440;
     border-radius: 4px;
 }
 
@@ -576,15 +584,6 @@ WinImgSearchPreviewWidget {
 /* win_info.py */
 
 /* win_main.py */
-
-MenuLeftTreeWidget,
-MainWinRightWidget {
-    background: #101820;
-    border: 1px solid #1c2833;
-    /* border: 1px solid transparent; */
-    border-radius: 10px;
-}
-
 /* win_main.py */
 
 /* win_servers.py */
@@ -600,24 +599,4 @@ MainWinRightWidget {
 /* win_text_search.py */
 
 /* win_upload.py */
-
-
-/* NotiWidget {
-    background: #16842c;
-    border-radius: 7px;
-}
-
-NotiWidget TransparentLabel {
-    font-weight: bold;
-    font-size: 15px;
-} */
-
-
 /* win_upload.py */
-
-
-
-/* базовый цвет самая нижняя подложка */
-/* #0d1218 */
-
-/*  */
