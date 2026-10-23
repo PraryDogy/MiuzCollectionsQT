@@ -105,7 +105,7 @@ class TransparentLabel(QLabel):
 			else self._original_text
 		)
 
-		QLabel.setText(self, text)
+		TransparentLabel.setText(self, text)
 
 		self.setToolTip(
 			self._original_text
@@ -851,7 +851,7 @@ class RowArrowWidget(TransparentWidget):
 		self.left_icon.hide()
 		
 		# Текст
-		self.text_widget = QLabel(text)
+		self.text_widget = TransparentLabel(text)
 		
 		# Стрелка справа
 		self.arrow_wid = QSvgWidget()
@@ -928,7 +928,7 @@ class WinProgressbar(UMainWindow):
 		right_side_lay.setSpacing(2)
 		h_lay.addWidget(right_side_wid)
 
-		self.above_label = QLabel()
+		self.above_label = TransparentLabel()
 		right_side_lay.addWidget(self.above_label)
 
 		progressbar_row = QWidget()
@@ -950,7 +950,7 @@ class WinProgressbar(UMainWindow):
 		self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
 		progressbar_lay.addWidget(self.cancel_btn)
 
-		self.below_label = QLabel()
+		self.below_label = TransparentLabel()
 		right_side_lay.addWidget(self.below_label)
 
 		self.adjustSize()
@@ -986,7 +986,7 @@ class VerticalWindow(UMainWindow):
 		self.btn_layout.setSpacing(6)
 
 	def _calculate_optimal_text_width(
-		self, text_wid: QLabel, text: str,
+		self, text_wid: TransparentLabel, text: str,
 		min_width: int = 180, max_width: int = 800,
 	) -> int:
 		fm = text_wid.fontMetrics()
@@ -1006,7 +1006,7 @@ class VerticalWindow(UMainWindow):
 
 		return max_width
 
-	def _adjust_window_size(self, text_wid: QLabel, text: str):
+	def _adjust_window_size(self, text_wid: TransparentLabel, text: str):
 		text_wid.setFixedWidth(self._calculate_optimal_text_width(text_wid, text))
 
 		self.icon_text_layout.activate()
@@ -1217,7 +1217,7 @@ class MfAliasWidget(QWidget):
 		v_layout.setContentsMargins(0, 0, 0, 0)
 		v_layout.setSpacing(0)
 
-		name_text = QLabel(Lng.folder_name_full[lng_index])
+		name_text = TransparentLabel(Lng.folder_name_full[lng_index])
 		name_text.setContentsMargins(2, 0, 2, 0)
 		v_layout.addWidget(name_text)
 
