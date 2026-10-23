@@ -14,7 +14,7 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
 
 
 class WinTextSearchTitleRow(TransparentFrame):
-	svg_path = Static.COMMON_ICONS / "text_edit.svg"
+	svg_path = Static.COMMON_ICONS / "text_edit_color.svg"
 	svg_size = (25, 25)
 
 	def __init__(self):
@@ -26,7 +26,7 @@ class WinTextSearchTitleRow(TransparentFrame):
 
 		self.svg_widget = QSvgWidget()
 		self.svg_widget.load(str(self.svg_path))
-		self.svg_widget.setFixedSize(*self.svg_size)
+		self.svg_widget.setFixedSize(*TitleTextLabel.icon_size)
 		self.h_lay.addWidget(self.svg_widget)
 
 		self.title_label = TitleTextLabel(Lng.text_editor[JsonData.lng_index])
@@ -70,6 +70,7 @@ class WinTextSearch(UMainWindow):
 		group_layout.addWidget(self.description_label)
 
 		self.text_edit = UTextEdit()
+		self.text_edit.setPlaceholderText(Lng.search_placeholder_texts[JsonData.lng_index])
 		self.central_layout.addWidget(self.text_edit)
 		self.text_edit.setPlainText(text)
 		self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
@@ -100,6 +101,8 @@ class WinTextSearch(UMainWindow):
 		self.ok_btn.setIconSize(self.icon_size)
 		self.ok_btn.clicked.connect(self.search)
 		btns_layout.addWidget(self.ok_btn)
+
+		self.setFocus()
 
 	def format_input_text(self):
 		text = self.text_edit.toPlainText()

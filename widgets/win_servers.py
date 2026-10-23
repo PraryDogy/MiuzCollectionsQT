@@ -143,7 +143,7 @@ class PassLineEdit(ULineEdit):
 			self.eye_svg.load(str(self.eye_svg.eye_off))
 
 
-class ServerLabel(GrayTextLabel):
+class ServerLabel(TransparentLabel):
 	def __init__(self, text: str):
 		super().__init__(text=text)
 		self.setContentsMargins(2, 0, 0, 0)
@@ -313,7 +313,7 @@ class ServersWin(UMainWindow):
 		self.v_list.remove_server.connect(self.remove_cmd)
 		self.v_list.connect_server.connect(self.connect_cmd)
 		self.v_list.evlosh_data_loaded.connect(self.evlosh_data_added)
-		self.central_layout.addWidget(self.v_list)
+		group_lay.addWidget(self.v_list)
 
 		# --- Кнопки ---
 		btn_layout = QHBoxLayout()

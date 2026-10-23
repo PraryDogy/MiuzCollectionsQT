@@ -621,3 +621,7 @@ class Lng:
 		"Select a server and click “Connect” to quickly mount the disk. "
 		"Only SMB connections are supported.",
 	)
+	search_placeholder_texts = (
+		"Введите текст для поиска",
+		"Enter text to search",
+	)
