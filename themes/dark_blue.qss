@@ -1,268 +1,205 @@
-/* прозрачность */
+/* =====================================================================
+   ТЁМНАЯ ТЕМА, УПОРЯДОЧЕНО ПО ЦВЕТУ
+   Порядок блоков: цвет фона/рамки/текста, затем геометрия.
+   Один цвет = один блок. Чтобы сменить цвет группы, меняйте блок этого цвета.
 
-TransparentButton,
-TransparentLabel,
-TransparentFrame,
-TransparentWidget,
-TransparentLineEdit,
-TransparentTextEdit,
-TransparentMenu,
-TransparentScrollArea,
-UGroupBox,
-TransparentListWidget,
-TransparentTreeWidget,
-TransparentTreeView,
-MacControlButton {
-    background: transparent;
-    border: none;
+   Палитра:
+   #000000  чёрный фон (просмотр изображений, превью)
+   #0c1218  фон UFrame
+   #101820  фон панелей (GroupBox, списки, деревья, меню)
+   #111a23  фон зоны перетаскивания
+   #18212a  фон кнопок, полей ввода, тултипа
+   #1d2833  наведение, выделение
+   #202c38  нажатие, фон миниатюр в рамке
+   #263440  рамка панелей, полей, кнопок, дорожка слайдера
+   #283645  фон иконочных кнопок (наведение, выбрано)
+   #30404f  рамка при наведении, рамка чекбоксов, рамка тегов
+   #3a4b5e  фон иконочной кнопки при нажатии
+   #0059d1  синий акцент (ActiveButton, синий тег, подпись миниатюры)
+   #303b46  фон серого тега
+   #064e3b  фон зелёного тега
+   #7b8792  серый текст
+   #6e6e6e  серый текст миниатюр
+   #8f9ba6  ползунок слайдера
+   #ffffff  основной текст
+   ===================================================================== */
+
+
+/* ---------------------------------------------------------------------
+   #000000  ЧЁРНЫЙ ФОН
+   UBlackFrame, окно просмотра, превью поиска
+   --------------------------------------------------------------------- */
+UBlackFrame,
+WinImgViewGraphics,
+WinImageView,
+WinImgSearchPreviewWidget {
+    background: #000000;
 }
 
 
-/* базовые виджеты */
-
+/* ---------------------------------------------------------------------
+   #0c1218  ФОН UFrame (альфа ff, формат #AARRGGBB)
+   --------------------------------------------------------------------- */
 UFrame {
     background: #ff0c1218;
-    border: 1px solid #ff1d2b38;
-    border-radius: 10px;
-}
-
-UBlackFrame {
-    background: #000000;
-    border: 1px solid transparent;
-    border-radius: 10px;
-}
-
-/* основные виджеты */
-
-UGroupBox, UTreeView, UListWidget, UTreeWidget, UMenu {
-    background: #101820;
-    border: 1px solid #263440;
-    border-radius: 10px;
-}
-
-UTreeView::item, UListWidget::item, UTreeWidget::item, UMenu::item {
-    background: transparent;
-    border: none;
-    color: #ffffff;
 }
 
 
-/* светлые виджеты должны выделяться на фоне group box, так как виджеты помещены всегда на group box */
-
-UPushButton, ULineEdit, UTextEdit, USep, USpinBox, QToolTip {
-    background: #18212a;
-    border: 1px solid #263440;
-    color: #ffffff;
-}
-
-
-
-/* НЕПОНЯТНО КУДА */
-USpinBox::up-button,
-USpinBox::down-button {
-    background: none;
-}
-
-
-
-/* еще светлее виджеты */
-
-UPushButton:hover, ULineEdit:hover, UTextEdit:hover, USpinBox:hover {
-    background: #1d2833;
-    border: 1px solid #30404f;
-}
-
-
-USpinBox::up-button, USpinBox::down-button {
-    background: #1d2833;
-}
-
-
-
-UListWidget::indicator, UListWidget::indicator:disabled {
-    background: #1d2833;
-    border: 1px solid #30404f;
-}
-
-UCheckBox::indicator {
-    background: transparent;
-    border: 1px solid #30404f;
-}
-
-
-UTreeView::item:selected, UListWidget::item:selected, UTreeWidget::item:selected, UMenu::item:selected {
-    background: #1d2833;
-}
-
-UTreeView::item:selected:!active, UListWidget::item:selected:!active, UTreeWidget::item:selected:!active {
-    background: #1d2833;
-}
-
-UTreeView::branch:selected, UTreeWidget::branch:selected {
-    background: #1d2833;
-}
-
-
-
-
-/* еще еще светлее виджеты */
-UPushButton:pressed, USpinBox::up-button:pressed, USpinBox::down-button:pressed {
-    background: #202c38;
-    border: 1px solid #30404f;
-}
-
-
-USpinBox::up-button:pressed, USpinBox::down-button:pressed {
-    border: none;
-}
-
-
-
-UListWidget::indicator {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-}
-
-
-UCheckBox::indicator {
-    width: 15px;
-    height: 15px;
-    border-radius: 5px;
-}
-
-
-
-UListWidget::indicator {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-}
-
-
-
-
-/* ==================== MENU ==================== */
-
-UMenu {
-    border-radius: 10px;
-    padding: 5px 2px 5px 2px;
-}
-
-UMenu::item {
-    padding: 5px 30px 5px 10px;
-}
-
-
-UMenu::icon {
-    padding-left: 5px;
-}
-
-UMenu::indicator {
-    width: 16px;
-    height: 16px;
-    padding-left: 5px;
-}
-
-UMenu::indicator:checked {
-    image: url(./icons/common/checkmark_small.svg);
-}
-
-UMenu::indicator:unchecked {
-    image: none;
-}
-
-UMenu::right-arrow {
-    image: url("./icons/common/arrow_right.svg");
-    width: 12px;
-    height: 12px;
-    padding-right: 5px;
-}
-
-UMenu::right-arrow:selected {
-    image: url("./icons/common/arrow_right.svg");
-}
-
-
-/* ==================== INPUT ==================== */
-
-ULineEdit {
-    border-radius: 6px;
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-
-UTextEdit {
-    border-radius: 10px;
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-
-
-/* ==================== TREE / LIST ==================== */
-
-UTreeView,
+/* ---------------------------------------------------------------------
+   #101820  ФОН ПАНЕЛЕЙ
+   GroupBox, списки, деревья, меню
+   --------------------------------------------------------------------- */
+UGroupBox,
 UListWidget,
-UTreeWidget {
-    border-radius: 10px;
-    padding: 10px 2px 10px 2px;
-}
-
-UTreeView::item,
-UListWidget::item,
-UTreeWidget::item {
-    height: 30px;
+UTreeView,
+UTreeWidget,
+UMenu {
+    background: #101820;
 }
 
 
-UTreeView::branch:has-children:closed,
-UTreeWidget::branch:has-children:closed {
-    image: url(./icons/common/expand.svg);
-}
-
-UTreeView::branch:has-children:open,
-UTreeWidget::branch:has-children:open {
-    image: url(./icons/common/collapse.svg);
+/* ---------------------------------------------------------------------
+   #111a23  ФОН ЗОНЫ ПЕРЕТАСКИВАНИЯ (поиск по изображению)
+   --------------------------------------------------------------------- */
+WinImgSearchDropWidget {
+    background: #111a23;
 }
 
 
-
-
-
-UListWidget::indicator:checked {
-    image: url(./icons/common/checkmark_small.svg);
+/* ---------------------------------------------------------------------
+   #18212a  ФОН ЭЛЕМЕНТОВ ВВОДА
+   Кнопки, поля, спинбокс и его стрелки, разделитель, тултип
+   --------------------------------------------------------------------- */
+UPushButton,
+ULineEdit,
+UTextEdit,
+USpinBox,
+USpinBox::up-button,
+USpinBox::down-button,
+USep,
+QToolTip {
+    background: #18212a;
 }
 
 
-
-
-/* ==================== BUTTON ==================== */
-
-UPushButton {
-    font-size: 11px;
-    border-radius: 8px;
-    padding-right: 5px;
-    padding-left: 5px;
+/* ---------------------------------------------------------------------
+   #1d2833  НАВЕДЕНИЕ И ВЫДЕЛЕНИЕ
+   Наведение на поля и кнопки, выбранные пункты списков, деревьев, меню,
+   чекбоксы в списках, ветки дерева при выделении
+   --------------------------------------------------------------------- */
+UPushButton:hover,
+ULineEdit:hover,
+UTextEdit:hover,
+USpinBox:hover,
+UListWidget::indicator,
+UListWidget::indicator:disabled,
+UTreeView::item:selected,
+UListWidget::item:selected,
+UTreeWidget::item:selected,
+UTreeView::item:selected:!active,
+UListWidget::item:selected:!active,
+UTreeWidget::item:selected:!active,
+UMenu::item:selected,
+UTreeView::branch:selected,
+UTreeWidget::branch:selected {
+    background: #1d2833;
 }
 
 
-
-
-UPushButton::menu-indicator {
-    image: url("./icons/common/arrow_down.svg");
-    width: 12px;
-    height: 12px;
+/* ---------------------------------------------------------------------
+   #202c38  НАЖАТИЕ
+   Кнопка и стрелки спинбокса при нажатии, фон миниатюры в рамке
+   --------------------------------------------------------------------- */
+UPushButton:pressed,
+USpinBox::up-button:pressed,
+USpinBox::down-button:pressed,
+ThumbImgWidget[framed="true"] {
+    background: #202c38;
 }
 
 
-/* ==================== ACTIVE BUTTON ==================== */
+/* ---------------------------------------------------------------------
+   #263440  РАМКА ПАНЕЛЕЙ И ЭЛЕМЕНТОВ ВВОДА
+   Рамка: GroupBox, списки, деревья, меню, кнопки, поля, спинбокс,
+   разделитель, тултип
+   Фон: дорожка слайдера
+   Рамка: зона перетаскивания (пунктир)
+   --------------------------------------------------------------------- */
+UGroupBox,
+UListWidget,
+UTreeView,
+UTreeWidget,
+UMenu,
+UPushButton,
+ULineEdit,
+UTextEdit,
+USpinBox,
+USep,
+QToolTip {
+    border: 1px solid #263440;
+}
+
+USlider::groove:horizontal {
+    background-color: #263440;
+}
+
+WinImgSearchDropWidget {
+    border: 2px dashed #263440;
+}
+
+
+/* ---------------------------------------------------------------------
+   #1d2b38  РАМКА UFrame (альфа ff)
+   --------------------------------------------------------------------- */
+UFrame {
+    border: 1px solid #ff1d2b38;
+}
+
+
+/* ---------------------------------------------------------------------
+   #30404f  РАМКА ПРИ НАВЕДЕНИИ И У ЧЕКБОКСОВ И ТЕГОВ
+   --------------------------------------------------------------------- */
+UPushButton:hover,
+ULineEdit:hover,
+UTextEdit:hover,
+USpinBox:hover,
+UPushButton:pressed,
+UListWidget::indicator,
+UListWidget::indicator:disabled,
+UCheckBox::indicator,
+UTagWidget[style="transparent"] {
+    border: 1px solid #30404f;
+}
+
+
+/* ---------------------------------------------------------------------
+   #283645  ИКОНОЧНЫЕ КНОПКИ: НАВЕДЕНИЕ И ВЫБРАНО
+   --------------------------------------------------------------------- */
+_SvgWithThemeBg:hover[style="base"],
+_SvgWithThemeBg[style="selected"] {
+    background: #283645;
+}
+
+
+/* ---------------------------------------------------------------------
+   #3a4b5e  ИКОНОЧНАЯ КНОПКА: НАЖАТИЕ
+   --------------------------------------------------------------------- */
+_SvgWithThemeBg[style="pressed"] {
+    background: #3A4B5E;
+}
+
+
+/* ---------------------------------------------------------------------
+   #0059d1  СИНИЙ АКЦЕНТ
+   Основная кнопка ActiveButton, синий тег, подпись выбранной миниатюры
+   --------------------------------------------------------------------- */
+ActiveButton,
+UTagWidget[style="blue"],
+ThumbWhiteTextWid[framed="true"] {
+    background: #0059D1;
+}
 
 ActiveButton {
-    background: #0059D1;
     border: 1px solid #0e69df;
 }
 
@@ -275,37 +212,164 @@ ActiveButton:pressed {
     border: 1px solid #2d7be1;
 }
 
-
-/* ==================== SLIDER ==================== */
-
-USlider::groove:horizontal {
-	/* Цвет самой линии (дорожки) */
-	background-color: #263440;
-	/* Толщина линии */
-	height: 3px;
-	/* Небольшое скругление краев линии */
-	border-radius: 1px;
-	margin: 0px;
+UTagWidget[style="blue"] {
+    border: 1px solid #156ee3;
 }
 
+
+/* ---------------------------------------------------------------------
+   #303b46 / #3d4a56  СЕРЫЙ ТЕГ
+   --------------------------------------------------------------------- */
+UTagWidget[style="gray"] {
+    background: #303b46;
+    border: 1px solid #3d4a56;
+}
+
+
+/* ---------------------------------------------------------------------
+   #064e3b / #10b981  ЗЕЛЁНЫЙ ТЕГ
+   --------------------------------------------------------------------- */
+UTagWidget[style="green"] {
+    background: #064E3B;
+    border: 1px solid #10B981;
+}
+
+
+/* ---------------------------------------------------------------------
+   #202c38  (см. выше) ФОН миниатюры в рамке
+   Уже указан в блоке «нажатие», здесь не дублируется.
+   --------------------------------------------------------------------- */
+
+
+/* ---------------------------------------------------------------------
+   #8f9ba6  ПОЛЗУНОК СЛАЙДЕРА
+   --------------------------------------------------------------------- */
 USlider::handle:horizontal {
-	/* Цвет кружочка (ползунка) */
-	background-color: #8f9ba6;
-	/* Размеры задают квадрат 10x10 пикселей */
-	height: 10px;
-	width: 10px;
-	/* Радиус скругления, равный половине ширины/высоты (10/2 = 5), делает из квадрата идеальный круг */
-	border-radius: 5px;
-	/* Смещаем ползунок вверх и вниз за пределы тонкой дорожки. 
-	   Математика: (Высота ползунка 10px - Высота дорожки 3px) / 2 = 3.5px. 
-	   Округление до 4px (или 3px) центрирует кружок относительно линии. */
-	margin: -4px 0;
+    background-color: #8f9ba6;
 }
 
 
-/* ==================== SPINBOX ==================== */
+/* ---------------------------------------------------------------------
+   #7b8792  СЕРЫЙ ТЕКСТ (подписи)
+   --------------------------------------------------------------------- */
+GrayTextLabel {
+    color: #7b8792;
+}
 
 
+/* ---------------------------------------------------------------------
+   #6e6e6e  СЕРЫЙ ТЕКСТ МИНИАТЮР
+   --------------------------------------------------------------------- */
+ThumbBlueTextWidget,
+ThumbMiuzBlueTextWidget {
+    color: #6E6E6E;
+}
+
+
+/* ---------------------------------------------------------------------
+   rgba(40, 54, 69, 191)  ПОЛУПРОЗРАЧНЫЙ ФОН КНОПКИ «ВВЕРХ»
+   --------------------------------------------------------------------- */
+UpBtnLabel {
+    background: rgba(40, 54, 69, 191);
+}
+
+
+/* ---------------------------------------------------------------------
+   #ffffff  ОСНОВНОЙ ТЕКСТ
+   Элементы ввода, пункты списков, деревьев, меню, теги, подписи миниатюр
+   --------------------------------------------------------------------- */
+UPushButton,
+ULineEdit,
+UTextEdit,
+USpinBox,
+QToolTip,
+UTreeView::item,
+UListWidget::item,
+UTreeWidget::item,
+UMenu::item,
+UTagWidget,
+ThumbWhiteTextWid {
+    color: #ffffff;
+}
+
+
+/* ---------------------------------------------------------------------
+   TRANSPARENT  ПРОЗРАЧНЫЙ ФОН И БЕЗ РАМКИ
+   Служебные и «пустые» виджеты, пункты списков и деревьев
+   --------------------------------------------------------------------- */
+TransparentButton,
+TransparentLabel,
+TransparentFrame,
+TransparentWidget,
+TransparentLineEdit,
+TransparentTextEdit,
+TransparentMenu,
+TransparentScrollArea,
+TransparentListWidget,   /* проверить: grep по коду */
+TransparentTreeWidget,   /* проверить: grep по коду */
+TransparentTreeView,     /* проверить: grep по коду */
+MacControlButton,        /* проверить: grep по коду */
+UTreeView::item,
+UListWidget::item,
+UTreeWidget::item,
+UMenu::item {
+    background: transparent;
+    border: none;
+}
+
+UBlackFrame {
+    border: 1px solid transparent;
+}
+
+ImgViewSvg,
+UCheckBox,
+UCheckBox::indicator,
+ThumbImgWidget[framed="false"],
+ThumbWhiteTextWid[framed="false"],
+ThumbBlueTextWidget,
+ThumbMiuzBlueTextWidget,
+_SvgWithThemeBg[style="base"],
+UTagWidget[style="transparent"] {
+    background: transparent;
+}
+
+
+/* =====================================================================
+   ГЕОМЕТРИЯ (без цветов): скругления, отступы, размеры, шрифты, иконки
+   ===================================================================== */
+
+/* --- Скругления контейнеров --- */
+UFrame,
+UBlackFrame,
+UGroupBox,
+UListWidget,
+UTreeView,
+UTreeWidget,
+UMenu,
+UTextEdit,
+UTagWidget,
+WinImgViewGraphics,
+WinImageView,
+WinImgSearchPreviewWidget,
+ThumbImgWidget {
+    border-radius: 10px;
+}
+
+UTagWidget {
+    border-radius: 12px;
+}
+
+WinImgSearchDropWidget {
+    border-radius: 20px;
+}
+
+UpBtnLabel {
+    border-radius: 18px;
+}
+
+ULineEdit {
+    border-radius: 6px;
+}
 
 USpinBox {
     border-radius: 4px;
@@ -313,10 +377,105 @@ USpinBox {
 
 USpinBox::up-button,
 USpinBox::down-button {
-    background: #18212a;
+    border-radius: 3px;
+}
+
+UPushButton,
+_SvgWithThemeBg[style="base"],
+_SvgWithThemeBg:hover[style="base"],
+_SvgWithThemeBg[style="selected"],
+_SvgWithThemeBg[style="pressed"] {
+    border-radius: 8px;
+}
+
+ThumbWhiteTextWid {
+    border-radius: 5px;
+}
+
+UCheckBox::indicator {
+    border-radius: 5px;
+}
+
+UListWidget::indicator {
+    border-radius: 4px;
+}
+
+USlider::groove:horizontal {
+    border-radius: 1px;
+}
+
+USlider::handle:horizontal {
+    border-radius: 5px;
+}
+
+
+/* --- Отступы и размеры --- */
+UFrame,
+UBlackFrame,
+UGroupBox,
+UTagWidget {
+    border-width: 1px;
+}
+
+UTreeView,
+UListWidget,
+UTreeWidget {
+    padding: 10px 2px 10px 2px;
+}
+
+UTreeView::item,
+UListWidget::item,
+UTreeWidget::item {
+    height: 30px;
+}
+
+UMenu {
+    padding: 5px 2px 5px 2px;
+}
+
+UMenu::item {
+    padding: 5px 30px 5px 10px;
+}
+
+UMenu::icon {
+    padding-left: 5px;
+}
+
+UMenu::indicator {
+    width: 16px;
+    height: 16px;
+    padding-left: 5px;
+}
+
+UMenu::right-arrow {
+    width: 12px;
+    height: 12px;
+    padding-right: 5px;
+}
+
+ULineEdit {
+    padding: 5px 2px 5px 2px;
+}
+
+UTextEdit {
+    padding: 5px 2px 5px 2px;
+}
+
+UPushButton {
+    font-size: 11px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+UPushButton::menu-indicator {
+    width: 12px;
+    height: 12px;
+}
+
+USpinBox::up-button,
+USpinBox::down-button {
     width: 17px;
     margin-right: 2px;
-    border-radius: 3px;
 }
 
 USpinBox::up-button {
@@ -329,85 +488,69 @@ USpinBox::down-button {
     margin-bottom: 2px;
 }
 
-
-USpinBox::up-arrow {
-    image: url("./icons/common/arrow_up.svg");
-    width: 9px;
-    height: 9px;
-}
-
+USpinBox::up-arrow,
 USpinBox::down-arrow {
-    image: url("./icons/common/arrow_down.svg");
     width: 9px;
     height: 9px;
 }
-
-
-/* ==================== CHECK BOX ==================== */
 
 UCheckBox {
-    background: transparent;
     spacing: 6px;
 }
 
-
-UCheckBox::indicator:checked {
-    image: url(./icons/common/checkmark_small.svg);
+UCheckBox::indicator {
+    width: 15px;
+    height: 15px;
 }
 
-UCheckBox::indicator:unchecked {
-    image: none;
+UListWidget::indicator {
+    width: 16px;
+    height: 16px;
 }
 
+USlider::groove:horizontal {
+    height: 3px;
+    margin: 0px;
+}
 
-/* ==================== TAG ==================== */
+USlider::handle:horizontal {
+    height: 10px;
+    width: 10px;
+    margin: -4px 0;   /* проверить: по расчёту нужно 3.5px */
+}
+
+SearchWidLineEdit {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+ThumbWhiteTextWid {
+    padding: 2px 4px 2px 4px;
+}
 
 UTagWidget {
-    border-radius: 12px;
     color: #ffffff;
 }
 
-UTagWidget[style="blue"] {
-    background: #0059D1;
-    border: 1px solid #156ee3;
+UBlackFrame,
+UFrame {
+    border-width: 1px;
 }
 
-UTagWidget[style="gray"] {
-    background: #303b46;
-    border: 1px solid #3d4a56;
+UPushButton,
+USpinBox {
+    border-style: solid;
 }
 
-UTagWidget[style="transparent"] {
-    background: transparent;
-    border: 1px solid #30404f;
+ImgViewSvg,
+TransparentFrame {
+    border-width: 0;
 }
 
-UTagWidget[style="green"] {
-    background: #064E3B;
-    border: 1px solid #10B981;
-}
-
-/* MfPathWidget {
-    border: 2px dashed #263440;
-} */
-
-/* MfStopListTagsGroup {
-    border-radius: 14px;
-    background: #18212a;
-} */
-
-
-/* ==================== TOOLTIP ==================== */
-
-QToolTip {
-    padding: 2px;
-}
-
-
-/* ==================== TEXT ==================== */
-
-GrayTextLabel {
-    color: #7b8792;
+ThumbWhiteTextWid,
+ThumbBlueTextWidget,
+ThumbMiuzBlueTextWidget {
+    font-size: 11px;
 }
 
 TitleTextLabel {
@@ -415,188 +558,47 @@ TitleTextLabel {
     font-size: 20px;
 }
 
-MfPathTitle {
-    font-size: 15px;
+
+QToolTip {
+    padding: 2px;
 }
 
 
-
-
-
-_SvgWithThemeBg[style="base"] {
-    background: transparent;
-    border-radius: 8px;
+/* --- Иконки --- */
+UMenu::indicator:checked,
+UListWidget::indicator:checked,
+UCheckBox::indicator:checked {
+    image: url(./icons/common/checkmark_small.svg);
 }
 
-_SvgWithThemeBg:hover[style="base"] {
-    background: #283645;
-    border-radius: 8px;
+UMenu::indicator:unchecked,
+UCheckBox::indicator:unchecked {
+    image: none;
 }
 
-_SvgWithThemeBg[style="selected"] {
-    background: #283645;
-    border-radius: 8px;
+UMenu::right-arrow,
+UMenu::right-arrow:selected {
+    image: url("./icons/common/arrow_right.svg");
 }
 
-_SvgWithThemeBg[style="pressed"] {
-    background: #3A4B5E;
-    border-radius: 8px;
+UPushButton::menu-indicator {
+    image: url("./icons/common/arrow_down.svg");
 }
 
-
-
-
-/* _base_widgets.py */
-
-/* actions.py */
-/*  */
-/* actions.py */
-
-/* bar_bottom.py */
-/*  */
-/* bar_bottom.py */
-
-/* bar_macos.py */
-/*  */
-/* bar_macos.py */
-
-/* bar_path.py */
-/*  */
-/* bar_path.py */
-
-/* bar_top.py */
-SearchWidLineEdit {
-    padding-right: 25px;
-    padding-left: 25px;
-}
-/* bar_top.py */
-
-/* caledar_widget.py */
-/*  */
-/* caledar_widget.py */
-
-
-
-
-/* grid.py */
-ThumbImgWidget {
-    border-radius: 10px;
+USpinBox::up-arrow {
+    image: url("./icons/common/arrow_up.svg");
 }
 
-ThumbImgWidget[framed="false"] {
-    background: transparent;
+USpinBox::down-arrow {
+    image: url("./icons/common/arrow_down.svg");
 }
 
-ThumbImgWidget[framed="true"] {
-    background: #202c38;
+UTreeView::branch:has-children:closed,
+UTreeWidget::branch:has-children:closed {
+    image: url(./icons/common/expand.svg);
 }
 
-ThumbWhiteTextWid {
-    padding-left: 4px;
-    padding-right: 4px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    border-radius: 5px;
-    font-size: 11px;
-    color: #FFFFFF;
+UTreeView::branch:has-children:open,
+UTreeWidget::branch:has-children:open {
+    image: url(./icons/common/collapse.svg);
 }
-
-ThumbWhiteTextWid[framed="false"] {
-    background: transparent;
-}
-
-ThumbWhiteTextWid[framed="true"] {
-    background: #0059D1;
-}
-
-ThumbBlueTextWidget,
-ThumbMiuzBlueTextWidget {
-    background: transparent;
-    color: #6E6E6E;
-    font-size: 11px;
-}
-
-UpBtnLabel {
-    /* 36 размер UpBtnLabel */
-    border-radius: 18px;
-    /* border: 1px solid #6E6E6E; */
-    background: rgba(40, 54, 69, 191);
-}
-
-
-/* grid.py */
-
-/* menu_left.py */
-/* стилизация этого меню будет в main_win, так как стиль меню будет
-таким же, как и у виджета сетки изображений */
-/* menu_left.py */
-
-/* path_widget.py */
-/*  */
-/* path_widget.py */
-
-/* win_collage.py */
-/* win_collage.py */
-
-/* win_copy_files.py */
-/* win_copy_files.py */
-
-/* win_filters.py */
-
-
-
-/* win_filters.py */
-
-/* win_first_load.py */
-/* win_first_load.py */
-
-/* win_image_view.py */
-
-ImgViewSvg {
-    background: transparent;
-}
-
-WinImgViewGraphics, WinImageView {
-    background: #000000;
-    border-radius: 10px;
-}
-
-
-/* win_image_view.py */
-
-/* win_img_search.py */
-
-WinImgSearchDropWidget {
-    border: 2px dashed #263440;
-    border-radius: 20px;
-    background: #111a23;
-}
-
-WinImgSearchPreviewWidget {
-    background: #000000;
-    border-radius: 10px;
-}
-
-
-/* win_img_search.py */
-
-/* win_info.py */
-/* win_info.py */
-
-/* win_main.py */
-/* win_main.py */
-
-/* win_servers.py */
-/* win_servers.py */
-
-/* win_settings.py */
-/* win_settings.py */
-
-/* win_smb.py */
-/* win_smb.py */
-
-/* win_text_search.py */
-/* win_text_search.py */
-
-/* win_upload.py */
-/* win_upload.py */
