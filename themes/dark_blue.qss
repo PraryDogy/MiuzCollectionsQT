@@ -34,7 +34,7 @@ UBlackFrame {
 
 /* основные виджеты */
 
-UGroupBox, UTreeView, UListWidget, UTreeWidget {
+UGroupBox, UTreeView, UListWidget, UTreeWidget, UMenu {
     background: #101820;
     border: 1px solid #263440;
     border-radius: 10px;
@@ -49,42 +49,34 @@ UTreeView::item, UListWidget::item, UTreeWidget::item, UMenu::item {
 
 /* светлые виджеты должны выделяться на фоне group box, так как виджеты помещены всегда на group box */
 
-UPushButton, ULineEdit, UTextEdit, USep, UMenu, USpinBox {
+UPushButton, ULineEdit, UTextEdit, USep, USpinBox, QToolTip {
     background: #18212a;
     border: 1px solid #263440;
     color: #ffffff;
 }
-
-UTreeView::item:selected, UListWidget::item:selected, UTreeWidget::item:selected, UMenu::item:selected {
-    background: #18212a;
-}
-
-UTreeView::item:selected:!active, UListWidget::item:selected:!active, UTreeWidget::item:selected:!active {
-    background: #18212a;
-}
-
-UTreeView::branch:selected, UTreeWidget::branch:selected {
-    background: #18212a;
-}
-
-
 
 
 
 /* НЕПОНЯТНО КУДА */
 USpinBox::up-button,
 USpinBox::down-button {
-    background: #18212a;
+    background: none;
 }
 
 
 
 /* еще светлее виджеты */
 
-UPushButton:hover, ULineEdit:hover, UTextEdit:hover, USpinBox::up-button:hover, USpinBox::down-button:hover {
+UPushButton:hover, ULineEdit:hover, UTextEdit:hover, USpinBox:hover {
     background: #1d2833;
     border: 1px solid #30404f;
 }
+
+
+USpinBox::up-button, USpinBox::down-button {
+    background: #1d2833;
+}
+
 
 
 UListWidget::indicator, UListWidget::indicator:disabled {
@@ -98,12 +90,32 @@ UCheckBox::indicator {
 }
 
 
+UTreeView::item:selected, UListWidget::item:selected, UTreeWidget::item:selected, UMenu::item:selected {
+    background: #1d2833;
+}
+
+UTreeView::item:selected:!active, UListWidget::item:selected:!active, UTreeWidget::item:selected:!active {
+    background: #1d2833;
+}
+
+UTreeView::branch:selected, UTreeWidget::branch:selected {
+    background: #1d2833;
+}
+
+
+
 
 /* еще еще светлее виджеты */
 UPushButton:pressed, USpinBox::up-button:pressed, USpinBox::down-button:pressed {
     background: #202c38;
     border: 1px solid #30404f;
 }
+
+
+USpinBox::up-button:pressed, USpinBox::down-button:pressed {
+    border: none;
+}
+
 
 
 UListWidget::indicator {
@@ -308,24 +320,15 @@ USpinBox::down-button {
 }
 
 USpinBox::up-button {
-    height: 10px;
+    height: 9px;
     margin-top: 2px;
 }
 
 USpinBox::down-button {
-    height: 10px;
+    height: 9px;
     margin-bottom: 2px;
 }
 
-USpinBox::up-button:hover,
-USpinBox::down-button:hover {
-    background: #1d2833;
-}
-
-USpinBox::up-button:pressed,
-USpinBox::down-button:pressed {
-    background: #202c38;
-}
 
 USpinBox::up-arrow {
     image: url("./icons/common/arrow_up.svg");
@@ -388,18 +391,15 @@ UTagWidget[style="green"] {
     border: 2px dashed #263440;
 } */
 
-MfStopListTagsGroup {
+/* MfStopListTagsGroup {
     border-radius: 14px;
     background: #18212a;
-}
+} */
 
 
 /* ==================== TOOLTIP ==================== */
 
 QToolTip {
-    color: #FFFFFF;
-    background-color: #18212a;
-    border: 1px solid #30404f;
     padding: 2px;
 }
 
@@ -423,22 +423,22 @@ MfPathTitle {
 
 
 
-_SvgIconButtonContainer[style="base"] {
+_SvgWithThemeBg[style="base"] {
     background: transparent;
     border-radius: 8px;
 }
 
-_SvgIconButtonContainer:hover[style="base"] {
+_SvgWithThemeBg:hover[style="base"] {
     background: #283645;
     border-radius: 8px;
 }
 
-_SvgIconButtonContainer[style="selected"] {
+_SvgWithThemeBg[style="selected"] {
     background: #283645;
     border-radius: 8px;
 }
 
-_SvgIconButtonContainer[style="pressed"] {
+_SvgWithThemeBg[style="pressed"] {
     background: #3A4B5E;
     border-radius: 8px;
 }

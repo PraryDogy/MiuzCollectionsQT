@@ -1322,7 +1322,7 @@ class FlowLayout(QLayout):
 
 
 
-class _SvgIconButtonContainer(TransparentLabel):
+class _SvgWithThemeBg(TransparentLabel):
 	qss_base_style = "base"
 	qss_selected_style = "selected"
 	qss_pressed_style = "pressed"
@@ -1355,7 +1355,7 @@ class _SvgIconButtonContainer(TransparentLabel):
 		ev.ignore()
 
 
-class SvgWithBgWidget(TransparentWidget):
+class SvgWithThemeBg(TransparentWidget):
 	clicked_ = pyqtSignal()
 
 	def __init__(self, svg_path: Path, container_size: tuple, icon_size: tuple):
@@ -1363,7 +1363,7 @@ class SvgWithBgWidget(TransparentWidget):
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		# Фоновая подложка с заданным размером
-		self.label = _SvgIconButtonContainer()
+		self.label = _SvgWithThemeBg()
 		self.label.setFixedSize(*container_size)
 
 		# SVG-иконка с заданным размером
