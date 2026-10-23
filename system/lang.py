@@ -137,7 +137,7 @@ class Lng:
 		"Список исключений: перетащите сюда папку или укажите имя с новой строки.",
 		"Ignore list: drag a folder here or enter a name on a new line."
 	)
-	stop_list = ("Споп лист", "Stop list")
+	stop_list = ("Стоп лист", "Stop list")
 	minutes = ("минут", "minutes")
 	search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
 	show_system_files = ("Системные файлы в Finder", "System files in Finder")
