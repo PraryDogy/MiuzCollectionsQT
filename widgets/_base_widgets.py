@@ -388,18 +388,9 @@ class ActiveButton(UPushButton):
 
 
 class USep(TransparentFrame):
-	property_name = "style"
-
 	def __init__(self):
 		super().__init__()
 		self.setFixedHeight(1)
-		self.set_style("default")
-
-	def set_style(self, style: Literal["default", "dark_gray"]):
-		self.setProperty(self.property_name, style)
-		self.style().unpolish(self)
-		self.style().polish(self)
-		self.update()
 
 
 class USlider(QSlider):
@@ -641,19 +632,14 @@ class TitleBar(TransparentWidget):
 		self._drag_pos = None
 
 
-# стилизованный виджет, чтобы окно имело заливку + рамку + углы
-class UMainWindowFrame(TransparentFrame):
-	property_name = "style"
-
+class UFrame(TransparentFrame):
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		self.set_style("default")
 
-	def set_style(self, style: Literal["default", "black"]):
-		self.setProperty(self.property_name, style)
-		self.style().unpolish(self)
-		self.style().polish(self)
-		self.update()
+
+class UBlackFrame(TransparentFrame):
+	def __init__(self, parent=None):
+		super().__init__(parent)
 
 
 class UMainWindow(QMainWindow):
@@ -670,7 +656,7 @@ class UMainWindow(QMainWindow):
 		return super().setWindowTitle(title)
 
 	def setup_window(self):
-		central_widget = UMainWindowFrame()
+		central_widget = UFrame()
 		self.setCentralWidget(central_widget)
 
 		self.window_layout = QVBoxLayout(central_widget)
@@ -696,13 +682,6 @@ class UMainWindow(QMainWindow):
 		self.window_layout.addLayout(self.central_layout)
 
 		self.register_window()
-
-	def set_window_style(self, style: Literal["default", "black"]):
-		frame: UMainWindowFrame = self.centralWidget()
-		frame.set_style(style)
-
-	def set_titlebar_sep_style(self, style: Literal["default", "dark_gray"]):
-		self.sep.set_style(style)
 
 	def set_titlebar_height(self, h: int):
 		self.title_bar.setFixedHeight(h)

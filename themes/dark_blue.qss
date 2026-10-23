@@ -21,16 +21,16 @@ TransparentTreeView {
 
 /* РАЗДЕЛИ НА ДВА КЛАССА, ДИНАМИКА НЕАКТУАЛЬНА */
 
-UMainWindowFrame[style="default"] {
+UFrame {
     background: #ff0c1218;
     border-radius: 10px;
     border: 1px solid #ff1d2b38;
 }
 
-UMainWindowFrame[style="black"] {
-    background: #000000;
+UBlackFrame {
+    background: #0000000;
     border-radius: 10px;
-    border: 1px solid #2a2a2a;
+    border: 1px solid transparent;
 }
 
 
@@ -239,12 +239,8 @@ ActiveButton:pressed {
 
 /* ==================== SEPARATOR ==================== */
 
-USep[style="default"] {
+USep {
     background: #1c2833;
-}
-
-USep[style="dark_gray"] {
-    background: #161616;
 }
 
 

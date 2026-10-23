@@ -239,9 +239,7 @@ class WinImageView(UMainWindow):
 		self.img_view_item = img_view_item
 		self.current_data_item = img_view_item.start_data_item
 
-		self.set_window_style("black")
 		self.show_titlebar_sep()
-		self.set_titlebar_sep_style("dark_gray")
 		self.setMinimumSize(QSize(self.min_w, self.min_h))
 		self.installEventFilter(self)
 		self.central_layout.setContentsMargins(0, 0, 0, 0)
