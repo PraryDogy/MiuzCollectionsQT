@@ -2,14 +2,14 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtWidgets import QGridLayout, QSpacerItem
+from PyQt6.QtWidgets import QGridLayout, QSpacerItem, QHBoxLayout
 
 from cfg import JsonData
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 
-from ._base_widgets import (GrayTextLabel, TransparentWidget,
-							UMainWindow, TransparentLabel)
+from ._base_widgets import (GrayTextLabel, TransparentLabel, ActiveButton,
+                            UMainWindow, UPushButton, UGroupBox, TransparentWidget)
 
 
 class WinInfoSelectableLabel(TransparentLabel):
@@ -32,9 +32,13 @@ class WinInfo(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.info[JsonData.lng_index])
+
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
+		self.central_layout.setSpacing(10)
+
 		self.path = paths[0]
 
-		wid = TransparentWidget()
+		wid = UGroupBox()
 		self.central_layout.addWidget(wid)
 
 		self.grid_lay = QGridLayout(wid)
@@ -72,6 +76,24 @@ class WinInfo(UMainWindow):
 		self.mod_label = selectable_labels[4]
 		self.res_label = selectable_labels[5]
 		self.load_info()
+
+		widget = TransparentWidget()
+		self.central_layout.addWidget(widget)
+		layout = QHBoxLayout(widget)
+		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setSpacing(5)
+
+		layout.addStretch()
+
+		copy_btn = UPushButton(Lng.copy_filepath[JsonData.lng_index])
+		layout.addWidget(copy_btn)
+
+		# layout.addStretch()
+
+		test = ActiveButton(Lng.close[JsonData.lng_index])
+		test.clicked.connect(self.deleteLater)
+		layout.addWidget(test)
+
 		self.adjustSize()
 		self.setFixedSize(self.width(), self.height())
 
