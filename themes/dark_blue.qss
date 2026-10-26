@@ -356,6 +356,9 @@ WinImgSearchPreviewWidget,
 Thumb {
     border-radius: 14px;
 }
+SquareThumb {
+    border-radius: 0px;
+}
 
 UTagWidget {
     border-radius: 12px;
