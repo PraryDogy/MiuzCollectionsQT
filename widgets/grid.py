@@ -555,7 +555,6 @@ class Grid(UScrollVerticalArea):
 
 	def rearrange(self):
 		self.grid_wid.hide()
-		# max_col = self.width() // Thumb.wid_width
 		max_col = self.get_max_columns()
 		self.cell_to_wid.clear()
 		for x, thumb in enumerate(self.url_to_wid.values()):
@@ -570,6 +569,7 @@ class Grid(UScrollVerticalArea):
 		for url, wid in self.url_to_wid.items():
 			wid.set_pixmap_with_actual_size()
 			wid.set_text_and_size()
+			wid.adjustSize()
 		self.rearrange()
 
 	def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
