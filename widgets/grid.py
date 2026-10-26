@@ -83,6 +83,10 @@ class Thumb(TransparentFrame):
 	sym_star = "\U00002605"
 	thumb_width = 0
 	thumb_offset = 0
+	img_w = 0       # ширина области картинки
+	img_h = 0       # высота области картинки
+	frame_w = 0     # полная ширина виджета Thumb
+	frame_h = 0     # полная высота виджета Thumb
 	blue_text_class = ThumbBlueTextWidget
 
 	def __init__(self, data_item: DataItem):
@@ -92,7 +96,7 @@ class Thumb(TransparentFrame):
 		if self.data_item.fav:
 			self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
 
-		self._img_size = None
+		self._size_key = None
 		self._pixmap_index = None
 
 		# --- Layout ---
@@ -113,24 +117,48 @@ class Thumb(TransparentFrame):
 
 		self.set_text_and_size()
 
+	# --- Геометрия: считается один раз в calculate_size ---
+
+	@classmethod
+	def _img_box_size(cls) -> tuple[int, int]:
+		return (cls.thumb_width + cls.thumb_offset, cls.thumb_width)
+
+	@classmethod
+	def _margins(cls) -> tuple[int, int, int, int]:
+		return (10, 10, 10, 2)
+
+	@classmethod
+	def _captions_height(cls) -> int:
+		# Оценка по метрикам шрифта: имя файла + строки даты,
+		# плюс spacing и addSpacing(5) между элементами лейаута
+		fm = QFontMetrics(QApplication.font())
+		lines = 2 if cls.blue_text_class is ThumbMiuzBlueTextWidget else 1
+		return fm.height() * (1 + lines) + 5 + 3 * 3
+
+	@classmethod
+	def calculate_size(cls):
+		ind = Dynamic.current_pixmap_size_index
+		cls.thumb_width = Static.THUMB_WIDTHS[ind]
+		cls.thumb_offset = Static.THUMB_OFFSETS[ind]
+		if Static.MIUZ_ZIP.exists():
+			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
+
+		cls.img_w, cls.img_h = cls._img_box_size()
+		left, top, right, bottom = cls._margins()
+		cls.frame_w = cls.img_w + left + right
+		cls.frame_h = cls.img_h + top + bottom + cls._captions_height()
+
+	# --- Построение лейаута ---
+
 	def _add_captions(self):
-		self.v_lay.setContentsMargins(10, 10, 10, 2)
+		self.v_lay.setContentsMargins(*self._margins())
 		self.v_lay.addSpacing(5)
 		self.white_text_wid = ThumbFilenameWid(self.data_item.filename)
 		self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 		self.blue_text_wid = self.blue_text_class(self.data_item)
 		self.v_lay.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-	def _img_box_size(self) -> tuple[int, int]:
-		return (Thumb.thumb_width + Thumb.thumb_offset, Thumb.thumb_width)
-
-	@classmethod
-	def calculate_size(cls):
-		ind = Dynamic.current_pixmap_size_index
-		Thumb.thumb_width = Static.THUMB_WIDTHS[ind]
-		Thumb.thumb_offset = Static.THUMB_OFFSETS[ind]
-		if Static.MIUZ_ZIP.exists():
-			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
+	# --- Стили ---
 
 	def _update_style(self):
 		# Принудительное обновление QSS-стиля виджета
@@ -151,6 +179,8 @@ class Thumb(TransparentFrame):
 	def set_no_frame(self):
 		self.set_no_frame_style()
 
+	# --- Картинка и размер ---
+
 	def set_pixmap_with_actual_size(self):
 		idx = Dynamic.current_pixmap_size_index
 		if self._pixmap_index == idx:
@@ -159,12 +189,14 @@ class Thumb(TransparentFrame):
 		self.img_wid.setPixmap(QPixmap.fromImage(self.data_item.resized_qimages[idx]))
 
 	def set_text_and_size(self):
-		size = self._img_box_size()
-		if size != self._img_size:
-			self._img_size = size
-			self.img_wid.setFixedSize(*size)
-			self.adjustSize()
+		key = (self.img_w, self.img_h, self.frame_w, self.frame_h)
+		if key != self._size_key:
+			self._size_key = key
+			self.img_wid.setFixedSize(self.img_w, self.img_h)
+			self.setFixedWidth(self.frame_w)
 		self.set_pixmap_with_actual_size()
+
+	# --- Избранное ---
 
 	def _set_fav_data(self, value: int):
 		self.data_item.fav = 1 if value else 0
@@ -180,12 +212,21 @@ class Thumb(TransparentFrame):
 
 
 class SquareThumb(Thumb):
+	@classmethod
+	def _img_box_size(cls) -> tuple[int, int]:
+		return (cls.thumb_width, cls.thumb_width)
+
+	@classmethod
+	def _margins(cls) -> tuple[int, int, int, int]:
+		return (10, 10, 10, 10)
+
+	@classmethod
+	def _captions_height(cls) -> int:
+		return 0
+
 	def _add_captions(self):
 		# Подписей в квадратном режиме нет
-		self.v_lay.setContentsMargins(10, 10, 10, 10)
-
-	def _img_box_size(self) -> tuple[int, int]:
-		return (Thumb.thumb_width, Thumb.thumb_width)
+		self.v_lay.setContentsMargins(*self._margins())
 
 	def _update_caption(self):
 		# Подписи нет, обновлять нечего
@@ -476,6 +517,7 @@ class Grid(UScrollVerticalArea):
 	open_filters_win = pyqtSignal()
 
 	resize_ms = 10
+	thumb_cls = Thumb
 	copy_files_path = Static.COMMON_ICONS / "copy_files.svg"
 
 	def __init__(self):
@@ -581,7 +623,7 @@ class Grid(UScrollVerticalArea):
 		self.grid_wid.show()
 
 	def resize_thumbnails(self):
-		Thumb.calculate_size()
+		self.thumb_cls.calculate_size()
 		for url, wid in self.url_to_wid.items():
 			wid.set_pixmap_with_actual_size()
 			wid.set_text_and_size()
@@ -1052,13 +1094,8 @@ class GridStandart(Grid):
 		UThreadPool.start(self.task_)
 
 	def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
-		Thumb.calculate_size()
-
-		if JsonData.square_thumbs:
-			thumb_widget = SquareThumb
-		else:
-			thumb_widget = Thumb
-
+		self.thumb_cls = SquareThumb if JsonData.square_thumbs else Thumb
+		self.thumb_cls.calculate_size()
 
 		for image_item in db_images:
 			data_item = DataItem(
@@ -1070,9 +1107,10 @@ class GridStandart(Grid):
 				hour_min_sec=image_item.hour_min_sec,
 				filename=os.path.basename(image_item.rel_img_path)
 			)
-			thumbnail = thumb_widget(data_item)
+			thumbnail = self.thumb_cls(data_item)
 			thumbnail.set_no_frame()
 			self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
+			
 		if not self.url_to_wid:
 			self.grid_wid.hide()
 			self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
