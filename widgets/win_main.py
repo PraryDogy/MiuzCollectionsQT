@@ -393,8 +393,12 @@ class WinMain(UMainWindow):
 				if wid:
 					base_qimage = Utils.qimage_from_array(update_thumb_item.array)
 					resized_qimages = []
+					if JsonData.square_thumbs:
+						scaled_fn = Utils.scale_qimage_square
+					else:
+						scaled_fn = Utils.scale_qimage_dpr
 					for i in Static.THUMB_WIDTHS:
-						x = Utils.scale_qimage_dpr(base_qimage, i)
+						x = scaled_fn(base_qimage, i)
 						resized_qimages.append(x)
 					wid.data_item.base_qimage = base_qimage
 					wid.data_item.resized_qimages = resized_qimages
