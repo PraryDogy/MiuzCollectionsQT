@@ -218,7 +218,7 @@ class SquareThumb(Thumb):
 
 	@classmethod
 	def _margins(cls) -> tuple[int, int, int, int]:
-		return (2, 2, 2, 2)  # запас под рамку выделения, зазор задаёт spacing
+		return (3, 3, 3, 3)  # запас под рамку выделения, зазор задаёт spacing
 
 	@classmethod
 	def _captions_height(cls) -> int:
