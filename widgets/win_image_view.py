@@ -341,7 +341,7 @@ class WinImageView(UMainWindow):
 				sz = self.current_data_item.base_qimage.size()
 				max_side = max(sz.width(), sz.height())
 				if max_side < Static.THUMB_MAX_SIZE:
-					self.new_thumb = WriteNewThumb(abs_path, img_array)
+					self.new_thumb = WriteNewThumb(self.current_data_item.rel_thumb_path, img_array)
 					UThreadPool.start(self.new_thumb)
 
 				if item.src == abs_path:

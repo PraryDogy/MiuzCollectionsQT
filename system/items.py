@@ -14,6 +14,7 @@ class SettingsItem:
 class DataItem:
 	base_qimage: QImage
 	resized_qimages: list[QImage]
+	rel_thumb_path: str
 	rel_path: str
 	fav: bool
 	day_month_year: str

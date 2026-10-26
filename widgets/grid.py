@@ -1145,6 +1145,7 @@ class GridStandart(Grid):
 			data_item = DataItem(
 				base_qimage=image_item.base_qimage,
 				resized_qimages=image_item.resized_qimages,
+				rel_thumb_path=image_item.rel_thumb_path,
 				rel_path=image_item.rel_img_path,
 				fav=image_item.fav,
 				day_month_year=image_item.day_month_year,

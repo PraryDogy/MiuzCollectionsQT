@@ -633,15 +633,16 @@ class WriteNewThumb(URunnable):
 	class Sigs(QObject):
 		finished = pyqtSignal()
 
-	def __init__(self, abs_thumb_path: str, img_array: np.ndarray):
+	def __init__(self, rel_thumb_path: str, img_array: np.ndarray):
 		super().__init__()
 		self.sigs = WriteNewThumb.Sigs()
 		self.img_array = img_array
-		self.abs_thumb_path = abs_thumb_path
+		self.rel_thumb_path = rel_thumb_path
 
 	def task(self):
+		abs_path = Utils.get_abs_thumb_path(self.rel_thumb_path)
 		scaled = ImgUtils.fit_to_thumb(self.img_array, Static.THUMB_MAX_SIZE)
-		result = ImgUtils.write_thumb(self.abs_thumb_path, scaled)
+		result = ImgUtils.write_thumb(abs_path, scaled)
 		if result:
-			print("новая миниатюра записана", self.abs_thumb_path)
+			pass
 		self.sigs.finished.emit()
