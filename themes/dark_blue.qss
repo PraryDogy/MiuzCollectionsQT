@@ -527,7 +527,7 @@ MfPathTitle {                    /* проверить: grep по коду */
 
 ThumbFilenameWid,
 ThumbBlueTextWidget,
-ThumbMiuzBlueTextWidget {
+ThumbMiuzBlueTextWidget GrayTextLabel {
     font-size: 11px;
 }
 
