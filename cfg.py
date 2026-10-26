@@ -104,6 +104,7 @@ class JsonData:
     theme = Themes.theme_auto
     scaner_minutes = 20
     hide_digits_mf_lst = []
+    square_thumbs = False
 
     @classmethod
     def get_data(cls):
@@ -112,7 +113,8 @@ class JsonData:
             "lng_index": cls.lng_index,
             "theme": cls.theme,
             "scaner_minutes": cls.scaner_minutes,
-            "hide_digits_mf_lst": cls.hide_digits_mf_lst,   
+            "hide_digits_mf_lst": cls.hide_digits_mf_lst,
+            "square_thumbs": cls.square_thumbs
         }
     
     @classmethod
