@@ -329,7 +329,10 @@ class WinImageView(UMainWindow):
 			shm.unlink()
 
 		def thumbnail_updated(qimage: QImage):
-			self.thumbnail_updated.emit(qimage)
+			try:
+				self.thumbnail_updated.emit(qimage)
+			except RuntimeError:
+				print("Win image view, не смог отправить сигнал thumbnail_updated")
 
 		def poll():
 			self.read_img_timer.stop()
