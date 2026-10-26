@@ -9,34 +9,29 @@
    Правило: при одинаковой специфичности побеждает правило, написанное
    позже. Поэтому основа идёт первой, а цвета перекрывают её.
 
-   Стрелки спинбокса прозрачные: они показывают фон самого поля,
-   и при наведении на поле меняется весь виджет целиком.
-
    Палитра:
-   #e9edf2  фон изображения и превью поиска
-   #f0f2f5  фон UFrame
-   #f5f7fa  фон панелей (GroupBox, списки, деревья, меню)
-   #f7f9fb  фон зоны перетаскивания
-   #ffffff  фон кнопок, полей ввода, спинбокса, тултипа
-   #e6ecf3  наведение, выделение, отметка в списке, иконочные кнопки при наведении
-   #dbe3ec  нажатие, фон миниатюры в рамке
-   #d0d7e0  рамка панелей и полей, дорожка слайдера
-   #dde5ee  иконочные кнопки: выбрано
-   #b8c2ce  рамка при наведении, чекбоксы, тег transparent
-   #cfd9e5  иконочная кнопка: нажатие
-   #0059d1  синий акцент: ActiveButton, синий тег, подпись миниатюры
-   #e3e8ee  серый тег
+   #ffffff  фон просмотра изображений, превью поиска
+   #f4f6f8  фон UFrame
+   #fafbfc  фон панелей (GroupBox, списки, деревья, меню)
+   #eef2f6  фон зоны перетаскивания
+   #f1f4f7  фон кнопок, полей ввода, спинбокса, тултипа
+   #e3eaf2  наведение, выделение, отметка в списке
+   #d5dfeb  нажатие, фон миниатюры в рамке
+   #d0d9e3  рамка панелей и полей, дорожка слайдера
+   #dde6f0  иконочные кнопки: выбрано
+   #b8c4d2  рамка при наведении, чекбоксы
+   #c9d5e3  иконочная кнопка: нажатие
+   #0059d1  синий акцент: ActiveButton, синий тег, рамка выбранной миниатюры
+   #e5e9ee  серый тег
    #d1fae5  зелёный тег
-   #6b7785  серый текст подписей
-   #7a7a7a  серый текст миниатюр
-   #8a94a0  ползунок слайдера
-   #1f2933  основной текст
+   #5f6d7b  серый текст подписей, ползунок слайдера
+   #5c6670  серый текст миниатюр
+   #1a2430  основной текст
    ===================================================================== */
 
 
 /* =====================================================================
    1. ПРОЗРАЧНАЯ ОСНОВА
-   Этот блок должен стоять первым. Цвета ниже его перекрывают.
    ===================================================================== */
 
 TransparentButton,
@@ -65,10 +60,6 @@ USep,
 UCheckBox,
 UCheckBox::indicator,
 UTagWidget,
-ThumbImgWidget,
-ThumbWhiteTextWid,
-ThumbBlueTextWidget,
-ThumbMiuzBlueTextWidget,
 UpBtnLabel,
 ImgViewSvg,
 _SvgWithThemeBg {
@@ -90,14 +81,14 @@ UMenu::item {
    ===================================================================== */
 
 /* ---------------------------------------------------------------------
-   #e9edf2  ФОН ИЗОБРАЖЕНИЯ
-   Контейнер, окно просмотра, превью поиска
+   #ffffff  БЕЛЫЙ ФОН
+   Окно просмотра, превью поиска
    --------------------------------------------------------------------- */
 UBlackFrame,
 WinImgViewGraphics,
 WinImageView,
 WinImgSearchPreviewWidget {
-    background: #e9edf2;
+    background: #ffffff;
 }
 
 UBlackFrame {
@@ -106,42 +97,36 @@ UBlackFrame {
 
 
 /* ---------------------------------------------------------------------
-   #f0f2f5  ФОН UFrame
-   Формат #AARRGGBB: ff в начале означает полную непрозрачность.
-   Рамка #d5dbe3.
+   #f4f6f8  ФОН UFrame
    --------------------------------------------------------------------- */
 UFrame {
-    background: #fff0f2f5;
-    border: 1px solid #ffd5dbe3;
+    background: #fff4f6f8;
+    border: 1px solid #ffd0d9e3;
 }
 
 
 /* ---------------------------------------------------------------------
-   #f5f7fa  ФОН ПАНЕЛЕЙ
-   GroupBox, списки, деревья, меню
+   #fafbfc  ФОН ПАНЕЛЕЙ
    --------------------------------------------------------------------- */
 UGroupBox,
 UListWidget,
 UTreeView,
 UTreeWidget,
 UMenu {
-    background: #f5f7fa;
+    background: #fafbfc;
 }
 
 
 /* ---------------------------------------------------------------------
-   #f7f9fb  ФОН ЗОНЫ ПЕРЕТАСКИВАНИЯ
-   Поиск по изображению
+   #eef2f6  ФОН ЗОНЫ ПЕРЕТАСКИВАНИЯ
    --------------------------------------------------------------------- */
 WinImgSearchDropWidget {
-    background: #f7f9fb;
+    background: #eef2f6;
 }
 
 
 /* ---------------------------------------------------------------------
-   #ffffff  ФОН ЭЛЕМЕНТОВ ВВОДА
-   Кнопки, поля, спинбокс, разделитель, тултип
-   Стрелки спинбокса сюда не входят: они прозрачные (см. блок 1).
+   #f1f4f7  ФОН ЭЛЕМЕНТОВ ВВОДА
    --------------------------------------------------------------------- */
 UPushButton,
 ULineEdit,
@@ -149,14 +134,12 @@ UTextEdit,
 USpinBox,
 USep,
 QToolTip {
-    background: #ffffff;
+    background: #f1f4f7;
 }
 
 
 /* ---------------------------------------------------------------------
-   #e6ecf3  НАВЕДЕНИЕ И ВЫДЕЛЕНИЕ
-   Наведение на поля, кнопки, спинбокс и иконочные кнопки,
-   выбранные пункты списков, деревьев и меню, ветки дерева, отметка в списке
+   #e3eaf2  НАВЕДЕНИЕ И ВЫДЕЛЕНИЕ
    --------------------------------------------------------------------- */
 UPushButton:hover,
 ULineEdit:hover,
@@ -174,19 +157,26 @@ UTreeWidget::item:selected:!active,
 UMenu::item:selected,
 UTreeView::branch:selected,
 UTreeWidget::branch:selected {
-    background: #e6ecf3;
+    background: #e3eaf2;
 }
 
 
 /* ---------------------------------------------------------------------
-   #dbe3ec  НАЖАТИЕ
-   Кнопка при нажатии, нажатая стрелка спинбокса, фон миниатюры в рамке
+   #d5dfeb  НАЖАТИЕ
    --------------------------------------------------------------------- */
 UPushButton:pressed,
 USpinBox::up-button:pressed,
 USpinBox::down-button:pressed,
-ThumbImgWidget[framed="true"] {
-    background: #dbe3ec;
+Thumb[framed="true"] {
+    border: 2px solid #0059d1;
+}
+
+SquareThumb[framed="true"] {
+    background: #cfe0f5;
+}
+
+UPushButton:pressed {
+    background: #d5dfeb;
 }
 
 USpinBox::up-button:pressed,
@@ -196,9 +186,7 @@ USpinBox::down-button:pressed {
 
 
 /* ---------------------------------------------------------------------
-   #d0d7e0  РАМКА ПАНЕЛЕЙ И ПОЛЕЙ
-   Панели, кнопки, поля, спинбокс, разделитель, тултип
-   Также дорожка слайдера и пунктирная рамка зоны перетаскивания
+   #d0d9e3  РАМКА ПАНЕЛЕЙ И ПОЛЕЙ
    --------------------------------------------------------------------- */
 UGroupBox,
 UListWidget,
@@ -211,20 +199,20 @@ UTextEdit,
 USpinBox,
 USep,
 QToolTip {
-    border: 1px solid #d0d7e0;
+    border: 1px solid #d0d9e3;
 }
 
 USlider::groove:horizontal {
-    background-color: #d0d7e0;
+    background-color: #d0d9e3;
 }
 
 WinImgSearchDropWidget {
-    border: 2px dashed #d0d7e0;
+    border: 2px dashed #d0d9e3;
 }
 
 
 /* ---------------------------------------------------------------------
-   #b8c2ce  РАМКА ПРИ НАВЕДЕНИИ, ЧЕКБОКСЫ, ТЕГ TRANSPARENT
+   #b8c4d2  РАМКА ПРИ НАВЕДЕНИИ, ЧЕКБОКСЫ
    --------------------------------------------------------------------- */
 UPushButton:hover,
 ULineEdit:hover,
@@ -233,37 +221,29 @@ USpinBox:hover,
 UPushButton:pressed,
 UListWidget::indicator,
 UListWidget::indicator:disabled,
-UCheckBox::indicator,
-UTagWidget[style="transparent"] {
-    border: 1px solid #b8c2ce;
+UCheckBox::indicator {
+    border: 1px solid #b8c4d2;
 }
 
 
 /* ---------------------------------------------------------------------
-   #dde5ee  ИКОНОЧНЫЕ КНОПКИ: ВЫБРАНО
-   Наведение задано в блоке #e6ecf3
+   ИКОНОЧНЫЕ КНОПКИ
    --------------------------------------------------------------------- */
 _SvgWithThemeBg[style="selected"] {
-    background: #dde5ee;
+    background: #dde6f0;
 }
 
-
-/* ---------------------------------------------------------------------
-   #cfd9e5  ИКОНОЧНАЯ КНОПКА: НАЖАТИЕ
-   --------------------------------------------------------------------- */
 _SvgWithThemeBg[style="pressed"] {
-    background: #cfd9e5;
+    background: #c9d5e3;
 }
 
 
 /* ---------------------------------------------------------------------
    #0059d1  СИНИЙ АКЦЕНТ
-   Основная кнопка ActiveButton, синий тег, подпись выбранной миниатюры
-   Текст на синем фоне белый.
    --------------------------------------------------------------------- */
 ActiveButton {
-    background: #0059D1;
-    border: 1px solid #0e69df;
+    background: #0059d1;
+    border: 1px solid #0a4fb8;
     color: #ffffff;
 }
 
@@ -272,76 +252,63 @@ ActiveButton:hover {
 }
 
 ActiveButton:pressed {
-    background: #0e69df;
-    border: 1px solid #2d7be1;
+    background: #0a4fb8;
+    border: 1px solid #083f94;
 }
 
 UTagWidget[style="blue"] {
-    background: #0059D1;
-    border: 1px solid #156ee3;
-    color: #ffffff;
-}
-
-ThumbWhiteTextWid[framed="true"] {
-    background: #0059D1;
+    background: #0059d1;
+    border: 1px solid #0a4fb8;
     color: #ffffff;
 }
 
 
 /* ---------------------------------------------------------------------
-   #e3e8ee / #c5ceda  СЕРЫЙ ТЕГ
+   СЕРЫЙ ТЕГ
    --------------------------------------------------------------------- */
 UTagWidget[style="gray"] {
-    background: #e3e8ee;
-    border: 1px solid #c5ceda;
+    background: #e5e9ee;
+    border: 1px solid #c5ced9;
+    color: #1a2430;
 }
 
 
 /* ---------------------------------------------------------------------
-   #d1fae5 / #10b981  ЗЕЛЁНЫЙ ТЕГ
+   ЗЕЛЁНЫЙ ТЕГ
    --------------------------------------------------------------------- */
 UTagWidget[style="green"] {
     background: #d1fae5;
-    border: 1px solid #10B981;
+    border: 1px solid #10b981;
+    color: #065f46;
 }
 
 
 /* ---------------------------------------------------------------------
-   #8a94a0  ПОЛЗУНОК СЛАЙДЕРА
+   ПОЛЗУНОК СЛАЙДЕРА
    --------------------------------------------------------------------- */
 USlider::handle:horizontal {
-    background-color: #8a94a0;
+    background-color: #5f6d7b;
 }
 
 
 /* ---------------------------------------------------------------------
-   rgba(240, 242, 245, 220)  ПОЛУПРОЗРАЧНЫЙ ФОН КНОПКИ «ВВЕРХ»
+   ПОЛУПРОЗРАЧНЫЙ ФОН КНОПКИ «ВВЕРХ»
    --------------------------------------------------------------------- */
 UpBtnLabel {
-    background: rgba(240, 242, 245, 220);
+    background: rgba(255, 255, 255, 191);
 }
 
 
 /* ---------------------------------------------------------------------
-   #6b7785  СЕРЫЙ ТЕКСТ ПОДПИСЕЙ
+   #5f6d7b  СЕРЫЙ ТЕКСТ ПОДПИСЕЙ
    --------------------------------------------------------------------- */
 GrayTextLabel {
-    color: #6b7785;
+    color: #5f6d7b;
 }
 
 
 /* ---------------------------------------------------------------------
-   #7a7a7a  СЕРЫЙ ТЕКСТ МИНИАТЮР
-   --------------------------------------------------------------------- */
-ThumbBlueTextWidget,
-ThumbMiuzBlueTextWidget {
-    color: #7a7a7a;
-}
-
-
-/* ---------------------------------------------------------------------
-   #1f2933  ОСНОВНОЙ ТЕКСТ
-   Элементы ввода, пункты списков, деревьев и меню, теги, подписи миниатюр
+   #1a2430  ОСНОВНОЙ ТЕКСТ
    --------------------------------------------------------------------- */
 UPushButton,
 ULineEdit,
@@ -351,10 +318,8 @@ QToolTip,
 UTreeView::item,
 UListWidget::item,
 UTreeWidget::item,
-UMenu::item,
-UTagWidget,
-ThumbWhiteTextWid {
-    color: #1f2933;
+UMenu::item {
+    color: #1a2430;
 }
 
 
@@ -374,8 +339,11 @@ UTextEdit,
 WinImgViewGraphics,
 WinImageView,
 WinImgSearchPreviewWidget,
-ThumbImgWidget {
-    border-radius: 10px;
+Thumb {
+    border-radius: 14px;
+}
+SquareThumb {
+    border-radius: 0px;
 }
 
 UTagWidget {
@@ -406,10 +374,6 @@ USpinBox {
 USpinBox::up-button,
 USpinBox::down-button {
     border-radius: 3px;
-}
-
-ThumbWhiteTextWid {
-    border-radius: 5px;
 }
 
 UCheckBox::indicator {
@@ -534,10 +498,6 @@ SearchWidLineEdit {
     padding-right: 25px;
 }
 
-ThumbWhiteTextWid {
-    padding: 2px 4px 2px 4px;
-}
-
 QToolTip {
     padding: 2px;
 }
@@ -547,12 +507,11 @@ TitleTextLabel TransparentLabel {
     font-size: 20px;
 }
 
-
 MfPathTitle {                    /* проверить: grep по коду */
     font-size: 15px;
 }
 
-ThumbWhiteTextWid,
+ThumbFilenameWid,
 ThumbBlueTextWidget,
 ThumbMiuzBlueTextWidget {
     font-size: 11px;
@@ -598,7 +557,3 @@ UTreeWidget::branch:has-children:open {
     image: url(./icons/common/collapse.svg);
 }
 
-
-TransparentLabel {
-    color: #000000;
-}
