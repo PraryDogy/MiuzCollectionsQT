@@ -183,8 +183,8 @@ class Thumb(TransparentFrame):
 
 	def set_pixmap_with_actual_size(self):
 		idx = Dynamic.current_pixmap_size_index
-		if self._pixmap_index == idx:
-			return
+		# if self._pixmap_index == idx:
+		# 	return
 		self._pixmap_index = idx
 		self.img_wid.setPixmap(QPixmap.fromImage(self.data_item.resized_qimages[idx]))
 
