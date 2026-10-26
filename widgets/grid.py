@@ -557,11 +557,10 @@ class Grid(UScrollVerticalArea):
 	def get_max_columns(self):
 		spacing = self.grid_lay.spacing()
 		try:
-			thumb_w = self.cell_to_wid[(0, 0)].width() + spacing
+			thumb_w = self.cell_to_wid[(0, 0)].sizeHint().width() + spacing
 			total_w = self.viewport().width() - (spacing * 2)
-			return total_w // thumb_w
+			return max(1, total_w // thumb_w)
 		except (ZeroDivisionError, KeyError):
-			# НА СЛУЧАЙ ПУСТОЙ СЕТКИку
 			return 1
 
 	def rearrange(self):
