@@ -602,6 +602,13 @@ class Grid(UScrollVerticalArea):
 			self.grid_lay.addWidget(thumb, row, col)
 		self.grid_wid.show()
 
+	def resize_thumbnails(self):
+		Thumb.calculate_size()
+		for url, wid in self.url_to_wid.items():
+			wid.set_pixmap_with_actual_size()
+			wid.set_text_and_size()
+		self.rearrange()
+
 	def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
 		global_pos = QCursor.pos() 
 		wid = QApplication.widgetAt(global_pos)
@@ -809,7 +816,6 @@ class Grid(UScrollVerticalArea):
 		super().resizeEvent(a0)
 		self.resize_timer.stop()
 		self.resize_timer.start(self.resize_ms)
-
 		QTimer.singleShot(0, self.position_up_btn)
 
 	def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:

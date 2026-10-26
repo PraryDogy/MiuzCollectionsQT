@@ -264,7 +264,7 @@ class WinMain(UMainWindow):
 		self.bar_bottom = BarBottom()
 		self.bar_bottom.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.bar_bottom.resize_thumbnails.connect(
-			lambda: self.load_st_grid()
+			lambda: self.grid.resize_thumbnails()
 		)
 		self.footer_layout.addWidget(self.bar_bottom)
 
@@ -904,18 +904,3 @@ class WinMain(UMainWindow):
 		wid = self.splitter.widget(1)
 		self.bar_path.setMaximumWidth(wid.width())
 		return super().resizeEvent(a0)
-	
-
-# class WinMain(UBaseWindow):
-#     def __init__(self, *args):
-#         super().__init__()
-
-#         self.grid = GridStandart()
-#         self.central_layout.addWidget(self.grid)
-
-#     def center_screen(self):
-#         screen = QDesktopWidget().screenGeometry()
-#         size = self.geometry()
-#         x = (screen.width() - size.width()) // 2
-#         y = (screen.height() - size.height()) // 2
-#         self.move(x, y)
