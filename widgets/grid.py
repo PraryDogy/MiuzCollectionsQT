@@ -479,7 +479,7 @@ class Grid(UScrollVerticalArea):
 	collage = pyqtSignal(list)
 	open_filters_win = pyqtSignal()
 
-	grid_spacing = 7
+	grid_spacing = 15
 	resize_ms = 10
 	copy_files_path = Static.COMMON_ICONS / "copy_files.svg"
 
