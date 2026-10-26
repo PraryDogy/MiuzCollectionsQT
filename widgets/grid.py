@@ -544,13 +544,11 @@ class Grid(UScrollVerticalArea):
 
 	def get_max_columns(self):
 		try:
-			# теперь виджет правильной ширины
-			# но теперь есть лишние спейсинги справа и слева в концах сетки
-			# что мы учитываем в total_w
 			thumb_w = self.cell_to_wid[(0, 0)].width() + self.grid_spacing
 			total_w = self.viewport().width() - (self.grid_spacing * 2)
 			return total_w // thumb_w
 		except (ZeroDivisionError, KeyError):
+			# НА СЛУЧАЙ ПУСТОЙ СЕТКИку
 			return 1
 
 	def rearrange(self):
