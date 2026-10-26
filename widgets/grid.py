@@ -39,22 +39,6 @@ class ThumbBaseLabel(TransparentLabel):
 class ThumbImgWidget(ThumbBaseLabel):
 	def __init__(self):
 		super().__init__()
-		self.set_no_frame_style()
-
-	def _update_style(self):
-		# Метод для принудительного обновления QSS стиля у виджета
-		self.style().unpolish(self)
-		self.style().polish(self)
-
-	def set_framed_style(self):
-		# Устанавливаем свойство framed в True
-		self.setProperty("framed", True)
-		self._update_style()
-	
-	def set_no_frame_style(self):
-		# Устанавливаем свойство framed в False
-		self.setProperty("framed", False)
-		self._update_style()
 
 	def show_updating(self):
 		"""Показывает текст 'обновление' вместо изображения."""
@@ -75,25 +59,8 @@ class ThumbWhiteTextWid(ThumbBaseLabel):
 		super().__init__()
 		self.setText(data_item.filename)
 		self.data_item = data_item
-		self.set_no_frame_style()
 		self.set_elide(True)
 
-	def set_framed_style(self):
-		"""Включает стиль с рамкой через QSS свойство."""
-		self.setProperty("framed", True)
-		self._update_style()
-
-	def set_no_frame_style(self):
-		"""Отключает стиль с рамкой через QSS свойство."""
-		self.setProperty("framed", False)
-		self._update_style()
-
-	def _update_style(self):
-		"""Принудительно обновляет QSS стиль виджета."""
-		self.style().unpolish(self)
-		self.style().polish(self)
-		self.update()
-	
 
 class ThumbBlueTextWidget(ThumbBaseLabel):
 	def __init__(self, data_item: DataItem):
@@ -178,6 +145,21 @@ class Thumb(TransparentFrame):
 		if Static.MIUZ_ZIP.exists():
 			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
+	def _update_style(self):
+		# Метод для принудительного обновления QSS стиля у виджета
+		self.style().unpolish(self)
+		self.style().polish(self)
+
+	def set_framed_style(self):
+		# Устанавливаем свойство framed в True
+		self.setProperty("framed", True)
+		self._update_style()
+	
+	def set_no_frame_style(self):
+		# Устанавливаем свойство framed в False
+		self.setProperty("framed", False)
+		self._update_style()
+
 	def set_pixmap_with_actual_size(self):
 		qimage = self.data_item.resized_qimages[Dynamic.current_pixmap_size_index]
 		pixmap = QPixmap.fromImage(qimage)
@@ -194,12 +176,10 @@ class Thumb(TransparentFrame):
 		self.set_pixmap_with_actual_size()
 
 	def set_frame(self):
-		self.img_wid.set_framed_style()
-		self.white_text_wid.set_framed_style()
+		self.set_framed_style()
 
 	def set_no_frame(self):
-		self.img_wid.set_no_frame_style()
-		self.white_text_wid.set_no_frame_style()
+		self.set_no_frame_style()
 
 	def set_fav(self, value: int):
 		if value == 0:

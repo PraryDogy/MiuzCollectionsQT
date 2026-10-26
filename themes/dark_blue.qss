@@ -185,7 +185,7 @@ UTreeWidget::branch:selected {
 UPushButton:pressed,
 USpinBox::up-button:pressed,
 USpinBox::down-button:pressed,
-ThumbImgWidget[framed="true"] {
+Thumb[framed="true"] {
     background: #202c38;
 }
 
@@ -370,7 +370,7 @@ UTextEdit,
 WinImgViewGraphics,
 WinImageView,
 WinImgSearchPreviewWidget,
-ThumbImgWidget {
+Thumb {
     border-radius: 10px;
 }
 
@@ -402,10 +402,6 @@ USpinBox {
 USpinBox::up-button,
 USpinBox::down-button {
     border-radius: 3px;
-}
-
-ThumbWhiteTextWid {
-    border-radius: 5px;
 }
 
 UCheckBox::indicator {
@@ -528,10 +524,6 @@ USlider::handle:horizontal {
 SearchWidLineEdit {
     padding-left: 25px;
     padding-right: 25px;
-}
-
-ThumbWhiteTextWid {
-    padding: 2px 4px 2px 4px;
 }
 
 QToolTip {
