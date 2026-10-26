@@ -226,7 +226,6 @@ class WinImageView(UMainWindow):
 	save_files = pyqtSignal(list)
 	open_in_app = pyqtSignal(tuple)
 	image_not_exists = pyqtSignal()
-	data_item_updated = pyqtSignal(str)
 	
 	min_w, min_h = 500, 400
 	ww, hh = 0, 0
@@ -327,23 +326,6 @@ class WinImageView(UMainWindow):
 			shm.close()
 			shm.unlink()
 
-		def update_data_item(qimage: QImage, data_item: DataItem):
-			try:
-				base_qimage = qimage
-				resized_qimages = []
-				if JsonData.square_thumbs:
-					scaled_fn = Utils.scale_qimage_square
-				else:
-					scaled_fn = Utils.scale_qimage_dpr
-				for i in Static.THUMB_WIDTHS:
-					x = scaled_fn(base_qimage, i)
-					resized_qimages.append(x)
-				data_item.base_qimage = base_qimage
-				data_item.resized_qimages = resized_qimages
-				self.data_item_updated.emit(data_item.rel_path)
-			except RuntimeError:
-				print("Win image view, не смог отправить сигнал thumbnail_updated")
-
 		def poll():
 			self.read_img_timer.stop()
 			queue = self.read_img_task.process_queue
@@ -351,18 +333,6 @@ class WinImageView(UMainWindow):
 				read_img_item: ReadImgItem = queue.get()
 				shm = shared_memory.SharedMemory(name=read_img_item.shm_name)
 				img_array = np.ndarray(read_img_item.shape, dtype=np.dtype(read_img_item.dtype), buffer=shm.buf)
-
-				# если миниатюра старая (210 пикселей),
-				# создаем миниатюру с новыми размерами, так как мы переходим
-				# на новый стандарт
-				sz = self.current_data_item.base_qimage.size()
-				max_side = max(sz.width(), sz.height())
-				if max_side < Static.THUMB_MAX_SIZE:
-					self.new_thumb = WriteNewThumb(self.current_data_item.rel_thumb_path, img_array)
-					self.new_thumb.sigs.finished.connect(
-						lambda qimage, i=self.current_data_item: update_data_item(qimage, i)
-					)
-					UThreadPool.start(self.new_thumb)
 
 				if read_img_item.src == abs_path:
 					qimage_task = ImgArrayQImage(img_array)
