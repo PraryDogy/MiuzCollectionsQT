@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QMenuBar
 from cfg import JsonData, Static
 from system.items import SettingsItem
 from system.lang import Lng
+from system.utils import Utils
 
 from ._base_widgets import GrayTextLabel, UMenu, UPushButton, VerticalWindow
 from .win_servers import ServersWin
@@ -30,12 +31,10 @@ class AboutWin(VerticalWindow):
 
 		icon = GrayTextLabel("")
 		qimage = QImage(str(self.icon_path))
-		qimage_saled = qimage.scaled(
-			self.icon_size * Static.DPR, self.icon_size * Static.DPR,
-			aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-			transformMode=Qt.TransformationMode.SmoothTransformation
+		qimage_saled = Utils.scale_qimage_dpr(
+			qimage=qimage,
+			size=self.icon_size
 		)
-		qimage_saled.setDevicePixelRatio(Static.DPR)
 		icon.setPixmap(QPixmap.fromImage(qimage_saled))
 		self.icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
