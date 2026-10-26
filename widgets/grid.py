@@ -277,6 +277,51 @@ class UpBtn(TransparentWidget):
 		super().mouseReleaseEvent(ev)
 
 
+
+
+
+class GridModeWidget(UPushButton):
+	load_st_grid = pyqtSignal()
+	view_mode_svg = Static.COMMON_ICONS / "view_mode.svg"
+
+	def __init__(self):
+		super().__init__("")
+		if JsonData.square_thumbs:
+			text = "Без подписей"
+		else:
+			text = "С подписями"
+		self.setText(text)
+		self.setIcon(QIcon(str(self.view_mode_svg)))
+
+		self.menu_ = UMenu(parent=self)
+		self.setMenu(self.menu_)
+
+		first = QAction("С подписями", self.menu_)
+		first.setCheckable(True)
+		first.triggered.connect(
+			lambda: self.change_mode(False, "С подписями")
+		)
+		self.menu_.addAction(first)
+
+		second = QAction("Без подписей", self.menu_)
+		second.setCheckable(True)
+		second.triggered.connect(
+			lambda: self.change_mode(True, "Без подписей")
+		)
+		self.menu_.addAction(second)
+
+		if JsonData.square_thumbs:
+			second.setChecked(True)
+		else:
+			first.setChecked(True)
+
+	def change_mode(self, value: bool, text: str):
+		JsonData.square_thumbs = value
+		self.setText(text)
+		self.load_st_grid.emit()
+		
+
+
 class GridSortWidget(TransparentWidget):
 	sort_icon_svg = Static.COMMON_ICONS / "sort.svg"
 	load_st_grid = pyqtSignal()
@@ -361,14 +406,17 @@ class GridControlsWidget(TransparentWidget):
 		self.v_lay.setSpacing(10) # Отступ между виджетом сортировки и фильтрами
 
 		# Инициализируем внутренние виджеты
+		self.grid_mode_widget = GridModeWidget()
 		self.sort_widget = GridSortWidget()
 		self.filters_widget = GridFiltersWidget()
 
 		# Добавляем их в лэйаут
+		self.v_lay.addWidget(self.grid_mode_widget)
 		self.v_lay.addWidget(self.sort_widget)
 		self.v_lay.addWidget(self.filters_widget)
 
 		# Перенаправляем (пробрасываем) внутренние сигналы наверх
+		self.grid_mode_widget.load_st_grid.connect(self.load_st_grid.emit)
 		self.sort_widget.load_st_grid.connect(self.load_st_grid.emit)
 		self.filters_widget.open_filters_win.connect(self.open_filters_win.emit)
 
