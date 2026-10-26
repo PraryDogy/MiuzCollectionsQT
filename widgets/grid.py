@@ -591,7 +591,10 @@ class Grid(UScrollVerticalArea):
 		self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
 	def get_grid_spacing(self):
-		return Static.GRID_SPACINGS[Dynamic.current_pixmap_size_index]
+		if JsonData.square_thumbs:
+			return 1
+		else:
+			return Static.GRID_SPACINGS[Dynamic.current_pixmap_size_index]
 
 	def select_by_url(self, path: str):
 		if path in self.url_to_wid:
