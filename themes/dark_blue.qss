@@ -182,7 +182,7 @@ UPushButton:pressed,
 USpinBox::up-button:pressed,
 USpinBox::down-button:pressed,
 Thumb[framed="true"] {
-    background: #202c38;
+    background: #263440;
 }
 
 USpinBox::up-button:pressed,
