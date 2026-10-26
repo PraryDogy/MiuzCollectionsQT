@@ -4,14 +4,14 @@ from multiprocessing import shared_memory
 
 import numpy as np
 from PyQt6.QtCore import (QEvent, QObject, QPoint, QPointF, QSize, Qt, QTimer,
-						  pyqtSignal)
+                          pyqtSignal)
 from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QIcon, QImage,
-						 QKeyEvent, QMouseEvent, QPainter, QPixmap,
-						 QResizeEvent, QTransform)
+                         QKeyEvent, QMouseEvent, QPainter, QPixmap,
+                         QResizeEvent, QTransform)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
-							 QGraphicsPixmapItem, QGraphicsScene,
-							 QGraphicsView)
+                             QGraphicsPixmapItem, QGraphicsScene,
+                             QGraphicsView)
 from typing_extensions import Literal
 
 from cfg import JsonData, Static
@@ -20,7 +20,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import SharedUtils
-from system.tasks import ImgArrayQImage, UThreadPool
+from system.tasks import ImgArrayQImage, UThreadPool, WriteNewThumb
 from system.utils import Utils
 
 from ._base_widgets import UMainWindow, UMenu, USep
@@ -334,6 +334,15 @@ class WinImageView(UMainWindow):
 				item: ReadImgItem = queue.get()
 				shm = shared_memory.SharedMemory(name=item.shm_name)
 				img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=shm.buf)
+
+				# если миниатюра старая (210 пикселей),
+				# создаем миниатюру с новыми размерами, так как мы переходим
+				# на новый стандарт
+				sz = self.current_data_item.base_qimage.size()
+				max_side = max(sz.width(), sz.height())
+				if max_side < Static.THUMB_MAX_SIZE:
+					self.new_thumb = WriteNewThumb(abs_path, img_array)
+					UThreadPool.start(self.new_thumb)
 
 				if item.src == abs_path:
 					qimage_task = ImgArrayQImage(img_array)
