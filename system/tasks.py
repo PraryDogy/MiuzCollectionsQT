@@ -87,7 +87,6 @@ class DbImagesLoaderItem:
 	fav: int
 	base_qimage: QImage
 	resized_qimages: list[QImage]
-	resized_qimage: QImage
 	day_month_year: str
 	hour_min_sec: str
 
@@ -139,13 +138,11 @@ class DbImagesLoader(URunnable):
 			ind = Dynamic.current_pixmap_size_index
 			current_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
 
-			src_qimage = Utils.qimage_from_array(img_rgb)
-			scaled_qimage = src_qimage.scaled(
-				current_size * Static.DPR, current_size * Static.DPR,
-				aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
-				transformMode=Qt.TransformationMode.SmoothTransformation
-			)
-			scaled_qimage.setDevicePixelRatio(Static.DPR)
+			base_qimage = Utils.qimage_from_array(img_rgb)
+			resized_qimages = []
+			for i in Static.THUMB_WID_PIXMAP_SIZE:
+				x = Utils.scale_qimage_dpr(base_qimage, i)
+				resized_qimages.append(x)
 
 			mod_time = datetime.fromtimestamp(mod)
 			date_ = mod_time.date()
@@ -159,9 +156,8 @@ class DbImagesLoader(URunnable):
 				rel_img_path=rel_img_path,
 				rel_thumb_path=rel_thumb_path,
 				fav=fav,
-				base_qimage=scaled_qimage,
-				resized_qimages=...,
-				base_qimage=src_qimage,
+				base_qimage=base_qimage,
+				resized_qimages=resized_qimages,
 				day_month_year=day_month_year,
 				hour_min_sec=hour_min_sec
 			)

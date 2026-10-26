@@ -297,7 +297,7 @@ class WinImageView(UMainWindow):
 			i.raise_()
 
 	def load_thumb(self):
-		qimage = self.current_data_item.src_qimage
+		qimage = self.current_data_item.base_qimage
 		pixmap = QPixmap.fromImage(qimage)
 		self.restart_img_wid(pixmap)
 
