@@ -49,17 +49,19 @@ class Utils:
 	@classmethod
 	def scale_qimage_square(cls, qimage: QImage, size: int, dpr: int = Static.DPR) -> QImage:
 		side = int(size * dpr)
-		scaled = qimage.scaled(
+		w, h = qimage.width(), qimage.height()
+		src = min(w, h)
+		x = (w - src) // 2
+		y = (h - src) // 2
+		square_src = qimage.copy(x, y, src, src)
+		scaled = square_src.scaled(
 			side,
 			side,
-			Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+			Qt.AspectRatioMode.IgnoreAspectRatio,
 			Qt.TransformationMode.SmoothTransformation
 		)
-		x = (scaled.width() - side) // 2
-		y = (scaled.height() - side) // 2
-		cropped = scaled.copy(x, y, side, side)
-		cropped.setDevicePixelRatio(dpr)
-		return cropped
+		scaled.setDevicePixelRatio(dpr)
+		return scaled
 
 	@classmethod
 	def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str:

@@ -140,8 +140,14 @@ class DbImagesLoader(URunnable):
 
 			base_qimage = Utils.qimage_from_array(img_rgb)
 			resized_qimages = []
+
+			if JsonData.square_thumbs:
+				scaled_fn = Utils.scale_qimage_square
+			else:
+				scaled_fn = Utils.scale_qimage_dpr
+
 			for i in Static.THUMB_WIDTHS:
-				x = Utils.scale_qimage_dpr(base_qimage, i)
+				x = scaled_fn(base_qimage, i)
 				resized_qimages.append(x)
 
 			mod_time = datetime.fromtimestamp(mod)
