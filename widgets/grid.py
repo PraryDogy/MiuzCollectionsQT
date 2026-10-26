@@ -94,7 +94,7 @@ class Thumb(TransparentFrame):
 
 		# --- Layout ---
 		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(0, 0, 0, 0)
+		self.v_lay.setContentsMargins(10, 10, 10, 2)
 		self.v_lay.setSpacing(3)
 		self.v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 
@@ -156,18 +156,17 @@ class Thumb(TransparentFrame):
 
 	def set_text_and_size(self):
 		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
+		self.adjustSize()
 		self.set_pixmap_with_actual_size()
 
-		# удобнее явно указать индексы
-		small_indexes = (0, 1)
-		if Dynamic.current_pixmap_size_index in small_indexes:
-			self.white_text_wid.hide()
-			self.blue_text_wid.hide()
-		else:
-			self.white_text_wid.show()
-			self.blue_text_wid.show()
-
-
+		# small_indexes = (0, 1)
+		# if Dynamic.current_pixmap_size_index in small_indexes:
+		# 	self.white_text_wid.show()
+		# 	self.blue_text_wid.show()
+		# else:
+		# 	self.white_text_wid.show()
+		# 	self.blue_text_wid.show()
+			
 	def set_frame(self):
 		self.set_framed_style()
 
@@ -555,13 +554,16 @@ class Grid(UScrollVerticalArea):
 			self.wid_to_selected_widgets(wid)
 
 	def get_max_columns(self):
-		spacing = self.grid_lay.spacing()
-		try:
-			thumb_w = self.cell_to_wid[(0, 0)].sizeHint().width() + spacing
-			total_w = self.viewport().width() - (spacing * 2)
-			return max(1, total_w // thumb_w)
-		except (ZeroDivisionError, KeyError):
+		spacing = self.get_grid_spacing()
+		first = next(iter(self.url_to_wid.values()), None)
+		if first is None:
 			return 1
+		self.grid_lay.activate()
+		thumb_w = first.width() + spacing
+		total_w = self.viewport().width() - spacing * 2
+		if thumb_w <= 0 or total_w <= 0:
+			return 1
+		return max(1, total_w // thumb_w)
 
 	def rearrange(self):
 		self.grid_wid.hide()
@@ -579,7 +581,6 @@ class Grid(UScrollVerticalArea):
 		for url, wid in self.url_to_wid.items():
 			wid.set_pixmap_with_actual_size()
 			wid.set_text_and_size()
-			wid.adjustSize()
 		self.grid_lay.setSpacing(self.get_grid_spacing())
 		self.rearrange()
 
@@ -1068,7 +1069,6 @@ class GridStandart(Grid):
 			lbl = TransparentLabel(Lng.no_photo[JsonData.lng_index])
 			self.scroll_layout.addWidget(lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 			self.scroll_layout.addStretch(1)
-			
 		else:
 			self.rearrange()
 		self.finished_.emit()
