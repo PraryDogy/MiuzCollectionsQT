@@ -125,7 +125,7 @@ class Thumb(TransparentFrame):
 
 	@classmethod
 	def _margins(cls) -> tuple[int, int, int, int]:
-		return (10, 10, 10, 3)
+		return (10, 10, 10, 5)
 
 	@classmethod
 	def _captions_height(cls) -> int:
