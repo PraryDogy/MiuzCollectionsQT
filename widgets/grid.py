@@ -277,47 +277,49 @@ class UpBtn(TransparentWidget):
 		super().mouseReleaseEvent(ev)
 
 
-
-
-
 class GridModeWidget(UPushButton):
 	load_st_grid = pyqtSignal()
 	view_mode_svg = Static.COMMON_ICONS / "view_mode.svg"
+	icon_offset = 60  # иконка слева и стрелка справа
 
 	def __init__(self):
 		super().__init__("")
-		if JsonData.square_thumbs:
-			text = "Без подписей"
-		else:
-			text = "С подписями"
-		self.setText(text)
+
+		self.MODES = {
+			False: Lng.captions_on[JsonData.lng_index],
+			True: Lng.captions_off[JsonData.lng_index]
+		}
+
 		self.setIcon(QIcon(str(self.view_mode_svg)))
 
 		self.menu_ = UMenu(parent=self)
 		self.setMenu(self.menu_)
 
-		first = QAction("С подписями", self.menu_)
-		first.setCheckable(True)
-		first.triggered.connect(
-			lambda: self.change_mode(False, "С подписями")
-		)
-		self.menu_.addAction(first)
+		self.actions_ = {}
+		for square, text in self.MODES.items():
+			act = QAction(text, self.menu_)
+			act.setCheckable(True)
+			act.triggered.connect(lambda _, s=square: self.change_mode(s))
+			self.menu_.addAction(act)
+			self.actions_[square] = act
 
-		second = QAction("Без подписей", self.menu_)
-		second.setCheckable(True)
-		second.triggered.connect(
-			lambda: self.change_mode(True, "Без подписей")
-		)
-		self.menu_.addAction(second)
+		current = JsonData.square_thumbs
+		self.actions_[current].setChecked(True)
+		self.setText(self.MODES[current])
+		self.set_fixed_width()
 
-		if JsonData.square_thumbs:
-			second.setChecked(True)
-		else:
-			first.setChecked(True)
+	def set_fixed_width(self):
+		# Шрифт из QSS применяется при polish, поэтому вызываем его до измерения
+		self.ensurePolished()
+		fm = self.fontMetrics()
+		longest = max(self.MODES.values(), key=fm.horizontalAdvance)
+		self.setFixedWidth(fm.horizontalAdvance(longest) + self.icon_offset)
 
-	def change_mode(self, value: bool, text: str):
-		JsonData.square_thumbs = value
-		self.setText(text)
+	def change_mode(self, square: bool):
+		if JsonData.square_thumbs == square:
+			return
+		JsonData.square_thumbs = square
+		self.setText(self.MODES[square])
 		self.load_st_grid.emit()
 		
 

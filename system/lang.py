@@ -625,3 +625,12 @@ class Lng:
 		"Введите текст для поиска",
 		"Enter text to search",
 	)
+	# Режим отображения миниатюр: подписи под изображением
+	captions_on = (
+		"С подписями",
+		"With captions",
+	)
+	captions_off = (
+		"Без подписей",
+		"Without captions",
+	)
