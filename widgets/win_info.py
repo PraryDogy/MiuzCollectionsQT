@@ -43,7 +43,7 @@ class WinInfo(UMainWindow):
 
 		self.grid_lay = QGridLayout(wid)
 		self.grid_lay.setSpacing(5)
-		self.grid_lay.setContentsMargins(5, 2, 5, 5)
+		self.grid_lay.setContentsMargins(10, 10, 10, 10)
 
 		self.data = {
 			Lng.file_name[JsonData.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
