@@ -393,7 +393,7 @@ class WinMain(UMainWindow):
 				if wid:
 					base_qimage = Utils.qimage_from_array(update_thumb_item.array)
 					resized_qimages = []
-					for i in Static.THUMB_WID_PIXMAP_SIZE:
+					for i in Static.THUMB_WIDTHS:
 						x = Utils.scale_qimage_dpr(base_qimage, i)
 						resized_qimages.append(x)
 					wid.data_item.base_qimage = base_qimage
@@ -893,7 +893,7 @@ class WinMain(UMainWindow):
 				step = 1 if a0.key() == Qt.Key.Key_Equal else -1
 				new_index = next_size_index(
 					Dynamic.current_pixmap_size_index,
-					len(Static.THUMB_WID_PIXMAP_SIZE),
+					len(Static.THUMB_WIDTHS),
 					step
 				)
 				if new_index != Dynamic.current_pixmap_size_index:

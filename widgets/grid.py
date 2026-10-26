@@ -129,7 +129,7 @@ class Thumb(TransparentFrame):
 	@classmethod
 	def calculate_size(cls):
 		ind = Dynamic.current_pixmap_size_index
-		Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
+		Thumb.img_wid_size = Static.THUMB_WIDTHS[ind]
 		if Static.MIUZ_ZIP.exists():
 			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
@@ -158,6 +158,9 @@ class Thumb(TransparentFrame):
 		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
 		self.adjustSize()
 		self.set_pixmap_with_actual_size()
+
+		# self.white_text_wid.set_font_size(Static.THUMB_FONTS[Dynamic.current_pixmap_size_index])
+		# self.blue_text_wid.set_font_size(Static.THUMB_FONTS[Dynamic.current_pixmap_size_index])
 
 		# small_indexes = (0, 1)
 		# if Dynamic.current_pixmap_size_index in small_indexes:
@@ -545,7 +548,7 @@ class Grid(UScrollVerticalArea):
 		self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
 	def get_grid_spacing(self):
-		return Static.GRID_SPACING[Dynamic.current_pixmap_size_index]
+		return Static.GRID_SPACINGS[Dynamic.current_pixmap_size_index]
 
 	def select_by_url(self, path: str):
 		if path in self.url_to_wid:

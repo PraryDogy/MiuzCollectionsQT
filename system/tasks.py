@@ -136,11 +136,11 @@ class DbImagesLoader(URunnable):
 			img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
 			ind = Dynamic.current_pixmap_size_index
-			current_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
+			current_size = Static.THUMB_WIDTHS[ind]
 
 			base_qimage = Utils.qimage_from_array(img_rgb)
 			resized_qimages = []
-			for i in Static.THUMB_WID_PIXMAP_SIZE:
+			for i in Static.THUMB_WIDTHS:
 				x = Utils.scale_qimage_dpr(base_qimage, i)
 				resized_qimages.append(x)
 

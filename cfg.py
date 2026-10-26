@@ -47,8 +47,9 @@ class Static:
     # максимально возможный размер миниатюры в HASHDIR
     THUMB_MAX_SIZE = 210
     # размеры для QPixmap в виджете Thumb
-    THUMB_WID_PIXMAP_SIZE = [65, 80, 135, 180]
-    GRID_SPACING = [5, 10, 15, 15]
+    THUMB_WIDTHS = (65, 80, 135, 180)
+    THUMB_FONTS = (5, 5, 8, 11)
+    GRID_SPACINGS = (5, 10, 15, 15)
     # рамка вокруг QPixmap в виджете Thumb
     THUMB_IMG_WID_BORDER = 0
 

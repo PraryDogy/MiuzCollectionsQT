@@ -95,7 +95,7 @@ class BarBottom(TransparentWidget):
 
 		self.slider.setOrientation(Qt.Orientation.Horizontal)
 		self.slider.setMinimum(0)
-		self.slider.setMaximum(len(Static.THUMB_WID_PIXMAP_SIZE) - 1)
+		self.slider.setMaximum(len(Static.THUMB_WIDTHS) - 1)
 		self.slider.setValue(Dynamic.current_pixmap_size_index)
 		self.slider.setFixedWidth(80)
 
