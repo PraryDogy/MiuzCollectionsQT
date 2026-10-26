@@ -100,6 +100,11 @@ class CalendarDaySelected(TransparentLabel):
 		super().mouseReleaseEvent(ev)
 
 
+class CalendarDaySelectedText(TransparentLabel):
+	def __init__(self, text="", parent=None):
+		super().__init__(text, parent)
+
+
 class WinCalendar(UMainWindow):
 	date_selected = pyqtSignal(QDate)
 
@@ -444,7 +449,7 @@ class WinCalendar(UMainWindow):
 						btn_day.setFixedSize(*self.cell_size)
 						btn_day.setPixmap(self.blue_circle_pixmap)
 
-						btn_day_text = TransparentLabel(
+						btn_day_text = CalendarDaySelectedText(
 							text=str(day_num),
 							parent=btn_day
 						)
@@ -456,7 +461,7 @@ class WinCalendar(UMainWindow):
 						btn_day.setFixedSize(*self.cell_size)
 						btn_day.setPixmap(self.gray_circle_pixmap)
 
-						btn_day_text = TransparentLabel(
+						btn_day_text = CalendarDaySelectedText(
 							text=str(day_num),
 							parent=btn_day
 						)

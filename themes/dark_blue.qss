@@ -341,7 +341,9 @@ GrayTextLabel {
     color: #7b8792;
 }
 
-
+CalendarDaySelectedText {
+    color: #ffffff;
+}
 
 
 
