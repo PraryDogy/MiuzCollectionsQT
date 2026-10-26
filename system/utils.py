@@ -36,23 +36,6 @@ class Utils:
 			return None
 
 	@classmethod
-	def pixmap_from_array(cls, image: np.ndarray):
-		try:
-			height, width, channel = image.shape
-			bytes_per_line = channel * width
-			qimage = QImage(
-				image.tobytes(),
-				width,
-				height,
-				bytes_per_line,
-				QImage.Format.Format_RGB888
-			)
-			return QPixmap.fromImage(qimage)
-		except Exception as e:
-			print(f"pixmap_from_array: {e}")
-			return None
-
-	@classmethod
 	def scale_qimage_dpr(cls, qimage: QImage, size: int, dpr: int = Static.DPR):
 		scaled = qimage.scaled(
 			int(size * dpr),
@@ -62,6 +45,21 @@ class Utils:
 		)
 		scaled.setDevicePixelRatio(dpr)
 		return scaled
+
+	@classmethod
+	def scale_qimage_square(cls, qimage: QImage, size: int, dpr: int = Static.DPR) -> QImage:
+		side = int(size * dpr)
+		scaled = qimage.scaled(
+			side,
+			side,
+			Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+			Qt.TransformationMode.SmoothTransformation
+		)
+		x = (scaled.width() - side) // 2
+		y = (scaled.height() - side) // 2
+		cropped = scaled.copy(x, y, side, side)
+		cropped.setDevicePixelRatio(dpr)
+		return cropped
 
 	@classmethod
 	def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str:
