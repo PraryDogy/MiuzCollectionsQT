@@ -2,13 +2,13 @@ import os
 import re
 
 from PyQt6.QtCore import (QDate, QLocale, QMimeData, QPoint, QRect, QSize, Qt,
-						  QTimer, QUrl, pyqtSignal)
+                          QTimer, QUrl, pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
-						 QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
-						 QPixmap, QResizeEvent)
+                         QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
+                         QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLayout,
-							 QRubberBand, QVBoxLayout)
+                             QRubberBand, QVBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
@@ -18,27 +18,22 @@ from system.shared_utils import SharedUtils
 from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (FlowLayout, TransparentFrame, TransparentLabel,
-							TransparentWidget, UMenu, UPushButton,
-							UScrollVerticalArea, USep, UTagWidget)
+from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
+                            TransparentLabel, TransparentWidget, UMenu,
+                            UPushButton, UScrollVerticalArea, USep, UTagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
-					  PasteFiles, RemoveFiles, RevealInFinder, Save,
-					  ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
-					  WinInfoAction)
+                      PasteFiles, RemoveFiles, RevealInFinder, Save,
+                      ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
+                      WinInfoAction)
 from .win_filters import DatesWidget
 
 CONTROLS_MARGIN = 10
 
 
-class ThumbBaseLabel(TransparentLabel):
-	def __init__(self):
-		super().__init__("")
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-
-class ThumbImgWidget(ThumbBaseLabel):
+class ThumbImgWidget(TransparentLabel):
 	def __init__(self):
 		super().__init__()
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 	def show_updating(self):
 		"""Показывает текст 'обновление' вместо изображения."""
@@ -55,37 +50,33 @@ class ThumbImgWidget(ThumbBaseLabel):
 
 class ThumbFilenameWid(TransparentLabel):
 	def __init__(self, filename: str):
-		super().__init__()
-		self.setText(filename)
+		super().__init__(filename)
 		self.set_elide(True)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
-class ThumbBlueTextWidget(ThumbBaseLabel):
+class ThumbBlueTextWidget(GrayTextLabel):
 	def __init__(self, data_item: DataItem):
-		super().__init__()
 		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
-		self.setText(day_month_year)
+		super().__init__(day_month_year)
 		self.set_elide(True)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
-class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
-	# Инкапсулированные статические переменные
-	FONT_SIZE = 11
+class ThumbMiuzBlueTextWidget(GrayTextLabel):
 	COLLECTION_RE = re.compile(r"^/+(?:\d+\s+)?([^/]+)")
 
 	def __init__(self, data_item: DataItem):
-		super().__init__()
-		self.data_item = data_item
-
-		root = os.path.dirname(self.data_item.rel_path)
+		root = os.path.dirname(data_item.rel_path)
 		if len(root) == 1:
 			miuz_collection_name = Mf.current_mf.mf_alias
 		else:
 			paths_list = root.split(os.sep)
 			miuz_collection_name = paths_list[1]
-
-		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {self.data_item.day_month_year}"
-		self.setText(f"{day_month_year}\n{miuz_collection_name}")
+		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
+		super().__init__(f"{day_month_year}\n{miuz_collection_name}")
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.set_elide(True)
 
 
 class Thumb(TransparentFrame):
@@ -110,6 +101,8 @@ class Thumb(TransparentFrame):
 		# --- Виджеты ---
 		self.img_wid = ThumbImgWidget()
 		self.v_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+
+		self.v_lay.addSpacing(5)
 
 		self.white_text_wid = ThumbFilenameWid(self.data_item.filename)
 		self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -137,9 +130,8 @@ class Thumb(TransparentFrame):
 	def calculate_size(cls):
 		ind = Dynamic.current_pixmap_size_index
 		Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
-		# Thumb.wid_width = Thumb.img_wid_size
-		# if Static.MIUZ_ZIP.exists():
-		# 	Thumb.blue_text_class = ThumbMiuzBlueTextWidget
+		if Static.MIUZ_ZIP.exists():
+			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
 	def _update_style(self):
 		# Метод для принудительного обновления QSS стиля у виджета
@@ -163,9 +155,6 @@ class Thumb(TransparentFrame):
 		self.img_wid.setPixmap(pixmap)
 
 	def set_text_and_size(self):
-		# if self.width() == Thumb.wid_width:
-		# 	return
-		# self.setFixedWidth(Thumb.wid_width)
 		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
 
 		self.set_pixmap_with_actual_size()
