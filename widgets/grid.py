@@ -472,7 +472,6 @@ class Grid(UScrollVerticalArea):
 	collage = pyqtSignal(list)
 	open_filters_win = pyqtSignal()
 
-	grid_spacing = 15
 	resize_ms = 10
 	copy_files_path = Static.COMMON_ICONS / "copy_files.svg"
 
@@ -540,11 +539,14 @@ class Grid(UScrollVerticalArea):
 		self.grid_wid = TransparentFrame()
 		self.scroll_layout.addWidget(self.grid_wid)
 		self.grid_lay = QGridLayout(self.grid_wid)
-		self.grid_lay.setSpacing(self.grid_spacing)
 		self.grid_lay.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+
 		self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
 
 		self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
+
+	def get_grid_spacing(self):
+		return Static.GRID_SPACING[Dynamic.current_pixmap_size_index]
 
 	def select_by_url(self, path: str):
 		if path in self.url_to_wid:
@@ -553,9 +555,10 @@ class Grid(UScrollVerticalArea):
 			self.wid_to_selected_widgets(wid)
 
 	def get_max_columns(self):
+		spacing = self.grid_lay.spacing()
 		try:
-			thumb_w = self.cell_to_wid[(0, 0)].width() + self.grid_spacing
-			total_w = self.viewport().width() - (self.grid_spacing * 2)
+			thumb_w = self.cell_to_wid[(0, 0)].width() + spacing
+			total_w = self.viewport().width() - (spacing * 2)
 			return total_w // thumb_w
 		except (ZeroDivisionError, KeyError):
 			# НА СЛУЧАЙ ПУСТОЙ СЕТКИку
@@ -578,6 +581,7 @@ class Grid(UScrollVerticalArea):
 			wid.set_pixmap_with_actual_size()
 			wid.set_text_and_size()
 			wid.adjustSize()
+		self.grid_lay.setSpacing(self.get_grid_spacing())
 		self.rearrange()
 
 	def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
