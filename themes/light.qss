@@ -65,6 +65,7 @@ ImgViewSvg,
 _SvgWithThemeBg {
     background: transparent;
     border: none;
+    color: #000000;
 }
 
 UTreeView::item,
