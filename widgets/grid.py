@@ -81,8 +81,8 @@ class ThumbMiuzBlueTextWidget(GrayTextLabel):
 
 class Thumb(TransparentFrame):
 	sym_star = "\U00002605"
-	wid_width = 0
-	img_wid_size = 0
+	thumb_width = 0
+	thumb_offset = 0
 	blue_text_class = ThumbBlueTextWidget
 
 	def __init__(self, data_item: DataItem):
@@ -129,7 +129,8 @@ class Thumb(TransparentFrame):
 	@classmethod
 	def calculate_size(cls):
 		ind = Dynamic.current_pixmap_size_index
-		Thumb.img_wid_size = Static.THUMB_WIDTHS[ind]
+		Thumb.thumb_width = Static.THUMB_WIDTHS[ind]
+		Thumb.thumb_offset = Static.THUMB_OFFSETS[ind]
 		if Static.MIUZ_ZIP.exists():
 			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
@@ -155,7 +156,7 @@ class Thumb(TransparentFrame):
 		self.img_wid.setPixmap(pixmap)
 
 	def set_text_and_size(self):
-		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
+		self.img_wid.setFixedSize(Thumb.thumb_width + Thumb.thumb_offset, Thumb.thumb_width)
 		self.adjustSize()
 		self.set_pixmap_with_actual_size()
 
