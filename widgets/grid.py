@@ -7,8 +7,8 @@ from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
                          QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
                          QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLayout,
-                             QRubberBand, QVBoxLayout)
+from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
+                             QRubberBand, QSizePolicy, QVBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
@@ -77,31 +77,6 @@ class ThumbMiuzBlueTextWidget(GrayTextLabel):
 		super().__init__(f"{day_month_year}\n{miuz_collection_name}")
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.set_elide(True)
-
-
-class ThumbMiuzBlueTextWidget(TransparentFrame):
-	COLLECTION_RE = re.compile(r"^/+(?:\d+\s+)?([^/]+)")
-
-	def __init__(self, data_item: DataItem):
-		super().__init__()
-		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(0, 0, 0, 0)
-		self.v_lay.setSpacing(0)
-
-		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
-		root = os.path.dirname(data_item.rel_path)
-		if len(root) == 1:
-			miuz_collection_name = Mf.current_mf.mf_alias
-		else:
-			paths_list = root.split(os.sep)
-			miuz_collection_name = paths_list[1]
-
-		self.date_label = GrayTextLabel(day_month_year)
-		self.v_lay.addWidget(self.date_label)
-
-		self.collection_label = GrayTextLabel(miuz_collection_name)
-		self.v_lay.addWidget(self.collection_label)
-
 
 
 class Thumb(TransparentFrame):

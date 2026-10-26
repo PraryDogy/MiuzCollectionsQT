@@ -92,10 +92,15 @@ class TransparentLabel(QLabel):
 			return self._original_text
 
 		metrics = QFontMetrics(self.font())
-		return metrics.elidedText(
-			self._original_text,
-			Qt.TextElideMode.ElideMiddle,
-			width,
+
+		lines = self._original_text.splitlines()
+		return '\n'.join(
+			metrics.elidedText(
+				line,
+				Qt.TextElideMode.ElideMiddle,
+				width,
+			)
+			for line in lines
 		)
 
 	def _update_text(self):
