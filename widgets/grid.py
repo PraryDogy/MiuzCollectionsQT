@@ -141,7 +141,8 @@ class Thumb(TransparentFrame):
 	def calculate_size(cls):
 		ind = Dynamic.current_pixmap_size_index
 		Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind] + Static.THUMB_IMG_WID_BORDER
-		Thumb.wid_width = Thumb.img_wid_size + Static.THUMB_WID_EXTRA_W
+		# Thumb.wid_width = Thumb.img_wid_size + Static.THUMB_WID_EXTRA_W
+		Thumb.wid_width = Thumb.img_wid_size
 		if Static.MIUZ_ZIP.exists():
 			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
@@ -169,7 +170,6 @@ class Thumb(TransparentFrame):
 	def set_text_and_size(self):
 		if self.width() == Thumb.wid_width:
 			return
-
 		self.setFixedWidth(Thumb.wid_width)
 		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
 
