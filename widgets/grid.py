@@ -158,6 +158,16 @@ class Thumb(TransparentFrame):
 		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
 		self.set_pixmap_with_actual_size()
 
+		# удобнее явно указать индексы
+		small_indexes = (0, 1)
+		if Dynamic.current_pixmap_size_index in small_indexes:
+			self.white_text_wid.hide()
+			self.blue_text_wid.hide()
+		else:
+			self.white_text_wid.show()
+			self.blue_text_wid.show()
+
+
 	def set_frame(self):
 		self.set_framed_style()
 
