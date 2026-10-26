@@ -92,9 +92,11 @@ class Thumb(TransparentFrame):
 		if self.data_item.fav:
 			self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
 
+		self._img_size = None
+		self._pixmap_index = None
+
 		# --- Layout ---
 		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 10, 10, 2)
 		self.v_lay.setSpacing(3)
 		self.v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 
@@ -102,29 +104,25 @@ class Thumb(TransparentFrame):
 		self.img_wid = ThumbImgWidget()
 		self.v_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-		self.v_lay.addSpacing(5)
+		self._add_captions()
 
+		filename = f"{Lng.file_name[JsonData.lng_index]}: {self.data_item.filename}"
+		location = f"{Lng.location[JsonData.lng_index]}: {Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
+		modified = f"{Lng.modified[JsonData.lng_index]}: {self.data_item.day_month_year} {self.data_item.hour_min_sec}"
+		self.setToolTip("\n".join([filename, location, modified]))
+
+		self.set_text_and_size()
+
+	def _add_captions(self):
+		self.v_lay.setContentsMargins(10, 10, 10, 2)
+		self.v_lay.addSpacing(5)
 		self.white_text_wid = ThumbFilenameWid(self.data_item.filename)
 		self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
-
 		self.blue_text_wid = self.blue_text_class(self.data_item)
 		self.v_lay.addWidget(self.blue_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-		filename = (
-			f"{Lng.file_name[JsonData.lng_index]}: "
-			f"{self.data_item.filename}"
-		)
-		location = (
-			f"{Lng.location[JsonData.lng_index]}: "
-			f"{Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
-		)
-		modified = (
-			f"{Lng.modified[JsonData.lng_index]}: "
-			f"{self.data_item.day_month_year} {self.data_item.hour_min_sec}"
-		)
-		self.setToolTip("\n".join([filename, location, modified, ]))
-
-		self.set_text_and_size()
+	def _img_box_size(self) -> tuple[int, int]:
+		return (Thumb.thumb_width + Thumb.thumb_offset, Thumb.thumb_width)
 
 	@classmethod
 	def calculate_size(cls):
@@ -135,61 +133,63 @@ class Thumb(TransparentFrame):
 			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
 	def _update_style(self):
-		# Метод для принудительного обновления QSS стиля у виджета
+		# Принудительное обновление QSS-стиля виджета
 		self.style().unpolish(self)
 		self.style().polish(self)
 
 	def set_framed_style(self):
-		# Устанавливаем свойство framed в True
 		self.setProperty("framed", True)
 		self._update_style()
-	
+
 	def set_no_frame_style(self):
-		# Устанавливаем свойство framed в False
 		self.setProperty("framed", False)
 		self._update_style()
 
-	def set_pixmap_with_actual_size(self):
-		qimage = self.data_item.resized_qimages[Dynamic.current_pixmap_size_index]
-		pixmap = QPixmap.fromImage(qimage)
-		self.img_wid.clear()
-		self.img_wid.setPixmap(pixmap)
-
-	def set_text_and_size(self):
-		self.img_wid.setFixedSize(Thumb.thumb_width + Thumb.thumb_offset, Thumb.thumb_width)
-		self.adjustSize()
-		self.set_pixmap_with_actual_size()
-
-		# self.white_text_wid.set_font_size(Static.THUMB_FONTS[Dynamic.current_pixmap_size_index])
-		# self.blue_text_wid.set_font_size(Static.THUMB_FONTS[Dynamic.current_pixmap_size_index])
-
-		# small_indexes = (0, 1)
-		# if Dynamic.current_pixmap_size_index in small_indexes:
-		# 	self.white_text_wid.show()
-		# 	self.blue_text_wid.show()
-		# else:
-		# 	self.white_text_wid.show()
-		# 	self.blue_text_wid.show()
-			
 	def set_frame(self):
 		self.set_framed_style()
 
 	def set_no_frame(self):
 		self.set_no_frame_style()
 
-	def set_fav(self, value: int):
-		if value == 0:
-			self.data_item.fav = 0
-			self.data_item.filename = os.path.basename(self.data_item.rel_path)
-		else:
-			self.data_item.fav = 1
-			self.data_item.filename = (
-				f"{self.sym_star} "
-				f"{os.path.basename(self.data_item.rel_path)}"
-			)
+	def set_pixmap_with_actual_size(self):
+		idx = Dynamic.current_pixmap_size_index
+		if self._pixmap_index == idx:
+			return
+		self._pixmap_index = idx
+		self.img_wid.setPixmap(QPixmap.fromImage(self.data_item.resized_qimages[idx]))
 
-		self.white_text_wid.data_item.filename = self.data_item.filename
+	def set_text_and_size(self):
+		size = self._img_box_size()
+		if size != self._img_size:
+			self._img_size = size
+			self.img_wid.setFixedSize(*size)
+			self.adjustSize()
+		self.set_pixmap_with_actual_size()
+
+	def _set_fav_data(self, value: int):
+		self.data_item.fav = 1 if value else 0
+		base = os.path.basename(self.data_item.rel_path)
+		self.data_item.filename = f"{self.sym_star} {base}" if value else base
+
+	def _update_caption(self):
 		self.white_text_wid.setText(self.data_item.filename)
+
+	def set_fav(self, value: int):
+		self._set_fav_data(value)
+		self._update_caption()
+
+
+class SquareThumb(Thumb):
+	def _add_captions(self):
+		# Подписей в квадратном режиме нет
+		self.v_lay.setContentsMargins(10, 10, 10, 10)
+
+	def _img_box_size(self) -> tuple[int, int]:
+		return (Thumb.thumb_width, Thumb.thumb_width)
+
+	def _update_caption(self):
+		# Подписи нет, обновлять нечего
+		pass
 
 
 
@@ -1053,6 +1053,13 @@ class GridStandart(Grid):
 
 	def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
 		Thumb.calculate_size()
+
+		if JsonData.square_thumbs:
+			thumb_widget = SquareThumb
+		else:
+			thumb_widget = Thumb
+
+
 		for image_item in db_images:
 			data_item = DataItem(
 				base_qimage=image_item.base_qimage,
@@ -1063,7 +1070,7 @@ class GridStandart(Grid):
 				hour_min_sec=image_item.hour_min_sec,
 				filename=os.path.basename(image_item.rel_img_path)
 			)
-			thumbnail = Thumb(data_item)
+			thumbnail = thumb_widget(data_item)
 			thumbnail.set_no_frame()
 			self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
 		if not self.url_to_wid:
