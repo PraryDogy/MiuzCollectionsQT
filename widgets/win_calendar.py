@@ -129,11 +129,11 @@ class WinCalendar(UMainWindow):
 			country = QLocale.Country.UnitedStates
 
 		qimg = QImage(str(self.svg_blue_circle_path))
-		qimg_scaled = Utils.qimage_scaled_high_dpi(qimg, self.svg_circle_size[0])
+		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
 		self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
 		qimg = QImage(str(self.svg_gray_circle_path))
-		qimg_scaled = Utils.qimage_scaled_high_dpi(qimg, self.svg_circle_size[0])
+		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
 		self.gray_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
 		self.q_locale = QLocale(lng, country)

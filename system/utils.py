@@ -15,7 +15,7 @@ from cfg import Static
 class Utils:
 
 	@classmethod
-	def pyqt_qimage_from_array(cls, image: np.ndarray) -> QImage | None:
+	def qimage_from_array(cls, image: np.ndarray) -> QImage | None:
 		try:
 			image = np.ascontiguousarray(image)
 			if image.ndim == 2:  # grayscale
@@ -36,7 +36,7 @@ class Utils:
 			return None
 
 	@classmethod
-	def pyqt_pixmap_from_array(cls, image: np.ndarray):
+	def pixmap_from_array(cls, image: np.ndarray):
 		try:
 			height, width, channel = image.shape
 			bytes_per_line = channel * width
@@ -53,17 +53,7 @@ class Utils:
 			return None
 
 	@classmethod
-	def pyqt_pixmap_scale(cls, pixmap: QPixmap, w: int, h: int):
-		try:
-			aspect = Qt.AspectRatioMode.KeepAspectRatio
-			transf = Qt.TransformationMode.SmoothTransformation
-			return pixmap.scaled(w, h, aspect, transf)
-		except Exception as e:
-			print(f"pixmap_scale: {e}")
-			return None
-
-	@classmethod
-	def qimage_scaled_high_dpi(cls, qimage: QImage, size: int, dpr: int = Static.DPR):
+	def scale_qimage_dpr(cls, qimage: QImage, size: int, dpr: int = Static.DPR):
 		scaled = qimage.scaled(
 			int(size * dpr),
 			int(size * dpr),
@@ -72,21 +62,6 @@ class Utils:
 		)
 		scaled.setDevicePixelRatio(dpr)
 		return scaled
-
-	@classmethod
-	def qpixmap_scaled_high_dpi(cls, qpixmap: QPixmap, size: int, dpr: int = 2):
-		scaled = qpixmap.scaled(
-			int(size * dpr),
-			int(size * dpr),
-			Qt.AspectRatioMode.KeepAspectRatio,
-			Qt.TransformationMode.SmoothTransformation
-		)
-		scaled.setDevicePixelRatio(dpr)
-		return scaled
-
-	@classmethod
-	def pyqt_qiconed_resize(cls, pixmap: QPixmap, max_side: int) -> QPixmap:
-		return QIcon(pixmap).pixmap(QSize(max_side, max_side))
 
 	@classmethod
 	def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str:

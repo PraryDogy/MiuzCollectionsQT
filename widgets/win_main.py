@@ -393,7 +393,7 @@ class WinMain(UMainWindow):
 				if wid:
 					ind = Dynamic.current_pixmap_size_index
 					current_size = Static.THUMB_WID_PIXMAP_SIZE[ind] * Static.DPR
-					qimage = Utils.pyqt_qimage_from_array(update_thumb_item.array)
+					qimage = Utils.qimage_from_array(update_thumb_item.array)
 					qimage_scaled = qimage.scaled(
 						current_size, current_size,
 						aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,

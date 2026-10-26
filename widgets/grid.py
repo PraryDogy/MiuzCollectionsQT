@@ -505,7 +505,7 @@ class Grid(UScrollVerticalArea):
 	def __init__(self):
 		super().__init__()
 		qimage = QImage(str(self.copy_files_path))
-		qimage_scaled = Utils.qimage_scaled_high_dpi(qimage, 80)
+		qimage_scaled = Utils.scale_qimage_dpr(qimage, 80)
 		self.copy_files_icon = QPixmap.fromImage(qimage_scaled)
 
 		# --- Состояние и данные ---
@@ -1069,7 +1069,7 @@ class GridStandart(Grid):
 		Thumb.calculate_size()
 		for image_item in db_images:
 			data_item = DataItem(
-				src_qimage=image_item.src_qimage,
+				src_qimage=image_item.base_qimage,
 				resized_qimage=image_item.resized_qimage,
 				rel_path=image_item.rel_img_path,
 				fav=image_item.fav,

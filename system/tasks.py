@@ -85,7 +85,8 @@ class DbImagesLoaderItem:
 	rel_img_path: str
 	rel_thumb_path: str
 	fav: int
-	src_qimage: QImage
+	base_qimage: QImage
+	resized_qimages: list[QImage]
 	resized_qimage: QImage
 	day_month_year: str
 	hour_min_sec: str
@@ -138,7 +139,7 @@ class DbImagesLoader(URunnable):
 			ind = Dynamic.current_pixmap_size_index
 			current_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
 
-			src_qimage = Utils.pyqt_qimage_from_array(img_rgb)
+			src_qimage = Utils.qimage_from_array(img_rgb)
 			scaled_qimage = src_qimage.scaled(
 				current_size * Static.DPR, current_size * Static.DPR,
 				aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
@@ -158,8 +159,9 @@ class DbImagesLoader(URunnable):
 				rel_img_path=rel_img_path,
 				rel_thumb_path=rel_thumb_path,
 				fav=fav,
-				resized_qimage=scaled_qimage,
-				src_qimage=src_qimage,
+				base_qimage=scaled_qimage,
+				resized_qimages=...,
+				base_qimage=src_qimage,
 				day_month_year=day_month_year,
 				hour_min_sec=hour_min_sec
 			)
@@ -407,7 +409,7 @@ class ImgArrayQImage(URunnable):
 		self.img_array = img_array
 
 	def task(self):
-		qimage = Utils.pyqt_qimage_from_array(self.img_array)
+		qimage = Utils.qimage_from_array(self.img_array)
 		self.sigs.finished_.emit(qimage)
 
 
@@ -424,7 +426,7 @@ class ImagePreviewTask(URunnable):
 		self.img_array = img_array
 
 	def task(self):
-		orig_qimg = Utils.pyqt_qimage_from_array(self.img_array)
+		orig_qimg = Utils.qimage_from_array(self.img_array)
 		if not self.size_:
 			# Если размер не задан, просто применяем DPR к оригиналу
 			orig_qimg.setDevicePixelRatio(Static.DPR)
