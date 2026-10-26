@@ -3,7 +3,7 @@ import os
 import subprocess
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeyEvent
+from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeyEvent, QImage
 from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
@@ -686,6 +686,9 @@ class WinMain(UMainWindow):
 		self.view_win.image_not_exists.connect(
 			lambda: self.open_win_smb(Mf.current_mf)
 		)
+		self.view_win.data_item_updated.connect(
+			lambda data: self.update_thumb_image(data)
+		)
 		if WinImageView.xx == 0:
 			self.view_win.resize(self.ww, self.hh)
 			self.view_win.center_to_parent(self.window())
@@ -694,6 +697,11 @@ class WinMain(UMainWindow):
 			self.view_win.resize(WinImageView.ww, WinImageView.hh)
 			self.view_win.move(WinImageView.xx, WinImageView.yy)
 		self.view_win.show()
+
+	def update_thumb_image(self, rel_img_path: str):
+		wid = self.grid.url_to_wid.get(rel_img_path)
+		if wid:
+			wid.set_pixmap_with_actual_size()
 
 	def poll_scaner_task(self, ms: int = 3000):
 
