@@ -182,13 +182,11 @@ UPushButton:pressed,
 USpinBox::up-button:pressed,
 USpinBox::down-button:pressed,
 Thumb[framed="true"] {
-    background: #2a3845;
-    /* border: 2px solid #2f3f4e; */
+    border: 2px solid #0059d1;
 }
 
 SquareThumb[framed="true"] {
-    background: #5b7892;
-    /* border: 2px solid #2f3f4e; */
+    border: 2px solid #0059d1;
 }
 
 USpinBox::up-button:pressed,
