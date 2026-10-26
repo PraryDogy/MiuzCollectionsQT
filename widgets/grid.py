@@ -283,7 +283,7 @@ class GridModeWidget(UPushButton):
 	icon_offset = 60  # иконка слева и стрелка справа
 
 	def __init__(self):
-		super().__init__("")
+		super().__init__(Lng.view[JsonData.lng_index])
 
 		self.MODES = {
 			False: Lng.captions_on[JsonData.lng_index],
@@ -305,21 +305,11 @@ class GridModeWidget(UPushButton):
 
 		current = JsonData.square_thumbs
 		self.actions_[current].setChecked(True)
-		self.setText(self.MODES[current])
-		self.set_fixed_width()
-
-	def set_fixed_width(self):
-		# Шрифт из QSS применяется при polish, поэтому вызываем его до измерения
-		self.ensurePolished()
-		fm = self.fontMetrics()
-		longest = max(self.MODES.values(), key=fm.horizontalAdvance)
-		self.setFixedWidth(fm.horizontalAdvance(longest) + self.icon_offset)
 
 	def change_mode(self, square: bool):
 		if JsonData.square_thumbs == square:
 			return
 		JsonData.square_thumbs = square
-		self.setText(self.MODES[square])
 		self.load_st_grid.emit()
 		
 

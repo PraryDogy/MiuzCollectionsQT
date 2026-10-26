@@ -634,3 +634,7 @@ class Lng:
 		"Без подписей",
 		"Without captions",
 	)
+	view = (
+		"Вид",
+		"View"
+	)
