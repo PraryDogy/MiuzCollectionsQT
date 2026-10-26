@@ -631,7 +631,7 @@ class ImageSearcher(URunnable):
 class WriteNewThumb(URunnable):
 
 	class Sigs(QObject):
-		finished = pyqtSignal()
+		finished = pyqtSignal(QImage)
 
 	def __init__(self, rel_thumb_path: str, img_array: np.ndarray):
 		super().__init__()
@@ -644,5 +644,5 @@ class WriteNewThumb(URunnable):
 		scaled = ImgUtils.fit_to_thumb(self.img_array, Static.THUMB_MAX_SIZE)
 		result = ImgUtils.write_thumb(abs_path, scaled)
 		if result:
-			pass
-		self.sigs.finished.emit()
+			qimage = Utils.qimage_from_array(scaled)
+			self.sigs.finished.emit(qimage)

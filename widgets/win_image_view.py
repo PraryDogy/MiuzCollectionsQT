@@ -226,6 +226,7 @@ class WinImageView(UMainWindow):
 	save_files = pyqtSignal(list)
 	open_in_app = pyqtSignal(tuple)
 	image_not_exists = pyqtSignal()
+	thumbnail_updated = pyqtSignal(QImage)
 	
 	min_w, min_h = 500, 400
 	ww, hh = 0, 0
@@ -327,6 +328,9 @@ class WinImageView(UMainWindow):
 			shm.close()
 			shm.unlink()
 
+		def thumbnail_updated(qimage: QImage):
+			self.thumbnail_updated.emit(qimage)
+
 		def poll():
 			self.read_img_timer.stop()
 			queue = self.read_img_task.process_queue
@@ -342,6 +346,7 @@ class WinImageView(UMainWindow):
 				max_side = max(sz.width(), sz.height())
 				if max_side < Static.THUMB_MAX_SIZE:
 					self.new_thumb = WriteNewThumb(self.current_data_item.rel_thumb_path, img_array)
+					self.new_thumb.sigs.finished.connect(thumbnail_updated)
 					UThreadPool.start(self.new_thumb)
 
 				if item.src == abs_path:
