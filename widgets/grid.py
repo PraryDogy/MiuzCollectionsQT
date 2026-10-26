@@ -616,6 +616,7 @@ class Grid(UScrollVerticalArea):
 
 	def rearrange(self):
 		self.grid_wid.hide()
+		self.grid_lay.setSpacing(self.get_grid_spacing())
 		max_col = self.get_max_columns()
 		self.cell_to_wid.clear()
 		for x, thumb in enumerate(self.url_to_wid.values()):
