@@ -53,12 +53,10 @@ class ThumbImgWidget(ThumbBaseLabel):
 			self.setPixmap(self._saved_pixmap)
 
 
-
-class ThumbWhiteTextWid(ThumbBaseLabel):
-	def __init__(self, data_item: DataItem):
+class ThumbFilenameWid(TransparentLabel):
+	def __init__(self, filename: str):
 		super().__init__()
-		self.setText(data_item.filename)
-		self.data_item = data_item
+		self.setText(filename)
 		self.set_elide(True)
 
 
@@ -67,7 +65,7 @@ class ThumbBlueTextWidget(ThumbBaseLabel):
 		super().__init__()
 		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
 		self.setText(day_month_year)
-		self.data_item = data_item
+		self.set_elide(True)
 
 
 class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
@@ -93,9 +91,7 @@ class ThumbMiuzBlueTextWidget(ThumbBaseLabel):
 class Thumb(TransparentFrame):
 	sym_star = "\U00002605"
 	wid_width = 0
-	wid_height = 0
 	img_wid_size = 0
-	img_wid_height = 0
 	blue_text_class = ThumbBlueTextWidget
 
 	def __init__(self, data_item: DataItem):
@@ -115,7 +111,7 @@ class Thumb(TransparentFrame):
 		self.img_wid = ThumbImgWidget()
 		self.v_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
-		self.white_text_wid = ThumbWhiteTextWid(self.data_item)
+		self.white_text_wid = ThumbFilenameWid(self.data_item.filename)
 		self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.blue_text_wid = self.blue_text_class(self.data_item)
@@ -140,11 +136,10 @@ class Thumb(TransparentFrame):
 	@classmethod
 	def calculate_size(cls):
 		ind = Dynamic.current_pixmap_size_index
-		Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind] + Static.THUMB_IMG_WID_BORDER
-		# Thumb.wid_width = Thumb.img_wid_size + Static.THUMB_WID_EXTRA_W
-		Thumb.wid_width = Thumb.img_wid_size
-		if Static.MIUZ_ZIP.exists():
-			Thumb.blue_text_class = ThumbMiuzBlueTextWidget
+		Thumb.img_wid_size = Static.THUMB_WID_PIXMAP_SIZE[ind]
+		# Thumb.wid_width = Thumb.img_wid_size
+		# if Static.MIUZ_ZIP.exists():
+		# 	Thumb.blue_text_class = ThumbMiuzBlueTextWidget
 
 	def _update_style(self):
 		# Метод для принудительного обновления QSS стиля у виджета
@@ -168,9 +163,9 @@ class Thumb(TransparentFrame):
 		self.img_wid.setPixmap(pixmap)
 
 	def set_text_and_size(self):
-		if self.width() == Thumb.wid_width:
-			return
-		self.setFixedWidth(Thumb.wid_width)
+		# if self.width() == Thumb.wid_width:
+		# 	return
+		# self.setFixedWidth(Thumb.wid_width)
 		self.img_wid.setFixedSize(Thumb.img_wid_size, Thumb.img_wid_size)
 
 		self.set_pixmap_with_actual_size()
@@ -564,10 +559,10 @@ class Grid(UScrollVerticalArea):
 			# теперь виджет правильной ширины
 			# но теперь есть лишние спейсинги справа и слева в концах сетки
 			# что мы учитываем в total_w
-			thumb_w = Thumb.wid_width + self.grid_spacing
+			thumb_w = self.cell_to_wid[(0, 0)].width() + self.grid_spacing
 			total_w = self.viewport().width() - (self.grid_spacing * 2)
 			return total_w // thumb_w
-		except ZeroDivisionError:
+		except (ZeroDivisionError, KeyError):
 			return 1
 
 	def rearrange(self):
@@ -592,7 +587,7 @@ class Grid(UScrollVerticalArea):
 	def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
 		global_pos = QCursor.pos() 
 		wid = QApplication.widgetAt(global_pos)
-		if isinstance(wid, (ThumbImgWidget, ThumbWhiteTextWid)):
+		if isinstance(wid, (ThumbImgWidget, ThumbFilenameWid)):
 			return wid.parent()
 		else:
 			return None
@@ -712,7 +707,7 @@ class Grid(UScrollVerticalArea):
 			ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
 
 			for wid in self.cell_to_wid.values():
-				widgets = wid.findChildren((ThumbWhiteTextWid, ThumbImgWidget))
+				widgets = wid.findChildren((ThumbFilenameWid, ThumbImgWidget))
 				intersects = any(
 					rect.intersects(QRect(child.mapTo(self, QPoint(0, 0)), child.size()))
 					for child in widgets
