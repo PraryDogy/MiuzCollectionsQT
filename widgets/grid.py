@@ -76,7 +76,8 @@ class ThumbMiuzBlueTextWidget(GrayTextLabel):
 		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
 		super().__init__(f"{day_month_year}\n{miuz_collection_name}")
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.set_elide(True)
+		# self.set_elide(True)
+		# как сделать elide 2 строк?
 
 
 class Thumb(TransparentFrame):
