@@ -280,15 +280,16 @@ class UpBtn(TransparentWidget):
 class GridModeWidget(UPushButton):
 	load_st_grid = pyqtSignal()
 	view_mode_svg = Static.COMMON_ICONS / "view_mode.svg"
-	icon_offset = 60  # иконка слева и стрелка справа
+	icon_offset = 35  # иконка слева и стрелка справа
 
 	def __init__(self):
-		super().__init__(Lng.view[JsonData.lng_index])
-
 		self.MODES = {
 			False: Lng.captions_on[JsonData.lng_index],
 			True: Lng.captions_off[JsonData.lng_index]
 		}
+
+		current = JsonData.square_thumbs
+		super().__init__(self.MODES[current])
 
 		self.setIcon(QIcon(str(self.view_mode_svg)))
 
@@ -303,13 +304,20 @@ class GridModeWidget(UPushButton):
 			self.menu_.addAction(act)
 			self.actions_[square] = act
 
-		current = JsonData.square_thumbs
 		self.actions_[current].setChecked(True)
+
+		self._fix_width()
+
+	def _fix_width(self):
+		metrics = QFontMetrics(self.font())
+		text_width = max(metrics.horizontalAdvance(text) for text in self.MODES.values())
+		self.setFixedWidth(text_width + self.icon_offset + self.iconSize().width())
 
 	def change_mode(self, square: bool):
 		if JsonData.square_thumbs == square:
 			return
 		JsonData.square_thumbs = square
+		self.setText(self.MODES[square])
 		self.load_st_grid.emit()
 		
 

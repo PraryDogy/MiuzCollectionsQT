@@ -580,4 +580,3 @@ UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
     image: url(./icons/common/collapse.svg);
 }
-
