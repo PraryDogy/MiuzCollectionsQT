@@ -91,7 +91,7 @@ class Thumb(TransparentFrame):
 
 	def __init__(self, data_item: DataItem):
 		super().__init__()
-		self.row, self.col = 0, 0
+		self.row, self.col, self.idx = 0, 0, 0   # idx — линейный индекс в сетке
 		self.data_item = data_item
 		if self.data_item.fav:
 			self.data_item.filename = f"{self.sym_star} {self.data_item.filename}"
@@ -233,7 +233,6 @@ class SquareThumb(Thumb):
 		pass
 
 
-
 class UpBtnLabel(TransparentLabel):
 	widget_size = (36, 36)
 	def __init__(self):
@@ -319,7 +318,6 @@ class GridModeWidget(UPushButton):
 		JsonData.square_thumbs = square
 		self.setText(self.MODES[square])
 		self.load_st_grid.emit()
-		
 
 
 class GridSortWidget(TransparentWidget):
@@ -564,7 +562,7 @@ class Grid(UScrollVerticalArea):
 	collage = pyqtSignal(list)
 	open_filters_win = pyqtSignal()
 
-	resize_ms = 50
+	resize_ms = 10
 	thumb_cls = Thumb
 	copy_files_path = Static.COMMON_ICONS / "copy_files.svg"
 
@@ -575,9 +573,11 @@ class Grid(UScrollVerticalArea):
 		self.copy_files_icon = QPixmap.fromImage(qimage_scaled)
 
 		# --- Состояние и данные ---
-		self.wid_under_mouse: Thumb = None
+		self.wid_under_mouse: Thumb | None = None
 		self.origin_pos = QPoint()
-		self.selected_widgets: list[Thumb] = []
+		self._sel: dict[Thumb, None] = {}      # выделение: ключи в порядке вставки, O(1)
+		self.ordered: list[Thumb] = []         # виджеты в порядке отображения, idx = позиция
+		self._cols = 1                         # текущее число колонок сетки
 		self.cell_to_wid: dict[tuple, Thumb] = {}
 		self.url_to_wid: dict[str, Thumb] = {}
 		self.files_to_copy = set()
@@ -586,11 +586,6 @@ class Grid(UScrollVerticalArea):
 			i: os.path.basename(i)
 			for i in SharedUtils.get_apps(Static.IMAGE_APPS)
 		}
-
-
-		self._cols = 0
-		self._spacing = -1
-		self.ordered: list[Thumb] = []   # порядок отображения, индекс = позиция в сетке
 
 		# --- Таймеры ---
 		self.resize_timer = QTimer(self)
@@ -643,17 +638,49 @@ class Grid(UScrollVerticalArea):
 
 		self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
 
-	def get_grid_spacing(self):
-		if JsonData.square_thumbs:
-			return 1
-		else:
-			return Static.GRID_SPACINGS[Dynamic.current_pixmap_size_index]
+	# --- Выделение ---
+
+	@property
+	def selected_widgets(self) -> list[Thumb]:
+		"""Список выделенных виджетов в порядке выделения (для внешнего кода)."""
+		return list(self._sel)
+
+	def _add_sel(self, wid: Thumb):
+		if wid not in self._sel:
+			self._sel[wid] = None
+			wid.set_frame()
+
+	def _remove_sel(self, wid: Thumb):
+		if wid in self._sel:
+			del self._sel[wid]
+			wid.set_no_frame()
+
+	def clear_selected_widgets(self):
+		"""
+		- Убирает стиль выделенных виджетов
+		- Очищает выделение
+		"""
+		for w in self._sel:
+			w.set_no_frame()
+		self._sel.clear()
+
+	def wid_to_selected_widgets(self, wid: Thumb):
+		if isinstance(wid, Thumb):
+			self._add_sel(wid)
 
 	def select_by_url(self, path: str):
 		if path in self.url_to_wid:
 			wid = self.url_to_wid.get(path)
 			self.clear_selected_widgets()
 			self.wid_to_selected_widgets(wid)
+
+	# --- Геометрия ---
+
+	def get_grid_spacing(self):
+		if JsonData.square_thumbs:
+			return 1
+		else:
+			return Static.GRID_SPACINGS[Dynamic.current_pixmap_size_index]
 
 	def get_max_columns(self):
 		spacing = self.get_grid_spacing()
@@ -667,24 +694,19 @@ class Grid(UScrollVerticalArea):
 			return 1
 		return max(1, total_w // thumb_w)
 
-	def rearrange(self, force=False):
-		spacing = self.get_grid_spacing()
-		cols = self.get_max_columns()
-		if not force and cols == self._cols and spacing == self._spacing:
-			return  # раскладка не изменилась, ничего не делаем
-
-		self._cols, self._spacing = cols, spacing
+	def rearrange(self):
+		self.grid_wid.hide()
+		self.grid_lay.setSpacing(self.get_grid_spacing())
+		max_col = self.get_max_columns()
+		self._cols = max_col
 		self.ordered = list(self.url_to_wid.values())
-
-		self.grid_wid.setUpdatesEnabled(False)
-		self.grid_lay.setSpacing(spacing)
+		self.cell_to_wid.clear()
 		for x, thumb in enumerate(self.ordered):
-			row, col = divmod(x, cols)
+			row, col = divmod(x, max_col)
+			self.cell_to_wid[row, col] = thumb
 			thumb.idx, thumb.row, thumb.col = x, row, col
-			self.grid_lay.removeWidget(thumb)
 			self.grid_lay.addWidget(thumb, row, col)
-		self.cell_to_wid = {(t.row, t.col): t for t in self.ordered}
-		self.grid_wid.setUpdatesEnabled(True)
+		self.grid_wid.show()
 
 	def resize_thumbnails(self):
 		self.thumb_cls.calculate_size()
@@ -694,32 +716,42 @@ class Grid(UScrollVerticalArea):
 		self.grid_lay.setSpacing(self.get_grid_spacing())
 		self.rearrange()
 
-	def get_clicked_widget(self, a0: QMouseEvent) -> None | Thumb:
-		global_pos = QCursor.pos() 
-		wid = QApplication.widgetAt(global_pos)
-		if isinstance(wid, (ThumbImgWidget, ThumbFilenameWid)):
-			return wid.parent()
-		else:
-			return None
-		
-	def clear_selected_widgets(self):
-		"""
-		- Убирает стиль выделенных виджетов
-		- Очищает selected widgets
-		"""
-		for i in self.selected_widgets:
-			i.set_no_frame()
-		self.selected_widgets.clear()
+	def clear_grid(self):
+		"""Удаляет все виджеты сетки (при полной перезагрузке)."""
+		for w in self.url_to_wid.values():
+			self.grid_lay.removeWidget(w)
+			w.deleteLater()
+		self.url_to_wid.clear()
+		self.cell_to_wid.clear()
+		self.ordered = []
+		self._sel.clear()
+		self.wid_under_mouse = None
+		self._cols = 1
 
-	def wid_to_selected_widgets(self, wid: Thumb):
-		if isinstance(wid, Thumb):
-			self.selected_widgets.append(wid)
-			wid.set_frame()
-				
-	def set_thumb_fav(self, rel_path: str, value: int):
-		if rel_path in self.url_to_wid:
-			wid = self.url_to_wid.get(rel_path)
-			wid.set_fav(value)
+	# --- Клавиатура ---
+
+	def _navigate(self, key):
+		"""Перемещает выделение по линейному индексу."""
+		if not self.ordered:
+			return
+		steps = {
+			Qt.Key.Key_Right: 1,
+			Qt.Key.Key_Left: -1,
+			Qt.Key.Key_Down: self._cols,
+			Qt.Key.Key_Up: -self._cols,
+		}
+		step = steps.get(key)
+		if step is None:
+			return
+
+		cur = next(reversed(self._sel)).idx if self._sel else 0
+		new_idx = min(max(cur + step, 0), len(self.ordered) - 1)
+		target = self.ordered[new_idx]
+
+		self.clear_selected_widgets()
+		self._add_sel(target)
+		self.ensureWidgetVisible(target)
+		self.wid_under_mouse = target
 
 	def keyPressEvent(self, event: QKeyEvent | None) -> None:
 		def remove_files():
@@ -729,69 +761,29 @@ class Grid(UScrollVerticalArea):
 
 		def open_info():
 			"""Открывает окно информации для выбранных виджетов."""
-			if self.selected_widgets:
+			if self._sel:
 				rel_paths = [self.wid_under_mouse.data_item.rel_path, ]
 				self.open_info_win.emit(rel_paths)
 
 		def select_all():
 			"""Выделяет все виджеты в сетке."""
-			for wid in self.cell_to_wid.values():
-				wid.set_frame()
-				self.selected_widgets.append(wid)
+			for wid in self.ordered:
+				self._add_sel(wid)
 
 		def open_last_selected():
 			"""Открывает просмотр последнего выбранного виджета."""
-			if self.selected_widgets:
+			if self._sel:
 				self.open_img_view.emit()
-
-		def navigate(offset: tuple[int, int]):
-			"""Перемещает выделение в сетке по заданному смещению."""
-			# начальный виджет
-			if not self.selected_widgets:
-				self.wid_under_mouse = self.cell_to_wid.get((0, 0))
-			else:
-				self.wid_under_mouse = self.selected_widgets[-1]
-
-			if not self.wid_under_mouse:
-				return
-
-			row, col = self.wid_under_mouse.row + offset[0], self.wid_under_mouse.col + offset[1]
-			next_wid = self.cell_to_wid.get((row, col))
-
-			# обработка перехода за пределы строки
-			if next_wid is None:
-				keys = list(self.cell_to_wid.keys())
-				curr_idx = keys.index((self.wid_under_mouse.row, self.wid_under_mouse.col))
-
-				if event.key() == Qt.Key.Key_Right:
-					row += 1
-					col = 0
-				elif event.key() == Qt.Key.Key_Left:
-					if curr_idx > 0:
-						row, col = keys[curr_idx - 1]
-					else:
-						# достигли начала сетки, остаёмся на месте
-						row, col = self.wid_under_mouse.row, self.wid_under_mouse.col
-
-				next_wid = self.cell_to_wid.get((row, col))
-
-			if next_wid:
-				self.clear_selected_widgets()
-				self.wid_to_selected_widgets(next_wid)
-				self.ensureWidgetVisible(next_wid)
-				self.wid_under_mouse = next_wid
 
 		# --- Основная логика ---
 		CTRL = Qt.KeyboardModifier.ControlModifier
-		KEY_NAVI = {
-			Qt.Key.Key_Left: (0, -1),
-			Qt.Key.Key_Right: (0, 1),
-			Qt.Key.Key_Up: (-1, 0),
-			Qt.Key.Key_Down: (1, 0)
-		}
+		NAVI_KEYS = (
+			Qt.Key.Key_Left, Qt.Key.Key_Right,
+			Qt.Key.Key_Up, Qt.Key.Key_Down,
+		)
 
 		if event.modifiers() == CTRL and event.key() == Qt.Key.Key_Backspace:
-			if self.selected_widgets:
+			if self._sel:
 				remove_files()
 		if event.modifiers() == CTRL and event.key() == Qt.Key.Key_I:
 			open_info()
@@ -804,73 +796,60 @@ class Grid(UScrollVerticalArea):
 		elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
 			if not event.isAutoRepeat():
 				open_last_selected()
-		elif event.key() in KEY_NAVI:
-			navigate(KEY_NAVI[event.key()])
+		elif event.key() in NAVI_KEYS:
+			self._navigate(event.key())
 
 		super().keyPressEvent(event)
+
+	# --- Мышь ---
+
+	def get_clicked_widget(self, a0) -> None | Thumb:
+		# позиция из события, а не из QCursor.pos(): работает и для контекстного меню
+		if isinstance(a0, QMouseEvent):
+			pos = a0.globalPosition().toPoint()
+		else:
+			pos = a0.globalPos()
+		wid = QApplication.widgetAt(pos)
+		if isinstance(wid, (ThumbImgWidget, ThumbFilenameWid)):
+			return wid.parent()
+		else:
+			return None
+
+	def handle_rubber_band_selection(self, rect: QRect, ctrl: bool):
+		# один раз переводим прямоугольник резинки в координаты grid_wid
+		rect_g = QRect(self.grid_wid.mapFrom(self.viewport(), rect.topLeft()), rect.size())
+		hits = [w for w in self.ordered if rect_g.intersects(w.geometry())]
+
+		if not ctrl:
+			self.clear_selected_widgets()
+		for w in hits:
+			if ctrl and w in self._sel:
+				self._remove_sel(w)
+			else:
+				self._add_sel(w)
+
+	def handle_shift_click(self):
+		anchor = next(reversed(self._sel))
+		target = self.wid_under_mouse
+		lo, hi = sorted((anchor.idx, target.idx))
+		for w in self.ordered[lo:hi + 1]:
+			self._add_sel(w)
+
+	def handle_control_click(self):
+		w = self.wid_under_mouse
+		if w in self._sel:
+			self._remove_sel(w)
+		else:
+			self._add_sel(w)
 
 	def mouseReleaseEvent(self, a0: QMouseEvent | None) -> None:
 		if a0.button() != Qt.MouseButton.LeftButton:
 			return
 
-		def handle_rubber_band_selection(rect: QRect):
-			ctrl = a0.modifiers() == Qt.KeyboardModifier.ControlModifier
-
-			for wid in self.cell_to_wid.values():
-				widgets = wid.findChildren((ThumbFilenameWid, ThumbImgWidget))
-				intersects = any(
-					rect.intersects(QRect(child.mapTo(self, QPoint(0, 0)), child.size()))
-					for child in widgets
-				)
-
-				if intersects:
-					if ctrl:
-						if wid in self.selected_widgets:
-							wid.set_no_frame()
-							self.selected_widgets.remove(wid)
-						else:
-							wid.set_frame()
-							self.selected_widgets.append(wid)
-					else:
-						if wid not in self.selected_widgets:
-							wid.set_frame()
-							self.selected_widgets.append(wid)
-				else:
-					if not ctrl and wid in self.selected_widgets:
-						wid.set_no_frame()
-						self.selected_widgets.remove(wid)
-
-		def handle_shift_click():
-			coords = list(self.cell_to_wid)
-			start_pos = (self.selected_widgets[-1].row, self.selected_widgets[-1].col)
-			target_pos = (self.wid_under_mouse.row, self.wid_under_mouse.col)
-
-			if coords.index(target_pos) > coords.index(start_pos):
-				start = coords.index(start_pos)
-				end = coords.index(target_pos)
-				slice_coords = coords[start : end + 1]
-			else:
-				start = coords.index(target_pos)
-				end = coords.index(start_pos)
-				slice_coords = coords[start : end + 1]
-
-			for c in slice_coords:
-				wid = self.cell_to_wid.get(c)
-				if wid not in self.selected_widgets:
-					self.wid_to_selected_widgets(wid)
-
-		def handle_control_click():
-			if self.wid_under_mouse in self.selected_widgets:
-				self.selected_widgets.remove(self.wid_under_mouse)
-				self.wid_under_mouse.set_no_frame()
-			else:
-				self.wid_to_selected_widgets(self.wid_under_mouse)
-
-		# --- Основная логика ---
 		if self.rubberBand.isVisible():
 			rect = QRect(self.origin_pos, a0.pos()).normalized()
 			self.rubberBand.hide()
-			handle_rubber_band_selection(rect)
+			self.handle_rubber_band_selection(rect, a0.modifiers() == Qt.KeyboardModifier.ControlModifier)
 			return
 
 		self.wid_under_mouse = self.get_clicked_widget(a0)
@@ -879,15 +858,14 @@ class Grid(UScrollVerticalArea):
 			self.clear_selected_widgets()
 			return
 
-
 		modifiers = a0.modifiers()
-		if modifiers == Qt.KeyboardModifier.ShiftModifier and self.selected_widgets:
-			handle_shift_click()
+		if modifiers == Qt.KeyboardModifier.ShiftModifier and self._sel:
+			self.handle_shift_click()
 		elif modifiers == Qt.KeyboardModifier.ControlModifier:
-			handle_control_click()
-		elif not hasattr(self, "double_click"):
+			self.handle_control_click()
+		else:
 			self.clear_selected_widgets()
-			self.wid_to_selected_widgets(self.wid_under_mouse)
+			self._add_sel(self.wid_under_mouse)
 
 	def position_up_btn(self):
 		vp = self.viewport()
@@ -941,11 +919,11 @@ class Grid(UScrollVerticalArea):
 			self.menu_.addAction(reveal)
 
 		def menu_widget(clicked: Thumb):
-			if not self.selected_widgets:
-				self.wid_to_selected_widgets(clicked)
-			elif clicked not in self.selected_widgets:
+			if not self._sel:
+				self._add_sel(clicked)
+			elif clicked not in self._sel:
 				self.clear_selected_widgets()
-				self.wid_to_selected_widgets(clicked)
+				self._add_sel(clicked)
 
 			data_items = [w.data_item for w in self.selected_widgets]
 			rel_paths = [di.rel_path for di in data_items]
@@ -1020,7 +998,7 @@ class Grid(UScrollVerticalArea):
 				lambda: self.update_thumb.emit(rel_paths)
 			)
 			self.menu_.addAction(update_thumb)
-			
+
 			self.menu_.addSeparator()
 
 			act = CopyFiles(self.menu_, rel_paths)
@@ -1043,7 +1021,7 @@ class Grid(UScrollVerticalArea):
 			)
 			self.menu_.addAction(act)
 
-			act = RemoveFiles(self.menu_, len(self.selected_widgets))
+			act = RemoveFiles(self.menu_, len(self._sel))
 			act.triggered.connect(
 				lambda: self.remove_files.emit(rel_paths)
 			)
@@ -1078,7 +1056,7 @@ class Grid(UScrollVerticalArea):
 		else:
 			self.path_bar_update.emit(Dynamic.current_dir)
 		return super().mousePressEvent(a0)
-	
+
 	def mouseMoveEvent(self, a0):
 		try:
 			distance = (a0.pos() - self.origin_pos).manhattanLength()
@@ -1099,10 +1077,9 @@ class Grid(UScrollVerticalArea):
 
 		def start_drag():
 			# если виджет под курсором не выделен — выделяем его
-			if self.wid_under_mouse and self.wid_under_mouse not in self.selected_widgets:
+			if self.wid_under_mouse and self.wid_under_mouse not in self._sel:
 				self.clear_selected_widgets()
-				self.wid_to_selected_widgets(self.wid_under_mouse)
-				QTimer.singleShot(100, self.wid_under_mouse.set_frame)
+				self._add_sel(self.wid_under_mouse)
 
 			# собираем пути выбранных изображений
 			paths = []
@@ -1146,22 +1123,50 @@ class GridStandart(Grid):
 	def __init__(self):
 		super().__init__()
 		self.setAcceptDrops(True)
-		self.load_db_images_task()
+		self._loading_more = False     # защита от повторной догрузки при прокрутке
+		self._load_id = 0              # номер текущего запроса к БД
+		self._tasks: dict[int, DbImagesLoader] = {}  # держим ссылки на работающие задачи
+		self._empty_lbl: TransparentLabel | None = None
+		self.load_db_images_task(reset=True)
 
 	def load_more_thumbnails(self):
 		Dynamic.loaded_thumbs += Static.THUMBS_LOAD_LIMIT
-		self.load_db_images_task()
+		self.load_db_images_task(reset=False)
 
-	def load_db_images_task(self):
-		self.task_ = DbImagesLoader()
-		self.task_.sigs.finished_.connect(self.create_thumbnails)
-		UThreadPool.start(self.task_)
+	def load_db_images_task(self, reset: bool = True):
+		self._load_id += 1
+		lid = self._load_id
+		task = DbImagesLoader()
+		# лямбда без receiver'а выполняется в потоке GUI, поэтому виджеты создаются безопасно
+		task.sigs.finished_.connect(
+			lambda items, lid=lid, reset=reset: self._on_loaded(items, lid, reset)
+		)
+		self._tasks[lid] = task
+		UThreadPool.start(task)
+
+	def _on_loaded(self, items: list[DbImagesLoaderItem], load_id: int, reset: bool):
+		self._tasks.pop(load_id, None)
+		if load_id != self._load_id:
+			return  # результат устарел, пришёл более новый запрос
+		if reset:
+			self.clear_grid()
+		self.create_thumbnails(items)
+
+	def clear_grid(self):
+		super().clear_grid()
+		if self._empty_lbl is not None:
+			self._empty_lbl.deleteLater()
+			self._empty_lbl = None
 
 	def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
 		self.thumb_cls = SquareThumb if JsonData.square_thumbs else Thumb
 		self.thumb_cls.calculate_size()
 
 		for image_item in db_images:
+			# при догрузке уже созданные миниатюры не пересоздаём
+			if image_item.rel_img_path in self.url_to_wid:
+				continue
+
 			data_item = DataItem(
 				base_qimage=image_item.base_qimage,
 				resized_qimages=image_item.resized_qimages,
@@ -1175,13 +1180,15 @@ class GridStandart(Grid):
 			thumbnail = self.thumb_cls(data_item)
 			thumbnail.set_no_frame()
 			self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
-			
+
+		self._loading_more = False
+
 		if not self.url_to_wid:
 			self.grid_wid.hide()
 			self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			self.scroll_layout.addStretch(1)
-			lbl = TransparentLabel(Lng.no_photo[JsonData.lng_index])
-			self.scroll_layout.addWidget(lbl, alignment=Qt.AlignmentFlag.AlignCenter)
+			self._empty_lbl = TransparentLabel(Lng.no_photo[JsonData.lng_index])
+			self.scroll_layout.addWidget(self._empty_lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 			self.scroll_layout.addStretch(1)
 		else:
 			self.rearrange()
@@ -1189,18 +1196,20 @@ class GridStandart(Grid):
 
 	def checkScrollValue(self, value: int):
 		super().checkScrollValue(value)
-		if value == self.verticalScrollBar().maximum():
+		sb = self.verticalScrollBar()
+		if sb.maximum() > 0 and not self._loading_more and value >= sb.maximum() - 50:
+			self._loading_more = True
 			self.load_more_thumbnails()
 
 	def dragEnterEvent(self, a0):
 		a0.acceptProposedAction()
 		return super().dragEnterEvent(a0)
-	
+
 	def dropEvent(self, a0):
 
 		if not a0.mimeData().hasUrls() or a0.source() is not None:
 			return
-		
+
 		elif Dynamic.search_words_list:
 			return
 
