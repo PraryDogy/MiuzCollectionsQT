@@ -16,7 +16,7 @@ from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
                            ScanerWorker)
 from system.shared_utils import ImgUtils
-from system.tasks import SetFav, UThreadPool, Utils
+from system.tasks import SetFav, UThreadPool, Utils, ThumbScale
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, USep, WarningWindow)
@@ -382,38 +382,37 @@ class WinMain(UMainWindow):
 		self.load_st_grid()
 		self.path_bar_update(Dynamic.current_dir)
 
+	def _on_thumb_ready(self, rel_img_path: str, base_qimage, resized_qimages):
+		wid = self.grid.url_to_wid.get(rel_img_path)  # сетка могла пересоздаться
+		if not wid:
+			return
+		wid.data_item.base_qimage = base_qimage
+		wid.data_item.resized_qimages = resized_qimages
+		wid.set_pixmap_with_actual_size()
+
 	@with_conn
 	def start_update_thumb(self, rel_paths: list[str]):
 
 		def poll_task():
-			alive = task.is_alive()  # сначала фиксируем состояние процесса
-			queue = task.process_queue  # локальная ссылка, а не self.*
+			alive = task.is_alive()
+			queue = task.process_queue
+			scaled_fn = Utils.scale_qimage_square if JsonData.square_thumbs else Utils.scale_qimage_dpr
 			while not queue.empty():
-				update_thumb_item: UpdateThumbItem = queue.get()
-				wid = self.grid.url_to_wid.get(update_thumb_item.rel_img_path)
-				if wid:
-					base_qimage = Utils.qimage_from_array(update_thumb_item.array)
-					resized_qimages = []
-					for i in Static.THUMB_WIDTHS:
-						x = scaled_fn(base_qimage, i)
-						resized_qimages.append(x)
-					wid.data_item.base_qimage = base_qimage
-					wid.data_item.resized_qimages = resized_qimages
-					wid.set_pixmap_with_actual_size()
+				item: UpdateThumbItem = queue.get()
+				if item.rel_img_path not in self.grid.url_to_wid:
+					continue
+				job = ThumbScale(item.rel_img_path, item.array, Static.THUMB_WIDTHS, scaled_fn)
+				job.sigs.finished_.connect(self._on_thumb_ready)
+				UThreadPool.start(job)
 			if alive:
 				QTimer.singleShot(700, poll_task)
 			else:
 				task.terminate_join()
-		scaled_fn = (
-			Utils.scale_qimage_square
-			if JsonData.square_thumbs
-			else Utils.scale_qimage_dpr
-		)
+
 		rel_set = set(rel_paths)
 		for url, wid in self.grid.url_to_wid.items():
 			if url in rel_set:
 				wid.img_wid.show_updating()
-
 		task = ProcessWorker(target=UpdateThumb.start, args=(Mf.current_mf, rel_paths))
 		self.update_thumb_task = task
 		task.start()

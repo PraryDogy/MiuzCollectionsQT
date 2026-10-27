@@ -697,3 +697,30 @@ class WriteNewThumb(URunnable):
 		if result:
 			qimage = Utils.qimage_from_array(scaled)
 			self.sigs.finished.emit(qimage)
+
+
+class ThumbScale(URunnable):
+	"""
+	Готовит миниатюры для сетки в фоновом потоке.
+	Читает массив изображения, создаёт QImage и масштабирует его до всех размеров из THUMB_WIDTHS.
+	QPixmap здесь не создаётся, потому что он допустим только в GUI-потоке.
+	Сигналы:
+	- finished_(str, QImage, list): rel_img_path, base_qimage, resized_qimages
+	"""
+
+	class Sigs(QObject):
+		finished_ = pyqtSignal(str, object, object)
+
+	def __init__(self, rel_img_path: str, img_array: np.ndarray,
+				 widths: list[int], scaled_fn: callable):
+		super().__init__()
+		self.sigs = ThumbScale.Sigs()
+		self.rel_img_path = rel_img_path
+		self.img_array = img_array  # массив уже скопирован из UpdateThumbItem
+		self.widths = list(widths)
+		self.scaled_fn = scaled_fn
+
+	def task(self):
+		base_qimage = Utils.qimage_from_array(self.img_array)
+		resized_qimages = [self.scaled_fn(base_qimage, w) for w in self.widths]
+		self.sigs.finished_.emit(self.rel_img_path, base_qimage, resized_qimages)
