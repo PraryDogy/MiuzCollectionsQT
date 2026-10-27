@@ -5,17 +5,12 @@ from cfg import JsonData, Static, Themes
 
 
 class TreeTheme:
-    """Базовый класс: параметры выделения строк дерева.
-
-    Синхронизировано с QSS: sel_color = UListWidget::item:selected,
-    sel_text = UListWidget::item color. При смене цветов в QSS
-    обновите этот файл вручную.
-    """
     sel_color = "#000000"
     sel_text = "#ffffff"
     sel_radius = 8
     h_margin = 4
     v_margin = 1
+    left_inset = 0      # левый край подсветки: 0 покрывает зону branch
 
 
 class DarkTreeTheme(TreeTheme):
@@ -25,6 +20,7 @@ class DarkTreeTheme(TreeTheme):
     sel_radius = 8
     h_margin = 4
     v_margin = 1
+    left_inset = -5     # подсветка начинается на 5 px левее viewport
 
 
 class LightTreeTheme(TreeTheme):
@@ -34,6 +30,7 @@ class LightTreeTheme(TreeTheme):
     sel_radius = 8
     h_margin = 4
     v_margin = 1
+    left_inset = -5
 
 
 class ThemeChanger:

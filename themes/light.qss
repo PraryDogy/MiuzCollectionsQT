@@ -561,12 +561,12 @@ USpinBox::down-arrow {
 
 UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
-    /* image: url(./icons/common/expand.svg); */
-    image: none;
+    image: url(./icons/common/expand.svg);
+    /* image: none; */
 }
 
 UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
-    /* image: url(./icons/common/collapse.svg); */
-    image: none;
+    image: url(./icons/common/collapse.svg);
+    /* image: none; */
 }

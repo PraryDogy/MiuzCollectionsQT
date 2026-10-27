@@ -5,20 +5,20 @@ from pathlib import Path
 from typing import Literal
 
 from PyQt6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
-                          pyqtSignal)
+						  pyqtSignal)
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-                         QFontMetrics, QIcon, QMouseEvent, QPainter,
-                         QPainterPath, QPalette)
+						 QFontMetrics, QIcon, QMouseEvent, QPainter,
+						 QPainterPath, QPalette)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
-                             QGroupBox, QHBoxLayout, QLabel, QLayout,
-                             QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
-                             QStackedWidget, QStyle, QStyledItemDelegate,
-                             QStyleOption, QStyleOptionViewItem, QTextEdit,
-                             QTreeView, QTreeWidget, QTreeWidgetItem,
-                             QVBoxLayout, QWidget)
+							 QGroupBox, QHBoxLayout, QLabel, QLayout,
+							 QLineEdit, QListWidget, QListWidgetItem,
+							 QMainWindow, QMenu, QProgressBar, QPushButton,
+							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
+							 QStackedWidget, QStyle, QStyledItemDelegate,
+							 QStyleOption, QStyleOptionViewItem, QTextEdit,
+							 QTreeView, QTreeWidget, QTreeWidgetItem,
+							 QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
@@ -339,62 +339,83 @@ class UListWidget(TransparentListWidget):
 		self.setIconSize(QSize(*self.ICON_SIZE))
 
 
+from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
+
+
 class RoundedRowDelegate(QStyledItemDelegate):
 
-    def paint(self, painter, option, index):
-        view = option.widget
-        is_selected = bool(option.state & QStyle.StateFlag.State_Selected)
+	def paint(self, painter, option, index):
+		view = option.widget
+		if view is None or index.column() != 0:
+			super().paint(painter, option, index)
+			return
 
-        if is_selected and index.column() == 0 and view is not None:
-            t = view.theme  # класс темы, см. UTreeWidget.theme
+		if view.selectionModel().isSelected(index):
+			text = QColor(view.theme.sel_text)
+			opt = QStyleOptionViewItem(option)
+			pal = QPalette(opt.palette)
+			pal.setColor(QPalette.ColorRole.Text, text)
+			pal.setColor(QPalette.ColorRole.HighlightedText, text)
+			opt.palette = pal
+			super().paint(painter, opt, index)
+			return
 
-            rect = QRectF(
-                t.h_margin,
-                option.rect.y() + t.v_margin,
-                view.viewport().width() - 2 * t.h_margin,
-                option.rect.height() - 2 * t.v_margin,
-            )
-            path = QPainterPath()
-            path.addRoundedRect(rect, t.sel_radius, t.sel_radius)
+		super().paint(painter, option, index)
 
-            painter.save()
-            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-            painter.fillPath(path, QColor(t.sel_color))
-            painter.restore()
 
-            text = QColor(t.sel_text)
-            opt = QStyleOptionViewItem(option)
-            opt.state &= ~QStyle.StateFlag.State_Selected
-            pal = QPalette(opt.palette)
-            pal.setColor(QPalette.ColorRole.Text, text)
-            pal.setColor(QPalette.ColorRole.HighlightedText, text)
-            opt.palette = pal
-            super().paint(painter, opt, index)
-            return
-
-        super().paint(painter, option, index)
 
 
 class UTreeWidget(TransparentTreeWidget):
-    ICON_SIZE = (16, 16)
+	ICON_SIZE = (16, 16)
+	BRANCH_ICON_X = 3   # x левого края иконки ветки от края viewport, подбирается по скриншоту
+	GAP = 5  # px между левым краем подсветки и иконкой
 
-    def __init__(self):
-        super().__init__()
-        self.horizontalScrollBar().setDisabled(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setIconSize(QSize(*self.ICON_SIZE))
-        self.setHeaderHidden(True)
-        self.setAutoScroll(False)
-        self.setIndentation(15)
-        self.setItemDelegate(RoundedRowDelegate(self))
+	def __init__(self):
+		super().__init__()
+		self.horizontalScrollBar().setDisabled(True)
+		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setIconSize(QSize(*self.ICON_SIZE))
+		self.setHeaderHidden(True)
+		self.setAutoScroll(False)
+		self.setIndentation(15)
+		self.setItemDelegate(RoundedRowDelegate(self))
 
-        pal = self.palette()
-        pal.setColor(QPalette.ColorRole.Highlight, QColor(0, 0, 0, 0))
-        self.setPalette(pal)
+		# Оставляем: без этой строки Qt снова рисует серый прямоугольник у branch
+		pal = self.palette()
+		pal.setColor(QPalette.ColorRole.Highlight, QColor(0, 0, 0, 0))
+		self.setPalette(pal)
 
-    @property
-    def theme(self) -> type[TreeTheme]:
-        return ThemeChanger.tree_theme
+	@property
+	def theme(self):
+		return ThemeChanger.tree_theme
+
+	def drawRow(self, painter, option, index):
+		if self.selectionModel().isSelected(index):
+			t = self.theme
+
+			# Абсолютная позиция: одна и та же для всех строк, потому что
+			# option.rect всегда начинается с края viewport
+			left = max(0, self.BRANCH_ICON_X - self.GAP)
+
+			rect = QRectF(
+				left,
+				option.rect.y() + t.v_margin,
+				self.viewport().width() - left - t.h_margin,
+				option.rect.height() - 2 * t.v_margin,
+			)
+			path = QPainterPath()
+			path.addRoundedRect(rect, t.sel_radius, t.sel_radius)
+
+			painter.save()
+			painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+			painter.fillPath(path, QColor(t.sel_color))
+			painter.restore()
+
+			option = QStyleOptionViewItem(option)
+			option.state &= ~QStyle.StateFlag.State_Selected
+
+		super().drawRow(painter, option, index)
 
 
 class UTreeView(TransparentTreeView):
