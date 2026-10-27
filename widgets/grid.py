@@ -15,7 +15,7 @@ from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
-from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool
+from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool, AppsScanner
 from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
@@ -582,10 +582,11 @@ class Grid(UScrollVerticalArea):
 		self.url_to_wid: dict[str, Thumb] = {}
 		self.files_to_copy = set()
 
-		self.image_apps = {
-			i: os.path.basename(i)
-			for i in SharedUtils.get_apps(Static.IMAGE_APPS)
-		}
+		# --- Приложения для «Открыть в…» (ищутся в фоне через URunnable) ---
+		self._image_apps: dict[str, str] = {}
+		self._apps_task = AppsScanner(Static.IMAGE_APPS)
+		self._apps_task.sigs.finished_.connect(self._on_apps_found)
+		UThreadPool.start(self._apps_task)
 
 		# --- Таймеры ---
 		self.resize_timer = QTimer(self)
@@ -637,6 +638,12 @@ class Grid(UScrollVerticalArea):
 		self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
 
 		self.verticalScrollBar().valueChanged.connect(self.checkScrollValue)
+
+	# --- Приложения ---
+
+	def _on_apps_found(self, apps: dict[str, str]):
+		# слот вызывается в GUI-потоке (сигнал пришёл из пула через очередь)
+		self._image_apps = apps
 
 	# --- Выделение ---
 
@@ -948,7 +955,8 @@ class Grid(UScrollVerticalArea):
 				open_menu.addAction(act)
 				open_menu.addSeparator()
 
-				for app_path, basename in self.image_apps.items():
+				# список уже найден в фоне; пока сканирование не закончилось, будет только «По умолчанию»
+				for app_path, basename in self._image_apps.items():
 					act = QAction(basename, open_menu)
 					act.triggered.connect(
 						lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))

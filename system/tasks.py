@@ -2,6 +2,7 @@ import os
 import traceback
 from dataclasses import dataclass
 from datetime import datetime, date
+from pathlib import Path
 
 import cv2
 # import imagehash
@@ -78,6 +79,58 @@ class SetFav(URunnable):
 			conn.execute(stmt)
 
 		self.sigs.finished_.emit(self.value)
+
+
+# ==========================================
+# Поиск приложений для «Открыть в…»
+# ==========================================
+
+APP_ROOTS = [Path("/Applications"), Path.home() / "Applications"]
+APP_MAX_DEPTH = 2  # /Applications и /Applications/<подпапка>, глубже не ходим
+
+
+def find_image_apps(app_names: list[str]) -> dict[str, str]:
+	"""Возвращает {путь к приложению: имя приложения, ...}."""
+	names = [k.lower() for k in app_names]
+	result: dict[str, str] = {}
+
+	def walk(directory: str, depth: int):
+		try:
+			with os.scandir(directory) as it:
+				for entry in it:
+					if not entry.is_dir(follow_symlinks=False):
+						continue
+					if entry.name.endswith(".app"):
+						if any(k in entry.name.lower() for k in names):
+							result[entry.path] = entry.name
+					elif depth < APP_MAX_DEPTH and not entry.name.startswith("."):
+						walk(entry.path, depth + 1)
+		except OSError:
+			pass
+
+	for root in APP_ROOTS:
+		if root.is_dir():
+			walk(str(root), 1)
+	return result
+
+
+class AppsScanner(URunnable):
+	"""
+	Ищет приложения для просмотра изображений в фоне.
+	Сигналы:
+	- finished_(dict): {путь к приложению: имя приложения, ...}
+	"""
+
+	class Sigs(QObject):
+		finished_ = pyqtSignal(dict)
+
+	def __init__(self, app_names: list[str]):
+		super().__init__()
+		self.sigs = AppsScanner.Sigs()
+		self.app_names = list(app_names)  # копия, чтобы поток не трогал чужие объекты
+
+	def task(self):
+		self.sigs.finished_.emit(find_image_apps(self.app_names))
 
 
 @dataclass(slots=True)
@@ -283,8 +336,6 @@ class MfDataCleaner(URunnable):
 		# удалять несуществующие пути к миниатюрам
 		# broken_thumb если есть то попытаться пересканить
 
-
-
 		with Dbase.main_engine.begin() as conn:
 			stmt = (
 				sqlalchemy.select(Thumbs.rel_thumb_path)
@@ -422,7 +473,7 @@ class ImagePreviewTask(URunnable):
 
 	def __init__(self, img_array: np.ndarray, size: tuple = None, radius: float = 16.0):
 		super().__init__()
-		self.sigs = ImgArrayQImage.Sigs()
+		self.sigs = ImagePreviewTask.Sigs()
 		self.size_ = size      # Логический размер виджета: tuple(width, height)
 		self.radius = radius   # Логический радиус скругления углов
 		self.img_array = img_array
