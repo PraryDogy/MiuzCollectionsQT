@@ -338,9 +338,6 @@ class UListWidget(TransparentListWidget):
 		self.setIconSize(QSize(*self.ICON_SIZE))
 
 
-
-
-
 class RoundedRowDelegate(QStyledItemDelegate):
 	RADIUS = 6          # радиус скругления
 	H_MARGIN = 4        # отступ от краёв viewport
