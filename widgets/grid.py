@@ -152,7 +152,7 @@ class Thumb(TransparentFrame):
 
 	def _add_captions(self):
 		self.v_lay.setContentsMargins(*self._margins())
-		self.v_lay.addSpacing(5)
+		self.v_lay.addSpacing(2)
 		self.white_text_wid = ThumbFilenameWid(self.data_item.filename)
 		self.v_lay.addWidget(self.white_text_wid, alignment=Qt.AlignmentFlag.AlignCenter)
 		self.blue_text_wid = self.blue_text_class(self.data_item)
