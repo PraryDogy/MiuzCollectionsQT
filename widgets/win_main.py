@@ -460,12 +460,16 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def open_in_app(self, rel_paths: list[str], app_path: str):
-		for i in rel_paths:
-			abs_path = Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
-			if app_path:
-				subprocess.Popen(["open", "-a", app_path, abs_path])
-			else:
-				subprocess.Popen(["open", abs_path])
+		abs_paths = [
+			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			for i in rel_paths
+		]
+		if not abs_paths:
+			return
+		cmd = ["open"]
+		if app_path:
+			cmd += ["-a", app_path]
+		subprocess.Popen(cmd + abs_paths)
 
 	@with_conn
 	def reveal_in_finder(self, rel_paths: list):
@@ -489,8 +493,8 @@ class WinMain(UMainWindow):
 	def remove_files(self, rel_paths: list, ms = 300):
 		
 		def poll_file_remover():
-			if not file_remover.process_queue.empty():
-				file_remover.process_queue.get()
+			while not file_remover.process_queue.empty():
+				file_remover.process_queue.get_nowait()
 			if not file_remover.is_alive():
 				file_remover.terminate_join()
 				for i in dirs_to_scan:
