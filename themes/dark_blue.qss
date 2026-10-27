@@ -154,8 +154,10 @@ QToolTip {
    #1d2833  НАВЕДЕНИЕ И ВЫДЕЛЕНИЕ
    Наведение на поля, кнопки, спинбокс и иконочные кнопки,
    выбранные пункты списков и меню, отметка в списке.
-   Выделение деревьев (UTreeView, UTreeWidget) рисует делегат,
-   поэтому здесь его нет.
+
+   ВАЖНО: при смене цвета UListWidget::item:selected или UMenu::item:selected
+   поменяйте sel_color в system/themes.py (класс DarkTreeTheme).
+   Выделение дерева (UTreeView, UTreeWidget) рисует делегат, здесь его нет.
    --------------------------------------------------------------------- */
 UPushButton:hover,
 ULineEdit:hover,
@@ -410,6 +412,15 @@ USlider::groove:horizontal {
 
 USlider::handle:horizontal {
     border-radius: 5px;
+}
+
+
+/* --- Скругление выделения пунктов списков и меню ---
+   Значение совпадает с sel_radius в system/themes.py (DarkTreeTheme). */
+UListWidget::item:selected,
+UListWidget::item:selected:!active,
+UMenu::item:selected {
+    border-radius: 6px;
 }
 
 

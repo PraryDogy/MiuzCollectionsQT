@@ -141,6 +141,9 @@ QToolTip {
 
 /* ---------------------------------------------------------------------
    #e3eaf2  НАВЕДЕНИЕ И ВЫДЕЛЕНИЕ
+   ВАЖНО: при смене цвета UListWidget::item:selected или UMenu::item:selected
+   поменяйте sel_color в system/themes.py (класс LightTreeTheme).
+   Выделение дерева (UTreeView, UTreeWidget) рисует делегат, здесь его нет.
    --------------------------------------------------------------------- */
 UPushButton:hover,
 ULineEdit:hover,
@@ -149,15 +152,9 @@ USpinBox:hover,
 _SvgWithThemeBg:hover[style="base"],
 UListWidget::indicator,
 UListWidget::indicator:disabled,
-UTreeView::item:selected,
 UListWidget::item:selected,
-UTreeWidget::item:selected,
-UTreeView::item:selected:!active,
 UListWidget::item:selected:!active,
-UTreeWidget::item:selected:!active,
-UMenu::item:selected,
-UTreeView::branch:selected,
-UTreeWidget::branch:selected {
+UMenu::item:selected {
     background: #e3eaf2;
 }
 
@@ -237,6 +234,7 @@ _SvgWithThemeBg[style="selected"] {
 _SvgWithThemeBg[style="pressed"] {
     background: #c9d5e3;
 }
+
 
 /* ---------------------------------------------------------------------
    #1a2430  ОСНОВНОЙ ТЕКСТ
@@ -398,6 +396,15 @@ USlider::handle:horizontal {
 }
 
 
+/* --- Скругление выделения пунктов списков и меню ---
+   Значение совпадает с sel_radius в system/themes.py (LightTreeTheme). */
+UListWidget::item:selected,
+UListWidget::item:selected:!active,
+UMenu::item:selected {
+    border-radius: 8px;
+}
+
+
 /* --- Отступы и размеры --- */
 UTreeView,
 UListWidget,
@@ -554,11 +561,12 @@ USpinBox::down-arrow {
 
 UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
-    image: url(./icons/common/expand.svg);
+    /* image: url(./icons/common/expand.svg); */
+    image: none;
 }
 
 UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
-    image: url(./icons/common/collapse.svg);
+    /* image: url(./icons/common/collapse.svg); */
+    image: none;
 }
-
