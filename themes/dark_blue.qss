@@ -362,7 +362,7 @@ WinImgViewGraphics,
 WinImageView,
 WinImgSearchPreviewWidget,
 Thumb {
-    border-radius: 14px;
+    border-radius: 8px;
 }
 SquareThumb {
     border-radius: 0px;
@@ -420,7 +420,7 @@ USlider::handle:horizontal {
 UListWidget::item:selected,
 UListWidget::item:selected:!active,
 UMenu::item:selected {
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 
