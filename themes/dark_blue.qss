@@ -420,7 +420,7 @@ USlider::handle:horizontal {
 UListWidget::item:selected,
 UListWidget::item:selected:!active,
 UMenu::item:selected {
-    border-radius: 6px;
+    border-radius: 8px;
 }
 
 

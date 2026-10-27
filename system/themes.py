@@ -13,7 +13,7 @@ class TreeTheme:
     """
     sel_color = "#000000"
     sel_text = "#ffffff"
-    sel_radius = 6
+    sel_radius = 8
     h_margin = 4
     v_margin = 1
 
@@ -22,7 +22,7 @@ class DarkTreeTheme(TreeTheme):
     # dark.qss: UListWidget::item:selected, UMenu::item:selected
     sel_color = "#1d2833"
     sel_text = "#ffffff"
-    sel_radius = 6
+    sel_radius = 8
     h_margin = 4
     v_margin = 1
 
