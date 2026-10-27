@@ -564,7 +564,7 @@ class Grid(UScrollVerticalArea):
 	collage = pyqtSignal(list)
 	open_filters_win = pyqtSignal()
 
-	resize_ms = 10
+	resize_ms = 50
 	thumb_cls = Thumb
 	copy_files_path = Static.COMMON_ICONS / "copy_files.svg"
 
@@ -586,6 +586,11 @@ class Grid(UScrollVerticalArea):
 			i: os.path.basename(i)
 			for i in SharedUtils.get_apps(Static.IMAGE_APPS)
 		}
+
+
+		self._cols = 0
+		self._spacing = -1
+		self.ordered: list[Thumb] = []   # порядок отображения, индекс = позиция в сетке
 
 		# --- Таймеры ---
 		self.resize_timer = QTimer(self)
@@ -662,17 +667,24 @@ class Grid(UScrollVerticalArea):
 			return 1
 		return max(1, total_w // thumb_w)
 
-	def rearrange(self):
-		self.grid_wid.hide()
-		self.grid_lay.setSpacing(self.get_grid_spacing())
-		max_col = self.get_max_columns()
-		self.cell_to_wid.clear()
-		for x, thumb in enumerate(self.url_to_wid.values()):
-			row, col = divmod(x, max_col)
-			self.cell_to_wid[row, col] = thumb
-			thumb.row, thumb.col = row, col
+	def rearrange(self, force=False):
+		spacing = self.get_grid_spacing()
+		cols = self.get_max_columns()
+		if not force and cols == self._cols and spacing == self._spacing:
+			return  # раскладка не изменилась, ничего не делаем
+
+		self._cols, self._spacing = cols, spacing
+		self.ordered = list(self.url_to_wid.values())
+
+		self.grid_wid.setUpdatesEnabled(False)
+		self.grid_lay.setSpacing(spacing)
+		for x, thumb in enumerate(self.ordered):
+			row, col = divmod(x, cols)
+			thumb.idx, thumb.row, thumb.col = x, row, col
+			self.grid_lay.removeWidget(thumb)
 			self.grid_lay.addWidget(thumb, row, col)
-		self.grid_wid.show()
+		self.cell_to_wid = {(t.row, t.col): t for t in self.ordered}
+		self.grid_wid.setUpdatesEnabled(True)
 
 	def resize_thumbnails(self):
 		self.thumb_cls.calculate_size()
