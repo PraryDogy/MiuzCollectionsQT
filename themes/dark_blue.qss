@@ -580,12 +580,12 @@ USpinBox::down-arrow {
 
 UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
-    image: url(./icons/common/expand.svg);
+    image: url(./icons/common/expand_r.svg);
     /* image: none; */
 }
 
 UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
-    image: url(./icons/common/collapse.svg);
+    image: url(./icons/common/collapse_r.svg);
     /* image: none; */
 }
