@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
+from system.themes import ThemeChanger, TreeTheme
 from system.utils import Utils
 
 
@@ -339,64 +340,61 @@ class UListWidget(TransparentListWidget):
 
 
 class RoundedRowDelegate(QStyledItemDelegate):
-	RADIUS = 6          # радиус скругления
-	H_MARGIN = 4        # отступ от краёв viewport
-	V_MARGIN = 1        # отступ сверху/снизу
-	SEL_COLOR = QColor(60, 110, 200)
-	SEL_TEXT_COLOR = QColor(255, 255, 255)
 
-	def paint(self, painter, option, index):
-		is_selected = bool(option.state & QStyle.StateFlag.State_Selected)
+    def paint(self, painter, option, index):
+        view = option.widget
+        is_selected = bool(option.state & QStyle.StateFlag.State_Selected)
 
-		if is_selected and index.column() == 0:
-			view = self.parent()
-			vp_width = view.viewport().width()
+        if is_selected and index.column() == 0 and view is not None:
+            t = view.theme  # класс темы, см. UTreeWidget.theme
 
-			# Прямоугольник на всю ширину строки, включая зону отступов (branch)
-			rect = QRectF(
-				self.H_MARGIN,
-				option.rect.y() + self.V_MARGIN,
-				vp_width - 2 * self.H_MARGIN,
-				option.rect.height() - 2 * self.V_MARGIN,
-			)
+            rect = QRectF(
+                t.h_margin,
+                option.rect.y() + t.v_margin,
+                view.viewport().width() - 2 * t.h_margin,
+                option.rect.height() - 2 * t.v_margin,
+            )
+            path = QPainterPath()
+            path.addRoundedRect(rect, t.sel_radius, t.sel_radius)
 
-			path = QPainterPath()
-			path.addRoundedRect(rect, self.RADIUS, self.RADIUS)
+            painter.save()
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.fillPath(path, QColor(t.sel_color))
+            painter.restore()
 
-			painter.save()
-			painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-			painter.fillPath(path, self.SEL_COLOR)
-			painter.restore()
+            text = QColor(t.sel_text)
+            opt = QStyleOptionViewItem(option)
+            opt.state &= ~QStyle.StateFlag.State_Selected
+            pal = QPalette(opt.palette)
+            pal.setColor(QPalette.ColorRole.Text, text)
+            pal.setColor(QPalette.ColorRole.HighlightedText, text)
+            opt.palette = pal
+            super().paint(painter, opt, index)
+            return
 
-			# Рисуем текст/иконку без системного выделения, своим цветом
-			opt = QStyleOptionViewItem(option)
-			opt.state &= ~QStyle.StateFlag.State_Selected
-			pal = QPalette(opt.palette)
-			pal.setColor(QPalette.ColorRole.Text, self.SEL_TEXT_COLOR)
-			pal.setColor(QPalette.ColorRole.HighlightedText, self.SEL_TEXT_COLOR)
-			opt.palette = pal
-			super().paint(painter, opt, index)
-			return
-
-		super().paint(painter, option, index)
+        super().paint(painter, option, index)
 
 
 class UTreeWidget(TransparentTreeWidget):
-	ICON_SIZE = (16, 16)
+    ICON_SIZE = (16, 16)
 
-	def __init__(self):
-		super().__init__()
-		self.horizontalScrollBar().setDisabled(True)
-		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setIconSize(QSize(*self.ICON_SIZE))
-		self.setHeaderHidden(True)
-		self.setAutoScroll(False)
-		self.setIndentation(15)
-		self.setItemDelegate(RoundedRowDelegate(self))
-		pal = self.palette()
-		pal.setColor(QPalette.ColorRole.Highlight, QColor(0, 0, 0, 0))
-		self.setPalette(pal)
+    def __init__(self):
+        super().__init__()
+        self.horizontalScrollBar().setDisabled(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setIconSize(QSize(*self.ICON_SIZE))
+        self.setHeaderHidden(True)
+        self.setAutoScroll(False)
+        self.setIndentation(15)
+        self.setItemDelegate(RoundedRowDelegate(self))
 
+        pal = self.palette()
+        pal.setColor(QPalette.ColorRole.Highlight, QColor(0, 0, 0, 0))
+        self.setPalette(pal)
+
+    @property
+    def theme(self) -> type[TreeTheme]:
+        return ThemeChanger.tree_theme
 
 
 class UTreeView(TransparentTreeView):
