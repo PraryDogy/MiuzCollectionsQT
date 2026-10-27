@@ -153,7 +153,9 @@ QToolTip {
 /* ---------------------------------------------------------------------
    #1d2833  НАВЕДЕНИЕ И ВЫДЕЛЕНИЕ
    Наведение на поля, кнопки, спинбокс и иконочные кнопки,
-   выбранные пункты списков, деревьев и меню, ветки дерева, отметка в списке
+   выбранные пункты списков и меню, отметка в списке.
+   Выделение деревьев (UTreeView, UTreeWidget) рисует делегат,
+   поэтому здесь его нет.
    --------------------------------------------------------------------- */
 UPushButton:hover,
 ULineEdit:hover,
@@ -162,15 +164,9 @@ USpinBox:hover,
 _SvgWithThemeBg:hover[style="base"],
 UListWidget::indicator,
 UListWidget::indicator:disabled,
-UTreeView::item:selected,
 UListWidget::item:selected,
-UTreeWidget::item:selected,
-UTreeView::item:selected:!active,
 UListWidget::item:selected:!active,
-UTreeWidget::item:selected:!active,
-UMenu::item:selected,
-UTreeView::branch:selected,
-UTreeWidget::branch:selected {
+UMenu::item:selected {
     background: #1d2833;
 }
 
@@ -573,10 +569,12 @@ USpinBox::down-arrow {
 
 UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
-    image: url(./icons/common/expand.svg);
+    /* image: url(./icons/common/expand.svg); */
+    image: none;
 }
 
 UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
-    image: url(./icons/common/collapse.svg);
+    /* image: url(./icons/common/collapse.svg); */
+    image: none;
 }

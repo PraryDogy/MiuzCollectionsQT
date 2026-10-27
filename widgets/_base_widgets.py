@@ -4,22 +4,27 @@ import sys
 from pathlib import Path
 from typing import Literal
 
-from PyQt6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import (QAction, QCloseEvent, QContextMenuEvent, QFontMetrics,
-						 QIcon, QMouseEvent)
+from PyQt6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
+                          pyqtSignal)
+from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
+                         QFontMetrics, QIcon, QMouseEvent, QPainter,
+                         QPainterPath, QPalette)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
-							 QGroupBox, QHBoxLayout, QLabel, QLayout,
-							 QLineEdit, QListWidget, QListWidgetItem,
-							 QMainWindow, QMenu, QProgressBar, QPushButton,
-							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
-							 QStackedWidget, QTextEdit, QTreeView, QTreeWidget,
-							 QTreeWidgetItem, QVBoxLayout, QWidget)
+                             QGroupBox, QHBoxLayout, QLabel, QLayout,
+                             QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QProgressBar, QPushButton,
+                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
+                             QStackedWidget, QStyle, QStyledItemDelegate,
+                             QStyleOption, QStyleOptionViewItem, QTextEdit,
+                             QTreeView, QTreeWidget, QTreeWidgetItem,
+                             QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.lang import Lng
-from system.utils import Utils
 from system.main_folder import Mf
+from system.utils import Utils
+
 
 class TransparentButton(QPushButton):
 	def __init__(self, text="", parent=None):
@@ -333,6 +338,52 @@ class UListWidget(TransparentListWidget):
 		self.setIconSize(QSize(*self.ICON_SIZE))
 
 
+
+
+
+class RoundedRowDelegate(QStyledItemDelegate):
+	RADIUS = 6          # радиус скругления
+	H_MARGIN = 4        # отступ от краёв viewport
+	V_MARGIN = 1        # отступ сверху/снизу
+	SEL_COLOR = QColor(60, 110, 200)
+	SEL_TEXT_COLOR = QColor(255, 255, 255)
+
+	def paint(self, painter, option, index):
+		is_selected = bool(option.state & QStyle.StateFlag.State_Selected)
+
+		if is_selected and index.column() == 0:
+			view = self.parent()
+			vp_width = view.viewport().width()
+
+			# Прямоугольник на всю ширину строки, включая зону отступов (branch)
+			rect = QRectF(
+				self.H_MARGIN,
+				option.rect.y() + self.V_MARGIN,
+				vp_width - 2 * self.H_MARGIN,
+				option.rect.height() - 2 * self.V_MARGIN,
+			)
+
+			path = QPainterPath()
+			path.addRoundedRect(rect, self.RADIUS, self.RADIUS)
+
+			painter.save()
+			painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+			painter.fillPath(path, self.SEL_COLOR)
+			painter.restore()
+
+			# Рисуем текст/иконку без системного выделения, своим цветом
+			opt = QStyleOptionViewItem(option)
+			opt.state &= ~QStyle.StateFlag.State_Selected
+			pal = QPalette(opt.palette)
+			pal.setColor(QPalette.ColorRole.Text, self.SEL_TEXT_COLOR)
+			pal.setColor(QPalette.ColorRole.HighlightedText, self.SEL_TEXT_COLOR)
+			opt.palette = pal
+			super().paint(painter, opt, index)
+			return
+
+		super().paint(painter, option, index)
+
+
 class UTreeWidget(TransparentTreeWidget):
 	ICON_SIZE = (16, 16)
 
@@ -341,10 +392,14 @@ class UTreeWidget(TransparentTreeWidget):
 		self.horizontalScrollBar().setDisabled(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setIconSize(QSize(*self.ICON_SIZE))
-
 		self.setHeaderHidden(True)
 		self.setAutoScroll(False)
 		self.setIndentation(15)
+		self.setItemDelegate(RoundedRowDelegate(self))
+		pal = self.palette()
+		pal.setColor(QPalette.ColorRole.Highlight, QColor(0, 0, 0, 0))
+		self.setPalette(pal)
+
 
 
 class UTreeView(TransparentTreeView):
