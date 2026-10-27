@@ -17,10 +17,11 @@
    #f1f4f7  фон кнопок, полей ввода, спинбокса, тултипа
    #e3eaf2  наведение, выделение, отметка в списке
    #d5dfeb  нажатие, фон миниатюры в рамке
-   #d0d9e3  рамка панелей и полей, дорожка слайдера
+   #d0d9e3  рамка панелей и полей, дорожка слайдера, ползунок полосы прокрутки
    #dde6f0  иконочные кнопки: выбрано
-   #b8c4d2  рамка при наведении, чекбоксы
+   #b8c4d2  рамка при наведении, чекбоксы, полоса прокрутки при наведении
    #c9d5e3  иконочная кнопка: нажатие
+   #9aa8b8  полоса прокрутки: нажатие
    #0059d1  синий акцент: ActiveButton, синий тег, рамка выбранной миниатюры
    #e5e9ee  серый тег
    #d1fae5  зелёный тег
@@ -237,6 +238,39 @@ _SvgWithThemeBg[style="pressed"] {
 
 
 /* ---------------------------------------------------------------------
+   #d0d9e3 / #b8c4d2 / #9aa8b8  ПОЛОСА ПРОКРУТКИ
+   Ползунок: обычный, при наведении, при нажатии.
+   Фон дорожки прозрачный, чтобы полоса не выделялась на панели.
+   --------------------------------------------------------------------- */
+QScrollBar {
+    background: transparent;
+    border: none;
+}
+
+QScrollBar::handle:vertical,
+QScrollBar::handle:horizontal {
+    background: #d0d9e3;
+}
+
+QScrollBar::handle:vertical:hover,
+QScrollBar::handle:horizontal:hover {
+    background: #b8c4d2;
+}
+
+QScrollBar::handle:vertical:pressed,
+QScrollBar::handle:horizontal:pressed {
+    background: #9aa8b8;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: transparent;
+}
+
+
+/* ---------------------------------------------------------------------
    #1a2430  ОСНОВНОЙ ТЕКСТ
    --------------------------------------------------------------------- */
 UPushButton,
@@ -401,7 +435,7 @@ USlider::handle:horizontal {
 UListWidget::item:selected,
 UListWidget::item:selected:!active,
 UMenu::item:selected {
-    border-radius: 6px;
+    border-radius: 8px;
 }
 
 
@@ -530,6 +564,41 @@ ThumbMiuzBlueTextWidget {
 }
 
 
+/* --- Полоса прокрутки ---
+   width и height задают полный размер области, margin отступает от краёв.
+   Видимая ширина = width - margin слева - margin справа = 8px.
+   border-radius ползунка = половина видимой ширины (4px). */
+QScrollBar:vertical {
+    width: 14px;
+    margin: 4px 3px 4px 3px;
+}
+
+QScrollBar:horizontal {
+    height: 14px;
+    margin: 3px 4px 3px 4px;
+}
+
+QScrollBar::handle:vertical {
+    min-height: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    height: 0px;
+    width: 0px;
+    border: none;
+    background: none;
+}
+
+
 /* --- Иконки --- */
 UMenu::indicator:checked,
 UListWidget::indicator:checked,
@@ -561,12 +630,10 @@ USpinBox::down-arrow {
 
 UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
-    image: url(./icons/common/expand.svg);
-    /* image: none; */
+    image: url(./icons/common/expand_r.svg);
 }
 
 UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
-    image: url(./icons/common/collapse.svg);
-    /* image: none; */
+    image: url(./icons/common/collapse_r.svg);
 }

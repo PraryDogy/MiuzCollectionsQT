@@ -20,10 +20,10 @@
    #18212a  фон кнопок, полей ввода, спинбокса, тултипа
    #1d2833  наведение, выделение, отметка в списке, иконочные кнопки при наведении
    #202c38  нажатие, фон миниатюры в рамке
-   #263440  рамка панелей и полей, дорожка слайдера
+   #263440  рамка панелей и полей, дорожка слайдера, ползунок полосы прокрутки
    #283645  иконочные кнопки: выбрано
-   #30404f  рамка при наведении, чекбоксы, тег transparent
-   #3a4b5e  иконочная кнопка: нажатие
+   #30404f  рамка при наведении, чекбоксы, тег transparent, полоса прокрутки при наведении
+   #3a4b5e  иконочная кнопка: нажатие, полоса прокрутки: нажатие
    #0059d1  синий акцент: ActiveButton, синий тег, подпись миниатюры
    #303b46  серый тег
    #064e3b  зелёный тег
@@ -254,6 +254,38 @@ _SvgWithThemeBg[style="pressed"] {
     background: #3A4B5E;
 }
 
+
+/* ---------------------------------------------------------------------
+   #263440 / #30404f / #3a4b5e  ПОЛОСА ПРОКРУТКИ
+   Ползунок: обычный, при наведении, при нажатии.
+   Фон дорожки прозрачный, чтобы полоса не выделялась на панели.
+   --------------------------------------------------------------------- */
+QScrollBar {
+    background: transparent;
+    border: none;
+}
+
+QScrollBar::handle:vertical,
+QScrollBar::handle:horizontal {
+    background: #263440;
+}
+
+QScrollBar::handle:vertical:hover,
+QScrollBar::handle:horizontal:hover {
+    background: #30404f;
+}
+
+QScrollBar::handle:vertical:pressed,
+QScrollBar::handle:horizontal:pressed {
+    background: #3a4b5e;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: transparent;
+}
 
 
 /* ---------------------------------------------------------------------
@@ -546,6 +578,41 @@ ThumbFilenameWid,
 ThumbBlueTextWidget,
 ThumbMiuzBlueTextWidget {
     font-size: 11px;
+}
+
+
+/* --- Полоса прокрутки ---
+   width и height задают полный размер области, margin отступает от краёв.
+   Видимая ширина = width - margin слева - margin справа = 8px.
+   border-radius ползунка = половина видимой ширины (4px). */
+QScrollBar:vertical {
+    width: 14px;
+    margin: 4px 3px 4px 3px;
+}
+
+QScrollBar:horizontal {
+    height: 14px;
+    margin: 3px 4px 3px 4px;
+}
+
+QScrollBar::handle:vertical {
+    min-height: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    height: 0px;
+    width: 0px;
+    border: none;
+    background: none;
 }
 
 
