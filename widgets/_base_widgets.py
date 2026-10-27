@@ -339,10 +339,6 @@ class UListWidget(TransparentListWidget):
 		self.setIconSize(QSize(*self.ICON_SIZE))
 
 
-from PyQt6.QtGui import QColor, QPalette
-from PyQt6.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
-
-
 class RoundedRowDelegate(QStyledItemDelegate):
 
 	def paint(self, painter, option, index):
@@ -362,8 +358,6 @@ class RoundedRowDelegate(QStyledItemDelegate):
 			return
 
 		super().paint(painter, option, index)
-
-
 
 
 class UTreeWidget(TransparentTreeWidget):
