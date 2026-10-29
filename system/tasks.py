@@ -350,6 +350,7 @@ class MfDataCleaner(URunnable):
 				.where(Dirs.mf_alias == self.mf_alias)
 			)
 		conn.execute(stmt)
+		return True
 
 	def get_rel_thumb_paths(self, conn: sqlalchemy.Connection):
 		stmt = (
@@ -364,8 +365,8 @@ class MfDataCleaner(URunnable):
 			.where(Thumbs.rel_thumb_path.in_(rel_paths))
 			.where(Thumbs.mf_alias==self.mf_alias)
 		)
-
 		conn.execute(stmt)
+		return True
 
 	def get_non_exist_rel_paths(self, rel_paths: list[str]):
 		non_exist_thumbs = []
