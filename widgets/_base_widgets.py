@@ -37,9 +37,9 @@ class TransparentLabel(QLabel):
 	sym_paragraph_sep = "\u2029"
 
 	def __init__(self, text="", parent=None):
-		super().__init__(text, parent)
+		super().__init__(text or "", parent)
 
-		self._original_text = text
+		self._original_text = text or ""
 		self._elide_enabled = False
 		self._context_menu_enabled = False
 
@@ -123,7 +123,6 @@ class TransparentLabel(QLabel):
 			if self._elide_enabled and text != self._original_text
 			else ""
 		)
-
 
 	def resizeEvent(self, event):
 		super().resizeEvent(event)

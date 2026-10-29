@@ -24,10 +24,13 @@ class BarBottomSlider(USlider):
 
 class BarBottomLeftLabel(GrayTextLabel):
 	interval_ms = 1000  # 1 секунда
+	ww = 320
 
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	def __init__(self):
+		super().__init__("")
 		self.set_font_size(11)
+		self.set_elide(True)
+		self.setFixedWidth(self.ww)
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self.timer = QTimer(self)
 		self.timer.timeout.connect(self.update_timer_text)
@@ -89,18 +92,15 @@ class BarBottom(TransparentWidget):
 		self.progress_bar.setText("")
 		self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
 
-		self.h_layout.addStretch()
+		# --- Подпись выделения строго по центру ---
+		self.h_layout.addStretch(1)
 		self.selection_label = GrayTextLabel("")
 		self.selection_label.set_font_size(11)
 		self.h_layout.addWidget(self.selection_label)
-		self.h_layout.addStretch()
+		self.h_layout.addStretch(1)
 
-		# --- Разделитель перед слайдером ---
-		self.h_layout.addStretch()
-
-		# --- Слайдер изменения размера миниатюр ---
+		# --- Слайдер справа ---
 		self.slider = BarBottomSlider()
-
 		self.slider.setOrientation(Qt.Orientation.Horizontal)
 		self.slider.setMinimum(0)
 		self.slider.setMaximum(len(Static.THUMB_WIDTHS) - 1)
