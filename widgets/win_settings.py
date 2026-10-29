@@ -553,16 +553,23 @@ class MfSettings(TransparentWidget):
 		self.remove_folder.setIcon(QIcon(str(self.trash_svg)))
 		self.buttons_layout.addWidget(self.remove_folder)
 
-		# self.buttons_layout.addStretch()
+
+		save_container = TransparentWidget()
+		main_lay.addWidget(save_container)
+		save_layout = QHBoxLayout(save_container)
+		save_layout.setContentsMargins(0, 0, 0, 0)
+		save_layout.setSpacing(5)
+
+		save_layout.addStretch()
 
 		self.save_text = GrayTextLabel("Есть несохраненные изменения")
-		# self.buttons_layout.addWidget(self.save_text)
+		save_layout.addWidget(self.save_text)
 		self.save_text.hide()
 
 		self.save_button = ActiveButton(Lng.save[JsonData.lng_index])
 		self.save_button.setIcon(QIcon(str(self.save_svg)))
 		self.save_button.clicked.connect(self.save_mf_settings)
-		self.buttons_layout.addWidget(self.save_button)
+		save_layout.addWidget(self.save_button)
 
 		main_lay.addStretch()
 
