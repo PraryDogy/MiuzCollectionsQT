@@ -331,39 +331,49 @@ class MfDataCleaner(URunnable):
 		self.sigs.finished_.emit()
 
 	def _task(self):
-		# сейчас он просто удаляет dirs и несуществующие миниатюры
-		# а надо удалять dirs для перескана
-		# удалять дубликаты из базы данных?
-		# удалять несуществующие пути к миниатюрам
-		# broken_thumb если есть то попытаться пересканить
-
+		"""
+		Удаляет содержимое Dirs table по mf alias
+		Проверяет существует ли миниатюра по записи БД thumbs по mf alias
+		Удаляет записи, миниатюры которых не существует
+		"""
 		with Dbase.main_engine.begin() as conn:
-			stmt = (
-				sqlalchemy.select(Thumbs.rel_thumb_path)
-				.where(Thumbs.mf_alias == self.mf_alias)
-			)
-			rel_thumb_paths = conn.execute(stmt).scalars().all()
+			self.clean_dir_table(conn)
 
-			stmt = (
+			rel_paths = self.get_rel_thumb_paths(conn)
+			non_exist_paths = self.get_non_exist_rel_paths(rel_paths)
+			self.del_rel_thumb_paths(conn, non_exist_paths)
+
+
+	def clean_dir_table(self, conn: sqlalchemy.Connection):
+		stmt = (
 				sqlalchemy.delete(Dirs.table)
 				.where(Dirs.mf_alias == self.mf_alias)
 			)
-			conn.execute(stmt)
+		conn.execute(stmt)
 
-			non_exist_thumbs = []
+	def get_rel_thumb_paths(self, conn: sqlalchemy.Connection):
+		stmt = (
+			sqlalchemy.select(Thumbs.rel_thumb_path)
+			.where(Thumbs.mf_alias == self.mf_alias)
+		)
+		return conn.execute(stmt).scalars().all()
 
-			for i in rel_thumb_paths:
-				abs_thumb_path = Utils.get_abs_thumb_path(i)
-				if not os.path.exists(abs_thumb_path):
-					non_exist_thumbs.append(i)
-			
-			stmt = (
-				sqlalchemy.delete(Thumbs.table)
-				.where(Thumbs.rel_thumb_path.in_(non_exist_thumbs))
-				.where(Thumbs.mf_alias==self.mf_alias)
-			)
+	def del_rel_thumb_paths(self, conn: sqlalchemy.Connection, rel_paths):
+		stmt = (
+			sqlalchemy.delete(Thumbs.table)
+			.where(Thumbs.rel_thumb_path.in_(rel_paths))
+			.where(Thumbs.mf_alias==self.mf_alias)
+		)
 
-			conn.execute(stmt)
+		conn.execute(stmt)
+
+	def get_non_exist_rel_paths(self, rel_paths: list[str]):
+		non_exist_thumbs = []
+		for i in rel_paths:
+			abs_thumb_path = Utils.get_abs_thumb_path(i)
+			if not os.path.exists(abs_thumb_path):
+				non_exist_thumbs.append(i)
+		return non_exist_thumbs
 
 
 class DbDirsLoader(URunnable):
