@@ -510,13 +510,13 @@ class MfRepairWidget(UGroupBox):
 		super().__init__(title, parent)
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(10, 10, 10, 10)
-		self.v_lay.setSpacing(10)
+		self.v_lay.setSpacing(0)
 
-		title_widget = TitleTextLabel(
+		title_layout = TitleTextLabel(
 			Lng.repair_mf[JsonData.lng_index],
 			self.svg_path
 		)
-		self.v_lay.addWidget(title_widget)
+		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())
 
@@ -526,11 +526,67 @@ class MfRepairWidget(UGroupBox):
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
 
-		title_widget.h_layout.addStretch()
+		button_container = TransparentWidget()
+		self.v_lay.addWidget(button_container)
+		button_layout = QHBoxLayout(button_container)
+		button_layout.setContentsMargins(0, 0, 0, 0)
+		button_layout.setSpacing(10)
 
-		self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
+		button_layout.addStretch()
+
+		start_descr = GrayTextLabel("Приложение будет перезапущено")
+		button_layout.addWidget(start_descr)
+
+		self.start_btn = ActiveButton("Исправить")
+		self.start_btn.setIcon(QIcon(str(self.svg_path)))
 		self.start_btn.clicked.connect(self.start_clicked)
-		title_widget.h_layout.addWidget(self.start_btn)
+		button_layout.addWidget(self.start_btn)
+
+		self.setFixedHeight(self.sizeHint().height())
+
+
+
+
+
+class MfRemoveWidget(UGroupBox):
+	svg_path = Static.COMMON_ICONS / "trash.svg"
+	start_clicked = pyqtSignal()
+
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(10, 10, 10, 10)
+		self.v_lay.setSpacing(0)
+
+		title_layout = TitleTextLabel(
+			Lng.remove_folder[JsonData.lng_index],
+			self.svg_path
+		)
+		self.v_lay.addWidget(title_layout)
+
+		self.v_lay.addWidget(USep())
+
+		descr = GrayTextLabel(
+			"Каталог будет полностью удален из приложения. Все изорбажения на диске удалены не будут."
+		)
+		descr.setWordWrap(True)
+		self.v_lay.addWidget(descr)
+
+		button_container = TransparentWidget()
+		self.v_lay.addWidget(button_container)
+		button_layout = QHBoxLayout(button_container)
+		button_layout.setContentsMargins(0, 0, 0, 0)
+		button_layout.setSpacing(10)
+
+		button_layout.addStretch()
+
+		start_descr = GrayTextLabel("Приложение будет перезапущено")
+		button_layout.addWidget(start_descr)
+
+		self.start_btn = ActiveButton("Удалить")
+		self.start_btn.setIcon(QIcon(str(self.svg_path)))
+		self.start_btn.clicked.connect(self.start_clicked)
+		button_layout.addWidget(self.start_btn)
 
 		self.setFixedHeight(self.sizeHint().height())
 
@@ -577,24 +633,10 @@ class MfSettings(UScrollVerticalArea):
 		self.repair_widget = MfRepairWidget()
 		self.repair_widget.start_clicked.connect(self.repair_mf)
 		main_lay.addWidget(self.repair_widget)
-	
 
-		self.buttons_container = TransparentWidget()
-		main_lay.addWidget(self.buttons_container)
-		self.buttons_layout = QHBoxLayout(self.buttons_container)
-		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
-		self.buttons_layout.setSpacing(5)
-
-		self.buttons_layout.addStretch()
-
-		# self.repair_button = UPushButton(Lng.repair_mf[JsonData.lng_index])
-		# self.repair_button.setIcon(QIcon(str(self.repair_svg)))
-		# self.buttons_layout.addWidget(self.repair_button)
-
-		self.remove_folder = UPushButton(Lng.remove_folder[JsonData.lng_index])
-		self.remove_folder.setIcon(QIcon(str(self.trash_svg)))
-		self.buttons_layout.addWidget(self.remove_folder)
-
+		self.remove_folder = MfRemoveWidget()
+		self.remove_folder.start_clicked.connect(self.remove_mf)
+		main_lay.addWidget(self.remove_folder)
 
 		save_container = TransparentWidget()
 		main_lay.addWidget(save_container)
