@@ -638,3 +638,20 @@ class Lng:
 		"Вид",
 		"View"
 	)
+	# «Выделено N объект(ов)»: префикс и три формы для русского, две для английского
+	selected_prefix = (
+		"Выделено",
+		"Selected",
+	)
+	selected_objects_one = (
+		"объект",
+		"object",
+	)
+	selected_objects_few = (
+		"объекта",
+		"objects",
+	)
+	selected_objects_many = (
+		"объектов",
+		"objects",
+	)
