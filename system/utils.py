@@ -36,12 +36,15 @@ class Utils:
 			return None
 
 	@classmethod
-	def scale_qimage_dpr(cls, qimage: QImage, size: int, dpr: int = Static.DPR):
+	def scale_qimage_dpr(cls, qimage: QImage, size: int, dpr: int = Static.DPR,
+						smooth: bool = True) -> QImage:
+		mode = Qt.TransformationMode.SmoothTransformation if smooth \
+			else Qt.TransformationMode.FastTransformation
 		scaled = qimage.scaled(
 			int(size * dpr),
 			int(size * dpr),
 			Qt.AspectRatioMode.KeepAspectRatio,
-			Qt.TransformationMode.SmoothTransformation
+			mode
 		)
 		scaled.setDevicePixelRatio(dpr)
 		return scaled

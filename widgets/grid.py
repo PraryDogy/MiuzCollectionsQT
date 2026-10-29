@@ -131,6 +131,7 @@ class Thumb(TransparentFrame):
 	frame_h = 0     # полная высота виджета Thumb
 	blue_text_class = ThumbBlueTextWidget
 	BORDER_W = 2  # должна совпадать с border в QSS для Thumb и SquareThumb
+	fast_scale = False
 
 	def __init__(self, data_item: DataItem, parent=None):
 		super().__init__(parent)
@@ -142,6 +143,7 @@ class Thumb(TransparentFrame):
 		self._size_key = None
 		self._pixmap_index = None
 		self._framed = False
+		self._pixmap_fast = False  # картинка сейчас нарисована быстрым методом
 
 		# --- Layout ---
 		self.v_lay = QVBoxLayout(self)
@@ -235,16 +237,29 @@ class Thumb(TransparentFrame):
 
 	def set_pixmap_with_actual_size(self, force: bool = False):
 		idx = Dynamic.current_pixmap_size_index
-		if not force and self._pixmap_index == idx:
+		fast = Thumb.fast_scale
+
+		# перерисовываем, если сменился размер, принудительно, или нужна сглаженная версия
+		need = force or self._pixmap_index != idx or (self._pixmap_fast and not fast)
+		if not need:
 			return
 
-		qimg = self.data_item.resized_qimages[idx]
-		if qimg is None:
-			scaler = Utils.thumb_scaler()
-			qimg = scaler(self.data_item.base_qimage, Static.THUMB_WIDTHS[idx])
+		cached = self.data_item.resized_qimages[idx]
+		if cached is not None:
+			qimg, is_fast = cached, False
+		elif fast:
+			# быстрый вариант не кладём в resized_qimages, иначе он останется после перетаскивания
+			qimg = Utils.scale_qimage_dpr(self.data_item.base_qimage,
+										Static.THUMB_WIDTHS[idx], smooth=False)
+			is_fast = True
+		else:
+			qimg = Utils.scale_qimage_dpr(self.data_item.base_qimage,
+										Static.THUMB_WIDTHS[idx])
 			self.data_item.resized_qimages[idx] = qimg
+			is_fast = False
 
 		self._pixmap_index = idx
+		self._pixmap_fast = is_fast
 		self.img_wid.setPixmap(QPixmap.fromImage(qimg))
 
 	def set_text_and_size(self):
@@ -655,6 +670,11 @@ class Grid(UScrollVerticalArea):
 		self.date_timer = QTimer(self)
 		self.date_timer.setSingleShot(True)
 
+		self._size_timer = QTimer(self)
+		self._size_timer.setSingleShot(True)
+		self._size_timer.timeout.connect(self._finish_resize)
+		self._size_debounce_ms = 150
+
 		# --- Вкладка прокрутки ---
 		self.scroll_wid = TransparentFrame()
 		self.setWidget(self.scroll_wid)
@@ -785,11 +805,20 @@ class Grid(UScrollVerticalArea):
 				wid.set_pixmap_with_actual_size()
 
 	def resize_thumbnails(self):
+		# на время перетаскивания масштабируем быстро
+		Thumb.fast_scale = True
 		self.thumb_cls.calculate_size()
 		for wid in self.url_to_wid.values():
 			wid.set_text_and_size()
 		self.grid_lay.setSpacing(self.get_grid_spacing())
-		self.rearrange()
+		self.rearrange()  # видимые получают быстрые картинки через _refresh_visible
+		# каждый вызов переносит финальный проход
+		self._size_timer.start(self._size_debounce_ms)
+
+	def _finish_resize(self):
+		# слайдер остановился: сглаженный проход только по видимым миниатюрам
+		Thumb.fast_scale = False
+		self._refresh_visible()
 
 	def clear_grid(self):
 		"""Удаляет все виджеты сетки (при полной перезагрузке)."""
