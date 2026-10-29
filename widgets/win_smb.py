@@ -33,7 +33,7 @@ class WinSmb(UMainWindow):
 		self.mf = mf
 		self.set_close_only()
 		self.set_always_on_top()
-		self.setWindowTitle(Lng.attention[JsonData.lng_index])
+		self.setWindowTitle(Lng.attention)
 		self.show_titlebar_sep()
 
 		# Делаем отступы аккуратными
@@ -45,11 +45,11 @@ class WinSmb(UMainWindow):
 		group_lay.setContentsMargins(0, 0, 0, 0)
 		group_lay.setSpacing(5)
 
-		title_lbl = TitleTextLabel(Lng.no_connection[JsonData.lng_index], str(self.yellow_warning_path))
+		title_lbl = TitleTextLabel(Lng.no_connection, str(self.yellow_warning_path))
 		group_lay.addWidget(title_lbl)
 
 		# Описание добавляем туда же, под заголовок
-		descr_lbl = GrayTextLabel(Lng.network_error_text[JsonData.lng_index])
+		descr_lbl = GrayTextLabel(Lng.network_error_text)
 		group_lay.addWidget(descr_lbl)
 
 		self.central_layout.addWidget(self.group_box)
@@ -67,18 +67,18 @@ class WinSmb(UMainWindow):
 
 		if Servers.items:
 
-			self.servers_btn = UPushButton(Lng.servers[JsonData.lng_index])
+			self.servers_btn = UPushButton(Lng.servers)
 			self.servers_btn.setIcon(QIcon(str(self.connect_svg_path)))
 			self.servers_btn.clicked.connect(self.open_servers)
 			btns_lay.addWidget(self.servers_btn)
 
 		btns_lay.addStretch()
 		
-		cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		cancel_btn = UPushButton(Lng.cancel)
 		cancel_btn.clicked.connect(self.deleteLater)
 		btns_lay.addWidget(cancel_btn)
 		
-		self.ok_btn = ActiveButton(Lng.apply[JsonData.lng_index])
+		self.ok_btn = ActiveButton(Lng.apply)
 		self.ok_btn.clicked.connect(self.ok_cmd)
 		btns_lay.addWidget(self.ok_btn)
 
@@ -100,7 +100,7 @@ class WinSmb(UMainWindow):
 
 		mf_path = self.path_widget.validate()
 		if mf_path:
-			self.super_win = SuperConfirmWindow(Lng.confirm_mf_path[JsonData.lng_index])
+			self.super_win = SuperConfirmWindow(Lng.confirm_mf_path)
 			self.super_win.ok_clicked.connect(ok_clicked)
 			self.super_win.center_to_parent(self)
 			self.super_win.show()

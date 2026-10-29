@@ -22,7 +22,7 @@ class WinCollage(UMainWindow):
 		self.set_close_only()
 		self.resize(self.ww, self.hh)
 		self.setMinimumSize(400, 400)
-		self.setWindowTitle(Lng.collage[JsonData.lng_index])
+		self.setWindowTitle(Lng.collage)
 		self.show_titlebar_sep()
 		self.central_layout.setContentsMargins(5, 0, 5, 0)
 

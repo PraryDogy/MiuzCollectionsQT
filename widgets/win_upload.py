@@ -40,7 +40,7 @@ class TitleWidget(UGroupBox):
 		self.title_label = TitleTextLabel(self.get_plural_text(files_count))
 		self.text_layout.addWidget(self.title_label)
 
-		self.description_label = GrayTextLabel(Lng.upload_files_description[JsonData.lng_index])
+		self.description_label = GrayTextLabel(Lng.upload_files_description)
 		self.text_layout.addWidget(self.description_label)
 
 	def get_plural_text(self, count):
@@ -53,7 +53,7 @@ class TitleWidget(UGroupBox):
 			chosen_tuple = Lng.chosen_xxx_files # ... 5-20 файлов
 
 		# 2. Берем строку под нужный язык и сразу подставляем число
-		return chosen_tuple[JsonData.lng_index].format(files_count=count)
+		return chosen_tuple.format(files_count=count)
 
 
 class DestinyFolderWidget(UGroupBox):
@@ -73,7 +73,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
 		self.main_layout.setSpacing(5)
 
-		self.title_label = TitleTextLabel(Lng.dest_folder[JsonData.lng_index], str(self.svg_path))
+		self.title_label = TitleTextLabel(Lng.dest_folder, str(self.svg_path))
 		self.main_layout.addWidget(self.title_label)
 
 		# с обычным spacing виджет под сепаратором будет как бы дальше
@@ -98,7 +98,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_row_layout.addWidget(self.copy_path_button)
 
 		# Кнопка вне GroupBox
-		self.change_btn = UPushButton(Lng.choose_folder[JsonData.lng_index])
+		self.change_btn = UPushButton(Lng.choose_folder)
 		self.change_btn.setIcon(QIcon(str(self.magnifier)))
 		self.change_btn.clicked.connect(self.change_dir)
 		self.main_layout.addWidget(self.change_btn)
@@ -133,7 +133,7 @@ class UploadWin(UMainWindow):
 
 	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
 		super().__init__()
-		self.setWindowTitle(Lng.file_loading[JsonData.lng_index])
+		self.setWindowTitle(Lng.file_loading)
 		self.setFixedWidth(450)
 		self.set_close_only()
 		self.set_always_on_top()
@@ -159,11 +159,11 @@ class UploadWin(UMainWindow):
 
 		self.button_layout.addStretch()
 
-		self.cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_button = UPushButton(Lng.cancel)
 		self.cancel_button.clicked.connect(self.deleteLater)
 		self.button_layout.addWidget(self.cancel_button)
 
-		self.ok_button = ActiveButton(Lng.upload[JsonData.lng_index])
+		self.ok_button = ActiveButton(Lng.upload)
 		self.ok_button.clicked.connect(
 			lambda e: self.ok_clicked.emit(self.current_dir)
 		)

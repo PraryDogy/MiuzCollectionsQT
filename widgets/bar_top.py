@@ -74,7 +74,7 @@ class SearchWidLineEdit(ULineEdit):
 
 	def update_placeholder(self):
 		self.setPlaceholderText(
-			f"{Lng.search[JsonData.lng_index]} {Lng.in_[JsonData.lng_index]} {Mf.current_mf.mf_alias}"
+			f"{Lng.search} {Lng.in_} {Mf.current_mf.mf_alias}"
 		)
 
 	def win_text_search_cmd(self, text: str):
@@ -171,7 +171,7 @@ class CatalogWidget(TransparentWidget):
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
 		self.h_lay.setSpacing(0)
 
-		self.title = GrayTextLabel(Lng.catalog[JsonData.lng_index])
+		self.title = GrayTextLabel(Lng.catalog)
 		self.h_lay.addWidget(self.title)
 
 		self.h_lay.addSpacing(10)
@@ -198,7 +198,7 @@ class CatalogWidget(TransparentWidget):
 
 		self.button_menu.addSeparator()
 
-		new_folder_action = QAction(Lng.new_folder[JsonData.lng_index], self.button_menu)
+		new_folder_action = QAction(Lng.new_folder, self.button_menu)
 		new_folder_action.setIcon(self.new_folder_icon)
 		new_folder_action.setIconVisibleInMenu(True)
 		new_folder_action.triggered.connect(self.mf_new_cmd)

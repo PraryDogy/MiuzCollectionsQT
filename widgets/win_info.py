@@ -31,7 +31,7 @@ class WinInfo(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.info[JsonData.lng_index])
+		self.setWindowTitle(Lng.info)
 
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(10)
@@ -46,12 +46,12 @@ class WinInfo(UMainWindow):
 		self.grid_lay.setContentsMargins(10, 10, 10, 10)
 
 		self.data = {
-			Lng.file_name[JsonData.lng_index]: OneFileInfo.lined_text(os.path.basename(self.path)),
-			Lng.type_[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-			Lng.file_size[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-			Lng.location[JsonData.lng_index]: OneFileInfo.lined_path(self.path),
-			Lng.changed[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
-			Lng.resol[JsonData.lng_index]: Lng.calculating[JsonData.lng_index],
+			Lng.file_name: OneFileInfo.lined_text(os.path.basename(self.path)),
+			Lng.type_: Lng.calculating,
+			Lng.file_size: Lng.calculating,
+			Lng.location: OneFileInfo.lined_path(self.path),
+			Lng.changed: Lng.calculating,
+			Lng.resol: Lng.calculating,
 		}
 
 		selectable_labels: list[WinInfoSelectableLabel] = []
@@ -85,12 +85,12 @@ class WinInfo(UMainWindow):
 
 		layout.addStretch()
 
-		copy_btn = UPushButton(Lng.copy_filepath[JsonData.lng_index])
+		copy_btn = UPushButton(Lng.copy_filepath)
 		layout.addWidget(copy_btn)
 
 		# layout.addStretch()
 
-		test = ActiveButton(Lng.close[JsonData.lng_index])
+		test = ActiveButton(Lng.close)
 		test.clicked.connect(self.deleteLater)
 		layout.addWidget(test)
 
@@ -123,7 +123,7 @@ class WinInfo(UMainWindow):
 		if info_item.res:
 			self.res_label.setText(info_item.res)
 		else:
-			self.type_label.setText(f"{Lng.image[JsonData.lng_index]} {info_item.type_[1:]}")
+			self.type_label.setText(f"{Lng.image} {info_item.type_[1:]}")
 			self.size_label.setText(info_item.size)
 			self.mod_label.setText(info_item.mod)
 

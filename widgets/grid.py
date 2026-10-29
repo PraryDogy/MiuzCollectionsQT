@@ -82,7 +82,7 @@ class ThumbImgWidget(TransparentLabel):
 		"""Показывает текст 'обновление' вместо изображения."""
 		self._saved_pixmap = self.pixmap()
 		self.setPixmap(QPixmap())
-		self.setText(Lng.updating[JsonData.lng_index])
+		self.setText(Lng.updating)
 
 	def restore_image(self):
 		"""Удаляет текст и возвращает исходное изображение."""
@@ -100,7 +100,7 @@ class ThumbFilenameWid(TransparentLabel):
 
 class ThumbBlueTextWidget(GrayTextLabel):
 	def __init__(self, data_item: DataItem):
-		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
+		day_month_year = f"{Lng.changed_short} {data_item.day_month_year}"
 		super().__init__(day_month_year)
 		self.set_elide(True)
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -116,7 +116,7 @@ class ThumbMiuzBlueTextWidget(GrayTextLabel):
 		else:
 			paths_list = root.split(os.sep)
 			miuz_collection_name = paths_list[1]
-		day_month_year = f"{Lng.changed_short[JsonData.lng_index]} {data_item.day_month_year}"
+		day_month_year = f"{Lng.changed_short} {data_item.day_month_year}"
 		super().__init__(f"{day_month_year}\n{miuz_collection_name}")
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.set_elide(True)
@@ -159,10 +159,10 @@ class Thumb(TransparentFrame):
 
 		self._add_captions()
 
-		ext = f"{Lng.type_[JsonData.lng_index]}: {self.data_item.ext}"
-		filename = f"{Lng.file_name[JsonData.lng_index]}: {self.data_item.filename}"
-		location = f"{Lng.location[JsonData.lng_index]}: {Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
-		modified = f"{Lng.modified[JsonData.lng_index]}: {self.data_item.day_month_year} {self.data_item.hour_min_sec}"
+		ext = f"{Lng.type_}: {self.data_item.ext}"
+		filename = f"{Lng.file_name}: {self.data_item.filename}"
+		location = f"{Lng.location}: {Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
+		modified = f"{Lng.modified}: {self.data_item.day_month_year} {self.data_item.hour_min_sec}"
 		self.setToolTip("\n".join([ext, filename, location, modified]))
 
 		self.set_text_and_size()
@@ -361,8 +361,8 @@ class GridModeWidget(UPushButton):
 
 	def __init__(self):
 		self.MODES = {
-			False: Lng.captions_on[JsonData.lng_index],
-			True: Lng.captions_off[JsonData.lng_index]
+			False: Lng.captions_on,
+			True: Lng.captions_off
 		}
 
 		current = JsonData.square_thumbs
@@ -421,17 +421,16 @@ class GridSortWidget(TransparentWidget):
 		self.button_menu = UMenu(parent=self)
 		self.button.setMenu(self.button_menu)
 
-		mod_action = QAction(Lng.sort_by_mod[JsonData.lng_index], self.button_menu)
+		mod_action = QAction(Lng.sort_by_mod, self.button_menu)
 		mod_action.triggered.connect(lambda: self.sort_btn_cmd(True))
 		self.button_menu.addAction(mod_action)
 
-		recent_action = QAction(Lng.sort_by_recent[JsonData.lng_index], self.button_menu)
+		recent_action = QAction(Lng.sort_by_recent, self.button_menu)
 		recent_action.triggered.connect(lambda: self.sort_btn_cmd(False))
 		self.button_menu.addAction(recent_action)
 
 	def set_button_width(self):
-		ind = JsonData.lng_index
-		word = max((Lng.sort_by_mod[ind], Lng.sort_by_recent[ind]), key=len)
+		word = max((Lng.sort_by_mod, Lng.sort_by_recent), key=len)
 		self.button.setText(word)
 		self.button.adjustSize()
 		offset = 40 # иконка слева и стрелочка справа
@@ -447,7 +446,7 @@ class GridSortWidget(TransparentWidget):
 			text = Lng.sort_by_mod
 		else:
 			text = Lng.sort_by_recent
-		self.button.setText(text[JsonData.lng_index])
+		self.button.setText(text)
 
 
 class GridFiltersWidget(TransparentWidget):
@@ -462,7 +461,7 @@ class GridFiltersWidget(TransparentWidget):
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
 
-		self.button = UPushButton(Lng.filters[JsonData.lng_index])
+		self.button = UPushButton(Lng.filters)
 		self.button.clicked.connect(self.open_filters_win.emit)
 		self.button.setIcon(self.sort_icon)
 		self.h_lay.addWidget(self.button)
@@ -548,7 +547,7 @@ class GridFavTag(GridTag):
 
 	def __init__(self):
 		super().__init__(
-			text=Lng.favorites[JsonData.lng_index],
+			text=Lng.favorites,
 			left_svg_path=self.left_svg_path
 		)
 
@@ -562,7 +561,7 @@ class GridNoSubfoldersTag(GridTag):
 
 	def __init__(self):
 		super().__init__(
-			text=Lng.without_subfolders[JsonData.lng_index],
+			text=Lng.without_subfolders,
 			left_svg_path=self.left_svg_path
 		)
 
@@ -1121,7 +1120,7 @@ class Grid(UScrollVerticalArea):
 				self.menu_.addAction(paste)
 				self.menu_.addSeparator()
 
-			update_grid = QAction(Lng.update_grid[JsonData.lng_index], self.menu_)
+			update_grid = QAction(Lng.update_grid, self.menu_)
 			update_grid.triggered.connect(
 				lambda: self.load_st_grid.emit()
 			)
@@ -1134,7 +1133,7 @@ class Grid(UScrollVerticalArea):
 			self.menu_.addAction(reload)
 
 			self.menu_.addSeparator()
-			reveal = QAction(Lng.reveal_in_finder[JsonData.lng_index], self.menu_)
+			reveal = QAction(Lng.reveal_in_finder, self.menu_)
 			reveal.triggered.connect(
 				lambda: self.reveal_in_finder.emit([Dynamic.current_dir, ])
 			)
@@ -1160,10 +1159,10 @@ class Grid(UScrollVerticalArea):
 			# открыть в приложении
 			if len(rel_paths) == 1:
 				open_menu = UMenu(
-					title=f"{Lng.open_in[JsonData.lng_index]}",
+					title=f"{Lng.open_in}",
 					parent=self.menu_
 				)
-				act = QAction(Lng.open_default[JsonData.lng_index], open_menu)
+				act = QAction(Lng.open_default, open_menu)
 				act.triggered.connect(
 					lambda: self.open_in_app.emit((rel_paths, None))
 				)
@@ -1420,7 +1419,7 @@ class GridStandart(Grid):
 			self.grid_wid.hide()
 			self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			self.scroll_layout.addStretch(1)
-			self._empty_lbl = TransparentLabel(Lng.no_photo[JsonData.lng_index])
+			self._empty_lbl = TransparentLabel(Lng.no_photo)
 			self.scroll_layout.addWidget(self._empty_lbl, alignment=Qt.AlignmentFlag.AlignCenter)
 			self.scroll_layout.addStretch(1)
 		else:

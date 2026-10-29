@@ -143,7 +143,7 @@ class TransparentLabel(QLabel):
 
 		menu = UMenu(parent=self)
 
-		copy_action = QAction(Lng.copy[JsonData.lng_index], menu)
+		copy_action = QAction(Lng.copy, menu)
 		copy_action.triggered.connect(
 			lambda: Utils.pyqt_copy_text(text)
 		)
@@ -151,7 +151,7 @@ class TransparentLabel(QLabel):
 
 		if os.path.isfile(full_text) or os.path.isdir(full_text):
 			reveal_action = QAction(
-				Lng.reveal_in_finder[JsonData.lng_index], menu
+				Lng.reveal_in_finder, menu
 			)
 			reveal_action.triggered.connect(
 				lambda: Utils.macos_reveal_files([full_text])
@@ -246,9 +246,9 @@ class ULineEdit(TransparentLineEdit):
 		self.menu_ = UMenu(parent=self)
 
 		actions = [
-			(Lng.cut[JsonData.lng_index], self.cut_selection),
-			(Lng.copy[JsonData.lng_index], lambda: Utils.pyqt_copy_text(self.selectedText())),
-			(Lng.paste[JsonData.lng_index], self.paste_text),
+			(Lng.cut, self.cut_selection),
+			(Lng.copy, lambda: Utils.pyqt_copy_text(self.selectedText())),
+			(Lng.paste, self.paste_text),
 		]
 
 		for text, slot in actions:
@@ -283,9 +283,9 @@ class UTextEdit(TransparentTextEdit):
 		menu_ = UMenu(parent=self)
 
 		actions = [
-			(Lng.cut[JsonData.lng_index], self.cut_selection),
-			(Lng.copy[JsonData.lng_index], self.copy_selection),
-			(Lng.paste[JsonData.lng_index], self.paste_text),
+			(Lng.cut, self.cut_selection),
+			(Lng.copy, self.copy_selection),
+			(Lng.paste, self.paste_text),
 		]
 
 		for text, slot in actions:
@@ -1105,7 +1105,7 @@ class ConfirmWindow(VerticalWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		# self.show_titlebar_underline()
-		self.setWindowTitle(Lng.attention[JsonData.lng_index])
+		self.setWindowTitle(Lng.attention)
 
 		self._setup_ui(text)
 		self.central_layout.activate()
@@ -1124,12 +1124,12 @@ class ConfirmWindow(VerticalWindow):
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
 
-		self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
+		self.ok_btn = ActiveButton(Lng.confirm)
 		self.ok_btn.clicked.connect(self.ok_clicked.emit)
 		self.ok_btn.clicked.connect(self.deleteLater)
 		self.btn_layout.addWidget(self.ok_btn)
 
-		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_layout.addWidget(self.cancel_btn)
@@ -1155,7 +1155,7 @@ class WarningWindow(VerticalWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
-		self.setWindowTitle(Lng.attention[JsonData.lng_index])
+		self.setWindowTitle(Lng.attention)
 
 		self._setup_ui(text, text_edit_text)
 		self.central_layout.activate()
@@ -1179,7 +1179,7 @@ class WarningWindow(VerticalWindow):
 			self.text_edit_widget.setPlainText(text_edit_text)
 			self.icon_text_layout.addWidget(self.text_edit_widget)
 
-		self.cancel_btn = ActiveButton(Lng.got_it[JsonData.lng_index])
+		self.cancel_btn = ActiveButton(Lng.got_it)
 		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_layout.addWidget(self.cancel_btn)
@@ -1208,7 +1208,7 @@ class InputTextWin(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.text_input[JsonData.lng_index])
+		self.setWindowTitle(Lng.text_input)
 		self.show_titlebar_sep()
 		self.central_layout.addSpacing(10)
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
@@ -1232,7 +1232,7 @@ class InputTextWin(UMainWindow):
 		self.central_layout.addSpacing(10)
 
 		self.line_edit_widget = ULineEdit()
-		self.line_edit_widget.setPlaceholderText(Lng.input_text[JsonData.lng_index])
+		self.line_edit_widget.setPlaceholderText(Lng.input_text)
 		self.central_layout.addWidget(self.line_edit_widget)
 
 		self.central_layout.addSpacing(10)
@@ -1246,12 +1246,12 @@ class InputTextWin(UMainWindow):
 
 		btn_layout.addStretch()
 
-		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		btn_layout.addWidget(self.cancel_btn)
 
-		self.ok_btn = ActiveButton(Lng.confirm[JsonData.lng_index])
+		self.ok_btn = ActiveButton(Lng.confirm)
 		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
 		btn_layout.addWidget(self.ok_btn)
 
@@ -1518,7 +1518,7 @@ class MfPathWidget(UGroupBox):
 			self.title_ = mf.mf_alias
 		else:
 			self.mf_path = None
-			self.title_ = Lng.catalog[JsonData.lng_index]
+			self.title_ = Lng.catalog
 
 		self.watch_timer = QTimer(self)
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
@@ -1566,7 +1566,7 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.setSpacing(10)
 
 		button = UPushButton(
-			Lng.choose_folder[JsonData.lng_index]
+			Lng.choose_folder
 		)
 		button.setIcon(QIcon(str(self.magnifier)))
 		button.clicked.connect(self.dialog_dir)
@@ -1596,7 +1596,7 @@ class MfPathWidget(UGroupBox):
 		labels_layout.setSpacing(2)
 
 		descr_label = GrayTextLabel(
-			Lng.catalog_path[JsonData.lng_index]
+			Lng.catalog_path
 		)
 		labels_layout.addWidget(descr_label)
 
@@ -1646,7 +1646,7 @@ class MfPathWidget(UGroupBox):
 		labels_layout.setSpacing(2)
 
 		descr_label = GrayTextLabel(
-			Lng.catalog_path[JsonData.lng_index]
+			Lng.catalog_path
 		)
 		labels_layout.addWidget(descr_label)
 
@@ -1659,7 +1659,7 @@ class MfPathWidget(UGroupBox):
 		self.copy_path_btn = UPushButton("")
 		self.copy_path_btn.setIcon(QIcon(str(self.copy)))
 		self.copy_path_btn.setToolTip(
-			Lng.copy_dirpath[JsonData.lng_index]
+			Lng.copy_dirpath
 		)
 		self.copy_path_btn.clicked.connect(self.copy_path)
 
@@ -1761,7 +1761,7 @@ class MfStopListEditTag(UMainWindow):
 		self.setFixedWidth(350)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.text_editor[JsonData.lng_index])
+		self.setWindowTitle(Lng.text_editor)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
 
@@ -1772,13 +1772,13 @@ class MfStopListEditTag(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(10)
 
-		title_label = TitleTextLabel(Lng.folder_name[JsonData.lng_index], str(self.text_edit))
+		title_label = TitleTextLabel(Lng.folder_name, str(self.text_edit))
 		group_layout.addWidget(title_label)
 
 		group_layout.addWidget(USep())
 
 		description = GrayTextLabel(
-			Lng.stop_list_description[JsonData.lng_index]
+			Lng.stop_list_description
 		)
 		description.setWordWrap(True)
 		group_layout.addWidget(description)
@@ -1795,16 +1795,16 @@ class MfStopListEditTag(UMainWindow):
 		buttons_layout.setContentsMargins(0, 0, 0, 0)
 		buttons_layout.setSpacing(5)
 
-		rem_button = UPushButton(Lng.delete[JsonData.lng_index])
+		rem_button = UPushButton(Lng.delete)
 		rem_button.clicked.connect(self.remove_clicked.emit)
 		buttons_layout.addWidget(rem_button)
 		buttons_layout.addStretch(1)
 
-		cancel_button = UPushButton(Lng.cancel[JsonData.lng_index])
+		cancel_button = UPushButton(Lng.cancel)
 		cancel_button.clicked.connect(self.deleteLater)
 		buttons_layout.addWidget(cancel_button)
 
-		apply_button = ActiveButton(Lng.apply[JsonData.lng_index])
+		apply_button = ActiveButton(Lng.apply)
 		apply_button.clicked.connect(self.ok_clicked_cmd)
 		buttons_layout.addWidget(apply_button)
 
@@ -1863,12 +1863,12 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
 
-		title_label = TitleTextLabel(Lng.stop_list[JsonData.lng_index], str(self.ignore_svg))
+		title_label = TitleTextLabel(Lng.stop_list, str(self.ignore_svg))
 		v_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())
 
-		description = GrayTextLabel(Lng.stop_list_descr_short[JsonData.lng_index])
+		description = GrayTextLabel(Lng.stop_list_descr_short)
 		v_layout.addWidget(description)
 
 		v_layout.addSpacing(5)
@@ -1885,7 +1885,7 @@ class MfStopListWidget(UGroupBox):
 
 		v_layout.addSpacing(5)
 
-		add_button = UPushButton(Lng.add_folder[JsonData.lng_index])
+		add_button = UPushButton(Lng.add_folder)
 		add_button.setIcon(QIcon(str(self.plus_svg)))
 		add_button.clicked.connect(self.add_tag)
 		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -1920,7 +1920,7 @@ class MfStopListWidget(UGroupBox):
 
 		if not self.get_stop_list():
 			self.create_no_tags_widget()
-			label = GrayTextLabel(Lng.stop_list_empty[JsonData.lng_index])
+			label = GrayTextLabel(Lng.stop_list_empty)
 			self.tags_flow_layout.addWidget(label)
 			self.tags_flow_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			return
@@ -1943,7 +1943,7 @@ class MfStopListWidget(UGroupBox):
 			if hasattr(self, "edit_text_win"):
 				self.edit_text_win.deleteLater()
 
-		self.confirm_win = ConfirmWindow(Lng.stop_list_remove_confirm[JsonData.lng_index])
+		self.confirm_win = ConfirmWindow(Lng.stop_list_remove_confirm)
 		self.confirm_win.center_to_parent(self.window())
 		self.confirm_win.ok_clicked.connect(finished)
 		self.confirm_win.show()
@@ -1959,7 +1959,7 @@ class MfStopListWidget(UGroupBox):
 			self.changed.emit()
 
 		self.text_win = InputTextWin(
-			description=Lng.folder_name[JsonData.lng_index],
+			description=Lng.folder_name,
 			svg_path=str(self.trash_svg)
 		)
 		self.text_win.setFixedWidth(300)

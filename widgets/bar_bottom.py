@@ -61,7 +61,7 @@ class BarBottomLeftLabel(GrayTextLabel):
 		seconds = self.total_seconds % 60
 
 		text = (
-			f"{Lng.next_search[JsonData.lng_index]} "
+			f"{Lng.next_search} "
 			f"{minutes:02d}:{seconds:02d}"
 		)
 		self.setText(text)
@@ -111,23 +111,22 @@ class BarBottom(TransparentWidget):
 		self.h_layout.addWidget(self.slider)
 
 	def _objects_word(self, n: int) -> str:
-		idx = JsonData.lng_index
-		if idx == 0:  # русский: три формы по правилам склонения
+		if JsonData.lng_index == 0:  # русский: три формы по правилам склонения
 			n_abs = abs(n) % 100
 			n1 = n_abs % 10
 			if 11 <= n_abs <= 14:
-				return Lng.selected_objects_many[idx]
+				return Lng.selected_objects_many
 			if n1 == 1:
-				return Lng.selected_objects_one[idx]
+				return Lng.selected_objects_one
 			if 2 <= n1 <= 4:
-				return Lng.selected_objects_few[idx]
-			return Lng.selected_objects_many[idx]
+				return Lng.selected_objects_few
+			return Lng.selected_objects_many
 		# английский: одна форма для 1, остальные во множественном
-		return Lng.selected_objects_one[idx] if n == 1 else Lng.selected_objects_few[idx]
+		return Lng.selected_objects_one if n == 1 else Lng.selected_objects_few
 
 	def set_selection_count(self, n: int):
 		if n <= 0:
 			self.selection_label.setText("")
 			return
-		prefix = Lng.selected_prefix[JsonData.lng_index]
+		prefix = Lng.selected_prefix
 		self.selection_label.setText(f"{prefix} {n} {self._objects_word(n)}")

@@ -161,33 +161,33 @@ class MenuLeftTreeWidget(UTreeWidget):
 			abs_path = item.path
 			rel_path = Utils.remove_mf_path(Mf.current_mf.mf_current_path, abs_path)
 			self.abs_selected_path = abs_path
-			view = QAction(Lng.open[JsonData.lng_index], menu)
+			view = QAction(Lng.open, menu)
 			view.triggered.connect(lambda: self.on_tree_clicked.emit(self.abs_selected_path))
 			menu.addAction(view)
 			menu.addSeparator()
 
 		if self.abs_selected_path == os.sep:
-			update = QAction(Lng.update_grid[JsonData.lng_index])
+			update = QAction(Lng.update_grid)
 			update.triggered.connect(self.init_ui)
 			menu.addAction(update)
 
 			menu.addSeparator()
 
-			expand_all = QAction(Lng.expand_all[JsonData.lng_index], menu)
+			expand_all = QAction(Lng.expand_all, menu)
 			expand_all.triggered.connect(lambda: self.expandAll())
 			menu.addAction(expand_all)
 
-			collapse_all = QAction(Lng.collapse_all[JsonData.lng_index], menu)
+			collapse_all = QAction(Lng.collapse_all, menu)
 			collapse_all.triggered.connect(lambda: collapse_all_cmd())
 			menu.addAction(collapse_all)
 
 			menu.addSeparator()
 
 			if self.need_hide_digits():
-				text = Lng.show_digits[JsonData.lng_index]
+				text = Lng.show_digits
 				cmd = show_digits_cmd
 			else:
-				text = Lng.hide_digits[JsonData.lng_index]
+				text = Lng.hide_digits
 				cmd = hide_digits_cmd
 			digits = QAction(text, menu)
 			digits.triggered.connect(cmd)
@@ -195,13 +195,13 @@ class MenuLeftTreeWidget(UTreeWidget):
 
 		menu.addSeparator()
 
-		copy_path = QAction(Lng.copy_dirpath[JsonData.lng_index], menu)
+		copy_path = QAction(Lng.copy_dirpath, menu)
 		copy_path.triggered.connect(
 			lambda: self.copy_path.emit([rel_path, ])
 		)
 		menu.addAction(copy_path)
 
-		reveal = QAction(Lng.reveal_in_finder[JsonData.lng_index], menu)
+		reveal = QAction(Lng.reveal_in_finder, menu)
 		reveal.triggered.connect(
 			lambda: self.reveal.emit([rel_path, ])
 		)

@@ -42,7 +42,7 @@ class AboutWin(VerticalWindow):
 		lbl.set_selectable(True)
 		self.icon_text_layout.addWidget(lbl)
 
-		close_btn = UPushButton(Lng.close[JsonData.lng_index])
+		close_btn = UPushButton(Lng.close)
 		self.btn_layout.addWidget(close_btn)
 		close_btn.clicked.connect(self.deleteLater)
 
@@ -62,22 +62,22 @@ class AboutWin(VerticalWindow):
 class BarMacos(QMenuBar):
 	def __init__(self):
 		super().__init__()
-		self.mainMenu = UMenu(Lng.menu[JsonData.lng_index], self)
+		self.mainMenu = UMenu(Lng.menu, self)
 
 		# Добавили self. к действию подключения к серверу
-		self.server_win = QAction(Lng.connect_to_server[JsonData.lng_index], self)
+		self.server_win = QAction(Lng.connect_to_server, self)
 		self.server_win.triggered.connect(self.open_server_window)
 		self.mainMenu.addAction(self.server_win)
 
 		# Добавили self. к действию настроек
-		self.actionSettings = QAction(Lng.open_settings_window[JsonData.lng_index], self)
+		self.actionSettings = QAction(Lng.open_settings_window, self)
 		self.actionSettings.triggered.connect(self.open_settings_window)
 		self.mainMenu.addAction(self.actionSettings)
 
 		self.mainMenu.addSeparator()
 
 		# Добавили self. к действию "О программе"
-		self.actionAbout = QAction(Lng.show_about[JsonData.lng_index], self)
+		self.actionAbout = QAction(Lng.show_about, self)
 		self.actionAbout.setMenuRole(QAction.MenuRole.NoRole)
 		self.actionAbout.triggered.connect(self.open_about_window)
 		self.mainMenu.addAction(self.actionAbout)

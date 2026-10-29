@@ -203,7 +203,7 @@ class DbImagesLoader(URunnable):
 			mod_time = datetime.fromtimestamp(mod)
 			date_ = mod_time.date()
 			time_ = mod_time.time()
-			month_gen_ = Lng.months_gen[JsonData.lng_index][str(date_.month)]
+			month_gen_ = Lng.months_gen[str(date_.month)]
 
 			day_month_year = f"{date_.day} {month_gen_} {date_.year}"
 			hour_min_sec = str(time_)

@@ -76,11 +76,11 @@ class RebootableSettings(UGroupBox):
 			action.triggered.connect(lambda e, v=value: self.change_language(v))
 			lng_menu.addAction(action)
 
-		lng_wid = RowArrowWidget(Lng.language_max[JsonData.lng_index])
+		lng_wid = RowArrowWidget(Lng.language_max)
 		lng_wid.set_left_icon(self.language_svg)
 		main_layout.addWidget(lng_wid)
-		self.lng_btn = UPushButton(text=Lng.russian[JsonData.lng_index])
-		self.lng_btn.setIcon(self.lng_icons[JsonData.lng_index])
+		self.lng_btn = UPushButton(text=Lng.russian)
+		self.lng_btn.setIcon(self.lng_icons)
 		self.lng_btn.setFixedWidth(100)
 		self.lng_btn.setMenu(lng_menu)
 		lng_wid.replace_arrow_widget(self.lng_btn)
@@ -89,7 +89,7 @@ class RebootableSettings(UGroupBox):
 
 		main_layout.addWidget(USep())
 
-		scaner_time_wid = RowArrowWidget(Lng.search_interval[JsonData.lng_index])
+		scaner_time_wid = RowArrowWidget(Lng.search_interval)
 		scaner_time_wid.set_left_icon(self.clock_svg)
 		# регулировка высоты ради кастомного спинбокса
 		scaner_time_wid.setFixedHeight(scaner_time_wid.height() + 1)
@@ -100,14 +100,14 @@ class RebootableSettings(UGroupBox):
 		self.spin.setMaximum(self.spin_max)
 		# ULineEdit не найдет поэтому импортируем оригинальный QLineEdit
 		self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
-		self.spin.setSuffix(f" {Lng.minutes[JsonData.lng_index]}")
+		self.spin.setSuffix(f" {Lng.minutes}")
 		self.spin.setValue(JsonData.scaner_minutes)
 		self.spin.valueChanged.connect(self.change_scan_time)
 		scaner_time_wid.replace_arrow_widget(self.spin)
 
 		main_layout.addWidget(USep())
 
-		reset_data_wid = RowArrowWidget(Lng.erase_data[JsonData.lng_index])
+		reset_data_wid = RowArrowWidget(Lng.erase_data)
 		reset_data_wid.set_left_icon(self.eraser_svg)
 		reset_data_wid.clicked.connect(self.erase_all_data)
 		main_layout.addWidget(reset_data_wid)
@@ -140,7 +140,7 @@ class RebootableSettings(UGroupBox):
 			shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
 			restart_app()
 
-		reset_win = ConfirmWindow(Lng.erase_data_long[JsonData.lng_index])
+		reset_win = ConfirmWindow(Lng.erase_data_long)
 		reset_win.center_to_parent(self.window())
 		reset_win.ok_clicked.connect(fin)
 		reset_win.show()
@@ -154,24 +154,24 @@ class SizesWin(UMainWindow):
 		super().__init__(parent)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.data_size[JsonData.lng_index])
+		self.setWindowTitle(Lng.data_size)
 		self.resize(self.ww, self.hh)
 		self.central_layout.setSpacing(10)
 
 		total_size = SharedUtils.get_f_size(sum(
 			item.size for item in size_items
 		))
-		first_row = TransparentLabel(f"{Lng.data_size[JsonData.lng_index]}: {total_size}")
+		first_row = TransparentLabel(f"{Lng.data_size}: {total_size}")
 		self.central_layout.addWidget(first_row)
 
 		total = sum(item.total_images for item in size_items)
-		sec_row = TransparentLabel(f"{Lng.images[JsonData.lng_index]}: {total}")
+		sec_row = TransparentLabel(f"{Lng.images}: {total}")
 		self.central_layout.addWidget(sec_row)
 
 		headers = [
-			Lng.folder[JsonData.lng_index],
-			Lng.file_size[JsonData.lng_index],
-			Lng.images[JsonData.lng_index]
+			Lng.folder,
+			Lng.file_size,
+			Lng.images
 		]
 		self.table = QTableWidget()
 		self.table.setSortingEnabled(True)
@@ -242,14 +242,14 @@ class NonRebootableSettings(UGroupBox):
 
 		self.size_items = {}
 
-		data_size_wid = RowArrowWidget(Lng.statistic[JsonData.lng_index])
+		data_size_wid = RowArrowWidget(Lng.statistic)
 		data_size_wid.set_left_icon(self.hdd_svg)
 		data_size_wid.clicked.connect(self.show_sizes_win)
 		main_layout.addWidget(data_size_wid)
 
 		main_layout.addWidget(USep())
 
-		show_files_wid = RowArrowWidget(Lng.show_system_files[JsonData.lng_index])
+		show_files_wid = RowArrowWidget(Lng.show_system_files)
 		show_files_wid.set_left_icon(self.finder_svg)
 		show_files_wid.clicked.connect(self.show_files_cmd)
 		main_layout.addWidget(show_files_wid)
@@ -325,7 +325,7 @@ class ThemesWidget(UGroupBox):
 		main_lay.setContentsMargins(*RowArrowWidget.group_margings)
 		main_lay.setSpacing(RowArrowWidget.group_spacing)
 
-		title_wid = RowArrowWidget(Lng.theme[JsonData.lng_index])
+		title_wid = RowArrowWidget(Lng.theme)
 		title_wid.set_left_icon(self.theme_svg)
 		title_wid.hide_arrow()
 		main_lay.addWidget(title_wid)
@@ -343,19 +343,19 @@ class ThemesWidget(UGroupBox):
 		themes_mappings = (
 			(
 				Themes.theme_auto,
-				Lng.theme_auto[JsonData.lng_index],
+				Lng.theme_auto,
 				Static.COMMON_ICONS / "theme_auto_1.svg",
 				Static.COMMON_ICONS / "theme_auto_2.svg"
 			),
 			(
 				Themes.theme_light,
-				Lng.theme_light[JsonData.lng_index],
+				Lng.theme_light,
 				Static.COMMON_ICONS / "theme_light_1.svg",
 				Static.COMMON_ICONS / "theme_light_2.svg"
 			),
 			(
 				Themes.theme_dark,
-				Lng.theme_dark[JsonData.lng_index],
+				Lng.theme_dark,
 				Static.COMMON_ICONS / "theme_dark_1.svg",
 				Static.COMMON_ICONS / "theme_dark_2.svg"
 			),
@@ -396,13 +396,13 @@ class AboutWidLabel(LabelMinWidth):
 	def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
 		context_menu = UMenu(parent=self)
 
-		copy_text = QAction(parent=context_menu, text=Lng.copy[JsonData.lng_index])
+		copy_text = QAction(parent=context_menu, text=Lng.copy)
 		copy_text.triggered.connect(self.copy_text_md)
 		context_menu.addAction(copy_text)
 
 		context_menu.addSeparator()
 
-		select_all = QAction(parent=context_menu, text=Lng.copy_all[JsonData.lng_index])
+		select_all = QAction(parent=context_menu, text=Lng.copy_all)
 		select_all.triggered.connect(lambda: Utils.pyqt_copy_text(self.text()))
 		context_menu.addAction(select_all)
 
@@ -491,7 +491,7 @@ class GeneralSettings(TransparentWidget):
 			JsonData.write_json_data()
 			restart_app()
 
-		win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
+		win = ConfirmWindow(Lng.app_will_restarted)
 		win.ok_clicked.connect(fin)
 		win.center_to_parent(self.window())
 		win.show()
@@ -514,14 +514,14 @@ class MfRepairWidget(UGroupBox):
 		self.v_lay.setSpacing(2)
 
 		title_layout = TitleTextLabel(
-			Lng.repair_catalog_long[JsonData.lng_index],
+			Lng.repair_catalog_long,
 			self.repair_svg
 		)
 		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())
 
-		descr = GrayTextLabel(Lng.catalog_reindex_warning[JsonData.lng_index])
+		descr = GrayTextLabel(Lng.catalog_reindex_warning)
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
 
@@ -531,7 +531,7 @@ class MfRepairWidget(UGroupBox):
 		button_layout.setContentsMargins(0, 0, 0, 0)
 		button_layout.setSpacing(10)
 
-		self.start_btn = UPushButton(Lng.repair_catalog_short[JsonData.lng_index])
+		self.start_btn = UPushButton(Lng.repair_catalog_short)
 		self.start_btn.setIcon(QIcon(str(self.repair_gray_svg)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
@@ -553,14 +553,14 @@ class MfRemoveWidget(UGroupBox):
 		self.v_lay.setSpacing(5)
 
 		title_layout = TitleTextLabel(
-			Lng.remove_folder[JsonData.lng_index],
+			Lng.remove_folder,
 			self.trash_svg
 		)
 		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())
 
-		descr = GrayTextLabel(Lng.catalog_delete_warning[JsonData.lng_index])
+		descr = GrayTextLabel(Lng.catalog_delete_warning)
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
 
@@ -573,7 +573,7 @@ class MfRemoveWidget(UGroupBox):
 		# start_descr = GrayTextLabel("Приложение будет перезапущено")
 		# button_layout.addWidget(start_descr)
 
-		self.start_btn = RedButton(Lng.remove_folder[JsonData.lng_index])
+		self.start_btn = RedButton(Lng.remove_folder)
 		self.start_btn.setIcon(QIcon(str(self.red_trash)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
@@ -638,11 +638,11 @@ class MfSettings(UScrollVerticalArea):
 
 		save_layout.addStretch()
 
-		self.save_text = GrayTextLabel(Lng.unsaved_changes[JsonData.lng_index])
+		self.save_text = GrayTextLabel(Lng.unsaved_changes)
 		save_layout.addWidget(self.save_text)
 		self.save_text.hide()
 
-		self.save_button = ActiveButton(Lng.save[JsonData.lng_index])
+		self.save_button = ActiveButton(Lng.save)
 		self.save_button.setIcon(QIcon(str(self.save_svg)))
 		self.save_button.clicked.connect(self.save_mf_settings)
 		save_layout.addWidget(self.save_button)
@@ -680,9 +680,9 @@ class MfSettings(UScrollVerticalArea):
 		)
 
 		if len(Mf.items) == 1:
-			win = WarningWindow(Lng.at_least_one_folder_required[JsonData.lng_index])
+			win = WarningWindow(Lng.at_least_one_folder_required)
 		else:
-			win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
+			win = ConfirmWindow(Lng.app_will_restarted)
 			win.ok_clicked.connect(start_mf_remover)
 		win.center_to_parent(self.window())
 		win.show()
@@ -693,7 +693,7 @@ class MfSettings(UScrollVerticalArea):
 			self.reset_task.sigs.finished_.connect(restart_app)
 			UThreadPool.start(self.reset_task)
 
-		win = ConfirmWindow(Lng.app_will_restarted[JsonData.lng_index])
+		win = ConfirmWindow(Lng.app_will_restarted)
 		win.ok_clicked.connect(reset_data)
 		win.center_to_parent(self.window())
 		win.show()
@@ -715,12 +715,12 @@ class MfSettings(UScrollVerticalArea):
 
 		mf_path = self.path_widget.validate()
 		if mf_path:
-			super_win = SuperConfirmWindow(Lng.confirm_mf_path[JsonData.lng_index])
+			super_win = SuperConfirmWindow(Lng.confirm_mf_path)
 			super_win.center_to_parent(self.window())
 			super_win.ok_clicked.connect(final)
 			super_win.show()
 		else:
-			win_warn = WarningWindow(Lng.select_folder_path[JsonData.lng_index])
+			win_warn = WarningWindow(Lng.select_folder_path)
 			win_warn.center_to_parent(self.window())
 			win_warn.ok_clicked.connect(win_warn.deleteLater)
 			win_warn.show()
@@ -808,7 +808,7 @@ class NewMfSettings(UScrollVerticalArea):
 				return None
 			for i in Mf.items:
 				if i.mf_alias == mf_alias:
-					win_warn = WarningWindow(Lng.alias_already_exists[JsonData.lng_index])
+					win_warn = WarningWindow(Lng.alias_already_exists)
 					win_warn.center_to_parent(self.window())
 					win_warn.ok_clicked.connect(win_warn.deleteLater)
 					win_warn.show()
@@ -820,7 +820,7 @@ class NewMfSettings(UScrollVerticalArea):
 		mf_stop_list = self.mf_stop_list.get_stop_list()
 
 		if mf_path and mf_alias:
-			super_win = SuperConfirmWindow(Lng.confirm_mf_path[JsonData.lng_index])
+			super_win = SuperConfirmWindow(Lng.confirm_mf_path)
 			super_win.ok_clicked.connect(
 				lambda: save_mf(mf_alias, mf_path, mf_stop_list)
 			)
@@ -850,7 +850,7 @@ class WinSettings(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.settings[JsonData.lng_index])
+		self.setWindowTitle(Lng.settings)
 		self.setMinimumSize(self.ww, self.hh)
 
 		self.settings_item = settings_item
@@ -868,14 +868,14 @@ class WinSettings(UMainWindow):
 
 		main_settings_item = UListWidgetItem(
 			parent=self.left_menu,
-			text=Lng.general[JsonData.lng_index]
+			text=Lng.general
 		)
 		main_settings_item.setIcon(QIcon(str(self.settings_svg)))
 		self.left_menu.addItem(main_settings_item)
 		
 		new_folder = UListWidgetItem(
 			parent=self.left_menu,
-			text=Lng.new_folder[JsonData.lng_index]
+			text=Lng.new_folder
 		)
 		new_folder.setIcon(QIcon(str(self.new_folder_svg)))
 		self.left_menu.addItem(new_folder)

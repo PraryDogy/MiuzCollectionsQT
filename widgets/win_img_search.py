@@ -34,7 +34,7 @@ class ProgressWin(UMainWindow):
 
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.progress[JsonData.lng_index])
+		self.setWindowTitle(Lng.progress)
 
 		self.stop_icon = QIcon(str(self.stop_svg_path))
 
@@ -56,7 +56,7 @@ class ProgressWin(UMainWindow):
 		self.text_label = TransparentLabel("")
 		self.text_layout.addWidget(self.text_label)
 
-		self.cancel_btn = UPushButton(Lng.stop[JsonData.lng_index])
+		self.cancel_btn = UPushButton(Lng.stop)
 		self.cancel_btn.setIcon(self.stop_icon)
 		self.cancel_btn.clicked.connect(self.stop_img_search.emit)
 		self.central_layout.addWidget(self.cancel_btn)
@@ -68,19 +68,19 @@ class ProgressWin(UMainWindow):
 
 		self.adjustSize()
 		self.setFixedSize(self.width(), self.height())
-		# self.text_label.setText(Lng.please_wait[JsonData.lng_index])
+		# self.text_label.setText(Lng.please_wait)
 
 	def set_text(self, current_count, total_count):
 		if current_count > total_count:
 			current_count = total_count
 
 		if total_count == 0:
-			text = Lng.please_wait[JsonData.lng_index]
+			text = Lng.please_wait
 		else:
 			text = (
-				f"{Lng.indexing[JsonData.lng_index]} "
+				f"{Lng.indexing} "
 				f"{current_count} "
-				f"{Lng.from_[JsonData.lng_index]} "
+				f"{Lng.from_} "
 				f"{total_count}"
 			)
 
@@ -91,12 +91,12 @@ class ProgressWin(UMainWindow):
 			current_count = total_count
 
 		if total_count == 0:
-			text = Lng.please_wait[JsonData.lng_index]
+			text = Lng.please_wait
 		else:
 			text = (
-				f"{Lng.indexing[JsonData.lng_index]} "
+				f"{Lng.indexing} "
 				f"{current_count} "
-				f"{Lng.from_[JsonData.lng_index]} "
+				f"{Lng.from_} "
 				f"{total_count}"
 			)
 
@@ -168,7 +168,7 @@ class WinImgSearchDropWidget(TransparentFrame):
 			self.svg_widget,
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
-		self.title_label = TitleTextLabel(Lng.image_search[JsonData.lng_index])
+		self.title_label = TitleTextLabel(Lng.image_search)
 
 		self.v_layout.addWidget(
 			self.title_label,
@@ -183,11 +183,11 @@ class WinImgSearchDropWidget(TransparentFrame):
 		)
 
 		lines_base_text = (
-			f"{Lng.search[JsonData.lng_index]} "
-			f"{Lng.in_[JsonData.lng_index]} "
+			f"{Lng.search} "
+			f"{Lng.in_} "
 			f"\"{Mf.current_mf.mf_alias}\"",
 
-			f"{Lng.image_search_drop[JsonData.lng_index]}.",
+			f"{Lng.image_search_drop}.",
 		)
 		self.base_text = "\n".join(lines_base_text)
 		self.descr_label.setText(self.base_text)
@@ -217,7 +217,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 		self.setFixedSize(*DROP_WIDGET_SIZE)
 
 		self.pixmap = QPixmap()
-		self.image_label = TransparentLabel(Lng.loading[JsonData.lng_index])
+		self.image_label = TransparentLabel(Lng.loading)
 		self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		layout = QVBoxLayout(self)
 		layout.setContentsMargins(0, 0, 0, 0)
@@ -297,13 +297,13 @@ class ControlsWidget(UGroupBox):
 		self.v_layout.setContentsMargins(5, 5, 5, 15)
 		self.v_layout.setSpacing(0)
 
-		title = TitleTextLabel(Lng.accuracy[JsonData.lng_index])
+		title = TitleTextLabel(Lng.accuracy)
 		self.v_layout.addWidget(title)
 
 		self.slider_widget = SliderWidget()
 		self.v_layout.addWidget(self.slider_widget)
 
-		descr = GrayTextLabel(Lng.image_search_descr[JsonData.lng_index])
+		descr = GrayTextLabel(Lng.image_search_descr)
 		self.v_layout.addWidget(descr)
 
 
@@ -316,7 +316,7 @@ class WinImgSearch(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.image_search[JsonData.lng_index])
+		self.setWindowTitle(Lng.image_search)
 		self.img_array = None
 		self.img_search_task = None
 		self.read_img_task = None
@@ -355,7 +355,7 @@ class WinImgSearch(UMainWindow):
 		btn_layout = QHBoxLayout()
 		self.central_layout.addLayout(btn_layout)
 		btn_layout.addStretch()
-		self.start_btn = ActiveButton(Lng.find_matches[JsonData.lng_index])
+		self.start_btn = ActiveButton(Lng.find_matches)
 		self.start_btn.setIcon(self.magnifier_icon)
 		self.start_btn.clicked.connect(self.start_img_search)
 		btn_layout.addWidget(self.start_btn)
@@ -373,17 +373,16 @@ class WinImgSearch(UMainWindow):
 		self.setFixedSize(self.width(), self.height())
 
 	def set_close_button_width(self):
-		ind = JsonData.lng_index
-		max_word = max((Lng.close[ind], Lng.hide[ind]), key=len)
+		max_word = max((Lng.close, Lng.hide), key=len)
 		self.close_button.setText(max_word)
 		self.close_button.adjustSize()
 		self.close_button.setFixedWidth(self.close_button.width())
 
 	def set_close_button_text(self):
 		if self.preview_widget.pixmap.isNull():
-			self.close_button.setText(Lng.close[JsonData.lng_index])
+			self.close_button.setText(Lng.close)
 		else:
-			self.close_button.setText(Lng.hide[JsonData.lng_index])
+			self.close_button.setText(Lng.hide)
 
 	def image_dropped(self, path: str):
 		self.start_read_img_task(path)

@@ -41,18 +41,18 @@ class WinTextSearch(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(7)
 
-		self.title_row = TitleTextLabel(Lng.text_editor[JsonData.lng_index], str(self.svg_text_edit_color))
+		self.title_row = TitleTextLabel(Lng.text_editor, str(self.svg_text_edit_color))
 		group_layout.addWidget(self.title_row)
 
 		group_layout.addWidget(USep())
 
 		# 1. Текст описания форматов (RU / EN)
-		self.description_label = GrayTextLabel(Lng.text_search_descr[JsonData.lng_index])
+		self.description_label = GrayTextLabel(Lng.text_search_descr)
 		self.description_label.setWordWrap(True) 
 		group_layout.addWidget(self.description_label)
 
 		self.text_edit = UTextEdit()
-		self.text_edit.setPlaceholderText(Lng.search_placeholder_texts[JsonData.lng_index])
+		self.text_edit.setPlaceholderText(Lng.search_placeholder_texts)
 		self.central_layout.addWidget(self.text_edit)
 		self.text_edit.setPlainText(text)
 		self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
@@ -66,7 +66,7 @@ class WinTextSearch(UMainWindow):
 
 		btns_layout.addStretch(1)
 
-		self.format_button = UPushButton(Lng.enhance_text[JsonData.lng_index])
+		self.format_button = UPushButton(Lng.enhance_text)
 		self.format_button.clicked.connect(self.format_input_text)
 		self.format_button.setIconSize(self.icon_size)
 		self.format_button.setIcon(self.wand_icon)
@@ -74,11 +74,11 @@ class WinTextSearch(UMainWindow):
 		self.title_row.h_layout.addWidget(self.format_button)
 		# btns_layout.addWidget(self.format_button)
 
-		close_btn = UPushButton(Lng.close[JsonData.lng_index])
+		close_btn = UPushButton(Lng.close)
 		close_btn.clicked.connect(self.deleteLater)
 		btns_layout.addWidget(close_btn)
 
-		self.ok_btn = ActiveButton(Lng.search[JsonData.lng_index])
+		self.ok_btn = ActiveButton(Lng.search)
 		self.ok_btn.setIcon(self.magnifier_icon)
 		self.ok_btn.setIconSize(self.icon_size)
 		self.ok_btn.clicked.connect(self.search)

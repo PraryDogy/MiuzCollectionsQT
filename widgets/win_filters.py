@@ -28,7 +28,7 @@ class WinFiltersTitleWidget(TitleTextLabel):
 		self.reset_icon = QIcon(str(self.reset_svg_path))
 		self.h_layout.addStretch(1)
 
-		self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
+		self.reset_button = UPushButton(Lng.reset)
 		self.reset_button.setIcon(self.reset_icon)
 		self.reset_button.clicked.connect(self.reset_clicked.emit)
 		self.h_layout.addWidget(self.reset_button)
@@ -37,7 +37,7 @@ class WinFiltersTitleWidget(TitleTextLabel):
 class CalendarTag(UTagWidget):
 	def __init__(self):
 		super().__init__(
-			text=Lng.not_selected[JsonData.lng_index],
+			text=Lng.not_selected,
 			qss_style=self.qss_gray,
 		)
 		self.adjustSize()
@@ -53,16 +53,15 @@ class DatesWidget(UGroupBox):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 
-		ind = JsonData.lng_index
 		_today = QDate.currentDate()
 
 		self.dates_dict = {
-			(_today, _today): Lng.preset_today[ind],
-			(_today.addDays(-1), _today.addDays(-1)): Lng.preset_yesterday[ind],
-			(_today.addDays(-7), _today): Lng.preset_week[ind],
-			(_today.addDays(-14), _today): Lng.preset_two_weeks[ind],
-			(_today.addMonths(-1), _today): Lng.preset_month[ind],
-			(_today.addYears(-1), _today): Lng.preset_year[ind],
+			(_today, _today): Lng.preset_today,
+			(_today.addDays(-1), _today.addDays(-1)): Lng.preset_yesterday,
+			(_today.addDays(-7), _today): Lng.preset_week,
+			(_today.addDays(-14), _today): Lng.preset_two_weeks,
+			(_today.addMonths(-1), _today): Lng.preset_month,
+			(_today.addYears(-1), _today): Lng.preset_year,
 		}
 
 		# Загружаем даты независимо друг от друга
@@ -86,7 +85,7 @@ class DatesWidget(UGroupBox):
 		self.main_layout.setSpacing(7)
 
 		self.title_widget = WinFiltersTitleWidget(
-			text=Lng.dates_management[ind],
+			text=Lng.dates_management,
 			svg_path=str(self.calendar_svg)
 		)
 		self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
@@ -98,7 +97,7 @@ class DatesWidget(UGroupBox):
 		dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
 		dynamic_container_lay.setSpacing(5)
 
-		self.dynamic_label = TransparentLabel(Lng.selected_dates[JsonData.lng_index])
+		self.dynamic_label = TransparentLabel(Lng.selected_dates)
 		dynamic_container_lay.addWidget(self.dynamic_label)
 
 		self.main_layout.addWidget(dynamic_container)
@@ -120,13 +119,13 @@ class DatesWidget(UGroupBox):
 		self.date_btns_layout.setContentsMargins(0, 0, 0, 0)
 		self.date_btns_layout.setSpacing(5)
 
-		dates_btn = UPushButton(Lng.period[JsonData.lng_index])
+		dates_btn = UPushButton(Lng.period)
 		dates_btn.setMenu(self.preset_menu)
 		self.date_btns_layout.addWidget(dates_btn)
 
 		self.date_btns_layout.addSpacing(10)
 
-		from_label = GrayTextLabel(Lng.start_date[ind])
+		from_label = GrayTextLabel(Lng.start_date)
 		self.date_btns_layout.addWidget(from_label)
 
 		self.left_calendar_tag = CalendarTag()
@@ -135,7 +134,7 @@ class DatesWidget(UGroupBox):
 
 		self.date_btns_layout.addSpacing(10)
 
-		to_label = GrayTextLabel(Lng.end_date[ind])
+		to_label = GrayTextLabel(Lng.end_date)
 		self.date_btns_layout.addWidget(to_label)
 
 		self.right_calendar_tag = CalendarTag()
@@ -204,8 +203,7 @@ class DatesWidget(UGroupBox):
 		self.update_readable_date_label()
 
 	def set_date_buttons_text(self):
-		ind = JsonData.lng_index
-		empty_text = Lng.not_selected[ind]
+		empty_text = Lng.not_selected
 
 		# Обрабатываем кнопку "Старт" независимо
 		if self.q_date_start is None:
@@ -224,31 +222,30 @@ class DatesWidget(UGroupBox):
 			self.right_calendar_tag.set_qss_style(self.right_calendar_tag.qss_green)
 
 	def update_readable_date_label(self):
-		ind = JsonData.lng_index
 		locale = QLocale(
-			QLocale.Language.Russian if ind == 0 else QLocale.Language.English
+			QLocale.Language.Russian if JsonData.lng_index == 0 else QLocale.Language.English
 		)
 
 		if self.is_all_time():
-			text = Lng.all_time[ind]
+			text = Lng.all_time
 			
 		elif self.q_date_start is not None and self.q_date_end is not None and (self.q_date_start, self.q_date_end) in self.dates_dict:
 			text = self.dates_dict[self.q_date_start, self.q_date_end]
 			
 		elif self.q_date_start is not None and self.q_date_end is None:
 			str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
-			text = f"{Lng.from_text[ind]} {str_from}"
+			text = f"{Lng.from_text} {str_from}"
 			
 		elif self.q_date_start is None and self.q_date_end is not None:
 			str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-			text = f"{Lng.to_text[ind]} {str_to}"
+			text = f"{Lng.to_text} {str_to}"
 			
 		else:
 			str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
 			str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
-			text = f"{Lng.from_text[ind]} {str_from} {Lng.to_text[ind].lower()} {str_to}"
+			text = f"{Lng.from_text} {str_from} {Lng.to_text.lower()} {str_to}"
 
-		text = f"{Lng.selected_dates[ind]}: {text.lower()}"
+		text = f"{Lng.selected_dates}: {text.lower()}"
 		self.dynamic_label.setText(text)
 		DatesWidget.readable_date = text
 
@@ -297,7 +294,7 @@ class WinFiltersFavTag(WinFiltersStantartTag):
 
 	def __init__(self):
 		super().__init__(
-			text=Lng.favorites[JsonData.lng_index],
+			text=Lng.favorites,
 			left_svg_path=str(self.left_svg_path),
 		)
 		if Dynamic.favs_tag_enabled:
@@ -318,7 +315,7 @@ class SubfoldersTagWidget(WinFiltersStantartTag):
 
 	def __init__(self):
 		super().__init__(
-			text=Lng.without_subfolders[JsonData.lng_index], 
+			text=Lng.without_subfolders, 
 			left_svg_path=str(self.left_svg_path)
 		)
 		if Dynamic.no_subfolders_tag_enabled:
@@ -361,7 +358,7 @@ class AddTagWidget(UTagWidget):
 
 	def __init__(self):
 		super().__init__(
-			text=Lng.new_tag[JsonData.lng_index],
+			text=Lng.new_tag,
 			qss_style=self.qss_transparent,
 			left_svg_path=str(self.left_svg_path)
 		)
@@ -425,7 +422,7 @@ class UserTags(TransparentWidget):
 				self._create_tags()
 
 		self.text_win = InputTextWin(
-			description=Lng.new_tag_desc[JsonData.lng_index],
+			description=Lng.new_tag_desc,
 			svg_path=str(self.svg_path)
 		)
 		self.text_win.center_to_parent(self.window())
@@ -443,7 +440,7 @@ class UserTags(TransparentWidget):
 				self.load_st_grid.emit()
 			widget.deleteLater()
 
-		self.remove_tag_win = ConfirmWindow(Lng.remove_tag_question[JsonData.lng_index])
+		self.remove_tag_win = ConfirmWindow(Lng.remove_tag_question)
 		self.remove_tag_win.ok_clicked.connect(ok_clicked)
 		self.remove_tag_win.center_to_parent(self.window())
 		self.remove_tag_win.show()
@@ -470,7 +467,7 @@ class TagsWidget(UGroupBox):
 		self.v_lay.setSpacing(7)
 
 		self.title_widget = WinFiltersTitleWidget(
-			text=Lng.tag_management[JsonData.lng_index],
+			text=Lng.tag_management,
 			svg_path=str(self.svg_path)
 		)
 		self.title_widget.reset_clicked.connect(lambda: self.reset_tags(True))
@@ -478,14 +475,14 @@ class TagsWidget(UGroupBox):
 
 		self.v_lay.addWidget(USep())
 
-		st_tags_title = GrayTextLabel(Lng.standart_tags[JsonData.lng_index])
+		st_tags_title = GrayTextLabel(Lng.standart_tags)
 		self.v_lay.addWidget(st_tags_title)
 
 		self.standart_tags = StandartTags()
 		self.standart_tags.load_st_grid.connect(self.load_st_grid.emit)
 		self.v_lay.addWidget(self.standart_tags)
 
-		user_tags_title = GrayTextLabel(Lng.user_tags[JsonData.lng_index])
+		user_tags_title = GrayTextLabel(Lng.user_tags)
 		self.v_lay.addWidget(user_tags_title)
 
 		self.user_tags = UserTags()
@@ -514,7 +511,7 @@ class WinFilters(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.filters[JsonData.lng_index])
+		self.setWindowTitle(Lng.filters)
 		self.setFixedWidth(self.ww)
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
@@ -535,11 +532,11 @@ class WinFilters(UMainWindow):
 
 		self.buttons_layout.addStretch(1)
 
-		self.reset_all_button = UPushButton(Lng.reset_all[JsonData.lng_index])
+		self.reset_all_button = UPushButton(Lng.reset_all)
 		self.reset_all_button.clicked.connect(self.reset_all_cmd)
 		self.buttons_layout.addWidget(self.reset_all_button)
 
-		self.close_button = ActiveButton(Lng.close[JsonData.lng_index])
+		self.close_button = ActiveButton(Lng.close)
 		self.close_button.clicked.connect(self.deleteLater)
 		self.buttons_layout.addWidget(self.close_button)
 

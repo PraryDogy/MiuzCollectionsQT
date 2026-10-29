@@ -152,7 +152,7 @@ class WinCalendar(UMainWindow):
 			self.selected_date = date
 			self.view_date = date
 
-		self.setWindowTitle(Lng.calendar[JsonData.lng_index])
+		self.setWindowTitle(Lng.calendar)
 		self.set_close_only()
 		self.set_always_on_top()
 
@@ -185,7 +185,7 @@ class WinCalendar(UMainWindow):
 		dynamic_container_lay.addStretch(1)
 
 		reset_icon = QIcon(str(self.svg_reset_path))
-		self.reset_button = UPushButton(Lng.reset[JsonData.lng_index])
+		self.reset_button = UPushButton(Lng.reset)
 		self.reset_button.clicked.connect(self.reset_button_cmd)
 		self.reset_button.setIcon(reset_icon)
 		dynamic_container_lay.addWidget(self.reset_button)
@@ -261,11 +261,11 @@ class WinCalendar(UMainWindow):
 		self.btn_container_layout.setSpacing(10)
 		self.btn_container_layout.addStretch(1)
 
-		cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		cancel_btn = UPushButton(Lng.cancel)
 		cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_container_layout.addWidget(cancel_btn)
 
-		self.done_btn = ActiveButton(Lng.apply[JsonData.lng_index])
+		self.done_btn = ActiveButton(Lng.apply)
 		self.done_btn.clicked.connect(self.ok_btn_cmd)
 		self.btn_container_layout.addWidget(self.done_btn)
 
@@ -304,7 +304,7 @@ class WinCalendar(UMainWindow):
 			readable_date = self.q_locale.toString(self.selected_date, "d MMMM yyyy")
 			self.dynamic_label.setText(readable_date)
 		else:
-			self.dynamic_label.setText(Lng.not_selected[JsonData.lng_index])
+			self.dynamic_label.setText(Lng.not_selected)
 
 	def populate_months(self):
 		self.menu_month.clear()

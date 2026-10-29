@@ -56,7 +56,7 @@ class ServerList(UListWidget):
 		self.evlosh_servers_path = Path("./_miuz_servers.json")
 
 	def remove_cmd(self, server_item: ServerItem):
-		self.win_warn = ConfirmWindow(Lng.confirm_delete[JsonData.lng_index])
+		self.win_warn = ConfirmWindow(Lng.confirm_delete)
 		self.win_warn.ok_clicked.connect(lambda: self.remove_server.emit(server_item))
 		self.win_warn.center_to_parent(self.window())
 		self.win_warn.show()
@@ -80,19 +80,19 @@ class ServerList(UListWidget):
 
 		# Если кликнули по существующему элементу, добавляем управление сервером
 		if list_item:
-			connect = QAction(Lng.connect[JsonData.lng_index], self.menu_)
+			connect = QAction(Lng.connect, self.menu_)
 			connect.triggered.connect(self.connect_server.emit)
 			self.menu_.addAction(connect)
 
 			self.menu_.addSeparator()
 
-			edit = QAction(Lng.edit[JsonData.lng_index], self.menu_)
+			edit = QAction(Lng.edit, self.menu_)
 			edit.triggered.connect(
 				lambda: self.edit_server.emit(list_item.server_item)
 			)
 			self.menu_.addAction(edit)
 
-			rem = QAction(Lng.delete[JsonData.lng_index], self.menu_)
+			rem = QAction(Lng.delete, self.menu_)
 			rem.triggered.connect(
 				lambda: self.remove_cmd(list_item.server_item)
 			)
@@ -162,7 +162,7 @@ class LoginWin(UMainWindow):
 		# Убрали сепаратор по правилу: если UGroupBox (или рамка) рядом с заголовком, сепаратор не нужен
 		
 		is_edit = server_item is not None
-		title_word = Lng.edit[JsonData.lng_index] if is_edit else Lng.add[JsonData.lng_index]
+		title_word = Lng.edit if is_edit else Lng.add
 		self.setWindowTitle(f"{title_word}")
 
 		# Уменьшили рамки вокруг виджетов
@@ -179,15 +179,15 @@ class LoginWin(UMainWindow):
 		form_lay.setSpacing(6)
 
 		# Псевдоним
-		form_lay.addWidget(ServerLabel(Lng.alias[JsonData.lng_index].capitalize()))
+		form_lay.addWidget(ServerLabel(Lng.alias.capitalize()))
 		self.alias = ULineEdit()
-		self.alias.setPlaceholderText(Lng.server_alias_placeholder[JsonData.lng_index])
+		self.alias.setPlaceholderText(Lng.server_alias_placeholder)
 		form_lay.addWidget(self.alias)
 
 		form_lay.addSpacing(4)
 
 		# Сервер
-		form_lay.addWidget(ServerLabel(Lng.server[JsonData.lng_index].capitalize()))
+		form_lay.addWidget(ServerLabel(Lng.server.capitalize()))
 		self.server = ULineEdit()
 		self.server.setPlaceholderText("smb://shares/design/")
 		form_lay.addWidget(self.server)
@@ -195,7 +195,7 @@ class LoginWin(UMainWindow):
 		form_lay.addSpacing(4)
 
 		# Логин
-		form_lay.addWidget(ServerLabel(Lng.login[JsonData.lng_index].capitalize()))
+		form_lay.addWidget(ServerLabel(Lng.login.capitalize()))
 		self.login = ULineEdit()
 		self.login.setPlaceholderText("login@name.lan")
 		form_lay.addWidget(self.login)
@@ -203,7 +203,7 @@ class LoginWin(UMainWindow):
 		form_lay.addSpacing(4)
 
 		# Пароль
-		form_lay.addWidget(ServerLabel(Lng.password[JsonData.lng_index].capitalize()))
+		form_lay.addWidget(ServerLabel(Lng.password.capitalize()))
 		self.pass_ = PassLineEdit()
 		self.pass_.setPlaceholderText("••••••••")
 		form_lay.addWidget(self.pass_)
@@ -216,11 +216,11 @@ class LoginWin(UMainWindow):
 
 		btn_layout.addStretch()
 
-		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		btn_layout.addWidget(self.cancel_btn)
 
-		btn_text = Lng.save[JsonData.lng_index] if is_edit else Lng.add[JsonData.lng_index]
+		btn_text = Lng.save if is_edit else Lng.add
 		self.ok_btn = ActiveButton(btn_text)
 		self.ok_btn.clicked.connect(self.ok_cmd)
 		btn_layout.addWidget(self.ok_btn)
@@ -267,7 +267,7 @@ class ServersWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		
-		title = Lng.connect_to_server_title[JsonData.lng_index]
+		title = Lng.connect_to_server_title
 		self.setWindowTitle(title)
 		self.setFixedWidth(400)
 		
@@ -282,7 +282,7 @@ class ServersWin(UMainWindow):
 		group_lay.setContentsMargins(12, 12, 12, 12)
 		group_lay.setSpacing(8)
 		title_lbl = TitleTextLabel(
-			Lng.favorite_servers[JsonData.lng_index],
+			Lng.favorite_servers,
 			str(self.connect_color)
 		)
 		group_lay.addWidget(title_lbl)
@@ -290,7 +290,7 @@ class ServersWin(UMainWindow):
 		group_lay.addWidget(USep())
 
 		# --- Описание ---
-		description_label = GrayTextLabel(Lng.servers_description[JsonData.lng_index])
+		description_label = GrayTextLabel(Lng.servers_description)
 		description_label.setWordWrap(True)
 		group_lay.addWidget(description_label)
 
@@ -312,18 +312,18 @@ class ServersWin(UMainWindow):
 		btn_layout.setSpacing(10)
 		self.central_layout.addLayout(btn_layout)
 
-		self.add_btn = UPushButton(Lng.add[JsonData.lng_index])
+		self.add_btn = UPushButton(Lng.add)
 		self.add_btn.setIcon(QIcon(str(Static.COMMON_ICONS / "plus_simple.svg")))
 		self.add_btn.clicked.connect(self.show_login_win)
 		btn_layout.addWidget(self.add_btn)
 
 		btn_layout.addStretch()
 
-		self.cancel_btn = UPushButton(Lng.cancel[JsonData.lng_index])
+		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		btn_layout.addWidget(self.cancel_btn)
 
-		self.connect_btn = ActiveButton(Lng.connect[JsonData.lng_index])
+		self.connect_btn = ActiveButton(Lng.connect)
 		self.connect_btn.clicked.connect(self.connect_cmd)
 		btn_layout.addWidget(self.connect_btn)
 

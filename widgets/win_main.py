@@ -140,12 +140,12 @@ class DangerWarn(ConfirmWindow):
 
 	def __init__(self, mf_alias: str, removed_images_count: int):
 		text = (
-			f"{Lng.dangerous_text[JsonData.lng_index]}".format(removed_images_count)
+			f"{Lng.dangerous_text}".format(removed_images_count)
 		)
 		super().__init__(text)
 		self.svg_widget.load(str(self.icon_path))
-		self.ok_btn.setText(Lng.allow[JsonData.lng_index])
-		self.cancel_btn.setText(Lng.deny[JsonData.lng_index])
+		self.ok_btn.setText(Lng.allow)
+		self.cancel_btn.setText(Lng.deny)
 
 	def closeEvent(self, a0):
 		a0.ignore()
@@ -341,7 +341,7 @@ class WinMain(UMainWindow):
 		self.bar_path.update(dir)
 
 	def on_hide_digits_clicked(self):
-		self.win_warn = WarningWindow(Lng.hide_digits_full[JsonData.lng_index])
+		self.win_warn = WarningWindow(Lng.hide_digits_full)
 		self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
 		self.win_warn.center_to_parent(self)
 		self.win_warn.show()
@@ -515,7 +515,7 @@ class WinMain(UMainWindow):
 		if not abs_paths:
 			return
 		dirs_to_scan = dirs_to_rescan(abs_paths)
-		text = getattr(Lng, remove_confirm_key(len(abs_paths)))[JsonData.lng_index]
+		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
 		self.remove_files_win = ConfirmWindow(text)
 		file_remover = ProcessWorker(
 				target=FilesRemover.start,
@@ -796,7 +796,7 @@ class WinMain(UMainWindow):
 				)
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
 			self.bar_bottom.progress_bar.stop_timer_text()
-			self.bar_bottom.progress_bar.setText(Lng.loading[JsonData.lng_index])
+			self.bar_bottom.progress_bar.setText(Lng.loading)
 			self.scaner_task.start()
 			self.scaner_poll_timer.stop()
 			self.scaner_poll_timer.start(ms)

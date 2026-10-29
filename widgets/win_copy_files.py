@@ -30,7 +30,7 @@ class ReplaceWin(VerticalWindow):
         self.filename = filename
         self.show_checkbox = show_checkbox
 
-        self.setWindowTitle(Lng.replace[JsonData.lng_index])
+        self.setWindowTitle(Lng.replace)
         self.set_close_only()
         self.set_always_on_top()
         self.show_titlebar_sep()
@@ -50,7 +50,7 @@ class ReplaceWin(VerticalWindow):
         )
 
         message = TransparentLabel(
-            Lng.file_exists[JsonData.lng_index]
+            Lng.file_exists
         )
         self.icon_text_layout.addWidget(message)
 
@@ -62,7 +62,7 @@ class ReplaceWin(VerticalWindow):
         self.icon_text_layout.addSpacing(5)
 
         self.replace_all_checkbox = UCheckBox(
-            Lng.apply_to_all_files[JsonData.lng_index]
+            Lng.apply_to_all_files
         )
         self.replace_all_checkbox.clicked.connect(
             self._checkbox_clicked
@@ -80,13 +80,13 @@ class ReplaceWin(VerticalWindow):
         self.actions_layout.setSpacing(5)
 
         self.replace_button = ActiveButton(
-            Lng.replace[JsonData.lng_index]
+            Lng.replace
         )
         self.replace_button.clicked.connect(self._replace)
         self.actions_layout.addWidget(self.replace_button)
 
         self.keep_both_button = UPushButton(
-            Lng.keep_both[JsonData.lng_index]
+            Lng.keep_both
         )
         self.keep_both_button.clicked.connect(self._keep_both)
         self.actions_layout.addWidget(self.keep_both_button)
@@ -94,13 +94,13 @@ class ReplaceWin(VerticalWindow):
         self.btn_layout.addWidget(self.actions_widget)
 
         self.skip_button = UPushButton(
-            Lng.skip[JsonData.lng_index]
+            Lng.skip
         )
         self.skip_button.clicked.connect(self._skip)
         self.btn_layout.addWidget(self.skip_button)
 
         self.cancel_button = UPushButton(
-            Lng.cancel[JsonData.lng_index]
+            Lng.cancel
         )
         self.cancel_button.clicked.connect(self._cancel)
         self.btn_layout.addWidget(self.cancel_button)
@@ -108,17 +108,17 @@ class ReplaceWin(VerticalWindow):
     def _checkbox_clicked(self):
         if self.replace_all_checkbox.isChecked():
             self.replace_button.setText(
-                Lng.replace_all[JsonData.lng_index]
+                Lng.replace_all
             )
             self.keep_both_button.setText(
-                Lng.keep_all[JsonData.lng_index]
+                Lng.keep_all
             )
         else:
             self.replace_button.setText(
-                Lng.replace[JsonData.lng_index]
+                Lng.replace
             )
             self.keep_both_button.setText(
-                Lng.keep_both[JsonData.lng_index]
+                Lng.keep_both
             )
 
     def _keep_both(self):
@@ -150,7 +150,7 @@ class WinCopyFiles(WinProgressbar):
         target_dir: str,
         files_to_copy: list[str],
     ):
-        super().__init__(Lng.copying[JsonData.lng_index])
+        super().__init__(Lng.copying)
 
         self.set_close_only()
         self.adjustSize()
@@ -169,11 +169,11 @@ class WinCopyFiles(WinProgressbar):
             dst_text = Mf.current_mf.mf_alias
 
         self.above_label.setText(
-            f'{Lng.copying[JsonData.lng_index]} '
-            f'{Lng.in_[JsonData.lng_index]} "{dst_text}"'
+            f'{Lng.copying} '
+            f'{Lng.in_} "{dst_text}"'
         )
         self.below_label.setText(
-            Lng.preparing[JsonData.lng_index]
+            Lng.preparing
         )
 
         self.copy_item = CopyTaskItem(
@@ -245,7 +245,7 @@ class WinCopyFiles(WinProgressbar):
         below_text = (
             self.windowTitle(),
             str(copy_item.current_file_count),
-            Lng.from_[JsonData.lng_index],
+            Lng.from_,
             str(copy_item.total_file_count),
         )
         self.below_label.setText(" ".join(below_text))
@@ -349,7 +349,7 @@ class WinCopyFiles(WinProgressbar):
         self.close_replace_window()
 
         self.error_win = WarningWindow(
-            Lng.copy_error[JsonData.lng_index],
+            Lng.copy_error,
             traceback_text,
         )
         self.error_win.center_to_parent(self.window())
@@ -370,7 +370,7 @@ class WinCopyFiles(WinProgressbar):
             below_text = (
                 self.windowTitle(),
                 str(self.copy_item.total_file_count),
-                Lng.from_[JsonData.lng_index],
+                Lng.from_,
                 str(self.copy_item.total_file_count),
             )
             self.below_label.setText(" ".join(below_text))
