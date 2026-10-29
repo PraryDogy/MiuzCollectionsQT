@@ -133,8 +133,10 @@ class Thumb(TransparentFrame):
 	BORDER_W = 2  # должна совпадать с border в QSS для Thumb и SquareThumb
 	fast_scale = False
 
-	def __init__(self, data_item: DataItem, parent=None):
-		super().__init__(parent)
+	# не передавай PARENT в Thumb, иначе не отображаются
+
+	def __init__(self, data_item: DataItem):
+		super().__init__()
 		self.row, self.col, self.idx = 0, 0, 0   # idx — линейный индекс в сетке
 		self.data_item = data_item
 		if self.data_item.fav:
@@ -656,6 +658,11 @@ class Grid(UScrollVerticalArea):
 		self.url_to_wid: dict[str, Thumb] = {}
 		self.files_to_copy = set()
 
+		# --- Дозагрузка ---
+		self._loading_more = False             # защита от параллельных запросов
+		self._exhausted = False                # БД вернула пустую порцию
+		self._fill_retries = 0                 # счётчик повторов проверки, пока геометрия не готова
+
 		# --- Приложения для «Открыть в…» (ищутся в фоне через URunnable) ---
 		self._image_apps: dict[str, str] = {}
 		self._apps_task = AppsScanner(Static.IMAGE_APPS)
@@ -670,6 +677,7 @@ class Grid(UScrollVerticalArea):
 		self.date_timer = QTimer(self)
 		self.date_timer.setSingleShot(True)
 
+		# таймер окончания перетаскивания слайдера: сглаженный проход один раз
 		self._size_timer = QTimer(self)
 		self._size_timer.setSingleShot(True)
 		self._size_timer.timeout.connect(self._finish_resize)
@@ -794,6 +802,8 @@ class Grid(UScrollVerticalArea):
 			self.grid_lay.addWidget(thumb, row, col)
 		self.grid_wid.show()
 		self._refresh_visible()
+		# проверку заполнения ставим в очередь: высоты обновятся после layout
+		QTimer.singleShot(0, self._fill_if_needed)
 
 	def _refresh_visible(self):
 		"""Ставит картинку только тем миниатюрам, которые попадают в видимую область."""
@@ -811,12 +821,12 @@ class Grid(UScrollVerticalArea):
 		for wid in self.url_to_wid.values():
 			wid.set_text_and_size()
 		self.grid_lay.setSpacing(self.get_grid_spacing())
-		self.rearrange()  # видимые получают быстрые картинки через _refresh_visible
+		self.rearrange()
 		# каждый вызов переносит финальный проход
 		self._size_timer.start(self._size_debounce_ms)
 
 	def _finish_resize(self):
-		# слайдер остановился: сглаженный проход только по видимым миниатюрам
+		# слайдер остановился: сглаженный проход по видимым миниатюрам
 		Thumb.fast_scale = False
 		self._refresh_visible()
 
@@ -831,6 +841,44 @@ class Grid(UScrollVerticalArea):
 		self._sel.clear()
 		self.wid_under_mouse = None
 		self._cols = 1
+
+	# --- Дозагрузка ---
+
+	def checkScrollValue(self, value: int):
+		self.up_btn.setVisible(value > 0)
+		self._refresh_visible()
+		self._fill_if_needed()
+
+	def _content_bottom(self) -> int:
+		"""Нижняя граница сетки в координатах scroll_wid."""
+		last = self.ordered[-1]
+		return self.grid_wid.y() + last.geometry().bottom()
+
+	def _visible_bottom(self) -> int:
+		"""Нижняя граница видимой части в тех же координатах."""
+		return self.verticalScrollBar().value() + self.viewport().height()
+
+	def _fill_if_needed(self):
+		if self._loading_more or self._exhausted or not self.ordered:
+			self._fill_retries = 0
+			return
+
+		last = self.ordered[-1]
+
+		# геометрия ещё не готова: повторяем проверку, а не решаем по старым данным
+		if self.grid_wid.height() <= 0 or last.height() <= 0:
+			if self._fill_retries < 20:
+				self._fill_retries += 1
+				QTimer.singleShot(30, self._fill_if_needed)
+			return
+
+		self._fill_retries = 0
+		self.scroll_layout.activate()
+		self.grid_lay.activate()
+
+		if self._content_bottom() - self._visible_bottom() <= 50:
+			self._loading_more = True
+			self.load_more_thumbnails()
 
 	# --- Клавиатура ---
 
@@ -1141,10 +1189,6 @@ class Grid(UScrollVerticalArea):
 
 		self.menu_.show_menu_under_cursor(a0)
 
-	def checkScrollValue(self, value: int):
-		self.up_btn.setVisible(value > 0)
-		self._refresh_visible()
-
 	def mouseDoubleClickEvent(self, a0):
 
 		def fin(wid: Thumb):
@@ -1229,13 +1273,15 @@ class GridStandart(Grid):
 	def __init__(self):
 		super().__init__()
 		self.setAcceptDrops(True)
-		self._loading_more = False     # защита от повторной догрузки при прокрутке
 		self._load_id = 0              # номер текущего запроса к БД
 		self._tasks: dict[int, DbImagesLoader] = {}  # держим ссылки на работающие задачи
 		self._empty_lbl: TransparentLabel | None = None
 		self.load_db_images_task(reset=True)
 
 	def load_more_thumbnails(self):
+		if self._exhausted:
+			self._loading_more = False
+			return
 		Dynamic.loaded_thumbs += Static.THUMBS_LOAD_LIMIT
 		self.load_db_images_task(reset=False)
 
@@ -1253,9 +1299,14 @@ class GridStandart(Grid):
 	def _on_loaded(self, items: list[DbImagesLoaderItem], load_id: int, reset: bool):
 		self._tasks.pop(load_id, None)
 		if load_id != self._load_id:
-			return  # результат устарел, пришёл более новый запрос
+			# результат устарел, сбрасываем флаг, иначе дозагрузка заблокируется
+			self._loading_more = False
+			return
 		if reset:
 			self.clear_grid()
+			self._exhausted = False
+		if not items:
+			self._exhausted = True
 		self.create_thumbnails(items)
 
 	def clear_grid(self):
@@ -1303,13 +1354,6 @@ class GridStandart(Grid):
 		else:
 			self.rearrange()
 		self.finished_.emit()
-
-	def checkScrollValue(self, value: int):
-		super().checkScrollValue(value)
-		sb = self.verticalScrollBar()
-		if sb.maximum() > 0 and not self._loading_more and value >= sb.maximum() - 50:
-			self._loading_more = True
-			self.load_more_thumbnails()
 
 	def dragEnterEvent(self, a0):
 		a0.acceptProposedAction()
