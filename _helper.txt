@@ -1,3 +1,11 @@
+Ищет текст в кавычках кроме .svg
+Помогает найти тексты которые не попали в Lng
+
+(["'])(?!\1)(?![^"' ]*\.svg\1).*?\1
+
+
+FONTS Mac os PyQt6
+
 .AppleSystemUIFont
 Academy Engraved LET
 Al Bayan
