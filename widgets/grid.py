@@ -31,11 +31,51 @@ CONTROLS_MARGIN = 10
 
 
 class ThumbImgWidget(TransparentLabel):
+	_badge_font = None  # общий для всех миниатюр, создаётся лениво
+
 	def __init__(self):
 		super().__init__()
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self._saved_pixmap = None
-		self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+		self.badge_text = ""
+		self._badge_rect: QRect | None = None  # пересчитывается при смене текста или размера
+
+	@classmethod
+	def _get_font(cls) -> QFont:
+		if cls._badge_font is None:
+			f = QFont(QApplication.font())
+			f.setBold(True)
+			f.setPointSizeF(max(7.0, f.pointSizeF() * 0.85))
+			cls._badge_font = f
+		return cls._badge_font
+
+	def set_badge_text(self, text: str):
+		self.badge_text = text
+		self._badge_rect = None  # пересчитаем в paintEvent
+
+	def _calc_badge_rect(self, painter: QPainter) -> QRect:
+		painter.setFont(self._get_font())
+		fm = painter.fontMetrics()
+		w = fm.horizontalAdvance(self.badge_text) + 8
+		h = fm.height() + 4
+		return QRect(self.width() - w - 4, 4, w, h)
+
+	def paintEvent(self, event):
+		super().paintEvent(event)
+		if not self.badge_text or self.pixmap() is None or self.pixmap().isNull():
+			return
+		p = QPainter(self)
+		p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+		if self._badge_rect is None or self._badge_rect.right() + 4 != self.width():
+			self._badge_rect = self._calc_badge_rect(p)
+		rect = self._badge_rect
+		p.setPen(Qt.PenStyle.NoPen)
+		p.setBrush(QColor(0, 0, 0, 170))
+		p.drawRoundedRect(rect, 3, 3)
+		p.setPen(QColor(255, 255, 255))
+		p.setFont(self._get_font())
+		p.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.badge_text)
+		p.end()
 
 	def show_updating(self):
 		"""Показывает текст 'обновление' вместо изображения."""
@@ -108,9 +148,9 @@ class Thumb(TransparentFrame):
 		self.v_lay.setSpacing(3)
 		self.v_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-		# --- Виджеты ---
 		self.img_wid = ThumbImgWidget()
 		self.v_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+		self.img_wid.set_badge_text(os.path.splitext(data_item.rel_path)[1].lstrip(".").upper())
 
 		self._add_captions()
 
