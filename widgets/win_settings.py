@@ -658,7 +658,7 @@ class NewMfSettings(UScrollVerticalArea):
 		main_wid = TransparentWidget()
 		self.setWidget(main_wid)
 
-		main_lay = QVBoxLayout(self)
+		main_lay = QVBoxLayout(main_wid)
 		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
 
@@ -760,16 +760,15 @@ class WinSettings(UMainWindow):
 	settings_svg = Static.COMMON_ICONS / "settings.svg"
 	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
-	ww = 700
-	hh = 500
+	ww = 720
+	hh = 550
 
 	def __init__(self, settings_item: SettingsItem):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.settings[JsonData.lng_index])
-		# self.setFixedSize(self.ww, self.hh)
-		self.resize(self.ww, self.hh)
+		self.setMinimumSize(self.ww, self.hh)
 
 		self.settings_item = settings_item
 
