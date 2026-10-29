@@ -147,6 +147,8 @@ class DbImagesLoaderItem:
 	resized_qimages: list[QImage]
 	day_month_year: str
 	hour_min_sec: str
+	filename: str
+	ext: str
 
 
 class DbImagesLoader(URunnable):
@@ -206,6 +208,8 @@ class DbImagesLoader(URunnable):
 			day_month_year = f"{date_.day} {month_gen_} {date_.year}"
 			hour_min_sec = str(time_)
 
+			rel_img_path: str
+
 			item = DbImagesLoaderItem(
 				rel_img_path=rel_img_path,
 				rel_thumb_path=rel_thumb_path,
@@ -213,7 +217,9 @@ class DbImagesLoader(URunnable):
 				base_qimage=base_qimage,
 				resized_qimages=resized_qimages,
 				day_month_year=day_month_year,
-				hour_min_sec=hour_min_sec
+				hour_min_sec=hour_min_sec,
+				filename=os.path.basename(rel_img_path),
+				ext=os.path.splitext(rel_img_path)[1].lstrip(".").upper()
 			)
 			thumbs.append(item)
 		return thumbs

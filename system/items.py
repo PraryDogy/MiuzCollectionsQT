@@ -20,3 +20,4 @@ class DataItem:
 	day_month_year: str
 	hour_min_sec: str
 	filename: str
+	ext: str

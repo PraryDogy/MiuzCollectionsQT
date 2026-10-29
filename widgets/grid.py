@@ -155,14 +155,15 @@ class Thumb(TransparentFrame):
 
 		self.img_wid = ThumbImgWidget()
 		self.v_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
-		self.img_wid.set_badge_text(os.path.splitext(data_item.rel_path)[1].lstrip(".").upper())
+		self.img_wid.set_badge_text(self.data_item.ext)
 
 		self._add_captions()
 
+		ext = f"{Lng.type_[JsonData.lng_index]}: {self.data_item.ext}"
 		filename = f"{Lng.file_name[JsonData.lng_index]}: {self.data_item.filename}"
 		location = f"{Lng.location[JsonData.lng_index]}: {Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
 		modified = f"{Lng.modified[JsonData.lng_index]}: {self.data_item.day_month_year} {self.data_item.hour_min_sec}"
-		self.setToolTip("\n".join([filename, location, modified]))
+		self.setToolTip("\n".join([ext, filename, location, modified]))
 
 		self.set_text_and_size()
 
@@ -1404,7 +1405,8 @@ class GridStandart(Grid):
 					fav=image_item.fav,
 					day_month_year=image_item.day_month_year,
 					hour_min_sec=image_item.hour_min_sec,
-					filename=os.path.basename(image_item.rel_img_path)
+					filename=image_item.filename,
+					ext=image_item.ext
 				)
 				thumbnail = self.thumb_cls(data_item)
 				thumbnail.set_no_frame()
