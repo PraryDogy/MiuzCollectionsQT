@@ -638,6 +638,7 @@ class Grid(UScrollVerticalArea):
 	finished_ = pyqtSignal()
 	collage = pyqtSignal(list)
 	open_filters_win = pyqtSignal()
+	selection_count_changed = pyqtSignal(int)
 
 	resize_ms = 10
 	thumb_cls = Thumb
@@ -665,6 +666,10 @@ class Grid(UScrollVerticalArea):
 		self._loading_more = False             # защита от параллельных запросов
 		self._exhausted = False                # БД вернула пустую порцию
 		self._fill_retries = 0                 # счётчик повторов проверки, пока геометрия не готова
+
+		# --- Уведомление о числе выделенных ---
+		self._sel_notify_enabled = True   # False внутри батча, чтобы не спамить сигналом
+		self._last_sel_count = 0
 
 		# --- Приложения для «Открыть в…» (ищутся в фоне через URunnable) ---
 		self._image_apps: dict[str, str] = {}
@@ -742,15 +747,35 @@ class Grid(UScrollVerticalArea):
 		"""Список выделенных виджетов в порядке выделения (для внешнего кода)."""
 		return list(self._sel)
 
+	def _notify_selection(self):
+		"""Испускает сигнал, только если число выделенных реально изменилось."""
+		if not self._sel_notify_enabled:
+			return
+		n = len(self._sel)
+		if n != self._last_sel_count:
+			self._last_sel_count = n
+			self.selection_count_changed.emit(n)
+
+	def _bulk_selection(self, fn):
+		"""Выполняет массовое изменение выделения и испускает сигнал один раз в конце."""
+		self._sel_notify_enabled = False
+		try:
+			fn()
+		finally:
+			self._sel_notify_enabled = True
+			self._notify_selection()
+
 	def _add_sel(self, wid: Thumb):
 		if wid not in self._sel:
 			self._sel[wid] = None
 			wid.set_frame()
+			self._notify_selection()
 
 	def _remove_sel(self, wid: Thumb):
 		if wid in self._sel:
 			del self._sel[wid]
 			wid.set_no_frame()
+			self._notify_selection()
 
 	def clear_selected_widgets(self):
 		"""
@@ -760,6 +785,7 @@ class Grid(UScrollVerticalArea):
 		for w in self._sel:
 			w.set_no_frame()
 		self._sel.clear()
+		self._notify_selection()
 
 	def wid_to_selected_widgets(self, wid: Thumb):
 		if isinstance(wid, Thumb):
@@ -877,6 +903,8 @@ class Grid(UScrollVerticalArea):
 		self._cols = 1
 		self._layout_cols = -1
 		self._layout_count = -1
+		self._last_sel_count = 0
+		self.selection_count_changed.emit(0)
 
 	# --- Дозагрузка ---
 
@@ -957,8 +985,9 @@ class Grid(UScrollVerticalArea):
 
 		def select_all():
 			"""Выделяет все виджеты в сетке."""
-			for wid in self.ordered:
-				self._add_sel(wid)
+			self._bulk_selection(
+				lambda: [self._add_sel(w) for w in self.ordered]
+			)
 
 		def open_last_selected():
 			"""Открывает просмотр последнего выбранного виджета."""
@@ -1010,20 +1039,23 @@ class Grid(UScrollVerticalArea):
 		rect_g = QRect(self.grid_wid.mapFrom(self.viewport(), rect.topLeft()), rect.size())
 		hits = [w for w in self.ordered if rect_g.intersects(w.geometry())]
 
-		if not ctrl:
-			self.clear_selected_widgets()
-		for w in hits:
-			if ctrl and w in self._sel:
-				self._remove_sel(w)
-			else:
-				self._add_sel(w)
+		def apply():
+			if not ctrl:
+				self.clear_selected_widgets()
+			for w in hits:
+				if ctrl and w in self._sel:
+					self._remove_sel(w)
+				else:
+					self._add_sel(w)
+		self._bulk_selection(apply)
 
 	def handle_shift_click(self):
 		anchor = next(reversed(self._sel))
 		target = self.wid_under_mouse
 		lo, hi = sorted((anchor.idx, target.idx))
-		for w in self.ordered[lo:hi + 1]:
-			self._add_sel(w)
+		self._bulk_selection(
+			lambda: [self._add_sel(w) for w in self.ordered[lo:hi + 1]]
+		)
 
 	def handle_control_click(self):
 		w = self.wid_under_mouse

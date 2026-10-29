@@ -87,8 +87,13 @@ class BarBottom(TransparentWidget):
 		# --- Прогресс-бар ---
 		self.progress_bar = BarBottomLeftLabel()
 		self.progress_bar.setText("")
-		# self.progress_bar.setFixedHeight(self.icon_size)
 		self.h_layout.addWidget(self.progress_bar, alignment=Qt.AlignmentFlag.AlignVCenter)
+
+		self.h_layout.addStretch()
+		self.selection_label = GrayTextLabel("")
+		self.selection_label.set_font_size(11)
+		self.h_layout.addWidget(self.selection_label)
+		self.h_layout.addStretch()
 
 		# --- Разделитель перед слайдером ---
 		self.h_layout.addStretch()
@@ -104,3 +109,9 @@ class BarBottom(TransparentWidget):
 
 		self.slider.clicked.connect(self.resize_thumbnails)
 		self.h_layout.addWidget(self.slider)
+
+	def set_selection_count(self, n: int):
+		if n <= 0:
+			self.selection_label.setText("")
+		else:
+			self.selection_label.setText(f"Выделено {n} объектов")

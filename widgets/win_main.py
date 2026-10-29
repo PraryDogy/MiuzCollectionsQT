@@ -646,6 +646,14 @@ class WinMain(UMainWindow):
 		self.grid.open_filters_win.connect(
 			lambda: self.open_filters_win()
 		)
+
+
+		self.grid.selection_count_changed.connect(
+			lambda x: self.bar_bottom.set_selection_count(x)
+		)
+
+
+
 		self.right_layout.addWidget(self.grid)
 
 	@with_conn
