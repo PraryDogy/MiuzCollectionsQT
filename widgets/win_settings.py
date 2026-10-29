@@ -509,8 +509,8 @@ class MfRepairWidget(UGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
 		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 10, 10, 10)
-		self.v_lay.setSpacing(5)
+		self.v_lay.setContentsMargins(10, 5, 10, 5)
+		self.v_lay.setSpacing(2)
 
 		title_layout = TitleTextLabel(
 			Lng.repair_mf[JsonData.lng_index],
@@ -553,8 +553,8 @@ class MfRemoveWidget(UGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
 		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 10, 10, 10)
-		self.v_lay.setSpacing(10)
+		self.v_lay.setContentsMargins(10, 5, 10, 5)
+		self.v_lay.setSpacing(5)
 
 		title_layout = TitleTextLabel(
 			Lng.remove_folder[JsonData.lng_index],
@@ -565,7 +565,7 @@ class MfRemoveWidget(UGroupBox):
 		self.v_lay.addWidget(USep())
 
 		descr = GrayTextLabel(
-			"Каталог будет полностью удален из приложения. Все изорбажения на диске удалены не будут."
+			"Каталог будет полностью удален из приложения. Файлы на диске останутся без изменений."
 		)
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
@@ -849,8 +849,8 @@ class WinSettings(UMainWindow):
 	settings_svg = Static.COMMON_ICONS / "settings.svg"
 	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
-	ww = 720
-	hh = 550
+	ww = 710
+	hh = 600
 
 	def __init__(self, settings_item: SettingsItem):
 		super().__init__()

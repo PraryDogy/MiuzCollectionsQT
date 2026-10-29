@@ -1524,7 +1524,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(15, 8, 15, 8)
+		self.main_lay.setContentsMargins(10, 10, 10, 10)
 		self.main_lay.setSpacing(0)
 
 		self.stack = QStackedWidget()
