@@ -8,8 +8,8 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
-							 QSplitter, QTableWidget, QTableWidgetItem,
-							 QVBoxLayout)
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
 from system.items import SettingsItem
@@ -18,18 +18,18 @@ from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
-						  UThreadPool)
+                          UThreadPool)
 from system.themes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
-							MfStopListWidget, RowArrowWidget,
-							SaveRowArrowWidget, SuperConfirmWindow,
-							UGroupBox, TransparentLabel,
-							TransparentWidget, USep, GrayTextLabel,
-							UListSpacerItem, UListWidget, UListWidgetItem,
-							UMainWindow, UMenu, UPushButton, USpinBox,
-							ActiveButton, WarningWindow, UScrollVerticalArea)
+from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
+                            MfAliasWidget, MfPathWidget, MfStopListWidget,
+                            RowArrowWidget, SaveRowArrowWidget,
+                            SuperConfirmWindow, TitleTextLabel,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UListSpacerItem, UListWidget, UListWidgetItem,
+                            UMainWindow, UMenu, UPushButton,
+                            UScrollVerticalArea, USep, USpinBox, WarningWindow)
 
 
 def restart_app():
@@ -502,7 +502,41 @@ class WinSettingsMfAliasTitle(TransparentLabel):
 		super().__init__(text)
 
 
-class MfSettings(TransparentWidget):
+class MfRepairWidget(UGroupBox):
+	svg_path = Static.COMMON_ICONS / "repair.svg"
+	start_clicked = pyqtSignal()
+
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(10, 10, 10, 10)
+		self.v_lay.setSpacing(10)
+
+		title_widget = TitleTextLabel(
+			Lng.repair_mf[JsonData.lng_index],
+			self.svg_path
+		)
+		self.v_lay.addWidget(title_widget)
+
+		self.v_lay.addWidget(USep())
+
+		descr = GrayTextLabel(
+			"Информация о каталоге будет очищена, все изображения будут заново проиндексированы. Это может занять время."
+		)
+		descr.setWordWrap(True)
+		self.v_lay.addWidget(descr)
+
+		title_widget.h_layout.addStretch()
+
+		self.start_btn = UPushButton(Lng.start[JsonData.lng_index])
+		self.start_btn.clicked.connect(self.start_clicked)
+		title_widget.h_layout.addWidget(self.start_btn)
+
+		self.setFixedHeight(self.sizeHint().height())
+
+
+
+class MfSettings(UScrollVerticalArea):
 	repair_svg = Static.COMMON_ICONS / "repair.svg"
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
 	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
@@ -515,7 +549,10 @@ class MfSettings(TransparentWidget):
 		#  Получаем объект Mf по индексу
 		self.mf = Mf.items[mf_index]
 
-		main_lay = QVBoxLayout(self)
+		main_wid = TransparentWidget()
+		self.setWidget(main_wid)
+
+		main_lay = QVBoxLayout(main_wid)
 		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
 
@@ -537,6 +574,11 @@ class MfSettings(TransparentWidget):
 		)
 		main_lay.addWidget(self.mf_stop_list)
 
+		self.repair_widget = MfRepairWidget()
+		self.repair_widget.start_clicked.connect(self.repair_mf)
+		main_lay.addWidget(self.repair_widget)
+	
+
 		self.buttons_container = TransparentWidget()
 		main_lay.addWidget(self.buttons_container)
 		self.buttons_layout = QHBoxLayout(self.buttons_container)
@@ -545,9 +587,9 @@ class MfSettings(TransparentWidget):
 
 		self.buttons_layout.addStretch()
 
-		self.repair_button = UPushButton(Lng.repair_mf[JsonData.lng_index])
-		self.repair_button.setIcon(QIcon(str(self.repair_svg)))
-		self.buttons_layout.addWidget(self.repair_button)
+		# self.repair_button = UPushButton(Lng.repair_mf[JsonData.lng_index])
+		# self.repair_button.setIcon(QIcon(str(self.repair_svg)))
+		# self.buttons_layout.addWidget(self.repair_button)
 
 		self.remove_folder = UPushButton(Lng.remove_folder[JsonData.lng_index])
 		self.remove_folder.setIcon(QIcon(str(self.trash_svg)))
