@@ -157,7 +157,9 @@ class DangerWarn(ConfirmWindow):
 class WinMain(UMainWindow):
 	min_w = 750
 	left_side_width = 250
-	ww, hh = 1160, 800
+	hh = 800
+	ww = 0
+
 	FOOTER_MARGINS = 5
 
 	def __init__(self, argv: list):
@@ -167,6 +169,7 @@ class WinMain(UMainWindow):
 		self.central_layout.setSpacing(0)
 		self.setMinimumWidth(self.min_w)
 		self.setMenuBar(BarMacos())
+		self.ww = 1050 if JsonData.square_thumbs else 1160
 
 		# self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
 		# self.test.center_to_parent(self)
