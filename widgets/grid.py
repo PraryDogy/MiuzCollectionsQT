@@ -5,7 +5,7 @@ from PyQt6.QtCore import (QDate, QLocale, QMimeData, QPoint, QRect, QSize, Qt,
 						  QTimer, QUrl, pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
 						 QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
-						 QPixmap, QResizeEvent)
+						 QPixmap, QResizeEvent, QPainter, QFont)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
 							 QRubberBand, QSizePolicy, QVBoxLayout)
@@ -31,10 +31,39 @@ CONTROLS_MARGIN = 10
 
 
 class ThumbImgWidget(TransparentLabel):
+	_badge_font = None
+
 	def __init__(self):
 		super().__init__()
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.badge_text = ""
 
+	def paintEvent(self, event):
+		super().paintEvent(event)
+		if not self.badge_text or self.pixmap() is None or self.pixmap().isNull():
+			return
+		p = QPainter(self)
+		p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+		p.setFont(self._get_font())
+		fm = p.fontMetrics()
+		w = fm.horizontalAdvance(self.badge_text) + 8
+		h = fm.height() + 4
+		rect = QRect(self.width() - w - 4, 4, w, h)
+		p.setPen(Qt.PenStyle.NoPen)
+		p.setBrush(QColor(0, 0, 0, 170))
+		p.drawRoundedRect(rect, 3, 3)
+		p.setPen(QColor(255, 255, 255))
+		p.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.badge_text)
+		p.end()
+
+	@classmethod
+	def _get_font(cls):
+		if cls._badge_font is None:
+			f = QFont(QApplication.font())
+			f.setBold(True)
+			f.setPointSizeF(max(7.0, f.pointSizeF() * 0.85))
+			cls._badge_font = f
+		return cls._badge_font
 	def show_updating(self):
 		"""Показывает текст 'обновление' вместо изображения."""
 		self._saved_pixmap = self.pixmap()
@@ -114,6 +143,7 @@ class Thumb(TransparentFrame):
 		location = f"{Lng.location[JsonData.lng_index]}: {Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
 		modified = f"{Lng.modified[JsonData.lng_index]}: {self.data_item.day_month_year} {self.data_item.hour_min_sec}"
 		self.setToolTip("\n".join([filename, location, modified]))
+		self.img_wid.badge_text = os.path.splitext(data_item.rel_path)[1].lstrip(".").upper()
 
 		self.set_text_and_size()
 
