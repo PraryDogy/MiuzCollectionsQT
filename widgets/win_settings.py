@@ -546,7 +546,8 @@ class MfRepairWidget(UGroupBox):
 
 
 class MfRemoveWidget(UGroupBox):
-	svg_path = Static.COMMON_ICONS / "trash.svg"
+	trash_svg = Static.COMMON_ICONS / "trash.svg"
+	red_trash = Static.COMMON_ICONS / "red_trash.svg"
 	start_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -557,7 +558,7 @@ class MfRemoveWidget(UGroupBox):
 
 		title_layout = TitleTextLabel(
 			Lng.remove_folder[JsonData.lng_index],
-			self.svg_path
+			self.trash_svg
 		)
 		self.v_lay.addWidget(title_layout)
 
@@ -579,7 +580,7 @@ class MfRemoveWidget(UGroupBox):
 		# button_layout.addWidget(start_descr)
 
 		self.start_btn = RedButton("Удалить каталог")
-		self.start_btn.setIcon(QIcon(str(self.svg_path)))
+		self.start_btn.setIcon(QIcon(str(self.red_trash)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
 
