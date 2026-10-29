@@ -545,9 +545,6 @@ class MfRepairWidget(UGroupBox):
 		self.setFixedHeight(self.sizeHint().height())
 
 
-
-
-
 class MfRemoveWidget(UGroupBox):
 	svg_path = Static.COMMON_ICONS / "trash.svg"
 	start_clicked = pyqtSignal()

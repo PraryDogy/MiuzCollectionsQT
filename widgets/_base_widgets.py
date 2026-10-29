@@ -1888,7 +1888,7 @@ class MfStopListWidget(UGroupBox):
 		add_button = UPushButton(Lng.add[JsonData.lng_index])
 		add_button.setIcon(QIcon(str(self.plus_svg)))
 		add_button.clicked.connect(self.add_tag)
-		v_layout.addWidget(add_button)
+		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
 		self.reload_tags()
 		self.setFixedHeight(self.sizeHint().height())
 
