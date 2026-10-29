@@ -383,12 +383,12 @@ class WinMain(UMainWindow):
 		self.path_bar_update(Dynamic.current_dir)
 
 	def _on_thumb_ready(self, rel_img_path: str, base_qimage, resized_qimages):
-		wid = self.grid.url_to_wid.get(rel_img_path)  # сетка могла пересоздаться
+		wid = self.grid.url_to_wid.get(rel_img_path)
 		if not wid:
 			return
 		wid.data_item.base_qimage = base_qimage
 		wid.data_item.resized_qimages = resized_qimages
-		wid.set_pixmap_with_actual_size()
+		wid.set_pixmap_with_actual_size(force=True)
 
 	@with_conn
 	def start_update_thumb(self, rel_paths: list[str]):
@@ -396,7 +396,7 @@ class WinMain(UMainWindow):
 		def poll_task():
 			alive = task.is_alive()
 			queue = task.process_queue
-			scaled_fn = Utils.scale_qimage_square if JsonData.square_thumbs else Utils.scale_qimage_dpr
+			scaled_fn = Utils.thumb_scaler()
 			while not queue.empty():
 				item: UpdateThumbItem = queue.get()
 				if item.rel_img_path not in self.grid.url_to_wid:

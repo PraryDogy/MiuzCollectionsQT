@@ -31,39 +31,11 @@ CONTROLS_MARGIN = 10
 
 
 class ThumbImgWidget(TransparentLabel):
-	_badge_font = None
-
 	def __init__(self):
 		super().__init__()
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.badge_text = ""
+		self._saved_pixmap = None
 
-	def paintEvent(self, event):
-		super().paintEvent(event)
-		if not self.badge_text or self.pixmap() is None or self.pixmap().isNull():
-			return
-		p = QPainter(self)
-		p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-		p.setFont(self._get_font())
-		fm = p.fontMetrics()
-		w = fm.horizontalAdvance(self.badge_text) + 8
-		h = fm.height() + 4
-		rect = QRect(self.width() - w - 4, 4, w, h)
-		p.setPen(Qt.PenStyle.NoPen)
-		p.setBrush(QColor(0, 0, 0, 170))
-		p.drawRoundedRect(rect, 3, 3)
-		p.setPen(QColor(255, 255, 255))
-		p.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.badge_text)
-		p.end()
-
-	@classmethod
-	def _get_font(cls):
-		if cls._badge_font is None:
-			f = QFont(QApplication.font())
-			f.setBold(True)
-			f.setPointSizeF(max(7.0, f.pointSizeF() * 0.85))
-			cls._badge_font = f
-		return cls._badge_font
 	def show_updating(self):
 		"""Показывает текст 'обновление' вместо изображения."""
 		self._saved_pixmap = self.pixmap()
@@ -118,8 +90,8 @@ class Thumb(TransparentFrame):
 	frame_h = 0     # полная высота виджета Thumb
 	blue_text_class = ThumbBlueTextWidget
 
-	def __init__(self, data_item: DataItem):
-		super().__init__()
+	def __init__(self, data_item: DataItem, parent=None):
+		super().__init__(parent)
 		self.row, self.col, self.idx = 0, 0, 0   # idx — линейный индекс в сетке
 		self.data_item = data_item
 		if self.data_item.fav:
@@ -127,6 +99,7 @@ class Thumb(TransparentFrame):
 
 		self._size_key = None
 		self._pixmap_index = None
+		self._framed = False
 
 		# --- Layout ---
 		self.v_lay = QVBoxLayout(self)
@@ -143,7 +116,6 @@ class Thumb(TransparentFrame):
 		location = f"{Lng.location[JsonData.lng_index]}: {Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
 		modified = f"{Lng.modified[JsonData.lng_index]}: {self.data_item.day_month_year} {self.data_item.hour_min_sec}"
 		self.setToolTip("\n".join([filename, location, modified]))
-		self.img_wid.badge_text = os.path.splitext(data_item.rel_path)[1].lstrip(".").upper()
 
 		self.set_text_and_size()
 
@@ -195,36 +167,50 @@ class Thumb(TransparentFrame):
 		self.style().unpolish(self)
 		self.style().polish(self)
 
-	def set_framed_style(self):
-		self.setProperty("framed", True)
-		self._update_style()
+	# --- Стили ---
 
-	def set_no_frame_style(self):
-		self.setProperty("framed", False)
+	def _update_style(self):
+		# Принудительное обновление QSS-стиля виджета
+		self.style().unpolish(self)
+		self.style().polish(self)
+
+	def _set_framed(self, value: bool):
+		# polish дорогой, поэтому вызываем только при реальном изменении
+		if self._framed == value:
+			return
+		self._framed = value
+		self.setProperty("framed", value)
 		self._update_style()
 
 	def set_frame(self):
-		self.set_framed_style()
+		self._set_framed(True)
 
 	def set_no_frame(self):
-		self.set_no_frame_style()
+		self._set_framed(False)
 
 	# --- Картинка и размер ---
 
-	def set_pixmap_with_actual_size(self):
+	def set_pixmap_with_actual_size(self, force: bool = False):
 		idx = Dynamic.current_pixmap_size_index
-		# if self._pixmap_index == idx:
-		# 	return
+		if not force and self._pixmap_index == idx:
+			return
+
+		qimg = self.data_item.resized_qimages[idx]
+		if qimg is None:
+			scaler = Utils.thumb_scaler()
+			qimg = scaler(self.data_item.base_qimage, Static.THUMB_WIDTHS[idx])
+			self.data_item.resized_qimages[idx] = qimg
+
 		self._pixmap_index = idx
-		self.img_wid.setPixmap(QPixmap.fromImage(self.data_item.resized_qimages[idx]))
+		self.img_wid.setPixmap(QPixmap.fromImage(qimg))
 
 	def set_text_and_size(self):
+		# только геометрия, картинку не трогаем
 		key = (self.img_w, self.img_h, self.frame_w, self.frame_h)
 		if key != self._size_key:
 			self._size_key = key
 			self.img_wid.setFixedSize(self.img_w, self.img_h)
 			self.setFixedWidth(self.frame_w)
-		self.set_pixmap_with_actual_size()
 
 	# --- Избранное ---
 
@@ -744,11 +730,20 @@ class Grid(UScrollVerticalArea):
 			thumb.idx, thumb.row, thumb.col = x, row, col
 			self.grid_lay.addWidget(thumb, row, col)
 		self.grid_wid.show()
+		self._refresh_visible()
+
+	def _refresh_visible(self):
+		"""Ставит картинку только тем миниатюрам, которые попадают в видимую область."""
+		self.grid_lay.activate()
+		vp_rect = self.viewport().rect()
+		for wid in self.ordered:
+			top_left = wid.mapTo(self.viewport(), QPoint(0, 0))
+			if QRect(top_left, wid.size()).intersects(vp_rect):
+				wid.set_pixmap_with_actual_size()
 
 	def resize_thumbnails(self):
 		self.thumb_cls.calculate_size()
-		for url, wid in self.url_to_wid.items():
-			wid.set_pixmap_with_actual_size()
+		for wid in self.url_to_wid.values():
 			wid.set_text_and_size()
 		self.grid_lay.setSpacing(self.get_grid_spacing())
 		self.rearrange()
@@ -1076,6 +1071,7 @@ class Grid(UScrollVerticalArea):
 
 	def checkScrollValue(self, value: int):
 		self.up_btn.setVisible(value > 0)
+		self._refresh_visible()
 
 	def mouseDoubleClickEvent(self, a0):
 
@@ -1200,24 +1196,28 @@ class GridStandart(Grid):
 		self.thumb_cls = SquareThumb if JsonData.square_thumbs else Thumb
 		self.thumb_cls.calculate_size()
 
-		for image_item in db_images:
-			# при догрузке уже созданные миниатюры не пересоздаём
-			if image_item.rel_img_path in self.url_to_wid:
-				continue
+		self.grid_wid.setUpdatesEnabled(False)
+		try:
+			for image_item in db_images:
+				# при догрузке уже созданные миниатюры не пересоздаём
+				if image_item.rel_img_path in self.url_to_wid:
+					continue
 
-			data_item = DataItem(
-				base_qimage=image_item.base_qimage,
-				resized_qimages=image_item.resized_qimages,
-				rel_thumb_path=image_item.rel_thumb_path,
-				rel_path=image_item.rel_img_path,
-				fav=image_item.fav,
-				day_month_year=image_item.day_month_year,
-				hour_min_sec=image_item.hour_min_sec,
-				filename=os.path.basename(image_item.rel_img_path)
-			)
-			thumbnail = self.thumb_cls(data_item)
-			thumbnail.set_no_frame()
-			self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
+				data_item = DataItem(
+					base_qimage=image_item.base_qimage,
+					resized_qimages=image_item.resized_qimages,
+					rel_thumb_path=image_item.rel_thumb_path,
+					rel_path=image_item.rel_img_path,
+					fav=image_item.fav,
+					day_month_year=image_item.day_month_year,
+					hour_min_sec=image_item.hour_min_sec,
+					filename=os.path.basename(image_item.rel_img_path)
+				)
+				thumbnail = self.thumb_cls(data_item)
+				thumbnail.set_no_frame()
+				self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
+		finally:
+			self.grid_wid.setUpdatesEnabled(True)
 
 		self._loading_more = False
 

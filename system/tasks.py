@@ -168,45 +168,35 @@ class DbImagesLoader(URunnable):
 	def task(self):
 		try:
 			with Dbase.main_engine.connect() as conn:
-				stmt = self.get_stmt()
-				res = conn.execute(stmt).fetchall()
-			if res:
-				image_items = self.create_dict(res)
-				self.sigs.finished_.emit(image_items)
-			else:
-				self.sigs.finished_.emit([])
-		except Exception as e:
+				res = conn.execute(self.get_stmt()).fetchall()
+			self.sigs.finished_.emit(self.create_dict(res) if res else [])
+		except Exception:
 			print(traceback.format_exc())
 			self.sigs.finished_.emit([])
 
 	def create_dict(self, res: list[tuple]):
-		# thumbs_dict = defaultdict(list[DbImagesItem])
 		thumbs = []
 
-		if JsonData.square_thumbs:
-			scaled_fn = Utils.scale_qimage_square
-		else:
-			scaled_fn = Utils.scale_qimage_dpr
+		scaled_fn = Utils.thumb_scaler()
+		ind = Dynamic.current_pixmap_size_index
+		size = Static.THUMB_WIDTHS[ind]
 
 		for rel_img_path, rel_thumb_path, mod, fav in res:
 			abs_thumb_path_ = Utils.get_abs_thumb_path(rel_thumb_path)
 
-			if not os.path.exists(abs_thumb_path_):
+			# cv2.imread вернёт None, если файла нет или он не читается
+			img_bgr = cv2.imread(abs_thumb_path_)
+			if img_bgr is None:
 				continue
 
-			# qimages = []
-			img_bgr = cv2.imread(abs_thumb_path_)
-			img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+			# Qt читает BGR напрямую: без cvtColor и без лишней копии массива.
+			# .copy() обязателен: без него QImage ссылается на буфер numpy.
+			h, w = img_bgr.shape[:2]
+			base_qimage = QImage(img_bgr.data, w, h, 3 * w, QImage.Format.Format_BGR888).copy()
 
-			ind = Dynamic.current_pixmap_size_index
-			current_size = Static.THUMB_WIDTHS[ind]
-
-			base_qimage = Utils.qimage_from_array(img_rgb)
-			resized_qimages = []
-
-			for i in Static.THUMB_WIDTHS:
-				x = scaled_fn(base_qimage, i)
-				resized_qimages.append(x)
+			# считаем только текущий размер, остальные None, досчитываются по требованию
+			resized_qimages = [None] * len(Static.THUMB_WIDTHS)
+			resized_qimages[ind] = scaled_fn(base_qimage, size)
 
 			mod_time = datetime.fromtimestamp(mod)
 			date_ = mod_time.date()
@@ -727,5 +717,7 @@ class ThumbScale(URunnable):
 
 	def task(self):
 		base_qimage = Utils.qimage_from_array(self.img_array)
-		resized_qimages = [self.scaled_fn(base_qimage, w) for w in self.widths]
+		idx = Dynamic.current_pixmap_size_index
+		resized_qimages = [None] * len(self.widths)
+		resized_qimages[idx] = self.scaled_fn(base_qimage, self.widths[idx])
 		self.sigs.finished_.emit(self.rel_img_path, base_qimage, resized_qimages)

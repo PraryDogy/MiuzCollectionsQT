@@ -9,7 +9,7 @@ from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon, QImage, QPixmap
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QVBoxLayout
 
-from cfg import Static
+from cfg import Static, JsonData
 
 
 class Utils:
@@ -21,12 +21,12 @@ class Utils:
 			if image.ndim == 2:  # grayscale
 				height, width = image.shape
 				bytes_per_line = width
-				qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format.Format_Grayscale8)
+				qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format.Format_Grayscale8).copy()
 			elif image.ndim == 3 and image.shape[2] in (3, 4):
 				height, width, channels = image.shape
 				bytes_per_line = channels * width
 				fmt = QImage.Format.Format_RGB888 if channels == 3 else QImage.Format.Format_RGBA8888
-				qimage = QImage(image.data, width, height, bytes_per_line, fmt)
+				qimage = QImage(image.data, width, height, bytes_per_line, fmt).copy()
 			else:
 				print(f"qimage_from_array: channels trouble {image.shape}")
 				return None
@@ -62,6 +62,15 @@ class Utils:
 		)
 		scaled.setDevicePixelRatio(dpr)
 		return scaled
+
+	# @classmethod
+	# def thumb_scaler(cls):
+		# return cls.scale_qimage_square if JsonData.square_thumbs else cls.scale_qimage_dpr
+	
+	# даже когда сетка квадратная мы не будем обрезать изображения
+	@classmethod
+	def thumb_scaler(cls):
+		return cls.scale_qimage_dpr
 
 	@classmethod
 	def create_abs_thumb_path(cls, rel_img_path: str, mf_alias: str) -> str:
