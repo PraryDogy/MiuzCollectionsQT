@@ -85,8 +85,13 @@ class SetFav(URunnable):
 # Поиск приложений для «Открыть в…»
 # ==========================================
 
-APP_ROOTS = [Path("/Applications"), Path.home() / "Applications"]
-APP_MAX_DEPTH = 2  # /Applications и /Applications/<подпапка>, глубже не ходим
+APP_ROOTS = [
+    Path("/Applications"),
+    Path.home() / "Applications",
+    Path("/System/Applications"),
+    Path("/System/Applications/Utilities"),
+]
+APP_MAX_DEPTH = 3
 
 
 def find_image_apps(app_names: list[str]) -> dict[str, str]:
@@ -178,6 +183,11 @@ class DbImagesLoader(URunnable):
 		# thumbs_dict = defaultdict(list[DbImagesItem])
 		thumbs = []
 
+		if JsonData.square_thumbs:
+			scaled_fn = Utils.scale_qimage_square
+		else:
+			scaled_fn = Utils.scale_qimage_dpr
+
 		for rel_img_path, rel_thumb_path, mod, fav in res:
 			abs_thumb_path_ = Utils.get_abs_thumb_path(rel_thumb_path)
 
@@ -193,11 +203,6 @@ class DbImagesLoader(URunnable):
 
 			base_qimage = Utils.qimage_from_array(img_rgb)
 			resized_qimages = []
-
-			if JsonData.square_thumbs:
-				scaled_fn = Utils.scale_qimage_square
-			else:
-				scaled_fn = Utils.scale_qimage_dpr
 
 			for i in Static.THUMB_WIDTHS:
 				x = scaled_fn(base_qimage, i)
