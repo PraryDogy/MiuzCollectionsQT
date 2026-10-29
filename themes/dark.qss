@@ -671,3 +671,20 @@ UTreeWidget::branch:has-children:open {
     image: url(./icons/common/collapse_r.svg);
     /* image: none; */
 }
+
+
+RedButton {
+    color: #FF646D;
+    background: transparent;
+    border: 1px solid #B8414C;
+}
+
+RedButton:hover {
+    background: #2B2027;
+    border: 1px solid #E0525B;
+}
+
+RedButton:pressed {
+    background: #40232A;
+    border: 1px solid #FF646D;
+}

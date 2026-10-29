@@ -457,6 +457,11 @@ class ActiveButton(UPushButton):
 		super().__init__(text)
 
 
+class RedButton(UPushButton):
+	def __init__(self, text):
+		super().__init__(text)
+
+
 class USep(TransparentFrame):
 	def __init__(self):
 		super().__init__()

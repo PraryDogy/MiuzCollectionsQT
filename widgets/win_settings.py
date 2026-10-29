@@ -29,7 +29,7 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton,
-                            UScrollVerticalArea, USep, USpinBox, WarningWindow)
+                            UScrollVerticalArea, USep, USpinBox, WarningWindow, RedButton)
 
 
 def restart_app():
@@ -510,7 +510,7 @@ class MfRepairWidget(UGroupBox):
 		super().__init__(title, parent)
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(10, 10, 10, 10)
-		self.v_lay.setSpacing(0)
+		self.v_lay.setSpacing(5)
 
 		title_layout = TitleTextLabel(
 			Lng.repair_mf[JsonData.lng_index],
@@ -532,15 +532,15 @@ class MfRepairWidget(UGroupBox):
 		button_layout.setContentsMargins(0, 0, 0, 0)
 		button_layout.setSpacing(10)
 
-		button_layout.addStretch()
+		# start_descr = GrayTextLabel("Приложение будет перезапущено")
+		# button_layout.addWidget(start_descr)
 
-		start_descr = GrayTextLabel("Приложение будет перезапущено")
-		button_layout.addWidget(start_descr)
-
-		self.start_btn = ActiveButton("Исправить")
+		self.start_btn = UPushButton("Исправить каталог")
 		self.start_btn.setIcon(QIcon(str(self.svg_path)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
+
+		button_layout.addStretch()
 
 		self.setFixedHeight(self.sizeHint().height())
 
@@ -556,7 +556,7 @@ class MfRemoveWidget(UGroupBox):
 		super().__init__(title, parent)
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(10, 10, 10, 10)
-		self.v_lay.setSpacing(0)
+		self.v_lay.setSpacing(10)
 
 		title_layout = TitleTextLabel(
 			Lng.remove_folder[JsonData.lng_index],
@@ -578,15 +578,15 @@ class MfRemoveWidget(UGroupBox):
 		button_layout.setContentsMargins(0, 0, 0, 0)
 		button_layout.setSpacing(10)
 
-		button_layout.addStretch()
+		# start_descr = GrayTextLabel("Приложение будет перезапущено")
+		# button_layout.addWidget(start_descr)
 
-		start_descr = GrayTextLabel("Приложение будет перезапущено")
-		button_layout.addWidget(start_descr)
-
-		self.start_btn = ActiveButton("Удалить")
+		self.start_btn = RedButton("Удалить каталог")
 		self.start_btn.setIcon(QIcon(str(self.svg_path)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
+
+		button_layout.addStretch()
 
 		self.setFixedHeight(self.sizeHint().height())
 
@@ -609,7 +609,7 @@ class MfSettings(UScrollVerticalArea):
 		self.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 0, 0)
+		main_lay.setContentsMargins(0, 0, 0, 10)
 		main_lay.setSpacing(10)
 
 		self.path_widget = MfPathWidget(
