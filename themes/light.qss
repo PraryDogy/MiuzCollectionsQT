@@ -14,9 +14,9 @@
    #f4f6f8  фон UFrame
    #fafbfc  фон панелей (GroupBox, списки, деревья, меню)
    #eef2f6  фон зоны перетаскивания
-   #f1f4f7  фон кнопок, полей ввода, спинбокса, тултипа
+   #f1f4f7  фон кнопок, полей ввода, спинбокса, тултипа, карточки миниатюры
    #e3eaf2  наведение, выделение, отметка в списке
-   #d5dfeb  нажатие, фон миниатюры в рамке
+   #d5dfeb  нажатие кнопки
    #d0d9e3  рамка панелей и полей, дорожка слайдера, ползунок полосы прокрутки
    #dde6f0  иконочные кнопки: выбрано
    #b8c4d2  рамка при наведении, чекбоксы, полоса прокрутки при наведении
@@ -67,6 +67,13 @@ _SvgWithThemeBg {
     background: transparent;
     border: none;
     color: #000000;
+}
+
+/* Рамка миниатюры всегда присутствует, но прозрачна.
+   Так при выделении меняется только цвет, размер содержимого не сдвигается. */
+Thumb,
+SquareThumb {
+    border: 2px solid transparent;
 }
 
 UTreeView::item,
@@ -128,20 +135,21 @@ WinImgSearchDropWidget {
 
 
 /* ---------------------------------------------------------------------
-   #f1f4f7  ФОН ЭЛЕМЕНТОВ ВВОДА
+   #f1f4f7  ФОН ЭЛЕМЕНТОВ ВВОДА И КАРТОЧКИ МИНИАТЮРЫ
    --------------------------------------------------------------------- */
 UPushButton,
 ULineEdit,
 UTextEdit,
 USpinBox,
 USep,
-QToolTip {
+QToolTip,
+ThumbImgWidget {
     background: #f1f4f7;
 }
 
 
 /* ---------------------------------------------------------------------
-   #e3eaf2  НАВЕДЕНИЕ И ВЫДЕЛЕНИЕ
+   #e3eaf2  НАВЕДЕНИЕ, ВЫДЕЛЕНИЕ, ОТМЕТКА В СПИСКЕ
    ВАЖНО: при смене цвета UListWidget::item:selected или UMenu::item:selected
    поменяйте sel_color в system/themes.py (класс LightTreeTheme).
    Выделение дерева (UTreeView, UTreeWidget) рисует делегат, здесь его нет.
@@ -161,26 +169,28 @@ UMenu::item:selected {
 
 
 /* ---------------------------------------------------------------------
-   #d5dfeb  НАЖАТИЕ
+   #d5dfeb  НАЖАТИЕ КНОПКИ
+   Нажатая стрелка спинбокса без фона: её фон даёт поле.
    --------------------------------------------------------------------- */
-UPushButton:pressed,
-USpinBox::up-button:pressed,
-USpinBox::down-button:pressed,
-Thumb[framed="true"] {
-    border: 2px solid #0059d1;
-}
-
-SquareThumb[framed="true"] {
-    background: #cfe0f5;
-}
-
 UPushButton:pressed {
     background: #d5dfeb;
+    border: 2px solid #0059d1;
 }
 
 USpinBox::up-button:pressed,
 USpinBox::down-button:pressed {
     border: none;
+}
+
+
+/* ---------------------------------------------------------------------
+   #0059d1  РАМКА ВЫБРАННОЙ МИНИАТЮРЫ
+   Размер содержимого не меняется: рамка задана в блоке 1,
+   здесь меняется только цвет.
+   --------------------------------------------------------------------- */
+Thumb[framed="true"],
+SquareThumb[framed="true"] {
+    border: 2px solid #0059d1;
 }
 
 
@@ -376,11 +386,14 @@ UTextEdit,
 WinImgViewGraphics,
 WinImageView,
 WinImgSearchPreviewWidget,
-Thumb {
+Thumb,
+SquareThumb {
     border-radius: 8px;
 }
-SquareThumb {
-    border-radius: 0px;
+
+/* карточка картинки внутри миниатюры */
+ThumbImgWidget {
+    border-radius: 6px;
 }
 
 UTagWidget {
@@ -564,10 +577,7 @@ ThumbMiuzBlueTextWidget {
 }
 
 
-/* --- Полоса прокрутки ---
-   width и height задают полный размер области, margin отступает от краёв.
-   Видимая ширина = width - margin слева - margin справа = 8px.
-   border-radius ползунка = половина видимой ширины (4px). */
+/* --- Полоса прокрутки --- */
 QScrollBar:vertical {
     width: 14px;
     margin: 4px 3px 4px 3px;

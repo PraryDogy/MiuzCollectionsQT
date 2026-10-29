@@ -35,6 +35,7 @@ class ThumbImgWidget(TransparentLabel):
 		super().__init__()
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self._saved_pixmap = None
+		self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
 	def show_updating(self):
 		"""Показывает текст 'обновление' вместо изображения."""
@@ -89,6 +90,7 @@ class Thumb(TransparentFrame):
 	frame_w = 0     # полная ширина виджета Thumb
 	frame_h = 0     # полная высота виджета Thumb
 	blue_text_class = ThumbBlueTextWidget
+	BORDER_W = 2  # должна совпадать с border в QSS для Thumb и SquareThumb
 
 	def __init__(self, data_item: DataItem, parent=None):
 		super().__init__(parent)
@@ -147,8 +149,9 @@ class Thumb(TransparentFrame):
 
 		cls.img_w, cls.img_h = cls._img_box_size()
 		left, top, right, bottom = cls._margins()
-		cls.frame_w = cls.img_w + left + right
-		cls.frame_h = cls.img_h + top + bottom + cls._captions_height()
+		b = cls.BORDER_W * 2
+		cls.frame_w = cls.img_w + left + right + b
+		cls.frame_h = cls.img_h + top + bottom + cls._captions_height() + b
 
 	# --- Построение лейаута ---
 
