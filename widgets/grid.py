@@ -654,6 +654,8 @@ class Grid(UScrollVerticalArea):
 		self._sel: dict[Thumb, None] = {}      # выделение: ключи в порядке вставки, O(1)
 		self.ordered: list[Thumb] = []         # виджеты в порядке отображения, idx = позиция
 		self._cols = 1                         # текущее число колонок сетки
+		self._layout_cols = -1                 # колонки, с которыми последний раз раскладывали сетку
+		self._layout_count = -1                # число виджетов на последней раскладке
 		self.cell_to_wid: dict[tuple, Thumb] = {}
 		self.url_to_wid: dict[str, Thumb] = {}
 		self.files_to_copy = set()
@@ -681,7 +683,7 @@ class Grid(UScrollVerticalArea):
 		self._size_timer = QTimer(self)
 		self._size_timer.setSingleShot(True)
 		self._size_timer.timeout.connect(self._finish_resize)
-		self._size_debounce_ms = 150
+		self._size_debounce_ms = 200
 
 		# --- Вкладка прокрутки ---
 		self.scroll_wid = TransparentFrame()
@@ -789,9 +791,18 @@ class Grid(UScrollVerticalArea):
 		return max(1, total_w // thumb_w)
 
 	def rearrange(self):
-		self.grid_wid.hide()
-		self.grid_lay.setSpacing(self.get_grid_spacing())
+		spacing = self.get_grid_spacing()
+		self.grid_lay.setSpacing(spacing)
 		max_col = self.get_max_columns()
+		count = len(self.url_to_wid)
+
+		# раскладку переписываем только если поменялись колонки или состав сетки
+		if max_col == self._layout_cols and count == self._layout_count:
+			self._refresh_visible()
+			QTimer.singleShot(0, self._fill_if_needed)
+			return
+
+		self.grid_wid.hide()
 		self._cols = max_col
 		self.ordered = list(self.url_to_wid.values())
 		self.cell_to_wid.clear()
@@ -800,35 +811,48 @@ class Grid(UScrollVerticalArea):
 			self.cell_to_wid[row, col] = thumb
 			thumb.idx, thumb.row, thumb.col = x, row, col
 			self.grid_lay.addWidget(thumb, row, col)
+		self._layout_cols = max_col
+		self._layout_count = count
 		self.grid_wid.show()
 		self._refresh_visible()
-		# проверку заполнения ставим в очередь: высоты обновятся после layout
 		QTimer.singleShot(0, self._fill_if_needed)
 
 	def _refresh_visible(self):
-		"""Ставит картинку только тем миниатюрам, которые попадают в видимую область."""
-		self.grid_lay.activate()
-		vp_rect = self.viewport().rect()
-		for wid in self.ordered:
-			top_left = wid.mapTo(self.viewport(), QPoint(0, 0))
-			if QRect(top_left, wid.size()).intersects(vp_rect):
-				wid.set_pixmap_with_actual_size()
+		"""Ставит картинку только миниатюрам из видимого диапазона строк."""
+		if not self.ordered or self._cols <= 0:
+			return
+
+		first_w = self.ordered[0]
+		row_h = first_w.height() + self.grid_lay.verticalSpacing()
+		if row_h <= 0:
+			return
+
+		# видимая часть вьюпорта в координатах grid_wid
+		top = self.verticalScrollBar().value() - self.grid_wid.y()
+		bottom = top + self.viewport().height()
+
+		total_rows = (len(self.ordered) + self._cols - 1) // self._cols
+		row_from = max(0, top // row_h - 1)              # запас в одну строку сверху
+		row_to = min(total_rows - 1, bottom // row_h + 1)  # и снизу
+
+		for row in range(row_from, row_to + 1):
+			for col in range(self._cols):
+				wid = self.cell_to_wid.get((row, col))
+				if wid is not None:
+					wid.set_pixmap_with_actual_size()
 
 	def resize_thumbnails(self):
-		# на время перетаскивания масштабируем быстро
-		Thumb.fast_scale = True
+		# только перезапускаем таймер: сама работа идёт после остановки слайдера
+		self._size_timer.start(self._size_debounce_ms)
+
+	def _finish_resize(self):
+		# слайдер остановился: один раз масштабируем и перекладываем сетку
+		Thumb.fast_scale = False
 		self.thumb_cls.calculate_size()
 		for wid in self.url_to_wid.values():
 			wid.set_text_and_size()
 		self.grid_lay.setSpacing(self.get_grid_spacing())
 		self.rearrange()
-		# каждый вызов переносит финальный проход
-		self._size_timer.start(self._size_debounce_ms)
-
-	def _finish_resize(self):
-		# слайдер остановился: сглаженный проход по видимым миниатюрам
-		Thumb.fast_scale = False
-		self._refresh_visible()
 
 	def clear_grid(self):
 		"""Удаляет все виджеты сетки (при полной перезагрузке)."""
@@ -841,6 +865,8 @@ class Grid(UScrollVerticalArea):
 		self._sel.clear()
 		self.wid_under_mouse = None
 		self._cols = 1
+		self._layout_cols = -1
+		self._layout_count = -1
 
 	# --- Дозагрузка ---
 
