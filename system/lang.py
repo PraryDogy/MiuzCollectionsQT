@@ -200,9 +200,13 @@ class Lng:
 	collapse_all = ("Свернуть всё", "Collapse All")
 	data_size = ("Размер данных", "Data size")
 	calculating = ("Вычисление", "Calculating")
-	repair_mf = (
+	repair_catalog_long = (
 		"Исправить ошибки в каталоге",
 		"Fix errors in the catalog"
+	)
+	repair_catalog_short = (
+		"Исправить каталог",
+		"Repair catalog"
 	)
 	app_will_restarted = (
 		"Приложение будет перезапущено. Нажмите ок, чтобы продолжить.",
@@ -658,4 +662,16 @@ class Lng:
 	add_folder = (
 		"Добавить папку",
 		"Add folder"
+	)
+	catalog_reindex_warning = (
+		"Информация о каталоге будет очищена, все изображения будут заново проиндексированы. Это может занять время.",
+		"The catalog information will be cleared, and all images will be re-indexed. This may take some time."
+	)
+	catalog_delete_warning = (
+		"Каталог будет полностью удален из приложения. Файлы на диске останутся без изменений.",
+		"The catalog will be completely removed from the application. Files on disk will remain unchanged."
+	)
+	unsaved_changes = (
+		"Есть несохраненные изменения",
+		"There are unsaved changes"
 	)

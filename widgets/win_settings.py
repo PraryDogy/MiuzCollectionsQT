@@ -514,16 +514,14 @@ class MfRepairWidget(UGroupBox):
 		self.v_lay.setSpacing(2)
 
 		title_layout = TitleTextLabel(
-			Lng.repair_mf[JsonData.lng_index],
+			Lng.repair_catalog_long[JsonData.lng_index],
 			self.repair_svg
 		)
 		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())
 
-		descr = GrayTextLabel(
-			"Информация о каталоге будет очищена, все изображения будут заново проиндексированы. Это может занять время."
-		)
+		descr = GrayTextLabel(Lng.catalog_reindex_warning[JsonData.lng_index])
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
 
@@ -533,10 +531,7 @@ class MfRepairWidget(UGroupBox):
 		button_layout.setContentsMargins(0, 0, 0, 0)
 		button_layout.setSpacing(10)
 
-		# start_descr = GrayTextLabel("Приложение будет перезапущено")
-		# button_layout.addWidget(start_descr)
-
-		self.start_btn = UPushButton("Исправить каталог")
+		self.start_btn = UPushButton(Lng.repair_catalog_short[JsonData.lng_index])
 		self.start_btn.setIcon(QIcon(str(self.repair_gray_svg)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
@@ -565,9 +560,7 @@ class MfRemoveWidget(UGroupBox):
 
 		self.v_lay.addWidget(USep())
 
-		descr = GrayTextLabel(
-			"Каталог будет полностью удален из приложения. Файлы на диске останутся без изменений."
-		)
+		descr = GrayTextLabel(Lng.catalog_delete_warning[JsonData.lng_index])
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
 
@@ -580,7 +573,7 @@ class MfRemoveWidget(UGroupBox):
 		# start_descr = GrayTextLabel("Приложение будет перезапущено")
 		# button_layout.addWidget(start_descr)
 
-		self.start_btn = RedButton("Удалить каталог")
+		self.start_btn = RedButton(Lng.remove_folder[JsonData.lng_index])
 		self.start_btn.setIcon(QIcon(str(self.red_trash)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
@@ -645,7 +638,7 @@ class MfSettings(UScrollVerticalArea):
 
 		save_layout.addStretch()
 
-		self.save_text = GrayTextLabel("Есть несохраненные изменения")
+		self.save_text = GrayTextLabel(Lng.unsaved_changes[JsonData.lng_index])
 		save_layout.addWidget(self.save_text)
 		self.save_text.hide()
 
