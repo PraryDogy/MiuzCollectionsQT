@@ -1504,11 +1504,6 @@ class MfPathWidget(UGroupBox):
 	def __init__(self, lng_index: int, mf: Mf = None):
 		super().__init__()
 		self.setAcceptDrops(True)
-		self.setSizePolicy(
-			QSizePolicy.Policy.Preferred,
-			QSizePolicy.Policy.Maximum,
-		)
-
 		self.copy_path_btn_locked = False
 		self.mf = mf
 		self.lng_index = lng_index
@@ -1537,6 +1532,8 @@ class MfPathWidget(UGroupBox):
 			self.show_ok_path()
 		else:
 			self.show_no_path()
+
+		self.setFixedHeight(self.sizeHint().height())
 
 	def _create_title(self, icon_path: Path) -> QHBoxLayout:
 		title = TitleTextLabel(self.title_, str(icon_path))
@@ -1848,6 +1845,12 @@ class MfStopListWidget(UGroupBox):
 
 	def __init__(self, lng_index: int, mf_stop_list: list[str]):
 		super().__init__()
+
+		# self.setSizePolicy(
+		# 	QSizePolicy.Policy.Preferred,
+		# 	QSizePolicy.Policy.Minimum,
+		# )
+	
 		self.lng_index = lng_index
 		self.draft_stop_list = list(mf_stop_list)
 
@@ -1882,6 +1885,7 @@ class MfStopListWidget(UGroupBox):
 		add_button.clicked.connect(self.add_tag)
 		v_layout.addWidget(add_button)
 		self.reload_tags()
+		self.setFixedHeight(self.sizeHint().height())
 
 	def create_tags_widget(self):
 		self.tags_widget = UGroupBox()
@@ -1889,7 +1893,6 @@ class MfStopListWidget(UGroupBox):
 		tags_layout = QVBoxLayout(self.tags_widget)
 		tags_layout.setContentsMargins(0, 0, 5, 0)
 		tags_layout.setSpacing(0)
-
 		scroll_area = UScrollVerticalArea()
 		tags_layout.addWidget(scroll_area)
 

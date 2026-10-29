@@ -29,7 +29,7 @@ from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
 							TransparentWidget, USep, GrayTextLabel,
 							UListSpacerItem, UListWidget, UListWidgetItem,
 							UMainWindow, UMenu, UPushButton, USpinBox,
-							ActiveButton, WarningWindow)
+							ActiveButton, WarningWindow, UScrollVerticalArea)
 
 
 def restart_app():
@@ -649,11 +649,15 @@ class MfSettings(TransparentWidget):
 
 # НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
 
-class NewMfSettings(TransparentWidget):
+class NewMfSettings(UScrollVerticalArea):
 	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
 	def __init__(self, mf_path: str = None):
 		super().__init__()
+
+		main_wid = TransparentWidget()
+		self.setWidget(main_wid)
+
 		main_lay = QVBoxLayout(self)
 		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
@@ -757,14 +761,15 @@ class WinSettings(UMainWindow):
 	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
 	ww = 700
-	hh = 560
+	hh = 500
 
 	def __init__(self, settings_item: SettingsItem):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.settings[JsonData.lng_index])
-		self.setFixedSize(self.ww, self.hh)
+		# self.setFixedSize(self.ww, self.hh)
+		self.resize(self.ww, self.hh)
 
 		self.settings_item = settings_item
 
