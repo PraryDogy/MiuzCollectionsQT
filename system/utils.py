@@ -1,7 +1,9 @@
 import hashlib
 import os
 import subprocess
+import time
 import traceback
+from functools import wraps
 from pathlib import Path
 
 import numpy as np
@@ -9,7 +11,7 @@ from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon, QImage, QPixmap
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QVBoxLayout
 
-from cfg import Static, JsonData
+from cfg import JsonData, Static
 
 
 class Utils:
@@ -142,3 +144,15 @@ class Utils:
 	def escape_like(text: str) -> str:
 		"""Экранирует спецсимволы LIKE, чтобы путь сравнивался буквально."""
 		return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+	def timed(label: str):
+		def deco(fn):
+			@wraps(fn)
+			def wrapper(*args, **kwargs):
+				t0 = time.perf_counter()
+				try:
+					return fn(*args, **kwargs)
+				finally:
+					print(f"[timing] {label}: {(time.perf_counter() - t0) * 1000:.1f} ms")
+			return wrapper
+		return deco

@@ -27,6 +27,7 @@ from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
 					  WinInfoAction)
 from .win_filters import DatesWidget
 
+
 CONTROLS_MARGIN = 10
 
 
@@ -790,6 +791,7 @@ class Grid(UScrollVerticalArea):
 			return 1
 		return max(1, total_w // thumb_w)
 
+	# @Utils.timed("rearrange")
 	def rearrange(self):
 		spacing = self.get_grid_spacing()
 		self.grid_lay.setSpacing(spacing)
@@ -817,6 +819,7 @@ class Grid(UScrollVerticalArea):
 		self._refresh_visible()
 		QTimer.singleShot(0, self._fill_if_needed)
 
+	# @Utils.timed("refresh visible")
 	def _refresh_visible(self):
 		"""Ставит картинку только миниатюрам из видимого диапазона строк."""
 		if not self.ordered or self._cols <= 0:
@@ -841,10 +844,12 @@ class Grid(UScrollVerticalArea):
 				if wid is not None:
 					wid.set_pixmap_with_actual_size()
 
+	# @Utils.timed("resize thumbnails")
 	def resize_thumbnails(self):
 		# только перезапускаем таймер: сама работа идёт после остановки слайдера
 		self._size_timer.start(self._size_debounce_ms)
 
+	# @Utils.timed("finish resize")
 	def _finish_resize(self):
 		# слайдер остановился: один раз масштабируем и перекладываем сетку
 		Thumb.fast_scale = False
@@ -870,6 +875,7 @@ class Grid(UScrollVerticalArea):
 
 	# --- Дозагрузка ---
 
+	# @Utils.timed("check scroll value")
 	def checkScrollValue(self, value: int):
 		self.up_btn.setVisible(value > 0)
 		self._refresh_visible()
@@ -884,6 +890,7 @@ class Grid(UScrollVerticalArea):
 		"""Нижняя граница видимой части в тех же координатах."""
 		return self.verticalScrollBar().value() + self.viewport().height()
 
+	# @Utils.timed("fill if needed")
 	def _fill_if_needed(self):
 		if self._loading_more or self._exhausted or not self.ordered:
 			self._fill_retries = 0
@@ -1341,6 +1348,7 @@ class GridStandart(Grid):
 			self._empty_lbl.deleteLater()
 			self._empty_lbl = None
 
+	# @Utils.timed("create_thumbnails")
 	def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
 		self.thumb_cls = SquareThumb if JsonData.square_thumbs else Thumb
 		self.thumb_cls.calculate_size()
