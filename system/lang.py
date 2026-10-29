@@ -655,3 +655,7 @@ class Lng:
 		"объектов",
 		"objects",
 	)
+	add_folder = (
+		"Добавить папку",
+		"Add folder"
+	)

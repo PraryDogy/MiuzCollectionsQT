@@ -503,7 +503,8 @@ class WinSettingsMfAliasTitle(TransparentLabel):
 
 
 class MfRepairWidget(UGroupBox):
-	svg_path = Static.COMMON_ICONS / "repair.svg"
+	repair_svg = Static.COMMON_ICONS / "repair.svg"
+	repair_gray_svg = Static.COMMON_ICONS / "repair_gray.svg"
 	start_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -514,7 +515,7 @@ class MfRepairWidget(UGroupBox):
 
 		title_layout = TitleTextLabel(
 			Lng.repair_mf[JsonData.lng_index],
-			self.svg_path
+			self.repair_svg
 		)
 		self.v_lay.addWidget(title_layout)
 
@@ -536,7 +537,7 @@ class MfRepairWidget(UGroupBox):
 		# button_layout.addWidget(start_descr)
 
 		self.start_btn = UPushButton("Исправить каталог")
-		self.start_btn.setIcon(QIcon(str(self.svg_path)))
+		self.start_btn.setIcon(QIcon(str(self.repair_gray_svg)))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
 

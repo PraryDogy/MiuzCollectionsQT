@@ -1885,7 +1885,7 @@ class MfStopListWidget(UGroupBox):
 
 		v_layout.addSpacing(5)
 
-		add_button = UPushButton(Lng.add[JsonData.lng_index])
+		add_button = UPushButton(Lng.add_folder[JsonData.lng_index])
 		add_button.setIcon(QIcon(str(self.plus_svg)))
 		add_button.clicked.connect(self.add_tag)
 		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
