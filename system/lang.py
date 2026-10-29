@@ -1,5 +1,24 @@
 class Lng:
-	months = [
+
+	@staticmethod
+	def init_lang(lng_index: int):
+		new_attrs = []
+		for key in dir(Lng):
+			value = getattr(Lng, key)
+			if isinstance(value, tuple):
+				new_attrs.append((key, value[lng_index]))
+			else:
+				# отладка
+				# print("Lng, не кортеж", key, type(key))
+				pass
+
+		for k, v in new_attrs:
+			delattr(Lng, k)
+
+		for k, v in new_attrs:
+			setattr(Lng, k, v)
+
+	months = (
 		{
 			"1": "Январь",
 			"10": "Октябрь",
@@ -28,8 +47,8 @@ class Lng:
 			"8": "August",
 			"9": "September"
 		}
-	]
-	months_gen = [
+	)
+	months_gen = (
 		{
 			"1": "января",
 			"10": "октября",
@@ -58,7 +77,7 @@ class Lng:
 			"8": "august",
 			"9": "september"
 		}
-	]
+	)
 	file_size = ("Размер", "Size")
 	info = ("Инфо", "Info")
 	loading = ("Загрузка...", "Loading...")
@@ -434,7 +453,7 @@ class Lng:
 	all_time = ("За все время", "All time")
 	from_text = ("С", "From")
 	to_text = ("По", "To")
-	not_selected = ["Не выбрано", "Not set"]
+	not_selected = ("Не выбрано", "Not set")
 
 	# Пресеты меню
 	preset_today = ("Сегодня", "Today")

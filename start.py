@@ -1,19 +1,20 @@
 import os
 import sys
 import traceback
+from typing import Literal
 
 from PyQt6.QtCore import QEvent, QObject
 from PyQt6.QtWidgets import (QApplication, QDialog, QPushButton, QTextEdit,
                              QVBoxLayout)
-from typing import Literal
 
 from cfg import JsonData, Static
 from system.database import Dbase
 from system.filters import Filters
+from system.lang import Lng
 from system.main_folder import Mf
-from system.themes import ThemeChanger
 from system.servers import Servers
 from system.tasks import UThreadPool
+from system.themes import ThemeChanger
 from widgets._base_widgets import UMainWindow
 from widgets.win_first_load import FirstLoadWin
 from widgets.win_img_search import WinImgSearch
@@ -107,6 +108,9 @@ class App(QApplication):
         # if data:
         #     JsonData.json_to_app(data)
         JsonData.json_to_app()
+
+        # язык
+        Lng.init_lang(JsonData.lng_index)
 
         # фильтры
         Static.FILTERS_JSON.touch(exist_ok=True)
