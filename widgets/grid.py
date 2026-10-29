@@ -846,18 +846,23 @@ class Grid(UScrollVerticalArea):
 
 	# @Utils.timed("resize thumbnails")
 	def resize_thumbnails(self):
-		# только перезапускаем таймер: сама работа идёт после остановки слайдера
-		self._size_timer.start(self._size_debounce_ms)
+		# размер сменился явно (слайдер или Cmd+/-): выполняем сразу
+		self._size_timer.stop()
+		self._apply_resize()
 
 	# @Utils.timed("finish resize")
-	def _finish_resize(self):
-		# слайдер остановился: один раз масштабируем и перекладываем сетку
+	def _apply_resize(self):
 		Thumb.fast_scale = False
 		self.thumb_cls.calculate_size()
 		for wid in self.url_to_wid.values():
 			wid.set_text_and_size()
 		self.grid_lay.setSpacing(self.get_grid_spacing())
 		self.rearrange()
+
+	# @Utils.timed("finish resize")
+	def _finish_resize(self):
+		# таймер отложенного ресайза (нужен только для окна, если используется)
+		self._apply_resize()
 
 	def clear_grid(self):
 		"""Удаляет все виджеты сетки (при полной перезагрузке)."""
@@ -1062,8 +1067,7 @@ class Grid(UScrollVerticalArea):
 
 	def resizeEvent(self, a0: QResizeEvent | None) -> None:
 		super().resizeEvent(a0)
-		self.resize_timer.stop()
-		self.resize_timer.start(self.resize_ms)
+		self._size_timer.start(self._size_debounce_ms)
 		QTimer.singleShot(0, self.position_up_btn)
 
 	def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
