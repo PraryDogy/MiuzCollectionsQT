@@ -169,7 +169,7 @@ class WinMain(UMainWindow):
 		self.central_layout.setSpacing(0)
 		self.setMinimumWidth(self.min_w)
 		self.setMenuBar(BarMacos())
-		self.ww = 1050 if JsonData.square_thumbs else 1160
+		self.ww = 1200 if JsonData.square_thumbs else 1160
 
 		# self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
 		# self.test.center_to_parent(self)
