@@ -84,13 +84,14 @@ class RebootableSettings(UGroupBox):
 		lng_wid = RowArrowWidget(Lng.language_max)
 		lng_wid.set_left_icon(self.language_svg)
 		main_layout.addWidget(lng_wid)
-		self.lng_btn = UPushButton(Lng.lng_menu_rus if self.lng_index == 0 else Lng.lng_menu_eng)
+		self.lng_btn = UPushButton("")
 		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
-		self.lng_btn.setFixedWidth(110)
 		self.lng_btn.setMenu(lng_menu)
 		self.lng_btn.setIconSize(QSize(17, 17))
+		self.lng_btn.setFixedWidth(self.lng_btn.width())
+
+
 		lng_wid.replace_arrow_widget(self.lng_btn)
-		# чтобы кнопка меню не теряла стиль
 		lng_wid.setFixedHeight(RowArrowWidget.hh + 6)
 
 		main_layout.addWidget(USep())
@@ -119,14 +120,12 @@ class RebootableSettings(UGroupBox):
 		main_layout.addWidget(reset_data_wid)
 
 	def set_russian(self, e):
-		self.lng_btn.setText(Lng.lng_menu_rus)
 		self.lng_index = 0
 		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
 		self.changed.emit()
 		self.lang_changed.emit()
 
 	def set_eng(self, e):
-		self.lng_btn.setText(Lng.lng_menu_eng)
 		self.lng_index = 1
 		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
 		self.changed.emit()
