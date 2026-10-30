@@ -63,25 +63,30 @@ class RebootableSettings(UGroupBox):
 
 		self.scaner_minutes = JsonData.scaner_minutes
 		self.lng_index = JsonData.lng_index
-		self.lng_icons = (
-			QIcon(str(self.rus_flag)),
-			QIcon(str(self.eng_flag))
-		)
+		self.rus_flag_icon = QIcon(str(self.rus_flag))
+		self.eng_flas_icon = QIcon(str(self.eng_flag))
 
 		lng_menu = UMenu(parent=self)
-		for value in (0, 1):
-			action = QAction(Lng.russian[value], lng_menu)
-			action.setIcon(self.lng_icons[value])
-			action.setIconVisibleInMenu(True)
-			action.triggered.connect(lambda e, v=value: self.change_language(v))
-			lng_menu.addAction(action)
+
+		rus_action = QAction(Lng.lng_menu_rus, lng_menu)
+		rus_action.setIcon(self.rus_flag_icon)
+		rus_action.setIconVisibleInMenu(True)
+		rus_action.triggered.connect(self.set_russian)
+		lng_menu.addAction(rus_action)
+
+		eng_action = QAction(Lng.lng_menu_eng, lng_menu)
+		eng_action.setIcon(self.eng_flas_icon)
+		eng_action.setIconVisibleInMenu(True)
+		eng_action.triggered.connect(self.set_eng)
+		lng_menu.addAction(eng_action)
+
 
 		lng_wid = RowArrowWidget(Lng.language_max)
 		lng_wid.set_left_icon(self.language_svg)
 		main_layout.addWidget(lng_wid)
-		self.lng_btn = UPushButton(text=Lng.russian)
-		self.lng_btn.setIcon(self.lng_icons)
-		self.lng_btn.setFixedWidth(100)
+		self.lng_btn = UPushButton(text=Lng.lng_menu_rus)
+		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
+		self.lng_btn.setFixedWidth(110)
 		self.lng_btn.setMenu(lng_menu)
 		lng_wid.replace_arrow_widget(self.lng_btn)
 		# чтобы кнопка меню не теряла стиль
@@ -112,12 +117,27 @@ class RebootableSettings(UGroupBox):
 		reset_data_wid.clicked.connect(self.erase_all_data)
 		main_layout.addWidget(reset_data_wid)
 
-	def change_language(self, value: int):
-		self.lng_btn.setText(Lng.russian[value])
-		self.lng_btn.setIcon(self.lng_icons[value])
-		self.lng_index = value
+	def set_russian(self, e):
+		self.lng_btn.setText(Lng.lng_menu_rus)
+		self.lng_index = 0
+		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
 		self.changed.emit()
 		self.lang_changed.emit()
+
+	def set_eng(self, e):
+		self.lng_btn.setText(Lng.lng_menu_eng)
+		self.lng_index = 1
+		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
+		self.changed.emit()
+		self.lang_changed.emit()
+
+
+	# def change_language(self, value: int):
+	# 	self.lng_btn.setText(Lng.lng_menu_rus)
+	# 	self.lng_btn.setIcon(self.lng_icons[value])
+	# 	self.lng_index = value
+	# 	self.changed.emit()
+	# 	self.lang_changed.emit()
 
 	def change_scan_time(self, value: int):
 		if value == self.spin_max:
@@ -475,7 +495,7 @@ class GeneralSettings(TransparentWidget):
 		save_container_lay.setContentsMargins(*RowArrowWidget.group_margings)
 		save_container_lay.setSpacing(RowArrowWidget.group_spacing)
 
-		self.save_wid = SaveRowArrowWidget(JsonData.lng_index)
+		self.save_wid = SaveRowArrowWidget()
 		self.save_wid.clicked.connect(
 			lambda: self.save_settings_cmd()
 		)

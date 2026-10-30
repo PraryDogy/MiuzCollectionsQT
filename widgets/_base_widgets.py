@@ -1276,23 +1276,21 @@ class InputTextWin(UMainWindow):
 class SaveRowArrowWidget(RowArrowWidget):
 	save_svg = Static.COMMON_ICONS / "save.svg"
 
-	def __init__(self, lng_index: int):
-		super().__init__(Lng.save[lng_index])
+	def __init__(self):
+		super().__init__(Lng.save)
 		self.set_left_icon(self.save_svg)
 
 
 class MfAliasWidget(TransparentWidget):
 	changed = pyqtSignal()
 
-	def __init__(self, lng_index: int):
+	def __init__(self):
 		super().__init__()
-		self.lng_index = lng_index
-
 		v_layout = QVBoxLayout(self)
 		v_layout.setContentsMargins(0, 0, 0, 0)
 		v_layout.setSpacing(0)
 
-		name_text = TransparentLabel(Lng.folder_name_full[lng_index])
+		name_text = TransparentLabel(Lng.folder_name_full)
 		name_text.setContentsMargins(2, 0, 2, 0)
 		v_layout.addWidget(name_text)
 
@@ -1300,7 +1298,7 @@ class MfAliasWidget(TransparentWidget):
 
 		self.line_edit = ULineEdit()
 		self.line_edit.textChanged.connect(self.changed.emit)
-		self.line_edit.setPlaceholderText(Lng.alias_immutable[lng_index])
+		self.line_edit.setPlaceholderText(Lng.alias_immutable)
 		v_layout.addWidget(self.line_edit)
 
 	def validate(self):
@@ -1308,11 +1306,11 @@ class MfAliasWidget(TransparentWidget):
 		mf_alias = self.line_edit.text()
 		error_text = None  # Переменная для хранения текста ошибки
 		if not mf_alias:
-			error_text = Lng.enter_alias_warning[self.lng_index]
+			error_text = Lng.enter_alias_warning
 		elif len(mf_alias) < 5 or len(mf_alias) > 50:
-			error_text = f'{Lng.string_limit[self.lng_index]}'
+			error_text = f'{Lng.string_limit}'
 		elif not re.fullmatch(pattern, mf_alias):
-			error_text = f'{Lng.valid_message[self.lng_index]}'
+			error_text = f'{Lng.valid_message}'
 		if error_text:
 			win_warn = WarningWindow(error_text)
 			win_warn.center_to_parent(self.window())
@@ -1506,12 +1504,11 @@ class MfPathWidget(UGroupBox):
 	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
 	copy = Static.COMMON_ICONS / "copy.svg"
 
-	def __init__(self, lng_index: int, mf: Mf = None):
+	def __init__(self, mf: Mf = None):
 		super().__init__()
 		self.setAcceptDrops(True)
 		self.copy_path_btn_locked = False
 		self.mf = mf
-		self.lng_index = lng_index
 
 		if mf:
 			self.mf_path = mf.mf_paths[0]
@@ -1600,9 +1597,7 @@ class MfPathWidget(UGroupBox):
 		)
 		labels_layout.addWidget(descr_label)
 
-		self.no_path_label = GrayTextLabel(
-			Lng.path_hint_texts[self.lng_index]
-		)
+		self.no_path_label = GrayTextLabel(Lng.path_hint_texts)
 		labels_layout.addWidget(self.no_path_label)
 
 		path_layout.addLayout(labels_layout, 1)
@@ -1722,7 +1717,7 @@ class MfPathWidget(UGroupBox):
 
 	def validate(self):
 		if not self.mf_path or not os.path.exists(self.mf_path):
-			win_warn = WarningWindow(Lng.select_folder_path[self.lng_index])
+			win_warn = WarningWindow(Lng.select_folder_path)
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
 			return None

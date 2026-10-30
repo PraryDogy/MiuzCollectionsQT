@@ -82,7 +82,7 @@ class FirstLoadWin(UMainWindow):
 				widget.deleteLater()
 
 	def init_ui(self):
-		self.setWindowTitle(Lng.settings[self.lng_index])
+		self.setWindowTitle(Lng.settings)
 		self.init_lang_widget()
 		self.init_mf_alias_widget()
 		self.init_path_widget()
@@ -96,15 +96,15 @@ class FirstLoadWin(UMainWindow):
 		self.init_ui()
 
 	def init_lang_widget(self):
-		rus_action_text = Lng.rus[self.lng_index]
-		eng_action_text = Lng.eng[self.lng_index]
+		rus_action_text = Lng.rus
+		eng_action_text = Lng.eng
 
 		if self.lng_index == 0:
-			lng_label_text = f"{Lng.app_lang[0]} ({Lng.app_lang[1]})"
+			lng_label_text = f"{Lng.app_lang} ({Lng.app_lang})"
 			lng_btn_text = rus_action_text
 			lng_btn_icon = QIcon(str(self.rus_flag))
 		else:
-			lng_label_text = f"{Lng.app_lang[1]} ({Lng.app_lang[0]})"
+			lng_label_text = f"{Lng.app_lang} ({Lng.app_lang})"
 			lng_btn_text = eng_action_text
 			lng_btn_icon  = QIcon(str(self.eng_flag))
 
@@ -128,7 +128,7 @@ class FirstLoadWin(UMainWindow):
 
 		lng_menu = UMenu(parent=self)
 		for value in (0, 1):
-			action = QAction(Lng.russian[value], lng_menu)
+			action = QAction(Lng.lng_menu_rus, lng_menu)
 			action.setIcon(lng_icons[value])
 			action.setIconVisibleInMenu(True)
 			action.triggered.connect(lambda e, v=value: self.change_language(v))
