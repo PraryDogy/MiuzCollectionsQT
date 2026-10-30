@@ -1,15 +1,19 @@
 import os
+from datetime import datetime
+from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent
-from PyQt6.QtWidgets import QGridLayout, QSpacerItem, QHBoxLayout
+from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QSpacerItem
 
 from cfg import JsonData
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
+from system.shared_utils import SharedUtils
 
-from ._base_widgets import (GrayTextLabel, TransparentLabel, ActiveButton,
-                            UMainWindow, UPushButton, UGroupBox, TransparentWidget)
+from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWindow,
+                            UPushButton)
 
 
 class WinInfoSelectableLabel(TransparentLabel):
@@ -18,14 +22,13 @@ class WinInfoSelectableLabel(TransparentLabel):
 		self.set_selectable(True)
 
 	def contextMenuEvent(self, ev):
-		selection = self.selectedText()
-		if len(selection) == 0:
+		if not self.selectedText():
 			self.setSelection(0, len(self.text()))
-		return super().contextMenuEvent(ev)
+		super().contextMenuEvent(ev)
 
 
 class WinInfo(UMainWindow):
-	finished_ = pyqtSignal()
+	POLL_MS = 100
 
 	def __init__(self, paths: list[str]):
 		super().__init__()
@@ -37,7 +40,22 @@ class WinInfo(UMainWindow):
 		self.central_layout.setSpacing(10)
 
 		self.path = paths[0]
+		self.labels: dict[str, WinInfoSelectableLabel] = {}
 
+		self._build_info()
+		self._build_buttons()
+		self._load_info()
+
+		self.setMinimumWidth(400)
+
+		# Высоту берём из раскладки, ширину не трогаем: sizeHint() по ширине
+		# у elided-лейблов завышен и тянет окно к длине пути
+		self.centralWidget().layout().activate()
+		height = self.centralWidget().sizeHint().height()
+		self.resize(400, height)
+		self.setFixedHeight(height)
+
+	def _build_info(self):
 		wid = UGroupBox()
 		self.central_layout.addWidget(wid)
 
@@ -45,109 +63,100 @@ class WinInfo(UMainWindow):
 		self.grid_lay.setSpacing(5)
 		self.grid_lay.setContentsMargins(10, 10, 10, 10)
 
-		self.data = {
-			Lng.file_name: OneFileInfo.lined_text(os.path.basename(self.path)),
-			Lng.type_: Lng.calculating,
-			Lng.file_size: Lng.calculating,
-			Lng.location: OneFileInfo.lined_path(self.path),
-			Lng.changed: Lng.calculating,
-			Lng.resol: Lng.calculating,
-		}
+		rows = [
+			("name", Lng.file_name, os.path.basename(self.path)),
+			("type", Lng.type_, Lng.calculating),
+			("size", Lng.file_size, Lng.calculating),
+			("location", Lng.location, self.path),
+			("changed", Lng.changed, Lng.calculating),
+			("resol", Lng.resol, Lng.calculating),
+		]
 
-		selectable_labels: list[WinInfoSelectableLabel] = []
-		row = 0
 		l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
-		r_fl = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-		for left_t, right_t in self.data.items():
-			left_lbl = GrayTextLabel(left_t + ":")
-			right_lbl = WinInfoSelectableLabel(right_t)
 
+		for row, (key, caption, value) in enumerate(rows):
+			left_lbl = GrayTextLabel(caption + ":")
+			right_lbl = WinInfoSelectableLabel(value)
 			for i in left_lbl, right_lbl:
 				i.set_font_size(11)
 
-			selectable_labels.append(right_lbl)
+			right_lbl.set_elide(True, ignore_width=False)
+
 			self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
 			self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
-			self.grid_lay.addWidget(right_lbl, row, 2, alignment=r_fl)
-			row += 1
+			self.grid_lay.addWidget(right_lbl, row, 2)  # без alignment: лейбл занимает всю ячейку
+			self.labels[key] = right_lbl
 
-		self.type_label = selectable_labels[1]
-		self.size_label = selectable_labels[2]
-		self.mod_label = selectable_labels[4]
-		self.res_label = selectable_labels[5]
-		self.load_info()
+		# Правая колонка забирает всё оставшееся место окна
+		self.grid_lay.setColumnStretch(2, 1)
 
+	def _build_buttons(self):
 		widget = TransparentWidget()
 		self.central_layout.addWidget(widget)
+
 		layout = QHBoxLayout(widget)
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setSpacing(5)
-
 		layout.addStretch()
 
 		copy_btn = UPushButton(Lng.copy_filepath)
+		copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(self.path))
 		layout.addWidget(copy_btn)
 
-		# layout.addStretch()
+		close_btn = ActiveButton(Lng.close)
+		close_btn.clicked.connect(self.close)
+		layout.addWidget(close_btn)
 
-		test = ActiveButton(Lng.close)
-		test.clicked.connect(self.deleteLater)
-		layout.addWidget(test)
-
-		self.adjustSize()
-		self.setFixedSize(self.width(), self.height())
-
-	def load_info(self):
-
-		def poll():
-			self.task_timer.stop()
-			queue = self.task_.process_queue
-			if not queue.empty():
-				info_item: OneFileInfoItem = queue.get()
-				self.single_img_fin(info_item)
-
-			if not self.task_.is_alive() and queue.empty():
-				self.task_.terminate_join()
-			else:
-				self.task_timer.start(500)
-
-		self.task_ = ProcessWorker(target=OneFileInfo.start, args=(self.path, ))
+	def _load_info(self):
+		self.task_ = ProcessWorker(target=OneFileInfo.start, args=(self.path,))
 		self.task_timer = QTimer(self)
 		self.task_timer.setSingleShot(True)
-		self.task_timer.timeout.connect(poll)
+		self.task_timer.timeout.connect(self.poll)
 
-		self.task_timer.start(500)
 		self.task_.start()
+		self.task_timer.start(self.POLL_MS)
 
-	def single_img_fin(self, info_item: OneFileInfoItem):
-		if info_item.res:
-			self.res_label.setText(info_item.res)
+	def poll(self):
+		# Флаг снимаем до чтения очереди: иначе процесс мог положить
+		# результат между чтением и проверкой и мы бы его потеряли
+		alive = self.task_.is_alive()
+
+		try:
+			info_item: OneFileInfoItem | None = self.task_.process_queue.get_nowait()
+			self.apply_info(info_item)
+		except Empty:
+			pass
+
+		if alive:
+			self.task_timer.start(self.POLL_MS)
 		else:
-			self.type_label.setText(f"{Lng.image} {info_item.type_[1:]}")
-			self.size_label.setText(info_item.size)
-			self.mod_label.setText(info_item.mod)
-
-	def lined_text(self, text: str, max_row = 50) -> str:
-		if len(text) > max_row:
-			return "\n".join(
-				text[i:i + max_row]
-				for i in range(0, len(text), max_row)
-			)
-		return text
-
-	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-		if a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Escape):
-			self.deleteLater()
-		return super().keyPressEvent(a0)
-  
-	def deleteLater(self):
-		if self.task_.is_alive():
-			self.task_timer.stop()
 			self.task_.terminate_join()
-		return super().deleteLater()
 
-	def closeEvent(self, a0):
-		if self.task_.is_alive():
-			self.task_timer.stop()
-			self.task_.terminate_join()
-		return super().closeEvent(a0)
+	def apply_info(self, info_item: OneFileInfoItem | None):
+		if info_item is None:
+			for key in ("type", "size", "changed", "resol"):
+				self.labels[key].setText("—")
+			return
+
+		self.labels["type"].setText(f"{Lng.image} {info_item.ext}")
+		self.labels["size"].setText(SharedUtils.get_f_size(info_item.size_bytes))
+		self.labels["changed"].setText(self.format_mod(info_item.mtime))
+		self.labels["resol"].setText(info_item.res or "—")
+
+	@staticmethod
+	def format_mod(mtime: float) -> str:
+		# Lng доступен только в главном потоке, поэтому форматируем здесь
+		dt = datetime.fromtimestamp(mtime)
+		month = Lng.months_gen[str(dt.month)]
+		return f"{dt.day} {month} {dt.year} {dt:%H:%M:%S}"
+
+	def keyPressEvent(self, ev: QKeyEvent):
+		if ev.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Escape):
+			self.close()
+			return
+		super().keyPressEvent(ev)
+
+	def closeEvent(self, ev):
+		self.task_timer.stop()
+		self.task_.terminate_join()
+		super().closeEvent(ev)

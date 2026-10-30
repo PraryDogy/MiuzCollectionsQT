@@ -101,74 +101,36 @@ class ReadImg:
 
 @dataclass(slots=True)
 class OneFileInfoItem:
-	type_: str
-	size: str
-	mod: str
-	res: str
+	name: str
+	ext: str
+	size_bytes: int
+	mtime: float
+	res: str | None
 
 
 class OneFileInfo:
 	@staticmethod
 	def start(path: str, process_queue: Queue):
-		"""Возвращает в Queue либо dict либо str. Если str, процесс окончен"""
+		"""Выполняется в подпроцессе. Кладёт в Queue только сырые данные, без Lng и JsonData."""
 		try:
-			info_item = OneFileInfo._gather_info(path)
-			process_queue.put(info_item)
-
-			resol = ImgUtils.get_img_res(path)
-			if resol:
-				info_item.res = resol
-			process_queue.put(info_item)
-		except Exception as e:
-			print("multiprocess One file info error", e)
+			process_queue.put(OneFileInfo._gather_info(path))
+		except Exception:
+			print("multiprocess one file info error:\n", traceback.format_exc())
+			process_queue.put(None)
 
 	@staticmethod
 	def _gather_info(path: str) -> OneFileInfoItem:
 		name = os.path.basename(path)
-		_, type_ = os.path.splitext(name)
+		_, ext = os.path.splitext(name)
 		stats = os.stat(path)
-		size = SharedUtils.get_f_size(stats.st_size)
-		date_time = datetime.fromtimestamp(stats.st_mtime)
-		clock = date_time.time().replace(microsecond=0)
-		month = Lng.months_gen[JsonData.lng_index][str(date_time.month)]
-		mod = f"{date_time.day} {month} {date_time.year} {clock}"
-		return OneFileInfoItem(type_, size, mod, "")
 
-	@staticmethod
-	def lined_text(text: str, max_row=50) -> str:
-		if len(text) > max_row:
-			return "\n".join(
-				text[i:i + max_row] for i in range(0, len(text), max_row)
-			)
-		return text
-
-	@staticmethod
-	def lined_path(text: str, max_row=50) -> str:
-		if len(text) <= max_row:
-			return text
-		
-		separator = os.sep
-		parts = text.split(separator)
-		lines = []
-		current_line = []
-
-		for part in parts:
-			potential_len = len(part) + (len(separator) if current_line else 0)
-			curr_len = sum(len(p) for p in current_line)
-			
-			if curr_len + len(current_line) - 1 + potential_len > max_row:
-				if current_line:
-					lines.append(separator.join(current_line) + separator)
-					current_line = [part]
-				else:
-					lines.append(part + separator)
-			else:
-				current_line.append(part)
-
-		if current_line:
-			lines.append(separator.join(current_line))
-		
-		return '\n'.join(lines)
+		return OneFileInfoItem(
+			name=name,
+			ext=ext.lstrip(".").lower(),
+			size_bytes=stats.st_size,
+			mtime=stats.st_mtime,
+			res=ImgUtils.get_img_res(path),
+		)
 
 
 @dataclass(slots=True)
