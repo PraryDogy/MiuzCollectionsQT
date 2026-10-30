@@ -108,40 +108,54 @@ class WinInfo(UMainWindow):
 		layout.addWidget(close_btn)
 
 	def _load_info(self):
-		self.task_ = ProcessWorker(target=OneFileInfo.start, args=(self.path,))
+		self.workers: dict[str, ProcessWorker] = {
+			"info": ProcessWorker(target=OneFileInfo.start, args=(self.path,)),
+			"res": ProcessWorker(target=OneFileInfo.start_res, args=(self.path,)),
+		}
 		self.task_timer = QTimer(self)
 		self.task_timer.setSingleShot(True)
 		self.task_timer.timeout.connect(self.poll)
 
-		self.task_.start()
+		for worker in self.workers.values():
+			worker.start()
 		self.task_timer.start(self.POLL_MS)
 
 	def poll(self):
-		# Флаг снимаем до чтения очереди: иначе процесс мог положить
-		# результат между чтением и проверкой и мы бы его потеряли
-		alive = self.task_.is_alive()
+		for key in list(self.workers):
+			worker = self.workers[key]
 
-		try:
-			info_item: OneFileInfoItem | None = self.task_.process_queue.get_nowait()
-			self.apply_info(info_item)
-		except Empty:
-			pass
+			# Флаг снимаем до чтения очереди: результат, положенный перед выходом
+			# процесса, гарантированно будет прочитан в этом же проходе
+			alive = worker.is_alive()
 
-		if alive:
+			try:
+				value = worker.process_queue.get_nowait()
+				if key == "info":
+					self.apply_info(value)
+				else:
+					self.apply_res(value)
+			except Empty:
+				pass
+
+			if not alive:
+				worker.terminate_join()
+				del self.workers[key]
+
+		if self.workers:
 			self.task_timer.start(self.POLL_MS)
-		else:
-			self.task_.terminate_join()
 
 	def apply_info(self, info_item: OneFileInfoItem | None):
 		if info_item is None:
-			for key in ("type", "size", "changed", "resol"):
+			for key in ("type", "size", "changed"):
 				self.labels[key].setText("—")
 			return
 
 		self.labels["type"].setText(f"{Lng.image} {info_item.ext}")
 		self.labels["size"].setText(SharedUtils.get_f_size(info_item.size_bytes))
 		self.labels["changed"].setText(self.format_mod(info_item.mtime))
-		self.labels["resol"].setText(info_item.res or "—")
+
+	def apply_res(self, res: str | None):
+		self.labels["resol"].setText(res or "—")
 
 	@staticmethod
 	def format_mod(mtime: float) -> str:
@@ -158,5 +172,7 @@ class WinInfo(UMainWindow):
 
 	def closeEvent(self, ev):
 		self.task_timer.stop()
-		self.task_.terminate_join()
+		for worker in self.workers.values():
+			worker.terminate_join()
+		self.workers.clear()
 		super().closeEvent(ev)

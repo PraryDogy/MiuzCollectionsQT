@@ -105,17 +105,25 @@ class OneFileInfoItem:
 	ext: str
 	size_bytes: int
 	mtime: float
-	res: str | None
 
 
 class OneFileInfo:
 	@staticmethod
 	def start(path: str, process_queue: Queue):
-		"""Выполняется в подпроцессе. Кладёт в Queue только сырые данные, без Lng и JsonData."""
+		"""Быстрые данные: stat и имя. Выполняется в подпроцессе."""
 		try:
 			process_queue.put(OneFileInfo._gather_info(path))
 		except Exception:
 			print("multiprocess one file info error:\n", traceback.format_exc())
+			process_queue.put(None)
+
+	@staticmethod
+	def start_res(path: str, process_queue: Queue):
+		"""Медленное разрешение: отдельный процесс, чтобы не задерживать остальные данные."""
+		try:
+			process_queue.put(ImgUtils.get_img_res(path))
+		except Exception:
+			print("multiprocess one file res error:\n", traceback.format_exc())
 			process_queue.put(None)
 
 	@staticmethod
@@ -129,7 +137,6 @@ class OneFileInfo:
 			ext=ext.lstrip(".").lower(),
 			size_bytes=stats.st_size,
 			mtime=stats.st_mtime,
-			res=ImgUtils.get_img_res(path),
 		)
 
 
