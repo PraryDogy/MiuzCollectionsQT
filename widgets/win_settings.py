@@ -88,6 +88,7 @@ class RebootableSettings(UGroupBox):
 		self.lng_btn.setFixedWidth(50)
 
 		menu = UMenu(parent=self)
+		self.lang_actions = []
 
 		languages = (
 			(Lng.lng_menu_rus, self.rus_flag_icon, 0),
@@ -98,10 +99,16 @@ class RebootableSettings(UGroupBox):
 			action = QAction(title, menu)
 			action.setIcon(icon)
 			action.setIconVisibleInMenu(True)
+			action.setCheckable(True)
 			action.triggered.connect(
 				lambda checked=False, i=index: self.set_language(i)
 			)
+
 			menu.addAction(action)
+			self.lang_actions.append(action)
+
+			if index == self.lng_index:
+				action.setChecked(True)
 
 		self.lng_btn.setMenu(menu)
 		widget.replace_arrow_widget(self.lng_btn)
@@ -109,6 +116,7 @@ class RebootableSettings(UGroupBox):
 		layout.addWidget(widget)
 
 		self._update_language_icon()
+		self._update_language_checked()
 
 	def _create_scanner_widget(self, layout):
 		widget = RowArrowWidget(Lng.search_interval)
@@ -140,6 +148,7 @@ class RebootableSettings(UGroupBox):
 
 		self.lng_index = index
 		self._update_language_icon()
+		self._update_language_checked()
 
 		self.changed.emit()
 		self.lang_changed.emit()
@@ -148,18 +157,23 @@ class RebootableSettings(UGroupBox):
 		icon = self.rus_flag_icon if self.lng_index == 0 else self.eng_flag_icon
 		self.lng_btn.setIcon(icon)
 
+	def _update_language_checked(self):
+		for i, action in enumerate(self.lang_actions):
+			action.setChecked(i == self.lng_index)
+
 	def change_scan_time(self, value: int):
-		if value == self.spin_max:
+		if value == self.SPIN_MAX:
 			self.spin.blockSignals(True)
-			self.spin.setValue(self.spin_min + 1)
+			self.spin.setValue(self.SPIN_MIN + 1)
 			self.spin.blockSignals(False)
-			value = self.spin.minimum()
-		elif value == self.spin_min:
+			value = self.SPIN_MIN
+		elif value == self.SPIN_MIN:
 			self.spin.blockSignals(True)
-			self.spin.setValue(self.spin_max - 1)
+			self.spin.setValue(self.SPIN_MAX - 1)
 			self.spin.blockSignals(False)
-			value = self.spin.maximum()
-		self.scaner_minutes = value
+			value = self.SPIN_MAX
+
+		self.scanner_minutes = value
 		self.changed.emit()
 
 	def erase_all_data(self, *args):
