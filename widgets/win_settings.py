@@ -644,7 +644,7 @@ class MfSettings(UScrollVerticalArea):
 		self.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 0, 10)
+		main_lay.setContentsMargins(0, 0, 10, 10)
 		main_lay.setSpacing(10)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
@@ -779,7 +779,7 @@ class NewMfSettings(UScrollVerticalArea):
 		self.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 0, 0)
+		main_lay.setContentsMargins(0, 0, 10, 0)
 		main_lay.setSpacing(10)
 
 		self.mf_alias_widget = MfAliasWidget()
