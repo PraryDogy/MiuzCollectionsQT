@@ -8,8 +8,8 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QVBoxLayout)
+							 QSplitter, QTableWidget, QTableWidgetItem,
+							 QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
 from system.items import SettingsItem
@@ -18,18 +18,18 @@ from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
-                          UThreadPool)
+						  UThreadPool)
 from system.themes import ThemeChanger
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-                            MfAliasWidget, MfPathWidget, MfStopListWidget,
-                            RowArrowWidget, SaveRowArrowWidget,
-                            SuperConfirmWindow, TitleTextLabel,
-                            TransparentLabel, TransparentWidget, UGroupBox,
-                            UListSpacerItem, UListWidget, UListWidgetItem,
-                            UMainWindow, UMenu, UPushButton,
-                            UScrollVerticalArea, USep, USpinBox, WarningWindow, RedButton)
+							MfAliasWidget, MfPathWidget, MfStopListWidget,
+							RowArrowWidget, SaveRowArrowWidget,
+							SuperConfirmWindow, TitleTextLabel,
+							TransparentLabel, TransparentWidget, UGroupBox,
+							UListSpacerItem, UListWidget, UListWidgetItem,
+							UMainWindow, UMenu, UPushButton,
+							UScrollVerticalArea, USep, USpinBox, WarningWindow, RedButton)
 
 
 def restart_app():
@@ -47,97 +47,106 @@ class LabelMinWidth(TransparentLabel):
 class RebootableSettings(UGroupBox):
 	changed = pyqtSignal()
 	lang_changed = pyqtSignal()
-	spin_max = 60
-	spin_min = 0
-	rus_flag = Static.COMMON_ICONS / "rus_flag.svg"
-	eng_flag = Static.COMMON_ICONS / "eng_flag.svg"
-	eraser_svg = Static.COMMON_ICONS / "eraser.svg"
-	clock_svg = Static.COMMON_ICONS / "clock.svg"
-	language_svg = Static.COMMON_ICONS / "language.svg"
+
+	SPIN_MAX = 60
+	SPIN_MIN = 0
+
+	RUS_FLAG = Static.COMMON_ICONS / "rus_flag.svg"
+	ENG_FLAG = Static.COMMON_ICONS / "eng_flag.svg"
+	ERASER_SVG = Static.COMMON_ICONS / "eraser.svg"
+	CLOCK_SVG = Static.COMMON_ICONS / "clock.svg"
+	LANGUAGE_SVG = Static.COMMON_ICONS / "language.svg"
 
 	def __init__(self):
 		super().__init__()
+
+		self.lng_index = JsonData.lng_index
+		self.scanner_minutes = JsonData.scaner_minutes
+
+		self.rus_flag_icon = QIcon(str(self.RUS_FLAG))
+		self.eng_flag_icon = QIcon(str(self.ENG_FLAG))
+
 		main_layout = QVBoxLayout(self)
 		main_layout.setContentsMargins(*RowArrowWidget.group_margings)
 		main_layout.setSpacing(RowArrowWidget.group_spacing)
 
-		self.scaner_minutes = JsonData.scaner_minutes
-		self.lng_index = JsonData.lng_index
-		self.rus_flag_icon = QIcon(str(self.rus_flag))
-		self.eng_flas_icon = QIcon(str(self.eng_flag))
-
-		lng_menu = UMenu(parent=self)
-
-		rus_action = QAction(Lng.lng_menu_rus, lng_menu)
-		rus_action.setIcon(self.rus_flag_icon)
-		rus_action.setIconVisibleInMenu(True)
-		rus_action.triggered.connect(self.set_russian)
-		lng_menu.addAction(rus_action)
-
-		eng_action = QAction(Lng.lng_menu_eng, lng_menu)
-		eng_action.setIcon(self.eng_flas_icon)
-		eng_action.setIconVisibleInMenu(True)
-		eng_action.triggered.connect(self.set_eng)
-		lng_menu.addAction(eng_action)
-
-
-		lng_wid = RowArrowWidget(Lng.language_max)
-		lng_wid.set_left_icon(self.language_svg)
-		main_layout.addWidget(lng_wid)
-		self.lng_btn = UPushButton("")
-		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
-		self.lng_btn.setMenu(lng_menu)
-		self.lng_btn.setIconSize(QSize(17, 17))
-		self.lng_btn.setFixedWidth(self.lng_btn.width())
-
-
-		lng_wid.replace_arrow_widget(self.lng_btn)
-		lng_wid.setFixedHeight(RowArrowWidget.hh + 6)
-
+		self._create_language_widget(main_layout)
 		main_layout.addWidget(USep())
 
-		scaner_time_wid = RowArrowWidget(Lng.search_interval)
-		scaner_time_wid.set_left_icon(self.clock_svg)
-		# регулировка высоты ради кастомного спинбокса
-		scaner_time_wid.setFixedHeight(scaner_time_wid.height() + 1)
-		main_layout.addWidget(scaner_time_wid)
+		self._create_scanner_widget(main_layout)
+		main_layout.addWidget(USep())
+
+		self._create_reset_widget(main_layout)
+
+	def _create_language_widget(self, layout):
+		widget = RowArrowWidget(Lng.language_max)
+		widget.set_left_icon(self.LANGUAGE_SVG)
+		widget.setFixedHeight(RowArrowWidget.hh + 6)
+
+		self.lng_btn = UPushButton("")
+		self.lng_btn.setIconSize(QSize(17, 17))
+		self.lng_btn.setFixedWidth(50)
+
+		menu = UMenu(parent=self)
+
+		languages = (
+			(Lng.lng_menu_rus, self.rus_flag_icon, 0),
+			(Lng.lng_menu_eng, self.eng_flag_icon, 1),
+		)
+
+		for title, icon, index in languages:
+			action = QAction(title, menu)
+			action.setIcon(icon)
+			action.setIconVisibleInMenu(True)
+			action.triggered.connect(
+				lambda checked=False, i=index: self.set_language(i)
+			)
+			menu.addAction(action)
+
+		self.lng_btn.setMenu(menu)
+		widget.replace_arrow_widget(self.lng_btn)
+
+		layout.addWidget(widget)
+
+		self._update_language_icon()
+
+	def _create_scanner_widget(self, layout):
+		widget = RowArrowWidget(Lng.search_interval)
+		widget.set_left_icon(self.CLOCK_SVG)
+		widget.setFixedHeight(widget.height() + 1)
+
 		self.spin = USpinBox(self)
 		self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
-		self.spin.setMinimum(self.spin_min)
-		self.spin.setMaximum(self.spin_max)
-		# ULineEdit не найдет поэтому импортируем оригинальный QLineEdit
+		self.spin.setRange(self.SPIN_MIN, self.SPIN_MAX)
 		self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
 		self.spin.setSuffix(f" {Lng.minutes}")
-		self.spin.setValue(JsonData.scaner_minutes)
+		self.spin.setValue(self.scanner_minutes)
+
 		self.spin.valueChanged.connect(self.change_scan_time)
-		scaner_time_wid.replace_arrow_widget(self.spin)
 
-		main_layout.addWidget(USep())
+		widget.replace_arrow_widget(self.spin)
+		layout.addWidget(widget)
 
-		reset_data_wid = RowArrowWidget(Lng.erase_data)
-		reset_data_wid.set_left_icon(self.eraser_svg)
-		reset_data_wid.clicked.connect(self.erase_all_data)
-		main_layout.addWidget(reset_data_wid)
+	def _create_reset_widget(self, layout):
+		widget = RowArrowWidget(Lng.erase_data)
+		widget.set_left_icon(self.ERASER_SVG)
+		widget.clicked.connect(self.erase_all_data)
 
-	def set_russian(self, e):
-		self.lng_index = 0
-		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
+		layout.addWidget(widget)
+
+	def set_language(self, index):
+		if self.lng_index == index:
+			return
+
+		self.lng_index = index
+		self._update_language_icon()
+
 		self.changed.emit()
 		self.lang_changed.emit()
 
-	def set_eng(self, e):
-		self.lng_index = 1
-		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
-		self.changed.emit()
-		self.lang_changed.emit()
-
-
-	# def change_language(self, value: int):
-	# 	self.lng_btn.setText(Lng.lng_menu_rus)
-	# 	self.lng_btn.setIcon(self.lng_icons[value])
-	# 	self.lng_index = value
-	# 	self.changed.emit()
-	# 	self.lang_changed.emit()
+	def _update_language_icon(self):
+		icon = self.rus_flag_icon if self.lng_index == 0 else self.eng_flag_icon
+		self.lng_btn.setIcon(icon)
 
 	def change_scan_time(self, value: int):
 		if value == self.spin_max:
