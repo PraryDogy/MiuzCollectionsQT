@@ -84,7 +84,7 @@ class RebootableSettings(UGroupBox):
 		lng_wid = RowArrowWidget(Lng.language_max)
 		lng_wid.set_left_icon(self.language_svg)
 		main_layout.addWidget(lng_wid)
-		self.lng_btn = UPushButton(text=Lng.lng_menu_rus)
+		self.lng_btn = UPushButton(Lng.lng_menu_rus if self.lng_index == 0 else Lng.lng_menu_eng)
 		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
 		self.lng_btn.setFixedWidth(110)
 		self.lng_btn.setMenu(lng_menu)
