@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
@@ -88,6 +88,7 @@ class RebootableSettings(UGroupBox):
 		self.lng_btn.setIcon(self.rus_flag_icon if self.lng_index == 0 else self.eng_flas_icon)
 		self.lng_btn.setFixedWidth(110)
 		self.lng_btn.setMenu(lng_menu)
+		self.lng_btn.setIconSize(QSize(17, 17))
 		lng_wid.replace_arrow_widget(self.lng_btn)
 		# чтобы кнопка меню не теряла стиль
 		lng_wid.setFixedHeight(RowArrowWidget.hh + 6)
