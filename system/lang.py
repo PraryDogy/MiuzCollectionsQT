@@ -1,22 +1,10 @@
 class Lng:
 
-	@staticmethod
-	def init_lang(lng_index: int):
-		new_attrs = []
-		for key in dir(Lng):
-			value = getattr(Lng, key)
+	@classmethod
+	def init_lang(cls, lng_index: int):
+		for key, value in vars(cls).copy().items():
 			if isinstance(value, tuple):
-				new_attrs.append((key, value[lng_index]))
-			else:
-				# отладка
-				# print("Lng, не кортеж", key, type(key))
-				pass
-
-		for k, v in new_attrs:
-			delattr(Lng, k)
-
-		for k, v in new_attrs:
-			setattr(Lng, k, v)
+				setattr(cls, key, value[lng_index])
 
 	months = (
 		{
