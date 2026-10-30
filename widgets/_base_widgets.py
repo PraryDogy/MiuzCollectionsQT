@@ -1843,15 +1843,8 @@ class MfStopListWidget(UGroupBox):
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
 	plus_svg = Static.COMMON_ICONS / "plus_simple.svg"
 
-	def __init__(self, lng_index: int, mf_stop_list: list[str]):
+	def __init__(self, mf_stop_list: list[str]):
 		super().__init__()
-
-		# self.setSizePolicy(
-		# 	QSizePolicy.Policy.Preferred,
-		# 	QSizePolicy.Policy.Minimum,
-		# )
-	
-		self.lng_index = lng_index
 		self.draft_stop_list = list(mf_stop_list)
 
 		v_layout = QVBoxLayout(self)

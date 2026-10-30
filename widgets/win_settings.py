@@ -647,19 +647,13 @@ class MfSettings(UScrollVerticalArea):
 		main_lay.setContentsMargins(0, 0, 0, 10)
 		main_lay.setSpacing(10)
 
-		self.path_widget = MfPathWidget(
-			lng_index=JsonData.lng_index,
-			mf=self.mf
-		)
+		self.path_widget = MfPathWidget(mf=self.mf)
 		self.path_widget.changed.connect(
 			lambda: self.show_warning()
 		)
 		main_lay.addWidget(self.path_widget)
 
-		self.mf_stop_list = MfStopListWidget(
-			lng_index=JsonData.lng_index,
-			mf_stop_list=self.mf.mf_stop_list
-		)
+		self.mf_stop_list = MfStopListWidget(mf_stop_list=self.mf.mf_stop_list)
 		self.mf_stop_list.changed.connect(
 			lambda: self.show_warning()
 		)
@@ -788,25 +782,19 @@ class NewMfSettings(UScrollVerticalArea):
 		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
 
-		self.mf_alias_widget = MfAliasWidget(JsonData.lng_index)
+		self.mf_alias_widget = MfAliasWidget()
 		self.mf_alias_widget.changed.connect(
 			lambda: self.mf_save_widget.show_warning()
 		)
 		main_lay.addWidget(self.mf_alias_widget)
 
-		self.mf_path_widget = MfPathWidget(
-			lng_index=JsonData.lng_index,
-			mf=None
-		)
+		self.mf_path_widget = MfPathWidget(mf=None)
 		self.mf_path_widget.changed.connect(
 			lambda: self.mf_path_widget_changed()
 		)
 		main_lay.addWidget(self.mf_path_widget)
 
-		self.mf_stop_list = MfStopListWidget(
-			lng_index=JsonData.lng_index,
-			mf_stop_list=[]
-		)
+		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
 		self.mf_stop_list.changed.connect(
 			lambda: self.mf_save_widget.show_warning()
 		)
@@ -818,7 +806,7 @@ class NewMfSettings(UScrollVerticalArea):
 		save_group_container.setContentsMargins(*RowArrowWidget.group_margings)
 		save_group_container.setSpacing(RowArrowWidget.group_spacing)
 
-		self.mf_save_widget = SaveRowArrowWidget(JsonData.lng_index)
+		self.mf_save_widget = SaveRowArrowWidget()
 		self.mf_save_widget.clicked.connect(self.save_mf_settings)
 		save_group_container.addWidget(self.mf_save_widget)
 
