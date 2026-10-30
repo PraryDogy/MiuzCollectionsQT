@@ -133,26 +133,27 @@ class TransparentLabel(QLabel):
 		if not self._context_menu_enabled:
 			return super().contextMenuEvent(ev)
 
-		text = self.selectedText().replace(
-			self.sym_paragraph_sep, ""
-		).replace(self.sym_line_feed, "")
+		def clean(s: str) -> str:
+			return s.replace(self.sym_paragraph_sep, "").replace(self.sym_line_feed, "")
 
-		full_text = self._original_text.replace(
-			self.sym_paragraph_sep, ""
-		).replace(self.sym_line_feed, "")
+		full_text = clean(self._original_text)
+
+		# При elide выделение относится к обрезанной строке, поэтому копируем исходный текст
+		if self._elide_enabled:
+			copy_text = full_text
+		else:
+			copy_text = clean(self.selectedText()) or full_text
 
 		menu = UMenu(parent=self)
 
 		copy_action = QAction(Lng.copy, menu)
 		copy_action.triggered.connect(
-			lambda: Utils.pyqt_copy_text(text)
+			lambda: Utils.pyqt_copy_text(copy_text)
 		)
 		menu.addAction(copy_action)
 
 		if os.path.isfile(full_text) or os.path.isdir(full_text):
-			reveal_action = QAction(
-				Lng.reveal_in_finder, menu
-			)
+			reveal_action = QAction(Lng.reveal_in_finder, menu)
 			reveal_action.triggered.connect(
 				lambda: Utils.macos_reveal_files([full_text])
 			)
