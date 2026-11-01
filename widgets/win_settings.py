@@ -592,7 +592,7 @@ class MfRemoveWidget(UGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
 		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 5, 10, 5)
+		self.v_lay.setContentsMargins(10, 5, 10, 10)
 		self.v_lay.setSpacing(5)
 
 		title_layout = TitleTextLabel(
@@ -606,6 +606,8 @@ class MfRemoveWidget(UGroupBox):
 		descr = GrayTextLabel(Lng.catalog_delete_warning)
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
+
+		self.v_lay.addSpacing(3)
 
 		button_container = TransparentWidget()
 		self.v_lay.addWidget(button_container)
