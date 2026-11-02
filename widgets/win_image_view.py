@@ -32,6 +32,7 @@ class ImgViewItem:
 	start_data_item: DataItem
 	data_items: list[DataItem]
 	is_selection: bool
+	image_apps: dict[str, str]
 
 
 class WinImgViewGraphics(QGraphicsView):
@@ -234,7 +235,7 @@ class WinImageView(UMainWindow):
 	def __init__(self, img_view_item: ImgViewItem):
 		super().__init__()
 
-		self.image_apps = {i: os.path.basename(i) for i in SharedUtils.get_apps(Static.IMAGE_APPS)}
+		self.image_apps = img_view_item.image_apps
 		self.url_to_pixmap: dict[str, QPixmap] = {}
 		self.img_view_item = img_view_item
 		self.current_data_item = img_view_item.start_data_item

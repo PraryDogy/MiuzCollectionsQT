@@ -674,7 +674,8 @@ class WinMain(UMainWindow):
 		item = ImgViewItem(
 			start_data_item=start_data_item,
 			data_items=data_items,
-			is_selection=is_selection
+			is_selection=is_selection,
+			image_apps=self.grid._image_apps
 		)
 		self.view_win = WinImageView(item)
 		self.view_win.open_win_info.connect(
