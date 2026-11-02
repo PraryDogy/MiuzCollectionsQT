@@ -478,14 +478,14 @@ class ImgArrayQImage(URunnable):
 		self.sigs.finished_.emit(qimage)
 
 
-class ImagePreviewTask(URunnable):
+class BlurImgBgTask(URunnable):
 
 	class Sigs(QObject):
 		finished_ = pyqtSignal(QImage)
 
 	def __init__(self, img: np.ndarray | QImage, size: tuple = None, radius: float = 16.0):
 		super().__init__()
-		self.sigs = ImagePreviewTask.Sigs()
+		self.sigs = BlurImgBgTask.Sigs()
 		self.size_ = size      # Логический размер виджета: tuple(width, height)
 		self.radius = radius   # Логический радиус скругления углов
 		self.img = img

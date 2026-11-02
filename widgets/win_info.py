@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent, QPixmap
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QSpacerItem, QVBoxLayout
 
-from cfg import JsonData
+from cfg import JsonData, Static
 from system.items import DataItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -17,6 +17,10 @@ from system.utils import Utils
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton)
+from system.tasks import BlurImgBgTask, UThreadPool
+
+
+MAX_SIZE = 250
 
 
 class WinInfoSelectableLabel(TransparentLabel):
@@ -50,6 +54,7 @@ class WinInfo(UMainWindow):
 		self.central_layout.setSpacing(10)
 
 		self.build_img_wid()
+		self.create_qimage()
 		self._build_info()
 		self._build_buttons()
 		self._load_info()
@@ -65,10 +70,20 @@ class WinInfo(UMainWindow):
 
 	def build_img_wid(self):
 		self.img_wid = TransparentLabel("")
-		qimage = self.data_item.base_qimage
-		pixmap = QPixmap.fromImage(qimage)
-		self.img_wid.setPixmap(pixmap)
+		self.img_wid.setFixedSize(MAX_SIZE, MAX_SIZE)
 		# Добавление в раскладку выполняется в _build_info, внутри группы
+
+	def create_qimage(self):
+
+		def fin(qimage):
+			qpixmap = QPixmap.fromImage(qimage)
+			self.img_wid.setPixmap(qpixmap)
+
+		size = (MAX_SIZE, MAX_SIZE)
+		self.qimage_task = BlurImgBgTask(self.data_item.base_qimage, size)
+		self.qimage_task.sigs.finished_.connect(fin)
+		UThreadPool.start(self.qimage_task)
+
 
 	def _build_info(self):
 		wid = UGroupBox()
