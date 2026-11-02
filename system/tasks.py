@@ -483,15 +483,18 @@ class ImagePreviewTask(URunnable):
 	class Sigs(QObject):
 		finished_ = pyqtSignal(QImage)
 
-	def __init__(self, img_array: np.ndarray, size: tuple = None, radius: float = 16.0):
+	def __init__(self, img: np.ndarray | QImage, size: tuple = None, radius: float = 16.0):
 		super().__init__()
 		self.sigs = ImagePreviewTask.Sigs()
 		self.size_ = size      # Логический размер виджета: tuple(width, height)
 		self.radius = radius   # Логический радиус скругления углов
-		self.img_array = img_array
+		self.img = img
 
 	def task(self):
-		orig_qimg = Utils.qimage_from_array(self.img_array)
+		if isinstance(self.img, np.ndarray):
+			orig_qimg = Utils.qimage_from_array(self.img)
+		else:
+			orig_qimg = self.img
 		if not self.size_:
 			# Если размер не задан, просто применяем DPR к оригиналу
 			orig_qimg.setDevicePixelRatio(Static.DPR)

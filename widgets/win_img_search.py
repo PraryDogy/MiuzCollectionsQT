@@ -241,7 +241,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 			self.pixmap_finished.emit()
 
 		self.qimage_task = ImagePreviewTask(
-			img_array=img_array,
+			img=img_array,
 			size=DROP_WIDGET_SIZE,
 			radius=10.0
 		)
