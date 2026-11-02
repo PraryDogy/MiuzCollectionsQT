@@ -3,13 +3,16 @@ from datetime import datetime
 from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtGui import QKeyEvent, QPixmap
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QSpacerItem
 
 from cfg import JsonData
+from system.items import DataItem
 from system.lang import Lng
+from system.main_folder import Mf
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 from system.shared_utils import SharedUtils
+from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
@@ -30,18 +33,23 @@ class WinInfoSelectableLabel(TransparentLabel):
 class WinInfo(UMainWindow):
 	POLL_MS = 100
 
-	def __init__(self, paths: list[str]):
+	def __init__(self, data_item: DataItem):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.info)
 
+		self.labels: dict[str, WinInfoSelectableLabel] = {}
+		self.data_item = data_item
+		self.abs_path = Utils.add_mf_path(
+			mf_path=Mf.current_mf.mf_paths[0],
+			rel_path=self.data_item.rel_path
+		)
+
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(10)
 
-		self.path = paths[0]
-		self.labels: dict[str, WinInfoSelectableLabel] = {}
-
+		self.build_img_wid()
 		self._build_info()
 		self._build_buttons()
 		self._load_info()
@@ -55,6 +63,13 @@ class WinInfo(UMainWindow):
 		self.resize(400, height)
 		self.setFixedHeight(height)
 
+	def build_img_wid(self):
+		self.img_wid = TransparentLabel("")
+		qimage = self.data_item.base_qimage
+		pixmap = QPixmap.fromImage(qimage)
+		self.img_wid.setPixmap(pixmap)
+		self.central_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+
 	def _build_info(self):
 		wid = UGroupBox()
 		self.central_layout.addWidget(wid)
@@ -64,10 +79,10 @@ class WinInfo(UMainWindow):
 		self.grid_lay.setContentsMargins(10, 10, 10, 10)
 
 		rows = [
-			("name", Lng.file_name, os.path.basename(self.path)),
+			("name", Lng.file_name, os.path.basename(self.abs_path)),
 			("type", Lng.type_, Lng.calculating),
 			("size", Lng.file_size, Lng.calculating),
-			("location", Lng.location, self.path),
+			("location", Lng.location, self.abs_path),
 			("changed", Lng.changed, Lng.calculating),
 			("resol", Lng.resol, Lng.calculating),
 		]
@@ -109,8 +124,8 @@ class WinInfo(UMainWindow):
 
 	def _load_info(self):
 		self.workers: dict[str, ProcessWorker] = {
-			"info": ProcessWorker(target=OneFileInfo.start, args=(self.path,)),
-			"res": ProcessWorker(target=OneFileInfo.start_res, args=(self.path,)),
+			"info": ProcessWorker(target=OneFileInfo.start, args=(self.abs_path,)),
+			"res": ProcessWorker(target=OneFileInfo.start_res, args=(self.abs_path,)),
 		}
 		self.task_timer = QTimer(self)
 		self.task_timer.setSingleShot(True)

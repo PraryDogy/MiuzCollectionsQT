@@ -552,9 +552,12 @@ class WinMain(UMainWindow):
 			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
 			for i in rel_paths
 		]
-		self.info_win = WinInfo(abs_paths)
-		self.info_win.center_to_parent(UMainWindow.win_list[-2])
-		self.info_win.show()
+		wid = self.grid.url_to_wid.get(rel_paths[0])
+		if wid:
+			data_item = wid.data_item
+			self.info_win = WinInfo(data_item)
+			self.info_win.center_to_parent(UMainWindow.win_list[-2])
+			self.info_win.show()
 
 	def open_settings_win(self, settings_item: SettingsItem):
 		self.bar_top.settings_btn.set_selected_style()
