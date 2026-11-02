@@ -6,36 +6,6 @@ class Lng:
 			if isinstance(value, tuple):
 				setattr(cls, key, value[lng_index])
 
-	months_gen = (
-		{
-			"1": "января",
-			"10": "октября",
-			"11": "ноября",
-			"12": "декабря",
-			"2": "февраля",
-			"3": "марта",
-			"4": "апреля",
-			"5": "мая",
-			"6": "июня",
-			"7": "июля",
-			"8": "августа",
-			"9": "сентября"
-		},
-		{
-			"1": "january",
-			"10": "october",
-			"11": "november",
-			"12": "december",
-			"2": "february",
-			"3": "march",
-			"4": "april",
-			"5": "may",
-			"6": "june",
-			"7": "july",
-			"8": "august",
-			"9": "september"
-		}
-	)
 	file_size = ("Размер", "Size")
 	info = ("Инфо", "Info")
 	loading = ("Загрузка...", "Loading...")

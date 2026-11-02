@@ -202,11 +202,7 @@ class DbImagesLoader(URunnable):
 			resized_qimages[ind] = scaled_fn(base_qimage, size)
 
 			mod_time = datetime.fromtimestamp(mod)
-			date_ = mod_time.date()
 			time_ = mod_time.time()
-			month_gen_ = Lng.months_gen[str(date_.month)]
-
-			day_month_year = f"{date_.day} {month_gen_} {date_.year}"
 			hour_min_sec = str(time_)
 
 			q_date = self.readable_date.qdate_from_timestamp(mod)

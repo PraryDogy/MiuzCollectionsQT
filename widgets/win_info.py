@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import BlurImgBgTask, UThreadPool
-from system.utils import Utils
+from system.utils import Utils, ReadableDate
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
@@ -110,6 +110,7 @@ class WinInfo(UMainWindow):
 		self.set_close_only()
 		self.setWindowTitle(Lng.info)
 
+		self.readable_date = ReadableDate(JsonData.lng_index)
 		self.labels: dict[str, WinInfoSelectableLabel] = {}
 		self.data_item = data_item
 		self.abs_path = Utils.add_mf_path(
@@ -263,12 +264,12 @@ class WinInfo(UMainWindow):
 	def apply_res(self, res: str | None):
 		self.labels["resol"].setText(res or "—")
 
-	@staticmethod
-	def format_mod(mtime: float) -> str:
+	def format_mod(self, mtime: float) -> str:
 		# Lng доступен только в главном потоке, поэтому форматируем здесь
 		dt = datetime.fromtimestamp(mtime)
-		month = Lng.months_gen[str(dt.month)]
-		return f"{dt.day} {month} {dt.year} {dt:%H:%M:%S}"
+		q_date = self.readable_date.qdate_from_timestamp(mtime)
+		readable_date = self.readable_date.get_readable_date(q_date)
+		return f"{readable_date} {dt:%H:%M:%S}"
 
 	def keyPressEvent(self, ev: QKeyEvent):
 		if ev.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Escape):
