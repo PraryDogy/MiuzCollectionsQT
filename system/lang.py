@@ -6,36 +6,6 @@ class Lng:
 			if isinstance(value, tuple):
 				setattr(cls, key, value[lng_index])
 
-	months = (
-		{
-			"1": "Январь",
-			"10": "Октябрь",
-			"11": "Ноябрь",
-			"12": "Декабрь",
-			"2": "Февраль",
-			"3": "Март",
-			"4": "Апрель",
-			"5": "Май",
-			"6": "Июнь",
-			"7": "Июль",
-			"8": "Август",
-			"9": "Сентябрь"
-		},
-		{
-			"1": "January",
-			"10": "October",
-			"11": "November",
-			"12": "December",
-			"2": "February",
-			"3": "March",
-			"4": "April",
-			"5": "May",
-			"6": "June",
-			"7": "July",
-			"8": "August",
-			"9": "September"
-		}
-	)
 	months_gen = (
 		{
 			"1": "января",
@@ -682,4 +652,12 @@ class Lng:
 	unsaved_changes = (
 		"Есть несохраненные изменения",
 		"There are unsaved changes"
+	)
+	open_thumb = (
+		"Открыть миниатюру",
+		"Open thumbnail"
+	)
+	reveal_thumb = (
+		"Показать миниатюру в Finder",
+		"Reveal thumbnail in Finder"
 	)

@@ -1,11 +1,11 @@
-from PyQt6.QtCore import QDate, QLocale, Qt, pyqtSignal
+from PyQt6.QtCore import QDate, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
-from system.utils import Utils
+from system.utils import Utils, ReadableDate
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
 							TransparentWidget, UMainWindow, UMenu, UPushButton,
@@ -125,13 +125,8 @@ class WinCalendar(UMainWindow):
 	# Теперь принимаем date, который может быть невалидным или None
 	def __init__(self, date=None):
 		super().__init__()
-
-		if JsonData.lng_index == 0:
-			lng = QLocale.Language.Russian
-			country = QLocale.Country.Russia
-		elif JsonData.lng_index == 1:
-			lng = QLocale.Language.English
-			country = QLocale.Country.UnitedStates
+		self.readable_date = ReadableDate(JsonData.lng_index)
+		self.date_now = QDate.currentDate()
 
 		qimg = QImage(str(self.svg_blue_circle_path))
 		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
@@ -140,9 +135,6 @@ class WinCalendar(UMainWindow):
 		qimg = QImage(str(self.svg_gray_circle_path))
 		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
 		self.gray_circle_pixmap = QPixmap.fromImage(qimg_scaled)
-
-		self.q_locale = QLocale(lng, country)
-		self.date_now = QDate.currentDate()
 
 		# --- РАЗДЕЛЕНИЕ ЛОГИКИ ---
 		if date is None or not date.isValid():
@@ -236,7 +228,7 @@ class WinCalendar(UMainWindow):
 		header_layout.setSpacing(0)
 
 		for col in range(7):
-			week_name = self.q_locale.dayName(col + 1, QLocale.FormatType.ShortFormat)
+			week_name = self.readable_date.q_locale.dayName(col + 1, self.readable_date.q_locale.FormatType.ShortFormat)
 			lbl_day = GrayTextLabel(week_name.capitalize())
 			lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			lbl_day.setFixedSize(*self.cell_size)
@@ -301,7 +293,7 @@ class WinCalendar(UMainWindow):
 	def update_dynamic_label(self):
 		# Если дата выбрана — показываем ее, иначе пишем "Не выбрано"
 		if self.selected_date:
-			readable_date = self.q_locale.toString(self.selected_date, "d MMMM yyyy")
+			readable_date = self.readable_date.get_readable_date(self.selected_date)
 			self.dynamic_label.setText(readable_date)
 		else:
 			self.dynamic_label.setText(Lng.not_selected)
@@ -311,8 +303,8 @@ class WinCalendar(UMainWindow):
 		max_width = 0
 		font_metrics = self.btn_month.fontMetrics()
 		for month in range(1, 13):
-			month_name = self.q_locale.standaloneMonthName(
-				month, QLocale.FormatType.LongFormat
+			month_name = self.readable_date.q_locale.standaloneMonthName(
+				month, self.readable_date.q_locale.FormatType.LongFormat
 			).capitalize()
 			action = QAction(month_name, self)
 			action.setData(month)
@@ -385,9 +377,9 @@ class WinCalendar(UMainWindow):
 		current_year = self.view_date.year()
 		current_month = self.view_date.month()
 
-		month = self.q_locale.standaloneMonthName(
+		month = self.readable_date.q_locale.standaloneMonthName(
 			current_month,
-			QLocale.FormatType.LongFormat
+			self.readable_date.q_locale.FormatType.LongFormat
 		)
 		self.btn_month.setText(month.capitalize())
 		self.btn_year.setText(str(current_year))

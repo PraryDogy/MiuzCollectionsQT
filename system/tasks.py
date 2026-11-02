@@ -17,7 +17,7 @@ from .database import Dbase, Dirs, Properties, Thumbs
 from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
-from .utils import Utils
+from .utils import Utils, ReadableDate
 
 import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal, Qt, QSize, QRectF
@@ -166,6 +166,7 @@ class DbImagesLoader(URunnable):
 	def __init__(self):
 		super().__init__()
 		self.sigs = DbImagesLoader.Sigs()
+		self.readable_date = ReadableDate(JsonData.lng_index)
 
 	def task(self):
 		try:
@@ -208,6 +209,9 @@ class DbImagesLoader(URunnable):
 			day_month_year = f"{date_.day} {month_gen_} {date_.year}"
 			hour_min_sec = str(time_)
 
+			q_date = self.readable_date.qdate_from_timestamp(mod)
+			str_date = self.readable_date.get_readable_date(q_date)
+
 			rel_img_path: str
 
 			item = DbImagesLoaderItem(
@@ -216,7 +220,7 @@ class DbImagesLoader(URunnable):
 				fav=fav,
 				base_qimage=base_qimage,
 				resized_qimages=resized_qimages,
-				day_month_year=day_month_year,
+				day_month_year=str_date,
 				hour_min_sec=hour_min_sec,
 				filename=os.path.basename(rel_img_path),
 				ext=os.path.splitext(rel_img_path)[1].lstrip(".").upper()

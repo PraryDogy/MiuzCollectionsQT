@@ -1,6 +1,6 @@
 import os
 
-from PyQt6.QtCore import QDate, QLocale, QPoint, QSize, Qt, pyqtSignal
+from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QCursor, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
 from cfg import Dynamic, JsonData, Static
 from system.filters import Filters
 from system.lang import Lng
+from system.utils import ReadableDate
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             GrayTextLabel, InputTextWin, TitleTextLabel,
@@ -54,6 +55,7 @@ class DatesWidget(UGroupBox):
 		super().__init__(parent)
 
 		_today = QDate.currentDate()
+		self.readable_date_wid = ReadableDate(JsonData.lng_index)
 
 		self.dates_dict = {
 			(_today, _today): Lng.preset_today,
@@ -222,10 +224,6 @@ class DatesWidget(UGroupBox):
 			self.right_calendar_tag.set_qss_style(self.right_calendar_tag.qss_green)
 
 	def update_readable_date_label(self):
-		locale = QLocale(
-			QLocale.Language.Russian if JsonData.lng_index == 0 else QLocale.Language.English
-		)
-
 		if self.is_all_time():
 			text = Lng.all_time
 			
@@ -233,16 +231,16 @@ class DatesWidget(UGroupBox):
 			text = self.dates_dict[self.q_date_start, self.q_date_end]
 			
 		elif self.q_date_start is not None and self.q_date_end is None:
-			str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
+			str_from = self.readable_date_wid.get_readable_date(self.q_date_start)
 			text = f"{Lng.from_text} {str_from}"
 			
 		elif self.q_date_start is None and self.q_date_end is not None:
-			str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+			str_to = self.readable_date_wid.get_readable_date(self.q_date_end)
 			text = f"{Lng.to_text} {str_to}"
 			
 		else:
-			str_from = locale.toString(self.q_date_start, "d MMMM yyyy")
-			str_to = locale.toString(self.q_date_end, "d MMMM yyyy")
+			str_from = self.readable_date_wid.get_readable_date(self.q_date_start)
+			str_to = self.readable_date_wid.get_readable_date(self.q_date_end)
 			text = f"{Lng.from_text} {str_from} {Lng.to_text.lower()} {str_to}"
 
 		text = f"{Lng.selected_dates}: {text.lower()}"

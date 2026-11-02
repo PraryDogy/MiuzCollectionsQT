@@ -85,13 +85,13 @@ class ImageWidget(TransparentLabel):
 		if not self.pixmap().isNull():
 			self.menu_ = UMenu(parent=self)
 
-			action = QAction("Открыть миниатюру", self.menu_)
+			action = QAction(Lng.open_thumb, self.menu_)
 			action.triggered.connect(lambda: self.open_thumb(reveal=False))
 			self.menu_.addAction(action)
 
 			self.menu_.addSeparator()
 	
-			action = QAction("Показать миниатюру", self.menu_)
+			action = QAction(Lng.reveal_thumb, self.menu_)
 			action.triggered.connect(lambda: self.open_thumb(reveal=True))
 			self.menu_.addAction(action)
 

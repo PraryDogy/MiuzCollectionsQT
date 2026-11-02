@@ -1,32 +1,32 @@
 import os
 import re
 
-from PyQt6.QtCore import (QDate, QLocale, QMimeData, QPoint, QRect, QSize, Qt,
-						  QTimer, QUrl, pyqtSignal)
+from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
+                          pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
-						 QFontMetrics, QIcon, QImage, QKeyEvent, QMouseEvent,
-						 QPixmap, QResizeEvent, QPainter, QFont)
+                         QFont, QFontMetrics, QIcon, QImage, QKeyEvent,
+                         QMouseEvent, QPainter, QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
-							 QRubberBand, QSizePolicy, QVBoxLayout)
+                             QRubberBand, QSizePolicy, QVBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
-from system.tasks import DbImagesLoader, DbImagesLoaderItem, UThreadPool, AppsScanner
+from system.tasks import (AppsScanner, DbImagesLoader, DbImagesLoaderItem,
+                          UThreadPool)
 from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
-							TransparentLabel, TransparentWidget, UMenu,
-							UPushButton, UScrollVerticalArea, USep, UTagWidget)
+                            TransparentLabel, TransparentWidget, UMenu,
+                            UPushButton, UScrollVerticalArea, USep, UTagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
-					  PasteFiles, RemoveFiles, RevealInFinder, Save,
-					  ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
-					  WinInfoAction)
+                      PasteFiles, RemoveFiles, RevealInFinder, Save,
+                      ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
+                      WinInfoAction)
 from .win_filters import DatesWidget
-
 
 CONTROLS_MARGIN = 10
 
