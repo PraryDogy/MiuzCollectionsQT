@@ -3,8 +3,9 @@ from datetime import datetime
 from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QKeyEvent, QPixmap, QIcon
-from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QSpacerItem, QVBoxLayout
+from PyQt6.QtGui import QIcon, QKeyEvent, QPixmap, QAction
+from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
+                             QSpacerItem, QVBoxLayout)
 
 from cfg import JsonData, Static
 from system.items import DataItem
@@ -12,12 +13,13 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 from system.shared_utils import SharedUtils
+from system.tasks import BlurImgBgTask, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow,
+                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
                             UPushButton)
-from system.tasks import BlurImgBgTask, UThreadPool
+import subprocess
 
 
 MAX_SIZE = 250
@@ -63,6 +65,42 @@ class CopyPathButton(UPushButton):
 		return super().mouseReleaseEvent(e)
 
 
+class ImageWidget(TransparentLabel):
+	def __init__(self, data_item: DataItem):
+		super().__init__("")
+		self.data_item = data_item
+		self.thumb_path = self.get_thumb_path()
+
+	def get_thumb_path(self):
+		return Utils.create_abs_thumb_path(self.data_item.rel_path, Mf.current_mf.mf_alias)
+
+	def open_thumb(self, reveal: bool):
+		if reveal:
+			subprocess.Popen(["open", "-R", self.thumb_path])
+		else:
+			subprocess.Popen(["open", self.thumb_path])
+
+	def contextMenuEvent(self, ev):
+
+		if not self.pixmap().isNull():
+			self.menu_ = UMenu(parent=self)
+
+			action = QAction("Открыть миниатюру", self.menu_)
+			action.triggered.connect(lambda: self.open_thumb(reveal=False))
+			self.menu_.addAction(action)
+
+			self.menu_.addSeparator()
+	
+			action = QAction("Показать миниатюру", self.menu_)
+			action.triggered.connect(lambda: self.open_thumb(reveal=True))
+			self.menu_.addAction(action)
+
+
+			self.menu_.show_menu_under_cursor(ev)
+
+		return super().contextMenuEvent(ev)
+
+
 class WinInfo(UMainWindow):
 	POLL_MS = 100
 
@@ -98,7 +136,7 @@ class WinInfo(UMainWindow):
 		self.setFixedHeight(height)
 
 	def build_img_wid(self):
-		self.img_wid = TransparentLabel("")
+		self.img_wid = ImageWidget(self.data_item)
 		self.img_wid.setFixedSize(MAX_SIZE, MAX_SIZE)
 		# Добавление в раскладку выполняется в _build_info, внутри группы
 
