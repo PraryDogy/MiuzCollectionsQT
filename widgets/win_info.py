@@ -4,7 +4,7 @@ from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent, QPixmap
-from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QSpacerItem
+from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QSpacerItem, QVBoxLayout
 
 from cfg import JsonData
 from system.items import DataItem
@@ -68,15 +68,22 @@ class WinInfo(UMainWindow):
 		qimage = self.data_item.base_qimage
 		pixmap = QPixmap.fromImage(qimage)
 		self.img_wid.setPixmap(pixmap)
-		self.central_layout.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+		# Добавление в раскладку выполняется в _build_info, внутри группы
 
 	def _build_info(self):
 		wid = UGroupBox()
 		self.central_layout.addWidget(wid)
 
-		self.grid_lay = QGridLayout(wid)
+		outer_lay = QVBoxLayout(wid)
+		outer_lay.setContentsMargins(10, 10, 10, 10)
+		outer_lay.setSpacing(10)
+
+		outer_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
+
+		self.grid_lay = QGridLayout()
 		self.grid_lay.setSpacing(5)
-		self.grid_lay.setContentsMargins(10, 10, 10, 10)
+		self.grid_lay.setContentsMargins(0, 0, 0, 0)
+		outer_lay.addLayout(self.grid_lay)
 
 		rows = [
 			("name", Lng.file_name, os.path.basename(self.abs_path)),
@@ -99,7 +106,7 @@ class WinInfo(UMainWindow):
 
 			self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
 			self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
-			self.grid_lay.addWidget(right_lbl, row, 2)  # без alignment: лейбл занимает всю ячейку
+			self.grid_lay.addWidget(right_lbl, row, 2)
 			self.labels[key] = right_lbl
 
 		# Правая колонка забирает всё оставшееся место окна
