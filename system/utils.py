@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QIcon, QImage, QPixmap
+from PyQt6.QtGui import QColorSpace, QIcon, QImage, QPixmap
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
@@ -16,22 +16,27 @@ from cfg import JsonData, Static
 
 class Utils:
 
+
 	@classmethod
 	def qimage_from_array(cls, image: np.ndarray) -> QImage | None:
 		try:
 			image = np.ascontiguousarray(image)
-			if image.ndim == 2:  # grayscale
+			if image.ndim == 2:
 				height, width = image.shape
-				bytes_per_line = width
-				qimage = QImage(image.data, width, height, bytes_per_line, QImage.Format.Format_Grayscale8).copy()
+				qimage = QImage(image.data, width, height, width,
+								QImage.Format.Format_Grayscale8).copy()
 			elif image.ndim == 3 and image.shape[2] in (3, 4):
 				height, width, channels = image.shape
-				bytes_per_line = channels * width
-				fmt = QImage.Format.Format_RGB888 if channels == 3 else QImage.Format.Format_RGBA8888
-				qimage = QImage(image.data, width, height, bytes_per_line, fmt).copy()
+				fmt = (QImage.Format.Format_RGB888 if channels == 3
+					else QImage.Format.Format_RGBA8888)
+				qimage = QImage(image.data, width, height,
+								channels * width, fmt).copy()
 			else:
 				print(f"qimage_from_array: channels trouble {image.shape}")
 				return None
+
+			# Значения уже в sRGB (ImgUtils приводит всё к sRGB), явно это фиксируем
+			qimage.setColorSpace(QColorSpace(QColorSpace.NamedColorSpace.SRgb))
 			return qimage
 		except Exception as e:
 			print(f"qimage_from_array: {e}")
