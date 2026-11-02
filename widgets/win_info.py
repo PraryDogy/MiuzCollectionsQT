@@ -3,7 +3,7 @@ from datetime import datetime
 from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QKeyEvent, QPixmap
+from PyQt6.QtGui import QKeyEvent, QPixmap, QIcon
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QSpacerItem, QVBoxLayout
 
 from cfg import JsonData, Static
@@ -32,6 +32,35 @@ class WinInfoSelectableLabel(TransparentLabel):
 		if not self.selectedText():
 			self.setSelection(0, len(self.text()))
 		super().contextMenuEvent(ev)
+
+
+class CopyPathButton(UPushButton):
+	copy_svg = Static.COMMON_ICONS / "copy.svg"
+	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
+	copy_clicked = pyqtSignal()
+	ms = 1000
+
+	def __init__(self):
+		super().__init__(Lng.copy_dirpath)
+		self.copy_qicon = QIcon(str(self.copy_svg))
+		self.green_qicon = QIcon(str(self.green_checkmark))
+		self.is_locked = False
+		self.setIcon(self.copy_qicon)
+
+	def unlock_button(self):
+		self.is_locked = False
+		self.setIcon(self.copy_qicon)
+
+	def mouseReleaseEvent(self, e):
+		if self.is_locked:
+			return
+		if e.button() == Qt.MouseButton.LeftButton:
+			self.is_locked = True
+			self.setIcon(self.green_qicon)
+			self.copy_clicked.emit()
+			QTimer.singleShot(self.ms, self.unlock_button)
+
+		return super().mouseReleaseEvent(e)
 
 
 class WinInfo(UMainWindow):
@@ -136,9 +165,11 @@ class WinInfo(UMainWindow):
 		layout.setSpacing(5)
 		layout.addStretch()
 
-		copy_btn = UPushButton(Lng.copy_filepath)
-		copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(self.path))
+		copy_btn = CopyPathButton()
+		copy_btn.copy_clicked.connect(lambda: QApplication.clipboard().setText(self.abs_path))
 		layout.addWidget(copy_btn)
+
+		# layout.addStretch(1)
 
 		close_btn = ActiveButton(Lng.close)
 		close_btn.clicked.connect(self.close)
