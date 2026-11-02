@@ -11,17 +11,12 @@ import numpy as np
 import pillow_heif
 import rawpy
 import tifffile
-from PIL import Image
+from PIL import Image, ImageCms, ImageOps
 
 from cfg import Static
 
 
 class SharedUtils:
-
-	@classmethod
-	def is_mounted(cls, server: str):
-		output = subprocess.check_output(["mount"]).decode()
-		return server in output
 
 	@classmethod
 	def get_apps(cls, app_names: list[str]):
@@ -54,28 +49,6 @@ class SharedUtils:
 		return image_apps
 
 	@classmethod
-	def get_sys_vol(cls):
-		"""
-		Возвращает путь к системному диску /Volumes/Macintosh HD (или иное имя)
-		"""
-		app_support = os.path.expanduser('~/Library/Application Support')
-		volumes = "/Volumes"
-		for i in os.scandir(volumes):
-			if os.path.exists(i.path + app_support):
-				return i.path
-			
-	@classmethod
-	def add_sys_vol(cls, path: str, sys_vol: str):
-		"""
-		Добавляет /Volumes/Macintosh HD (или иное имя системного диска),
-		если директория локальная - т.е. начинается с /Users/Username/...
-		sys_vol - системный диск, обычно это /Volumes/Macintosh HD
-		"""
-		if path.startswith(os.path.expanduser("~")):
-			return sys_vol + path
-		return path
-					
-	@classmethod
 	def get_f_size(cls, bytes_size: int, round_value: int = 2) -> str:
 		def format_size(size: float) -> str:
 			if round_value == 0:
@@ -107,17 +80,6 @@ class SharedUtils:
 		else:
 			return date.strftime("%d.%m.%y %H:%M")
 		
-	def insert_linebreaks(text: str, n: int = 35) -> str:
-		new_text = []
-		for i in range(0, len(text), n):
-			row = text[i:i+n]
-			if row[-1] == " ":
-				row = row.rstrip()
-			else:
-				row = row + "-"
-			new_text.append(row)
-		return "\n".join(new_text).rstrip("-")
-
 
 class ImgUtils:
 	pillow_heif.register_heif_opener() 
@@ -317,9 +279,19 @@ class ImgUtils:
 				img = Image.open(path)
 				img = img.convert("RGB")
 				return np.array(img)
-			else:
-				img = cv2.imread(path, cv2.IMREAD_COLOR)
-				return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+			img = Image.open(path)
+			img = ImageOps.exif_transpose(img)
+
+			icc = img.info.get("icc_profile")
+			if icc:
+				src = ImageCms.ImageCmsProfile(io.BytesIO(icc))
+				dst = ImageCms.createProfile("sRGB")
+				img = ImageCms.profileToProfile(img, src, dst, outputMode="RGB")
+			elif img.mode == "CMYK":
+				img = img.convert("RGB")
+
+			return np.array(img.convert("RGB"))
 		except Exception as e:
 			print("read jpg error", e)
 			return cls._get_broken_image()
@@ -540,29 +512,6 @@ class ImgUtils:
 		except Exception as e:
 			print(f"read_thumb: ошибка чтения thumb: {e}")
 			return None
-			
-	@classmethod
-	def desaturate_image(cls, image: np.ndarray, factor=0.2):
-		try:
-			# если 4 канала (RGBA), убираем альфу для операции
-			has_alpha = image.shape[2] == 4
-			img = image[:, :, :3] if has_alpha else image
-
-			# преобразуем в серый
-			gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-			gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-
-			# объединяем с оригиналом
-			desat = cv2.addWeighted(img, 1 - factor, gray_bgr, factor, 0)
-
-			# если был альфа-канал, добавляем обратно
-			if has_alpha:
-				desat = np.dstack([desat, image[:, :, 3]])
-
-			return desat
-		except Exception:
-			cls.print_error()
-			return image
 
 	def is_grayscale(img: np.ndarray, saturation_threshold=3):
 		if len(img.shape) < 3 or img.shape[2] == 1:
