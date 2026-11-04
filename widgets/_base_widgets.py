@@ -1976,6 +1976,30 @@ class MfStopListWidget(UGroupBox):
 		return list(self.draft_stop_list)
 
 
-class SaveWidget(UGroupBox):
-	def __init__(self, title=None, parent=None):
-		super().__init__(title, parent)
+class SaveGroupBox(TransparentWidget):
+	save_clicked = pyqtSignal()
+	save_svg = Static.COMMON_ICONS / "save.svg"
+	attention_gray = Static.COMMON_ICONS / "attention_gray.svg"
+
+	def __init__(self):
+		super().__init__()
+
+		self.h_lay = QHBoxLayout(self)
+		self.h_lay.setContentsMargins(5, 5, 5, 5)
+		self.h_lay.setSpacing(5)
+
+
+		self.save_text = UTagWidget(
+			text=Lng.unsaved_changes,
+			qss_style=UTagWidget.qss_yellow,
+			left_svg_path=str(self.attention_gray)
+		)
+		self.h_lay.addWidget(self.save_text)
+		self.save_text.hide()
+
+		self.h_lay.addStretch()
+
+		self.save_button = ActiveButton(Lng.save_changes_text)
+		self.save_button.setIcon(QIcon(str(self.save_svg)))
+		self.save_button.clicked.connect(self.save_clicked.emit)
+		self.h_lay.addWidget(self.save_button)

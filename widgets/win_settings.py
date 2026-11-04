@@ -4,12 +4,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
-							 QSplitter, QTableWidget, QTableWidgetItem,
-							 QVBoxLayout)
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
 from system.items import SettingsItem
@@ -18,18 +18,19 @@ from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
-						  UThreadPool)
+                          UThreadPool)
 from system.themes import ThemeChanger
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-							MfAliasWidget, MfPathWidget, MfStopListWidget,
-							RowArrowWidget, SaveRowArrowWidget,
-							SuperConfirmWindow, TitleTextLabel,
-							TransparentLabel, TransparentWidget, UGroupBox,
-							UListSpacerItem, UListWidget, UListWidgetItem,
-							UMainWindow, UMenu, UPushButton,
-							UScrollVerticalArea, USep, USpinBox, WarningWindow, RedButton)
+                            MfAliasWidget, MfPathWidget, MfStopListWidget,
+                            RedButton, RowArrowWidget, SaveGroupBox,
+                            SaveRowArrowWidget, SuperConfirmWindow,
+                            TitleTextLabel, TransparentLabel,
+                            TransparentWidget, UGroupBox, UListSpacerItem,
+                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
+                            UPushButton, UScrollVerticalArea, USep, USpinBox,
+                            WarningWindow)
 
 
 def restart_app():
@@ -633,7 +634,6 @@ class MfSettings(UScrollVerticalArea):
 	repair_svg = Static.COMMON_ICONS / "repair.svg"
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
 	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-	save_svg = Static.COMMON_ICONS / "save.svg"
 	image_folder_size = (23, 23)
 
 	def __init__(self, mf_index: int):
@@ -649,47 +649,49 @@ class MfSettings(UScrollVerticalArea):
 		main_lay.setContentsMargins(0, 0, 10, 10)
 		main_lay.setSpacing(10)
 
+		# --- Группа: путь и список остановок ---
+		paths_group = UGroupBox()
+		paths_lay = QVBoxLayout(paths_group)
+		paths_lay.setContentsMargins(5, 5, 5, 5)
+		paths_lay.setSpacing(10)
+
 		self.path_widget = MfPathWidget(mf=self.mf)
 		self.path_widget.changed.connect(
 			lambda: self.show_warning()
 		)
-		main_lay.addWidget(self.path_widget)
+		paths_lay.addWidget(self.path_widget)
 
 		self.mf_stop_list = MfStopListWidget(mf_stop_list=self.mf.mf_stop_list)
 		self.mf_stop_list.changed.connect(
 			lambda: self.show_warning()
 		)
-		main_lay.addWidget(self.mf_stop_list)
+		paths_lay.addWidget(self.mf_stop_list)
+
+		self.save_group = SaveGroupBox()
+		self.save_group.save_clicked.connect(self.save_mf_settings)
+		paths_lay.addWidget(self.save_group)
+		
+		main_lay.addWidget(paths_group)
+
+		# --- Группа: ремонт и удаление ---
+		actions_group = UGroupBox()
+		actions_lay = QVBoxLayout(actions_group)
+		actions_lay.setSpacing(10)
 
 		self.repair_widget = MfRepairWidget()
 		self.repair_widget.start_clicked.connect(self.repair_mf)
-		main_lay.addWidget(self.repair_widget)
+		actions_lay.addWidget(self.repair_widget)
 
 		self.remove_folder = MfRemoveWidget()
 		self.remove_folder.start_clicked.connect(self.remove_mf)
-		main_lay.addWidget(self.remove_folder)
+		actions_lay.addWidget(self.remove_folder)
 
-		save_container = TransparentWidget()
-		main_lay.addWidget(save_container)
-		save_layout = QHBoxLayout(save_container)
-		save_layout.setContentsMargins(0, 0, 0, 0)
-		save_layout.setSpacing(5)
-
-		save_layout.addStretch()
-
-		self.save_text = GrayTextLabel(Lng.unsaved_changes)
-		save_layout.addWidget(self.save_text)
-		self.save_text.hide()
-
-		self.save_button = ActiveButton(Lng.save)
-		self.save_button.setIcon(QIcon(str(self.save_svg)))
-		self.save_button.clicked.connect(self.save_mf_settings)
-		save_layout.addWidget(self.save_button)
+		main_lay.addWidget(actions_group)
 
 		main_lay.addStretch()
 
 	def show_warning(self):
-		self.save_text.show()
+		self.save_group.save_text.show()
 
 	def remove_mf(self, *args):
 		
@@ -876,7 +878,7 @@ class WinSettings(UMainWindow):
 	settings_svg = Static.COMMON_ICONS / "settings.svg"
 	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
 
-	ww = 710
+	ww = 730
 	hh = 600
 
 	def __init__(self, settings_item: SettingsItem):
