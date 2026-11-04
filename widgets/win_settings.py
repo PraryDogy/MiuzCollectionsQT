@@ -691,7 +691,7 @@ class MfSettings(UScrollVerticalArea):
 		main_lay.addStretch()
 
 	def show_warning(self):
-		self.save_group.save_text.show()
+		self.save_group.show_warning()
 
 	def remove_mf(self, *args):
 		

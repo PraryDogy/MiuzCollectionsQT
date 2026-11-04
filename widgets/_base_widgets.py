@@ -1989,11 +1989,18 @@ class SaveGroupBox(TransparentWidget):
 		self.h_lay.setSpacing(5)
 
 
-		self.save_text = UTagWidget(
-			text=Lng.unsaved_changes,
-			qss_style=UTagWidget.qss_yellow,
-			left_svg_path=str(self.attention_gray)
-		)
+		# self.save_text = UTagWidget(
+		# 	text=Lng.unsaved_changes,
+		# 	qss_style=UTagWidget.qss_yellow,
+		# 	left_svg_path=str(self.attention_gray)
+		# )
+
+		self.attention_wid = QSvgWidget(str(self.attention_gray))
+		self.attention_wid.setFixedSize(15, 15)
+		self.attention_wid.hide()
+		self.h_lay.addWidget(self.attention_wid)
+
+		self.save_text = GrayTextLabel(text=Lng.unsaved_changes)
 		self.h_lay.addWidget(self.save_text)
 		self.save_text.hide()
 
@@ -2003,3 +2010,7 @@ class SaveGroupBox(TransparentWidget):
 		self.save_button.setIcon(QIcon(str(self.save_svg)))
 		self.save_button.clicked.connect(self.save_clicked.emit)
 		self.h_lay.addWidget(self.save_button)
+
+	def show_warning(self):
+		self.attention_wid.show()
+		self.save_text.show()
