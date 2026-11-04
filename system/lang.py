@@ -612,8 +612,8 @@ class Lng:
 		"Add folder"
 	)
 	catalog_reindex_warning = (
-		"Информация о каталоге будет очищена, все изображения будут заново проиндексированы. Это может занять время.",
-		"The catalog information will be cleared, and all images will be re-indexed. This may take some time."
+		"Информация о каталоге будет очищена, изображения будут заново проиндексированы. Это может занять время.",
+		"The catalog information will be cleared, and images will be re-indexed. This may take some time."
 	)
 	catalog_delete_warning = (
 		"Каталог будет полностью удален из приложения. Файлы на диске останутся без изменений.",
