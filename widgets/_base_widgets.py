@@ -837,6 +837,8 @@ class UTagWidget(TransparentFrame):
 	qss_gray = "gray"
 	qss_transparent = "transparent"
 	qss_green = "green"
+	qss_yellow = "yellow"
+	qss_red = "red"
 
 	tag_height = 25
 	right_svg_size = (14, 14)
@@ -1972,3 +1974,8 @@ class MfStopListWidget(UGroupBox):
 
 	def get_stop_list(self) -> list[str]:
 		return list(self.draft_stop_list)
+
+
+class SaveWidget(UGroupBox):
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
