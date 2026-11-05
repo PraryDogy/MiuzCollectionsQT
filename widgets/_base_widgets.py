@@ -23,7 +23,7 @@ from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
 from cfg import JsonData, Static
 from system.lang import Lng
 from system.main_folder import Mf
-from system.themes import ThemeChanger, TreeTheme
+from system.themes import ThemeChanger
 from system.utils import Utils
 
 

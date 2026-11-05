@@ -1118,6 +1118,7 @@ class WinSettings(UMainWindow):
 
 	def save_settings_cmd(self):
 		if not self.has_unsaved:
+			self.deleteLater()
 			return
 		if self.current_page is not None:
 			self.current_page.save_changes()
