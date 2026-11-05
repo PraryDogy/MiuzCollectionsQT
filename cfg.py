@@ -42,6 +42,8 @@ class Static:
     APP_ICONS = ICONS / "app_icons"
     COMMON_ICONS = ICONS / "common"
     JPEG_ICONS = ICONS / "jpeg_icons"
+    GRAY_ICONS = ICONS / "gray"
+    COLOR_ICONS = ICONS / "color"
 
 
     # максимально возможный размер миниатюры в HASHDIR
