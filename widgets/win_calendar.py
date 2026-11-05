@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QDate, Qt, pyqtSignal
+from PyQt6.QtCore import QDate, Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
@@ -107,19 +107,9 @@ class CalendarDaySelectedText(TransparentLabel):
 
 class WinCalendar(UMainWindow):
 	date_selected = pyqtSignal(QDate)
-
-	svg_calendar_path = Static.COMMON_ICONS / "calendar.svg"
-	svg_previous_path = Static.COMMON_ICONS / "arrow_left.svg"
-	svg_next_path = Static.COMMON_ICONS / "arrow_right.svg"
-	svg_blue_circle_path = Static.COMMON_ICONS / "blue_circle.svg"
-	svg_gray_circle_path = Static.COMMON_ICONS / "gray_circle.svg"
-	svg_reset_path = Static.COMMON_ICONS / "reset.svg"
-
 	min_year = 2015
-
 	cell_size = (45, 35)
 	svg_nav_size = (23, 23)
-	svg_calendar_size = (15, 15)
 	svg_circle_size = (27, 27)
 
 	# Теперь принимаем date, который может быть невалидным или None
@@ -128,11 +118,11 @@ class WinCalendar(UMainWindow):
 		self.readable_date = ReadableDate(JsonData.lng_index)
 		self.date_now = QDate.currentDate()
 
-		qimg = QImage(str(self.svg_blue_circle_path))
+		qimg = QImage(str(Static.COLOR_ICONS / "blue_circle.svg"))
 		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
 		self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
-		qimg = QImage(str(self.svg_gray_circle_path))
+		qimg = QImage(str(Static.GRAY_ICONS / "circle_gray.svg"))
 		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
 		self.gray_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
@@ -166,9 +156,8 @@ class WinCalendar(UMainWindow):
 		dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
 		dynamic_container_lay.setSpacing(0)
 
-		calendar_icon = QSvgWidget()
-		calendar_icon.load(str(self.svg_calendar_path))
-		calendar_icon.setFixedSize(*self.svg_calendar_size)
+		calendar_icon = QSvgWidget(str(Static.COLOR_ICONS / "calendar.svg"))
+		calendar_icon.setFixedSize(15, 15)
 		dynamic_container_lay.addWidget(calendar_icon)
 		dynamic_container_lay.addSpacing(10)
 
@@ -176,10 +165,11 @@ class WinCalendar(UMainWindow):
 		dynamic_container_lay.addWidget(self.dynamic_label)
 		dynamic_container_lay.addStretch(1)
 
-		reset_icon = QIcon(str(self.svg_reset_path))
+		reset_icon = QIcon(str(Static.GRAY_ICONS / "cancel_solid_gray.svg"))
 		self.reset_button = UPushButton(Lng.reset)
 		self.reset_button.clicked.connect(self.reset_button_cmd)
 		self.reset_button.setIcon(reset_icon)
+		self.reset_button.setIconSize(QSize(10, 10))
 		dynamic_container_lay.addWidget(self.reset_button)
 
 		self.central_layout.addSpacing(spacing)
@@ -194,7 +184,7 @@ class WinCalendar(UMainWindow):
 		self.nav_layout.setSpacing(0)
 		self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-		self.btn_prev = CalendarSvgNavi(str(self.svg_previous_path))
+		self.btn_prev = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_left_gray.svg"))
 		self.btn_prev.setFixedSize(*self.svg_nav_size)
 		self.btn_prev.clicked.connect(self.prev_month)
 		self.nav_layout.addWidget(self.btn_prev)
@@ -214,7 +204,7 @@ class WinCalendar(UMainWindow):
 		self.nav_layout.addWidget(self.btn_year)
 		self.nav_layout.addStretch()
 
-		self.btn_next = CalendarSvgNavi(str(self.svg_next_path))
+		self.btn_next = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
 		self.btn_next.setFixedSize(*self.svg_nav_size)
 		self.btn_next.clicked.connect(self.next_month)
 		self.nav_layout.addWidget(self.btn_next)
