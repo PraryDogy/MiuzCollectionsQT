@@ -51,10 +51,6 @@ class SaveGroupBox(TransparentWidget):
 	cancel_clicked = pyqtSignal()
 	new_catalog_clicked = pyqtSignal()
 
-	save_svg = Static.COMMON_ICONS / "save.svg"
-	attention_gray = Static.COMMON_ICONS / "attention_gray.svg"
-	new_catalog = Static.COMMON_ICONS / "new_folder.svg"
-
 	def __init__(self, show_new_catalog: bool = True):
 		super().__init__()
 		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -64,14 +60,14 @@ class SaveGroupBox(TransparentWidget):
 		self.h_lay.setSpacing(5)
 
 		self.new_catalog_btn = UPushButton(Lng.new_catalog)
-		self.new_catalog_btn.setIcon(QIcon(str(self.new_catalog)))
+		self.new_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "folder_gray.svg")))
 		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
 		self.new_catalog_btn.setVisible(show_new_catalog)
 		self.h_lay.addWidget(self.new_catalog_btn)
 
 		self.h_lay.addStretch()
 
-		self.attention_wid = QSvgWidget(str(self.attention_gray))
+		self.attention_wid = QSvgWidget(str(Static.GRAY_ICONS / "attention_gray.svg"))
 		self.attention_wid.setFixedSize(15, 15)
 		self.attention_wid.hide()
 		self.h_lay.addWidget(self.attention_wid)
@@ -88,7 +84,7 @@ class SaveGroupBox(TransparentWidget):
 		self.h_lay.addWidget(self.cancel_button)
 
 		self.save_button = ActiveButton(Lng.save_changes_text)
-		self.save_button.setIcon(QIcon(str(self.save_svg)))
+		self.save_button.setIcon(QIcon(str(Static.GRAY_ICONS / "diskette_gray.svg")))
 		self.save_button.clicked.connect(self.save_clicked.emit)
 		self.h_lay.addWidget(self.save_button)
 
@@ -116,15 +112,8 @@ class SaveGroupBox(TransparentWidget):
 class RebootableSettings(UGroupBox):
 	changed = pyqtSignal()
 	lang_changed = pyqtSignal()
-
 	SPIN_MAX = 60
 	SPIN_MIN = 0
-
-	RUS_FLAG = Static.COMMON_ICONS / "rus_flag.svg"
-	ENG_FLAG = Static.COMMON_ICONS / "eng_flag.svg"
-	ERASER_SVG = Static.COMMON_ICONS / "eraser.svg"
-	CLOCK_SVG = Static.COMMON_ICONS / "clock.svg"
-	LANGUAGE_SVG = Static.COMMON_ICONS / "language.svg"
 
 	def __init__(self):
 		super().__init__()
@@ -132,8 +121,8 @@ class RebootableSettings(UGroupBox):
 		self.lng_index = JsonData.lng_index
 		self.scanner_minutes = JsonData.scaner_minutes
 
-		self.rus_flag_icon = QIcon(str(self.RUS_FLAG))
-		self.eng_flag_icon = QIcon(str(self.ENG_FLAG))
+		self.rus_flag_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
+		self.eng_flag_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
 		main_layout = QVBoxLayout(self)
 		main_layout.setContentsMargins(*RowArrowWidget.group_margings)
@@ -149,8 +138,7 @@ class RebootableSettings(UGroupBox):
 
 	def _create_language_widget(self, layout):
 		widget = RowArrowWidget(Lng.language_max)
-		widget.set_left_icon(self.LANGUAGE_SVG)
-		widget.setFixedHeight(RowArrowWidget.hh + 6)
+		widget.set_left_icon(Static.COLOR_ICONS / "language.svg")
 
 		self.lng_btn = UPushButton("")
 		self.lng_btn.setIconSize(QSize(17, 17))
@@ -186,10 +174,11 @@ class RebootableSettings(UGroupBox):
 
 		self._update_language_icon()
 		self._update_language_checked()
+		widget.setFixedHeight(self.lng_btn.height() + 4)
 
 	def _create_scanner_widget(self, layout):
 		widget = RowArrowWidget(Lng.search_interval)
-		widget.set_left_icon(self.CLOCK_SVG)
+		widget.set_left_icon(Static.COLOR_ICONS / "clock.svg")
 		widget.setFixedHeight(widget.height() + 1)
 
 		self.spin = USpinBox(self)
@@ -206,7 +195,7 @@ class RebootableSettings(UGroupBox):
 
 	def _create_reset_widget(self, layout):
 		widget = RowArrowWidget(Lng.erase_data)
-		widget.set_left_icon(self.ERASER_SVG)
+		widget.set_left_icon(Static.COLOR_ICONS / "eraser.svg")
 		widget.clicked.connect(self.erase_all_data)
 
 		layout.addWidget(widget)
@@ -343,8 +332,6 @@ class SizesWin(UMainWindow):
 
 
 class NonRebootableSettings(UGroupBox):
-	finder_svg = Static.COMMON_ICONS / "finder.svg"
-	hdd_svg = Static.COMMON_ICONS / "hdd.svg"
 
 	def __init__(self):
 		super().__init__()
@@ -355,14 +342,14 @@ class NonRebootableSettings(UGroupBox):
 		self.size_items = {}
 
 		data_size_wid = RowArrowWidget(Lng.statistic)
-		data_size_wid.set_left_icon(self.hdd_svg)
+		data_size_wid.set_left_icon(Static.COLOR_ICONS / "hdd.svg")
 		data_size_wid.clicked.connect(self.show_sizes_win)
 		main_layout.addWidget(data_size_wid)
 
 		main_layout.addWidget(USep())
 
 		show_files_wid = RowArrowWidget(Lng.show_system_files)
-		show_files_wid.set_left_icon(self.finder_svg)
+		show_files_wid.set_left_icon(Static.COLOR_ICONS / "finder.svg")
 		show_files_wid.clicked.connect(self.show_files_cmd)
 		main_layout.addWidget(show_files_wid)
 
@@ -430,8 +417,6 @@ class ThemeBtn(TransparentWidget):
 
 
 class ThemesWidget(UGroupBox):
-	theme_svg = Static.COMMON_ICONS / "theme.svg"
-
 	def __init__(self):
 		super().__init__()
 		main_lay = QVBoxLayout(self)
@@ -439,7 +424,7 @@ class ThemesWidget(UGroupBox):
 		main_lay.setSpacing(RowArrowWidget.group_spacing)
 
 		title_wid = RowArrowWidget(Lng.theme)
-		title_wid.set_left_icon(self.theme_svg)
+		title_wid.set_left_icon(Static.COLOR_ICONS / "theme.svg")
 		title_wid.hide_arrow()
 		main_lay.addWidget(title_wid)
 
@@ -455,14 +440,14 @@ class ThemesWidget(UGroupBox):
 
 		themes_mappings = (
 			(Themes.theme_auto, Lng.theme_auto,
-				Static.COMMON_ICONS / "theme_auto_1.svg",
-				Static.COMMON_ICONS / "theme_auto_2.svg"),
+				Static.COLOR_ICONS / "theme_auto_1.svg",
+				Static.COLOR_ICONS / "theme_auto_2.svg"),
 			(Themes.theme_light, Lng.theme_light,
-				Static.COMMON_ICONS / "theme_light_1.svg",
-				Static.COMMON_ICONS / "theme_light_2.svg"),
+				Static.COLOR_ICONS / "theme_light_1.svg",
+				Static.COLOR_ICONS / "theme_light_2.svg"),
 			(Themes.theme_dark, Lng.theme_dark,
-				Static.COMMON_ICONS / "theme_dark_1.svg",
-				Static.COMMON_ICONS / "theme_dark_2.svg"),
+				Static.COLOR_ICONS / "theme_dark_1.svg",
+				Static.COLOR_ICONS / "theme_dark_2.svg"),
 		)
 
 		self.selected_theme = JsonData.theme
@@ -603,8 +588,6 @@ class WinSettingsMfAliasTitle(TransparentLabel):
 
 
 class MfRepairWidget(UGroupBox):
-	repair_svg = Static.COMMON_ICONS / "repair.svg"
-	repair_gray_svg = Static.COMMON_ICONS / "repair_gray.svg"
 	start_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -615,7 +598,7 @@ class MfRepairWidget(UGroupBox):
 
 		title_layout = TitleTextLabel(
 			Lng.repair_catalog_long,
-			self.repair_svg
+			Static.COLOR_ICONS / "repair.svg"
 		)
 		self.v_lay.addWidget(title_layout)
 
@@ -632,7 +615,7 @@ class MfRepairWidget(UGroupBox):
 		button_layout.setSpacing(10)
 
 		self.start_btn = UPushButton(Lng.repair_catalog_short)
-		self.start_btn.setIcon(QIcon(str(self.repair_gray_svg)))
+		self.start_btn.setIcon(QIcon(str(Static.COMMON_ICONS / "repair_gray.svg")))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
 
@@ -642,8 +625,6 @@ class MfRepairWidget(UGroupBox):
 
 
 class MfRemoveWidget(UGroupBox):
-	trash_svg = Static.COMMON_ICONS / "trash.svg"
-	red_trash = Static.COMMON_ICONS / "red_trash.svg"
 	start_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -654,7 +635,7 @@ class MfRemoveWidget(UGroupBox):
 
 		title_layout = TitleTextLabel(
 			Lng.remove_folder,
-			self.trash_svg
+			Static.GRAY_ICONS / "trash_gray.svg"
 		)
 		self.v_lay.addWidget(title_layout)
 
@@ -673,7 +654,7 @@ class MfRemoveWidget(UGroupBox):
 		button_layout.setSpacing(10)
 
 		self.start_btn = RedButton(Lng.remove_folder)
-		self.start_btn.setIcon(QIcon(str(self.red_trash)))
+		self.start_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "red_trash.svg")))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
 
@@ -943,20 +924,12 @@ class NewMfSettings(UMainWindow):
 class WinSettings(UMainWindow):
 	closed = pyqtSignal()
 
-	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-	new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
-	settings_svg = Static.COMMON_ICONS / "settings.svg"
-	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
-
-	ww = 730
-	hh = 600
-
 	def __init__(self, settings_item: SettingsItem):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.settings)
-		self.setMinimumSize(self.ww, self.hh)
+		self.setMinimumSize(730, 600)
 
 		self.settings_item = settings_item
 		self.current_page = None
@@ -990,7 +963,7 @@ class WinSettings(UMainWindow):
 			parent=self.left_menu,
 			text=Lng.general
 		)
-		main_settings_item.setIcon(QIcon(str(self.settings_svg)))
+		main_settings_item.setIcon(QIcon(str(Static.COLOR_ICONS / "settings.svg")))
 		self.left_menu.addItem(main_settings_item)
 
 		spacer = UListSpacerItem(self.left_menu)
@@ -998,7 +971,7 @@ class WinSettings(UMainWindow):
 
 		for i in Mf.items:
 			new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
-			new_folder.setIcon(QIcon(str(self.image_folder_svg)))
+			new_folder.setIcon(QIcon(str(Static.COLOR_ICONS / "image_folder.svg")))
 			self.left_menu.addItem(new_folder)
 
 		self.right_wid = TransparentWidget()
