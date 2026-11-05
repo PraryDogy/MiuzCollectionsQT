@@ -39,6 +39,13 @@ def restart_app():
 	QApplication.exit(0)
 
 
+class CancelChangesWin(ConfirmWindow):
+	def __init__(self, text):
+		super().__init__(text)
+		self.ok_btn.setText(Lng.do_not_save)
+		self.cancel_btn.setText(Lng.go_back)
+
+
 class SaveGroupBox(TransparentWidget):
 	save_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
@@ -909,8 +916,7 @@ class NewMfSettings(UMainWindow):
 		self.close()
 
 	def _ask_discard(self):
-		win = ConfirmWindow(Lng.unsaved_changes_confirm)
-		win.ok_btn.setText(Lng.cancel_changes)
+		win = CancelChangesWin(Lng.unsaved_changes_confirm)
 		win.ok_clicked.connect(self._on_discard_confirmed)
 		win.center_to_parent(self)
 		win.show()
@@ -1096,8 +1102,7 @@ class WinSettings(UMainWindow):
 		self._show_unsaved_window(win)
 
 	def _create_unsaved_window(self) -> ConfirmWindow:
-		win = ConfirmWindow(Lng.unsaved_changes_confirm)
-		win.ok_btn.setText(Lng.cancel_changes)
+		win = CancelChangesWin(Lng.unsaved_changes_confirm)
 		return win
 
 	def _show_unsaved_window(self, win: ConfirmWindow):

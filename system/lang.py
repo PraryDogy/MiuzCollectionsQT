@@ -633,10 +633,18 @@ class Lng:
 		"Reveal thumbnail in Finder"
 	)
 	unsaved_changes_confirm = (
-		"Есть несохраненные изменения. Отменить?",  # ru
-		"There are unsaved changes. Discard them?",  # en
+		"Есть несохраненные изменения.",  # ru
+		"There are unsaved changes.",  # en
 	)
 	cancel_changes = (
 		"Отменить изменения",  # ru
 		"Cancel changes",  # en
+	)
+	go_back = (
+		"Вернуться",  # ru
+		"Go back",  # en
+	)
+	do_not_save = (
+		"Не сохранять",  # ru
+		"Do not save",  # en
 	)
