@@ -16,13 +16,15 @@ class TreeTheme:
     h_margin = 4
     v_margin = 1
 
+    _COMMENT_RE = re.compile(r"/\*.*?\*/", re.S)
     _SEL_RE = re.compile(
         r"UListWidget::item:selected\b[^{}]*\{\s*background:\s*(#[0-9a-fA-F]{3,8})\s*;\s*\}"
     )
 
     @classmethod
     def parse_sel_color(cls, qss_text: str) -> str:
-        m = cls._SEL_RE.search(qss_text)
+        qss_no_comments = cls._COMMENT_RE.sub("", qss_text)
+        m = cls._SEL_RE.search(qss_no_comments)
         if not m:
             raise ValueError("TreeTheme: не могу найти цвет UListWidget::item:selected в QSS")
         return m.group(1)
