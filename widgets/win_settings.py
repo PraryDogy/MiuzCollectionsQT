@@ -430,7 +430,6 @@ class ThemeBtn(TransparentWidget):
 
 class ThemesWidget(UGroupBox):
 	theme_svg = Static.COMMON_ICONS / "theme.svg"
-	changed = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -454,24 +453,15 @@ class ThemesWidget(UGroupBox):
 		main_lay.addWidget(themes_wid)
 
 		themes_mappings = (
-			(
-				Themes.theme_auto,
-				Lng.theme_auto,
+			(Themes.theme_auto, Lng.theme_auto,
 				Static.COMMON_ICONS / "theme_auto_1.svg",
-				Static.COMMON_ICONS / "theme_auto_2.svg"
-			),
-			(
-				Themes.theme_light,
-				Lng.theme_light,
+				Static.COMMON_ICONS / "theme_auto_2.svg"),
+			(Themes.theme_light, Lng.theme_light,
 				Static.COMMON_ICONS / "theme_light_1.svg",
-				Static.COMMON_ICONS / "theme_light_2.svg"
-			),
-			(
-				Themes.theme_dark,
-				Lng.theme_dark,
+				Static.COMMON_ICONS / "theme_light_2.svg"),
+			(Themes.theme_dark, Lng.theme_dark,
 				Static.COMMON_ICONS / "theme_dark_1.svg",
-				Static.COMMON_ICONS / "theme_dark_2.svg"
-			),
+				Static.COMMON_ICONS / "theme_dark_2.svg"),
 		)
 
 		self.selected_theme = JsonData.theme
@@ -499,7 +489,10 @@ class ThemesWidget(UGroupBox):
 			return
 		self.selected_theme = theme_type
 		self._refresh_selection()
-		self.changed.emit()
+		# Тема сразу сохраняется и применяется, без участия в несохранённых изменениях
+		JsonData.theme = theme_type
+		JsonData.write_json_data()
+		ThemeChanger.init()
 
 
 class AboutWidLabel(TransparentLabel):
@@ -583,7 +576,6 @@ class GeneralSettings(TransparentWidget):
 		v_lay.addWidget(NonRebootableSettings())
 
 		self.themes = ThemesWidget()
-		self.themes.changed.connect(self.changed.emit)
 		v_lay.addWidget(self.themes)
 
 		v_lay.addWidget(AboutWid())
