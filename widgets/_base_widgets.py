@@ -1596,7 +1596,7 @@ class MfPathWidget(UGroupBox):
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
-		title = self._create_title(Static.COLOR_ICONS / "folder_magnifier.svg")
+		title = self._create_title(Static.GRAY_ICONS / "folder_magnifier_gray.svg")
 		texts_layout.addWidget(title)
 
 		# Разделитель

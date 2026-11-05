@@ -60,7 +60,8 @@ class SaveGroupBox(TransparentWidget):
 		self.h_lay.setSpacing(5)
 
 		self.new_catalog_btn = UPushButton(Lng.new_catalog)
-		self.new_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "folder_gray.svg")))
+		self.new_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
+		self.new_catalog_btn.setIconSize(QSize(10, 10))
 		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
 		self.new_catalog_btn.setVisible(show_new_catalog)
 		self.h_lay.addWidget(self.new_catalog_btn)
@@ -332,7 +333,6 @@ class SizesWin(UMainWindow):
 
 
 class NonRebootableSettings(UGroupBox):
-
 	def __init__(self):
 		super().__init__()
 		main_layout = QVBoxLayout(self)
@@ -615,7 +615,7 @@ class MfRepairWidget(UGroupBox):
 		button_layout.setSpacing(10)
 
 		self.start_btn = UPushButton(Lng.repair_catalog_short)
-		self.start_btn.setIcon(QIcon(str(Static.COMMON_ICONS / "repair_gray.svg")))
+		self.start_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "repair_gray.svg")))
 		self.start_btn.clicked.connect(self.start_clicked)
 		button_layout.addWidget(self.start_btn)
 
@@ -664,10 +664,6 @@ class MfRemoveWidget(UGroupBox):
 
 
 class MfSettings(UScrollVerticalArea):
-	repair_svg = Static.COMMON_ICONS / "repair.svg"
-	trash_svg = Static.COMMON_ICONS / "trash.svg"
-	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-	image_folder_size = (23, 23)
 	changed = pyqtSignal()
 
 	def __init__(self, mf_index: int):
