@@ -1,0 +1,973 @@
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
+                             QSplitter, QTableWidget, QTableWidgetItem,
+                             QVBoxLayout)
+
+from cfg import JsonData, Static, Themes
+from system.items import SettingsItem
+from system.lang import Lng
+from system.main_folder import Mf
+from system.multiprocess import MfRemover, ProcessWorker
+from system.shared_utils import SharedUtils
+from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
+                          UThreadPool)
+from system.themes import ThemeChanger
+from system.utils import Utils
+
+from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
+                            MfAliasWidget, MfPathWidget, MfStopListWidget,
+                            RedButton, RowArrowWidget, SaveGroupBox,
+                            SaveRowArrowWidget, SuperConfirmWindow,
+                            TitleTextLabel, TransparentLabel,
+                            TransparentWidget, UGroupBox, UListSpacerItem,
+                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
+                            UPushButton, UScrollVerticalArea, USep, USpinBox,
+                            WarningWindow)
+
+
+def restart_app():
+	ProcessWorker.stop_all() 
+	os.execl(sys.executable, sys.executable, *sys.argv)
+	QApplication.exit(0)
+
+
+class LabelMinWidth(TransparentLabel):
+	def __init__(self, text="", parent=None):
+		super().__init__(text, parent)
+		self.setMinimumWidth(30)
+
+
+class RebootableSettings(UGroupBox):
+	changed = pyqtSignal()
+	lang_changed = pyqtSignal()
+
+	SPIN_MAX = 60
+	SPIN_MIN = 0
+
+	RUS_FLAG = Static.COMMON_ICONS / "rus_flag.svg"
+	ENG_FLAG = Static.COMMON_ICONS / "eng_flag.svg"
+	ERASER_SVG = Static.COMMON_ICONS / "eraser.svg"
+	CLOCK_SVG = Static.COMMON_ICONS / "clock.svg"
+	LANGUAGE_SVG = Static.COMMON_ICONS / "language.svg"
+
+	def __init__(self):
+		super().__init__()
+
+		self.lng_index = JsonData.lng_index
+		self.scanner_minutes = JsonData.scaner_minutes
+
+		self.rus_flag_icon = QIcon(str(self.RUS_FLAG))
+		self.eng_flag_icon = QIcon(str(self.ENG_FLAG))
+
+		main_layout = QVBoxLayout(self)
+		main_layout.setContentsMargins(*RowArrowWidget.group_margings)
+		main_layout.setSpacing(RowArrowWidget.group_spacing)
+
+		self._create_language_widget(main_layout)
+		main_layout.addWidget(USep())
+
+		self._create_scanner_widget(main_layout)
+		main_layout.addWidget(USep())
+
+		self._create_reset_widget(main_layout)
+
+	def _create_language_widget(self, layout):
+		widget = RowArrowWidget(Lng.language_max)
+		widget.set_left_icon(self.LANGUAGE_SVG)
+		widget.setFixedHeight(RowArrowWidget.hh + 6)
+
+		self.lng_btn = UPushButton("")
+		self.lng_btn.setIconSize(QSize(17, 17))
+		self.lng_btn.setFixedWidth(50)
+
+		menu = UMenu(parent=self)
+		self.lang_actions = []
+
+		languages = (
+			(Lng.lng_menu_rus, self.rus_flag_icon, 0),
+			(Lng.lng_menu_eng, self.eng_flag_icon, 1),
+		)
+
+		for title, icon, index in languages:
+			action = QAction(title, menu)
+			action.setIcon(icon)
+			action.setIconVisibleInMenu(True)
+			action.setCheckable(True)
+			action.triggered.connect(
+				lambda checked=False, i=index: self.set_language(i)
+			)
+
+			menu.addAction(action)
+			self.lang_actions.append(action)
+
+			if index == self.lng_index:
+				action.setChecked(True)
+
+		self.lng_btn.setMenu(menu)
+		widget.replace_arrow_widget(self.lng_btn)
+
+		layout.addWidget(widget)
+
+		self._update_language_icon()
+		self._update_language_checked()
+
+	def _create_scanner_widget(self, layout):
+		widget = RowArrowWidget(Lng.search_interval)
+		widget.set_left_icon(self.CLOCK_SVG)
+		widget.setFixedHeight(widget.height() + 1)
+
+		self.spin = USpinBox(self)
+		self.spin.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
+		self.spin.setRange(self.SPIN_MIN, self.SPIN_MAX)
+		self.spin.findChild(QLineEdit).setTextMargins(3, 0, 3, 0)
+		self.spin.setSuffix(f" {Lng.minutes}")
+		self.spin.setValue(self.scanner_minutes)
+
+		self.spin.valueChanged.connect(self.change_scan_time)
+
+		widget.replace_arrow_widget(self.spin)
+		layout.addWidget(widget)
+
+	def _create_reset_widget(self, layout):
+		widget = RowArrowWidget(Lng.erase_data)
+		widget.set_left_icon(self.ERASER_SVG)
+		widget.clicked.connect(self.erase_all_data)
+
+		layout.addWidget(widget)
+
+	def set_language(self, index):
+		if self.lng_index == index:
+			return
+
+		self.lng_index = index
+		self._update_language_icon()
+		self._update_language_checked()
+
+		self.changed.emit()
+		self.lang_changed.emit()
+
+	def _update_language_icon(self):
+		icon = self.rus_flag_icon if self.lng_index == 0 else self.eng_flag_icon
+		self.lng_btn.setIcon(icon)
+
+	def _update_language_checked(self):
+		for i, action in enumerate(self.lang_actions):
+			action.setChecked(i == self.lng_index)
+
+	def change_scan_time(self, value: int):
+		if value == self.SPIN_MAX:
+			self.spin.blockSignals(True)
+			self.spin.setValue(self.SPIN_MIN + 1)
+			self.spin.blockSignals(False)
+			value = self.SPIN_MIN
+		elif value == self.SPIN_MIN:
+			self.spin.blockSignals(True)
+			self.spin.setValue(self.SPIN_MAX - 1)
+			self.spin.blockSignals(False)
+			value = self.SPIN_MAX
+
+		self.scanner_minutes = value
+		self.changed.emit()
+
+	def erase_all_data(self, *args):
+
+		def fin():
+			self.hide()
+			shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
+			restart_app()
+
+		reset_win = ConfirmWindow(Lng.erase_data_long)
+		reset_win.center_to_parent(self.window())
+		reset_win.ok_clicked.connect(fin)
+		reset_win.show()
+
+
+class SizesWin(UMainWindow):
+	ww = 500
+	hh = 330
+
+	def __init__(self, size_items: list[HashDirSizeItem], parent=None):
+		super().__init__(parent)
+		self.set_always_on_top()
+		self.set_close_only()
+		self.setWindowTitle(Lng.data_size)
+		self.resize(self.ww, self.hh)
+		self.central_layout.setSpacing(10)
+
+		total_size = SharedUtils.get_f_size(sum(
+			item.size for item in size_items
+		))
+		first_row = TransparentLabel(f"{Lng.data_size}: {total_size}")
+		self.central_layout.addWidget(first_row)
+
+		total = sum(item.total_images for item in size_items)
+		sec_row = TransparentLabel(f"{Lng.images}: {total}")
+		self.central_layout.addWidget(sec_row)
+
+		headers = [
+			Lng.folder,
+			Lng.file_size,
+			Lng.images
+		]
+		self.table = QTableWidget()
+		self.table.setSortingEnabled(True)
+		self.table.setColumnCount(len(headers))
+		self.table.setHorizontalHeaderLabels(headers)
+		self.table.setRowCount(len(size_items))
+		self.table.verticalHeader().hide()
+		self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignVCenter)
+		self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+		self.table.horizontalScrollBar().setDisabled(True)
+		self.table.horizontalScrollBar().hide()
+
+		name_width = self.width() // 2
+		other_width = self.width() // 4
+		self.table.setColumnWidth(0, name_width)
+		self.table.setColumnWidth(1, other_width)
+		self.table.setColumnWidth(2, other_width)
+
+		self.central_layout.addWidget(self.table)
+
+		self.populate_table(size_items)
+		self.setFocus()
+
+	def populate_table(self, size_items: list[HashDirSizeItem]):
+		item_flags = Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
+		v_center = Qt.AlignmentFlag.AlignVCenter
+
+		for row, item in enumerate(size_items):
+			folder_item = QTableWidgetItem(item.mf.mf_alias)
+			folder_item.setFlags(
+				Qt.ItemFlag.ItemIsSelectable|Qt.ItemFlag.ItemIsEnabled
+			)
+			folder_item.setTextAlignment(
+				Qt.AlignmentFlag.AlignLeft | v_center
+			)
+
+			size_item = QTableWidgetItem(SharedUtils.get_f_size(item.size))
+			size_item.setFlags(item_flags)
+			size_item.setTextAlignment(
+				Qt.AlignmentFlag.AlignLeft | v_center
+			)
+
+			total_item = QTableWidgetItem(str(item.total_images))
+			total_item.setFlags(item_flags)
+			total_item.setTextAlignment(
+				Qt.AlignmentFlag.AlignLeft | v_center
+			)
+
+			self.table.setItem(row, 0, folder_item)
+			self.table.setItem(row, 1, size_item)
+			self.table.setItem(row, 2, total_item)
+		
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		return super().keyPressEvent(a0)
+
+
+class NonRebootableSettings(UGroupBox):
+	finder_svg = Static.COMMON_ICONS / "finder.svg"
+	hdd_svg = Static.COMMON_ICONS / "hdd.svg"
+
+	def __init__(self):
+		super().__init__()
+		main_layout = QVBoxLayout(self)
+		main_layout.setContentsMargins(*RowArrowWidget.group_margings)
+		main_layout.setSpacing(RowArrowWidget.group_spacing)
+
+		self.size_items = {}
+
+		data_size_wid = RowArrowWidget(Lng.statistic)
+		data_size_wid.set_left_icon(self.hdd_svg)
+		data_size_wid.clicked.connect(self.show_sizes_win)
+		main_layout.addWidget(data_size_wid)
+
+		main_layout.addWidget(USep())
+
+		show_files_wid = RowArrowWidget(Lng.show_system_files)
+		show_files_wid.set_left_icon(self.finder_svg)
+		show_files_wid.clicked.connect(self.show_files_cmd)
+		main_layout.addWidget(show_files_wid)
+
+		self.get_sizes()
+
+	def show_sizes_win(self, *args):
+		self.sizes_win = SizesWin(self.size_items)
+		self.sizes_win.center_to_parent(self.window())
+		self.sizes_win.show()
+
+	def get_sizes(self):
+		def on_finish(items: list[HashDirSizeItem]):
+			self.size_items = items
+		self.hashdir_size = HashDirSize()
+		self.hashdir_size.sigs.finished_.connect(on_finish)
+		UThreadPool.start(self.hashdir_size)
+
+	def show_files_cmd(self, *args):
+		try:
+			subprocess.Popen(["open", Static.APP_DATA_DIR])
+		except Exception as e:
+			print(e)
+
+
+class ThemeBtn(TransparentWidget):
+	clicked = pyqtSignal()
+	ww = 70
+	svg_size = (40, 40)
+
+	def __init__(self, theme_name: str, svg_paths: list[Path]):
+		super().__init__()
+		self.theme_name = theme_name
+		self.svg_1, self.svg_2 = svg_paths
+
+		self.setFixedWidth(self.ww)
+
+		layout_ = QVBoxLayout(self)
+		layout_.setContentsMargins(0, 0, 0, 0)
+		layout_.setSpacing(5)
+		
+		self.svg_widget = QSvgWidget()
+		self.svg_widget.setFixedSize(*self.svg_size)
+		layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+
+		self.title_label = TransparentLabel(self.theme_name)
+		layout_.addWidget(self.title_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+		self.clear_selection()
+
+	def select(self):
+		self.svg_widget.load(str(self.svg_2))
+
+	def clear_selection(self):
+		self.svg_widget.load(str(self.svg_1))
+
+	def mouseReleaseEvent(self, a0):
+		if a0.button() == Qt.MouseButton.LeftButton:
+			self.clicked.emit()
+		return super().mouseReleaseEvent(a0)
+
+	def enterEvent(self, event):
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		return super().enterEvent(event)
+
+
+class ThemesWidget(UGroupBox):
+	theme_svg = Static.COMMON_ICONS / "theme.svg"
+
+	def __init__(self):
+		super().__init__()
+		main_lay = QVBoxLayout(self)
+		main_lay.setContentsMargins(*RowArrowWidget.group_margings)
+		main_lay.setSpacing(RowArrowWidget.group_spacing)
+
+		title_wid = RowArrowWidget(Lng.theme)
+		title_wid.set_left_icon(self.theme_svg)
+		title_wid.hide_arrow()
+		main_lay.addWidget(title_wid)
+
+		main_lay.addWidget(USep())
+		main_lay.addSpacing(5)
+
+		themes_wid = TransparentWidget()
+		themes_layout = QHBoxLayout(themes_wid)
+		themes_layout.setContentsMargins(0, 0, 0, 0)
+		themes_layout.setSpacing(5)
+		themes_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+		main_lay.addWidget(themes_wid)
+
+		themes_mappings = (
+			(
+				Themes.theme_auto,
+				Lng.theme_auto,
+				Static.COMMON_ICONS / "theme_auto_1.svg",
+				Static.COMMON_ICONS / "theme_auto_2.svg"
+			),
+			(
+				Themes.theme_light,
+				Lng.theme_light,
+				Static.COMMON_ICONS / "theme_light_1.svg",
+				Static.COMMON_ICONS / "theme_light_2.svg"
+			),
+			(
+				Themes.theme_dark,
+				Lng.theme_dark,
+				Static.COMMON_ICONS / "theme_dark_1.svg",
+				Static.COMMON_ICONS / "theme_dark_2.svg"
+			),
+		)
+
+		for theme_type, theme_name, svg_1, svg_2 in themes_mappings:
+			btn = ThemeBtn(theme_name, (svg_1, svg_2))
+			btn.clicked.connect(
+				lambda t=theme_type, btn=btn: self.on_btn_clicked(t, btn)
+			)
+			themes_layout.addWidget(btn)
+			if theme_type == JsonData.theme:
+				btn.select()
+
+	def on_btn_clicked(self, theme_type: str, btn: ThemeBtn):
+		theme_btns = self.findChildren(ThemeBtn)
+		if theme_type != JsonData.theme:
+			for i in theme_btns:
+				i.clear_selection()
+			btn.select()
+			JsonData.theme = theme_type
+			ThemeChanger.init()
+
+
+class AboutWidLabel(LabelMinWidth):
+	txt = "\n".join([
+		f"Version {Static.APP_VERSION}",
+		"Developed by Evlosh",
+		"email: evlosh@gmail.com",
+		"telegram: evlosh",
+		])
+	def __init__(self, parent):
+		super().__init__(parent=parent)
+		self.setText(self.txt)
+		self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+		self.setCursor(Qt.CursorShape.IBeamCursor)
+
+	def contextMenuEvent(self, ev: QContextMenuEvent | None) -> None:
+		context_menu = UMenu(parent=self)
+
+		copy_text = QAction(parent=context_menu, text=Lng.copy)
+		copy_text.triggered.connect(self.copy_text_md)
+		context_menu.addAction(copy_text)
+
+		context_menu.addSeparator()
+
+		select_all = QAction(parent=context_menu, text=Lng.copy_all)
+		select_all.triggered.connect(lambda: Utils.pyqt_copy_text(self.text()))
+		context_menu.addAction(select_all)
+
+		context_menu.show_menu_under_cursor(ev)
+		# return super().contextMenuEvent(ev)
+
+	def copy_text_md(self):
+		Utils.pyqt_copy_text(self.selectedText())
+
+
+class AboutWid(UGroupBox):
+	icon_path = Static.APP_ICONS / "icon.png"
+	icon_size = 85
+
+	def __init__(self):
+		super().__init__()
+		h_lay = QHBoxLayout(self)
+		h_lay.setContentsMargins(0, 0, 0, 0)
+		h_lay.setSpacing(0)
+
+		icon = TransparentLabel()
+		qimage = QImage(str(self.icon_path))
+		qimage_scaled = Utils.scale_qimage_dpr(qimage, self.icon_size)
+		pixmap = QPixmap.fromImage(qimage_scaled)
+		icon.setPixmap(pixmap)
+		h_lay.addWidget(icon)
+
+		h_lay.addSpacerItem(QSpacerItem(0, 20))
+
+		lbl = AboutWidLabel(self)
+		h_lay.addWidget(lbl)
+
+		h_lay.addStretch()
+
+		if not self.icon_path.exists():
+			print("win settings about wid, icon.png not exists")
+
+
+class GeneralSettings(TransparentWidget):
+	lang_changed = pyqtSignal()
+
+	def __init__(self):
+		super().__init__()
+
+		v_lay = QVBoxLayout(self)
+		v_lay.setSpacing(10)
+		v_lay.setContentsMargins(0, 0, 0, 0)
+
+		self.rebootable_settings = RebootableSettings()
+		self.rebootable_settings.lang_changed.connect(
+			lambda: self.lang_changed.emit()
+		)
+		v_lay.addWidget(self.rebootable_settings)
+
+		non_rebootable_settings = NonRebootableSettings()
+		v_lay.addWidget(non_rebootable_settings)
+
+		themes = ThemesWidget()
+		v_lay.addWidget(themes)
+
+		about = AboutWid()
+		v_lay.addWidget(about)
+
+	def save_settings_cmd(self):
+
+		def fin():
+			JsonData.scaner_minutes = self.rebootable_settings.scaner_minutes
+			JsonData.lng_index = self.rebootable_settings.lng_index
+			JsonData.write_json_data()
+			restart_app()
+
+		win = ConfirmWindow(Lng.app_will_restarted)
+		win.ok_clicked.connect(fin)
+		win.center_to_parent(self.window())
+		win.show()
+
+
+class WinSettingsMfAliasTitle(TransparentLabel):
+	def __init__(self, text: str):
+		super().__init__(text)
+
+
+class MfRepairWidget(UGroupBox):
+	repair_svg = Static.COMMON_ICONS / "repair.svg"
+	repair_gray_svg = Static.COMMON_ICONS / "repair_gray.svg"
+	start_clicked = pyqtSignal()
+
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(10, 5, 10, 5)
+		self.v_lay.setSpacing(2)
+
+		title_layout = TitleTextLabel(
+			Lng.repair_catalog_long,
+			self.repair_svg
+		)
+		self.v_lay.addWidget(title_layout)
+
+		self.v_lay.addWidget(USep())
+
+		descr = GrayTextLabel(Lng.catalog_reindex_warning)
+		descr.setWordWrap(True)
+		self.v_lay.addWidget(descr)
+
+		button_container = TransparentWidget()
+		self.v_lay.addWidget(button_container)
+		button_layout = QHBoxLayout(button_container)
+		button_layout.setContentsMargins(0, 0, 0, 0)
+		button_layout.setSpacing(10)
+
+		self.start_btn = UPushButton(Lng.repair_catalog_short)
+		self.start_btn.setIcon(QIcon(str(self.repair_gray_svg)))
+		self.start_btn.clicked.connect(self.start_clicked)
+		button_layout.addWidget(self.start_btn)
+
+		button_layout.addStretch()
+
+		self.setFixedHeight(self.sizeHint().height())
+
+
+class MfRemoveWidget(UGroupBox):
+	trash_svg = Static.COMMON_ICONS / "trash.svg"
+	red_trash = Static.COMMON_ICONS / "red_trash.svg"
+	start_clicked = pyqtSignal()
+
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(10, 5, 10, 10)
+		self.v_lay.setSpacing(5)
+
+		title_layout = TitleTextLabel(
+			Lng.remove_folder,
+			self.trash_svg
+		)
+		self.v_lay.addWidget(title_layout)
+
+		self.v_lay.addWidget(USep())
+
+		descr = GrayTextLabel(Lng.catalog_delete_warning)
+		descr.setWordWrap(True)
+		self.v_lay.addWidget(descr)
+
+		self.v_lay.addSpacing(3)
+
+		button_container = TransparentWidget()
+		self.v_lay.addWidget(button_container)
+		button_layout = QHBoxLayout(button_container)
+		button_layout.setContentsMargins(0, 0, 0, 0)
+		button_layout.setSpacing(10)
+
+		# start_descr = GrayTextLabel("Приложение будет перезапущено")
+		# button_layout.addWidget(start_descr)
+
+		self.start_btn = RedButton(Lng.remove_folder)
+		self.start_btn.setIcon(QIcon(str(self.red_trash)))
+		self.start_btn.clicked.connect(self.start_clicked)
+		button_layout.addWidget(self.start_btn)
+
+		button_layout.addStretch()
+
+		self.setFixedHeight(self.sizeHint().height())
+
+
+
+class MfSettings(UScrollVerticalArea):
+	repair_svg = Static.COMMON_ICONS / "repair.svg"
+	trash_svg = Static.COMMON_ICONS / "trash.svg"
+	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+	image_folder_size = (23, 23)
+
+	def __init__(self, mf_index: int):
+		super().__init__()
+
+		#  Получаем объект Mf по индексу
+		self.mf = Mf.items[mf_index]
+
+		main_wid = TransparentWidget()
+		self.setWidget(main_wid)
+
+		main_lay = QVBoxLayout(main_wid)
+		main_lay.setContentsMargins(0, 0, 10, 10)
+		main_lay.setSpacing(10)
+
+		# --- Группа: путь и список остановок ---
+		paths_group = UGroupBox()
+		paths_lay = QVBoxLayout(paths_group)
+		paths_lay.setContentsMargins(5, 5, 5, 5)
+		paths_lay.setSpacing(10)
+
+		self.path_widget = MfPathWidget(mf=self.mf)
+		self.path_widget.changed.connect(
+			lambda: self.show_warning()
+		)
+		paths_lay.addWidget(self.path_widget)
+
+		self.mf_stop_list = MfStopListWidget(mf_stop_list=self.mf.mf_stop_list)
+		self.mf_stop_list.changed.connect(
+			lambda: self.show_warning()
+		)
+		paths_lay.addWidget(self.mf_stop_list)
+
+		main_lay.addWidget(paths_group)
+
+		# --- Группа: ремонт и удаление ---
+		actions_group = UGroupBox()
+		actions_lay = QVBoxLayout(actions_group)
+		actions_lay.setSpacing(10)
+
+		self.repair_widget = MfRepairWidget()
+		self.repair_widget.start_clicked.connect(self.repair_mf)
+		actions_lay.addWidget(self.repair_widget)
+
+		self.remove_folder = MfRemoveWidget()
+		self.remove_folder.start_clicked.connect(self.remove_mf)
+		actions_lay.addWidget(self.remove_folder)
+
+		main_lay.addWidget(actions_group)
+
+		main_lay.addStretch()
+
+	def show_warning(self):
+		...
+
+	def remove_mf(self, *args):
+		
+		def poll_task():
+			if not self.mf_remover.is_alive():
+				for i in Mf.items:
+					if i.mf_alias == self.mf.mf_alias:
+						Mf.items.remove(i)
+						break
+				if self.mf.mf_alias in JsonData.hide_digits_mf_lst:
+					JsonData.hide_digits_mf_lst.remove(self.mf.mf_alias)
+					JsonData.write_json_data()
+				Mf.write_json_data()
+				restart_app()
+			else:
+				QTimer.singleShot(1000, poll_task)
+
+		def start_mf_remover():
+			for i in UMainWindow.win_list:
+				i.hide()
+			self.mf_remover.start()
+			QTimer.singleShot(1000, poll_task)
+
+		self.mf_remover = ProcessWorker(
+			target=MfRemover.start,
+			args=(self.mf.mf_alias, )
+		)
+
+		if len(Mf.items) == 1:
+			win = WarningWindow(Lng.at_least_one_folder_required)
+		else:
+			win = ConfirmWindow(Lng.app_will_restarted)
+			win.ok_clicked.connect(start_mf_remover)
+		win.center_to_parent(self.window())
+		win.show()
+
+	def repair_mf(self, *args):
+		def reset_data():
+			self.reset_task = MfDataCleaner(self.mf.mf_alias)
+			self.reset_task.sigs.finished_.connect(restart_app)
+			UThreadPool.start(self.reset_task)
+
+		win = ConfirmWindow(Lng.app_will_restarted)
+		win.ok_clicked.connect(reset_data)
+		win.center_to_parent(self.window())
+		win.show()
+
+	def save_mf_settings(self):
+
+		def final():
+			current_mf = None
+			for i in Mf.items:
+				if i.mf_alias == self.mf.mf_alias:
+					current_mf = i
+					break
+			mf_stop_list = self.mf_stop_list.get_stop_list()
+			current_mf.mf_paths = [self.path_widget.mf_path, ]
+			current_mf.mf_current_path = self.path_widget.mf_path
+			current_mf.mf_stop_list = mf_stop_list
+			Mf.write_json_data()
+			restart_app()
+
+		mf_path = self.path_widget.validate()
+		if mf_path:
+			super_win = SuperConfirmWindow(Lng.confirm_mf_path)
+			super_win.center_to_parent(self.window())
+			super_win.ok_clicked.connect(final)
+			super_win.show()
+		else:
+			win_warn = WarningWindow(Lng.select_folder_path)
+			win_warn.center_to_parent(self.window())
+			win_warn.ok_clicked.connect(win_warn.deleteLater)
+			win_warn.show()
+
+	def mouseReleaseEvent(self, a0):
+		self.setFocus()
+		return super().mouseReleaseEvent(a0)
+
+
+# НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
+
+class NewMfSettings(UScrollVerticalArea):
+	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
+
+	def __init__(self, mf_path: str = None):
+		super().__init__()
+
+		main_wid = TransparentWidget()
+		self.setWidget(main_wid)
+
+		main_lay = QVBoxLayout(main_wid)
+		main_lay.setContentsMargins(0, 0, 10, 0)
+		main_lay.setSpacing(10)
+
+		self.mf_alias_widget = MfAliasWidget()
+		self.mf_alias_widget.changed.connect(
+			lambda: self.mf_save_widget.show_warning()
+		)
+		main_lay.addWidget(self.mf_alias_widget)
+
+		self.mf_path_widget = MfPathWidget(mf=None)
+		self.mf_path_widget.changed.connect(
+			lambda: self.mf_path_widget_changed()
+		)
+		main_lay.addWidget(self.mf_path_widget)
+
+		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
+		self.mf_stop_list.changed.connect(
+			lambda: self.mf_save_widget.show_warning()
+		)
+		main_lay.addWidget(self.mf_stop_list)
+
+		save_group = UGroupBox()
+		main_lay.addWidget(save_group)
+		save_group_container = QVBoxLayout(save_group)
+		save_group_container.setContentsMargins(*RowArrowWidget.group_margings)
+		save_group_container.setSpacing(RowArrowWidget.group_spacing)
+
+		self.mf_save_widget = SaveRowArrowWidget()
+		self.mf_save_widget.clicked.connect(self.save_mf_settings)
+		save_group_container.addWidget(self.mf_save_widget)
+
+		main_lay.addStretch()
+
+		if mf_path:
+			self.mf_path_widget_changed()
+
+	def mf_path_widget_changed(self):
+		basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
+		self.mf_alias_widget.line_edit.setText(basename)
+		self.mf_save_widget.show_warning()
+
+	def save_mf_settings(self):
+
+		def save_mf(mf_alias, mf_path, mf_stop_list):
+			mf = Mf(
+				mf_alias=mf_alias,
+				mf_paths=[mf_path, ],
+				mf_stop_list=mf_stop_list,
+				mf_current_path=mf_path
+			)
+			Mf.items.append(mf)
+			Mf.write_json_data()
+			restart_app()
+
+		def get_mf_alias():
+			mf_alias = self.mf_alias_widget.validate()
+			if not mf_alias:
+				return None
+			for i in Mf.items:
+				if i.mf_alias == mf_alias:
+					win_warn = WarningWindow(Lng.alias_already_exists)
+					win_warn.center_to_parent(self.window())
+					win_warn.ok_clicked.connect(win_warn.deleteLater)
+					win_warn.show()
+					return None
+			return mf_alias
+
+		mf_path = self.mf_path_widget.validate()
+		mf_alias = get_mf_alias()
+		mf_stop_list = self.mf_stop_list.get_stop_list()
+
+		if mf_path and mf_alias:
+			super_win = SuperConfirmWindow(Lng.confirm_mf_path)
+			super_win.ok_clicked.connect(
+				lambda: save_mf(mf_alias, mf_path, mf_stop_list)
+			)
+			super_win.center_to_parent(self.window())
+			super_win.show()
+
+	def mouseReleaseEvent(self, a0):
+		self.setFocus()
+		return super().mouseReleaseEvent(a0)
+
+
+# ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
+
+
+class WinSettings(UMainWindow):
+	closed = pyqtSignal()
+	
+	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
+	new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
+	settings_svg = Static.COMMON_ICONS / "settings.svg"
+	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
+
+	ww = 730
+	hh = 600
+
+	def __init__(self, settings_item: SettingsItem):
+		super().__init__()
+		self.set_always_on_top()
+		self.set_close_only()
+		self.setWindowTitle(Lng.settings)
+		self.setMinimumSize(self.ww, self.hh)
+
+		self.settings_item = settings_item
+
+		self.central_layout.setContentsMargins(5, 5, 5, 5)
+
+		self.splitter = QSplitter()
+		self.splitter.setHandleWidth(15)
+		self.splitter.setOrientation(Qt.Orientation.Horizontal)
+		self.central_layout.addWidget(self.splitter)
+
+		self.save_widget = SaveGroupBox()
+		self.central_layout.addWidget(self.save_widget)
+
+		self.left_menu = UListWidget()
+		self.left_menu.clicked.connect(self.left_menu_click)
+		self.splitter.addWidget(self.left_menu)
+
+		main_settings_item = UListWidgetItem(
+			parent=self.left_menu,
+			text=Lng.general
+		)
+		main_settings_item.setIcon(QIcon(str(self.settings_svg)))
+		self.left_menu.addItem(main_settings_item)
+		
+		new_folder = UListWidgetItem(
+			parent=self.left_menu,
+			text=Lng.new_folder
+		)
+		new_folder.setIcon(QIcon(str(self.new_folder_svg)))
+		self.left_menu.addItem(new_folder)
+		
+		spacer = UListSpacerItem(self.left_menu)
+		self.left_menu.addItem(spacer)
+
+		for i in Mf.items:
+			new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
+			new_folder.setIcon(QIcon(str(self.image_folder_svg)))
+			self.left_menu.addItem(new_folder)
+
+		self.right_wid = TransparentWidget()
+		self.right_lay = QVBoxLayout(self.right_wid)
+		self.right_lay.setContentsMargins(0, 0, 0, 0)
+		self.right_lay.setSpacing(0)
+		self.splitter.addWidget(self.right_wid)
+		self.splitter.setStretchFactor(0, 0)
+		self.splitter.setStretchFactor(1, 1)
+		self.splitter.setSizes([200, 600])
+
+		# idx соответствует номеру строки в левом меню
+		# при этом важно помнить, что номер 3 зарезервирован за пустым
+		# спейсером
+		if settings_item.type_ == "general":
+			idx = 0
+		elif settings_item.type_ == "new_folder":
+			idx = 1
+		elif settings_item.type_ == "edit_folder":
+			for x, i in enumerate(Mf.items, start=3):
+				if i.mf_alias == self.settings_item.content:
+					idx = x
+					break
+		self.left_menu.setCurrentRow(idx)
+		self.init_right_side(idx)
+
+	def init_right_side(self, idx: int):
+		if idx == 0:
+			r_wid = GeneralSettings()
+		elif idx == 1:
+			if self.settings_item.type_ == "new_folder":
+				r_wid = NewMfSettings(self.settings_item.content)
+				self.settings_item.type_ = "general"
+				self.settings_item.content = ""
+			else:
+				r_wid = NewMfSettings()
+		elif idx > 2:
+			item: UListWidgetItem = self.left_menu.item(idx)
+			for index, mf in enumerate(Mf.items):
+				if mf.mf_alias == item.text():
+					r_wid = MfSettings(index)
+					self.settings_item.type_ = "general"
+					self.settings_item.content = ""
+					break
+		self.right_lay.insertWidget(0, r_wid)
+
+	def clear_right_side(self):
+		wids = (GeneralSettings, MfSettings, NewMfSettings)
+		right_wid = self.right_wid.findChild(wids)
+		right_wid.deleteLater()
+
+	def left_menu_click(self, *args):
+		self.clear_right_side()
+		idx = self.left_menu.currentRow()
+		self.init_right_side(idx)
+
+	def deleteLater(self):
+		self.closed.emit()
+		return super().deleteLater()
+	
+	def closeEvent(self, a0):
+		self.closed.emit()
+		return super().closeEvent(a0)
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		return super().keyPressEvent(a0)

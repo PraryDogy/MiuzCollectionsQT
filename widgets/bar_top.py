@@ -198,7 +198,7 @@ class CatalogWidget(TransparentWidget):
 
 		self.button_menu.addSeparator()
 
-		new_folder_action = QAction(Lng.new_folder, self.button_menu)
+		new_folder_action = QAction(Lng.new_catalog, self.button_menu)
 		new_folder_action.setIcon(self.new_folder_icon)
 		new_folder_action.setIconVisibleInMenu(True)
 		new_folder_action.triggered.connect(self.mf_new_cmd)

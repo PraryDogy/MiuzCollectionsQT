@@ -5,11 +5,12 @@ import sys
 from pathlib import Path
 
 from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
+from PyQt6.QtGui import (QAction, QContextMenuEvent, QFontMetrics, QIcon,
+                         QImage, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSpacerItem,
-                             QSplitter, QTableWidget, QTableWidgetItem,
-                             QVBoxLayout)
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSizePolicy,
+                             QSpacerItem, QSplitter, QTableWidget,
+                             QTableWidgetItem, QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
 from system.items import SettingsItem
@@ -24,17 +25,16 @@ from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
                             MfAliasWidget, MfPathWidget, MfStopListWidget,
-                            RedButton, RowArrowWidget, SaveGroupBox,
-                            SaveRowArrowWidget, SuperConfirmWindow,
-                            TitleTextLabel, TransparentLabel,
-                            TransparentWidget, UGroupBox, UListSpacerItem,
-                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
-                            UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            WarningWindow)
+                            RedButton, RowArrowWidget, 
+                            SuperConfirmWindow, TitleTextLabel,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UListSpacerItem, UListWidget, UListWidgetItem,
+                            UMainWindow, UMenu, UPushButton, UScrollVerticalArea,
+                            USep, USpinBox, WarningWindow)
 
 
 def restart_app():
-	ProcessWorker.stop_all() 
+	ProcessWorker.stop_all()
 	os.execl(sys.executable, sys.executable, *sys.argv)
 	QApplication.exit(0)
 
@@ -267,7 +267,7 @@ class SizesWin(UMainWindow):
 			self.table.setItem(row, 0, folder_item)
 			self.table.setItem(row, 1, size_item)
 			self.table.setItem(row, 2, total_item)
-		
+
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
 			self.deleteLater()
@@ -334,7 +334,7 @@ class ThemeBtn(TransparentWidget):
 		layout_ = QVBoxLayout(self)
 		layout_.setContentsMargins(0, 0, 0, 0)
 		layout_.setSpacing(5)
-		
+
 		self.svg_widget = QSvgWidget()
 		self.svg_widget.setFixedSize(*self.svg_size)
 		layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -362,6 +362,7 @@ class ThemeBtn(TransparentWidget):
 
 class ThemesWidget(UGroupBox):
 	theme_svg = Static.COMMON_ICONS / "theme.svg"
+	changed = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -405,23 +406,32 @@ class ThemesWidget(UGroupBox):
 			),
 		)
 
+		self.selected_theme = JsonData.theme
+		self.theme_btns = []
+
 		for theme_type, theme_name, svg_1, svg_2 in themes_mappings:
 			btn = ThemeBtn(theme_name, (svg_1, svg_2))
 			btn.clicked.connect(
-				lambda t=theme_type, btn=btn: self.on_btn_clicked(t, btn)
+				lambda t=theme_type, b=btn: self.on_btn_clicked(t, b)
 			)
 			themes_layout.addWidget(btn)
-			if theme_type == JsonData.theme:
+			self.theme_btns.append((theme_type, btn))
+
+		self._refresh_selection()
+
+	def _refresh_selection(self):
+		for theme_type, btn in self.theme_btns:
+			if theme_type == self.selected_theme:
 				btn.select()
+			else:
+				btn.clear_selection()
 
 	def on_btn_clicked(self, theme_type: str, btn: ThemeBtn):
-		theme_btns = self.findChildren(ThemeBtn)
-		if theme_type != JsonData.theme:
-			for i in theme_btns:
-				i.clear_selection()
-			btn.select()
-			JsonData.theme = theme_type
-			ThemeChanger.init()
+		if theme_type == self.selected_theme:
+			return
+		self.selected_theme = theme_type
+		self._refresh_selection()
+		self.changed.emit()
 
 
 class AboutWidLabel(LabelMinWidth):
@@ -431,6 +441,7 @@ class AboutWidLabel(LabelMinWidth):
 		"email: evlosh@gmail.com",
 		"telegram: evlosh",
 		])
+
 	def __init__(self, parent):
 		super().__init__(parent=parent)
 		self.setText(self.txt)
@@ -451,7 +462,6 @@ class AboutWidLabel(LabelMinWidth):
 		context_menu.addAction(select_all)
 
 		context_menu.show_menu_under_cursor(ev)
-		# return super().contextMenuEvent(ev)
 
 	def copy_text_md(self):
 		Utils.pyqt_copy_text(self.selectedText())
@@ -487,6 +497,7 @@ class AboutWid(UGroupBox):
 
 class GeneralSettings(TransparentWidget):
 	lang_changed = pyqtSignal()
+	changed = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -496,42 +507,23 @@ class GeneralSettings(TransparentWidget):
 		v_lay.setContentsMargins(0, 0, 0, 0)
 
 		self.rebootable_settings = RebootableSettings()
-		self.rebootable_settings.changed.connect(
-			lambda: self.save_wid.show_warning()
-		)
-		self.rebootable_settings.lang_changed.connect(
-			lambda: self.lang_changed.emit()
-		)
+		self.rebootable_settings.changed.connect(self.changed.emit)
+		self.rebootable_settings.lang_changed.connect(self.lang_changed.emit)
 		v_lay.addWidget(self.rebootable_settings)
 
-		non_rebootable_settings = NonRebootableSettings()
-		v_lay.addWidget(non_rebootable_settings)
+		v_lay.addWidget(NonRebootableSettings())
 
-		themes = ThemesWidget()
-		v_lay.addWidget(themes)
+		self.themes = ThemesWidget()
+		self.themes.changed.connect(self.changed.emit)
+		v_lay.addWidget(self.themes)
 
-		about = AboutWid()
-		v_lay.addWidget(about)
+		v_lay.addWidget(AboutWid())
 
-		save_container = UGroupBox()
-		v_lay.addWidget(save_container)
-		save_container_lay = QVBoxLayout(save_container)
-		save_container_lay.setContentsMargins(*RowArrowWidget.group_margings)
-		save_container_lay.setSpacing(RowArrowWidget.group_spacing)
-
-		self.save_wid = SaveRowArrowWidget()
-		self.save_wid.clicked.connect(
-			lambda: self.save_settings_cmd()
-		)
-		save_container_lay.addWidget(self.save_wid)
-
-		v_lay.addStretch()
-
-	def save_settings_cmd(self):
-
+	def save_changes(self):
 		def fin():
-			JsonData.scaner_minutes = self.rebootable_settings.scaner_minutes
+			JsonData.scaner_minutes = self.rebootable_settings.scanner_minutes
 			JsonData.lng_index = self.rebootable_settings.lng_index
+			JsonData.theme = self.themes.selected_theme
 			JsonData.write_json_data()
 			restart_app()
 
@@ -616,9 +608,6 @@ class MfRemoveWidget(UGroupBox):
 		button_layout.setContentsMargins(0, 0, 0, 0)
 		button_layout.setSpacing(10)
 
-		# start_descr = GrayTextLabel("Приложение будет перезапущено")
-		# button_layout.addWidget(start_descr)
-
 		self.start_btn = RedButton(Lng.remove_folder)
 		self.start_btn.setIcon(QIcon(str(self.red_trash)))
 		self.start_btn.clicked.connect(self.start_clicked)
@@ -629,72 +618,71 @@ class MfRemoveWidget(UGroupBox):
 		self.setFixedHeight(self.sizeHint().height())
 
 
-
 class MfSettings(UScrollVerticalArea):
 	repair_svg = Static.COMMON_ICONS / "repair.svg"
 	trash_svg = Static.COMMON_ICONS / "trash.svg"
 	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
 	image_folder_size = (23, 23)
+	changed = pyqtSignal()
 
 	def __init__(self, mf_index: int):
 		super().__init__()
 
-		#  Получаем объект Mf по индексу
+		# Получаем объект Mf по индексу
 		self.mf = Mf.items[mf_index]
 
 		main_wid = TransparentWidget()
 		self.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 10, 10)
+		main_lay.setContentsMargins(0, 0, 10, 0)
 		main_lay.setSpacing(10)
 
-		# --- Группа: путь и список остановок ---
-		paths_group = UGroupBox()
-		paths_lay = QVBoxLayout(paths_group)
-		paths_lay.setContentsMargins(5, 5, 5, 5)
-		paths_lay.setSpacing(10)
-
 		self.path_widget = MfPathWidget(mf=self.mf)
-		self.path_widget.changed.connect(
-			lambda: self.show_warning()
-		)
-		paths_lay.addWidget(self.path_widget)
+		self.path_widget.changed.connect(self.changed.emit)
+		main_lay.addWidget(self.path_widget)
 
 		self.mf_stop_list = MfStopListWidget(mf_stop_list=self.mf.mf_stop_list)
-		self.mf_stop_list.changed.connect(
-			lambda: self.show_warning()
-		)
-		paths_lay.addWidget(self.mf_stop_list)
-
-		self.save_group = SaveGroupBox()
-		self.save_group.save_clicked.connect(self.save_mf_settings)
-		paths_lay.addWidget(self.save_group)
-		
-		main_lay.addWidget(paths_group)
-
-		# --- Группа: ремонт и удаление ---
-		actions_group = UGroupBox()
-		actions_lay = QVBoxLayout(actions_group)
-		actions_lay.setSpacing(10)
+		self.mf_stop_list.changed.connect(self.changed.emit)
+		main_lay.addWidget(self.mf_stop_list)
 
 		self.repair_widget = MfRepairWidget()
 		self.repair_widget.start_clicked.connect(self.repair_mf)
-		actions_lay.addWidget(self.repair_widget)
+		main_lay.addWidget(self.repair_widget)
 
 		self.remove_folder = MfRemoveWidget()
 		self.remove_folder.start_clicked.connect(self.remove_mf)
-		actions_lay.addWidget(self.remove_folder)
-
-		main_lay.addWidget(actions_group)
+		main_lay.addWidget(self.remove_folder)
 
 		main_lay.addStretch()
 
-	def show_warning(self):
-		self.save_group.show_warning()
+	def save_changes(self):
+		if not self.path_widget.validate():
+			win_warn = WarningWindow(Lng.select_folder_path)
+			win_warn.center_to_parent(self.window())
+			win_warn.ok_clicked.connect(win_warn.deleteLater)
+			win_warn.show()
+			return
+
+		def final():
+			current_mf = next(
+				(i for i in Mf.items if i.mf_alias == self.mf.mf_alias), None
+			)
+			if current_mf is None:
+				return
+			current_mf.mf_paths = [self.path_widget.mf_path]
+			current_mf.mf_current_path = self.path_widget.mf_path
+			current_mf.mf_stop_list = self.mf_stop_list.get_stop_list()
+			Mf.write_json_data()
+			restart_app()
+
+		win = ConfirmWindow(Lng.app_will_restarted)
+		win.ok_clicked.connect(final)
+		win.center_to_parent(self.window())
+		win.show()
 
 	def remove_mf(self, *args):
-		
+
 		def poll_task():
 			if not self.mf_remover.is_alive():
 				for i in Mf.items:
@@ -739,80 +727,45 @@ class MfSettings(UScrollVerticalArea):
 		win.center_to_parent(self.window())
 		win.show()
 
-	def save_mf_settings(self):
-
-		def final():
-			current_mf = None
-			for i in Mf.items:
-				if i.mf_alias == self.mf.mf_alias:
-					current_mf = i
-					break
-			mf_stop_list = self.mf_stop_list.get_stop_list()
-			current_mf.mf_paths = [self.path_widget.mf_path, ]
-			current_mf.mf_current_path = self.path_widget.mf_path
-			current_mf.mf_stop_list = mf_stop_list
-			Mf.write_json_data()
-			restart_app()
-
-		mf_path = self.path_widget.validate()
-		if mf_path:
-			super_win = SuperConfirmWindow(Lng.confirm_mf_path)
-			super_win.center_to_parent(self.window())
-			super_win.ok_clicked.connect(final)
-			super_win.show()
-		else:
-			win_warn = WarningWindow(Lng.select_folder_path)
-			win_warn.center_to_parent(self.window())
-			win_warn.ok_clicked.connect(win_warn.deleteLater)
-			win_warn.show()
-
 	def mouseReleaseEvent(self, a0):
 		self.setFocus()
 		return super().mouseReleaseEvent(a0)
 
 
-# НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА НОВАЯ ПАПКА 
-
-class NewMfSettings(UScrollVerticalArea):
+class NewMfSettings(UMainWindow):
 	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
+	changed = pyqtSignal()
 
 	def __init__(self, mf_path: str = None):
 		super().__init__()
 
+		# Встраиваем окно как обычный виджет, иначе QMainWindow
+		# откроется отдельным окном внутри WinSettings
+		self.set_always_on_top()
+		self.set_close_only()
+
+		scroll = UScrollVerticalArea()
+		self.central_layout.setContentsMargins(0, 0, 0, 0)
+		self.central_layout.addWidget(scroll)
+
 		main_wid = TransparentWidget()
-		self.setWidget(main_wid)
+		scroll.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
 		main_lay.setContentsMargins(0, 0, 10, 0)
 		main_lay.setSpacing(10)
 
 		self.mf_alias_widget = MfAliasWidget()
-		self.mf_alias_widget.changed.connect(
-			lambda: self.mf_save_widget.show_warning()
-		)
+		self.mf_alias_widget.changed.connect(self.changed.emit)
 		main_lay.addWidget(self.mf_alias_widget)
 
 		self.mf_path_widget = MfPathWidget(mf=None)
-		self.mf_path_widget.changed.connect(
-			lambda: self.mf_path_widget_changed()
-		)
+		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
 		main_lay.addWidget(self.mf_path_widget)
 
 		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
-		self.mf_stop_list.changed.connect(
-			lambda: self.mf_save_widget.show_warning()
-		)
+		self.mf_stop_list.changed.connect(self.changed.emit)
 		main_lay.addWidget(self.mf_stop_list)
-
-		save_group = UGroupBox()
-		main_lay.addWidget(save_group)
-		save_group_container = QVBoxLayout(save_group)
-		save_group_container.setContentsMargins(*RowArrowWidget.group_margings)
-		save_group_container.setSpacing(RowArrowWidget.group_spacing)
-
-		self.mf_save_widget = SaveRowArrowWidget()
-		self.mf_save_widget.clicked.connect(self.save_mf_settings)
-		save_group_container.addWidget(self.mf_save_widget)
 
 		main_lay.addStretch()
 
@@ -822,14 +775,35 @@ class NewMfSettings(UScrollVerticalArea):
 	def mf_path_widget_changed(self):
 		basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
 		self.mf_alias_widget.line_edit.setText(basename)
-		self.mf_save_widget.show_warning()
+		self.changed.emit()
 
-	def save_mf_settings(self):
+	def save_changes(self):
+		mf_path = self.mf_path_widget.validate()
+		mf_alias = self.mf_alias_widget.validate()
 
-		def save_mf(mf_alias, mf_path, mf_stop_list):
+		if not mf_path:
+			win_warn = WarningWindow(Lng.select_folder_path)
+			win_warn.center_to_parent(self.window())
+			win_warn.ok_clicked.connect(win_warn.deleteLater)
+			win_warn.show()
+			return
+
+		if not mf_alias:
+			return
+
+		if any(i.mf_alias == mf_alias for i in Mf.items):
+			win_warn = WarningWindow(Lng.alias_already_exists)
+			win_warn.center_to_parent(self.window())
+			win_warn.ok_clicked.connect(win_warn.deleteLater)
+			win_warn.show()
+			return
+
+		mf_stop_list = self.mf_stop_list.get_stop_list()
+
+		def fin():
 			mf = Mf(
 				mf_alias=mf_alias,
-				mf_paths=[mf_path, ],
+				mf_paths=[mf_path],
 				mf_stop_list=mf_stop_list,
 				mf_current_path=mf_path
 			)
@@ -837,42 +811,83 @@ class NewMfSettings(UScrollVerticalArea):
 			Mf.write_json_data()
 			restart_app()
 
-		def get_mf_alias():
-			mf_alias = self.mf_alias_widget.validate()
-			if not mf_alias:
-				return None
-			for i in Mf.items:
-				if i.mf_alias == mf_alias:
-					win_warn = WarningWindow(Lng.alias_already_exists)
-					win_warn.center_to_parent(self.window())
-					win_warn.ok_clicked.connect(win_warn.deleteLater)
-					win_warn.show()
-					return None
-			return mf_alias
-
-		mf_path = self.mf_path_widget.validate()
-		mf_alias = get_mf_alias()
-		mf_stop_list = self.mf_stop_list.get_stop_list()
-
-		if mf_path and mf_alias:
-			super_win = SuperConfirmWindow(Lng.confirm_mf_path)
-			super_win.ok_clicked.connect(
-				lambda: save_mf(mf_alias, mf_path, mf_stop_list)
-			)
-			super_win.center_to_parent(self.window())
-			super_win.show()
+		win = ConfirmWindow(Lng.app_will_restarted)
+		win.ok_clicked.connect(fin)
+		win.center_to_parent(self.window())
+		win.show()
 
 	def mouseReleaseEvent(self, a0):
 		self.setFocus()
 		return super().mouseReleaseEvent(a0)
 
 
-# ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК ОКНО НАСТРОЕК 
+class SaveGroupBox(TransparentWidget):
+	save_clicked = pyqtSignal()
+	cancel_clicked = pyqtSignal()
+	new_catalog_clicked = pyqtSignal()
+
+	save_svg = Static.COMMON_ICONS / "save.svg"
+	attention_gray = Static.COMMON_ICONS / "attention_gray.svg"
+
+	def __init__(self):
+		super().__init__()
+		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+		self.h_lay = QHBoxLayout(self)
+		self.h_lay.setContentsMargins(0, 0, 0, 0)
+		self.h_lay.setSpacing(5)
+
+		self.new_catalog_btn = UPushButton(Lng.new_catalog)
+		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
+		self.h_lay.addWidget(self.new_catalog_btn)
+
+		self.h_lay.addStretch()
+
+		self.attention_wid = QSvgWidget(str(self.attention_gray))
+		self.attention_wid.setFixedSize(15, 15)
+		self.attention_wid.hide()
+		self.h_lay.addWidget(self.attention_wid)
+
+		self.save_text = GrayTextLabel(text=Lng.unsaved_changes)
+		self.h_lay.addWidget(self.save_text)
+		self.save_text.hide()
+
+		self.h_lay.addSpacing(5)
+
+		self.cancel_button = UPushButton(Lng.close)
+		self._fix_cancel_button_width()
+		self.cancel_button.clicked.connect(self.cancel_clicked.emit)
+		self.h_lay.addWidget(self.cancel_button)
+
+		self.save_button = ActiveButton(Lng.save_changes_text)
+		self.save_button.setIcon(QIcon(str(self.save_svg)))
+		self.save_button.clicked.connect(self.save_clicked.emit)
+		self.h_lay.addWidget(self.save_button)
+
+	def _fix_cancel_button_width(self):
+		# Ширина по самой широкой подписи из двух возможных
+		fm = QFontMetrics(self.cancel_button.font())
+		texts = (Lng.close, Lng.cancel)
+		text_w = max(fm.horizontalAdvance(t) for t in texts)
+
+		# Учитываем внутренние отступы стиля кнопки
+		opt_w = self.cancel_button.sizeHint().width() - fm.horizontalAdvance(self.cancel_button.text())
+		self.cancel_button.setFixedWidth(text_w + opt_w)
+
+	def show_warning(self):
+		self.attention_wid.show()
+		self.save_text.show()
+		self.cancel_button.setText(Lng.cancel)
+
+	def hide_warning(self):
+		self.attention_wid.hide()
+		self.save_text.hide()
+		self.cancel_button.setText(Lng.close)
 
 
 class WinSettings(UMainWindow):
 	closed = pyqtSignal()
-	
+
 	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
 	new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
 	settings_svg = Static.COMMON_ICONS / "settings.svg"
@@ -889,13 +904,23 @@ class WinSettings(UMainWindow):
 		self.setMinimumSize(self.ww, self.hh)
 
 		self.settings_item = settings_item
+		self.current_page = None
 
-		self.central_layout.setContentsMargins(5, 5, 5, 5)
+		self.central_layout.setContentsMargins(5, 5, 5, 10)
 
 		self.splitter = QSplitter()
 		self.splitter.setHandleWidth(15)
 		self.splitter.setOrientation(Qt.Orientation.Horizontal)
 		self.central_layout.addWidget(self.splitter)
+
+
+		self.central_layout.addSpacing(10)
+		# Единственная кнопка сохранения: футер окна
+		self.save_widget = SaveGroupBox()
+		self.save_widget.new_catalog_clicked.connect(self.open_new_catalog_win)
+		self.save_widget.save_clicked.connect(self.save_settings_cmd)
+		self.save_widget.cancel_clicked.connect(self.close)
+		self.central_layout.addWidget(self.save_widget)
 
 		self.left_menu = UListWidget()
 		self.left_menu.clicked.connect(self.left_menu_click)
@@ -907,14 +932,14 @@ class WinSettings(UMainWindow):
 		)
 		main_settings_item.setIcon(QIcon(str(self.settings_svg)))
 		self.left_menu.addItem(main_settings_item)
-		
-		new_folder = UListWidgetItem(
-			parent=self.left_menu,
-			text=Lng.new_folder
-		)
-		new_folder.setIcon(QIcon(str(self.new_folder_svg)))
-		self.left_menu.addItem(new_folder)
-		
+
+		# new_folder = UListWidgetItem(
+		# 	parent=self.left_menu,
+		# 	text=Lng.new_catalog
+		# )
+		# new_folder.setIcon(QIcon(str(self.new_folder_svg)))
+		# self.left_menu.addItem(new_folder)
+
 		spacer = UListSpacerItem(self.left_menu)
 		self.left_menu.addItem(spacer)
 
@@ -927,6 +952,7 @@ class WinSettings(UMainWindow):
 		self.right_lay = QVBoxLayout(self.right_wid)
 		self.right_lay.setContentsMargins(0, 0, 0, 0)
 		self.right_lay.setSpacing(0)
+		self.right_lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.splitter.addWidget(self.right_wid)
 		self.splitter.setStretchFactor(0, 0)
 		self.splitter.setStretchFactor(1, 1)
@@ -947,12 +973,20 @@ class WinSettings(UMainWindow):
 		self.left_menu.setCurrentRow(idx)
 		self.init_right_side(idx)
 
+	def open_new_catalog_win(self):
+		self.new_catalog_win = NewMfSettings(mf_path=self.settings_item.content)
+		self.new_catalog_win.center_to_parent(self)
+		self.new_catalog_win.show()
+
 	def init_right_side(self, idx: int):
+		prefilled = False
+
 		if idx == 0:
 			r_wid = GeneralSettings()
 		elif idx == 1:
 			if self.settings_item.type_ == "new_folder":
 				r_wid = NewMfSettings(self.settings_item.content)
+				prefilled = True
 				self.settings_item.type_ = "general"
 				self.settings_item.content = ""
 			else:
@@ -965,22 +999,36 @@ class WinSettings(UMainWindow):
 					self.settings_item.type_ = "general"
 					self.settings_item.content = ""
 					break
+
+		# Любое изменение на странице открывает предупреждение в футере
+		r_wid.changed.connect(self.save_widget.show_warning)
+		self.current_page = r_wid
 		self.right_lay.insertWidget(0, r_wid)
+
+		if prefilled:
+			self.save_widget.show_warning()
 
 	def clear_right_side(self):
 		wids = (GeneralSettings, MfSettings, NewMfSettings)
 		right_wid = self.right_wid.findChild(wids)
-		right_wid.deleteLater()
+		if right_wid is not None:
+			right_wid.deleteLater()
+		self.current_page = None
 
 	def left_menu_click(self, *args):
 		self.clear_right_side()
+		self.save_widget.hide_warning()
 		idx = self.left_menu.currentRow()
 		self.init_right_side(idx)
+
+	def save_settings_cmd(self):
+		if self.current_page is not None:
+			self.current_page.save_changes()
 
 	def deleteLater(self):
 		self.closed.emit()
 		return super().deleteLater()
-	
+
 	def closeEvent(self, a0):
 		self.closed.emit()
 		return super().closeEvent(a0)

@@ -55,7 +55,7 @@ class Lng:
 	)
 	save = ("Сохранить", "Save")
 	save_changes_text = ("Сохранить изменения", "Save changes")
-	new_folder = ("Новый каталог", "New catalog")
+	new_catalog = ("Новый каталог", "New catalog")
 	enter_alias_warning = (
 		"Пожалуйста, введите имя. Это поле не может быть пустым.",
 		"Please enter a name. This field cannot be left blank."
