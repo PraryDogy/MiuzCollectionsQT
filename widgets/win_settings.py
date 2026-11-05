@@ -39,12 +39,6 @@ def restart_app():
 	QApplication.exit(0)
 
 
-class LabelMinWidth(TransparentLabel):
-	def __init__(self, text="", parent=None):
-		super().__init__(text, parent)
-		self.setMinimumWidth(30)
-
-
 class SaveGroupBox(TransparentWidget):
 	save_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
@@ -52,6 +46,7 @@ class SaveGroupBox(TransparentWidget):
 
 	save_svg = Static.COMMON_ICONS / "save.svg"
 	attention_gray = Static.COMMON_ICONS / "attention_gray.svg"
+	new_catalog = Static.COMMON_ICONS / "new_folder.svg"
 
 	def __init__(self, show_new_catalog: bool = True):
 		super().__init__()
@@ -62,6 +57,7 @@ class SaveGroupBox(TransparentWidget):
 		self.h_lay.setSpacing(5)
 
 		self.new_catalog_btn = UPushButton(Lng.new_catalog)
+		self.new_catalog_btn.setIcon(QIcon(str(self.new_catalog)))
 		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
 		self.new_catalog_btn.setVisible(show_new_catalog)
 		self.h_lay.addWidget(self.new_catalog_btn)
@@ -631,7 +627,7 @@ class ThemesWidget(UGroupBox):
 		self.changed.emit()
 
 
-class AboutWidLabel(LabelMinWidth):
+class AboutWidLabel(TransparentLabel):
 	txt = "\n".join([
 		f"Version {Static.APP_VERSION}",
 		"Developed by Evlosh",
@@ -641,6 +637,7 @@ class AboutWidLabel(LabelMinWidth):
 
 	def __init__(self, parent):
 		super().__init__(parent=parent)
+		self.setMinimumWidth(30)
 		self.setText(self.txt)
 		self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 		self.setCursor(Qt.CursorShape.IBeamCursor)
