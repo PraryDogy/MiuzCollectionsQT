@@ -136,14 +136,12 @@ class TestWid(TransparentLabel):
 
 
 class DangerWarn(ConfirmWindow):
-	icon_path = Static.COMMON_ICONS / "red_warning.svg"
-
 	def __init__(self, mf_alias: str, removed_images_count: int):
 		text = (
 			f"{Lng.dangerous_text}".format(removed_images_count)
 		)
 		super().__init__(text)
-		self.svg_widget.load(str(self.icon_path))
+		self.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
 		self.ok_btn.setText(Lng.allow)
 		self.cancel_btn.setText(Lng.deny)
 

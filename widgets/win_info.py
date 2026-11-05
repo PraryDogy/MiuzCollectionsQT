@@ -37,15 +37,13 @@ class WinInfoSelectableLabel(TransparentLabel):
 
 
 class CopyPathButton(UPushButton):
-	copy_svg = Static.COMMON_ICONS / "copy.svg"
-	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
 	copy_clicked = pyqtSignal()
 	ms = 1000
 
 	def __init__(self):
 		super().__init__(Lng.copy_dirpath)
-		self.copy_qicon = QIcon(str(self.copy_svg))
-		self.green_qicon = QIcon(str(self.green_checkmark))
+		self.copy_qicon = QIcon(str(Static.GRAY_ICONS / "copy_gray.svg"))
+		self.green_qicon = QIcon(str(Static.COLOR_ICONS / "green_checkmark.svg"))
 		self.is_locked = False
 		self.setIcon(self.copy_qicon)
 

@@ -4,7 +4,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
@@ -35,13 +35,10 @@ class ServerListItem(UListWidgetItem):
 
 
 class EyeSvg(QSvgWidget):
-	eye_on = Static.COMMON_ICONS / "eye_on.svg"
-	eye_off = Static.COMMON_ICONS / "eye_off.svg"
-
 	def __init__(self):
 		super().__init__()
 		self.setFixedSize(16, 16)
-		self.load(str(self.eye_off))
+		self.load(str(Static.GRAY_ICONS / "eye_off_gray.svg"))
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 	
 
@@ -137,10 +134,10 @@ class PassLineEdit(ULineEdit):
 	def show_hide_pass(self, *args):
 		if self.echoMode() == ULineEdit.EchoMode.Password:
 			self.setEchoMode(ULineEdit.EchoMode.Normal)
-			self.eye_svg.load(str(self.eye_svg.eye_on))
+			self.eye_svg.load(str(Static.GRAY_ICONS / "eye_on_gray.svg"))
 		else:
 			self.setEchoMode(ULineEdit.EchoMode.Password)
-			self.eye_svg.load(str(self.eye_svg.eye_off))
+			self.eye_svg.load(str(Static.GRAY_ICONS / "eye_off_gray.svg"))
 
 
 class ServerLabel(TransparentLabel):
@@ -260,8 +257,6 @@ class LoginWin(UMainWindow):
 
 
 class ServersWin(UMainWindow):
-	connect_color = str(Static.COMMON_ICONS / "connect_color.svg")
-
 	def __init__(self):
 		super().__init__()
 		self.set_always_on_top()
@@ -283,7 +278,7 @@ class ServersWin(UMainWindow):
 		group_lay.setSpacing(8)
 		title_lbl = TitleTextLabel(
 			Lng.favorite_servers,
-			str(self.connect_color)
+			str(Static.COLOR_ICONS / "connect_color.svg")
 		)
 		group_lay.addWidget(title_lbl)
 
@@ -313,7 +308,8 @@ class ServersWin(UMainWindow):
 		self.central_layout.addLayout(btn_layout)
 
 		self.add_btn = UPushButton(Lng.add)
-		self.add_btn.setIcon(QIcon(str(Static.COMMON_ICONS / "plus_simple.svg")))
+		self.add_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
+		self.add_btn.setIconSize(QSize(10, 10))
 		self.add_btn.clicked.connect(self.show_login_win)
 		btn_layout.addWidget(self.add_btn)
 
