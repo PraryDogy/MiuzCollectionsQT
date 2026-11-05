@@ -69,8 +69,6 @@ class BarBottomLeftLabel(GrayTextLabel):
 
 class BarBottom(TransparentWidget):
 	resize_thumbnails = pyqtSignal()
-	icon_path = Static.COMMON_ICONS / "next.svg"
-	icon_size = 15
 
 	def __init__(self):
 		super().__init__()
@@ -81,8 +79,8 @@ class BarBottom(TransparentWidget):
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
 		self.svg_wid = QSvgWidget()
-		self.svg_wid.load(str(self.icon_path))
-		self.svg_wid.setFixedSize(self.icon_size, self.icon_size)
+		self.svg_wid.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+		self.svg_wid.setFixedSize(15, 15)
 		self.h_layout.addWidget(self.svg_wid)
 
 		self.h_layout.addSpacing(5)

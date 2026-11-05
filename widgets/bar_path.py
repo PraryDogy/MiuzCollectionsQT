@@ -13,18 +13,13 @@ from ._base_widgets import GrayTextLabel, TransparentWidget
 
 
 class PathItem(TransparentWidget):
-	min_wid = 5
 	new_history_item = pyqtSignal(str)
 	load_st_grid = pyqtSignal()
 	arrow_right = " \U0000203A" # ›
-	item_height = 15
 	info_win = pyqtSignal(list)
 	add_fav = pyqtSignal(str)
 	del_fav = pyqtSignal(str)
 	type_to_pixmap: dict = {}
-	base_folder_svg = Static.COMMON_ICONS / "base_folder.svg"
-	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-	img_svg = Static.COMMON_ICONS / "image_file.svg"
 
 	def __init__(self, dir: str, name: str):
 		super().__init__()
@@ -35,8 +30,8 @@ class PathItem(TransparentWidget):
 		item_layout.setSpacing(5)
 
 		self.img_wid = QSvgWidget()
-		self.img_wid.load(str(self.base_folder_svg))
-		self.img_wid.setFixedSize(self.item_height, self.item_height)
+		self.img_wid.load(str(Static.COLOR_ICONS / "base_folder.svg"))
+		self.img_wid.setFixedSize(15, 15)
 		item_layout.addWidget(self.img_wid)
 		
 		self.text_wid = GrayTextLabel(text=name)
@@ -56,9 +51,9 @@ class PathItem(TransparentWidget):
 		self.text_wid.setFixedWidth(self.text_wid.sizeHint().width())
  
 
-	def collapse(self):
+	def collapse(self, min_w = 5):
 		if not self.text_wid.underMouse():
-			self.text_wid.setMinimumWidth(self.min_wid)
+			self.text_wid.setMinimumWidth(min_w)
 
 
 class PathBar(TransparentWidget):
@@ -67,7 +62,6 @@ class PathBar(TransparentWidget):
 	info_win = pyqtSignal(list)
 	add_fav = pyqtSignal(str)
 	del_fav = pyqtSignal(str)
-	last_item_limit = 40
 
 	def __init__(self):
 		super().__init__()
@@ -77,7 +71,7 @@ class PathBar(TransparentWidget):
 		self.h_layout.setSpacing(5)
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-	def update(self, dir: str):
+	def update(self, dir: str, last_item_limit = 40):
 		"""
 		Отобразить новый путь сетки / папки / файла     
 		src: путь сетки / папки / файла
@@ -105,31 +99,20 @@ class PathBar(TransparentWidget):
 			self.h_layout.addWidget(path_item)
 
 		path_items[1].img_wid.load(
-			str(path_items[1].image_folder_svg)
+			str(Static.COLOR_ICONS / "image_folder.svg")
 		)
 
 		last_item = path_items.get(len(root))
 		if dir.endswith(ImgUtils.ext_all):
 			last_item.img_wid.load(
-				str(last_item.img_svg)
+				str(Static.GRAY_ICONS / "image_icon_gray.svg")
 			)
 
 		text_ = last_item.text_wid.text()
-		if len(text_) > PathBar.last_item_limit:
-			path_item.text_wid.setText(
-				# text_[:PathBar.last_item_limit] + "..."
-				self.shorten_filename(text_)
-			)
+		print('path bar настрой elide')
+		if len(text_) > last_item_limit:
+			path_item.setFixedWidth(100)
+			path_item.text_wid.set_elide(True)
 		
 		if len(root) != 1:
 			last_item.del_arrow()
-
-	def shorten_filename(self, filename: str, max_len: int = 40) -> str:
-		name, ext = os.path.splitext(filename)
-		if len(filename) <= max_len:
-			return filename
-		# сколько символов оставить до "..." и после него
-		keep = max_len - 3 - len(ext)
-		start_len = keep // 2
-		end_len = keep - start_len
-		return f"{name[:start_len]}...{name[-end_len:]}{ext}"   
