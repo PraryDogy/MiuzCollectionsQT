@@ -907,7 +907,8 @@ class WinSettings(UMainWindow):
 
 		self.settings_item = settings_item
 		self.current_page = None
-		self.current_idx = None
+		self.current_idx = 0
+		self.pending_idx = None
 		self.has_unsaved = False
 		self.discard_win = None
 
@@ -930,6 +931,8 @@ class WinSettings(UMainWindow):
 		self.left_menu.clicked.connect(self.left_menu_click)
 		self.splitter.addWidget(self.left_menu)
 
+		# Строки левого меню: 0 — общие настройки, 1 — пустой спейсер,
+		# с 2 — папки (catalog)
 		main_settings_item = UListWidgetItem(
 			parent=self.left_menu,
 			text=Lng.general
@@ -955,15 +958,9 @@ class WinSettings(UMainWindow):
 		self.splitter.setStretchFactor(1, 1)
 		self.splitter.setSizes([200, 600])
 
-		# idx соответствует номеру строки в левом меню
-		# при этом важно помнить, что номер 3 зарезервирован за пустым
-		# спейсером
-		if settings_item.type_ == "general":
-			idx = 0
-		elif settings_item.type_ == "new_folder":
-			idx = 1
-		elif settings_item.type_ == "edit_folder":
-			for x, i in enumerate(Mf.items, start=3):
+		idx = 0
+		if settings_item.type_ == "edit_folder":
+			for x, i in enumerate(Mf.items, start=2):
 				if i.mf_alias == self.settings_item.content:
 					idx = x
 					break
@@ -980,7 +977,7 @@ class WinSettings(UMainWindow):
 	def init_right_side(self, idx: int):
 		if idx == 0:
 			r_wid = GeneralSettings()
-		elif idx > 1:
+		else:
 			item: UListWidgetItem = self.left_menu.item(idx)
 			for index, mf in enumerate(Mf.items):
 				if mf.mf_alias == item.text():
@@ -1011,29 +1008,11 @@ class WinSettings(UMainWindow):
 			return
 
 		if self.has_unsaved:
-			# Новый пункт остаётся выделенным, пока пользователь не решил
-			self._confirm_discard(
-				on_discard=lambda: self._switch_page(new_idx),
-				on_cancel=self._restore_selection,
-			)
+			self.pending_idx = new_idx
+			self._ask_discard_for_switch()
 			return
 
 		self._switch_page(new_idx)
-
-	def _restore_selection(self):
-		# Возвращаем выделение на открытую страницу без повторного вызова left_menu_click
-		self.left_menu.blockSignals(True)
-		self.left_menu.setCurrentRow(self.current_idx)
-		self.left_menu.blockSignals(False)
-
-	def _confirm_discard(self, on_discard, on_cancel=None):
-		win = ConfirmWindow(self.UNSAVED_TEXT)
-		win.ok_clicked.connect(lambda: self._discard(on_discard))
-		if on_cancel is not None:
-			win.cancel_clicked.connect(on_cancel)
-		win.center_to_parent(self)
-		win.show()
-		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
 
 	def _switch_page(self, idx: int):
 		self.clear_right_side()
@@ -1045,43 +1024,69 @@ class WinSettings(UMainWindow):
 		self.current_idx = idx
 		self.init_right_side(idx)
 
+	def _restore_selection(self):
+		# Возвращаем выделение на открытую страницу без повторного вызова left_menu_click
+		self.left_menu.blockSignals(True)
+		self.left_menu.setCurrentRow(self.current_idx)
+		self.left_menu.blockSignals(False)
+
+	def _ask_discard_for_switch(self):
+		win = self._create_unsaved_window()
+		win.ok_clicked.connect(self._on_switch_confirmed)
+		win.cancel_clicked.connect(self._on_switch_cancelled)
+		self._show_unsaved_window(win)
+
+	def _ask_discard_for_close(self):
+		win = self._create_unsaved_window()
+		win.ok_clicked.connect(self._on_close_confirmed)
+		self._show_unsaved_window(win)
+
+	def _create_unsaved_window(self) -> ConfirmWindow:
+		return ConfirmWindow(self.UNSAVED_TEXT)
+
+	def _show_unsaved_window(self, win: ConfirmWindow):
+		win.center_to_parent(self)
+		win.show()
+		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
+
+	def _on_switch_confirmed(self):
+		self.has_unsaved = False
+		self._switch_page(self.pending_idx)
+
+	def _on_switch_cancelled(self):
+		self._restore_selection()
+
+	def _on_close_confirmed(self):
+		self.has_unsaved = False
+		self.close()
+
 	def save_settings_cmd(self):
 		if self.current_page is not None:
 			self.current_page.save_changes()
 
-	def _discard(self, on_discard):
-		self.has_unsaved = False
-		on_discard()
-
-	def _guard_close(self, action) -> bool:
-		# Возвращает True, если закрытие нужно отложить до подтверждения
-		if not self.has_unsaved:
-			return False
-		self._confirm_discard(action)
-		return True
-
 	def close(self) -> bool:
-		if self._guard_close(self.close):
+		if self.has_unsaved:
+			self._ask_discard_for_close()
 			return False
 		return super().close()
 
 	def deleteLater(self):
-		if self._guard_close(self.deleteLater):
+		if self.has_unsaved:
+			self._ask_discard_for_close()
 			return
 		self.closed.emit()
 		return super().deleteLater()
 
 	def closeEvent(self, a0):
-		if self._guard_close(self.close):
+		if self.has_unsaved:
 			a0.ignore()
+			self._ask_discard_for_close()
 			return
 		self.closed.emit()
 		return super().closeEvent(a0)
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
-			if self._guard_close(self.deleteLater):
-				return
-			self.deleteLater()
+			self.close()
 			return
 		return super().keyPressEvent(a0)
