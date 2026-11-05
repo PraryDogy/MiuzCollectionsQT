@@ -896,6 +896,8 @@ class WinSettings(UMainWindow):
 	ww = 730
 	hh = 600
 
+	UNSAVED_TEXT = "Есть несохраненные изменения. Отменить?"
+
 	def __init__(self, settings_item: SettingsItem):
 		super().__init__()
 		self.set_always_on_top()
@@ -905,6 +907,9 @@ class WinSettings(UMainWindow):
 
 		self.settings_item = settings_item
 		self.current_page = None
+		self.current_idx = None
+		self.has_unsaved = False
+		self.discard_win = None
 
 		self.central_layout.setContentsMargins(5, 5, 5, 10)
 
@@ -912,7 +917,6 @@ class WinSettings(UMainWindow):
 		self.splitter.setHandleWidth(15)
 		self.splitter.setOrientation(Qt.Orientation.Horizontal)
 		self.central_layout.addWidget(self.splitter)
-
 
 		self.central_layout.addSpacing(10)
 		# Единственная кнопка сохранения: футер окна
@@ -963,6 +967,8 @@ class WinSettings(UMainWindow):
 				if i.mf_alias == self.settings_item.content:
 					idx = x
 					break
+
+		self.current_idx = idx
 		self.left_menu.setCurrentRow(idx)
 		self.init_right_side(idx)
 
@@ -972,8 +978,6 @@ class WinSettings(UMainWindow):
 		self.new_catalog_win.show()
 
 	def init_right_side(self, idx: int):
-		prefilled = False
-
 		if idx == 0:
 			r_wid = GeneralSettings()
 		elif idx > 1:
@@ -985,13 +989,14 @@ class WinSettings(UMainWindow):
 					self.settings_item.content = ""
 					break
 
-		# Любое изменение на странице открывает предупреждение в футере
-		r_wid.changed.connect(self.save_widget.show_warning)
+		# Любое изменение на странице помечает окно как несохранённое
+		r_wid.changed.connect(self._on_page_changed)
 		self.current_page = r_wid
 		self.right_lay.insertWidget(0, r_wid)
 
-		if prefilled:
-			self.save_widget.show_warning()
+	def _on_page_changed(self):
+		self.has_unsaved = True
+		self.save_widget.show_warning()
 
 	def clear_right_side(self):
 		wids = (GeneralSettings, MfSettings, NewMfSettings)
@@ -1001,24 +1006,82 @@ class WinSettings(UMainWindow):
 		self.current_page = None
 
 	def left_menu_click(self, *args):
+		new_idx = self.left_menu.currentRow()
+		if new_idx == self.current_idx:
+			return
+
+		if self.has_unsaved:
+			# Новый пункт остаётся выделенным, пока пользователь не решил
+			self._confirm_discard(
+				on_discard=lambda: self._switch_page(new_idx),
+				on_cancel=self._restore_selection,
+			)
+			return
+
+		self._switch_page(new_idx)
+
+	def _restore_selection(self):
+		# Возвращаем выделение на открытую страницу без повторного вызова left_menu_click
+		self.left_menu.blockSignals(True)
+		self.left_menu.setCurrentRow(self.current_idx)
+		self.left_menu.blockSignals(False)
+
+	def _confirm_discard(self, on_discard, on_cancel=None):
+		win = ConfirmWindow(self.UNSAVED_TEXT)
+		win.ok_clicked.connect(lambda: self._discard(on_discard))
+		if on_cancel is not None:
+			win.cancel_clicked.connect(on_cancel)
+		win.center_to_parent(self)
+		win.show()
+		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
+
+	def _switch_page(self, idx: int):
 		self.clear_right_side()
+		self.has_unsaved = False
 		self.save_widget.hide_warning()
-		idx = self.left_menu.currentRow()
+		self.left_menu.blockSignals(True)
+		self.left_menu.setCurrentRow(idx)
+		self.left_menu.blockSignals(False)
+		self.current_idx = idx
 		self.init_right_side(idx)
 
 	def save_settings_cmd(self):
 		if self.current_page is not None:
 			self.current_page.save_changes()
 
+	def _discard(self, on_discard):
+		self.has_unsaved = False
+		on_discard()
+
+	def _guard_close(self, action) -> bool:
+		# Возвращает True, если закрытие нужно отложить до подтверждения
+		if not self.has_unsaved:
+			return False
+		self._confirm_discard(action)
+		return True
+
+	def close(self) -> bool:
+		if self._guard_close(self.close):
+			return False
+		return super().close()
+
 	def deleteLater(self):
+		if self._guard_close(self.deleteLater):
+			return
 		self.closed.emit()
 		return super().deleteLater()
 
 	def closeEvent(self, a0):
+		if self._guard_close(self.close):
+			a0.ignore()
+			return
 		self.closed.emit()
 		return super().closeEvent(a0)
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
+			if self._guard_close(self.deleteLater):
+				return
 			self.deleteLater()
+			return
 		return super().keyPressEvent(a0)
