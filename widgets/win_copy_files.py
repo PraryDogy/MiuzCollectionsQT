@@ -21,9 +21,6 @@ class ReplaceWin(VerticalWindow):
     cancel_pressed = pyqtSignal()
     keep_both = pyqtSignal()
 
-    warn_svg = Static.COMMON_ICONS / "yellow_warning.svg"
-    warn_svg_size = (65, 65)
-
     def __init__(self, filename: str, show_checkbox: bool):
         super().__init__()
 
@@ -40,9 +37,8 @@ class ReplaceWin(VerticalWindow):
         self.setFixedSize(self.width(), self.height())
 
     def _init_ui(self):
-        icon = QSvgWidget()
-        icon.load(str(self.warn_svg))
-        icon.setFixedSize(*self.warn_svg_size)
+        icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+        icon.setFixedSize(65, 65)
 
         self.icon_text_layout.addWidget(
             icon,

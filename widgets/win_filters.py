@@ -22,15 +22,11 @@ UGroupBox_spacing = 10
 
 class WinFiltersTitleWidget(TitleTextLabel):
 	reset_clicked = pyqtSignal()
-	reset_svg_path = Static.COMMON_ICONS / "reset.svg"
 
 	def __init__(self, text: str, svg_path: str):
 		super().__init__(text, svg_path)
-		self.reset_icon = QIcon(str(self.reset_svg_path))
 		self.h_layout.addStretch(1)
-
 		self.reset_button = UPushButton(Lng.reset)
-		self.reset_button.setIcon(self.reset_icon)
 		self.reset_button.clicked.connect(self.reset_clicked.emit)
 		self.h_layout.addWidget(self.reset_button)
 
@@ -47,8 +43,6 @@ class CalendarTag(UTagWidget):
 
 class DatesWidget(UGroupBox):
 	load_st_grid = pyqtSignal()
-	calendar_svg = Static.COMMON_ICONS / "calendar.svg"
-	svg_calendar_size = (15, 15)
 	readable_date = None
 
 	def __init__(self, parent=None):
@@ -88,7 +82,7 @@ class DatesWidget(UGroupBox):
 
 		self.title_widget = WinFiltersTitleWidget(
 			text=Lng.dates_management,
-			svg_path=str(self.calendar_svg)
+			svg_path=str(Static.COLOR_ICONS / "calendar.svg")
 		)
 		self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
 		self.main_layout.addWidget(self.title_widget)
@@ -267,14 +261,13 @@ class DatesWidget(UGroupBox):
 
 
 class WinFiltersUserTag(UTagWidget):
-	right_svg_path = Static.COMMON_ICONS / "trash.svg"
 
 	def __init__(self, text: str, left_svg_path: str):
 		super().__init__(
 			text=text,
 			qss_style=UTagWidget.qss_gray,
 			left_svg_path=left_svg_path,
-			right_svg_path=str(self.right_svg_path)
+			right_svg_path=str(Static.GRAY_ICONS / "trash_gray.svg")
 		)
 
 
@@ -288,12 +281,10 @@ class WinFiltersStantartTag(UTagWidget):
 
 
 class WinFiltersFavTag(WinFiltersStantartTag):
-	left_svg_path =  Static.COMMON_ICONS / "fav.svg"
-
 	def __init__(self):
 		super().__init__(
 			text=Lng.favorites,
-			left_svg_path=str(self.left_svg_path),
+			left_svg_path=str(Static.GRAY_ICONS / "star_gray.svg"),
 		)
 		if Dynamic.favs_tag_enabled:
 			self.set_qss_style(self.qss_green)
@@ -309,12 +300,10 @@ class WinFiltersFavTag(WinFiltersStantartTag):
 
 
 class SubfoldersTagWidget(WinFiltersStantartTag):
-	left_svg_path =  Static.COMMON_ICONS / "folder_gray.svg"
-
 	def __init__(self):
 		super().__init__(
 			text=Lng.without_subfolders, 
-			left_svg_path=str(self.left_svg_path)
+			left_svg_path=str(Static.GRAY_ICONS / "folder_gray.svg")
 		)
 		if Dynamic.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_green)
@@ -330,12 +319,11 @@ class SubfoldersTagWidget(WinFiltersStantartTag):
 
 
 class WordFiltersTagWidget(WinFiltersUserTag):
-	left_svg_path = Static.COMMON_ICONS / "tags.svg"
 
 	def __init__(self, text):
 		super().__init__(
 			text=text,
-			left_svg_path=str(self.left_svg_path)
+			left_svg_path=str(Static.GRAY_ICONS / "tags_gray.svg")
 		)
 		if text in Dynamic.word_tags_list:
 			self.set_qss_style(self.qss_green)
@@ -351,15 +339,13 @@ class WordFiltersTagWidget(WinFiltersUserTag):
 
 
 class AddTagWidget(UTagWidget):
-	left_svg_path =  Static.COMMON_ICONS / "plus_simple.svg"
-	left_svg_size = (12, 12)
-
 	def __init__(self):
 		super().__init__(
 			text=Lng.new_tag,
 			qss_style=self.qss_transparent,
-			left_svg_path=str(self.left_svg_path)
+			left_svg_path=str(Static.GRAY_ICONS / "crest_gray.svg")
 		)
+		self.left_svg_widget.setFixedSize(10, 10)
 
 
 class StandartTags(TransparentWidget):
@@ -384,7 +370,6 @@ class StandartTags(TransparentWidget):
 
 class UserTags(TransparentWidget):
 	load_st_grid = pyqtSignal()
-	svg_path = Static.COMMON_ICONS / "tags.svg"
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -421,7 +406,7 @@ class UserTags(TransparentWidget):
 
 		self.text_win = InputTextWin(
 			description=Lng.new_tag_desc,
-			svg_path=str(self.svg_path)
+			svg_path=str(Static.GRAY_ICONS / "tags_gray.svg")
 		)
 		self.text_win.center_to_parent(self.window())
 		self.text_win.ok_clicked.connect(ok_clicked)
@@ -456,7 +441,6 @@ class UserTags(TransparentWidget):
 
 class TagsWidget(UGroupBox):
 	load_st_grid = pyqtSignal()
-	svg_path = Static.COMMON_ICONS / "tags_color.svg"
 
 	def __init__(self):
 		super().__init__()
@@ -466,7 +450,7 @@ class TagsWidget(UGroupBox):
 
 		self.title_widget = WinFiltersTitleWidget(
 			text=Lng.tag_management,
-			svg_path=str(self.svg_path)
+			svg_path=str(Static.COLOR_ICONS / "tags_color.svg")
 		)
 		self.title_widget.reset_clicked.connect(lambda: self.reset_tags(True))
 		self.v_lay.addWidget(self.title_widget)
@@ -498,19 +482,16 @@ class TagsWidget(UGroupBox):
 
 
 class WinFilters(UMainWindow):
-	reset_svg = Static.COMMON_ICONS / "reset.svg"
-	edit_svg = Static.COMMON_ICONS / "edit.svg"
 	closed_ = pyqtSignal()
 	load_st_grid = pyqtSignal()
 	edit_filters = pyqtSignal()
-	ww = 590
 
 	def __init__(self):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.filters)
-		self.setFixedWidth(self.ww)
+		self.setFixedWidth(590)
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
