@@ -581,6 +581,8 @@ class GeneralSettings(TransparentWidget):
 
 		v_lay.addWidget(AboutWid())
 
+		self.adjustSize()
+
 	def save_changes(self):
 		def fin():
 			JsonData.scaner_minutes = self.rebootable_settings.scanner_minutes
