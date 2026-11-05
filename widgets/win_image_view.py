@@ -154,11 +154,10 @@ class ZoomWidget(ImgViewSvg):
 	zoom_in = pyqtSignal()
 	zoom_out = pyqtSignal()
 	zoom_fit = pyqtSignal()
-	svg_path = Static.COMMON_ICONS / "zoom_buttons.svg"
 
 	def __init__(self):
 		super().__init__()
-		self.load(str(self.svg_path))
+		self.load(str(Static.COLOR_ICONS / "zoom_buttons.svg"))
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.zone_width = self.width() / 4
 		self.start_pos = None
@@ -203,19 +202,15 @@ class ZoomWidget(ImgViewSvg):
 
 
 class PrevButton(ImgViewSvg):
-	svg_path = Static.COMMON_ICONS / "previous.svg"
-
 	def __init__(self) -> None:
 		super().__init__()
-		self.load(str(self.svg_path))
+		self.load(str(Static.GRAY_ICONS / "arrow_left_solid_gray.svg"))
 
 
 class NextButton(ImgViewSvg):
-	svg_path = Static.COMMON_ICONS / "next.svg"
-
 	def __init__(self) -> None:
 		super().__init__()
-		self.load(str(self.svg_path))
+		self.load(str(Static.GRAY_ICONS / "arrow_right_solid_gray.svg"))
 
 
 class WinImageView(UMainWindow):
