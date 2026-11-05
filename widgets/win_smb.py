@@ -55,7 +55,7 @@ class WinSmb(UMainWindow):
 		self.central_layout.addWidget(self.group_box)
 		
 		# --- Виджет пути ---
-		self.path_widget = MfPathWidget(JsonData.lng_index, mf)
+		self.path_widget = MfPathWidget(mf)
 		self.central_layout.addWidget(self.path_widget)
 
 		# --- Кнопки ---
