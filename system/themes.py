@@ -2,13 +2,13 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication
 
 from cfg import JsonData, Static, Themes
+import re
 
 
 class TreeTheme:
     """Параметры выделения строк дерева.
 
-    Синхронизировано с QSS: sel_color = UListWidget::item:selected,
-    UMenu::item:selected. При смене цветов в QSS обновите этот файл вручную.
+    sel_color берётся из QSS (UListWidget::item:selected) при загрузке темы.
     """
     sel_color = "#000000"
     sel_text = "#ffffff"
@@ -16,10 +16,33 @@ class TreeTheme:
     h_margin = 4
     v_margin = 1
 
+    _SEL_RE = re.compile(
+        r"UListWidget::item:selected\b[^{}]*\{\s*background:\s*(#[0-9a-fA-F]{3,8})\s*;\s*\}"
+    )
+
+    @classmethod
+    def parse_sel_color(cls, qss_text: str) -> str:
+        m = cls._SEL_RE.search(qss_text)
+        if not m:
+            raise ValueError("TreeTheme: не могу найти цвет UListWidget::item:selected в QSS")
+        return m.group(1)
+
+    @classmethod
+    def load_from_qss(cls, qss_text: str) -> None:
+        cls.sel_color = cls.parse_sel_color(qss_text)
+
+    @classmethod
+    def open_dark_qss(cls):
+        with open(Static.THEME_DARK_QSS, "r") as file:
+            return file.read()
+
+    @classmethod
+    def open_light_qss(cls):
+        with open(Static.THEME_LIGHT_QSS, "r") as file:
+            return file.read()
+
 
 class DarkTreeTheme(TreeTheme):
-    # dark.qss: UListWidget::item:selected, UMenu::item:selected
-    sel_color = "#1d2833"
     sel_text = "#ffffff"
     sel_radius = 6
     h_margin = 4
@@ -27,8 +50,6 @@ class DarkTreeTheme(TreeTheme):
 
 
 class LightTreeTheme(TreeTheme):
-    # light.qss: UListWidget::item:selected, UMenu::item:selected
-    sel_color = "#e3eaf2"
     sel_text = "#1a2430"
     sel_radius = 8
     h_margin = 4
@@ -75,8 +96,11 @@ class ThemeChanger:
         app: QApplication = QApplication.instance()
 
         with open(qss_path, "r", encoding="utf-8") as f:
-            app.setStyleSheet(f.read())
+            qss_text = f.read()
 
+        app.setStyleSheet(qss_text)
+
+        tree_theme.load_from_qss(qss_text)
         cls.tree_theme = tree_theme
         cls._repaint_trees()
 
