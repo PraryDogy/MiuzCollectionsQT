@@ -331,8 +331,8 @@ class UpBtn(TransparentWidget):
 		self.label = UpBtnLabel()
 
 		# 2. Фиксированная SVG-иконка
-		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "arrow_up_solid_gray.svg"), self)
-		self.svg_widget.setFixedSize(28, 28)
+		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "arrow_up_gray.svg"), self)
+		self.svg_widget.setFixedSize(20, 20)
 		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
 		# 3. Наслоение через сетку

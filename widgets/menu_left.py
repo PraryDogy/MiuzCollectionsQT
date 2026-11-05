@@ -30,8 +30,6 @@ class MenuLeftTreeWidget(UTreeWidget):
 	on_tree_clicked = pyqtSignal(str)
 	on_hide_digits_clicked = pyqtSignal()
 	on_scroll_changed = pyqtSignal(int)
-	
-	icon_path = Static.COMMON_ICONS / "base_folder.svg"
 
 	def __init__(self):
 		super().__init__()
@@ -65,7 +63,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 		self.clear()
 
 		root_item = MenuLeftTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
-		root_item.setIcon(0, QIcon(str(self.icon_path)))
+		root_item.setIcon(0, QIcon(str(Static.COLOR_ICONS / "base_folder.svg")))
 		self.addTopLevelItem(root_item)
 
 		task = DbDirsLoader(Mf.current_mf)
@@ -91,7 +89,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 				continue
 
 			child = MenuLeftTreeWidgetItem(parent_item, name, path)
-			child.setIcon(0, QIcon(str(self.icon_path)))
+			child.setIcon(0, QIcon(str(Static.COLOR_ICONS / "base_folder.svg")))
 			parent_item.addChild(child)
 			self.items[path] = child
 

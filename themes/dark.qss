@@ -644,7 +644,7 @@ QScrollBar::sub-line:horizontal {
 UMenu::indicator:checked,
 UListWidget::indicator:checked,
 UCheckBox::indicator:checked {
-    image: url(./icons/common/checkmark_small.svg);
+    image: url(./icons/gray/checkmark_gray.svg);
 }
 
 UMenu::indicator:unchecked,
@@ -654,27 +654,27 @@ UCheckBox::indicator:unchecked {
 
 UMenu::right-arrow,
 UMenu::right-arrow:selected {
-    image: url("./icons/common/arrow_right.svg");
+    image: url("./icons/gray/arrow_right_gray.svg");
 }
 
 UPushButton::menu-indicator {
-    image: url("./icons/common/arrow_down.svg");
+    image: url("./icons/gray/arrow_down_gray.svg");
 }
 
 USpinBox::up-arrow {
-    image: url("./icons/common/arrow_up.svg");
+    image: url("./icons/gray/arrow_up_gray.svg");
 }
 
 USpinBox::down-arrow {
-    image: url("./icons/common/arrow_down.svg");
+    image: url("./icons/gray/arrow_down_gray.svg");
 }
 
 UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
-    image: url(./icons/common/expand_r.svg);
+    image: url(./icons/gray/expand_gray.svg);
 }
 
 UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
-    image: url(./icons/common/collapse_r.svg);
+    image: url(./icons/gray/collapse_gray.svg);
 }
