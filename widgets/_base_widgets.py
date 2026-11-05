@@ -757,6 +757,12 @@ class UMainWindow(QMainWindow):
 		
 		self.window_layout.addLayout(self.central_layout)
 
+		# Затемняющий слой поверх всего окна, виден когда окно не в фокусе
+		self.dim_overlay = QWidget(self)
+		self.dim_overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+		self.dim_overlay.setStyleSheet("background-color: rgba(0, 0, 0, 150);")
+		self.dim_overlay.hide()
+
 		self.register_window()
 
 	def set_titlebar_height(self, h: int):
@@ -799,6 +805,20 @@ class UMainWindow(QMainWindow):
 	def deleteLater(self):
 		self.unregister_window()
 		return super().deleteLater()
+
+	def changeEvent(self, a0):
+		if a0.type() == QEvent.Type.ActivationChange:
+			self._apply_focus_state(self.isActiveWindow())
+		return super().changeEvent(a0)
+
+	def resizeEvent(self, a0):
+		self.dim_overlay.setGeometry(self.rect())
+		return super().resizeEvent(a0)
+
+	def _apply_focus_state(self, focused: bool):
+		self.title_bar.set_window_focused(focused)
+		self.dim_overlay.setVisible(not focused)
+		self.dim_overlay.raise_()
 
 
 # если переименовываешь, не забудь qss

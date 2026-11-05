@@ -832,7 +832,7 @@ class MfSettings(UScrollVerticalArea):
 		self.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 10, 0)
+		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
@@ -936,7 +936,7 @@ class NewMfSettings(UMainWindow):
 		self.setWindowTitle(Lng.new_catalog)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setMinimumSize(600, 600)
+		self.setMinimumSize(550, 580)
 
 		self.has_unsaved = False
 		self.discard_win = None
@@ -950,7 +950,7 @@ class NewMfSettings(UMainWindow):
 		scroll.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 10, 0)
+		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
 
 		self.mf_alias_widget = MfAliasWidget()
@@ -975,6 +975,8 @@ class NewMfSettings(UMainWindow):
 
 		if mf_path:
 			self.mf_path_widget_changed()
+
+		self.adjustSize()
 
 	def _on_changed(self):
 		self.has_unsaved = True
