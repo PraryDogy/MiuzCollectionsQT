@@ -743,9 +743,10 @@ class NewMfSettings(UMainWindow):
 		# откроется отдельным окном внутри WinSettings
 		self.set_always_on_top()
 		self.set_close_only()
+		self.setMinimumSize(600, 600)
 
 		scroll = UScrollVerticalArea()
-		self.central_layout.setContentsMargins(0, 0, 0, 0)
+		self.central_layout.setContentsMargins(10, 10, 10, 10)
 		self.central_layout.addWidget(scroll)
 
 		main_wid = TransparentWidget()
@@ -819,6 +820,11 @@ class NewMfSettings(UMainWindow):
 	def mouseReleaseEvent(self, a0):
 		self.setFocus()
 		return super().mouseReleaseEvent(a0)
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		return super().keyPressEvent(a0)
 
 
 class SaveGroupBox(TransparentWidget):
@@ -964,6 +970,8 @@ class WinSettings(UMainWindow):
 				if i.mf_alias == self.settings_item.content:
 					idx = x
 					break
+		elif settings_item.type_ == "new_folder":
+			QTimer.singleShot(10, self.open_new_catalog_win)
 
 		self.current_idx = idx
 		self.left_menu.setCurrentRow(idx)
