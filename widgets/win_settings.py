@@ -398,6 +398,7 @@ class ThemeBtn(TransparentWidget):
 		self.svg_1, self.svg_2 = svg_paths
 
 		self.setFixedWidth(self.ww)
+		self.setFixedHeight(self.ww)
 
 		layout_ = QVBoxLayout(self)
 		layout_.setContentsMargins(0, 0, 0, 0)
