@@ -983,15 +983,7 @@ class WinSettings(UMainWindow):
 
 		if idx == 0:
 			r_wid = GeneralSettings()
-		elif idx == 1:
-			if self.settings_item.type_ == "new_folder":
-				r_wid = NewMfSettings(self.settings_item.content)
-				prefilled = True
-				self.settings_item.type_ = "general"
-				self.settings_item.content = ""
-			else:
-				r_wid = NewMfSettings()
-		elif idx > 2:
+		elif idx > 1:
 			item: UListWidgetItem = self.left_menu.item(idx)
 			for index, mf in enumerate(Mf.items):
 				if mf.mf_alias == item.text():
