@@ -321,8 +321,6 @@ class UpBtnLabel(TransparentLabel):
 
 class UpBtn(TransparentWidget):
 	scroll_to_top = pyqtSignal()
-	icon_path = Static.COMMON_ICONS / "arrow_up.svg"
-	icon_size = (28, 28)
 
 	def __init__(self, parent: TransparentWidget | None = None):
 		super().__init__(parent)
@@ -333,8 +331,8 @@ class UpBtn(TransparentWidget):
 		self.label = UpBtnLabel()
 
 		# 2. Фиксированная SVG-иконка
-		self.svg_widget = QSvgWidget(str(self.icon_path), self)
-		self.svg_widget.setFixedSize(*self.icon_size)
+		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "arrow_up_solid_gray.svg"), self)
+		self.svg_widget.setFixedSize(28, 28)
 		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
 		# 3. Наслоение через сетку
@@ -356,8 +354,6 @@ class UpBtn(TransparentWidget):
 
 class GridModeWidget(UPushButton):
 	load_st_grid = pyqtSignal()
-	view_mode_svg = Static.COMMON_ICONS / "view_mode.svg"
-	icon_offset = 35  # иконка слева и стрелка справа
 
 	def __init__(self):
 		self.MODES = {
@@ -368,7 +364,7 @@ class GridModeWidget(UPushButton):
 		current = JsonData.square_thumbs
 		super().__init__(self.MODES[current])
 
-		self.setIcon(QIcon(str(self.view_mode_svg)))
+		self.setIcon(QIcon(str(Static.GRAY_ICONS / "view_mode_gray.svg")))
 
 		self.menu_ = UMenu(parent=self)
 		self.setMenu(self.menu_)
@@ -388,7 +384,7 @@ class GridModeWidget(UPushButton):
 	def _fix_width(self):
 		metrics = QFontMetrics(self.font())
 		text_width = max(metrics.horizontalAdvance(text) for text in self.MODES.values())
-		self.setFixedWidth(text_width + self.icon_offset + self.iconSize().width())
+		self.setFixedWidth(text_width + 35 + self.iconSize().width())
 
 	def change_mode(self, square: bool):
 		if JsonData.square_thumbs == square:
@@ -399,13 +395,12 @@ class GridModeWidget(UPushButton):
 
 
 class GridSortWidget(TransparentWidget):
-	sort_icon_svg = Static.COMMON_ICONS / "sort.svg"
 	load_st_grid = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
 
-		self.sort_icon = QIcon(str(self.sort_icon_svg))
+		self.sort_icon = QIcon(str(Static.GRAY_ICONS / "sort_gray.svg"))
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
@@ -450,13 +445,12 @@ class GridSortWidget(TransparentWidget):
 
 
 class GridFiltersWidget(TransparentWidget):
-	sort_icon_svg = Static.COMMON_ICONS / "filters.svg"
 	open_filters_win = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
 
-		self.sort_icon = QIcon(str(self.sort_icon_svg))
+		self.sort_icon = QIcon(str(Static.GRAY_ICONS / "filters_gray.svg"))
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
@@ -499,27 +493,23 @@ class GridControlsWidget(TransparentWidget):
 
 
 class GridTag(UTagWidget):
-	right_svg_path = Static.COMMON_ICONS / "cancel.svg"
-	right_svg_size = (12, 12)
 
 	def __init__(self, left_svg_path, text):
 		super().__init__(
 			qss_style=self.qss_green,
 			left_svg_path=str(left_svg_path),
 			text=text,
-			right_svg_path=str(self.right_svg_path)
+			right_svg_path=str(Static.GRAY_ICONS / "cancel_solid_gray.svg")
 		)
-		self.right_svg_widget.setFixedSize(*self.right_svg_size)
+		self.right_svg_widget.setFixedSize(12, 12)
 		self.right_svg_lay.setContentsMargins(0, 1, 0, 0)
 
 
 class GridDatesTag(GridTag):
-	left_svg_path = Static.COMMON_ICONS / "gray_calendar.svg"
-
 	def __init__(self):
 		super().__init__(
 			text=DatesWidget.readable_date,
-			left_svg_path=self.left_svg_path
+			left_svg_path=str(Static.GRAY_ICONS / "calendar_gray.svg")
 		)
 
 	def right_svg_cmd(self, *args):
@@ -529,12 +519,10 @@ class GridDatesTag(GridTag):
 
 
 class GridWordTag(GridTag):
-	left_svg_path = Static.COMMON_ICONS / "tags.svg"
-
 	def __init__(self, text):
 		super().__init__(
 			text=text,
-			left_svg_path=self.left_svg_path
+			left_svg_path=str(Static.GRAY_ICONS / "tags_gray.svg")
 		)
 
 	def right_svg_cmd(self, *args):
@@ -543,12 +531,10 @@ class GridWordTag(GridTag):
 
 
 class GridFavTag(GridTag):
-	left_svg_path = Static.COMMON_ICONS / "fav.svg"
-
 	def __init__(self):
 		super().__init__(
 			text=Lng.favorites,
-			left_svg_path=self.left_svg_path
+			left_svg_path=str(Static.COMMON_ICONS / "star_gray.svg")
 		)
 
 	def right_svg_cmd(self, *args):
@@ -557,12 +543,12 @@ class GridFavTag(GridTag):
 
 
 class GridNoSubfoldersTag(GridTag):
-	left_svg_path = Static.COMMON_ICONS / "folder_gray.svg"
+	left_svg_path = Static.GRAY_ICONS / "folder_gray.svg"
 
 	def __init__(self):
 		super().__init__(
 			text=Lng.without_subfolders,
-			left_svg_path=self.left_svg_path
+			left_svg_path=str(Static.GRAY_ICONS / "folder_gray.svg")
 		)
 
 	def right_svg_cmd(self, *args):
@@ -639,14 +625,11 @@ class Grid(UScrollVerticalArea):
 	collage = pyqtSignal(list)
 	open_filters_win = pyqtSignal()
 	selection_count_changed = pyqtSignal(int)
-
-	resize_ms = 10
 	thumb_cls = Thumb
-	copy_files_path = Static.COMMON_ICONS / "copy_files.svg"
 
 	def __init__(self):
 		super().__init__()
-		qimage = QImage(str(self.copy_files_path))
+		qimage = QImage(str(Static.COLOR_ICONS / "copy_files.svg"))
 		qimage_scaled = Utils.scale_qimage_dpr(qimage, 80)
 		self.copy_files_icon = QPixmap.fromImage(qimage_scaled)
 

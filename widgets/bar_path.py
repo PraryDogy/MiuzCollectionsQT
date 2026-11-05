@@ -109,9 +109,8 @@ class PathBar(TransparentWidget):
 			)
 
 		text_ = last_item.text_wid.text()
-		print('path bar настрой elide')
 		if len(text_) > last_item_limit:
-			path_item.setFixedWidth(100)
+			path_item.setFixedWidth(400)
 			path_item.text_wid.set_elide(True)
 		
 		if len(root) != 1:
