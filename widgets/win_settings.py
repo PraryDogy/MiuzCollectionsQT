@@ -933,13 +933,6 @@ class WinSettings(UMainWindow):
 		main_settings_item.setIcon(QIcon(str(self.settings_svg)))
 		self.left_menu.addItem(main_settings_item)
 
-		# new_folder = UListWidgetItem(
-		# 	parent=self.left_menu,
-		# 	text=Lng.new_catalog
-		# )
-		# new_folder.setIcon(QIcon(str(self.new_folder_svg)))
-		# self.left_menu.addItem(new_folder)
-
 		spacer = UListSpacerItem(self.left_menu)
 		self.left_menu.addItem(spacer)
 
