@@ -36,11 +36,11 @@ class SearchWidBaseSvg(QSvgWidget):
 
 
 class SearchWidClearSvg(SearchWidBaseSvg):
-	icon_path = Static.COMMON_ICONS / "cancel.svg"
+	icon_path = Static.GRAY_ICONS / "cancel_solid_gray.svg"
 
 
 class SearchWidTextSearchSvg(SearchWidBaseSvg):
-	icon_path = Static.COMMON_ICONS / "text_edit.svg" 
+	icon_path = Static.GRAY_ICONS / "text_edit_gray.svg" 
 
 
 class SearchWidLineEdit(ULineEdit):
@@ -130,7 +130,7 @@ class SearchWidLineEdit(ULineEdit):
 
 class CommonSvgIconButton(SvgWithThemeBg):
 	label_size = (28, 28)
-	icon_size = (26, 26)
+	icon_size = (14, 14)
 	base_svg: Path
 
 	def __init__(self):
@@ -142,30 +142,24 @@ class CommonSvgIconButton(SvgWithThemeBg):
 
 
 class SettingsSvgBtn(CommonSvgIconButton):
-	base_svg = Static.COMMON_ICONS / "settings.svg"
-	icon_size = (14, 14)  # Уменьшили размер иконки (по умолчанию 26x26), чтобы визуально сравнять с настройками
-	# 17 17 идентичен шестеренке но тогда доминирует
+	base_svg = Static.GRAY_ICONS / "settings_gray.svg"
 
 class ConnectServerSvgBtn(CommonSvgIconButton):
-	base_svg = Static.COMMON_ICONS / "connect.svg"
-	icon_size = (14, 14)  # Уменьшили размер иконки (по умолчанию 26x26), чтобы визуально сравнять с настройками
-	# 17 17 идентичен шестеренке но тогда доминирует
+	base_svg = Static.GRAY_ICONS / "connections_gray.svg"
 
 
 class ImgSearchSvgBtn(CommonSvgIconButton):
-	base_svg = Static.COMMON_ICONS / "camera.svg"
+	base_svg = Static.GRAY_ICONS / "camera_gray.svg"
 
 
 class CatalogWidget(TransparentWidget):
-	image_folder_svg = Static.COMMON_ICONS / "image_folder.svg"
-	new_folder_svg = Static.COMMON_ICONS / "new_folder.svg"
 	mf_open = pyqtSignal(Mf)
 	mf_new = pyqtSignal(SettingsItem)
 
 	def __init__(self):
 		super().__init__()
-		self.image_folder_icon = QIcon(str(self.image_folder_svg))
-		self.new_folder_icon = QIcon(str(self.new_folder_svg))
+		self.image_folder_icon = QIcon(str(Static.COLOR_ICONS / "image_folder.svg"))
+		self.new_folder_icon = QIcon(str(Static.COLOR_ICONS / "new_folder.svg"))
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
