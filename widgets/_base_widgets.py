@@ -946,10 +946,6 @@ class UTagWidget(TransparentFrame):
 
 class RowArrowWidget(TransparentWidget):
 	clicked = pyqtSignal()
-	arrow_svg = Static.COMMON_ICONS / "next.svg"
-	warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
-	hh = 26
-	svg_size = 16
 
 	# обычно эти виджеты помещаются в QGroupBox
 	# Это правильные отступы чтобы все красиво смотрелось
@@ -958,7 +954,7 @@ class RowArrowWidget(TransparentWidget):
 
 	def __init__(self, text: str):
 		super().__init__()
-		self.setFixedHeight(self.hh)
+		self.setFixedHeight(26)
 		
 		# Один прямой горизонтальный слой
 		self.main_layout = QHBoxLayout(self)
@@ -967,16 +963,15 @@ class RowArrowWidget(TransparentWidget):
 		
 		# Иконка слева
 		self.left_icon = QSvgWidget()
-		self.left_icon.setFixedSize(self.svg_size, self.svg_size)
+		self.left_icon.setFixedSize(16, 16)
 		self.left_icon.hide()
 		
 		# Текст
 		self.text_widget = TransparentLabel(text)
 		
 		# Стрелка справа
-		self.arrow_wid = QSvgWidget()
-		self.arrow_wid.setFixedSize(self.svg_size, self.svg_size)
-		self.arrow_wid.load(str(self.arrow_svg))
+		self.arrow_wid = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.arrow_wid.setFixedSize(12, 12)
 		
 		# Сборка в один ряд
 		self.main_layout.addWidget(self.left_icon)
@@ -998,7 +993,7 @@ class RowArrowWidget(TransparentWidget):
 		self.arrow_wid.hide()
 
 	def show_warning(self):
-		self.set_left_icon(self.warning_svg)
+		self.set_left_icon(Static.COLOR_ICONS / "yellow_warning.svg")
 
 	def set_disabled(self):
 		self.blockSignals(True)
@@ -1018,14 +1013,11 @@ class RowArrowWidget(TransparentWidget):
 
 class WinProgressbar(UMainWindow):
 	cancel = pyqtSignal()
-	files_icon_path = Static.COMMON_ICONS / "copy_files.svg"
-	cancel_icon_path = Static.COMMON_ICONS / "cancel.svg"
-	ww = 370
 
 	def __init__(self, title: str):
 		super().__init__()
 		self.setWindowTitle(title)
-		self.setFixedWidth(self.ww)
+		self.setFixedWidth(370)
 
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(0)
@@ -1038,7 +1030,7 @@ class WinProgressbar(UMainWindow):
 		h_lay.setContentsMargins(0, 0, 0, 0)
 		h_lay.setSpacing(10)
 
-		left_side_icon = QSvgWidget(str(self.files_icon_path))
+		left_side_icon = QSvgWidget(str(Static.COLOR_ICONS / "copy_files.svg"))
 		left_side_icon.setFixedSize(40, 40)
 		h_lay.addWidget(left_side_icon)
 
@@ -1064,7 +1056,7 @@ class WinProgressbar(UMainWindow):
 		self.progressbar.adjustSize()
 		progressbar_lay.addWidget(self.progressbar)
 
-		self.cancel_btn = QSvgWidget(str(self.cancel_icon_path))
+		self.cancel_btn = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid_gray.svg"))
 		self.cancel_btn.setFixedSize(13, 13)
 		self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
@@ -1141,10 +1133,6 @@ class ConfirmWindow(VerticalWindow):
 	ok_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 
-	icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
-	icon_size = (65, 65)
-	ww = 280
-
 	def __init__(self, text: str):
 		super().__init__()
 		self.set_always_on_top()
@@ -1158,8 +1146,8 @@ class ConfirmWindow(VerticalWindow):
 
 	def _setup_ui(self, text: str):
 		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(self.icon_path))
-		self.svg_widget.setFixedSize(*self.icon_size)
+		self.svg_widget.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		self.svg_widget.setFixedSize(65, 65)
 		self.icon_text_layout.addWidget(
 			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
 		)
@@ -1191,10 +1179,6 @@ class WarningWindow(VerticalWindow):
 	ok_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 
-	icon_path = Static.COMMON_ICONS / "yellow_warning.svg"
-	icon_size = (65, 65)
-	ww = 280
-
 	def __init__(self, text: str, text_edit_text: str = None):
 		super().__init__()
 		self.set_always_on_top()
@@ -1208,8 +1192,8 @@ class WarningWindow(VerticalWindow):
 
 	def _setup_ui(self, text: str, text_edit_text: str):
 		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(self.icon_path))
-		self.svg_widget.setFixedSize(*self.icon_size)
+		self.svg_widget.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		self.svg_widget.setFixedSize(65, 65)
 		self.icon_text_layout.addWidget(
 			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
 		)
@@ -1238,11 +1222,9 @@ class WarningWindow(VerticalWindow):
 
 
 class SuperConfirmWindow(ConfirmWindow):
-	icon_path = Static.COMMON_ICONS / "red_warning.svg"
-
 	def __init__(self, text: str):
 		super().__init__(text)
-		self.svg_widget.load(str(self.icon_path))
+		self.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
 
 
 class InputTextWin(UMainWindow):
@@ -1319,11 +1301,9 @@ class InputTextWin(UMainWindow):
 
 
 class SaveRowArrowWidget(RowArrowWidget):
-	save_svg = Static.COMMON_ICONS / "save.svg"
-
 	def __init__(self):
 		super().__init__(Lng.save)
-		self.set_left_icon(self.save_svg)
+		self.set_left_icon(Static.COMMON_ICONS / "diskette.svg")
 
 
 class MfAliasWidget(TransparentWidget):
@@ -1544,11 +1524,6 @@ class SvgWithThemeBg(TransparentWidget):
 class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
 
-	folder_magnifier = Static.COMMON_ICONS / "folder_magnifier.svg"
-	magnifier = Static.COMMON_ICONS / "magnifier.svg"
-	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
-	copy = Static.COMMON_ICONS / "copy.svg"
-
 	def __init__(self, mf: Mf = None):
 		super().__init__()
 		self.setAcceptDrops(True)
@@ -1610,7 +1585,7 @@ class MfPathWidget(UGroupBox):
 		button = UPushButton(
 			Lng.choose_folder
 		)
-		button.setIcon(QIcon(str(self.magnifier)))
+		button.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
 		button.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(button)
 
@@ -1621,7 +1596,7 @@ class MfPathWidget(UGroupBox):
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
-		title = self._create_title(self.folder_magnifier)
+		title = self._create_title(Static.COLOR_ICONS / "folder_magnifier.svg")
 		texts_layout.addWidget(title)
 
 		# Разделитель
@@ -1648,7 +1623,7 @@ class MfPathWidget(UGroupBox):
 		path_layout.addLayout(labels_layout, 1)
 
 		self.fake_copy_btn = UPushButton("")
-		self.fake_copy_btn.setIcon(QIcon(str(self.copy)))
+		self.fake_copy_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
 
 		policy = self.fake_copy_btn.sizePolicy()
 		policy.setRetainSizeWhenHidden(True)
@@ -1669,7 +1644,7 @@ class MfPathWidget(UGroupBox):
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
-		title = self._create_title(self.green_checkmark)
+		title = self._create_title(Static.COLOR_ICONS / "green_checkmark.svg")
 		texts_layout.addWidget(title)
 
 		# Разделитель
@@ -1697,7 +1672,7 @@ class MfPathWidget(UGroupBox):
 		path_layout.addLayout(labels_layout, 1)
 
 		self.copy_path_btn = UPushButton("")
-		self.copy_path_btn.setIcon(QIcon(str(self.copy)))
+		self.copy_path_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
 		self.copy_path_btn.setToolTip(
 			Lng.copy_dirpath
 		)
@@ -1719,7 +1694,7 @@ class MfPathWidget(UGroupBox):
 		def unlock():
 			self.set_copy_path_btn_locked(False)
 			try:
-				self.copy_path_btn.setIcon(QIcon(str(self.copy)))
+				self.copy_path_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
 			except RuntimeError:
 				# на случай если окно уничтожилось раньше действия
 				pass
@@ -1728,7 +1703,7 @@ class MfPathWidget(UGroupBox):
 			return
 
 		Utils.pyqt_copy_text(self.mf_path)
-		self.copy_path_btn.setIcon(QIcon(str(self.green_checkmark)))
+		self.copy_path_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "green_checkmark.svg")))
 		self.set_copy_path_btn_locked(True)
 
 		QTimer.singleShot(1000, unlock)
@@ -1792,7 +1767,6 @@ class MfPathWidget(UGroupBox):
 
 
 class MfStopListEditTag(UMainWindow):
-	text_edit = Static.COMMON_ICONS / "text_edit.svg"
 	remove_clicked = pyqtSignal()
 	ok_clicked = pyqtSignal(str)
 
@@ -1812,7 +1786,7 @@ class MfStopListEditTag(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(10)
 
-		title_label = TitleTextLabel(Lng.folder_name, str(self.text_edit))
+		title_label = TitleTextLabel(Lng.folder_name, str(Static.COMMON_ICONS / "text_edit_gray.svg"))
 		group_layout.addWidget(title_label)
 
 		group_layout.addWidget(USep())
@@ -1867,14 +1841,11 @@ class MfStopListEditTag(UMainWindow):
 
 
 class MfStopListTag(UTagWidget):
-	trash_svg = Static.COMMON_ICONS / "trash.svg"
-	max_width = 150
-
 	def __init__(self, text):
 		super().__init__(
 			text,
 			self.qss_gray,
-			right_svg_path=str(self.trash_svg),
+			right_svg_path=str(Static.GRAY_ICONS / "trash_gray.svg"),
 		)
 		self.text_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.setToolTip(text)
@@ -1884,9 +1855,6 @@ class MfStopListTag(UTagWidget):
 
 class MfStopListWidget(UGroupBox):
 	changed = pyqtSignal()
-	ignore_svg = Static.COMMON_ICONS / "ignore.svg"
-	trash_svg = Static.COMMON_ICONS / "trash.svg"
-	plus_svg = Static.COMMON_ICONS / "plus_simple.svg"
 
 	def __init__(self, mf_stop_list: list[str]):
 		super().__init__()
@@ -1896,7 +1864,7 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
 
-		title_label = TitleTextLabel(Lng.stop_list, str(self.ignore_svg))
+		title_label = TitleTextLabel(Lng.stop_list, str(Static.GRAY_ICONS / "stop_gray.svg"))
 		v_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())
@@ -1919,7 +1887,7 @@ class MfStopListWidget(UGroupBox):
 		v_layout.addSpacing(5)
 
 		add_button = UPushButton(Lng.add_folder)
-		add_button.setIcon(QIcon(str(self.plus_svg)))
+		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
 		add_button.clicked.connect(self.add_tag)
 		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
 		self.reload_tags()
@@ -1993,7 +1961,7 @@ class MfStopListWidget(UGroupBox):
 
 		self.text_win = InputTextWin(
 			description=Lng.folder_name,
-			svg_path=str(self.trash_svg)
+			svg_path=str(Static.GRAY_ICONS / "trash_gray.svg")
 		)
 		self.text_win.setFixedWidth(300)
 		self.text_win.center_to_parent(self.window())
