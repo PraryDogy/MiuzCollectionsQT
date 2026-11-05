@@ -25,9 +25,6 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
 
 class ProgressWin(UMainWindow):
 	stop_img_search = pyqtSignal()
-	base_image_svg_path = Static.COMMON_ICONS / "base_image.svg"
-	stop_svg_path = Static.COMMON_ICONS / "stop.svg"
-	base_image_size = (28, 28)
 
 	def __init__(self):
 		super().__init__()
@@ -36,7 +33,7 @@ class ProgressWin(UMainWindow):
 		self.set_close_only()
 		self.setWindowTitle(Lng.progress)
 
-		self.stop_icon = QIcon(str(self.stop_svg_path))
+		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square_gray.svg"))
 
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 10, 10, 10)
@@ -48,9 +45,8 @@ class ProgressWin(UMainWindow):
 		self.text_layout.setContentsMargins(5, 0, 5, 0)
 		self.text_layout.setSpacing(10)
 
-		self.svg_icon = QSvgWidget() 
-		self.svg_icon.load(str(self.base_image_svg_path))
-		self.svg_icon.setFixedSize(*self.base_image_size)
+		self.svg_icon = QSvgWidget(str(Static.GRAY_ICONS / "image_icon_gray.svg")) 
+		self.svg_icon.setFixedSize(28, 28)
 		self.text_layout.addWidget(self.svg_icon)
 
 		self.text_label = TransparentLabel("")
@@ -146,8 +142,6 @@ DROP_WIDGET_SIZE = (350, 300)
 
 
 class WinImgSearchDropWidget(TransparentFrame):
-	svg_path = Static.COMMON_ICONS / "base_image.svg"
-	svg_size = (50, 50)
 	image_dropped = pyqtSignal(str)
 
 	def __init__(self, parent=None):
@@ -160,9 +154,8 @@ class WinImgSearchDropWidget(TransparentFrame):
 		self.v_layout.setSpacing(10)
 		self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(self.svg_path))
-		self.svg_widget.setFixedSize(*self.svg_size)
+		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "image_icon_gray.svg"))
+		self.svg_widget.setFixedSize(50, 50)
 
 		self.v_layout.addWidget(
 			self.svg_widget,
@@ -209,8 +202,6 @@ class WinImgSearchDropWidget(TransparentFrame):
 class WinImgSearchPreviewWidget(TransparentFrame):
 	pixmap_finished = pyqtSignal()
 	cancel_clicked = pyqtSignal()
-	cancel_svg_path = Static.COMMON_ICONS / "cancel.svg"
-	cancel_icon_size = (20, 20)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -253,9 +244,9 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 		self.image_label.clear()
 
 	def create_cancel_button(self):
-		self.cancel_icon = QSvgWidget(self)
-		self.cancel_icon.load(str(self.cancel_svg_path))
-		self.cancel_icon.setFixedSize(*self.cancel_icon_size)
+		self.cancel_icon = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid_gray.svg"))
+		self.cancel_icon.setParent(self)
+		self.cancel_icon.setFixedSize(20, 20)
 		self.cancel_icon.mouseReleaseEvent = self.clear_image_cmd
 		self.cancel_icon.setCursor(Qt.CursorShape.PointingHandCursor)
 
@@ -287,7 +278,6 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 
 
 class ControlsWidget(UGroupBox):
-	reset_svg = Static.COMMON_ICONS / "reset.svg"
 	reset_btn_clicked = pyqtSignal()
 	slider_moved = pyqtSignal(int)
 
@@ -310,7 +300,6 @@ class ControlsWidget(UGroupBox):
 class WinImgSearch(UMainWindow):
 	reload_thumbnails = pyqtSignal()
 	closed = pyqtSignal()
-	magnifier_svg_path = Static.COMMON_ICONS / "magnifier.svg"
 
 	def __init__(self):
 		super().__init__()
@@ -323,7 +312,7 @@ class WinImgSearch(UMainWindow):
 		self.shm = None
 		self.progress_win = None
 		self.read_img_poll_ms = 300
-		self.magnifier_icon = QIcon(str(self.magnifier_svg_path))
+		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg"))
 
 		self.found_image_timer = QTimer(self)
 		self.found_image_timer.setSingleShot(True)
