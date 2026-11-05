@@ -534,7 +534,7 @@ class GridFavTag(GridTag):
 	def __init__(self):
 		super().__init__(
 			text=Lng.favorites,
-			left_svg_path=str(Static.COMMON_ICONS / "star_gray.svg")
+			left_svg_path=str(Static.GRAY_ICONS / "star_gray.svg")
 		)
 
 	def right_svg_cmd(self, *args):
