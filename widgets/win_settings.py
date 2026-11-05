@@ -106,138 +106,6 @@ class SaveGroupBox(TransparentWidget):
 		self.cancel_button.setText(Lng.close)
 
 
-class NewMfSettings(UMainWindow):
-
-	def __init__(self, mf_path: str = None):
-		super().__init__()
-
-		self.set_always_on_top()
-		self.set_close_only()
-		self.setMinimumSize(600, 600)
-
-		self.has_unsaved = False
-		self.discard_win = None
-
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
-
-		scroll = UScrollVerticalArea()
-		self.central_layout.addWidget(scroll)
-
-		main_wid = TransparentWidget()
-		scroll.setWidget(main_wid)
-
-		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 10, 0)
-		main_lay.setSpacing(10)
-
-		self.mf_alias_widget = MfAliasWidget()
-		self.mf_alias_widget.changed.connect(self._on_changed)
-		main_lay.addWidget(self.mf_alias_widget)
-
-		self.mf_path_widget = MfPathWidget(mf=None)
-		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
-		main_lay.addWidget(self.mf_path_widget)
-
-		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
-		self.mf_stop_list.changed.connect(self._on_changed)
-		main_lay.addWidget(self.mf_stop_list)
-
-		main_lay.addStretch()
-
-		# Футер с кнопками без «Новый каталог»
-		self.save_group = SaveGroupBox(show_new_catalog=False)
-		self.save_group.save_clicked.connect(self.save_changes)
-		self.save_group.cancel_clicked.connect(self._try_close)
-		self.central_layout.addWidget(self.save_group)
-
-		if mf_path:
-			self.mf_path_widget_changed()
-
-	def _on_changed(self):
-		self.has_unsaved = True
-		self.save_group.show_warning()
-
-	def mf_path_widget_changed(self):
-		basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
-		self.mf_alias_widget.line_edit.setText(basename)
-		self._on_changed()
-
-	def save_changes(self):
-		mf_path = self.mf_path_widget.validate()
-		mf_alias = self.mf_alias_widget.validate()
-
-		if not mf_path:
-			win_warn = WarningWindow(Lng.select_folder_path)
-			win_warn.center_to_parent(self.window())
-			win_warn.ok_clicked.connect(win_warn.deleteLater)
-			win_warn.show()
-			return
-
-		if not mf_alias:
-			return
-
-		if any(i.mf_alias == mf_alias for i in Mf.items):
-			win_warn = WarningWindow(Lng.alias_already_exists)
-			win_warn.center_to_parent(self.window())
-			win_warn.ok_clicked.connect(win_warn.deleteLater)
-			win_warn.show()
-			return
-
-		mf_stop_list = self.mf_stop_list.get_stop_list()
-
-		def fin():
-			mf = Mf(
-				mf_alias=mf_alias,
-				mf_paths=[mf_path],
-				mf_stop_list=mf_stop_list,
-				mf_current_path=mf_path
-			)
-			Mf.items.append(mf)
-			Mf.write_json_data()
-			restart_app()
-
-		win = ConfirmWindow(Lng.app_will_restarted)
-		win.ok_clicked.connect(fin)
-		win.center_to_parent(self.window())
-		win.show()
-
-	def _try_close(self):
-		# Кнопка «Отмена» и Esc: сначала проверка несохранённых изменений
-		if self.has_unsaved:
-			self._ask_discard()
-			return
-		self.close()
-
-	def _ask_discard(self):
-		win = ConfirmWindow(Lng.unsaved_changes_confirm)
-		win.ok_clicked.connect(self._on_discard_confirmed)
-		win.center_to_parent(self)
-		win.show()
-		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
-
-	def _on_discard_confirmed(self):
-		self.has_unsaved = False
-		self.close()
-
-	def closeEvent(self, a0):
-		# Крестик окна тоже проходит проверку
-		if self.has_unsaved:
-			a0.ignore()
-			self._ask_discard()
-			return
-		return super().closeEvent(a0)
-
-	def mouseReleaseEvent(self, a0):
-		self.setFocus()
-		return super().mouseReleaseEvent(a0)
-
-	def keyPressEvent(self, a0):
-		if a0.key() == Qt.Key.Key_Escape:
-			self._try_close()
-			return
-		return super().keyPressEvent(a0)
-
-
 class RebootableSettings(UGroupBox):
 	changed = pyqtSignal()
 	lang_changed = pyqtSignal()
@@ -831,6 +699,7 @@ class MfSettings(UScrollVerticalArea):
 		main_lay = QVBoxLayout(main_wid)
 		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
+		self.main_lay = main_lay
 
 		self.path_widget = MfPathWidget(mf=self.mf)
 		self.path_widget.changed.connect(self.changed.emit)
@@ -849,6 +718,9 @@ class MfSettings(UScrollVerticalArea):
 		main_lay.addWidget(self.remove_folder)
 
 		main_lay.addStretch()
+
+		self.verticalScrollBar().rangeChanged.connect(self._update_right_margin)
+		self._update_right_margin()
 
 	def save_changes(self):
 		if not self.path_widget.validate():
@@ -874,6 +746,12 @@ class MfSettings(UScrollVerticalArea):
 		win.ok_clicked.connect(final)
 		win.center_to_parent(self.window())
 		win.show()
+
+	def _update_right_margin(self, *args):
+		# Справа отступ только при видимом скроллбаре
+		has_scroll = self.verticalScrollBar().maximum() > 0
+		right = 10 if has_scroll else 0
+		self.main_lay.setContentsMargins(0, 0, right, 0)
 
 	def remove_mf(self, *args):
 
@@ -1032,6 +910,7 @@ class NewMfSettings(UMainWindow):
 
 	def _ask_discard(self):
 		win = ConfirmWindow(Lng.unsaved_changes_confirm)
+		win.ok_btn.setText(Lng.cancel_changes)
 		win.ok_clicked.connect(self._on_discard_confirmed)
 		win.center_to_parent(self)
 		win.show()
@@ -1171,7 +1050,7 @@ class WinSettings(UMainWindow):
 		self.save_widget.show_warning()
 
 	def clear_right_side(self):
-		wids = (GeneralSettings, MfSettings, NewMfSettings)
+		wids = (GeneralSettings, MfSettings)
 		right_wid = self.right_wid.findChild(wids)
 		if right_wid is not None:
 			right_wid.deleteLater()
@@ -1217,7 +1096,9 @@ class WinSettings(UMainWindow):
 		self._show_unsaved_window(win)
 
 	def _create_unsaved_window(self) -> ConfirmWindow:
-		return ConfirmWindow(Lng.unsaved_changes_confirm)
+		win = ConfirmWindow(Lng.unsaved_changes_confirm)
+		win.ok_btn.setText(Lng.cancel_changes)
+		return win
 
 	def _show_unsaved_window(self, win: ConfirmWindow):
 		win.center_to_parent(self)

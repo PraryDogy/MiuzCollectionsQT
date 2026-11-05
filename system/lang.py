@@ -636,3 +636,7 @@ class Lng:
 		"Есть несохраненные изменения. Отменить?",  # ru
 		"There are unsaved changes. Discard them?",  # en
 	)
+	cancel_changes = (
+		"Отменить изменения",  # ru
+		"Cancel changes",  # en
+	)
