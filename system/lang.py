@@ -632,3 +632,7 @@ class Lng:
 		"Показать миниатюру в Finder",
 		"Reveal thumbnail in Finder"
 	)
+	unsaved_changes_confirm = (
+		"Есть несохраненные изменения. Отменить?",  # ru
+		"There are unsaved changes. Discard them?",  # en
+	)

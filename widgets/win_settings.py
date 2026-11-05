@@ -45,6 +45,203 @@ class LabelMinWidth(TransparentLabel):
 		self.setMinimumWidth(30)
 
 
+class SaveGroupBox(TransparentWidget):
+	save_clicked = pyqtSignal()
+	cancel_clicked = pyqtSignal()
+	new_catalog_clicked = pyqtSignal()
+
+	save_svg = Static.COMMON_ICONS / "save.svg"
+	attention_gray = Static.COMMON_ICONS / "attention_gray.svg"
+
+	def __init__(self, show_new_catalog: bool = True):
+		super().__init__()
+		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+		self.h_lay = QHBoxLayout(self)
+		self.h_lay.setContentsMargins(0, 0, 0, 0)
+		self.h_lay.setSpacing(5)
+
+		self.new_catalog_btn = UPushButton(Lng.new_catalog)
+		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
+		self.new_catalog_btn.setVisible(show_new_catalog)
+		self.h_lay.addWidget(self.new_catalog_btn)
+
+		self.h_lay.addStretch()
+
+		self.attention_wid = QSvgWidget(str(self.attention_gray))
+		self.attention_wid.setFixedSize(15, 15)
+		self.attention_wid.hide()
+		self.h_lay.addWidget(self.attention_wid)
+
+		self.save_text = GrayTextLabel(text=Lng.unsaved_changes)
+		self.h_lay.addWidget(self.save_text)
+		self.save_text.hide()
+
+		self.h_lay.addSpacing(5)
+
+		self.cancel_button = UPushButton(Lng.close)
+		self._fix_cancel_button_width()
+		self.cancel_button.clicked.connect(self.cancel_clicked.emit)
+		self.h_lay.addWidget(self.cancel_button)
+
+		self.save_button = ActiveButton(Lng.save_changes_text)
+		self.save_button.setIcon(QIcon(str(self.save_svg)))
+		self.save_button.clicked.connect(self.save_clicked.emit)
+		self.h_lay.addWidget(self.save_button)
+
+	def _fix_cancel_button_width(self):
+		# Ширина по самой широкой подписи из двух возможных
+		fm = QFontMetrics(self.cancel_button.font())
+		texts = (Lng.close, Lng.cancel)
+		text_w = max(fm.horizontalAdvance(t) for t in texts)
+
+		# Учитываем внутренние отступы стиля кнопки
+		opt_w = self.cancel_button.sizeHint().width() - fm.horizontalAdvance(self.cancel_button.text())
+		self.cancel_button.setFixedWidth(text_w + opt_w)
+
+	def show_warning(self):
+		self.attention_wid.show()
+		self.save_text.show()
+		self.cancel_button.setText(Lng.cancel)
+
+	def hide_warning(self):
+		self.attention_wid.hide()
+		self.save_text.hide()
+		self.cancel_button.setText(Lng.close)
+
+
+class NewMfSettings(UMainWindow):
+
+	def __init__(self, mf_path: str = None):
+		super().__init__()
+
+		self.set_always_on_top()
+		self.set_close_only()
+		self.setMinimumSize(600, 600)
+
+		self.has_unsaved = False
+		self.discard_win = None
+
+		self.central_layout.setContentsMargins(10, 10, 10, 10)
+
+		scroll = UScrollVerticalArea()
+		self.central_layout.addWidget(scroll)
+
+		main_wid = TransparentWidget()
+		scroll.setWidget(main_wid)
+
+		main_lay = QVBoxLayout(main_wid)
+		main_lay.setContentsMargins(0, 0, 10, 0)
+		main_lay.setSpacing(10)
+
+		self.mf_alias_widget = MfAliasWidget()
+		self.mf_alias_widget.changed.connect(self._on_changed)
+		main_lay.addWidget(self.mf_alias_widget)
+
+		self.mf_path_widget = MfPathWidget(mf=None)
+		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
+		main_lay.addWidget(self.mf_path_widget)
+
+		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
+		self.mf_stop_list.changed.connect(self._on_changed)
+		main_lay.addWidget(self.mf_stop_list)
+
+		main_lay.addStretch()
+
+		# Футер с кнопками без «Новый каталог»
+		self.save_group = SaveGroupBox(show_new_catalog=False)
+		self.save_group.save_clicked.connect(self.save_changes)
+		self.save_group.cancel_clicked.connect(self._try_close)
+		self.central_layout.addWidget(self.save_group)
+
+		if mf_path:
+			self.mf_path_widget_changed()
+
+	def _on_changed(self):
+		self.has_unsaved = True
+		self.save_group.show_warning()
+
+	def mf_path_widget_changed(self):
+		basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
+		self.mf_alias_widget.line_edit.setText(basename)
+		self._on_changed()
+
+	def save_changes(self):
+		mf_path = self.mf_path_widget.validate()
+		mf_alias = self.mf_alias_widget.validate()
+
+		if not mf_path:
+			win_warn = WarningWindow(Lng.select_folder_path)
+			win_warn.center_to_parent(self.window())
+			win_warn.ok_clicked.connect(win_warn.deleteLater)
+			win_warn.show()
+			return
+
+		if not mf_alias:
+			return
+
+		if any(i.mf_alias == mf_alias for i in Mf.items):
+			win_warn = WarningWindow(Lng.alias_already_exists)
+			win_warn.center_to_parent(self.window())
+			win_warn.ok_clicked.connect(win_warn.deleteLater)
+			win_warn.show()
+			return
+
+		mf_stop_list = self.mf_stop_list.get_stop_list()
+
+		def fin():
+			mf = Mf(
+				mf_alias=mf_alias,
+				mf_paths=[mf_path],
+				mf_stop_list=mf_stop_list,
+				mf_current_path=mf_path
+			)
+			Mf.items.append(mf)
+			Mf.write_json_data()
+			restart_app()
+
+		win = ConfirmWindow(Lng.app_will_restarted)
+		win.ok_clicked.connect(fin)
+		win.center_to_parent(self.window())
+		win.show()
+
+	def _try_close(self):
+		# Кнопка «Отмена» и Esc: сначала проверка несохранённых изменений
+		if self.has_unsaved:
+			self._ask_discard()
+			return
+		self.close()
+
+	def _ask_discard(self):
+		win = ConfirmWindow(Lng.unsaved_changes_confirm)
+		win.ok_clicked.connect(self._on_discard_confirmed)
+		win.center_to_parent(self)
+		win.show()
+		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
+
+	def _on_discard_confirmed(self):
+		self.has_unsaved = False
+		self.close()
+
+	def closeEvent(self, a0):
+		# Крестик окна тоже проходит проверку
+		if self.has_unsaved:
+			a0.ignore()
+			self._ask_discard()
+			return
+		return super().closeEvent(a0)
+
+	def mouseReleaseEvent(self, a0):
+		self.setFocus()
+		return super().mouseReleaseEvent(a0)
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self._try_close()
+			return
+		return super().keyPressEvent(a0)
+
+
 class RebootableSettings(UGroupBox):
 	changed = pyqtSignal()
 	lang_changed = pyqtSignal()
@@ -733,20 +930,20 @@ class MfSettings(UScrollVerticalArea):
 
 
 class NewMfSettings(UMainWindow):
-	yellow_warning_svg = Static.COMMON_ICONS / "yellow_warning.svg"
-	changed = pyqtSignal()
 
 	def __init__(self, mf_path: str = None):
 		super().__init__()
-
-		# Встраиваем окно как обычный виджет, иначе QMainWindow
-		# откроется отдельным окном внутри WinSettings
+		self.setWindowTitle(Lng.new_catalog)
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setMinimumSize(600, 600)
 
-		scroll = UScrollVerticalArea()
+		self.has_unsaved = False
+		self.discard_win = None
+
 		self.central_layout.setContentsMargins(10, 10, 10, 10)
+
+		scroll = UScrollVerticalArea()
 		self.central_layout.addWidget(scroll)
 
 		main_wid = TransparentWidget()
@@ -757,7 +954,7 @@ class NewMfSettings(UMainWindow):
 		main_lay.setSpacing(10)
 
 		self.mf_alias_widget = MfAliasWidget()
-		self.mf_alias_widget.changed.connect(self.changed.emit)
+		self.mf_alias_widget.changed.connect(self._on_changed)
 		main_lay.addWidget(self.mf_alias_widget)
 
 		self.mf_path_widget = MfPathWidget(mf=None)
@@ -765,18 +962,28 @@ class NewMfSettings(UMainWindow):
 		main_lay.addWidget(self.mf_path_widget)
 
 		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
-		self.mf_stop_list.changed.connect(self.changed.emit)
+		self.mf_stop_list.changed.connect(self._on_changed)
 		main_lay.addWidget(self.mf_stop_list)
 
 		main_lay.addStretch()
 
+		# Футер с кнопками без «Новый каталог»
+		self.save_group = SaveGroupBox(show_new_catalog=False)
+		self.save_group.save_clicked.connect(self.save_changes)
+		self.save_group.cancel_clicked.connect(self._try_close)
+		self.central_layout.addWidget(self.save_group)
+
 		if mf_path:
 			self.mf_path_widget_changed()
+
+	def _on_changed(self):
+		self.has_unsaved = True
+		self.save_group.show_warning()
 
 	def mf_path_widget_changed(self):
 		basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
 		self.mf_alias_widget.line_edit.setText(basename)
-		self.changed.emit()
+		self._on_changed()
 
 	def save_changes(self):
 		mf_path = self.mf_path_widget.validate()
@@ -817,78 +1024,41 @@ class NewMfSettings(UMainWindow):
 		win.center_to_parent(self.window())
 		win.show()
 
+	def _try_close(self):
+		# Кнопка «Отмена» и Esc: сначала проверка несохранённых изменений
+		if self.has_unsaved:
+			self._ask_discard()
+			return
+		self.close()
+
+	def _ask_discard(self):
+		win = ConfirmWindow(Lng.unsaved_changes_confirm)
+		win.ok_clicked.connect(self._on_discard_confirmed)
+		win.center_to_parent(self)
+		win.show()
+		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
+
+	def _on_discard_confirmed(self):
+		self.has_unsaved = False
+		self.close()
+
+	def closeEvent(self, a0):
+		# Крестик окна тоже проходит проверку
+		if self.has_unsaved:
+			a0.ignore()
+			self._ask_discard()
+			return
+		return super().closeEvent(a0)
+
 	def mouseReleaseEvent(self, a0):
 		self.setFocus()
 		return super().mouseReleaseEvent(a0)
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
-			self.deleteLater()
+			self._try_close()
+			return
 		return super().keyPressEvent(a0)
-
-
-class SaveGroupBox(TransparentWidget):
-	save_clicked = pyqtSignal()
-	cancel_clicked = pyqtSignal()
-	new_catalog_clicked = pyqtSignal()
-
-	save_svg = Static.COMMON_ICONS / "save.svg"
-	attention_gray = Static.COMMON_ICONS / "attention_gray.svg"
-
-	def __init__(self):
-		super().__init__()
-		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-
-		self.h_lay = QHBoxLayout(self)
-		self.h_lay.setContentsMargins(0, 0, 0, 0)
-		self.h_lay.setSpacing(5)
-
-		self.new_catalog_btn = UPushButton(Lng.new_catalog)
-		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
-		self.h_lay.addWidget(self.new_catalog_btn)
-
-		self.h_lay.addStretch()
-
-		self.attention_wid = QSvgWidget(str(self.attention_gray))
-		self.attention_wid.setFixedSize(15, 15)
-		self.attention_wid.hide()
-		self.h_lay.addWidget(self.attention_wid)
-
-		self.save_text = GrayTextLabel(text=Lng.unsaved_changes)
-		self.h_lay.addWidget(self.save_text)
-		self.save_text.hide()
-
-		self.h_lay.addSpacing(5)
-
-		self.cancel_button = UPushButton(Lng.close)
-		self._fix_cancel_button_width()
-		self.cancel_button.clicked.connect(self.cancel_clicked.emit)
-		self.h_lay.addWidget(self.cancel_button)
-
-		self.save_button = ActiveButton(Lng.save_changes_text)
-		self.save_button.setIcon(QIcon(str(self.save_svg)))
-		self.save_button.clicked.connect(self.save_clicked.emit)
-		self.h_lay.addWidget(self.save_button)
-
-	def _fix_cancel_button_width(self):
-		# Ширина по самой широкой подписи из двух возможных
-		fm = QFontMetrics(self.cancel_button.font())
-		texts = (Lng.close, Lng.cancel)
-		text_w = max(fm.horizontalAdvance(t) for t in texts)
-
-		# Учитываем внутренние отступы стиля кнопки
-		opt_w = self.cancel_button.sizeHint().width() - fm.horizontalAdvance(self.cancel_button.text())
-		self.cancel_button.setFixedWidth(text_w + opt_w)
-
-	def show_warning(self):
-		self.attention_wid.show()
-		self.save_text.show()
-		self.cancel_button.setText(Lng.cancel)
-
-	def hide_warning(self):
-		self.attention_wid.hide()
-		self.save_text.hide()
-		self.cancel_button.setText(Lng.close)
 
 
 class WinSettings(UMainWindow):
@@ -901,8 +1071,6 @@ class WinSettings(UMainWindow):
 
 	ww = 730
 	hh = 600
-
-	UNSAVED_TEXT = "Есть несохраненные изменения. Отменить?"
 
 	def __init__(self, settings_item: SettingsItem):
 		super().__init__()
@@ -1050,7 +1218,7 @@ class WinSettings(UMainWindow):
 		self._show_unsaved_window(win)
 
 	def _create_unsaved_window(self) -> ConfirmWindow:
-		return ConfirmWindow(self.UNSAVED_TEXT)
+		return ConfirmWindow(Lng.unsaved_changes_confirm)
 
 	def _show_unsaved_window(self, win: ConfirmWindow):
 		win.center_to_parent(self)
