@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
 							 QMainWindow, QMenu, QProgressBar, QPushButton,
 							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
 							 QStackedWidget, QStyle, QStyledItemDelegate,
-							 QStyleOption, QStyleOptionViewItem, QTextEdit,
+							 QApplication, QStyleOptionViewItem, QTextEdit,
 							 QTreeView, QTreeWidget, QTreeWidgetItem,
 							 QVBoxLayout, QWidget)
 
@@ -718,14 +718,38 @@ class UBlackFrame(TransparentFrame):
 		super().__init__(parent)
 
 
+class UMainWinOverlay(TransparentWidget):
+	def __init__(self, parent=None):
+		"""для стилизации в qss"""
+		super().__init__(parent)
+		self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+
 class UMainWindow(QMainWindow):
 	win_list: list[TransparentWidget] = []
+	_focus_connected: bool = False
 
 	def __init__(self, parent: TransparentWidget = None):
 		super().__init__(parent)
 		self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 		self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 		self.setup_window()
+		UMainWindow._connect_focus_signal()
+
+	@classmethod
+	def _connect_focus_signal(cls):
+		if UMainWindow._focus_connected:
+			return
+		app = QApplication.instance()
+		app.focusWindowChanged.connect(UMainWindow._on_focus_window_changed)
+		UMainWindow._focus_connected = True
+
+	@staticmethod
+	def _on_focus_window_changed(_window):
+		active = QApplication.activeWindow()
+		for w in list(UMainWindow.win_list):
+			if isinstance(w, UMainWindow):
+				w._apply_focus_state(active)
 
 	def setWindowTitle(self, title: str):
 		self.title_bar.set_title_text(title)
@@ -754,13 +778,12 @@ class UMainWindow(QMainWindow):
 		self.central_layout = QVBoxLayout()
 		self.central_layout.setContentsMargins(0, 0, 0, 0)
 		self.central_layout.setSpacing(0)
-		
+
 		self.window_layout.addLayout(self.central_layout)
 
-		# Затемняющий слой поверх всего окна, виден когда окно не в фокусе
-		self.dim_overlay = QWidget(self)
+		# Затемняющий слой поверх окна, виден когда поверх открыто другое UMainWindow
+		self.dim_overlay = UMainWinOverlay(parent=self)
 		self.dim_overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-		self.dim_overlay.setStyleSheet("background-color: rgba(0, 0, 0, 150);")
 		self.dim_overlay.hide()
 
 		self.register_window()
@@ -793,10 +816,6 @@ class UMainWindow(QMainWindow):
 
 	def set_close_only(self):
 		self.title_bar.set_close_only()
-		return
-		flags = Qt.WindowType.CustomizeWindowHint
-		flags |= Qt.WindowType.WindowCloseButtonHint
-		self.setWindowFlags(flags)
 
 	def closeEvent(self, event: QCloseEvent | None):
 		self.unregister_window()
@@ -808,17 +827,20 @@ class UMainWindow(QMainWindow):
 
 	def changeEvent(self, a0):
 		if a0.type() == QEvent.Type.ActivationChange:
-			self._apply_focus_state(self.isActiveWindow())
+			self.title_bar.set_window_focused(self.isActiveWindow())
 		return super().changeEvent(a0)
 
 	def resizeEvent(self, a0):
 		self.dim_overlay.setGeometry(self.rect())
 		return super().resizeEvent(a0)
 
-	def _apply_focus_state(self, focused: bool):
-		self.title_bar.set_window_focused(focused)
-		self.dim_overlay.setVisible(not focused)
-		self.dim_overlay.raise_()
+	def _apply_focus_state(self, active_window):
+		# затемняем, только если активно другое наше UMainWindow;
+		# если активна другая программа (active_window is None), ничего не меняем
+		covered = isinstance(active_window, UMainWindow) and active_window is not self
+		self.dim_overlay.setVisible(covered)
+		if covered:
+			self.dim_overlay.raise_()
 
 
 # если переименовываешь, не забудь qss

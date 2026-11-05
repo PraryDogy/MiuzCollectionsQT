@@ -424,8 +424,13 @@ WinImgViewGraphics,
 WinImageView,
 WinImgSearchPreviewWidget,
 Thumb,
-SquareThumb {
+SquareThumb,
+UMainWinOverlay {
     border-radius: 8px;
+}
+
+UMainWinOverlay {
+    background: rgba(0, 0, 0, 150);
 }
 
 /* карточка картинки внутри миниатюры */
