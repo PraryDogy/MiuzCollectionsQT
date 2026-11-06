@@ -24,10 +24,6 @@ def restart_app():
 
 
 class WinSmb(UMainWindow):
-	yellow_warning_path = Static.COMMON_ICONS / "yellow_warning.svg"
-	yellow_waring_size = (20, 20)
-	connect_svg_path = Static.COMMON_ICONS / "connect.svg"
-
 	def __init__(self, mf: Mf):
 		super().__init__()
 		self.mf = mf
@@ -45,7 +41,7 @@ class WinSmb(UMainWindow):
 		group_lay.setContentsMargins(0, 0, 0, 0)
 		group_lay.setSpacing(5)
 
-		title_lbl = TitleTextLabel(Lng.no_connection, str(self.yellow_warning_path))
+		title_lbl = TitleTextLabel(Lng.no_connection, str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		group_lay.addWidget(title_lbl)
 
 		# Описание добавляем туда же, под заголовок
@@ -67,8 +63,8 @@ class WinSmb(UMainWindow):
 
 		if Servers.items:
 
-			self.servers_btn = UPushButton(Lng.servers)
-			self.servers_btn.setIcon(QIcon(str(self.connect_svg_path)))
+			self.servers_btn = UPushButton(Lng.connections)
+			self.servers_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "connections_gray.svg")))
 			self.servers_btn.clicked.connect(self.open_servers)
 			btns_lay.addWidget(self.servers_btn)
 

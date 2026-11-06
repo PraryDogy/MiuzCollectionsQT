@@ -186,6 +186,7 @@ class Lng:
 	connect_to_server_title = ("Подключение к серверу", "Connect to server")
 	connect_short = ("Подкл.", "Connect")
 	connect = ("Подключиться", "Connect")
+	connections = ("Подключения", "Connections")
 	server = ("Адрес сервера", "Server address")
 	# server_favs = ("Избранные серверы", "Favorites")
 	login = ("Логин", "Username")
