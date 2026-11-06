@@ -16,9 +16,6 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
 
 
 class TitleWidget(UGroupBox):
-	svg_path = Static.COMMON_ICONS / "upload_file.svg"
-	svg_size = (45, 45)
-
 	def __init__(self, files_count: int):
 		super().__init__()
 
@@ -27,8 +24,8 @@ class TitleWidget(UGroupBox):
 		self.h_layout.setSpacing(10)
 
 		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(self.svg_path))
-		self.svg_widget.setFixedSize(*self.svg_size)
+		self.svg_widget.load(str(Static.GRAY_ICONS / "upload_file_gray.svg"))
+		self.svg_widget.setFixedSize(45, 45)
 		self.h_layout.addWidget(self.svg_widget)
 
 		self.text_container = TransparentWidget()
@@ -58,12 +55,6 @@ class TitleWidget(UGroupBox):
 
 class DestinyFolderWidget(UGroupBox):
 	dir_changed = pyqtSignal(str)
-	copy = Static.COMMON_ICONS / "copy.svg"
-	magnifier = Static.COMMON_ICONS / "magnifier.svg"
-	svg_path = Static.COMMON_ICONS / "folder_solid.svg"
-	green_checkmark = Static.COMMON_ICONS / "green_checkmark.svg"
-	svg_size = (20, 20)
-
 	def __init__(self, current_dir: str):
 		super().__init__()
 		self.current_dir = current_dir
@@ -73,7 +64,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
 		self.main_layout.setSpacing(5)
 
-		self.title_label = TitleTextLabel(Lng.dest_folder, str(self.svg_path))
+		self.title_label = TitleTextLabel(Lng.dest_folder, str(Static.GRAY_ICONS / "folder_gray.svg"))
 		self.main_layout.addWidget(self.title_label)
 
 		# с обычным spacing виджет под сепаратором будет как бы дальше
@@ -93,13 +84,13 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_row_layout.addWidget(self.path_label, 1)
 
 		self.copy_path_button = UPushButton("")
-		self.copy_path_button.setIcon(QIcon(str(self.copy)))
+		self.copy_path_button.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
 		self.copy_path_button.clicked.connect(self.copy_path)
 		self.path_row_layout.addWidget(self.copy_path_button)
 
 		# Кнопка вне GroupBox
 		self.change_btn = UPushButton(Lng.choose_folder)
-		self.change_btn.setIcon(QIcon(str(self.magnifier)))
+		self.change_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
 		self.change_btn.clicked.connect(self.change_dir)
 		self.main_layout.addWidget(self.change_btn)
 
@@ -107,12 +98,12 @@ class DestinyFolderWidget(UGroupBox):
 
 		def unlock():
 			self.copy_path_btn_locked = False
-			self.copy_path_button.setIcon(QIcon(str(self.copy)))
+			self.copy_path_button.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
 
 		if self.copy_path_btn_locked:
 			return
 		Utils.pyqt_copy_text(self.current_dir)
-		self.copy_path_button.setIcon(QIcon(str(self.green_checkmark)))
+		self.copy_path_button.setIcon(QIcon(str(Static.COLOR_ICONS / "green_checkmark.svg")))
 		self.copy_path_btn_locked = True
 		QTimer.singleShot(1000, unlock)
 
