@@ -132,7 +132,7 @@ class ProgressWidget(GrayTextLabel):
 	def __init__(self):
 		super().__init__("")
 		self.set_font_size(11)
-		self.setMaximumWidth(250)
+		self.setMaximumWidth(350)
 		self.set_elide(True, ignore_width=False)
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self.timer = QTimer(self)
