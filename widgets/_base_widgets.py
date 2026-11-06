@@ -1274,10 +1274,12 @@ class MfAliasWidget(UGroupBox):
 	changed = pyqtSignal()
 
 	PATTERN = re.compile(r'^[A-Za-zА-Яа-яЁё0-9 ]+$')
-	VALIDATE_DELAY_MS = 1000
+	VALIDATE_DELAY_MS = 500
 
 	def __init__(self):
 		super().__init__()
+		self.name_is_valid: bool = False
+
 		v_layout = QVBoxLayout(self)
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
@@ -1310,16 +1312,20 @@ class MfAliasWidget(UGroupBox):
 		self.validate_timer.setSingleShot(True)
 		self.validate_timer.timeout.connect(self._check_and_show)
 
+		v_layout.addSpacing(5)
+
 		checker_wrapper = TransparentWidget()
 		checker_lay = QHBoxLayout(checker_wrapper)
 		checker_lay.setContentsMargins(0, 0, 0, 0)
 		checker_lay.setSpacing(5)
 
 		self.checker_svg = QSvgWidget()
-		self.checker_svg.setFixedSize(12, 12)
+		self.checker_svg.setFixedSize(13, 13)
 		checker_lay.addWidget(self.checker_svg)
 
 		self.checker_text = GrayTextLabel("")
+		self.checker_text.set_elide(True, ignore_width=False)
+		self.checker_text.set_selectable(True)
 		checker_lay.addWidget(self.checker_text)
 		checker_lay.addStretch()
 		v_layout.addWidget(checker_wrapper)
@@ -1336,7 +1342,12 @@ class MfAliasWidget(UGroupBox):
 		self._show_state(self._get_error(self.line_edit.text()))
 
 	def _show_state(self, error_text: str | None):
-		if not self.line_edit.text():
+		text = self.line_edit.text()
+
+		# единая точка обновления флага: читается при сохранении
+		self.name_is_valid = bool(text) and error_text is None
+
+		if not text:
 			self.checker_svg.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
 			self.checker_text.setText(Lng.enter_alias_warning)
 		elif error_text:
@@ -1348,13 +1359,15 @@ class MfAliasWidget(UGroupBox):
 
 	# --- Правила проверки (одно место для ввода и для сохранения) ---
 
-	def _get_error(self, mf_alias: str, minim = 3, maxim = 50) -> str | None:
+	def _get_error(self, mf_alias: str, minim=3, maxim=50) -> str | None:
 		if not mf_alias:
 			return Lng.enter_alias_warning
 		if len(mf_alias) < minim or len(mf_alias) > maxim:
 			return Lng.string_limit.format(minim=minim, maxim=maxim)
 		if not self.PATTERN.fullmatch(mf_alias):
 			return Lng.valid_message
+		if any(i.mf_alias == mf_alias for i in Mf.items):
+			return Lng.alias_taken
 		return None
 
 	def validate(self):

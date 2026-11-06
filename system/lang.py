@@ -656,3 +656,7 @@ class Lng:
 		"Имя свободно",
 		"Name is free"
 	)
+	alias_taken = (
+		"Имя занято",
+		"Name is taken"
+	)
