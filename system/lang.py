@@ -67,7 +67,7 @@ class Lng:
 		"Для продолжения работы необходимо указать путь к папке с изображениями.",
 		"You need to specify the path to the image folder to continue."
 	)
-	catalog_path = ("Путь к каталогу.", "Catalog path.")
+	catalog_path = ("Путь к каталогу", "Catalog path")
 	general = ("Основные", "General")
 	at_least_one_folder_required = (
 		"Нужен хотя бы один каталог с изображениями",
@@ -215,8 +215,8 @@ class Lng:
 	error = ("Ошибка", "Error")
 	next_search = ("Поиск новых изображений через", "Search new images in")
 	string_limit = (
-		"Длина имени должна составлять от 5 до 30 символов",
-		"The name must be between 5 and 30 characters long.",
+		"Длина имени должна составлять от {minim} до {maxim} символов",
+		"The name must be between {minim} and {maxim} characters long.",
 	)
 	valid_message = (
 		"Имя может содержать только русские и английские буквы, "
@@ -651,4 +651,8 @@ class Lng:
 	do_not_save = (
 		"Не сохранять",  # ru
 		"Do not save",  # en
+	)
+	alias_ok = (
+		"Имя свободно",
+		"Name is free"
 	)

@@ -1273,14 +1273,24 @@ class SaveRowArrowWidget(RowArrowWidget):
 class MfAliasWidget(UGroupBox):
 	changed = pyqtSignal()
 
+	PATTERN = re.compile(r'^[A-Za-zА-Яа-яЁё0-9 ]+$')
+	VALIDATE_DELAY_MS = 1000
+
 	def __init__(self):
 		super().__init__()
 		v_layout = QVBoxLayout(self)
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
 
+		title_wrapper = TransparentWidget()
+		title_lay = QHBoxLayout(title_wrapper)
+		title_lay.setContentsMargins(0, 0, 0, 0)
+		title_lay.setSpacing(0)
+
 		title = TitleTextLabel(Lng.catalog_name, Static.COLOR_ICONS / "image_folder.svg")
-		v_layout.addWidget(title)
+		title_lay.addWidget(title)
+		title_lay.addStretch()
+		v_layout.addWidget(title_wrapper)
 
 		v_layout.addWidget(USep())
 
@@ -1291,20 +1301,68 @@ class MfAliasWidget(UGroupBox):
 		v_layout.addSpacing(5)
 
 		self.line_edit = ULineEdit()
-		self.line_edit.textChanged.connect(self.changed.emit)
 		self.line_edit.setPlaceholderText(Lng.alias_immutable)
+		self.line_edit.textChanged.connect(self._on_text_changed)
 		v_layout.addWidget(self.line_edit)
 
-	def validate(self):
-		pattern = r'^[A-Za-zА-Яа-яЁё0-9 ]+$'
-		mf_alias = self.line_edit.text()
-		error_text = None  # Переменная для хранения текста ошибки
+		# таймер отложенной проверки: перезапускается при каждом изменении текста
+		self.validate_timer = QTimer(self)
+		self.validate_timer.setSingleShot(True)
+		self.validate_timer.timeout.connect(self._check_and_show)
+
+		checker_wrapper = TransparentWidget()
+		checker_lay = QHBoxLayout(checker_wrapper)
+		checker_lay.setContentsMargins(0, 0, 0, 0)
+		checker_lay.setSpacing(5)
+
+		self.checker_svg = QSvgWidget()
+		self.checker_svg.setFixedSize(12, 12)
+		checker_lay.addWidget(self.checker_svg)
+
+		self.checker_text = GrayTextLabel("")
+		checker_lay.addWidget(self.checker_text)
+		checker_lay.addStretch()
+		v_layout.addWidget(checker_wrapper)
+
+		self._show_state(None)
+
+	# --- Отложенная проверка при вводе ---
+
+	def _on_text_changed(self, _text: str):
+		self.changed.emit()
+		self.validate_timer.start(self.VALIDATE_DELAY_MS)
+
+	def _check_and_show(self):
+		self._show_state(self._get_error(self.line_edit.text()))
+
+	def _show_state(self, error_text: str | None):
+		if not self.line_edit.text():
+			self.checker_svg.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+			self.checker_text.setText(Lng.enter_alias_warning)
+		elif error_text:
+			self.checker_svg.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+			self.checker_text.setText(error_text)
+		else:
+			self.checker_svg.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
+			self.checker_text.setText(Lng.alias_ok)
+
+	# --- Правила проверки (одно место для ввода и для сохранения) ---
+
+	def _get_error(self, mf_alias: str, minim = 5, maxim = 50) -> str | None:
 		if not mf_alias:
-			error_text = Lng.enter_alias_warning
-		elif len(mf_alias) < 5 or len(mf_alias) > 50:
-			error_text = f'{Lng.string_limit}'
-		elif not re.fullmatch(pattern, mf_alias):
-			error_text = f'{Lng.valid_message}'
+			return Lng.enter_alias_warning
+		if len(mf_alias) < minim or len(mf_alias) > maxim:
+			return Lng.string_limit.format(minim=minim, maxim=maxim)
+		if not self.PATTERN.fullmatch(mf_alias):
+			return Lng.valid_message
+		return None
+
+	def validate(self):
+		mf_alias = self.line_edit.text()
+		error_text = self._get_error(mf_alias)
+		# при сохранении проверка срабатывает сразу, без ожидания таймера
+		self.validate_timer.stop()
+		self._show_state(error_text)
 		if error_text:
 			win_warn = WarningWindow(error_text)
 			win_warn.center_to_parent(self.window())
