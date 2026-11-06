@@ -771,12 +771,12 @@ class NewMfSettings(UMainWindow):
 		self.setWindowTitle(Lng.new_catalog)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setMinimumSize(550, 580)
+		self.setFixedSize(550, 645)
 
 		self.has_unsaved = False
 		self.discard_win = None
 
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
 
 		scroll = UScrollVerticalArea()
 		self.central_layout.addWidget(scroll)
@@ -802,6 +802,8 @@ class NewMfSettings(UMainWindow):
 
 		main_lay.addStretch()
 
+		self.central_layout.addSpacing(10)
+
 		# Футер с кнопками без «Новый каталог»
 		self.save_group = SaveGroupBox(show_new_catalog=False)
 		self.save_group.save_clicked.connect(self.save_changes)
@@ -810,8 +812,6 @@ class NewMfSettings(UMainWindow):
 
 		if mf_path:
 			self.mf_path_widget_changed()
-
-		self.adjustSize()
 
 	def _on_changed(self):
 		self.has_unsaved = True

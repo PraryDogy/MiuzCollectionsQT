@@ -1348,7 +1348,7 @@ class MfAliasWidget(UGroupBox):
 		self.name_is_valid = bool(text) and error_text is None
 
 		if not text:
-			self.checker_svg.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+			self.checker_svg.load(str(Static.GRAY_ICONS / "attention_gray.svg"))
 			self.checker_text.setText(Lng.enter_alias_warning)
 		elif error_text:
 			self.checker_svg.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
