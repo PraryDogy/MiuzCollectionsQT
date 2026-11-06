@@ -26,7 +26,7 @@ from system.utils import Utils
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
                             MfAliasWidget, MfPathWidget, MfStopListWidget,
                             RedButton, RowArrowWidget, 
-                            SuperConfirmWindow, TitleTextLabel,
+                            UTagWidget, TitleTextWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton, UScrollVerticalArea,
@@ -579,7 +579,7 @@ class MfRepairWidget(UGroupBox):
 		self.v_lay.setContentsMargins(10, 5, 10, 5)
 		self.v_lay.setSpacing(2)
 
-		title_layout = TitleTextLabel(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
+		title_layout = TitleTextWidget(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
 		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())
@@ -613,7 +613,7 @@ class MfRemoveWidget(UGroupBox):
 		self.v_lay.setContentsMargins(10, 5, 10, 10)
 		self.v_lay.setSpacing(5)
 
-		title_layout = TitleTextLabel(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
+		title_layout = TitleTextWidget(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
 		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())
@@ -647,15 +647,29 @@ class MfTitleWid(UGroupBox):
 		self.v_lay.setContentsMargins(10, 10, 10, 10)
 		self.v_lay.setSpacing(5)
 
-		self.title_label = TitleTextLabel(title)
+		self.title_label = TitleTextWidget(title)
 		self.title_label.text_widget.set_elide(True, ignore_width=False)
 		self.v_lay.addWidget(self.title_label)
+
+		self.title_label.h_layout.addStretch()
+
+		self.title_tag = UTagWidget(text=Lng.status_no_changes, style=UTagWidget.qss_gray)
+		self.title_tag.text_widget.set_font_size(10)
+		self.title_label.h_layout.addWidget(self.title_tag)
 
 		self.v_lay.addWidget(USep())
 
 		self.text_label = GrayTextLabel(Lng.catalog_settings)
 		self.v_lay.addWidget(self.text_label)
 
+	def set_has_changes(self, has_changes: bool):
+		if has_changes:
+			self.title_tag.set_qss_style(UTagWidget.qss_yellow)
+			self.title_tag.text_widget.setText(Lng.unsaved_changes)
+		else:
+			self.title_tag.set_qss_style(UTagWidget.qss_gray)
+			self.title_tag.text_widget.setText(Lng.status_no_changes)
+	
 
 class MfSettings(UScrollVerticalArea):
 	changed = pyqtSignal()
@@ -663,7 +677,6 @@ class MfSettings(UScrollVerticalArea):
 	def __init__(self, mf_index: int):
 		super().__init__()
 
-		# Получаем объект Mf по индексу
 		self.mf = Mf.items[mf_index]
 
 		main_wid = TransparentWidget()
@@ -678,11 +691,9 @@ class MfSettings(UScrollVerticalArea):
 		self.main_lay.addWidget(self.title_wid)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
-		self.path_widget.changed.connect(self.changed.emit)
 		main_lay.addWidget(self.path_widget)
 
 		self.mf_stop_list = MfStopListWidget(mf_stop_list=self.mf.mf_stop_list)
-		self.mf_stop_list.changed.connect(self.changed.emit)
 		main_lay.addWidget(self.mf_stop_list)
 
 		self.repair_widget = MfRepairWidget()
@@ -695,8 +706,27 @@ class MfSettings(UScrollVerticalArea):
 
 		main_lay.addStretch()
 
+		# снимок исходных значений, сравниваем с ним при каждом изменении
+		self._initial = self._snapshot()
+
+		self.path_widget.changed.connect(self._on_fields_changed)
+		self.mf_stop_list.changed.connect(self._on_fields_changed)
+
 		self.verticalScrollBar().rangeChanged.connect(self._update_right_margin)
 		self._update_right_margin()
+
+	def _snapshot(self) -> tuple:
+		return (
+			self.path_widget.mf_path,
+			tuple(self.mf_stop_list.get_stop_list()),
+		)
+
+	def has_changes(self) -> bool:
+		return self._snapshot() != self._initial
+
+	def _on_fields_changed(self):
+		self.title_wid.set_has_changes(self.has_changes())
+		self.changed.emit()
 
 	def save_changes(self):
 		if not self.path_widget.validate_and_show_win():

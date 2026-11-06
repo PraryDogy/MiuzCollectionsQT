@@ -836,8 +836,13 @@ class GrayTextLabel(TransparentLabel):
 		super().__init__(text)
 
 
+class TitleTextLabel(TransparentLabel):
+	def __init__(self, text="", parent=None):
+		super().__init__(text, parent)
+
+
 # если переименовываешь, не забудь qss
-class TitleTextLabel(TransparentWidget):
+class TitleTextWidget(TransparentWidget):
 	def __init__(self, text: str, svg: Path = None):
 		super().__init__()
 		self.h_layout = QHBoxLayout(self)
@@ -849,7 +854,7 @@ class TitleTextLabel(TransparentWidget):
 			self.svg_widget.setFixedSize(23, 23)
 			self.h_layout.addWidget(self.svg_widget)
 
-		self.text_widget = TransparentLabel(text)
+		self.text_widget = TitleTextLabel(text)
 		self.h_layout.addWidget(self.text_widget)
 
 
@@ -1289,7 +1294,7 @@ class MfAliasWidget(UGroupBox):
 		title_lay.setContentsMargins(0, 0, 0, 0)
 		title_lay.setSpacing(0)
 
-		title = TitleTextLabel(Lng.catalog_name, Static.GRAY_ICONS / "text_edit_gray.svg")
+		title = TitleTextWidget(Lng.catalog_name, Static.GRAY_ICONS / "text_edit_gray.svg")
 		title_lay.addWidget(title)
 		title_lay.addStretch()
 		v_layout.addWidget(title_wrapper)
@@ -1596,7 +1601,7 @@ class MfPathWidget(UGroupBox):
 		self.setFixedHeight(self.sizeHint().height())
 
 	def _create_title(self, icon_path: Path) -> QHBoxLayout:
-		title = TitleTextLabel(self.title_, icon_path)
+		title = TitleTextWidget(self.title_, icon_path)
 		title.text_widget.set_elide(True)
 		return title
 
@@ -1810,7 +1815,7 @@ class MfStopListEditTag(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(10)
 
-		title_label = TitleTextLabel(Lng.folder_name, Static.GRAY_ICONS / "text_edit_gray.svg")
+		title_label = TitleTextWidget(Lng.folder_name, Static.GRAY_ICONS / "text_edit_gray.svg")
 		group_layout.addWidget(title_label)
 
 		group_layout.addWidget(USep())
@@ -1884,7 +1889,7 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
 
-		title_label = TitleTextLabel(Lng.stop_list, Static.COLOR_ICONS / "stop.svg")
+		title_label = TitleTextWidget(Lng.stop_list, Static.COLOR_ICONS / "stop.svg")
 		v_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())

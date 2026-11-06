@@ -18,7 +18,7 @@ from system.tasks import BlurImgBgTask, ImageSearcher, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
-                            TitleTextLabel, TransparentFrame, TransparentLabel,
+                            TitleTextWidget, TransparentFrame, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton, USep, USlider)
 
@@ -160,7 +160,7 @@ class WinImgSearchDropWidget(TransparentFrame):
 			self.svg_widget,
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
-		self.title_label = TitleTextLabel(Lng.image_search)
+		self.title_label = TitleTextWidget(Lng.image_search)
 
 		self.v_layout.addWidget(
 			self.title_label,
@@ -286,7 +286,7 @@ class ControlsWidget(UGroupBox):
 		self.v_layout.setContentsMargins(5, 5, 5, 15)
 		self.v_layout.setSpacing(0)
 
-		title = TitleTextLabel(Lng.accuracy)
+		title = TitleTextWidget(Lng.accuracy)
 		self.v_layout.addWidget(title)
 
 		self.slider_widget = SliderWidget()

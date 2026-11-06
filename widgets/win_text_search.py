@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from cfg import JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
+from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextWidget,
 							TransparentFrame, TransparentWidget, UGroupBox,
 							UMainWindow, UPushButton, USep, UTextEdit)
 
@@ -35,7 +35,7 @@ class WinTextSearch(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(7)
 
-		self.title_row = TitleTextLabel(Lng.text_editor, Static.COLOR_ICONS / "text_edit_color.svg")
+		self.title_row = TitleTextWidget(Lng.text_editor, Static.COLOR_ICONS / "text_edit_color.svg")
 		group_layout.addWidget(self.title_row)
 
 		group_layout.addWidget(USep())

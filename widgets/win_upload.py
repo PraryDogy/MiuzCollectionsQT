@@ -10,7 +10,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
+from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UMainWindow, UPushButton, USep)
 
@@ -33,7 +33,7 @@ class TitleWidget(UGroupBox):
 		self.text_layout.setContentsMargins(0, 0, 0, 0)
 		self.text_layout.setSpacing(5)
 
-		self.title_label = TitleTextLabel(self.get_plural_text(files_count))
+		self.title_label = TitleTextWidget(self.get_plural_text(files_count))
 		self.text_layout.addWidget(self.title_label)
 
 		self.description_label = GrayTextLabel(Lng.upload_files_description)
@@ -64,7 +64,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
 		self.main_layout.setSpacing(5)
 
-		self.title_label = TitleTextLabel(Lng.dest_folder, Static.GRAY_ICONS / "folder_gray.svg")
+		self.title_label = TitleTextWidget(Lng.dest_folder, Static.GRAY_ICONS / "folder_gray.svg")
 		self.main_layout.addWidget(self.title_label)
 
 		# с обычным spacing виджет под сепаратором будет как бы дальше

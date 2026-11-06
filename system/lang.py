@@ -629,6 +629,10 @@ class Lng:
 		"Есть несохраненные изменения",
 		"There are unsaved changes"
 	)
+	status_no_changes = (
+		"Изменений нет",
+		"No changes"
+	)
 	open_thumb = (
 		"Открыть миниатюру",
 		"Open thumbnail"

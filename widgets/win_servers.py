@@ -14,7 +14,7 @@ from system.lang import Lng
 from system.servers import Servers
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-                            TitleTextLabel, TransparentLabel,
+                            TitleTextWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, ULineEdit,
                             UListWidget, UListWidgetItem, UMainWindow, UMenu,
                             UPushButton, USep)
@@ -275,7 +275,7 @@ class ServersWin(UMainWindow):
 		group_lay = QVBoxLayout(group)
 		group_lay.setContentsMargins(12, 12, 12, 12)
 		group_lay.setSpacing(8)
-		title_lbl = TitleTextLabel(Lng.favorite_servers, Static.COLOR_ICONS / "connect_color.svg")
+		title_lbl = TitleTextWidget(Lng.favorite_servers, Static.COLOR_ICONS / "connect_color.svg")
 		group_lay.addWidget(title_lbl)
 
 		group_lay.addWidget(USep())

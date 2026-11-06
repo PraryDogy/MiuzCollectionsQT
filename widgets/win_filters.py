@@ -12,13 +12,13 @@ from system.lang import Lng
 from system.utils import ReadableDate
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
-                            GrayTextLabel, InputTextWin, TitleTextLabel,
+                            GrayTextLabel, InputTextWin, TitleTextWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UMainWindow, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
 
 
-class WinFiltersTitleWidget(TitleTextLabel):
+class WinFiltersTitleWidget(TitleTextWidget):
 	reset_clicked = pyqtSignal()
 
 	def __init__(self, text: str, svg: Path):
