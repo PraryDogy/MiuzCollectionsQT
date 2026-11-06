@@ -15,7 +15,7 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UMainWindow, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
-
+from pathlib import Path
 
 class WinFiltersTitleWidget(TitleTextLabel):
 	reset_clicked = pyqtSignal()
@@ -32,7 +32,7 @@ class CalendarTag(UTagWidget):
 	def __init__(self):
 		super().__init__(
 			text=Lng.not_selected,
-			qss_style=self.qss_gray,
+			style=self.qss_gray,
 		)
 		self.adjustSize()
 		self.setFixedWidth(self.width())
@@ -258,21 +258,21 @@ class DatesWidget(UGroupBox):
 
 
 class WinFiltersUserTag(UTagWidget):
-	def __init__(self, text: str, left_svg_path: str):
+	def __init__(self, text: str, left_svg_path: Path):
 		super().__init__(
 			text=text,
-			qss_style=UTagWidget.qss_gray,
-			left_svg_path=left_svg_path,
-			right_svg_path=str(Static.GRAY_ICONS / "trash_gray.svg")
+			style=UTagWidget.qss_gray,
+			l_svg=left_svg_path,
+			r_svg=Static.GRAY_ICONS / "trash_gray.svg"
 		)
 
 
 class WinFiltersStantartTag(UTagWidget):
-	def __init__(self, text: str, left_svg_path: str):
+	def __init__(self, text: str, left_svg_path: Path):
 		super().__init__(
 			text=text,
-			qss_style=self.qss_gray,
-			left_svg_path=left_svg_path
+			style=self.qss_gray,
+			l_svg=left_svg_path
 		)
 
 
@@ -280,7 +280,7 @@ class WinFiltersFavTag(WinFiltersStantartTag):
 	def __init__(self):
 		super().__init__(
 			text=Lng.favorites,
-			left_svg_path=str(Static.GRAY_ICONS / "star_gray.svg"),
+			left_svg_path=Static.GRAY_ICONS / "star_gray.svg",
 		)
 		if Dynamic.favs_tag_enabled:
 			self.set_qss_style(self.qss_green)
@@ -299,7 +299,7 @@ class SubfoldersTagWidget(WinFiltersStantartTag):
 	def __init__(self):
 		super().__init__(
 			text=Lng.without_subfolders, 
-			left_svg_path=str(Static.GRAY_ICONS / "folder_gray.svg")
+			left_svg_path=Static.GRAY_ICONS / "folder_gray.svg"
 		)
 		if Dynamic.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_green)
@@ -318,7 +318,7 @@ class WordFiltersTagWidget(WinFiltersUserTag):
 	def __init__(self, text):
 		super().__init__(
 			text=text,
-			left_svg_path=str(Static.GRAY_ICONS / "tags_gray.svg")
+			left_svg_path=Static.GRAY_ICONS / "tags_gray.svg"
 		)
 		if text in Dynamic.word_tags_list:
 			self.set_qss_style(self.qss_green)
@@ -337,8 +337,8 @@ class AddTagWidget(UTagWidget):
 	def __init__(self):
 		super().__init__(
 			text=Lng.new_tag,
-			qss_style=self.qss_transparent,
-			left_svg_path=str(Static.GRAY_ICONS / "crest_gray.svg")
+			style=self.qss_transparent,
+			l_svg=Static.GRAY_ICONS / "crest_gray.svg"
 		)
 		self.left_svg_widget.setFixedSize(10, 10)
 
@@ -401,7 +401,7 @@ class UserTags(TransparentWidget):
 
 		self.text_win = InputTextWin(
 			description=Lng.new_tag_desc,
-			svg_path=str(Static.GRAY_ICONS / "tags_gray.svg")
+			svg_path=Static.GRAY_ICONS / "tags_gray.svg"
 		)
 		self.text_win.center_to_parent(self.window())
 		self.text_win.ok_clicked.connect(ok_clicked)

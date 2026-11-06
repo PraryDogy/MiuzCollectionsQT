@@ -867,17 +867,12 @@ class UTagWidget(TransparentFrame):
 	qss_yellow = "yellow"
 	qss_red = "red"
 
-	def __init__(
-			  self, text: str,
-			  qss_style: str,
-			  left_svg_path: str = None,
-			  right_svg_path: str = None
-			):
+	def __init__(self, text: str, style: str, l_svg: Path = None, r_svg: Path = None):
 		super().__init__()
-		self.qss_style = qss_style
+		self.qss_style = style
 		self.setFixedHeight(25)
-		self.setProperty(UTagWidget.qss_property_name, qss_style)
-		self.set_qss_style(qss_style)
+		self.setProperty(UTagWidget.qss_property_name, style)
+		self.set_qss_style(style)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		self.h_lay = QHBoxLayout(self)
@@ -885,8 +880,8 @@ class UTagWidget(TransparentFrame):
 		self.h_lay.setSpacing(6)
 		self.h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-		if left_svg_path:
-			self.left_svg_widget = QSvgWidget(left_svg_path)
+		if l_svg:
+			self.left_svg_widget = QSvgWidget(str(l_svg))
 			self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
 			self.left_svg_widget.setFixedSize(15, 15)
 			self.h_lay.addWidget(self.left_svg_widget)
@@ -895,14 +890,14 @@ class UTagWidget(TransparentFrame):
 		self.text_widget.mouseReleaseEvent = self.text_widget_cmd
 		self.h_lay.addWidget(self.text_widget)
 
-		if right_svg_path:
+		if r_svg:
 			right_svg_wrapper = TransparentWidget()
 			self.h_lay.addWidget(right_svg_wrapper)
 			self.right_svg_lay = QVBoxLayout(right_svg_wrapper)
 			self.right_svg_lay.setContentsMargins(0, 0, 0, 0)
 			self.right_svg_lay.setSpacing(0)
 
-			self.right_svg_widget = QSvgWidget(right_svg_path)
+			self.right_svg_widget = QSvgWidget(str(r_svg))
 			self.right_svg_widget.mouseReleaseEvent = self.right_svg_cmd
 			self.right_svg_widget.setFixedSize(14, 14)
 			self.right_svg_lay.addWidget(self.right_svg_widget)
@@ -1811,11 +1806,7 @@ class MfStopListEditTag(UMainWindow):
 
 class MfStopListTag(UTagWidget):
 	def __init__(self, text):
-		super().__init__(
-			text,
-			self.qss_gray,
-			right_svg_path=str(Static.GRAY_ICONS / "trash_gray.svg"),
-		)
+		super().__init__(text, self.qss_gray, r_svg=Static.GRAY_ICONS / "trash_gray.svg")
 		self.text_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.setToolTip(text)
 		self.setMaximumWidth(150)
