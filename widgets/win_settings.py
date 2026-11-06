@@ -530,9 +530,6 @@ class AboutWid(UGroupBox):
 
 		h_lay.addStretch()
 
-		if not self.icon_path.exists():
-			print("win settings about wid, icon.png not exists")
-
 
 class GeneralSettings(TransparentWidget):
 	lang_changed = pyqtSignal()
