@@ -15,22 +15,16 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextLabel,
 
 class WinTextSearch(UMainWindow):
 	ok_clicked = pyqtSignal(str)
-	size_ = (380, 330)  # Немного увеличил высоту, чтобы поместилось описание
-	svg_magnifier = Static.COMMON_ICONS / "magnifier.svg"
-	svg_wand = Static.COMMON_ICONS / "wand.svg"
-	icon_size = QSize(10, 10)
-	svg_text_edit_color = Static.COMMON_ICONS / "text_edit_color.svg"
-
 
 	def __init__(self, text: str):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setFixedSize(*self.size_)
+		self.setFixedSize(380, 330)
 		# self.insert_sep()
 
-		self.magnifier_icon = QIcon(str(self.svg_magnifier))
-		self.wand_icon = QIcon(str(self.svg_wand))
+		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg"))
+		self.wand_icon = QIcon(str(Static.GRAY_ICONS / "wand_gray.svg"))
 
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
@@ -41,7 +35,7 @@ class WinTextSearch(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(7)
 
-		self.title_row = TitleTextLabel(Lng.text_editor, str(self.svg_text_edit_color))
+		self.title_row = TitleTextLabel(Lng.text_editor, str(Static.COLOR_ICONS / "text_edit_color.svg"))
 		group_layout.addWidget(self.title_row)
 
 		group_layout.addWidget(USep())
@@ -68,7 +62,7 @@ class WinTextSearch(UMainWindow):
 
 		self.format_button = UPushButton(Lng.enhance_text)
 		self.format_button.clicked.connect(self.format_input_text)
-		self.format_button.setIconSize(self.icon_size)
+		self.format_button.setIconSize(QSize(10, 10))
 		self.format_button.setIcon(self.wand_icon)
 		self.title_row.h_layout.addStretch()
 		self.title_row.h_layout.addWidget(self.format_button)
@@ -80,7 +74,7 @@ class WinTextSearch(UMainWindow):
 
 		self.ok_btn = ActiveButton(Lng.search)
 		self.ok_btn.setIcon(self.magnifier_icon)
-		self.ok_btn.setIconSize(self.icon_size)
+		self.ok_btn.setIconSize(QSize(10, 10))
 		self.ok_btn.clicked.connect(self.search)
 		btns_layout.addWidget(self.ok_btn)
 
