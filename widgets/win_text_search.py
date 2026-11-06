@@ -35,7 +35,7 @@ class WinTextSearch(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(7)
 
-		self.title_row = TitleTextLabel(Lng.text_editor, str(Static.COLOR_ICONS / "text_edit_color.svg"))
+		self.title_row = TitleTextLabel(Lng.text_editor, Static.COLOR_ICONS / "text_edit_color.svg")
 		group_layout.addWidget(self.title_row)
 
 		group_layout.addWidget(USep())

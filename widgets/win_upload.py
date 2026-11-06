@@ -64,7 +64,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.main_layout.setContentsMargins(10, 10, 10, 10)
 		self.main_layout.setSpacing(5)
 
-		self.title_label = TitleTextLabel(Lng.dest_folder, str(Static.GRAY_ICONS / "folder_gray.svg"))
+		self.title_label = TitleTextLabel(Lng.dest_folder, Static.GRAY_ICONS / "folder_gray.svg")
 		self.main_layout.addWidget(self.title_label)
 
 		# с обычным spacing виджет под сепаратором будет как бы дальше

@@ -838,14 +838,14 @@ class GrayTextLabel(TransparentLabel):
 
 # если переименовываешь, не забудь qss
 class TitleTextLabel(TransparentWidget):
-	def __init__(self, text: str, svg_path: str = None):
+	def __init__(self, text: str, svg: Path = None):
 		super().__init__()
 		self.h_layout = QHBoxLayout(self)
 		self.h_layout.setSpacing(10)
 		self.h_layout.setContentsMargins(0, 0, 0, 0)
 
-		if svg_path:
-			self.svg_widget = QSvgWidget(str(svg_path))
+		if svg:
+			self.svg_widget = QSvgWidget(str(svg))
 			self.svg_widget.setFixedSize(23, 23)
 			self.h_layout.addWidget(self.svg_widget)
 
@@ -1196,7 +1196,7 @@ class InputTextWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 	cancel_clicked = pyqtSignal()
 
-	def __init__(self, description: str, svg_path: str = None):
+	def __init__(self, description: str, svg: Path = None):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
@@ -1212,8 +1212,8 @@ class InputTextWin(UMainWindow):
 		svg_text_layout.setContentsMargins(5, 0, 10, 0)
 		svg_text_layout.setSpacing(5)
 
-		if svg_path:
-			svg_icon = QSvgWidget(svg_path)
+		if svg:
+			svg_icon = QSvgWidget(str(svg))
 			svg_icon.setFixedSize(20, 20)
 			svg_text_layout.addWidget(svg_icon)
 
@@ -1522,7 +1522,7 @@ class MfPathWidget(UGroupBox):
 		self.setFixedHeight(self.sizeHint().height())
 
 	def _create_title(self, icon_path: Path) -> QHBoxLayout:
-		title = TitleTextLabel(self.title_, str(icon_path))
+		title = TitleTextLabel(self.title_, icon_path)
 		title.text_widget.set_elide(True)
 		return title
 
@@ -1750,7 +1750,7 @@ class MfStopListEditTag(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(10)
 
-		title_label = TitleTextLabel(Lng.folder_name, str(Static.GRAY_ICONS / "text_edit_gray.svg"))
+		title_label = TitleTextLabel(Lng.folder_name, Static.GRAY_ICONS / "text_edit_gray.svg")
 		group_layout.addWidget(title_label)
 
 		group_layout.addWidget(USep())
@@ -1824,7 +1824,7 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
 
-		title_label = TitleTextLabel(Lng.stop_list, str(Static.GRAY_ICONS / "stop_gray.svg"))
+		title_label = TitleTextLabel(Lng.stop_list, Static.GRAY_ICONS / "stop_gray.svg")
 		v_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())
@@ -1921,7 +1921,7 @@ class MfStopListWidget(UGroupBox):
 
 		self.text_win = InputTextWin(
 			description=Lng.folder_name,
-			svg_path=str(Static.GRAY_ICONS / "trash_gray.svg")
+			svg=Static.GRAY_ICONS / "trash_gray.svg"
 		)
 		self.text_win.setFixedWidth(300)
 		self.text_win.center_to_parent(self.window())

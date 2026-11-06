@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QCursor, QIcon
@@ -15,13 +16,13 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UMainWindow, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
-from pathlib import Path
+
 
 class WinFiltersTitleWidget(TitleTextLabel):
 	reset_clicked = pyqtSignal()
 
-	def __init__(self, text: str, svg_path: str):
-		super().__init__(text, svg_path)
+	def __init__(self, text: str, svg: Path):
+		super().__init__(text, svg)
 		self.h_layout.addStretch(1)
 		self.reset_button = UPushButton(Lng.reset)
 		self.reset_button.clicked.connect(self.reset_clicked.emit)
@@ -77,10 +78,7 @@ class DatesWidget(UGroupBox):
 		self.main_layout.setContentsMargins(5, 5, 5, 5)
 		self.main_layout.setSpacing(7)
 
-		self.title_widget = WinFiltersTitleWidget(
-			text=Lng.dates_management,
-			svg_path=str(Static.COLOR_ICONS / "calendar.svg")
-		)
+		self.title_widget = WinFiltersTitleWidget(Lng.dates_management, Static.COLOR_ICONS / "calendar.svg")
 		self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
 		self.main_layout.addWidget(self.title_widget)
 		self.main_layout.addWidget(USep())
@@ -401,7 +399,7 @@ class UserTags(TransparentWidget):
 
 		self.text_win = InputTextWin(
 			description=Lng.new_tag_desc,
-			svg_path=Static.GRAY_ICONS / "tags_gray.svg"
+			svg=Static.GRAY_ICONS / "tags_gray.svg"
 		)
 		self.text_win.center_to_parent(self.window())
 		self.text_win.ok_clicked.connect(ok_clicked)
@@ -443,10 +441,7 @@ class TagsWidget(UGroupBox):
 		self.v_lay.setContentsMargins(5, 5, 5, 5)
 		self.v_lay.setSpacing(7)
 
-		self.title_widget = WinFiltersTitleWidget(
-			text=Lng.tag_management,
-			svg_path=str(Static.COLOR_ICONS / "tags_color.svg")
-		)
+		self.title_widget = WinFiltersTitleWidget(Lng.tag_management, Static.COLOR_ICONS / "tags_color.svg")
 		self.title_widget.reset_clicked.connect(lambda: self.reset_tags(True))
 		self.v_lay.addWidget(self.title_widget)
 

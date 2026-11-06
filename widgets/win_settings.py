@@ -584,10 +584,7 @@ class MfRepairWidget(UGroupBox):
 		self.v_lay.setContentsMargins(10, 5, 10, 5)
 		self.v_lay.setSpacing(2)
 
-		title_layout = TitleTextLabel(
-			Lng.repair_catalog_long,
-			Static.COLOR_ICONS / "repair.svg"
-		)
+		title_layout = TitleTextLabel(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
 		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())
@@ -621,10 +618,7 @@ class MfRemoveWidget(UGroupBox):
 		self.v_lay.setContentsMargins(10, 5, 10, 10)
 		self.v_lay.setSpacing(5)
 
-		title_layout = TitleTextLabel(
-			Lng.remove_folder,
-			Static.GRAY_ICONS / "trash_gray.svg"
-		)
+		title_layout = TitleTextLabel(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
 		self.v_lay.addWidget(title_layout)
 
 		self.v_lay.addWidget(USep())

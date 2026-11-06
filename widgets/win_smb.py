@@ -41,7 +41,7 @@ class WinSmb(UMainWindow):
 		group_lay.setContentsMargins(0, 0, 0, 0)
 		group_lay.setSpacing(5)
 
-		title_lbl = TitleTextLabel(Lng.no_connection, str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		title_lbl = TitleTextLabel(Lng.no_connection, Static.COLOR_ICONS / "yellow_warning.svg")
 		group_lay.addWidget(title_lbl)
 
 		# Описание добавляем туда же, под заголовок
