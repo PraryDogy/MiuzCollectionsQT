@@ -1348,7 +1348,7 @@ class MfAliasWidget(UGroupBox):
 
 	# --- Правила проверки (одно место для ввода и для сохранения) ---
 
-	def _get_error(self, mf_alias: str, minim = 5, maxim = 50) -> str | None:
+	def _get_error(self, mf_alias: str, minim = 3, maxim = 50) -> str | None:
 		if not mf_alias:
 			return Lng.enter_alias_warning
 		if len(mf_alias) < minim or len(mf_alias) > maxim:
