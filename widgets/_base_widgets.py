@@ -1303,7 +1303,7 @@ class InputTextWin(UMainWindow):
 class SaveRowArrowWidget(RowArrowWidget):
 	def __init__(self):
 		super().__init__(Lng.save)
-		self.set_left_icon(Static.COMMON_ICONS / "diskette.svg")
+		self.set_left_icon(Static.GRAY_ICONS / "diskette_gray.svg")
 
 
 class MfAliasWidget(TransparentWidget):
@@ -1786,7 +1786,7 @@ class MfStopListEditTag(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(10)
 
-		title_label = TitleTextLabel(Lng.folder_name, str(Static.COMMON_ICONS / "text_edit_gray.svg"))
+		title_label = TitleTextLabel(Lng.folder_name, str(Static.GRAY_ICONS / "text_edit_gray.svg"))
 		group_layout.addWidget(title_label)
 
 		group_layout.addWidget(USep())

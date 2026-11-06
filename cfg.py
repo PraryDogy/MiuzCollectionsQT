@@ -40,7 +40,6 @@ class Static:
 
     # Подпапки для иконок (красиво собираются от базовой папки icons)
     APP_ICONS = ICONS / "app_icons"
-    COMMON_ICONS = ICONS / "common"
     JPEG_ICONS = ICONS / "jpeg_icons"
     GRAY_ICONS = ICONS / "gray"
     COLOR_ICONS = ICONS / "color"

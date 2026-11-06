@@ -52,10 +52,10 @@ class ZipTask(URunnable):
 
 
 class FirstLoadWin(UMainWindow):
-	rus_flag = Static.COMMON_ICONS / "rus_flag.svg"
-	eng_flag = Static.COMMON_ICONS / "eng_flag.svg"
-	language_svg = Static.COMMON_ICONS / "language.svg"
-	miuz_svg = Static.COMMON_ICONS / "miuz.svg"
+	rus_flag = Static.COLOR_ICONS / "rus_flag.svg"
+	eng_flag = Static.COLOR_ICONS / "eng_flag.svg"
+	language_svg = Static.COLOR_ICONS / "language.svg"
+	miuz_svg = Static.COLOR_ICONS / "miuz.svg"
 	svg_size = 16
 	ww = 440
 
