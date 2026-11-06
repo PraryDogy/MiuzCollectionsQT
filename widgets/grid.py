@@ -302,11 +302,10 @@ class SquareThumb(Thumb):
 
 
 class UpBtnLabel(TransparentLabel):
-	widget_size = (36, 36)
 	def __init__(self):
 		super().__init__()
 		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-		self.setFixedSize(*self.widget_size)
+		self.setFixedSize(36, 36)
 
 
 class UpBtn(TransparentWidget):
@@ -315,7 +314,7 @@ class UpBtn(TransparentWidget):
 	def __init__(self, parent: TransparentWidget | None = None):
 		super().__init__(parent)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		self.setFixedSize(*UpBtnLabel.widget_size)
+		self.setFixedSize(36, 36)
 
 		# 1. Отдельный класс подложки
 		self.label = UpBtnLabel()
@@ -483,7 +482,6 @@ class GridControlsWidget(TransparentWidget):
 
 
 class GridTag(UTagWidget):
-
 	def __init__(self, left_svg_path, text):
 		super().__init__(
 			qss_style=self.qss_green,

@@ -14,13 +14,11 @@ from ._base_widgets import (TransparentFrame, TransparentLabel,
 
 
 class WinCollage(UMainWindow):
-	ww, hh = 700, 700
-
 	def __init__(self, data_items: list[DataItem]):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.resize(self.ww, self.hh)
+		self.resize(700, 700)
 		self.setMinimumSize(400, 400)
 		self.setWindowTitle(Lng.collage)
 		self.show_titlebar_sep()

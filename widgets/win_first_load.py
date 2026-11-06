@@ -52,16 +52,9 @@ class ZipTask(URunnable):
 
 
 class FirstLoadWin(UMainWindow):
-	rus_flag = Static.COLOR_ICONS / "rus_flag.svg"
-	eng_flag = Static.COLOR_ICONS / "eng_flag.svg"
-	language_svg = Static.COLOR_ICONS / "language.svg"
-	miuz_svg = Static.COLOR_ICONS / "miuz.svg"
-	svg_size = 16
-	ww = 440
-
 	def __init__(self):
 		super().__init__()
-		self.setFixedWidth(self.ww)
+		self.setFixedWidth(400)
 		self.set_always_on_top()
 		self.set_close_only()
 		UThreadPool.init()
@@ -102,28 +95,28 @@ class FirstLoadWin(UMainWindow):
 		if self.lng_index == 0:
 			lng_label_text = f"{Lng.app_lang} ({Lng.app_lang})"
 			lng_btn_text = rus_action_text
-			lng_btn_icon = QIcon(str(self.rus_flag))
+			lng_btn_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
 		else:
 			lng_label_text = f"{Lng.app_lang} ({Lng.app_lang})"
 			lng_btn_text = eng_action_text
-			lng_btn_icon  = QIcon(str(self.eng_flag))
+			lng_btn_icon  = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
 		# Сохраняем ссылку в self.lng_container
 		self.lng_container = UGroupBox()
 		self.central_layout.addWidget(self.lng_container)
 		
 		lng_layout = QHBoxLayout(self.lng_container)
-		lng_layout.setContentsMargins(*RowArrowWidget.group_margings)
+		lng_layout.setContentsMargins(0, 0, 0, 0)
 		lng_layout.setSpacing(10)
 
 		lng_wid = RowArrowWidget(lng_label_text)
-		lng_wid.set_left_icon(str(self.language_svg))
+		lng_wid.set_left_icon(str(Static.COLOR_ICONS / "language.svg"))
 		lng_wid.hide_arrow()
 		lng_layout.addWidget(lng_wid)
 
 		lng_icons = (
-			QIcon(str(self.rus_flag)),
-			QIcon(str(self.eng_flag))
+			QIcon(str(Static.COLOR_ICONS / "rus_flag.svg")),
+			QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 		)
 
 		lng_menu = UMenu(parent=self)
@@ -169,14 +162,14 @@ class FirstLoadWin(UMainWindow):
 		self.central_layout.addWidget(self.last_block_container)
 
 		last_block_layout = QVBoxLayout(self.last_block_container)
-		last_block_layout.setContentsMargins(*RowArrowWidget.group_margings)
-		last_block_layout.setSpacing(RowArrowWidget.group_spacing)
+		last_block_layout.setContentsMargins(0, 0, 0, 0)
+		last_block_layout.setSpacing(0)
 
 		if Static.MIUZ_ZIP.exists():
 			self.copy_zip_widget = RowArrowWidget(
 				Lng.miuz_diamonds[self.lng_index]
 			)
-			self.copy_zip_widget.set_left_icon(self.miuz_svg)
+			self.copy_zip_widget.set_left_icon(Static.COLOR_ICONS / "miuz.svg")
 			self.copy_zip_widget.clicked.connect(
 				lambda: self.copy_zip_cmd()
 			)

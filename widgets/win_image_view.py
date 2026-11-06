@@ -128,7 +128,6 @@ class WinImgViewGraphics(QGraphicsView):
 
 class ImgViewSvg(QSvgWidget):
 	clicked = pyqtSignal()
-	svg_size = 50
 
 	def __init__(self):
 		super().__init__()
@@ -140,8 +139,8 @@ class ImgViewSvg(QSvgWidget):
 		if renderer and renderer.isValid():
 			orig_size = renderer.defaultSize()
 			aspect_ratio = orig_size.width() / orig_size.height()
-			calculated_width = int(self.svg_size * aspect_ratio)
-			self.setFixedSize(calculated_width, self.svg_size)
+			calculated_width = int(50 * aspect_ratio)
+			self.setFixedSize(calculated_width, 50)
 
 	def mouseReleaseEvent(self, a0: QMouseEvent):
 		if a0.button() == Qt.MouseButton.LeftButton:
@@ -223,7 +222,6 @@ class WinImageView(UMainWindow):
 	open_in_app = pyqtSignal(tuple)
 	image_not_exists = pyqtSignal()
 	
-	min_w, min_h = 500, 400
 	ww, hh = 0, 0
 	xx, yy = 0, 0
 
@@ -235,7 +233,7 @@ class WinImageView(UMainWindow):
 		self.img_view_item = img_view_item
 		self.current_data_item = img_view_item.start_data_item
 
-		self.setMinimumSize(QSize(self.min_w, self.min_h))
+		self.setMinimumSize(QSize(500, 400))
 		self.installEventFilter(self)
 		self.central_layout.setContentsMargins(0, 0, 0, 0)
 		self.central_layout.setSpacing(0)

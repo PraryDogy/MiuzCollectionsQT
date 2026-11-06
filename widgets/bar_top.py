@@ -20,11 +20,10 @@ from .win_text_search import WinTextSearch
 class SearchWidBaseSvg(QSvgWidget):
 	clicked_ = pyqtSignal()
 	icon_path = None
-	icon_size = 13
 
 	def __init__(self, parent):
 		super().__init__(parent)
-		self.setFixedSize(self.icon_size, self.icon_size)
+		self.setFixedSize(13, 13)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.load(str(self.icon_path))
 		self.hide()

@@ -22,9 +22,6 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
 import subprocess
 
 
-MAX_SIZE = 250
-
-
 class WinInfoSelectableLabel(TransparentLabel):
 	def __init__(self, text: str):
 		super().__init__(text)
@@ -101,6 +98,7 @@ class ImageWidget(TransparentLabel):
 
 class WinInfo(UMainWindow):
 	POLL_MS = 100
+	MAX_SIZE = 250
 
 	def __init__(self, data_item: DataItem):
 		super().__init__()
@@ -136,7 +134,7 @@ class WinInfo(UMainWindow):
 
 	def build_img_wid(self):
 		self.img_wid = ImageWidget(self.data_item)
-		self.img_wid.setFixedSize(MAX_SIZE, MAX_SIZE)
+		self.img_wid.setFixedSize(self.MAX_SIZE, self.MAX_SIZE)
 		# Добавление в раскладку выполняется в _build_info, внутри группы
 
 	def create_qimage(self):
@@ -145,7 +143,7 @@ class WinInfo(UMainWindow):
 			qpixmap = QPixmap.fromImage(qimage)
 			self.img_wid.setPixmap(qpixmap)
 
-		size = (MAX_SIZE, MAX_SIZE)
+		size = (self.MAX_SIZE, self.MAX_SIZE)
 		self.qimage_task = BlurImgBgTask(self.data_item.base_qimage, size)
 		self.qimage_task.sigs.finished_.connect(fin)
 		UThreadPool.start(self.qimage_task)

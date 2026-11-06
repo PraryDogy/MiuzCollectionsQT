@@ -153,8 +153,6 @@ class DangerWarn(ConfirmWindow):
 
 
 class WinMain(UMainWindow):
-	min_w = 750
-	left_side_width = 250
 	hh = 800
 	ww = 0
 
@@ -165,7 +163,7 @@ class WinMain(UMainWindow):
 		# отступы от окна слева справа, кроме заголовка окна
 		self.central_layout.setContentsMargins(5, 0, 5, 0)
 		self.central_layout.setSpacing(0)
-		self.setMinimumWidth(self.min_w)
+		self.setMinimumWidth(750)
 		self.setMenuBar(BarMacos())
 		self.ww = 1200 if JsonData.square_thumbs else 1160
 

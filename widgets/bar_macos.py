@@ -13,9 +13,6 @@ from .win_settings import WinSettings
 
 
 class AboutWin(VerticalWindow):
-	icon_path = Static.APP_ICONS / "icon.png"
-	icon_size = 100
-
 	INFO_TEXT = "\n".join([
 		f"{Static.APP_NAME}",
 		f"Version {Static.APP_VERSION}",
@@ -30,10 +27,10 @@ class AboutWin(VerticalWindow):
 		self.set_close_only()
 
 		icon = GrayTextLabel("")
-		qimage = QImage(str(self.icon_path))
+		qimage = QImage(str(Static.APP_ICONS / "icon.png"))
 		qimage_saled = Utils.scale_qimage_dpr(
 			qimage=qimage,
-			size=self.icon_size
+			size=100
 		)
 		icon.setPixmap(QPixmap.fromImage(qimage_saled))
 		self.icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)

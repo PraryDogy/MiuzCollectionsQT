@@ -103,7 +103,6 @@ class ProgressWin(UMainWindow):
 
 
 class SliderWidget(TransparentWidget):
-
 	def __init__(self):
 		super().__init__()
 
@@ -138,15 +137,15 @@ class SliderWidget(TransparentWidget):
 		self.current_value = value
 
 
-DROP_WIDGET_SIZE = (350, 300)
 
 
 class WinImgSearchDropWidget(TransparentFrame):
 	image_dropped = pyqtSignal(str)
+	DROP_WIDGET_SIZE = (350, 300)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		self.setFixedSize(*DROP_WIDGET_SIZE)
+		self.setFixedSize(*self.DROP_WIDGET_SIZE)
 		self.setAcceptDrops(True)
 
 		self.v_layout = QVBoxLayout(self)
@@ -205,7 +204,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		self.setFixedSize(*DROP_WIDGET_SIZE)
+		self.setFixedSize(*self.DROP_WIDGET_SIZE)
 
 		self.pixmap = QPixmap()
 		self.image_label = TransparentLabel(Lng.loading)
@@ -233,7 +232,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 
 		self.qimage_task = BlurImgBgTask(
 			img=img_array,
-			size=DROP_WIDGET_SIZE,
+			size=self.DROP_WIDGET_SIZE,
 			radius=10.0
 		)
 		self.qimage_task.sigs.finished_.connect(finished)

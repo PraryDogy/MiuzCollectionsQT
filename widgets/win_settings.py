@@ -126,8 +126,8 @@ class RebootableSettings(UGroupBox):
 		self.eng_flag_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
 		main_layout = QVBoxLayout(self)
-		main_layout.setContentsMargins(*RowArrowWidget.group_margings)
-		main_layout.setSpacing(RowArrowWidget.group_spacing)
+		main_layout.setContentsMargins(0, 0, 0, 0)
+		main_layout.setSpacing(0)
 
 		self._create_language_widget(main_layout)
 		main_layout.addWidget(USep())
@@ -249,15 +249,12 @@ class RebootableSettings(UGroupBox):
 
 
 class SizesWin(UMainWindow):
-	ww = 500
-	hh = 330
-
 	def __init__(self, size_items: list[HashDirSizeItem], parent=None):
 		super().__init__(parent)
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.data_size)
-		self.resize(self.ww, self.hh)
+		self.resize(500, 330)
 		self.central_layout.setSpacing(10)
 
 		total_size = SharedUtils.get_f_size(sum(
@@ -336,8 +333,8 @@ class NonRebootableSettings(UGroupBox):
 	def __init__(self):
 		super().__init__()
 		main_layout = QVBoxLayout(self)
-		main_layout.setContentsMargins(*RowArrowWidget.group_margings)
-		main_layout.setSpacing(RowArrowWidget.group_spacing)
+		main_layout.setContentsMargins(0, 0, 0, 0)
+		main_layout.setSpacing(0)
 
 		self.size_items = {}
 
@@ -376,23 +373,20 @@ class NonRebootableSettings(UGroupBox):
 
 class ThemeBtn(TransparentWidget):
 	clicked = pyqtSignal()
-	ww = 70
-	svg_size = (40, 40)
 
 	def __init__(self, theme_name: str, svg_paths: list[Path]):
 		super().__init__()
 		self.theme_name = theme_name
 		self.svg_1, self.svg_2 = svg_paths
 
-		self.setFixedWidth(self.ww)
-		self.setFixedHeight(self.ww)
+		self.setFixedSize(70, 70)
 
 		layout_ = QVBoxLayout(self)
 		layout_.setContentsMargins(0, 0, 0, 0)
 		layout_.setSpacing(5)
 
 		self.svg_widget = QSvgWidget()
-		self.svg_widget.setFixedSize(*self.svg_size)
+		self.svg_widget.setFixedSize(40, 40)
 		layout_.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.title_label = TransparentLabel(self.theme_name)
@@ -420,8 +414,8 @@ class ThemesWidget(UGroupBox):
 	def __init__(self):
 		super().__init__()
 		main_lay = QVBoxLayout(self)
-		main_lay.setContentsMargins(*RowArrowWidget.group_margings)
-		main_lay.setSpacing(RowArrowWidget.group_spacing)
+		main_lay.setContentsMargins(0, 0, 0, 0)
+		main_lay.setSpacing(0)
 
 		title_wid = RowArrowWidget(Lng.theme)
 		title_wid.set_left_icon(Static.COLOR_ICONS / "theme.svg")
@@ -516,9 +510,6 @@ class AboutWidLabel(TransparentLabel):
 
 
 class AboutWid(UGroupBox):
-	icon_path = Static.APP_ICONS / "icon.png"
-	icon_size = 85
-
 	def __init__(self):
 		super().__init__()
 		h_lay = QHBoxLayout(self)
@@ -526,8 +517,8 @@ class AboutWid(UGroupBox):
 		h_lay.setSpacing(0)
 
 		icon = TransparentLabel()
-		qimage = QImage(str(self.icon_path))
-		qimage_scaled = Utils.scale_qimage_dpr(qimage, self.icon_size)
+		qimage = QImage(str(Static.APP_ICONS / "icon.png"))
+		qimage_scaled = Utils.scale_qimage_dpr(qimage, 85)
 		pixmap = QPixmap.fromImage(qimage_scaled)
 		icon.setPixmap(pixmap)
 		h_lay.addWidget(icon)
@@ -784,7 +775,6 @@ class MfSettings(UScrollVerticalArea):
 
 
 class NewMfSettings(UMainWindow):
-
 	def __init__(self, mf_path: str = None):
 		super().__init__()
 		self.setWindowTitle(Lng.new_catalog)

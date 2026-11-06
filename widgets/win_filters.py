@@ -16,9 +16,6 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             UMainWindow, UMenu, UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
 
-UGroupBox_margins = (5, 5, 5, 5)
-UGroupBox_spacing = 10
-
 
 class WinFiltersTitleWidget(TitleTextLabel):
 	reset_clicked = pyqtSignal()
@@ -261,7 +258,6 @@ class DatesWidget(UGroupBox):
 
 
 class WinFiltersUserTag(UTagWidget):
-
 	def __init__(self, text: str, left_svg_path: str):
 		super().__init__(
 			text=text,
@@ -319,7 +315,6 @@ class SubfoldersTagWidget(WinFiltersStantartTag):
 
 
 class WordFiltersTagWidget(WinFiltersUserTag):
-
 	def __init__(self, text):
 		super().__init__(
 			text=text,

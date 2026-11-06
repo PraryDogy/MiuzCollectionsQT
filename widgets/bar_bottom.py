@@ -23,14 +23,11 @@ class BarBottomSlider(USlider):
 
 
 class BarBottomLeftLabel(GrayTextLabel):
-	interval_ms = 1000  # 1 секунда
-	ww = 250
-
 	def __init__(self):
 		super().__init__("")
 		self.set_font_size(11)
 		self.set_elide(True)
-		self.setFixedWidth(self.ww)
+		self.setFixedWidth(250)
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self.timer = QTimer(self)
 		self.timer.timeout.connect(self.update_timer_text)
@@ -40,7 +37,7 @@ class BarBottomLeftLabel(GrayTextLabel):
 		self.timer.stop()
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self.update_label()
-		self.timer.start(self.interval_ms)
+		self.timer.start(1000)
 
 	def stop_timer_text(self):
 		self.timer.stop()

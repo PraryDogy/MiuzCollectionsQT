@@ -926,11 +926,6 @@ class UTagWidget(TransparentFrame):
 class RowArrowWidget(TransparentWidget):
 	clicked = pyqtSignal()
 
-	# обычно эти виджеты помещаются в QGroupBox
-	# Это правильные отступы чтобы все красиво смотрелось
-	group_margings = (5, 5, 5, 5)
-	group_spacing = 5
-
 	def __init__(self, text: str):
 		super().__init__()
 		self.setFixedHeight(26)

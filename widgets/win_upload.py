@@ -55,6 +55,7 @@ class TitleWidget(UGroupBox):
 
 class DestinyFolderWidget(UGroupBox):
 	dir_changed = pyqtSignal(str)
+
 	def __init__(self, current_dir: str):
 		super().__init__()
 		self.current_dir = current_dir
