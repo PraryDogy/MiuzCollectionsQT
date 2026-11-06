@@ -30,7 +30,7 @@ class PathItem(TransparentWidget):
 		item_layout.setSpacing(5)
 
 		self.img_wid = QSvgWidget(str(Static.COLOR_ICONS / "base_folder.svg"))
-		self.img_wid.setFixedSize(15, 15)
+		self.img_wid.setFixedSize(12, 12)
 		item_layout.addWidget(self.img_wid)
 		
 		self.text_wid = GrayTextLabel(text=name)
