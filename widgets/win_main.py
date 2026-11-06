@@ -287,7 +287,8 @@ class WinMain(UMainWindow):
 			self.start_scaner_task()
 		else:
 			print("СКАНЕР ВЫКЛЮЧЕН")
-			self.bar_bottom.progress_bar.setText("noscan enabled")
+			self.bar_bottom.progress_widget.setText("noscan enabled")
+			self.bar_bottom.progress_widget.set_qss_style(self.bar_bottom.progress_widget.qss_transparent)
 
 		# QTimer.singleShot(100, lambda: self.open_win_smb(Mf.current_mf))
 
@@ -744,14 +745,13 @@ class WinMain(UMainWindow):
 				self.win_warn.show()
 
 			elif isinstance(data, ScanProgress):
-				text = scan_progress_text(data)
-				if self.bar_bottom.progress_bar.text() != text:
-					self.bar_bottom.progress_bar.setText(text)
+				self.bar_bottom.progress_widget.set_text(data)
 
 		if not self.scaner_task.is_alive():
 			self.scaner_task.terminate_join()
-			self.bar_bottom.progress_bar.setText("")
-			self.bar_bottom.progress_bar.start_timer_text()
+			self.bar_bottom.progress_widget.setText("")
+			self.bar_bottom.progress_widget.set_qss_style(self.bar_bottom.progress_widget.qss_transparent)
+			self.bar_bottom.progress_widget.start_timer_text()
 			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
 			if db_changed(self.db_mtime, new_db_time):
 				self.load_st_grid()
@@ -803,8 +803,9 @@ class WinMain(UMainWindow):
 					args=(Mf.items, )
 				)
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
-			self.bar_bottom.progress_bar.stop_timer_text()
-			self.bar_bottom.progress_bar.setText(Lng.loading)
+			self.bar_bottom.progress_widget.stop_timer_text()
+			self.bar_bottom.progress_widget.setText(Lng.loading)
+			self.bar_bottom.progress_widget.set_qss_style(self.bar_bottom.progress_widget.qss_transparent)
 			self.scaner_task.start()
 			self.scaner_poll_timer.stop()
 			self.scaner_poll_timer.start(ms)
