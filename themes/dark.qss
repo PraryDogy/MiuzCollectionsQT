@@ -688,19 +688,17 @@ ProgressWidget {
     color: #ffffff;
     padding: 2px 10px;
     border-radius: 8px;
-    border: 1px solid transparent;
+    border: none;
 }
 
 ProgressWidget[style="yellow"] {
-    background: #713f12;
-    border: 1px solid #eab308;
+    background: #4a3a12;
 }
 
 ProgressWidget[style="green"] {
-    background: #064e3b;
-    border: 1px solid #10b981;
+    background: #1f3a2f;
 }
 
 ProgressWidget[style="transparent"] {
-    border: 1px solid #30404f;
+    background: #1d2833;
 }
