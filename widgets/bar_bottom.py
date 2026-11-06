@@ -147,7 +147,7 @@ class ProgressWidget(GrayTextLabel):
 		self.setText(self.scan_progress_text(progress))
 		if progress.kind == "indexing":
 			self.set_green_checkmark.emit()
-		elif progress.kind in ("search_dirs", "no_connection"):
+		elif progress.kind in ("no_connection", ):
 			self.set_warning.emit()
 		else:
 			self.set_arrow_terminal.emit()
