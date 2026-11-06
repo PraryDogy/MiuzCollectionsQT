@@ -1270,20 +1270,25 @@ class SaveRowArrowWidget(RowArrowWidget):
 		self.set_left_icon(Static.GRAY_ICONS / "diskette_gray.svg")
 
 
-class MfAliasWidget(TransparentWidget):
+class MfAliasWidget(UGroupBox):
 	changed = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
 		v_layout = QVBoxLayout(self)
-		v_layout.setContentsMargins(0, 0, 0, 0)
-		v_layout.setSpacing(0)
+		v_layout.setContentsMargins(10, 10, 10, 10)
+		v_layout.setSpacing(5)
 
-		name_text = TransparentLabel(Lng.folder_name_full)
-		name_text.setContentsMargins(2, 0, 2, 0)
+		title = TitleTextLabel(Lng.catalog_name, Static.COLOR_ICONS / "image_folder.svg")
+		v_layout.addWidget(title)
+
+		v_layout.addWidget(USep())
+
+		name_text = GrayTextLabel(Lng.folder_name_full)
+		name_text.setContentsMargins(0, 0, 0, 0)
 		v_layout.addWidget(name_text)
 
-		v_layout.addSpacing(10)
+		v_layout.addSpacing(5)
 
 		self.line_edit = ULineEdit()
 		self.line_edit.textChanged.connect(self.changed.emit)
@@ -1493,13 +1498,11 @@ class MfPathWidget(UGroupBox):
 		self.setAcceptDrops(True)
 		self.copy_path_btn_locked = False
 		self.mf = mf
-
+		self.title_ = Lng.catalog_path
 		if mf:
 			self.mf_path = mf.mf_paths[0]
-			self.title_ = mf.mf_alias
 		else:
 			self.mf_path = None
-			self.title_ = Lng.catalog
 
 		self.watch_timer = QTimer(self)
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
@@ -1546,9 +1549,7 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.setContentsMargins(0, 5, 0, 0)
 		buttons_layout.setSpacing(10)
 
-		button = UPushButton(
-			Lng.choose_folder
-		)
+		button = UPushButton(Lng.choose_folder)
 		button.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
 		button.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(button)
@@ -1575,11 +1576,6 @@ class MfPathWidget(UGroupBox):
 		labels_layout = QVBoxLayout()
 		labels_layout.setContentsMargins(0, 0, 0, 0)
 		labels_layout.setSpacing(2)
-
-		descr_label = GrayTextLabel(
-			Lng.catalog_path
-		)
-		labels_layout.addWidget(descr_label)
 
 		self.no_path_label = GrayTextLabel(Lng.path_hint_texts)
 		labels_layout.addWidget(self.no_path_label)
@@ -1624,11 +1620,6 @@ class MfPathWidget(UGroupBox):
 		labels_layout.setContentsMargins(0, 0, 0, 0)
 		labels_layout.setSpacing(2)
 
-		descr_label = GrayTextLabel(
-			Lng.catalog_path
-		)
-		labels_layout.addWidget(descr_label)
-
 		self.mf_path_label = GrayTextLabel("")
 		self.mf_path_label.set_elide(True)
 		labels_layout.addWidget(self.mf_path_label)
@@ -1637,9 +1628,7 @@ class MfPathWidget(UGroupBox):
 
 		self.copy_path_btn = UPushButton("")
 		self.copy_path_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
-		self.copy_path_btn.setToolTip(
-			Lng.copy_dirpath
-		)
+		self.copy_path_btn.setToolTip(Lng.copy_dirpath)
 		self.copy_path_btn.clicked.connect(self.copy_path)
 
 		# пространство перед кнопкой чтобы виджет пути не был близко
@@ -1824,7 +1813,7 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 10, 10, 10)
 		v_layout.setSpacing(5)
 
-		title_label = TitleTextLabel(Lng.stop_list, Static.GRAY_ICONS / "stop_gray.svg")
+		title_label = TitleTextLabel(Lng.stop_list, Static.COLOR_ICONS / "stop.svg")
 		v_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())
@@ -1848,6 +1837,7 @@ class MfStopListWidget(UGroupBox):
 
 		add_button = UPushButton(Lng.add_folder)
 		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
+		add_button.setIconSize(QSize(10, 10))
 		add_button.clicked.connect(self.add_tag)
 		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
 		self.reload_tags()
