@@ -149,6 +149,7 @@ class WinCopyFiles(WinProgressbar):
         super().__init__(Lng.copying)
 
         self.set_close_only()
+        self.set_always_on_top()
         self.adjustSize()
         self.setFixedHeight(self.height())
 
