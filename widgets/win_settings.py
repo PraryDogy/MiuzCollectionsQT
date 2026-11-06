@@ -570,11 +570,6 @@ class GeneralSettings(TransparentWidget):
 		win.show()
 
 
-class WinSettingsMfAliasTitle(TransparentLabel):
-	def __init__(self, text: str):
-		super().__init__(text)
-
-
 class MfRepairWidget(UGroupBox):
 	start_clicked = pyqtSignal()
 
@@ -645,6 +640,23 @@ class MfRemoveWidget(UGroupBox):
 		self.setFixedHeight(self.sizeHint().height())
 
 
+class MfTitleWid(UGroupBox):
+	def __init__(self, title: str):
+		super().__init__()
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(10, 10, 10, 10)
+		self.v_lay.setSpacing(5)
+
+		self.title_label = TitleTextLabel(title)
+		self.title_label.text_widget.set_elide(True, ignore_width=False)
+		self.v_lay.addWidget(self.title_label)
+
+		self.v_lay.addWidget(USep())
+
+		self.text_label = GrayTextLabel(Lng.catalog_settings)
+		self.v_lay.addWidget(self.text_label)
+
+
 class MfSettings(UScrollVerticalArea):
 	changed = pyqtSignal()
 
@@ -661,6 +673,9 @@ class MfSettings(UScrollVerticalArea):
 		main_lay.setContentsMargins(0, 0, 0, 0)
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
+
+		self.title_wid = MfTitleWid(self.mf.mf_alias)
+		self.main_lay.addWidget(self.title_wid)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
 		self.path_widget.changed.connect(self.changed.emit)

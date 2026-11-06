@@ -27,6 +27,7 @@ class Lng:
 	save_to_downloads = ("Сохранить в папку «Загрузки»", "Save to Downloads")
 	search = ("Поиск", "Search")
 	settings = ("Настройки", "Settings")
+	catalog_settings = ("Настройки каталога", "Catalog settings")
 	total_files = ("Всего файлов", "Total files")
 	type_ = ("Тип", "Type")
 	open = ("Открыть", "Open")
