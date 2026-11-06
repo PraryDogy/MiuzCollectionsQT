@@ -2,13 +2,13 @@ import os
 import re
 
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
-                          pyqtSignal)
+						  pyqtSignal)
 from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
-                         QFont, QFontMetrics, QIcon, QImage, QKeyEvent,
-                         QMouseEvent, QPainter, QPixmap, QResizeEvent)
+						 QFont, QFontMetrics, QIcon, QImage, QKeyEvent,
+						 QMouseEvent, QPainter, QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
-                             QRubberBand, QSizePolicy, QVBoxLayout)
+							 QRubberBand, QSizePolicy, QVBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, SettingsItem
@@ -16,16 +16,16 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.shared_utils import SharedUtils
 from system.tasks import (AppsScanner, DbImagesLoader, DbImagesLoaderItem,
-                          UThreadPool)
+						  SmoothSignals, SmoothThumbsTask, UThreadPool)
 from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
-                            TransparentLabel, TransparentWidget, UMenu,
-                            UPushButton, UScrollVerticalArea, USep, UTagWidget)
+							TransparentLabel, TransparentWidget, UMenu,
+							UPushButton, UScrollVerticalArea, USep, UTagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
-                      PasteFiles, RemoveFiles, RevealInFinder, Save,
-                      ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
-                      WinInfoAction)
+					  PasteFiles, RemoveFiles, RevealInFinder, Save,
+					  ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
+					  WinInfoAction)
 from .win_filters import DatesWidget
 
 CONTROLS_MARGIN = 10
@@ -132,7 +132,6 @@ class Thumb(TransparentFrame):
 	frame_h = 0     # полная высота виджета Thumb
 	blue_text_class = ThumbBlueTextWidget
 	BORDER_W = 2  # должна совпадать с border в QSS для Thumb и SquareThumb
-	fast_scale = False
 
 	# не передавай PARENT в Thumb, иначе не отображаются
 
@@ -216,13 +215,6 @@ class Thumb(TransparentFrame):
 		self.style().unpolish(self)
 		self.style().polish(self)
 
-	# --- Стили ---
-
-	def _update_style(self):
-		# Принудительное обновление QSS-стиля виджета
-		self.style().unpolish(self)
-		self.style().polish(self)
-
 	def _set_framed(self, value: bool):
 		# polish дорогой, поэтому вызываем только при реальном изменении
 		if self._framed == value:
@@ -239,31 +231,29 @@ class Thumb(TransparentFrame):
 
 	# --- Картинка и размер ---
 
-	def set_pixmap_with_actual_size(self, force: bool = False):
+	def set_fast_pixmap(self, force: bool = False):
+		"""Ставит картинку текущего размера: из кэша, если есть, иначе быстро из base_qimage."""
 		idx = Dynamic.current_pixmap_size_index
-		fast = Thumb.fast_scale
-
-		# перерисовываем, если сменился размер, принудительно, или нужна сглаженная версия
-		need = force or self._pixmap_index != idx or (self._pixmap_fast and not fast)
-		if not need:
+		if not force and self._pixmap_index == idx:
 			return
 
 		cached = self.data_item.resized_qimages[idx]
 		if cached is not None:
 			qimg, is_fast = cached, False
-		elif fast:
-			# быстрый вариант не кладём в resized_qimages, иначе он останется после перетаскивания
-			qimg = Utils.scale_qimage_dpr(self.data_item.base_qimage,
-										Static.THUMB_WIDTHS[idx], smooth=False)
-			is_fast = True
 		else:
 			qimg = Utils.scale_qimage_dpr(self.data_item.base_qimage,
-										Static.THUMB_WIDTHS[idx])
-			self.data_item.resized_qimages[idx] = qimg
-			is_fast = False
+										  Static.THUMB_WIDTHS[idx], smooth=False)
+			is_fast = True
 
 		self._pixmap_index = idx
 		self._pixmap_fast = is_fast
+		self.img_wid.setPixmap(QPixmap.fromImage(qimg))
+
+	def apply_smooth(self, idx: int, qimg: QImage):
+		"""Подменяет быструю картинку сглаженной, если размер всё ещё тот же."""
+		if self._pixmap_index != idx or not self._pixmap_fast:
+			return
+		self._pixmap_fast = False
 		self.img_wid.setPixmap(QPixmap.fromImage(qimg))
 
 	def set_text_and_size(self):
@@ -668,11 +658,14 @@ class Grid(UScrollVerticalArea):
 		self.date_timer = QTimer(self)
 		self.date_timer.setSingleShot(True)
 
-		# таймер окончания перетаскивания слайдера: сглаженный проход один раз
-		self._size_timer = QTimer(self)
-		self._size_timer.setSingleShot(True)
-		self._size_timer.timeout.connect(self._finish_resize)
-		self._size_debounce_ms = 200
+		# --- Ресайз и сглаживание ---
+		# settle: ресайз или прокрутка затихли, пора раскладывать и сглаживать видимые
+		self._settle_timer = QTimer(self)
+		self._settle_timer.setSingleShot(True)
+		self._settle_timer.timeout.connect(self._settle)
+		self._settle_debounce_ms = 200
+		self._smooth_signals = SmoothSignals()
+		self._smooth_signals.done.connect(self._on_smooth_ready)
 
 		# --- Вкладка прокрутки ---
 		self.scroll_wid = TransparentFrame()
@@ -828,53 +821,77 @@ class Grid(UScrollVerticalArea):
 		self._refresh_visible()
 		QTimer.singleShot(0, self._fill_if_needed)
 
-	# @Utils.timed("refresh visible")
-	def _refresh_visible(self):
-		"""Ставит картинку только миниатюрам из видимого диапазона строк."""
-		if not self.ordered or self._cols <= 0:
-			return
+	# --- Ресайз и сглаживание ---
 
-		first_w = self.ordered[0]
-		row_h = first_w.height() + self.grid_lay.verticalSpacing()
-		if row_h <= 0:
-			return
-
-		# видимая часть вьюпорта в координатах grid_wid
-		top = self.verticalScrollBar().value() - self.grid_wid.y()
-		bottom = top + self.viewport().height()
-
-		total_rows = (len(self.ordered) + self._cols - 1) // self._cols
-		row_from = max(0, top // row_h - 1)              # запас в одну строку сверху
-		row_to = min(total_rows - 1, bottom // row_h + 1)  # и снизу
-
-		for row in range(row_from, row_to + 1):
-			for col in range(self._cols):
-				wid = self.cell_to_wid.get((row, col))
-				if wid is not None:
-					wid.set_pixmap_with_actual_size()
-
-	# @Utils.timed("resize thumbnails")
 	def resize_thumbnails(self):
-		# размер сменился явно (слайдер или Cmd+/-): выполняем сразу
-		self._size_timer.stop()
-		self._apply_resize()
+		# слайдер: сразу меняем геометрию и ставим быстрые картинки видимым
+		self._apply_resize_fast()
+		self._settle_timer.start(self._settle_debounce_ms)
 
-	# @Utils.timed("finish resize")
-	def _apply_resize(self):
-		Thumb.fast_scale = False
+	def _apply_resize_fast(self):
 		self.thumb_cls.calculate_size()
 		for wid in self.url_to_wid.values():
 			wid.set_text_and_size()
 		self.grid_lay.setSpacing(self.get_grid_spacing())
 		self.rearrange()
 
-	# @Utils.timed("finish resize")
-	def _finish_resize(self):
-		# таймер отложенного ресайза (нужен только для окна, если используется)
-		self._apply_resize()
+	def _settle(self):
+		# ресайз или прокрутка затихли: раскладка и сглаженные картинки видимых
+		self.rearrange()
+		self._start_smooth_pass()
+
+	def _visible_widgets(self) -> list[Thumb]:
+		if not self.ordered or self._cols <= 0:
+			return []
+		row_h = self.ordered[0].height() + self.grid_lay.verticalSpacing()
+		if row_h <= 0:
+			return []
+
+		# видимая часть вьюпорта в координатах grid_wid
+		top = self.verticalScrollBar().value() - self.grid_wid.y()
+		bottom = top + self.viewport().height()
+		total_rows = (len(self.ordered) + self._cols - 1) // self._cols
+		row_from = max(0, top // row_h - 1)              # запас в одну строку сверху
+		row_to = min(total_rows - 1, bottom // row_h + 1)  # и снизу
+
+		result = []
+		for row in range(row_from, row_to + 1):
+			for col in range(self._cols):
+				wid = self.cell_to_wid.get((row, col))
+				if wid is not None:
+					result.append(wid)
+		return result
+
+	def _refresh_visible(self):
+		"""Ставит быструю картинку только видимым миниатюрам."""
+		for wid in self._visible_widgets():
+			wid.set_fast_pixmap()
+
+	def _start_smooth_pass(self):
+		self._smooth_signals.gen += 1
+		idx = Dynamic.current_pixmap_size_index
+		items = [
+			(w.data_item.rel_path, idx, w.data_item.base_qimage)
+			for w in self._visible_widgets()
+			if w.data_item.resized_qimages[idx] is None
+		]
+		if items:
+			UThreadPool.start(SmoothThumbsTask(self._smooth_signals.gen, items,
+											   self._smooth_signals))
+
+	def _on_smooth_ready(self, gen: int, rel_path: str, idx: int, qimg: QImage):
+		# слот в GUI-потоке; результаты старого поколения отбрасываем
+		if gen != self._smooth_signals.gen:
+			return
+		wid = self.url_to_wid.get(rel_path)
+		if wid is None:
+			return
+		wid.data_item.resized_qimages[idx] = qimg
+		wid.apply_smooth(idx, qimg)
 
 	def clear_grid(self):
 		"""Удаляет все виджеты сетки (при полной перезагрузке)."""
+		self._smooth_signals.gen += 1   # отменяем ожидающие сглаживания старой сетки
 		for w in self.url_to_wid.values():
 			self.grid_lay.removeWidget(w)
 			w.deleteLater()
@@ -895,6 +912,7 @@ class Grid(UScrollVerticalArea):
 	def checkScrollValue(self, value: int):
 		self.up_btn.setVisible(value > 0)
 		self._refresh_visible()
+		self._settle_timer.start(self._settle_debounce_ms)
 		self._fill_if_needed()
 
 	def _content_bottom(self) -> int:
@@ -1082,7 +1100,7 @@ class Grid(UScrollVerticalArea):
 
 	def resizeEvent(self, a0: QResizeEvent | None) -> None:
 		super().resizeEvent(a0)
-		self._size_timer.start(self._size_debounce_ms)
+		self._settle_timer.start(self._settle_debounce_ms)
 		QTimer.singleShot(0, self.position_up_btn)
 
 	def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
@@ -1407,6 +1425,8 @@ class GridStandart(Grid):
 			self.scroll_layout.addStretch(1)
 		else:
 			self.rearrange()
+			# новые миниатюры сначала получают быструю картинку, затем сглаживаются
+			self._settle_timer.start(self._settle_debounce_ms)
 		self.finished_.emit()
 
 	def dragEnterEvent(self, a0):

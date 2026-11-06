@@ -5,11 +5,10 @@ from datetime import datetime, date
 from pathlib import Path
 
 import cv2
-# import imagehash
 import numpy as np
 import sqlalchemy
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, Qt
-from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtCore import QObject, QRunnable, QThreadPool, QSize, QRectF, Qt, pyqtSignal
+from PyQt6.QtGui import QImage, QPainter, QPainterPath, QColor, QPixmap
 
 from cfg import Dynamic, JsonData, Static
 
@@ -19,15 +18,11 @@ from .main_folder import Mf
 from .shared_utils import ImgUtils
 from .utils import Utils, ReadableDate
 
-import numpy as np
-from PyQt6.QtCore import QObject, pyqtSignal, Qt, QSize, QRectF
-from PyQt6.QtGui import QImage, QPainter, QPainterPath, QColor
-
 
 class URunnable(QRunnable):
 	def __init__(self):
 		super().__init__()
-	
+
 	def run(self):
 		try:
 			self.task()
@@ -36,7 +31,7 @@ class URunnable(QRunnable):
 
 	def task(self):
 		raise NotImplementedError("Переопредели метод task() в подклассе.")
-	
+
 
 class UThreadPool:
 	pool: QThreadPool = None
@@ -70,8 +65,8 @@ class SetFav(URunnable):
 		with Dbase.main_engine.begin() as conn:
 			stmt = (
 				sqlalchemy.update(Thumbs.table)
-				.where(Thumbs.rel_img_path==self.rel_path)
-				.where(Thumbs.mf_alias==Mf.current_mf.mf_alias)
+				.where(Thumbs.rel_img_path == self.rel_path)
+				.where(Thumbs.mf_alias == Mf.current_mf.mf_alias)
 				.values({
 					Thumbs.fav.name: self.value
 				})
@@ -86,10 +81,10 @@ class SetFav(URunnable):
 # ==========================================
 
 APP_ROOTS = [
-    Path("/Applications"),
-    Path.home() / "Applications",
-    Path("/System/Applications"),
-    Path("/System/Applications/Utilities"),
+	Path("/Applications"),
+	Path.home() / "Applications",
+	Path("/System/Applications"),
+	Path("/System/Applications/Utilities"),
 ]
 APP_MAX_DEPTH = 3
 
@@ -153,11 +148,9 @@ class DbImagesLoaderItem:
 
 class DbImagesLoader(URunnable):
 	"""
-	Загружает изображения из БД и формирует словарь для UI.
+	Загружает изображения из БД и формирует список DbImagesLoaderItem для UI.
 
-	Сигнал finished_ возвращает словарь:
-	- ключ — дата изменения изображения (или 0 при сортировке по добавлению),
-	- значение — список LoadDbImagesItem для соответствующей даты.
+	Сигнал finished_ возвращает список DbImagesLoaderItem.
 	"""
 
 	class Sigs(QObject):
@@ -207,8 +200,6 @@ class DbImagesLoader(URunnable):
 
 			q_date = self.readable_date.qdate_from_timestamp(mod)
 			str_date = self.readable_date.get_readable_date(q_date)
-
-			rel_img_path: str
 
 			item = DbImagesLoaderItem(
 				rel_img_path=rel_img_path,
@@ -286,10 +277,9 @@ class DbImagesLoader(URunnable):
 		- Если нет date_end -> Сегодня 23:59:59
 		Возвращает кортеж (start_timestamp, end_timestamp).
 		"""
-		# Если из UI пришел None, задаем крайние точки прямо перед запросом
 		if date_start is None:
 			date_start = date(1970, 1, 1)
-			
+
 		if date_end is None:
 			date_end = date.today()
 
@@ -302,7 +292,6 @@ class DbImagesLoader(URunnable):
 			datetime.max.time().replace(microsecond=0)
 		)
 
-		# Вызов .timestamp() напрямую у объекта работает чище
 		return start.timestamp(), end.timestamp()
 
 
@@ -313,7 +302,7 @@ class MfDataCleaner(URunnable):
 
 	"""
 	Сбрасывает данные в БД для пересканирования:
-	
+
 	- Удаляет записи из THUMBS, если файл миниатюры отсутствует.
 	- Удаляет запись о папке `mf` из DIRS.
 	"""
@@ -343,12 +332,11 @@ class MfDataCleaner(URunnable):
 			non_exist_paths = self.get_non_exist_rel_paths(rel_paths)
 			self.del_rel_thumb_paths(conn, non_exist_paths)
 
-
 	def clean_dir_table(self, conn: sqlalchemy.Connection):
 		stmt = (
-				sqlalchemy.delete(Dirs.table)
-				.where(Dirs.mf_alias == self.mf_alias)
-			)
+			sqlalchemy.delete(Dirs.table)
+			.where(Dirs.mf_alias == self.mf_alias)
+		)
 		conn.execute(stmt)
 		return True
 
@@ -363,7 +351,7 @@ class MfDataCleaner(URunnable):
 		stmt = (
 			sqlalchemy.delete(Thumbs.table)
 			.where(Thumbs.rel_thumb_path.in_(rel_paths))
-			.where(Thumbs.mf_alias==self.mf_alias)
+			.where(Thumbs.mf_alias == self.mf_alias)
 		)
 		conn.execute(stmt)
 		return True
@@ -403,7 +391,7 @@ class DbDirsLoader(URunnable):
 			).distinct()
 			res = conn.execute(stmt).scalars().all()
 			return self.fill_missing_paths(res)
-		
+
 	def fill_missing_paths(self, paths: list[str]) -> list[str]:
 		"""Добавляет недостающие промежуточные директории."""
 		full_set = set()
@@ -424,7 +412,7 @@ class HashDirSizeItem:
 
 
 class HashDirSize(URunnable):
-	
+
 	class Sigs(QObject):
 		finished_ = pyqtSignal(list)
 
@@ -461,10 +449,10 @@ class HashDirSize(URunnable):
 				)
 				items.append(item)
 		return items
-	
+
 
 class ImgArrayQImage(URunnable):
-	
+
 	class Sigs(QObject):
 		finished_ = pyqtSignal(QImage)
 
@@ -511,8 +499,8 @@ class BlurImgBgTask(URunnable):
 		# ШАГ 1: Размытый фон (в физических пикселях)
 		# ==========================================
 		bg_qimg = orig_qimg.scaled(
-			target_size_physical, 
-			Qt.AspectRatioMode.KeepAspectRatioByExpanding, 
+			target_size_physical,
+			Qt.AspectRatioMode.KeepAspectRatioByExpanding,
 			Qt.TransformationMode.SmoothTransformation
 		)
 
@@ -526,8 +514,8 @@ class BlurImgBgTask(URunnable):
 		# ШАГ 2: Картинка на передний план (Foreground)
 		# ==========================================
 		fg_qimg = orig_qimg.scaled(
-			target_size_physical, 
-			Qt.AspectRatioMode.KeepAspectRatio, 
+			target_size_physical,
+			Qt.AspectRatioMode.KeepAspectRatio,
 			Qt.TransformationMode.SmoothTransformation
 		)
 
@@ -545,11 +533,11 @@ class BlurImgBgTask(URunnable):
 		# 3.1. Делаем обтравочную маску с заданным радиусом
 		# Умножаем заданный радиус на DPR для корректного отображения
 		physical_radius = self.radius * Static.DPR
-		
+
 		clip_path = QPainterPath()
 		clip_path.addRoundedRect(
-			QRectF(0, 0, target_size_physical.width(), target_size_physical.height()), 
-			physical_radius, 
+			QRectF(0, 0, target_size_physical.width(), target_size_physical.height()),
+			physical_radius,
 			physical_radius
 		)
 		painter.setClipPath(clip_path)
@@ -567,7 +555,7 @@ class BlurImgBgTask(URunnable):
 		fg_rect.moveCenter(final_qimg.rect().center())
 		painter.drawImage(fg_rect, fg_qimg)
 
-		painter.end() 
+		painter.end()
 
 		# ==========================================
 		# ШАГ 4: Применяем DPR к финализированному QImage
@@ -614,7 +602,7 @@ class ImageSearcher(URunnable):
 		self.set_total_count()
 		self.manage_thumbs_no_hist()
 		self.manage_thumbs_with_hist()
-		
+
 	def split_by_histogram(self):
 		select_hist = (
 			sqlalchemy.select(Thumbs.id, Thumbs.rel_thumb_path, Properties.bytes_hist)
@@ -657,7 +645,7 @@ class ImageSearcher(URunnable):
 
 	def calc_hist(self, abs_thumb_path: str):
 		img = ImgUtils.read_img(abs_thumb_path)
-		hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)        
+		hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 		hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
 		cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 		return hist2
@@ -667,7 +655,7 @@ class ImageSearcher(URunnable):
 		hist = flat_array.reshape(50, 60)
 		return hist
 
-	def write_to_db(sefl, db_data: list):
+	def write_to_db(self, db_data: list):
 		values = [
 			{
 				Properties.thumb_id.name: id_,
@@ -741,3 +729,41 @@ class ThumbScale(URunnable):
 		resized_qimages = [None] * len(self.widths)
 		resized_qimages[idx] = self.scaled_fn(base_qimage, self.widths[idx])
 		self.sigs.finished_.emit(self.rel_img_path, base_qimage, resized_qimages)
+
+
+# ==========================================
+# Сглаживание миниатюр после ресайза
+# ==========================================
+
+class SmoothSignals(QObject):
+	"""
+	Живёт в GUI-потоке (создаётся владельцем, например Grid).
+	- gen: текущее поколение; воркеры со старым gen прекращают работу.
+	- done(gen, rel_path, idx, image): готовая сглаженная картинка.
+	"""
+	done = pyqtSignal(int, str, int, object)
+
+	def __init__(self):
+		super().__init__()
+		self.gen = 0
+
+
+class SmoothThumbsTask(URunnable):
+	"""
+	CPU-работа с QImage в фоне: сглаженное масштабирование видимых миниатюр.
+	QPixmap здесь не создаётся, он допустим только в GUI-потоке.
+	"""
+
+	def __init__(self, gen: int, items: list, signals: SmoothSignals):
+		super().__init__()
+		self.gen = gen
+		self.items = items        # [(rel_path, idx, base_qimage), ...]
+		self.sigs = signals
+
+	def task(self):
+		for rel_path, idx, base in self.items:
+			# поколение сменилось (ресайз, прокрутка, очистка) - результат уже не нужен
+			if self.sigs.gen != self.gen:
+				return
+			qimg = Utils.scale_qimage_dpr(base, Static.THUMB_WIDTHS[idx])
+			self.sigs.done.emit(self.gen, rel_path, idx, qimg)
