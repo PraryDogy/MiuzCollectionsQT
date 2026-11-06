@@ -684,7 +684,7 @@ class MfSettings(UScrollVerticalArea):
 		self._update_right_margin()
 
 	def save_changes(self):
-		if not self.path_widget.validate():
+		if not self.path_widget.validate_and_show_win():
 			win_warn = WarningWindow(Lng.select_folder_path)
 			win_warn.center_to_parent(self.window())
 			win_warn.ok_clicked.connect(win_warn.deleteLater)
@@ -818,29 +818,15 @@ class NewMfSettings(UMainWindow):
 		self.save_group.show_warning()
 
 	def mf_path_widget_changed(self):
-		basename = os.path.basename(self.mf_path_widget.mf_path).capitalize()
-		self.mf_alias_widget.line_edit.setText(basename)
 		self._on_changed()
 
 	def save_changes(self):
-		mf_path = self.mf_path_widget.validate()
-		mf_alias = self.mf_alias_widget.validate()
-
-		if not mf_path:
-			win_warn = WarningWindow(Lng.select_folder_path)
-			win_warn.center_to_parent(self.window())
-			win_warn.ok_clicked.connect(win_warn.deleteLater)
-			win_warn.show()
-			return
-
+		mf_alias = self.mf_alias_widget.validate_and_show_win()
 		if not mf_alias:
 			return
 
-		if any(i.mf_alias == mf_alias for i in Mf.items):
-			win_warn = WarningWindow(Lng.alias_already_exists)
-			win_warn.center_to_parent(self.window())
-			win_warn.ok_clicked.connect(win_warn.deleteLater)
-			win_warn.show()
+		mf_path = self.mf_path_widget.validate_and_show_win()
+		if not mf_path:
 			return
 
 		mf_stop_list = self.mf_stop_list.get_stop_list()

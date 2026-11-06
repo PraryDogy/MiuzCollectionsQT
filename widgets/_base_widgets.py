@@ -1289,7 +1289,7 @@ class MfAliasWidget(UGroupBox):
 		title_lay.setContentsMargins(0, 0, 0, 0)
 		title_lay.setSpacing(0)
 
-		title = TitleTextLabel(Lng.catalog_name, Static.COLOR_ICONS / "image_folder.svg")
+		title = TitleTextLabel(Lng.catalog_name, Static.GRAY_ICONS / "text_edit_gray.svg")
 		title_lay.addWidget(title)
 		title_lay.addStretch()
 		v_layout.addWidget(title_wrapper)
@@ -1370,7 +1370,7 @@ class MfAliasWidget(UGroupBox):
 			return Lng.alias_taken
 		return None
 
-	def validate(self):
+	def validate_and_show_win(self):
 		mf_alias = self.line_edit.text()
 		error_text = self._get_error(mf_alias)
 		# при сохранении проверка срабатывает сразу, без ожидания таймера
@@ -1759,7 +1759,7 @@ class MfPathWidget(UGroupBox):
 		self.changed.emit()
 		self.show_ok_path()
 
-	def validate(self):
+	def validate_and_show_win(self):
 		if not self.mf_path or not os.path.exists(self.mf_path):
 			win_warn = WarningWindow(Lng.select_folder_path)
 			win_warn.center_to_parent(self.window())

@@ -94,7 +94,7 @@ class WinSmb(UMainWindow):
 			Mf.write_json_data()
 			restart_app()
 
-		mf_path = self.path_widget.validate()
+		mf_path = self.path_widget.validate_and_show_win()
 		if mf_path:
 			self.super_win = SuperConfirmWindow(Lng.confirm_mf_path)
 			self.super_win.ok_clicked.connect(ok_clicked)
