@@ -227,8 +227,6 @@ class UMenu(TransparentMenu):
 
 
 class ULineEdit(TransparentLineEdit):
-	hh = 30
-
 	def __init__(self):
 		super().__init__()
 
@@ -307,14 +305,12 @@ class UScrollVerticalArea(TransparentScrollArea):
 
 
 class UListSpacerItem(QListWidgetItem):
-
 	def __init__(self, parent: QListWidget):
 		super().__init__()
 		self.setFlags(Qt.ItemFlag.NoItemFlags)
 
 
 class UListWidgetItem(QListWidgetItem):
-
 	def __init__(self, parent: QListWidget, text: str):
 		super().__init__(text, parent)
 
@@ -324,23 +320,19 @@ class UListWidgetItem(QListWidgetItem):
 
 
 class UTreeWidgetItem(QTreeWidgetItem):
-
 	def __init__(self, parent: QTreeWidget | QTreeWidgetItem, text: str):
 		super().__init__(parent, [text])
 
 
 class UListWidget(TransparentListWidget):
-	ICON_SIZE = (16, 16)
-
 	def __init__(self):
 		super().__init__()
 		self.horizontalScrollBar().setDisabled(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setIconSize(QSize(*self.ICON_SIZE))
+		self.setIconSize(QSize(16, 16))
 
 
 class RoundedRowDelegate(QStyledItemDelegate):
-
 	def paint(self, painter, option, index):
 		view = option.widget
 		if view is None or index.column() != 0:
@@ -361,7 +353,6 @@ class RoundedRowDelegate(QStyledItemDelegate):
 
 
 class UTreeWidget(TransparentTreeWidget):
-	ICON_SIZE = (16, 16)
 	BRANCH_ICON_X = 3   # x левого края иконки ветки от края viewport, подбирается по скриншоту
 	GAP = 5  # px между левым краем подсветки и иконкой
 
@@ -369,7 +360,7 @@ class UTreeWidget(TransparentTreeWidget):
 		super().__init__()
 		self.horizontalScrollBar().setDisabled(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setIconSize(QSize(*self.ICON_SIZE))
+		self.setIconSize(QSize(16, 16))
 		self.setHeaderHidden(True)
 		self.setAutoScroll(False)
 		self.setIndentation(15)
@@ -418,14 +409,11 @@ class UTreeView(TransparentTreeView):
 
 
 class UPushButton(TransparentButton):
-	hh = 28
-	icon_size = (12, 12)
-
 	def __init__(self, text: str):
 		self._raw_text = ""      # Инициализируем переменную для хранения чистого текста
 		super().__init__("")
-		self.setIconSize(QSize(*self.icon_size))
-		self.setFixedHeight(self.hh)
+		self.setIconSize(QSize(12, 12))
+		self.setFixedHeight(28)
 		self.setText(text)       # Вызываем наш переопределенный setText
 		self.ensurePolished()
 
@@ -521,7 +509,7 @@ class UCheckBox(QCheckBox):
 
 
 class MacControlButton(QPushButton):
-	base_path = Static.ICONS / "traffic_lights"
+	traffic_lights_path = Static.ICONS / "traffic_lights"
 
 	def __init__(self, btn_type: str, parent=None):
 		super().__init__(parent)
@@ -537,13 +525,13 @@ class MacControlButton(QPushButton):
 	def update_icon(self):
 		# Если окно не в фокусе ИЛИ кнопка отключена — ставим серую иконку
 		if not self.isEnabled() or not self.is_window_focused:
-			icon_path = f"{self.base_path}/unfocused.svg"
+			icon_path = f"{self.traffic_lights_path}/unfocused.svg"
 		elif self.is_pressed:
-			icon_path = f"{self.base_path}/{self.btn_type}/active.svg"
+			icon_path = f"{self.traffic_lights_path}/{self.btn_type}/active.svg"
 		elif self.is_group_hovered:
-			icon_path = f"{self.base_path}/{self.btn_type}/hover.svg"
+			icon_path = f"{self.traffic_lights_path}/{self.btn_type}/hover.svg"
 		else:
-			icon_path = f"{self.base_path}/{self.btn_type}/default.svg"
+			icon_path = f"{self.traffic_lights_path}/{self.btn_type}/default.svg"
 
 		self.setIcon(QIcon(icon_path))
 		self.setIconSize(QSize(12, 12))
@@ -561,12 +549,11 @@ class MacControlButton(QPushButton):
 
 
 class TitleBar(TransparentWidget):
-	HH = 28
 	TRAFFIC_LIGHT_WIDTH = 0
 
 	def __init__(self, parent: QMainWindow):
 		super().__init__(parent)
-		self.setFixedHeight(self.HH)
+		self.setFixedHeight(28)
 
 		self.parent_ = parent
 		self._drag_pos = None
@@ -851,8 +838,6 @@ class GrayTextLabel(TransparentLabel):
 
 # если переименовываешь, не забудь qss
 class TitleTextLabel(TransparentWidget):
-	icon_size = (23, 23)
-
 	def __init__(self, text: str, svg_path: str = None):
 		super().__init__()
 		self.h_layout = QHBoxLayout(self)
@@ -861,7 +846,7 @@ class TitleTextLabel(TransparentWidget):
 
 		if svg_path:
 			self.svg_widget = QSvgWidget(str(svg_path))
-			self.svg_widget.setFixedSize(*self.icon_size)
+			self.svg_widget.setFixedSize(23, 23)
 			self.h_layout.addWidget(self.svg_widget)
 
 		self.text_widget = TransparentLabel(text)
@@ -882,12 +867,6 @@ class UTagWidget(TransparentFrame):
 	qss_yellow = "yellow"
 	qss_red = "red"
 
-	tag_height = 25
-	right_svg_size = (14, 14)
-	left_svg_size = (15, 15)
-	base_right_spacing = 7
-	low_right_spacing = 3
-
 	def __init__(
 			  self, text: str,
 			  qss_style: str,
@@ -896,13 +875,13 @@ class UTagWidget(TransparentFrame):
 			):
 		super().__init__()
 		self.qss_style = qss_style
-		self.setFixedHeight(self.tag_height)
+		self.setFixedHeight(25)
 		self.setProperty(UTagWidget.qss_property_name, qss_style)
 		self.set_qss_style(qss_style)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		self.h_lay = QHBoxLayout(self)
-		self.h_lay.setContentsMargins(7, 2, self.base_right_spacing, 2)
+		self.h_lay.setContentsMargins(7, 2, 7, 2)
 		self.h_lay.setSpacing(6)
 		self.h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -910,7 +889,7 @@ class UTagWidget(TransparentFrame):
 			self.left_svg_widget = QSvgWidget()
 			self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
 			self.left_svg_widget.load(left_svg_path)
-			self.left_svg_widget.setFixedSize(*self.left_svg_size)
+			self.left_svg_widget.setFixedSize(15, 15)
 			self.h_lay.addWidget(self.left_svg_widget)
 
 		self.text_widget = TransparentLabel(text)
@@ -927,7 +906,7 @@ class UTagWidget(TransparentFrame):
 			self.right_svg_widget = QSvgWidget()
 			self.right_svg_widget.mouseReleaseEvent = self.right_svg_cmd
 			self.right_svg_widget.load(right_svg_path)
-			self.right_svg_widget.setFixedSize(*self.right_svg_size)
+			self.right_svg_widget.setFixedSize(14, 14)
 			self.right_svg_lay.addWidget(self.right_svg_widget)
 
 	def set_qss_style(self, qss_style: str):
