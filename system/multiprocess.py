@@ -387,7 +387,6 @@ class CopyTask:
 		return path
 
 
-import time
 
 
 class FilesRemover:
@@ -404,7 +403,7 @@ class FilesRemover:
 				if e.errno != errno.EBUSY or attempt == attempts - 1:
 					print("FilesRemover error:", path, e)
 					return False
-				time.sleep(delay)
+				sleep(delay)
 		return False
 
 	@staticmethod
