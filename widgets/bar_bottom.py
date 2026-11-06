@@ -1,27 +1,128 @@
 import os
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QButtonGroup, QGraphicsOpacityEffect, QHBoxLayout,
-                             QToolButton)
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
+from system.main_folder import Mf
 from system.scaner import ScanProgress
+from system.shared_utils import ImgUtils
 
-from ._base_widgets import (GrayTextLabel, TransparentWidget, UMenu,
-                            UPushButton, USlider)
+from ._base_widgets import (GrayTextLabel, TransparentWidget, USep,
+                            USlider)
 
 
-class BarBottomSlider(USlider):
+# =============================================================================
+# ПУТЬ (бывший bar_path.py)
+# =============================================================================
+
+class PathItem(TransparentWidget):
+	new_history_item = pyqtSignal(str)
+	load_st_grid = pyqtSignal()
+	arrow_right = " \U0000203A"  # ›
+	info_win = pyqtSignal(list)
+	add_fav = pyqtSignal(str)
+	del_fav = pyqtSignal(str)
+	type_to_pixmap: dict = {}
+
+	def __init__(self, dir: str, name: str):
+		super().__init__()
+		self.item_dir = dir
+
+		item_layout = QHBoxLayout(self)
+		item_layout.setContentsMargins(0, 0, 0, 0)
+		item_layout.setSpacing(5)
+
+		self.img_wid = QSvgWidget(str(Static.COLOR_ICONS / "base_folder.svg"))
+		self.img_wid.setFixedSize(12, 12)
+		item_layout.addWidget(self.img_wid)
+
+		self.text_wid = GrayTextLabel(text=name)
+		self.text_wid.set_font_size(11)
+		self.collapse()
+		item_layout.addWidget(self.text_wid)
+
+	def add_arrow(self):
+		t = self.text_wid.text() + " " + PathItem.arrow_right
+		self.text_wid.setText(t)
+
+	def del_arrow(self):
+		t = self.text_wid.text().replace(PathItem.arrow_right, "")
+		self.text_wid.setText(t)
+
+	def expand(self):
+		self.text_wid.setFixedWidth(self.text_wid.sizeHint().width())
+
+	def collapse(self, min_w=5):
+		if not self.text_wid.underMouse():
+			self.text_wid.setMinimumWidth(min_w)
+
+
+class PathBar(TransparentWidget):
+	new_history_item = pyqtSignal(str)
+	load_st_grid = pyqtSignal()
+	info_win = pyqtSignal(list)
+	add_fav = pyqtSignal(str)
+	del_fav = pyqtSignal(str)
+
 	def __init__(self):
 		super().__init__()
+		self.current_path: str = None
 
-	def _on_value_changed(self, value):
-		Dynamic.current_pixmap_size_index = value
-		super()._on_value_changed(value)
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setSpacing(5)
+		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
+	def update(self, dir: str, last_item_limit=40):
+		"""
+		Отобразить новый путь сетки / папки / файла
+		src: путь сетки / папки / файла
+		"""
+		if dir == self.current_path:
+			return
+		for i in self.findChildren(PathItem):
+			i.deleteLater()
+		self.current_path = dir
+		root = dir.strip(os.sep).split(os.sep)
+		path_items: dict[int, PathItem] = {}
+
+		for x, name in enumerate(root, start=1):
+			item_dir = os.path.join(os.sep, *root[:x])
+			path_item = PathItem(item_dir, name)
+			path_item.new_history_item.connect(self.new_history_item.emit)
+			path_item.load_st_grid.connect(self.load_st_grid.emit)
+			path_item.info_win.connect(lambda lst: self.info_win.emit(lst))
+			path_item.add_fav.connect(self.add_fav.emit)
+			path_item.del_fav.connect(self.del_fav.emit)
+			path_item.add_arrow()
+			path_items[x] = path_item
+			self.h_layout.addWidget(path_item)
+
+		path_items[1].img_wid.load(
+			str(Static.COLOR_ICONS / "image_folder.svg")
+		)
+
+		last_item = path_items.get(len(root))
+		if dir.endswith(ImgUtils.ext_all):
+			last_item.img_wid.load(
+				str(Static.GRAY_ICONS / "image_icon_gray.svg")
+			)
+
+		text_ = last_item.text_wid.text()
+		if len(text_) > last_item_limit:
+			last_item.setFixedWidth(400)
+			last_item.text_wid.set_elide(True)
+
+		if len(root) != 1:
+			last_item.del_arrow()
+
+
+# =============================================================================
+# ПРОГРЕСС (ProgressWidget)
+# =============================================================================
 
 class ProgressWidget(GrayTextLabel):
 	qss_property_name = "style"
@@ -135,24 +236,53 @@ class ProgressWidget(GrayTextLabel):
 		QTimer.singleShot(len(steps) * step_ms, self.show_timer)
 
 
+# =============================================================================
+# СЛАЙДЕР
+# =============================================================================
+
+class BarBottomSlider(USlider):
+	def __init__(self):
+		super().__init__()
+
+	def _on_value_changed(self, value):
+		Dynamic.current_pixmap_size_index = value
+		super()._on_value_changed(value)
+
+
+# =============================================================================
+# ЕДИНЫЙ НИЖНИЙ БЛОК: путь сверху, прогресс и слайдер снизу
+# =============================================================================
+
 class BarBottom(TransparentWidget):
 	resize_thumbnails = pyqtSignal()
+
+	FOOTER_MARGINS = 5
 
 	def __init__(self):
 		super().__init__()
 
-		# --- Горизонтальный layout ---
-		self.h_layout = QHBoxLayout(self)
+		# --- Вертикальный лэйаут: путь сверху, нижняя строка снизу ---
+		self.v_layout = QVBoxLayout(self)
+		self.v_layout.setContentsMargins(self.FOOTER_MARGINS, 5, self.FOOTER_MARGINS, 0)
+		self.v_layout.setSpacing(0)
+
+		# --- Путь ---
+		self.bar_path = PathBar()
+		self.bar_path.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.v_layout.addWidget(self.bar_path)
+
+		self.v_layout.addSpacing(5)
+		self.v_layout.addWidget(USep())
+
+		# --- Нижняя строка: прогресс, выделение, слайдер ---
+		bottom = TransparentWidget()
+		self.h_layout = QHBoxLayout(bottom)
+		self.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.h_layout.setSpacing(0)
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+		self.v_layout.addWidget(bottom)
 
-		# self.svg_wid = QSvgWidget(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
-		# self.svg_wid.setFixedSize(12, 12)
-		# self.h_layout.addWidget(self.svg_wid)
-
-		# self.h_layout.addSpacing(5)
-
-		# --- Прогресс-бар ---
+		# --- Прогресс ---
 		self.progress_widget = ProgressWidget()
 		self.h_layout.addWidget(self.progress_widget)
 
@@ -170,13 +300,10 @@ class BarBottom(TransparentWidget):
 		self.slider.setMaximum(len(Static.THUMB_WIDTHS) - 1)
 		self.slider.setValue(Dynamic.current_pixmap_size_index)
 		self.slider.setFixedWidth(80)
-
 		self.slider.clicked.connect(self.resize_thumbnails)
 		self.h_layout.addWidget(self.slider)
 
 		self.progress_widget.raise_()
-
-		# QTimer.singleShot(500, self.progress_widget.run_demo)
 
 	def _objects_word(self, n: int) -> str:
 		if JsonData.lng_index == 0:  # русский: три формы по правилам склонения

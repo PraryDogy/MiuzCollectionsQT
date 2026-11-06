@@ -22,7 +22,7 @@ from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, USep, WarningWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
-from .bar_path import PathBar
+# from .bar_path import PathBar
 from .bar_top import BarTop
 from .grid import Grid, GridStandart, Thumb
 from .menu_left import MenuLeft
@@ -252,36 +252,13 @@ class WinMain(UMainWindow):
 		self.splitter.setStretchFactor(1, 1)
 		self.resize(self.ww, self.hh)
 
-		# --- Создаем единый контейнер для всего нижнего блока ---
-		self.footer_container = TransparentWidget()
-		self.footer_layout = QVBoxLayout(self.footer_container)
-
-		# слева справа доп отступы, чтобы быть уже, чем основные виджеты
-		# сетка и левое меню, отступ сверху от сетки и меню
-		self.footer_layout.setContentsMargins(self.FOOTER_MARGINS, 5, self.FOOTER_MARGINS, 0)
-		self.footer_layout.setSpacing(0)
-
-		self.bar_path = PathBar()
-		self.bar_path.h_layout.setContentsMargins(0, 0, 0, 0)
-		self.path_bar_update("")
-		self.footer_layout.addWidget(self.bar_path)
-
-		self.footer_layout.addSpacing(5)
-
-		# 2. Добавляем горизонтальный разделитель
-		bar_bottom_sep = USep()
-		self.footer_layout.addWidget(bar_bottom_sep)
-
 		# левый и правый маргин для красивого отступа
 		self.bar_bottom = BarBottom()
 		self.bar_bottom.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.bar_bottom.resize_thumbnails.connect(
 			lambda: self.grid.resize_thumbnails()
 		)
-		self.footer_layout.addWidget(self.bar_bottom)
-
-		# --- Добавляем уже готовый собранный виджет в главный лэйаут ---
-		self.central_layout.addWidget(self.footer_container)
+		self.central_layout.addWidget(self.bar_bottom)
 
 		if "noscan" not in argv:
 			self.start_scaner_task()
@@ -289,6 +266,8 @@ class WinMain(UMainWindow):
 			print("СКАНЕР ВЫКЛЮЧЕН")
 			self.bar_bottom.progress_widget.reset()
 			self.bar_bottom.progress_widget.setText("СКАНЕР ВЫКЛЮЧЕН")
+
+		self.path_bar_update("")
 
 		# QTimer.singleShot(100, lambda: self.open_win_smb(Mf.current_mf))
 
@@ -348,7 +327,7 @@ class WinMain(UMainWindow):
 
 	def path_bar_update(self, path: str):
 		dir = f"/{Mf.current_mf.mf_alias}{path}"
-		self.bar_path.update(dir)
+		self.bar_bottom.bar_path.update(dir)
 
 	def on_hide_digits_clicked(self):
 		self.win_warn = WarningWindow(Lng.hide_digits_full)
@@ -922,8 +901,3 @@ class WinMain(UMainWindow):
 				if new_index != Dynamic.current_pixmap_size_index:
 					Dynamic.current_pixmap_size_index = new_index
 					self.bar_bottom.slider._on_value_changed(new_index)
-
-	def resizeEvent(self, a0):
-		wid = self.splitter.widget(1)
-		self.bar_path.setMaximumWidth(wid.width())
-		return super().resizeEvent(a0)
