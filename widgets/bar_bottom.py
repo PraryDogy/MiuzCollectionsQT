@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QButtonGroup, QGraphicsOpacityEffect, QHBoxLayout,
 from cfg import Dynamic, JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import (GrayTextLabel, SvgWithThemeBg, TransparentWidget,
+from ._base_widgets import (GrayTextLabel, TransparentWidget,
                             UMenu, UPushButton, USlider)
 
 

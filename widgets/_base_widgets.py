@@ -948,8 +948,8 @@ class RowArrowWidget(TransparentWidget):
 		
 		self.adjustSize()
 
-	def set_left_icon(self, svg_path: Path):
-		self.left_icon.load(str(svg_path))
+	def set_left_icon(self, svg: Path):
+		self.left_icon.load(str(svg))
 		self.left_icon.show()
 
 	def replace_arrow_widget(self, widget: TransparentWidget):
@@ -1434,7 +1434,7 @@ class _SvgWithThemeBg(TransparentLabel):
 class SvgWithThemeBg(TransparentWidget):
 	clicked_ = pyqtSignal()
 
-	def __init__(self, svg_path: Path, container_size: tuple, icon_size: tuple):
+	def __init__(self, svg: Path, container_size: tuple, icon_size: tuple):
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
@@ -1443,7 +1443,7 @@ class SvgWithThemeBg(TransparentWidget):
 		self.label.setFixedSize(*container_size)
 
 		# SVG-иконка с заданным размером
-		self.svg_widget = QSvgWidget(str(svg_path), self)
+		self.svg_widget = QSvgWidget(str(svg), self)
 		self.svg_widget.setFixedSize(*icon_size)
 		self.svg_widget.setAttribute(
 			Qt.WidgetAttribute.WA_TransparentForMouseEvents, True

@@ -256,21 +256,21 @@ class DatesWidget(UGroupBox):
 
 
 class WinFiltersUserTag(UTagWidget):
-	def __init__(self, text: str, left_svg_path: Path):
+	def __init__(self, text: str, l_svg: Path):
 		super().__init__(
 			text=text,
 			style=UTagWidget.qss_gray,
-			l_svg=left_svg_path,
+			l_svg=l_svg,
 			r_svg=Static.GRAY_ICONS / "trash_gray.svg"
 		)
 
 
 class WinFiltersStantartTag(UTagWidget):
-	def __init__(self, text: str, left_svg_path: Path):
+	def __init__(self, text: str, l_svg: Path):
 		super().__init__(
 			text=text,
 			style=self.qss_gray,
-			l_svg=left_svg_path
+			l_svg=l_svg
 		)
 
 
@@ -278,7 +278,7 @@ class WinFiltersFavTag(WinFiltersStantartTag):
 	def __init__(self):
 		super().__init__(
 			text=Lng.favorites,
-			left_svg_path=Static.GRAY_ICONS / "star_gray.svg",
+			l_svg=Static.GRAY_ICONS / "star_gray.svg",
 		)
 		if Dynamic.favs_tag_enabled:
 			self.set_qss_style(self.qss_green)
@@ -297,7 +297,7 @@ class SubfoldersTagWidget(WinFiltersStantartTag):
 	def __init__(self):
 		super().__init__(
 			text=Lng.without_subfolders, 
-			left_svg_path=Static.GRAY_ICONS / "folder_gray.svg"
+			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
 		)
 		if Dynamic.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_green)
@@ -316,7 +316,7 @@ class WordFiltersTagWidget(WinFiltersUserTag):
 	def __init__(self, text):
 		super().__init__(
 			text=text,
-			left_svg_path=Static.GRAY_ICONS / "tags_gray.svg"
+			l_svg=Static.GRAY_ICONS / "tags_gray.svg"
 		)
 		if text in Dynamic.word_tags_list:
 			self.set_qss_style(self.qss_green)

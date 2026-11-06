@@ -482,10 +482,10 @@ class GridControlsWidget(TransparentWidget):
 
 
 class GridTag(UTagWidget):
-	def __init__(self, left_svg_path, text):
+	def __init__(self, l_svg, text):
 		super().__init__(
 			style=self.qss_green,
-			l_svg=left_svg_path,
+			l_svg=l_svg,
 			text=text,
 			r_svg=Static.GRAY_ICONS / "cancel_solid_gray.svg"
 		)
@@ -497,7 +497,7 @@ class GridDatesTag(GridTag):
 	def __init__(self):
 		super().__init__(
 			text=DatesWidget.readable_date,
-			left_svg_path=Static.GRAY_ICONS / "calendar_gray.svg"
+			l_svg=Static.GRAY_ICONS / "calendar_gray.svg"
 		)
 
 	def right_svg_cmd(self, *args):
@@ -510,7 +510,7 @@ class GridWordTag(GridTag):
 	def __init__(self, text):
 		super().__init__(
 			text=text,
-			left_svg_path=Static.GRAY_ICONS / "tags_gray.svg"
+			l_svg=Static.GRAY_ICONS / "tags_gray.svg"
 		)
 
 	def right_svg_cmd(self, *args):
@@ -522,7 +522,7 @@ class GridFavTag(GridTag):
 	def __init__(self):
 		super().__init__(
 			text=Lng.favorites,
-			left_svg_path=Static.GRAY_ICONS / "star_gray.svg"
+			l_svg=Static.GRAY_ICONS / "star_gray.svg"
 		)
 
 	def right_svg_cmd(self, *args):
@@ -531,12 +531,12 @@ class GridFavTag(GridTag):
 
 
 class GridNoSubfoldersTag(GridTag):
-	left_svg_path = Static.GRAY_ICONS / "folder_gray.svg"
+	l_svg = Static.GRAY_ICONS / "folder_gray.svg"
 
 	def __init__(self):
 		super().__init__(
 			text=Lng.without_subfolders,
-			left_svg_path=Static.GRAY_ICONS / "folder_gray.svg"
+			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
 		)
 
 	def right_svg_cmd(self, *args):

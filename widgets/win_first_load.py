@@ -100,7 +100,7 @@ class FirstLoadWin(UMainWindow):
 		lng_layout.setSpacing(10)
 
 		lng_wid = RowArrowWidget(Lng.language_max)
-		lng_wid.set_left_icon(str(Static.COLOR_ICONS / "language.svg"))
+		lng_wid.set_left_icon(Static.COLOR_ICONS / "language.svg")
 		lng_wid.hide_arrow()
 		lng_layout.addWidget(lng_wid)
 
