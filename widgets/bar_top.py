@@ -149,6 +149,9 @@ class ConnectServerSvgBtn(CommonSvgIconButton):
 class ImgSearchSvgBtn(CommonSvgIconButton):
 	base_svg = Static.GRAY_ICONS / "camera_gray.svg"
 
+	def __init__(self):
+		super().__init__()
+
 
 class CatalogWidget(TransparentWidget):
 	mf_open = pyqtSignal(Mf)
