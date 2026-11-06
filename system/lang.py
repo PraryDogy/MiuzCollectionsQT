@@ -1,7 +1,9 @@
 class Lng:
+	CURRENT_LNG_INDEX = 0
 
 	@classmethod
 	def init_lang(cls, lng_index: int):
+		cls.CURRENT_LNG_INDEX = lng_index
 		for key, value in vars(cls).copy().items():
 			if isinstance(value, tuple):
 				setattr(cls, key, value[lng_index])

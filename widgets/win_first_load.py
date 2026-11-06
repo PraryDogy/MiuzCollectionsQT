@@ -58,11 +58,10 @@ class FirstLoadWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		UThreadPool.init()
+		Lng.init_lang(0)
 		self.central_layout.setContentsMargins(5, 7, 5, 10)
 		self.central_layout.setSpacing(10)
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.lng_index = 0
-		self.margins = 3
 		self.init_ui()
 		self.adjustSize()
 		# self.setFixedHeight(self.height())
@@ -82,23 +81,14 @@ class FirstLoadWin(UMainWindow):
 		self.init_last_block()
 
 	def change_language(self, value: int):
-		if self.lng_index == value:
-			return
+		Lng.init_lang(value)
 		self.remove_ui()
-		self.lng_index = value
 		self.init_ui()
 
 	def init_lang_widget(self):
-		rus_action_text = Lng.rus
-		eng_action_text = Lng.eng
-
-		if self.lng_index == 0:
-			lng_label_text = f"{Lng.app_lang} ({Lng.app_lang})"
-			lng_btn_text = rus_action_text
+		if Lng.CURRENT_LNG_INDEX == 0:
 			lng_btn_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
 		else:
-			lng_label_text = f"{Lng.app_lang} ({Lng.app_lang})"
-			lng_btn_text = eng_action_text
 			lng_btn_icon  = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
 		# Сохраняем ссылку в self.lng_container
@@ -109,7 +99,7 @@ class FirstLoadWin(UMainWindow):
 		lng_layout.setContentsMargins(0, 0, 0, 0)
 		lng_layout.setSpacing(10)
 
-		lng_wid = RowArrowWidget(lng_label_text)
+		lng_wid = RowArrowWidget(Lng.language_max)
 		lng_wid.set_left_icon(str(Static.COLOR_ICONS / "language.svg"))
 		lng_wid.hide_arrow()
 		lng_layout.addWidget(lng_wid)
@@ -127,7 +117,7 @@ class FirstLoadWin(UMainWindow):
 			action.triggered.connect(lambda e, v=value: self.change_language(v))
 			lng_menu.addAction(action)
 
-		lng_btn = UPushButton(lng_btn_text)
+		lng_btn = UPushButton()
 		lng_btn.setFixedWidth(100)
 		lng_btn.setMenu(lng_menu)
 		lng_btn.setIcon(lng_btn_icon)
@@ -136,7 +126,7 @@ class FirstLoadWin(UMainWindow):
 		# self.lng_container.adjustSize()
 
 	def init_mf_alias_widget(self):
-		self.mf_alias_widget = MfAliasWidget(self.lng_index)
+		self.mf_alias_widget = MfAliasWidget()
 		self.mf_alias_widget.changed.connect(
 			lambda: self.save_widget.show_warning()
 		)
@@ -151,7 +141,7 @@ class FirstLoadWin(UMainWindow):
 			self.path_widget.mf_path
 			self.save_widget.show_warning()
 
-		self.path_widget = MfPathWidget(self.lng_index)
+		self.path_widget = MfPathWidget()
 		self.path_widget.changed.connect(
 			lambda: mf_path_changed()
 		)
@@ -167,7 +157,7 @@ class FirstLoadWin(UMainWindow):
 
 		if Static.MIUZ_ZIP.exists():
 			self.copy_zip_widget = RowArrowWidget(
-				Lng.miuz_diamonds[self.lng_index]
+				Lng.miuz_diamonds
 			)
 			self.copy_zip_widget.set_left_icon(Static.COLOR_ICONS / "miuz.svg")
 			self.copy_zip_widget.clicked.connect(
@@ -175,14 +165,14 @@ class FirstLoadWin(UMainWindow):
 			)
 			last_block_layout.addWidget(self.copy_zip_widget)
 
-		self.save_widget = SaveRowArrowWidget(self.lng_index)
+		self.save_widget = SaveRowArrowWidget()
 		self.save_widget.clicked.connect(lambda: self.save_cmd())
 		last_block_layout.addWidget(self.save_widget)
 
 	def copy_zip_cmd(self):
 
 		def fin():
-			JsonData.lng_index = self.lng_index
+			JsonData.lng_index = Lng.CURRENT_LNG_INDEX
 			JsonData.write_json_data()
 			restart_app()
 
@@ -203,14 +193,14 @@ class FirstLoadWin(UMainWindow):
 			Mf.items.clear()
 			Mf.items.append(mf)
 			Mf.write_json_data()
-			JsonData.lng_index = self.lng_index
+			JsonData.lng_index = Lng.CURRENT_LNG_INDEX
 			JsonData.write_json_data()
 			restart_app()
 
 		mf_alias = self.mf_alias_widget.validate()
 		mf_path = self.path_widget.validate()
 		if mf_alias and mf_path:
-			self.save_win = ConfirmWindow(Lng.save_text_long[self.lng_index])
+			self.save_win = ConfirmWindow(Lng.save_text_long)
 			self.save_win.ok_clicked.connect(
 				lambda: save_fin(mf_alias, mf_path)
 			)

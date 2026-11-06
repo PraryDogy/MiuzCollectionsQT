@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
-                           ScanerWorker)
+                           ScanConfirmRequest, ScanerWorker, ScanProgress)
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils, ThumbScale
 
@@ -91,6 +91,19 @@ def reset_mf_after_rejection(mf) -> None:
 	"""Пользователь отказался от найденных опасных файлов: сбрасываем хранилище в корень."""
 	mf.set_mf_current_path(None)
 	mf.mf_paths = [""]
+
+
+def scan_progress_text(progress: ScanProgress) -> str:
+	"""Текст прогресса сканера. Строится только в GUI-потоке, где доступен Lng."""
+	if progress.kind == "search_dirs":
+		return f"{progress.mf_alias}: {Lng.search_in.lower()}"
+	if progress.kind == "indexing":
+		return (
+			f"{progress.mf_alias}: "
+			f"{Lng.indexing_files.lower()} "
+			f"{progress.current} {Lng.from_} {progress.total}"
+		)
+	return f"{progress.mf_alias}: {Lng.no_connection.lower()}"
 
 
 class ForcedDirsRegistry:
@@ -242,7 +255,7 @@ class WinMain(UMainWindow):
 		# --- Создаем единый контейнер для всего нижнего блока ---
 		self.footer_container = TransparentWidget()
 		self.footer_layout = QVBoxLayout(self.footer_container)
-		
+
 		# слева справа доп отступы, чтобы быть уже, чем основные виджеты
 		# сетка и левое меню, отступ сверху от сетки и меню
 		self.footer_layout.setContentsMargins(self.FOOTER_MARGINS, 5, self.FOOTER_MARGINS, 0)
@@ -324,14 +337,14 @@ class WinMain(UMainWindow):
 		self.win_img_search.show()
 		self.win_img_search.raise_()
 		self.win_img_search.activateWindow()
-	
+
 	def show_in_app(self, rel_path: str):
 		current_dir = os.path.dirname(rel_path)
 		Dynamic.current_dir = current_dir
 		self.go_to_url = rel_path
 		self.load_st_grid()
 		self.left_menu.tree_wid.expand_to_path(current_dir)
-	
+
 	def path_bar_update(self, path: str):
 		dir = f"/{Mf.current_mf.mf_alias}{path}"
 		self.bar_path.update(dir)
@@ -341,7 +354,7 @@ class WinMain(UMainWindow):
 		self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
 		self.win_warn.center_to_parent(self)
 		self.win_warn.show()
-		
+
 	def open_filters_win(self):
 
 		def edit_filters():
@@ -370,7 +383,7 @@ class WinMain(UMainWindow):
 		mf_path = mf.get_avaiable_mf_path()
 		if not mf_path:
 			self.open_win_smb(mf)
- 
+
 	@with_conn
 	def on_tree_clicked(self, abs_path: str):
 		rel_path = Utils.remove_mf_path(
@@ -387,7 +400,7 @@ class WinMain(UMainWindow):
 			return
 		wid.data_item.base_qimage = base_qimage
 		wid.data_item.resized_qimages = resized_qimages
-		wid.set_pixmap_with_actual_size(force=True)
+		wid.set_fast_pixmap(force=True)
 
 	@with_conn
 	def start_update_thumb(self, rel_paths: list[str]):
@@ -490,7 +503,7 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def remove_files(self, rel_paths: list, ms = 300):
-		
+
 		def poll_file_remover():
 			while not file_remover.process_queue.empty():
 				file_remover.process_queue.get_nowait()
@@ -520,14 +533,13 @@ class WinMain(UMainWindow):
 		self.remove_files_win.center_to_parent(self.window())
 		self.remove_files_win.ok_clicked.connect(start_file_remover)
 		self.remove_files_win.show()
-	
+
 	@with_conn
 	def upload_files(self, dropped_files: list[str]):
 
 		def fin(dest: str):
 			self.upload_win.deleteLater()
 			self.paste_files(dropped_files, dest)
-
 
 		dropped_files = filter_supported(dropped_files)
 		self.upload_win = UploadWin(
@@ -543,7 +555,7 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def open_info_win(self, rel_paths: list[str]):
-		
+
 		abs_paths = [
 			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
 			for i in rel_paths
@@ -649,12 +661,9 @@ class WinMain(UMainWindow):
 			lambda: self.open_filters_win()
 		)
 
-
 		self.grid.selection_count_changed.connect(
 			lambda x: self.bar_bottom.set_selection_count(x)
 		)
-
-
 
 		self.right_layout.addWidget(self.grid)
 
@@ -727,17 +736,17 @@ class WinMain(UMainWindow):
 		while not self.scaner_task.process_queue.empty():
 			data = self.scaner_task.process_queue.get()
 
-			if isinstance(data, tuple):
-				mf_alias, removed_images_count = data
-				self.win_warn = DangerWarn(mf_alias, removed_images_count)
+			if isinstance(data, ScanConfirmRequest):
+				self.win_warn = DangerWarn(data.mf_alias, data.removed_count)
 				self.win_warn.center_to_parent(self)
-				self.win_warn.ok_clicked.connect(lambda: can_continue(True, mf_alias))
-				self.win_warn.cancel_clicked.connect(lambda: can_continue(False, mf_alias))
+				self.win_warn.ok_clicked.connect(lambda: can_continue(True, data.mf_alias))
+				self.win_warn.cancel_clicked.connect(lambda: can_continue(False, data.mf_alias))
 				self.win_warn.show()
 
-			else:
-				if self.bar_bottom.progress_bar.text() != data:
-					self.bar_bottom.progress_bar.setText(data)
+			elif isinstance(data, ScanProgress):
+				text = scan_progress_text(data)
+				if self.bar_bottom.progress_bar.text() != text:
+					self.bar_bottom.progress_bar.setText(text)
 
 		if not self.scaner_task.is_alive():
 			self.scaner_task.terminate_join()
@@ -782,7 +791,6 @@ class WinMain(UMainWindow):
 				forced_scaner_item = ForcedScanerItem(
 					mf=Mf.current_mf,
 					dirs_to_scan=forced_dirs,
-					lng_index=JsonData.lng_index
 				)
 				self.scaner_task = ScanerWorker(
 					target=ForcedScaner.start,
@@ -792,7 +800,7 @@ class WinMain(UMainWindow):
 				# print("штатно запускаю ОБЩИЙ сканер")
 				self.scaner_task = ScanerWorker(
 					target=BaseScaner.start,
-					args=(Mf.items, JsonData.lng_index, )
+					args=(Mf.items, )
 				)
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
 			self.bar_bottom.progress_bar.stop_timer_text()
@@ -813,17 +821,17 @@ class WinMain(UMainWindow):
 		except AttributeError as e:
 			print("Win main restart scaner task", e)
 		self.start_scaner_task()
-		
+
 	def center_screen(self):
 		# Получаем геометрию первичного (главного) экрана
 		screen = QGuiApplication.primaryScreen().geometry()
 		# Получаем геометрию текущего окна
 		size = self.geometry()
-		
+
 		# Вычисляем координаты центра
 		x = (screen.width() - size.width()) // 2
 		y = (screen.height() - size.height()) // 2
-		
+
 		# Перемещаем окно
 		self.move(x, y)
 
@@ -866,9 +874,9 @@ class WinMain(UMainWindow):
 			target_dir=dest
 		)
 		progress_win.center_to_parent(self)
-		progress_win.show()   
+		progress_win.show()
 		return progress_win
-	
+
 	def open_server_win(self):
 		self.server_win = ServersWin()
 		self.server_win.center_to_parent(self)
@@ -877,9 +885,9 @@ class WinMain(UMainWindow):
 	def closeEvent(self, a0: QCloseEvent | None) -> None:
 		self.hide()
 		a0.ignore()
-	
+
 	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
-		
+
 		if a0.key() == Qt.Key.Key_V:
 			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier and self.files_to_copy:
 				dest = destination_dir(Mf.current_mf.mf_current_path, Dynamic.current_dir)
@@ -915,7 +923,7 @@ class WinMain(UMainWindow):
 				if new_index != Dynamic.current_pixmap_size_index:
 					Dynamic.current_pixmap_size_index = new_index
 					self.bar_bottom.slider._on_value_changed(new_index)
-	
+
 	def resizeEvent(self, a0):
 		wid = self.splitter.widget(1)
 		self.bar_path.setMaximumWidth(wid.width())
