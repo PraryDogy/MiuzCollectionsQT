@@ -85,7 +85,7 @@ class SaveGroupBox(TransparentWidget):
 		self.h_lay.addWidget(self.cancel_button)
 
 		self.save_button = ActiveButton(Lng.save_changes_text)
-		self.save_button.setIcon(QIcon(str(Static.GRAY_ICONS / "diskette_gray.svg")))
+		# self.save_button.setIcon(QIcon(str(Static.GRAY_ICONS / "diskette_gray.svg")))
 		self.save_button.clicked.connect(self.save_clicked.emit)
 		self.h_lay.addWidget(self.save_button)
 
