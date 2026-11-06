@@ -679,26 +679,3 @@ UTreeWidget::branch:has-children:open {
     image: url(./icons/gray/collapse_gray.svg);
 }
 
-
-/* =====================================================================
-   PROGRESS (стиль как у UTagWidget)
-   ===================================================================== */
-
-/* ProgressWidget { */
-    /* color: #ffffff;
-    padding: 2px 10px;
-    border-radius: 8px;
-    border: none; */
-}
-
-/* ProgressWidget[style="yellow"] {
-    background: transparent;
-}
-
-ProgressWidget[style="green"] {
-    background: transparent;
-}
-
-ProgressWidget[style="transparent"] {
-    background: transparent;
-} */

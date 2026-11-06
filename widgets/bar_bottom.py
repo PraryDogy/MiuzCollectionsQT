@@ -125,63 +125,53 @@ class PathBar(TransparentWidget):
 # =============================================================================
 
 class ProgressWidget(GrayTextLabel):
-	qss_property_name = "style"
-	qss_yellow = "yellow"
-	qss_green = "green"
-	qss_transparent = "transparent"
+	set_warning = pyqtSignal()
+	set_green_checkmark = pyqtSignal()
+	set_arrow_terminal = pyqtSignal()
 
 	def __init__(self):
 		super().__init__("")
 		self.set_font_size(11)
-		self.setMidLineWidth(100)
 		self.setMaximumWidth(250)
 		self.set_elide(True, ignore_width=False)
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self.timer = QTimer(self)
 		self.timer.timeout.connect(self._on_tick)
-		self._apply(self.qss_transparent)
-
-	# --- Единая точка смены стиля и текста ---
-
-	def _apply(self, qss_style: str, text: str = ""):
-		self.setProperty(self.qss_property_name, qss_style)
-		self.style().unpolish(self)
-		self.style().polish(self)
-		self.setText(text)
-		self.update()
+		self.reset()
 
 	# --- Публичный интерфейс для WinMain ---
 
 	def show_status(self, progress: ScanProgress):
 		"""Прогресс сканера. Таймер останавливается, чтобы не перебивать текст."""
 		self.timer.stop()
-		self._apply(self._status_style(progress), self.scan_progress_text(progress))
+		self.setText(self.scan_progress_text(progress))
+		if progress.kind == "indexing":
+			self.set_green_checkmark.emit()
+		elif progress.kind in ("search_dirs", "no_connection"):
+			self.set_warning.emit()
+		else:
+			self.set_arrow_terminal.emit()
 
 	def show_loading(self):
 		"""Запуск сканера до первого прогресса."""
 		self.timer.stop()
-		self._apply(self.qss_transparent, Lng.loading)
+		self.setText(Lng.loading)
+		self.set_arrow_terminal.emit()
 
 	def show_timer(self):
 		"""Обратный отсчёт до следующего сканирования."""
 		self.total_seconds = JsonData.scaner_minutes * 60
-		self._apply(self.qss_transparent, self._timer_text())
+		self.setText(self._timer_text())
+		self.set_arrow_terminal.emit()
 		self.timer.start(1000)
 
 	def reset(self):
 		"""Пустое состояние без таймера."""
 		self.timer.stop()
-		self._apply(self.qss_transparent)
+		self.setText("")
+		self.set_arrow_terminal.emit()
 
 	# --- Внутреннее ---
-
-	def _status_style(self, progress: ScanProgress) -> str:
-		if progress.kind == "indexing":
-			return self.qss_green
-		# поиск папок и отсутствие подключения выделяем жёлтым
-		if progress.kind in ("search_dirs", "no_connection"):
-			return self.qss_yellow
-		return self.qss_transparent
 
 	def _on_tick(self):
 		self.total_seconds -= 1
@@ -207,33 +197,25 @@ class ProgressWidget(GrayTextLabel):
 			)
 		return f"{progress.mf_alias}: {Lng.no_connection.lower()}"
 
-	# --- Отладка: все демо-шаги внутри одного метода ---
+	# --- Отладка: демо состояний и elide ---
 
 	def run_demo(self, step_ms: int = 1500):
 		"""
-		Отладка: последовательно показывает все состояния и тексты разной длины
-		(проверка смены стилей и elide), в конце запускает обратный отсчёт.
+		Отладка: показывает иконки и тексты разной длины, в конце запускает таймер.
 		Удаляется целиком этим методом.
 		"""
-		demo_texts = (
-			"mf: ищу папки",
-			"mf: индексация файлов 12 из 340",
-			(
+		demo_steps = [
+			(self.set_arrow_terminal, "mf: ищу папки"),
+			(self.set_warning, "mf: индексация файлов 12 из 340"),
+			(self.set_green_checkmark, (
 				"очень длинное имя хранилища для проверки elide: "
 				"индексация файлов 12345 из 987654 и ещё очень много текста"
-			),
-		)
-		styles = (self.qss_transparent, self.qss_yellow, self.qss_green)
-
-		self.timer.stop()
-		steps = [
-			lambda s=style, t=text: self._apply(s, t)
-			for text in demo_texts
-			for style in styles
+			)),
 		]
-		for i, step in enumerate(steps):
-			QTimer.singleShot(i * step_ms, step)
-		QTimer.singleShot(len(steps) * step_ms, self.show_timer)
+		self.timer.stop()
+		for i, (signal, text) in enumerate(demo_steps):
+			QTimer.singleShot(i * step_ms, lambda s=signal, t=text: (s.emit(), self.setText(t)))
+		QTimer.singleShot(len(demo_steps) * step_ms, self.show_timer)
 
 
 # =============================================================================
@@ -282,8 +264,23 @@ class BarBottom(TransparentWidget):
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 		self.v_layout.addWidget(bottom)
 
+		self.progress_svg = QSvgWidget(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+		self.progress_svg.setFixedSize(12, 12)
+		self.h_layout.addWidget(self.progress_svg)
+
+		self.h_layout.addSpacing(5)
+
 		# --- Прогресс ---
 		self.progress_widget = ProgressWidget()
+		self.progress_widget.set_arrow_terminal.connect(
+			lambda: self.progress_svg.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+		)
+		self.progress_widget.set_warning.connect(
+			lambda: self.progress_svg.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		)
+		self.progress_widget.set_green_checkmark.connect(
+			lambda: self.progress_svg.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
+		)
 		self.h_layout.addWidget(self.progress_widget)
 
 		# --- Подпись выделения строго по центру ---
@@ -303,7 +300,7 @@ class BarBottom(TransparentWidget):
 		self.slider.clicked.connect(self.resize_thumbnails)
 		self.h_layout.addWidget(self.slider)
 
-		self.progress_widget.raise_()
+		# self.progress_widget.run_demo()
 
 	def _objects_word(self, n: int) -> str:
 		if JsonData.lng_index == 0:  # русский: три формы по правилам склонения
