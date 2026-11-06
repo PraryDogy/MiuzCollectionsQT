@@ -306,16 +306,11 @@ class CopyTask:
 		dest: Path,
 	):
 		block = 4 * 1024 * 1024
-		backup = None
+		# временный файл в той же папке: os.replace атомарен только в пределах одного тома
+		tmp = dest.with_name(f".{dest.name}.part")
 
 		try:
-			# Если файл существует, временно сохраняем его.
-			if dest.exists():
-				backup = CopyTask.set_count_name(dest)
-				dest.rename(backup)
-
-			# Копируем файл с обновлением прогресса.
-			with open(src, "rb") as fsrc, open(dest, "wb") as fdst:
+			with open(src, "rb") as fsrc, open(tmp, "wb") as fdst:
 				while True:
 					command = CopyTask.check_command(gui_queue)
 
@@ -341,42 +336,27 @@ class CopyTask:
 				fdst.flush()
 				os.fsync(fdst.fileno())
 
-			# Сохраняем временные метки исходного файла.
+			# Временные метки исходного файла
 			stat = src.stat()
-			os.utime(
-				dest,
-				ns=(stat.st_atime_ns, stat.st_mtime_ns),
-			)
+			os.utime(tmp, ns=(stat.st_atime_ns, stat.st_mtime_ns))
 
-			# Удаляем резервную копию после успешного копирования.
-			if backup is not None:
-				backup.unlink()
-				backup = None
-
+			# Замена целевого файла только после полностью записанной копии.
+			# Если замена не удалась (например, файл занят), старый dest остаётся нетронутым.
+			os.replace(tmp, dest)
 			return None
 
 		except Exception:
 			error = traceback.format_exc()
 
-			# Удаляем частично скопированный файл.
+			# Удаляем только временный файл, целевой не трогаем
 			try:
-				if dest.exists():
-					dest.unlink()
+				if tmp.exists():
+					tmp.unlink()
 			except OSError:
 				error += (
-					"\nОшибка удаления частичного файла:\n"
+					"\nОшибка удаления временного файла:\n"
 					+ traceback.format_exc()
 				)
-
-			# Восстанавливаем резервную копию.
-			if backup is not None and backup.exists():
-				try:
-					backup.rename(dest)
-				except OSError:
-					error += (
-						"\nОшибка восстановления резервной копии:\n"
-						+ traceback.format_exc()
-					)
 
 			copy_item.msg = "error"
 			copy_item.error_traceback = error
