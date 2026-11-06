@@ -1,3 +1,4 @@
+import errno
 import os
 import shutil
 import traceback
@@ -386,18 +387,33 @@ class CopyTask:
 		return path
 
 
+import time
+
+
 class FilesRemover:
+	@staticmethod
+	def _remove_with_retry(path: str, attempts: int = 5, delay: float = 0.5) -> bool:
+		for attempt in range(attempts):
+			try:
+				os.remove(path)
+				return True
+			except FileNotFoundError:
+				return True  # уже удалён, цель достигнута
+			except OSError as e:
+				# EBUSY (16) может пройти через несколько секунд
+				if e.errno != errno.EBUSY or attempt == attempts - 1:
+					print("FilesRemover error:", path, e)
+					return False
+				time.sleep(delay)
+		return False
+
 	@staticmethod
 	def start(paths: list[str], queue: Queue):
 		deleted_files = []
 		for path in paths:
-			try:
-				os.remove(path)
+			if FilesRemover._remove_with_retry(path):
 				deleted_files.append(path)
-			except Exception as e:
-				print("FilesRemover error:", e)
 		queue.put(deleted_files)
-		
 
 class MfRemover:
 	@staticmethod
