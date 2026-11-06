@@ -36,9 +36,8 @@ class ServerListItem(UListWidgetItem):
 
 class EyeSvg(QSvgWidget):
 	def __init__(self):
-		super().__init__()
+		super().__init__(str(Static.GRAY_ICONS / "eye_off_gray.svg"))
 		self.setFixedSize(16, 16)
-		self.load(str(Static.GRAY_ICONS / "eye_off_gray.svg"))
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 	
 

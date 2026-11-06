@@ -22,10 +22,9 @@ class SearchWidBaseSvg(QSvgWidget):
 	icon_path = None
 
 	def __init__(self, parent):
-		super().__init__(parent)
+		super().__init__(str(self.icon_path), parent)
 		self.setFixedSize(13, 13)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		self.load(str(self.icon_path))
 		self.hide()
 
 	def mouseReleaseEvent(self, a0):

@@ -29,8 +29,7 @@ class PathItem(TransparentWidget):
 		item_layout.setContentsMargins(0, 0, 0, 0)
 		item_layout.setSpacing(5)
 
-		self.img_wid = QSvgWidget()
-		self.img_wid.load(str(Static.COLOR_ICONS / "base_folder.svg"))
+		self.img_wid = QSvgWidget(str(Static.COLOR_ICONS / "base_folder.svg"))
 		self.img_wid.setFixedSize(15, 15)
 		item_layout.addWidget(self.img_wid)
 		

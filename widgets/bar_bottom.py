@@ -75,8 +75,7 @@ class BarBottom(TransparentWidget):
 		self.h_layout.setSpacing(0)
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-		self.svg_wid = QSvgWidget()
-		self.svg_wid.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+		self.svg_wid = QSvgWidget(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
 		self.svg_wid.setFixedSize(15, 15)
 		self.h_layout.addWidget(self.svg_wid)
 

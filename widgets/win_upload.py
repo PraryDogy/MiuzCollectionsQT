@@ -23,8 +23,7 @@ class TitleWidget(UGroupBox):
 		self.h_layout.setContentsMargins(10, 10, 10, 10)
 		self.h_layout.setSpacing(10)
 
-		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(Static.GRAY_ICONS / "upload_file_gray.svg"))
+		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "upload_file_gray.svg"))
 		self.svg_widget.setFixedSize(45, 45)
 		self.h_layout.addWidget(self.svg_widget)
 

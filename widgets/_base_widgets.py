@@ -886,9 +886,8 @@ class UTagWidget(TransparentFrame):
 		self.h_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 		if left_svg_path:
-			self.left_svg_widget = QSvgWidget()
+			self.left_svg_widget = QSvgWidget(left_svg_path)
 			self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
-			self.left_svg_widget.load(left_svg_path)
 			self.left_svg_widget.setFixedSize(15, 15)
 			self.h_lay.addWidget(self.left_svg_widget)
 
@@ -903,9 +902,8 @@ class UTagWidget(TransparentFrame):
 			self.right_svg_lay.setContentsMargins(0, 0, 0, 0)
 			self.right_svg_lay.setSpacing(0)
 
-			self.right_svg_widget = QSvgWidget()
+			self.right_svg_widget = QSvgWidget(right_svg_path)
 			self.right_svg_widget.mouseReleaseEvent = self.right_svg_cmd
-			self.right_svg_widget.load(right_svg_path)
 			self.right_svg_widget.setFixedSize(14, 14)
 			self.right_svg_lay.addWidget(self.right_svg_widget)
 
@@ -1119,8 +1117,7 @@ class ConfirmWindow(VerticalWindow):
 		self._adjust_window_size(self.text_wid, text)
 
 	def _setup_ui(self, text: str):
-		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		self.svg_widget.setFixedSize(65, 65)
 		self.icon_text_layout.addWidget(
 			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
@@ -1165,8 +1162,7 @@ class WarningWindow(VerticalWindow):
 		self._adjust_window_size(self.text_wid, text)
 
 	def _setup_ui(self, text: str, text_edit_text: str):
-		self.svg_widget = QSvgWidget()
-		self.svg_widget.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		self.svg_widget.setFixedSize(65, 65)
 		self.icon_text_layout.addWidget(
 			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
@@ -1222,8 +1218,7 @@ class InputTextWin(UMainWindow):
 		svg_text_layout.setSpacing(5)
 
 		if svg_path:
-			svg_icon = QSvgWidget()
-			svg_icon.load(svg_path)
+			svg_icon = QSvgWidget(svg_path)
 			svg_icon.setFixedSize(20, 20)
 			svg_text_layout.addWidget(svg_icon)
 
