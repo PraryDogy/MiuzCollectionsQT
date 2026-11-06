@@ -1214,7 +1214,7 @@ class InputTextWin(UMainWindow):
 
 		if svg:
 			svg_icon = QSvgWidget(str(svg))
-			svg_icon.setFixedSize(20, 20)
+			svg_icon.setFixedSize(15, 15)
 			svg_text_layout.addWidget(svg_icon)
 
 		self.description_label = GrayTextLabel(description)
@@ -1632,7 +1632,7 @@ class MfPathWidget(UGroupBox):
 		texts_layout = self._create_base_layout(widget)
 
 		# Заголовок
-		title = self._create_title(Static.GRAY_ICONS / "folder_magnifier_gray.svg")
+		title = self._create_title(Static.COLOR_ICONS / "warning_blue.svg")
 		texts_layout.addWidget(title)
 
 		# Разделитель
@@ -1982,7 +1982,7 @@ class MfStopListWidget(UGroupBox):
 
 		self.text_win = InputTextWin(
 			description=Lng.folder_name,
-			svg=Static.GRAY_ICONS / "trash_gray.svg"
+			svg=Static.GRAY_ICONS / "attention_gray.svg"
 		)
 		self.text_win.setFixedWidth(300)
 		self.text_win.center_to_parent(self.window())
