@@ -836,7 +836,7 @@ class GrayTextLabel(TransparentLabel):
 		super().__init__(text)
 
 
-class TitleTextLabel(TransparentLabel):
+class _TitleTextLabel(TransparentLabel):
 	def __init__(self, text="", parent=None):
 		super().__init__(text, parent)
 
@@ -854,7 +854,7 @@ class TitleTextWidget(TransparentWidget):
 			self.svg_widget.setFixedSize(23, 23)
 			self.h_layout.addWidget(self.svg_widget)
 
-		self.text_widget = TitleTextLabel(text)
+		self.text_widget = _TitleTextLabel(text)
 		self.h_layout.addWidget(self.text_widget)
 
 
@@ -1578,146 +1578,72 @@ class MfPathWidget(UGroupBox):
 		self.copy_path_btn_locked = False
 		self.mf = mf
 		self.title_ = Lng.catalog_path
-		if mf:
-			self.mf_path = mf.mf_paths[0]
-		else:
-			self.mf_path = None
+		self.mf_path = mf.mf_paths[0] if mf else None
+		self._title_icon = None
+		self.title = None
 
 		self.watch_timer = QTimer(self)
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 
-		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(10, 5, 10, 5)
-		self.main_lay.setSpacing(0)
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(10, 5, 10, 5)
+		self.v_lay.setSpacing(5)
 
-		self.stack = QStackedWidget()
-		self.main_lay.addWidget(self.stack)
+		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "green_checkmark.svg")
+		self.v_lay.addWidget(self.title_widget)
 
-		self.init_no_path_ui()
-		self.init_ok_path_ui()
+		# заголовок создаётся в _set_title_icon, здесь только разделитель и описание
+		self.v_lay.addWidget(USep())
 
-		if self.mf_path and os.path.exists(self.mf_path):
-			self.show_ok_path()
-		else:
-			self.show_no_path()
+		self.path_label = GrayTextLabel("")
+		self.path_label.setWordWrap(True)
+		self.path_label.set_elide(True)
+		self.v_lay.addWidget(self.path_label)
 
-	def _create_title(self, icon_path: Path) -> QHBoxLayout:
-		title = TitleTextWidget(self.title_, icon_path)
-		title.text_widget.set_elide(True)
-		return title
+		self.v_lay.addLayout(self._create_buttons_layout())
 
-	def _create_base_layout(self, widget: TransparentWidget):
-		main_layout = QHBoxLayout(widget)
-		main_layout.setContentsMargins(0, 0, 0, 0)
-		main_layout.setSpacing(0)
+		self.update_ui()
 
-		texts = TransparentWidget()
-		main_layout.addWidget(texts)
-
-		texts_layout = QVBoxLayout(texts)
-		texts_layout.setContentsMargins(0, 0, 0, 0)
-		texts_layout.setSpacing(3)
-
-		return texts_layout
-
-	def _create_buttons_layout(self) -> TransparentWidget:
-		buttons_container = TransparentWidget()
-		buttons_layout = QHBoxLayout(buttons_container)
+	def _create_buttons_layout(self) -> QHBoxLayout:
+		buttons_layout = QHBoxLayout()
 		buttons_layout.setContentsMargins(0, 5, 0, 0)
 		buttons_layout.setSpacing(10)
 
-		button = UPushButton(Lng.choose_folder)
-		button.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
-		button.clicked.connect(self.dialog_dir)
-		buttons_layout.addWidget(button)
+		self.choose_btn = UPushButton(Lng.choose_folder)
+		self.choose_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
+		self.choose_btn.clicked.connect(self.dialog_dir)
+		buttons_layout.addWidget(self.choose_btn)
 
-		return buttons_container
+		# buttons_layout.addStretch()
 
-	def init_no_path_ui(self):
-		widget = TransparentWidget()
-		texts_layout = self._create_base_layout(widget)
-
-		# Заголовок
-		title = self._create_title(Static.COLOR_ICONS / "warning_blue.svg")
-		texts_layout.addWidget(title)
-
-		# Разделитель
-		texts_layout.addWidget(USep())
-
-		# Два лейбла слева, кнопка копирования справа
-		second_row = TransparentWidget()
-		path_layout = QHBoxLayout(second_row)
-		path_layout.setContentsMargins(0, 0, 0, 0)
-		path_layout.setSpacing(0)
-
-		labels_layout = QVBoxLayout()
-		labels_layout.setContentsMargins(0, 0, 0, 0)
-		labels_layout.setSpacing(2)
-
-		self.no_path_label = GrayTextLabel(Lng.path_hint_texts)
-		labels_layout.addWidget(self.no_path_label)
-
-		path_layout.addLayout(labels_layout, 1)
-
-		self.fake_copy_btn = UPushButton("")
-		self.fake_copy_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
-
-		policy = self.fake_copy_btn.sizePolicy()
-		policy.setRetainSizeWhenHidden(True)
-		self.fake_copy_btn.setSizePolicy(policy)
-		self.fake_copy_btn.hide()
-
-		path_layout.addWidget(self.fake_copy_btn)
-
-		texts_layout.addWidget(second_row)
-
-		buttons_container = self._create_buttons_layout()
-		texts_layout.addWidget(buttons_container)
-
-		self.stack.addWidget(widget)
-
-	def init_ok_path_ui(self):
-		widget = TransparentWidget()
-		texts_layout = self._create_base_layout(widget)
-
-		# Заголовок
-		title = self._create_title(Static.COLOR_ICONS / "green_checkmark.svg")
-		texts_layout.addWidget(title)
-
-		# Разделитель
-		texts_layout.addWidget(USep())
-
-		# Лейблы вертикально слева, кнопка копирования справа
-		second_row = TransparentWidget()
-		path_layout = QHBoxLayout(second_row)
-		path_layout.setContentsMargins(0, 0, 0, 0)
-		path_layout.setSpacing(0)
-
-		labels_layout = QVBoxLayout()
-		labels_layout.setContentsMargins(0, 0, 0, 0)
-		labels_layout.setSpacing(2)
-
-		self.mf_path_label = GrayTextLabel("")
-		self.mf_path_label.set_elide(True)
-		labels_layout.addWidget(self.mf_path_label)
-
-		path_layout.addLayout(labels_layout, 1)
-
-		self.copy_path_btn = UPushButton("")
+		self.copy_path_btn = UPushButton(Lng.copy_dirpath)
 		self.copy_path_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
 		self.copy_path_btn.setToolTip(Lng.copy_dirpath)
 		self.copy_path_btn.clicked.connect(self.copy_path)
+		buttons_layout.addWidget(self.copy_path_btn)
 
-		# пространство перед кнопкой чтобы виджет пути не был близко
-		path_layout.addSpacing(10)
-		path_layout.addWidget(self.copy_path_btn)
+		buttons_layout.addStretch()
 
-		texts_layout.addWidget(second_row)
+		return buttons_layout
 
-		buttons_container = self._create_buttons_layout()
-		texts_layout.addWidget(buttons_container)
+	def _path_exists(self) -> bool:
+		return bool(self.mf_path) and os.path.exists(self.mf_path)
 
-		self.stack.addWidget(widget)
+	def update_ui(self):
+		"""Обновляет заголовок, описание, кнопки и таймер по текущему пути"""
+		has_path = self._path_exists()
+
+		if has_path:
+			self.title_widget.svg_widget.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
+			self.path_label.setText(self.mf_path)
+			self.watch_timer.stop()
+			self.copy_path_btn.show()
+		else:
+			self.title_widget.svg_widget.load(str(Static.COLOR_ICONS / "warning_blue.svg"))
+			self.path_label.setText(Lng.path_hint_texts)
+			if not self.watch_timer.isActive():
+				self.watch_timer.start(1000)  # Проверка каждую секунду
+			self.copy_path_btn.hide()
 
 	def copy_path(self):
 
@@ -1729,7 +1655,7 @@ class MfPathWidget(UGroupBox):
 				# на случай если окно уничтожилось раньше действия
 				pass
 
-		if self.copy_path_btn_locked:
+		if self.copy_path_btn_locked or not self._path_exists():
 			return
 
 		Utils.pyqt_copy_text(self.mf_path)
@@ -1741,32 +1667,20 @@ class MfPathWidget(UGroupBox):
 	def set_copy_path_btn_locked(self, value: bool):
 		self.copy_path_btn_locked = value
 
-	def show_no_path(self):
-		"""Включение режима ожидания пути"""
-		self.stack.setCurrentIndex(0)
-		if not self.watch_timer.isActive():
-			self.watch_timer.start(1000)  # Проверка каждую секунду
-
-	def show_ok_path(self):
-		"""Включение режима успешного пути"""
-		self.watch_timer.stop()  # Важно: останавливаем таймер сразу
-		self.mf_path_label.setText(self.mf_path)
-		self.stack.setCurrentIndex(1)
-
 	def check_path_by_timer(self):
-		"""Срабатывание таймера"""
-		if self.mf_path and os.path.exists(self.mf_path):
+		"""Срабатывание таймера в режиме ожидания пути"""
+		if self._path_exists():
 			self.changed.emit()
-			self.show_ok_path()
+			self.update_ui()
 
 	def update_path(self, new_path: str):
 		"""Единый метод обновления пути из любых событий"""
 		self.mf_path = new_path.rstrip(os.sep)
 		self.changed.emit()
-		self.show_ok_path()
+		self.update_ui()
 
 	def validate_and_show_win(self):
-		if not self.mf_path or not os.path.exists(self.mf_path):
+		if not self._path_exists():
 			win_warn = WarningWindow(Lng.select_folder_path)
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
@@ -1789,7 +1703,7 @@ class MfPathWidget(UGroupBox):
 			if url and os.path.isdir(url):
 				self.update_path(url)
 		return super().dropEvent(a0)
-	
+
 	def dragEnterEvent(self, a0):
 		if a0.mimeData().hasUrls():  # Принимаем дроп только если это ссылки/файлы
 			a0.accept()

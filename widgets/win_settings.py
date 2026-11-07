@@ -815,38 +815,24 @@ class NewMfWin(UMainWindow):
 		self.setWindowTitle(Lng.new_catalog)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setFixedSize(550, 650)
 
 		self.has_unsaved = False
 		self.discard_win = None
 
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
-
-		scroll = UScrollVerticalArea()
-		self.central_layout.addWidget(scroll)
-
-		main_wid = TransparentWidget()
-		scroll.setWidget(main_wid)
-
-		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 0, 0)
-		main_lay.setSpacing(10)
+		self.central_layout.setSpacing(10)
 
 		self.mf_alias_widget = MfAliasWidget()
 		self.mf_alias_widget.changed.connect(self._on_changed)
-		main_lay.addWidget(self.mf_alias_widget)
+		self.central_layout.addWidget(self.mf_alias_widget)
 
 		self.mf_path_widget = MfPathWidget(mf=None)
 		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
-		main_lay.addWidget(self.mf_path_widget)
+		self.central_layout.addWidget(self.mf_path_widget)
 
 		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
 		self.mf_stop_list.changed.connect(self._on_changed)
-		main_lay.addWidget(self.mf_stop_list)
-
-		main_lay.addStretch()
-
-		self.central_layout.addSpacing(10)
+		self.central_layout.addWidget(self.mf_stop_list)
 
 		# Футер с кнопками без «Новый каталог»
 		self.save_group = SaveGroupBox(show_new_catalog=False)
@@ -856,6 +842,10 @@ class NewMfWin(UMainWindow):
 
 		if mf_path:
 			self.mf_path_widget_changed()
+
+		self.setFixedWidth(550)
+		self.adjustSize()
+		self.setFixedHeight(self.height())
 
 	def _on_changed(self):
 		self.has_unsaved = True
