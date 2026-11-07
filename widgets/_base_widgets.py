@@ -1371,7 +1371,7 @@ class MfAliasWidget(UGroupBox):
 			return Lng.string_limit.format(minim=minim, maxim=maxim)
 		if not self.PATTERN.fullmatch(mf_alias):
 			return Lng.valid_message
-		if any(i.mf_alias == mf_alias for i in Mf.items):
+		if any(i.mf_alias.lower() == mf_alias.lower() for i in Mf.items):
 			return Lng.alias_taken
 		return None
 

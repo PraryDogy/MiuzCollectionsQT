@@ -644,7 +644,7 @@ class MfTitleWid(UGroupBox):
 	def __init__(self, title: str):
 		super().__init__()
 		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 10, 10, 10)
+		self.v_lay.setContentsMargins(10, 5, 10, 5)
 		self.v_lay.setSpacing(5)
 
 		self.title_label = TitleTextWidget(title)
@@ -810,18 +810,18 @@ class MfSettings(UScrollVerticalArea):
 		return super().mouseReleaseEvent(a0)
 
 
-class NewMfSettings(UMainWindow):
+class NewMfWin(UMainWindow):
 	def __init__(self, mf_path: str = None):
 		super().__init__()
 		self.setWindowTitle(Lng.new_catalog)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setFixedSize(550, 645)
+		self.setFixedSize(550, 650)
 
 		self.has_unsaved = False
 		self.discard_win = None
 
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		scroll = UScrollVerticalArea()
 		self.central_layout.addWidget(scroll)
@@ -1006,7 +1006,7 @@ class WinSettings(UMainWindow):
 		self.init_right_side(idx)
 
 	def open_new_catalog_win(self):
-		self.new_catalog_win = NewMfSettings(mf_path=self.settings_item.content)
+		self.new_catalog_win = NewMfWin(mf_path=self.settings_item.content)
 		self.new_catalog_win.center_to_parent(self)
 		self.new_catalog_win.show()
 
