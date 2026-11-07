@@ -1795,89 +1795,6 @@ class MfPathWidget(UGroupBox):
 		return super().dragEnterEvent(a0)
 
 
-class MfStopListEditTag(UMainWindow):
-	remove_clicked = pyqtSignal()
-	ok_clicked = pyqtSignal(str)
-
-	def __init__(self, text: str):
-		super().__init__()
-		self.setFixedWidth(350)
-		self.set_always_on_top()
-		self.set_close_only()
-		self.setWindowTitle(Lng.text_editor)
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-		self.central_layout.setSpacing(10)
-
-		group_box = UGroupBox()
-		self.central_layout.addWidget(group_box)
-
-		group_layout = QVBoxLayout(group_box)
-		group_layout.setContentsMargins(5, 5, 5, 5)
-		group_layout.setSpacing(10)
-
-		title_label = TitleTextWidget(Lng.folder_name, Static.GRAY_ICONS / "text_edit_gray.svg")
-		group_layout.addWidget(title_label)
-
-		group_layout.addWidget(USep())
-
-		description = GrayTextLabel(
-			Lng.stop_list_description
-		)
-		description.setWordWrap(True)
-		group_layout.addWidget(description)
-
-		self.line_edit = ULineEdit()
-		self.line_edit.setText(text)
-		group_layout.addWidget(self.line_edit)
-
-		# self.central_layout.addSpacing(10)
-
-		buttons_container = TransparentWidget()
-		self.central_layout.addWidget(buttons_container)
-		buttons_layout = QHBoxLayout(buttons_container)
-		buttons_layout.setContentsMargins(0, 0, 0, 0)
-		buttons_layout.setSpacing(5)
-
-		rem_button = UPushButton(Lng.delete)
-		rem_button.clicked.connect(self.remove_clicked.emit)
-		buttons_layout.addWidget(rem_button)
-		buttons_layout.addStretch(1)
-
-		cancel_button = UPushButton(Lng.cancel)
-		cancel_button.clicked.connect(self.deleteLater)
-		buttons_layout.addWidget(cancel_button)
-
-		apply_button = ActiveButton(Lng.apply)
-		apply_button.clicked.connect(self.ok_clicked_cmd)
-		buttons_layout.addWidget(apply_button)
-
-		self.adjustSize()
-		self.setFixedHeight(self.height())
-		self.setFocus()
-
-	def mouseReleaseEvent(self, a0):
-		self.setFocus()
-		return super().mouseReleaseEvent(a0)
-
-	def ok_clicked_cmd(self):
-		self.ok_clicked.emit(self.line_edit.text())
-		self.deleteLater()
-
-	def keyPressEvent(self, a0):
-		if a0.key() == Qt.Key.Key_Escape:
-			self.deleteLater()
-		return super().keyPressEvent(a0)
-
-
-class MfStopListTag(UTagWidget):
-	def __init__(self, text):
-		super().__init__(text, self.qss_gray, r_svg=Static.GRAY_ICONS / "trash_gray.svg")
-		self.text_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.setToolTip(text)
-		self.setMaximumWidth(150)
-		self.text_widget.set_elide(True, ignore_width=False)
-
-
 class MfStopListWidget(UGroupBox):
 	changed = pyqtSignal()
 
@@ -1895,120 +1812,24 @@ class MfStopListWidget(UGroupBox):
 		v_layout.addWidget(USep())
 
 		description = GrayTextLabel(Lng.stop_list_descr_short)
+		description.setWordWrap(True)
 		v_layout.addWidget(description)
 
 		v_layout.addSpacing(5)
 
-		self.tags_container = TransparentWidget()
-		self.tags_container.setFixedHeight(105)
-		v_layout.addWidget(self.tags_container)
-
-		self.tags_container_layout = QVBoxLayout(self.tags_container)
-		self.tags_container_layout.setContentsMargins(0, 0, 0, 0)
-		self.tags_container_layout.setSpacing(0)
-
-		self.tags_widget = TransparentWidget()
-
-		v_layout.addSpacing(5)
-
-		add_button = UPushButton(Lng.add_folder)
+		add_button = UPushButton(Lng.open_list)
 		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
 		add_button.setIconSize(QSize(10, 10))
-		add_button.clicked.connect(self.add_tag)
+		add_button.clicked.connect(self.open_tags_win)
 		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
-		self.reload_tags()
+
+		self.adjustSize()
 		self.setFixedHeight(self.sizeHint().height())
-
-	def create_tags_widget(self):
-		self.tags_widget = UGroupBox()
-		self.tags_container_layout.addWidget(self.tags_widget)
-		tags_layout = QVBoxLayout(self.tags_widget)
-		tags_layout.setContentsMargins(0, 0, 5, 0)
-		tags_layout.setSpacing(0)
-		scroll_area = UScrollVerticalArea()
-		tags_layout.addWidget(scroll_area)
-
-		scroll_widget = TransparentWidget()
-		scroll_area.setWidget(scroll_widget)
-
-		self.tags_flow_layout = FlowLayout(scroll_widget)
-		self.tags_flow_layout.setContentsMargins(5, 5, 5, 5)
-		self.tags_flow_layout.setSpacing(0)
-
-	def create_no_tags_widget(self):
-		self.tags_widget = UGroupBox()
-		self.tags_container_layout.addWidget(self.tags_widget)
-		self.tags_flow_layout = QVBoxLayout(self.tags_widget)
-		self.tags_flow_layout.setContentsMargins(0, 0, 0, 0)
-		self.tags_flow_layout.setSpacing(0)
-
-	def reload_tags(self):
-		self.tags_widget.deleteLater()
-
-		if not self.get_stop_list():
-			self.create_no_tags_widget()
-			label = GrayTextLabel(Lng.stop_list_empty)
-			self.tags_flow_layout.addWidget(label)
-			self.tags_flow_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-			return
-
-		self.create_tags_widget()
-		for name in self.draft_stop_list:
-			tag = MfStopListTag(name)
-			tag.right_svg_clicked.connect(lambda t=name: self.remove_tag(t))
-			tag.text_clicked.connect(lambda t=name: self.edit_tag(t))
-			self.tags_flow_layout.addWidget(tag)
-
-	def remove_tag(self, text: str):
-
-		def finished():
-			if text in self.draft_stop_list:
-				self.draft_stop_list.remove(text)
-			self.reload_tags()
-			self.changed.emit()
-
-			if hasattr(self, "edit_text_win"):
-				self.edit_text_win.deleteLater()
-
-		self.confirm_win = ConfirmWindow(Lng.stop_list_remove_confirm)
-		self.confirm_win.center_to_parent(self.window())
-		self.confirm_win.ok_clicked.connect(finished)
-		self.confirm_win.show()
-
-	def add_tag(self):
-
-		def finished(text: str):
-			text = text.strip()
-			if not text or text in self.draft_stop_list:
-				return
-			self.draft_stop_list.append(text)
-			self.reload_tags()
-			self.changed.emit()
-
-		self.text_win = InputTextWin(
-			description=Lng.folder_name,
-			svg=Static.GRAY_ICONS / "attention_gray.svg"
-		)
-		self.text_win.setFixedWidth(300)
-		self.text_win.center_to_parent(self.window())
-		self.text_win.ok_clicked.connect(finished)
-		self.text_win.show()
-
-	def edit_tag(self, text: str):
-
-		def finished(new_text: str):
-			old_text_index = self.draft_stop_list.index(text)
-			self.draft_stop_list.remove(text)
-			self.draft_stop_list.insert(old_text_index, new_text)
-			self.reload_tags()
-
-		self.edit_text_win = MfStopListEditTag(text)
-		self.edit_text_win.center_to_parent(self.window())
-		self.edit_text_win.ok_clicked.connect(finished)
-		self.edit_text_win.remove_clicked.connect(lambda: self.remove_tag(text))
-		self.edit_text_win.show()
 
 	def get_stop_list(self) -> list[str]:
 		return list(self.draft_stop_list)
+
+	def open_tags_win(self):
+		...
 
 

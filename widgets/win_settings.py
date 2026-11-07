@@ -640,27 +640,27 @@ class MfRemoveWidget(UGroupBox):
 		self.setFixedHeight(self.sizeHint().height())
 
 
-class MfTitleWid(UGroupBox):
-	def __init__(self, title: str):
-		super().__init__()
-		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 5, 10, 5)
-		self.v_lay.setSpacing(5)
+# class MfTitleWid(TransparentWidget):
+# 	def __init__(self, title: str):
+# 		super().__init__()
+# 		self.v_lay = QVBoxLayout(self)
+# 		self.v_lay.setContentsMargins(10, 5, 10, 5)
+# 		self.v_lay.setSpacing(5)
 
-		self.title_label = TitleTextWidget(title)
-		self.title_label.text_widget.set_elide(True, ignore_width=False)
-		self.v_lay.addWidget(self.title_label)
+# 		self.title_label = TitleTextWidget(title)
+# 		self.title_label.text_widget.set_elide(True, ignore_width=False)
+# 		self.v_lay.addWidget(self.title_label)
 
-		self.title_label.h_layout.addStretch()
+# 		self.title_label.h_layout.addStretch()
 
-		self.title_tag = UTagWidget(text=Lng.status_no_changes, style=UTagWidget.qss_gray)
-		self.title_tag.text_widget.set_font_size(10)
-		self.title_label.h_layout.addWidget(self.title_tag)
+# 		self.title_tag = UTagWidget(text=Lng.status_no_changes, style=UTagWidget.qss_gray)
+# 		self.title_tag.text_widget.set_font_size(10)
+# 		self.title_label.h_layout.addWidget(self.title_tag)
 
-		self.v_lay.addWidget(USep())
+# 		self.v_lay.addWidget(USep())
 
-		self.text_label = GrayTextLabel(Lng.catalog_settings)
-		self.v_lay.addWidget(self.text_label)
+# 		self.text_label = GrayTextLabel(Lng.catalog_settings)
+# 		self.v_lay.addWidget(self.text_label)
 
 	def set_has_changes(self, has_changes: bool):
 		if has_changes:
@@ -671,7 +671,7 @@ class MfTitleWid(UGroupBox):
 			self.title_tag.text_widget.setText(Lng.status_no_changes)
 	
 
-class MfSettings(UScrollVerticalArea):
+class MfSettings(UGroupBox):
 	changed = pyqtSignal()
 
 	def __init__(self, mf_index: int):
@@ -679,16 +679,25 @@ class MfSettings(UScrollVerticalArea):
 
 		self.mf = Mf.items[mf_index]
 
+		outer_lay = QVBoxLayout(self)
+		outer_lay.setContentsMargins(2, 2, 2, 2)
+		outer_lay.setSpacing(0)
+
+		self.scroll = UScrollVerticalArea()
+		outer_lay.addWidget(self.scroll)
+
 		main_wid = TransparentWidget()
-		self.setWidget(main_wid)
+		self.scroll.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 0, 0, 0)
+		main_lay.setContentsMargins(0, 5, 5, 0)
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
-		self.title_wid = MfTitleWid(self.mf.mf_alias)
-		self.main_lay.addWidget(self.title_wid)
+		title = f" {self.mf.mf_alias}"
+		self.title_label = TitleTextWidget(title)
+		self.title_label.text_widget.set_elide(True, ignore_width=False)
+		self.main_lay.addWidget(self.title_label)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
 		main_lay.addWidget(self.path_widget)
@@ -711,9 +720,6 @@ class MfSettings(UScrollVerticalArea):
 
 		self.path_widget.changed.connect(self._on_fields_changed)
 		self.mf_stop_list.changed.connect(self._on_fields_changed)
-
-		self.verticalScrollBar().rangeChanged.connect(self._update_right_margin)
-		self._update_right_margin()
 
 	def _snapshot(self) -> tuple:
 		return (
@@ -752,12 +758,6 @@ class MfSettings(UScrollVerticalArea):
 		win.ok_clicked.connect(final)
 		win.center_to_parent(self.window())
 		win.show()
-
-	def _update_right_margin(self, *args):
-		# Справа отступ только при видимом скроллбаре
-		has_scroll = self.verticalScrollBar().maximum() > 0
-		right = 10 if has_scroll else 0
-		self.main_lay.setContentsMargins(0, 0, right, 0)
 
 	def remove_mf(self, *args):
 

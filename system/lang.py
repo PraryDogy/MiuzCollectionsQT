@@ -559,8 +559,8 @@ class Lng:
 		"Folder name"
 	)
 	stop_list_descr_short = (
-		"Папки с указанными именами будут игнорироваться в этом каталоге.",
-		"Folders with the specified names will be ignored in this directory."
+		"Изображения из папок стоп-листа игнорируются и не кешируются. Добавлять и удалять папки можно в левом меню основного окна или через кнопку «Открыть список».",
+		"Images from stop-list folders are ignored and not cached. You can add and remove folders in the left menu of the main window, or via the «Open list» button."
 	)
 	stop_list_empty = (
 		"Список пуст",
@@ -664,4 +664,8 @@ class Lng:
 	alias_taken = (
 		"Имя занято",
 		"Name is taken"
+	)
+	open_list = (
+		"Открыть список",
+		"Open list"
 	)
