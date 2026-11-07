@@ -577,7 +577,9 @@ class MfRepairWidget(UGroupBox):
 		super().__init__(title, parent)
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(10, 5, 10, 5)
-		self.v_lay.setSpacing(2)
+		self.v_lay.setSpacing(7)
+
+		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
 		title_layout = TitleTextWidget(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
 		self.v_lay.addWidget(title_layout)
@@ -601,17 +603,17 @@ class MfRepairWidget(UGroupBox):
 
 		button_layout.addStretch()
 
-		self.setFixedHeight(self.sizeHint().height())
-
 
 class MfRemoveWidget(UGroupBox):
 	start_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
+		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
 		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 5, 10, 10)
-		self.v_lay.setSpacing(5)
+		self.v_lay.setContentsMargins(10, 5, 10, 5)
+		self.v_lay.setSpacing(7)
 
 		title_layout = TitleTextWidget(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
 		self.v_lay.addWidget(title_layout)
@@ -636,9 +638,6 @@ class MfRemoveWidget(UGroupBox):
 		button_layout.addWidget(self.start_btn)
 
 		button_layout.addStretch()
-
-		self.setFixedHeight(self.sizeHint().height())
-
 
 # class MfTitleWid(TransparentWidget):
 # 	def __init__(self, title: str):
@@ -690,7 +689,7 @@ class MfSettings(UGroupBox):
 		self.scroll.setWidget(main_wid)
 
 		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(0, 5, 5, 0)
+		main_lay.setContentsMargins(0, 5, 5, 5)
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 

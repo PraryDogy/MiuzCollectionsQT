@@ -1283,10 +1283,12 @@ class MfAliasWidget(UGroupBox):
 
 	def __init__(self):
 		super().__init__()
+		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
 		self.name_is_valid: bool = False
 
 		v_layout = QVBoxLayout(self)
-		v_layout.setContentsMargins(10, 10, 10, 10)
+		v_layout.setContentsMargins(10, 5, 10, 5)
 		v_layout.setSpacing(5)
 
 		title_wrapper = TransparentWidget()
@@ -1571,6 +1573,7 @@ class MfPathWidget(UGroupBox):
 
 	def __init__(self, mf: Mf = None):
 		super().__init__()
+		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 		self.setAcceptDrops(True)
 		self.copy_path_btn_locked = False
 		self.mf = mf
@@ -1584,7 +1587,7 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 
 		self.main_lay = QVBoxLayout(self)
-		self.main_lay.setContentsMargins(10, 10, 10, 10)
+		self.main_lay.setContentsMargins(10, 5, 10, 5)
 		self.main_lay.setSpacing(0)
 
 		self.stack = QStackedWidget()
@@ -1597,8 +1600,6 @@ class MfPathWidget(UGroupBox):
 			self.show_ok_path()
 		else:
 			self.show_no_path()
-
-		self.setFixedHeight(self.sizeHint().height())
 
 	def _create_title(self, icon_path: Path) -> QHBoxLayout:
 		title = TitleTextWidget(self.title_, icon_path)
@@ -1802,8 +1803,10 @@ class MfStopListWidget(UGroupBox):
 		super().__init__()
 		self.draft_stop_list = list(mf_stop_list)
 
+		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
 		v_layout = QVBoxLayout(self)
-		v_layout.setContentsMargins(10, 10, 10, 10)
+		v_layout.setContentsMargins(10, 5, 10, 5)
 		v_layout.setSpacing(5)
 
 		title_label = TitleTextWidget(Lng.stop_list, Static.COLOR_ICONS / "stop.svg")
@@ -1813,6 +1816,7 @@ class MfStopListWidget(UGroupBox):
 
 		description = GrayTextLabel(Lng.stop_list_descr_short)
 		description.setWordWrap(True)
+		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 		v_layout.addWidget(description)
 
 		v_layout.addSpacing(5)
@@ -1822,9 +1826,6 @@ class MfStopListWidget(UGroupBox):
 		add_button.setIconSize(QSize(10, 10))
 		add_button.clicked.connect(self.open_tags_win)
 		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
-
-		self.adjustSize()
-		self.setFixedHeight(self.sizeHint().height())
 
 	def get_stop_list(self) -> list[str]:
 		return list(self.draft_stop_list)
