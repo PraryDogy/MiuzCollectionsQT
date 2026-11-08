@@ -26,7 +26,7 @@ class MenuLeftTreeWidgetItem(UTreeWidgetItem):
 
 class MenuLeftTreeWidget(UTreeWidget):
 	load_st_grid = pyqtSignal()
-	restart_scaner = pyqtSignal()
+	removed_from_stop_list = pyqtSignal()
 	reveal = pyqtSignal(list)
 	copy_path = pyqtSignal(list)
 	on_tree_clicked = pyqtSignal(str)
@@ -151,6 +151,10 @@ class MenuLeftTreeWidget(UTreeWidget):
 		self.abs_selected_path = abs_path
 		self.on_tree_clicked.emit(abs_path)
 
+	def _to_abs(self, rel_path: str) -> str:
+		"""Абсолютный путь из относительного: /subfolder -> /Volumes/Shares/My Folder/subfolder."""
+		return os.path.join(Mf.current_mf.mf_paths[0], rel_path.lstrip(os.sep))
+
 	def contextMenuEvent(self, a0):
 
 		def hide_digits_cmd():
@@ -176,16 +180,17 @@ class MenuLeftTreeWidget(UTreeWidget):
 				return
 			Mf.current_mf.mf_stop_list.append(rel_path)
 			Mf.write_json_data()
+			self.on_tree_clicked.emit(self._to_abs(rel_path))
 			self._rebuild()
-			self.load_st_grid.emit()
 
 		def rem_stop_list_cmd():
 			if rel_path in Mf.current_mf.mf_stop_list:
 				Mf.current_mf.mf_stop_list.remove(rel_path)
 				Mf.write_json_data()
 				print("папка удалена из игнор листа")
+			self.on_tree_clicked.emit(self._to_abs(rel_path))
+			self.removed_from_stop_list.emit()
 			self._rebuild()
-			self.restart_scaner.emit()
 
 		item: MenuLeftTreeWidgetItem = self.itemAt(a0.pos())
 		menu = UMenu(parent=self)
@@ -255,8 +260,7 @@ class MenuLeft(TransparentFrame):
 	reveal = pyqtSignal(list)
 	copy_path = pyqtSignal(list)
 	on_hide_digits_clicked = pyqtSignal()
-	load_st_grid = pyqtSignal()
-	restart_scaner = pyqtSignal()
+	removed_from_stop_list = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -280,11 +284,8 @@ class MenuLeft(TransparentFrame):
 		self.tree_wid.copy_path.connect(
 			lambda rel_paths: self.copy_path.emit(rel_paths)
 		)
-		self.tree_wid.load_st_grid.connect(
-			lambda: self.load_st_grid.emit()
-		)
-		self.tree_wid.restart_scaner.connect(
-			lambda: self.restart_scaner.emit()
+		self.tree_wid.removed_from_stop_list.connect(
+			lambda: self.removed_from_stop_list.emit()
 		)
 		self.tree_wid.init_ui()
 

@@ -681,3 +681,7 @@ class Lng:
 		"Папка в игнор листе",
 		"Folder in ignore list"
 	)
+	wait_for_scan = (
+		"Папка удалена из игнор листа. Пожалуйста, подождите, пока изображения будут проиндексированы.",
+		"The folder has been removed from the ignore list. Please wait while the images are indexed."
+	)

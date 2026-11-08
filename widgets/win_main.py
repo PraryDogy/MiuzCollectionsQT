@@ -191,6 +191,7 @@ class WinMain(UMainWindow):
 		self.go_to_url: str | None = None
 		self.files_to_copy = set()
 		self.stop_scaner = True
+		self.removed_from_stop_list = False
 
 		self.bar_top = BarTop()
 		# отступ справа в заголовке окна
@@ -236,11 +237,8 @@ class WinMain(UMainWindow):
 		self.left_menu.copy_path.connect(
 			lambda rel_paths: self.copy_path(rel_paths)
 		)
-		self.left_menu.load_st_grid.connect(
-			lambda: self.load_st_grid()
-		)
-		self.left_menu.restart_scaner.connect(
-			lambda: self.restart_scaner_task()
+		self.left_menu.removed_from_stop_list.connect(
+			lambda: self.removed_from_stop_list_cmd()
 		)
 		self.splitter.addWidget(self.left_menu)
 
@@ -288,6 +286,14 @@ class WinMain(UMainWindow):
 			self.open_win_smb(Mf.current_mf)
 			return None
 		return wrapper
+
+	def removed_from_stop_list_cmd(self):
+		self.removed_from_stop_list = True
+		self.restart_scaner_task()
+
+		win_warn = WarningWindow(Lng.wait_for_scan)
+		win_warn.center_to_parent(self)
+		win_warn.show()
 
 	def set_no_img_search(self):
 		Dynamic.img_search_thumb_paths.clear()
@@ -738,9 +744,10 @@ class WinMain(UMainWindow):
 			self.scaner_task.terminate_join()
 			progress.show_timer()
 			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
-			if db_changed(self.db_mtime, new_db_time):
+			if db_changed(self.db_mtime, new_db_time) or self.removed_from_stop_list:
 				self.load_st_grid()
 				self.left_menu.tree_wid.init_ui()
+				self.removed_from_stop_list = False
 		else:
 			self.scaner_poll_timer.start(ms)
 
