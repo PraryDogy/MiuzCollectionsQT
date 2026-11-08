@@ -17,7 +17,7 @@ from .lang import Lng
 from .main_folder import Mf
 from .shared_utils import ImgUtils
 from .utils import Utils, ReadableDate
-
+from .scaner import StopList
 
 class URunnable(QRunnable):
 	def __init__(self):
@@ -227,6 +227,12 @@ class DbImagesLoader(URunnable):
 			if clean:
 				patterns.append(f"{os.sep}{Utils.escape_like(clean)}{os.sep}%")
 		return patterns
+
+	@staticmethod
+	def is_stopped_path(rel_path: str) -> bool:
+		"""True, если rel_path или любой его предок есть в стоп-листе."""
+		stop = StopList(Mf.current_mf.mf_stop_list)
+		return stop.contains(rel_path)
 
 	def get_stmt(self):
 		rel_path = Dynamic.current_dir

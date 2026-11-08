@@ -1341,10 +1341,14 @@ class GridStandart(Grid):
 	def __init__(self):
 		super().__init__()
 		self.setAcceptDrops(True)
-		self._load_id = 0              # номер текущего запроса к БД
-		self._tasks: dict[int, DbImagesLoader] = {}  # держим ссылки на работающие задачи
+		self._load_id = 0
+		self._tasks: dict[int, DbImagesLoader] = {}
 		self._empty_lbl: TransparentLabel | None = None
 		self.load_db_images_task(reset=True)
+
+	def is_current_dir_stopped(self) -> bool:
+		"""Текущая папка или её родитель находятся в стоп-листе."""
+		return DbImagesLoader.is_stopped_path(Dynamic.current_dir)
 
 	def load_more_thumbnails(self):
 		if self._exhausted:
@@ -1354,10 +1358,19 @@ class GridStandart(Grid):
 		self.load_db_images_task(reset=False)
 
 	def load_db_images_task(self, reset: bool = True):
+		# Стоп-папка: не запускаем запрос к БД вообще, сразу показываем заглушку
+		if reset and self.is_current_dir_stopped():
+			self._load_id += 1
+			self.clear_grid()
+			self._exhausted = True
+			self._loading_more = False
+			self.show_empty_state()
+			self.finished_.emit()
+			return
+
 		self._load_id += 1
 		lid = self._load_id
 		task = DbImagesLoader()
-		# лямбда без receiver'а выполняется в потоке GUI, поэтому виджеты создаются безопасно
 		task.sigs.finished_.connect(
 			lambda items, lid=lid, reset=reset: self._on_loaded(items, lid, reset)
 		)
@@ -1367,7 +1380,6 @@ class GridStandart(Grid):
 	def _on_loaded(self, items: list[DbImagesLoaderItem], load_id: int, reset: bool):
 		self._tasks.pop(load_id, None)
 		if load_id != self._load_id:
-			# результат устарел, сбрасываем флаг, иначе дозагрузка заблокируется
 			self._loading_more = False
 			return
 		if reset:
@@ -1383,6 +1395,30 @@ class GridStandart(Grid):
 			self._empty_lbl.deleteLater()
 			self._empty_lbl = None
 
+	def show_empty_state(self):
+		"""Показывает заглушку: папка в стоп-листе или нет фото."""
+		self.grid_wid.hide()
+		self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.scroll_layout.addStretch(1)
+
+		empty_container = TransparentWidget()
+		self.scroll_layout.addWidget(empty_container, alignment=Qt.AlignmentFlag.AlignCenter)
+		empty_layout = QHBoxLayout(empty_container)
+		empty_layout.setContentsMargins(0, 0, 0, 0)
+		empty_layout.setSpacing(10)
+
+		if self.is_current_dir_stopped():
+			self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
+			self._empty_lbl = TransparentLabel(Lng.folder_in_stop_list)
+		else:
+			self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "image_icon_gray.svg"))
+			self._empty_lbl = TransparentLabel(Lng.no_photo)
+
+		self.icon_wid.setFixedSize(25, 25)
+		empty_layout.addWidget(self.icon_wid)
+		empty_layout.addWidget(self._empty_lbl)
+		self.scroll_layout.addStretch(1)
+
 	# @Utils.timed("create_thumbnails")
 	def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
 		self.thumb_cls = SquareThumb if JsonData.square_thumbs else Thumb
@@ -1391,7 +1427,6 @@ class GridStandart(Grid):
 		self.grid_wid.setUpdatesEnabled(False)
 		try:
 			for image_item in db_images:
-				# при догрузке уже созданные миниатюры не пересоздаём
 				if image_item.rel_img_path in self.url_to_wid:
 					continue
 
@@ -1415,31 +1450,9 @@ class GridStandart(Grid):
 		self._loading_more = False
 
 		if not self.url_to_wid:
-
-			self.grid_wid.hide()
-			self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-			self.scroll_layout.addStretch(1)
-
-			empty_container = TransparentWidget()
-			self.scroll_layout.addWidget(empty_container, alignment=Qt.AlignmentFlag.AlignCenter)
-			empty_layout = QHBoxLayout(empty_container)
-			empty_layout.setContentsMargins(0, 0, 0, 0)
-			empty_layout.setSpacing(10)
-
-			if Dynamic.current_dir in Mf.current_mf.mf_stop_list:
-				self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
-				self._empty_lbl = TransparentLabel(Lng.folder_in_stop_list)
-			else:
-				self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "image_icon_gray.svg"))
-				self._empty_lbl = TransparentLabel(Lng.no_photo)
-
-			self.icon_wid.setFixedSize(25, 25)
-			empty_layout.addWidget(self.icon_wid)
-			empty_layout.addWidget(self._empty_lbl)
-			self.scroll_layout.addStretch(1)
+			self.show_empty_state()
 		else:
 			self.rearrange()
-			# новые миниатюры сначала получают быструю картинку, затем сглаживаются
 			self._settle_timer.start(self._settle_debounce_ms)
 		self.finished_.emit()
 
@@ -1448,10 +1461,8 @@ class GridStandart(Grid):
 		return super().dragEnterEvent(a0)
 
 	def dropEvent(self, a0):
-
 		if not a0.mimeData().hasUrls() or a0.source() is not None:
 			return
-
 		elif Dynamic.search_words_list:
 			return
 
