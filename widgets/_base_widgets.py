@@ -888,7 +888,7 @@ class UTagWidget(TransparentFrame):
 		if l_svg:
 			self.left_svg_widget = QSvgWidget(str(l_svg))
 			self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
-			self.left_svg_widget.setFixedSize(15, 15)
+			self.left_svg_widget.setFixedSize(14, 14)
 			self.h_lay.addWidget(self.left_svg_widget)
 
 		self.text_widget = TransparentLabel(text)
