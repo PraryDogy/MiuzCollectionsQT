@@ -24,13 +24,12 @@ from system.themes import ThemeChanger
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-                            MfAliasWidget, MfPathWidget, MfStopListWidget,
-                            RedButton, RowArrowWidget, 
-                            UTagWidget, TitleTextWidget,
-                            TransparentLabel, TransparentWidget, UGroupBox,
-                            UListSpacerItem, UListWidget, UListWidgetItem,
-                            UMainWindow, UMenu, UPushButton, UScrollVerticalArea,
-                            USep, USpinBox, WarningWindow)
+                            MfAliasWidget, MfPathWidget, RedButton,
+                            RowArrowWidget, TitleTextWidget, TransparentLabel,
+                            TransparentWidget, UGroupBox, UListSpacerItem,
+                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
+                            UPushButton, UScrollVerticalArea, USep, USpinBox,
+                            UTagWidget, WarningWindow)
 
 
 def restart_app():
@@ -643,11 +642,99 @@ class MfRemoveWidget(UGroupBox):
 
 
 class IgnoreListWin(UMainWindow):
-	def __init__(self, parent = None):
+	def __init__(self, mf: Mf, parent=None):
 		super().__init__(parent)
-		self.setWindowTitle()
+		self.set_always_on_top()
+		self.set_close_only()
+		self.setWindowTitle(Lng.ignore_list)
+
+		self.mf = mf
+
+		self.central_layout.setContentsMargins(5, 5, 5, 5)
+		self.central_layout.setSpacing(5)
+
+		self.group_box = UGroupBox()
+		self.group_lay = QVBoxLayout(self.group_box)
+		self.group_lay.setContentsMargins(10, 5, 10, 5)
+		self.group_lay.setSpacing(5)
+
+		self.title_widget = TitleTextWidget(
+			text=Lng.ignore_list,
+			svg=Static.COLOR_ICONS / "stop.svg"
+		)
+		self.group_lay.addWidget(self.title_widget)
+		self.group_lay.addWidget(USep())
+
+		self.descr_widget = GrayTextLabel(
+			text=Lng.ignore_list_descr_short
+		)
+		self.descr_widget.setWordWrap(True)
+		self.group_lay.addWidget(self.descr_widget)
+
+		if len(self.mf.mf_stop_list) > 0:
+			hh = 100
+			self.v_list_widget = UListWidget()
+			for i in self.mf.mf_stop_list * 10:
+				item = UListWidgetItem(parent=self.v_list_widget, text=i * 10)
+				self.v_list_widget.addItem(item)
+			self.group_lay.addWidget(self.v_list_widget)
+		else:
+			hh = 100
+			self.group_lay.addWidget(USep())
+			self.v_list_widget = TransparentLabel(Lng.ignore_list_empty)
+			self.group_lay.addWidget(self.v_list_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+
+		self.central_layout.addWidget(self.group_box)
+
+		self.setMinimumWidth(420)
+		self.setMinimumHeight(hh)
+		self.adjustSize()
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		return super().keyPressEvent(a0)
 
 
+class MfStopListWidget(UGroupBox):
+	changed = pyqtSignal()
+
+	def __init__(self, mf: Mf):
+		super().__init__()
+		self.mf = mf
+		self.draft_stop_list = list(self.mf.mf_stop_list)
+
+		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
+		v_layout = QVBoxLayout(self)
+		v_layout.setContentsMargins(10, 5, 10, 5)
+		v_layout.setSpacing(5)
+
+		title_label = TitleTextWidget(Lng.ignore_list, Static.COLOR_ICONS / "stop.svg")
+		v_layout.addWidget(title_label)
+
+		v_layout.addWidget(USep())
+
+		description = GrayTextLabel(Lng.ignore_list_descr_short)
+		description.setWordWrap(True)
+		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
+		v_layout.addWidget(description)
+
+		v_layout.addSpacing(5)
+
+		add_button = UPushButton(Lng.open_list)
+		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
+		add_button.setIconSize(QSize(10, 10))
+		add_button.clicked.connect(self.open_ignore_list_win)
+		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
+
+	def get_stop_list(self) -> list[str]:
+		return list(self.draft_stop_list)
+
+	def open_ignore_list_win(self):
+		self.ignore_win = IgnoreListWin(self.mf)
+		self.ignore_win.center_to_parent(self.window())
+		self.ignore_win.show()
 
 
 class MfSettings(UGroupBox):
@@ -681,7 +768,7 @@ class MfSettings(UGroupBox):
 		self.path_widget = MfPathWidget(mf=self.mf)
 		main_lay.addWidget(self.path_widget)
 
-		self.mf_stop_list = MfStopListWidget(mf_stop_list=self.mf.mf_stop_list)
+		self.mf_stop_list = MfStopListWidget(self.mf)
 		main_lay.addWidget(self.mf_stop_list)
 
 		self.repair_widget = MfRepairWidget()

@@ -85,10 +85,6 @@ class Lng:
 	no_connection = ("Нет подключения", "No connection")
 	ok = ("ОК", "OK")
 	alias = ("Имя", "Name")
-	ignore_list_descr = (
-		"Список исключений: перетащите сюда папку или укажите имя с новой строки.",
-		"Ignore list: drag a folder here or enter a name on a new line."
-	)
 	ignore_list = ("Игнор лист", "Ignore list")
 	minutes = ("минут", "minutes")
 	search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
@@ -554,8 +550,8 @@ class Lng:
 		"Folder name"
 	)
 	ignore_list_descr_short = (
-		"Изображения из папок игнор листа игнорируются и не кешируются. Добавлять и удалять папки можно в левом меню основного окна или через кнопку «Открыть список».",
-		"Images from ignore list folders are ignored and not cached. You can add and remove folders in the left menu of the main window, or via the «Open list» button."
+		"Папки из игнор-листа не индексируются: их изображения не кешируются и не отображаются. Добавлять и удалять папки можно в левом меню или через кнопку «Открыть список».",
+		"Folders in the ignore list are not indexed: their images are not cached or shown. You can add and remove folders in the left menu or via the «Open list» button."
 	)
 	ignore_list_empty = (
 		"Список пуст",
