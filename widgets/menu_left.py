@@ -38,6 +38,9 @@ class MenuLeftTreeWidget(UTreeWidget):
 		self.abs_selected_path: str = os.sep
 		self.items: dict[str, MenuLeftTreeWidgetItem] = {}
 
+		self.base_folder_icon = QIcon(str(Static.COLOR_ICONS / "base_folder.svg"))
+		self.base_stop_list_icon = QIcon(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
+
 	def need_hide_digits(self):
 		if Mf.current_mf.mf_alias not in JsonData.hide_digits_mf_lst:
 			return False
@@ -63,7 +66,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 		self.clear()
 
 		root_item = MenuLeftTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
-		root_item.setIcon(0, QIcon(str(Static.COLOR_ICONS / "base_folder.svg")))
+		root_item.setIcon(0, self.base_folder_icon)
 		self.addTopLevelItem(root_item)
 
 		task = DbDirsLoader(Mf.current_mf)
@@ -79,6 +82,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 				continue
 			parent = os.path.dirname(path) or os.sep
 			name = os.path.basename(path)
+			rel_path = Utils.remove_mf_path(Mf.current_mf.mf_paths[0], path)
 
 			# Опция: скрывать числовые префиксы только у папок первого (верхнего) уровня
 			if hide_digits and path.count(os.sep) == 1:
@@ -89,7 +93,11 @@ class MenuLeftTreeWidget(UTreeWidget):
 				continue
 
 			child = MenuLeftTreeWidgetItem(parent_item, name, path)
-			child.setIcon(0, QIcon(str(Static.COLOR_ICONS / "base_folder.svg")))
+
+			if rel_path in Mf.current_mf.mf_stop_list:
+				child.setIcon(0, self.base_stop_list_icon)
+			else:	
+				child.setIcon(0, self.base_folder_icon)
 			parent_item.addChild(child)
 			self.items[path] = child
 
@@ -223,7 +231,6 @@ class MenuLeftTreeWidget(UTreeWidget):
 			add_stop_list = QAction(Lng.add_stop_list, menu)
 			add_stop_list.triggered.connect(add_stop_list_cmd)
 			menu.addAction(add_stop_list)
-
 
 		menu.show_menu_under_cursor(a0)
 
