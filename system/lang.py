@@ -677,3 +677,7 @@ class Lng:
 		"Удалить из стоп листа",
 		"Remove from stop list"
 	)
+	folder_in_stop_list = (
+		"Папка в игнор листе",
+		"Folder in ignore list"
+	)

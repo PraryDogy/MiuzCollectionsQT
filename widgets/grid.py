@@ -1415,11 +1415,27 @@ class GridStandart(Grid):
 		self._loading_more = False
 
 		if not self.url_to_wid:
+
 			self.grid_wid.hide()
 			self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			self.scroll_layout.addStretch(1)
-			self._empty_lbl = TransparentLabel(Lng.no_photo)
-			self.scroll_layout.addWidget(self._empty_lbl, alignment=Qt.AlignmentFlag.AlignCenter)
+
+			empty_container = TransparentWidget()
+			self.scroll_layout.addWidget(empty_container, alignment=Qt.AlignmentFlag.AlignCenter)
+			empty_layout = QHBoxLayout(empty_container)
+			empty_layout.setContentsMargins(0, 0, 0, 0)
+			empty_layout.setSpacing(10)
+
+			if Dynamic.current_dir in Mf.current_mf.mf_stop_list:
+				self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
+				self._empty_lbl = TransparentLabel(Lng.folder_in_stop_list)
+			else:
+				self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "image_icon_gray.svg"))
+				self._empty_lbl = TransparentLabel(Lng.no_photo)
+
+			self.icon_wid.setFixedSize(25, 25)
+			empty_layout.addWidget(self.icon_wid)
+			empty_layout.addWidget(self._empty_lbl)
 			self.scroll_layout.addStretch(1)
 		else:
 			self.rearrange()
