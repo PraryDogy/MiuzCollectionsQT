@@ -1420,7 +1420,7 @@ class GridStandart(Grid):
 			self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
 			self._empty_lbl = TransparentLabel(Lng.folder_in_stop_list)
 		else:
-			self.icon_wid = QSvgWidget(str(Static.COLOR_ICONS / "image_icon_gray.svg"))
+			self.icon_wid = QSvgWidget(str(Static.GRAY_ICONS / "image_icon_gray.svg"))
 			self._empty_lbl = TransparentLabel(Lng.no_photo)
 
 		self.icon_wid.setFixedSize(25, 25)

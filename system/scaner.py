@@ -601,6 +601,18 @@ class DirImagesUpdater(ScanerParent):
 		except Empty:
 			return False
 
+	def _dirs_without_changes(self, removed_images: list[ImgItem],
+							  new_images: list[ImgItem]) -> list[DirItem]:
+		"""Папки, в которых нет ни удалённых, ни новых изображений."""
+		busy = {
+			os.path.normpath(os.path.dirname(i.abs_img_path))
+			for i in removed_images + new_images
+		}
+		return [
+			d for d in self.dirs_to_scan
+			if os.path.normpath(d.abs_path) not in busy
+		]
+
 	def start(self):
 		"""
 		На основе сохраненного списка добавляются и удаляются миниатюры в "hashdir",
@@ -615,12 +627,6 @@ class DirImagesUpdater(ScanerParent):
 		img_comparator = ImgComparator(scaner, finder_images, db_images)
 		removed_images, new_images = img_comparator.start()
 
-		# мы проверяем на удаление
-		# если из каталога удаляется более Х изображений
-		# это подозрительно
-		# возможно пользователь указал неправильный путь к каталогу
-		# из-за чего приложение пытается все удалить из старого каталога
-		# чтобы добавить все из нового
 		stmt = all((
 			len(removed_images) > self.removed_images_count,
 			scaner.scaner_type == "base",
@@ -631,9 +637,12 @@ class DirImagesUpdater(ScanerParent):
 			)
 			can_continue = self.wait_for_answer(scaner)
 			if not can_continue:
+				# изменений без подтверждения не применяем, но папки без изменений записываем
+				safe_dirs = self._dirs_without_changes(removed_images, new_images)
+				if safe_dirs:
+					DirsDbUpdater(scaner, safe_dirs).upsert_records()
 				return
 
-		# общий счет для отображения в GUI
 		scaner.total_count = len(removed_images) + len(new_images)
 
 		thumbs_updater = ThumbsUpdater(scaner, removed_images, new_images)
