@@ -401,24 +401,24 @@ class DbDirsLoader(URunnable):
 		self.sigs.finished_.emit(res)
 
 	def _task(self):
+		# Dirs содержит все папки, включая пустые и стоп-папки (mod = 0)
 		with Dbase.main_engine.begin() as conn:
 			stmt = (
-				sqlalchemy.select(Thumbs.root)
-				.where(Thumbs.mf_alias == self.mf.mf_alias)
-			).distinct()
+				sqlalchemy.select(Dirs.rel_dir_path)
+				.where(Dirs.mf_alias == self.mf.mf_alias)
+			)
 			res = conn.execute(stmt).scalars().all()
-			return self.fill_missing_paths(res)
+		return self.normalize_paths(res)
 
-	def fill_missing_paths(self, paths: list[str]) -> list[str]:
-		"""Добавляет недостающие промежуточные директории."""
-		full_set = set()
+	@staticmethod
+	def normalize_paths(paths: list[str]) -> list[str]:
+		"""Приводит пути к виду /папка/подпапка и убирает корень: он добавляется в дереве отдельно."""
+		result = set()
 		for p in paths:
-			parts = p.strip("/").split("/")
-			curr = ""
-			for part in parts:
-				curr = curr + "/" + part if curr else "/" + part
-				full_set.add(curr)
-		return sorted(full_set)
+			clean = p.strip(os.sep)
+			if clean:
+				result.add(os.sep + clean)
+		return sorted(result)
 
 
 @dataclass(slots=True)
