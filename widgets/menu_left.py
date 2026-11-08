@@ -151,6 +151,14 @@ class MenuLeftTreeWidget(UTreeWidget):
 			first_item.setExpanded(True)
 			self.setCurrentItem(first_item)
 
+		def add_stop_list_cmd():
+			Mf.current_mf.mf_stop_list.append(rel_path)
+			Mf.write_json_data()
+
+		def rem_stop_list_cmd():
+			if rel_path in Mf.current_mf.mf_stop_list:
+				Mf.current_mf.mf_stop_list.remove(rel_path)
+
 		item: MenuLeftTreeWidgetItem = self.itemAt(a0.pos())
 		menu = UMenu(parent=self)
 
@@ -204,6 +212,18 @@ class MenuLeftTreeWidget(UTreeWidget):
 			lambda: self.reveal.emit([rel_path, ])
 		)
 		menu.addAction(reveal)
+
+		menu.addSeparator()
+
+		if rel_path in Mf.current_mf.mf_stop_list:
+			rem_stop_list = QAction(Lng.remove_from_stop_list, menu)
+			rem_stop_list.triggered.connect(rem_stop_list_cmd)
+			menu.addAction(rem_stop_list)
+		else:
+			add_stop_list = QAction(Lng.add_stop_list, menu)
+			add_stop_list.triggered.connect(add_stop_list_cmd)
+			menu.addAction(add_stop_list)
+
 
 		menu.show_menu_under_cursor(a0)
 

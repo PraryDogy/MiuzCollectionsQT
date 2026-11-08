@@ -669,3 +669,11 @@ class Lng:
 		"Открыть список",
 		"Open list"
 	)
+	add_stop_list = (
+		"Добавить в стоп лист",
+		"Add to stop list"
+	)
+	remove_from_stop_list = (
+		"Удалить из стоп листа",
+		"Remove from stop list"
+	)
