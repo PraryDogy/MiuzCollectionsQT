@@ -89,7 +89,7 @@ class Lng:
 		"Список исключений: перетащите сюда папку или укажите имя с новой строки.",
 		"Ignore list: drag a folder here or enter a name on a new line."
 	)
-	stop_list = ("Стоп лист", "Stop list")
+	ignore_list = ("Игнор лист", "Ignore list")
 	minutes = ("минут", "minutes")
 	search_interval = ("Интервал поиска новых изображений", "Interval for checking new images")
 	show_system_files = ("Системные файлы в Finder", "System files in Finder")
@@ -549,26 +549,21 @@ class Lng:
 		"Неактивен",
 		"Inactive"
 	)
-
-	stop_list_description =	(
-			"Укажите имя папки. Все папки с таким именем будут игнорироваться в данном каталоге.",
-			"Enter a folder name. All folders with this name will be ignored in this directory."
-		)
 	folder_name = (
 		"Имя папки",
 		"Folder name"
 	)
-	stop_list_descr_short = (
-		"Изображения из папок стоп-листа игнорируются и не кешируются. Добавлять и удалять папки можно в левом меню основного окна или через кнопку «Открыть список».",
-		"Images from stop-list folders are ignored and not cached. You can add and remove folders in the left menu of the main window, or via the «Open list» button."
+	ignore_list_descr_short = (
+		"Изображения из папок игнор листа игнорируются и не кешируются. Добавлять и удалять папки можно в левом меню основного окна или через кнопку «Открыть список».",
+		"Images from ignore list folders are ignored and not cached. You can add and remove folders in the left menu of the main window, or via the «Open list» button."
 	)
-	stop_list_empty = (
+	ignore_list_empty = (
 		"Список пуст",
 		"The list is empty",
 	)
-	stop_list_remove_confirm = (
-		"Удалить этот элемент из стоп-листа?",
-		"Remove this item from the stop list?",
+	ignore_list_remove_confirm = (
+		"Удалить этот элемент из игнор листа?",
+		"Remove this item from the ignore list?",
 	)
 	servers_description = (
 		"Добавляйте и сохраняйте данные SMB-серверов так же, как в macOS. "
@@ -669,19 +664,23 @@ class Lng:
 		"Открыть список",
 		"Open list"
 	)
-	add_stop_list = (
-		"Добавить в стоп лист",
-		"Add to stop list"
+	add_ignore_list = (
+		"Добавить в игнор лист",
+		"Add to ignore list"
 	)
-	remove_from_stop_list = (
-		"Удалить из стоп листа",
-		"Remove from stop list"
+	remove_from_ignore_list = (
+		"Удалить из игнор листа",
+		"Remove from ignore list"
 	)
-	folder_in_stop_list = (
+	folder_in_ignore_list = (
 		"Папка в игнор листе",
 		"Folder in ignore list"
 	)
 	wait_for_scan = (
 		"Папка удалена из игнор листа. Пожалуйста, подождите, пока изображения будут проиндексированы.",
 		"The folder has been removed from the ignore list. Please wait while the images are indexed."
+	)
+	ignore_list = (
+		"Игнор лист",
+		"Ignore list"
 	)

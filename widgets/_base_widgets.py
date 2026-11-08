@@ -1723,12 +1723,12 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 5, 10, 5)
 		v_layout.setSpacing(5)
 
-		title_label = TitleTextWidget(Lng.stop_list, Static.COLOR_ICONS / "stop.svg")
+		title_label = TitleTextWidget(Lng.ignore_list, Static.COLOR_ICONS / "stop.svg")
 		v_layout.addWidget(title_label)
 
 		v_layout.addWidget(USep())
 
-		description = GrayTextLabel(Lng.stop_list_descr_short)
+		description = GrayTextLabel(Lng.ignore_list_descr_short)
 		description.setWordWrap(True)
 		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 		v_layout.addWidget(description)

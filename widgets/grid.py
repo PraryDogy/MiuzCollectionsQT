@@ -1409,7 +1409,7 @@ class GridStandart(Grid):
 		self.grid_wid.hide()
 		if self.is_current_dir_stopped():
 			self.icon_wid.load(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
-			self._empty_lbl.setText(Lng.folder_in_stop_list)
+			self._empty_lbl.setText(Lng.folder_in_ignore_list)
 		else:
 			self.icon_wid.load(str(Static.GRAY_ICONS / "image_icon_gray.svg"))
 			self._empty_lbl.setText(Lng.no_photo)

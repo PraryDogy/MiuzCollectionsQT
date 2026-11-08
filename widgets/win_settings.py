@@ -642,6 +642,14 @@ class MfRemoveWidget(UGroupBox):
 		button_layout.addStretch()
 
 
+class IgnoreListWin(UMainWindow):
+	def __init__(self, parent = None):
+		super().__init__(parent)
+		self.setWindowTitle()
+
+
+
+
 class MfSettings(UGroupBox):
 	changed = pyqtSignal()
 

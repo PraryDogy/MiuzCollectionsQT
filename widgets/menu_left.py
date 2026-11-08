@@ -250,11 +250,11 @@ class MenuLeftTreeWidget(UTreeWidget):
 		if rel_path != os.sep:
 			menu.addSeparator()
 			if rel_path in Mf.current_mf.mf_stop_list:
-				rem_stop_list = QAction(Lng.remove_from_stop_list, menu)
+				rem_stop_list = QAction(Lng.remove_from_ignore_list, menu)
 				rem_stop_list.triggered.connect(rem_stop_list_cmd)
 				menu.addAction(rem_stop_list)
 			else:
-				add_stop_list = QAction(Lng.add_stop_list, menu)
+				add_stop_list = QAction(Lng.add_ignore_list, menu)
 				add_stop_list.triggered.connect(add_stop_list_cmd)
 				menu.addAction(add_stop_list)
 
