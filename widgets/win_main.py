@@ -236,6 +236,12 @@ class WinMain(UMainWindow):
 		self.left_menu.copy_path.connect(
 			lambda rel_paths: self.copy_path(rel_paths)
 		)
+		self.left_menu.load_st_grid.connect(
+			lambda: self.load_st_grid()
+		)
+		self.left_menu.restart_scaner.connect(
+			lambda: self.restart_scaner_task()
+		)
 		self.splitter.addWidget(self.left_menu)
 
 		# Правый виджет
@@ -556,7 +562,7 @@ class WinMain(UMainWindow):
 		self.settings_win.center_to_parent(self.window())
 		self.settings_win.show()
 
-	def load_st_grid(self, layout_index: int = 3):
+	def load_st_grid(self):
 
 		def finished():
 			self.grid.setFocus()

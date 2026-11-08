@@ -20,7 +20,6 @@ from system.utils import Utils
 class Tools:
 	@staticmethod
 	def log(text: str) -> None:
-		from pathlib import Path  # noqa: F401  (оставлено для совместимости импортов)
 		from cfg import Static as _Static
 		filepath = _Static.APP_DATA_DIR / "log.txt"
 		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -71,7 +70,7 @@ class DirItem:
 		- Mf.curr_path = /User/Downloads/parent/folder
 		- подкаталог = /User/Downloads/parent/folder/subfolder
 		- rel_path = /subfolder
-	- mod: дата модификации каталога (os.stat.st_mtime)
+	- mod: дата модификации каталога (os.stat.st_mtime), либо StopList.MOD для стоп-папки
 	"""
 	abs_path: str
 	rel_path: str
@@ -91,6 +90,30 @@ class ImgItem:
 	size: int
 	mod: int
 	rel_thumb_path: str = ""
+
+
+class StopList:
+	"""
+	Стоп-лист по относительным путям. Папка из стоп-листа и всё её поддерево
+	считаются стоп-папками: изображения в них не сканируются, структура сохраняется.
+	"""
+
+	# mod для стоп-папок в Dirs. Реальный mtime никогда не равен 0.
+	MOD = 0
+
+	def __init__(self, stop_list: list[str]):
+		self.roots = {
+			os.sep + s.strip(os.sep)
+			for s in stop_list
+			if s.strip(os.sep)
+		}
+
+	def contains(self, rel_path: str) -> bool:
+		rel = os.sep + rel_path.strip(os.sep)
+		for root in self.roots:
+			if rel == root or rel.startswith(root + os.sep):
+				return True
+		return False
 
 
 @dataclass(slots=True)
@@ -122,11 +145,12 @@ class DirsChangeWatcher(ScanerParent):
 
 	def is_changed(self) -> tuple[bool, list[DirItem]]:
 		db_dirs: list[DirItem] = []
-		mf_alias = self.scaner_item.mf.mf_alias
-		base_path = self.scaner_item.mf.mf_current_path.strip(os.sep)
+		mf = self.scaner_item.mf
+		stop = StopList(mf.mf_stop_list)
+		base_path = mf.mf_current_path.strip(os.sep)
 		q = (
 			sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
-			.where(Dirs.mf_alias == mf_alias)
+			.where(Dirs.mf_alias == mf.mf_alias)
 		)
 		with self.scaner_item.engine.connect() as conn:
 			for rel_path, mod in conn.execute(q):
@@ -135,12 +159,11 @@ class DirsChangeWatcher(ScanerParent):
 					base_path,
 					rel_path.strip(os.sep)
 				)
-				item = DirItem(
+				db_dirs.append(DirItem(
 					abs_path=abs_dir_path,
 					rel_path=rel_path,
 					mod=mod
-				)
-				db_dirs.append(item)
+				))
 
 		is_changed_flag = False
 
@@ -148,14 +171,26 @@ class DirsChangeWatcher(ScanerParent):
 			if not os.path.exists(item.abs_path):
 				is_changed_flag = True
 				break
+
+			if stop.contains(item.rel_path):
+				# стоп-папка: mtime не отслеживаем, но если в БД ещё не стоит MOD,
+				# нужно её перезаписать
+				if item.mod != StopList.MOD:
+					is_changed_flag = True
+					break
+				continue
+
 			try:
 				stat = os.stat(item.abs_path)
 			except Exception as e:
 				print("DirsChangeWatcher error", item.abs_path, e)
 				continue
-			if int(stat.st_mtime) > item.mod:
+
+			# MOD у обычной папки означает, что её только что убрали из стоп-листа
+			if item.mod == StopList.MOD or int(stat.st_mtime) > item.mod:
 				is_changed_flag = True
 				break
+
 		if not db_dirs:
 			is_changed_flag = True
 		return (is_changed_flag, db_dirs)
@@ -168,54 +203,50 @@ class DirsLoader(ScanerParent):
 
 	def get_finder_dirs(self) -> list[DirItem]:
 		"""
-		Собирает список директорий, которые:
-		- есть в каталоге `Mf.curr_path`
-		- не в стоп-листе `Mf.stop_list`
+		Собирает список директорий:
+		- стоп-папка записывается в список с mod = StopList.MOD, внутрь не заходим
+		- её подпапки и изображения не попадают в список вообще
 		"""
 		scaner = self.scaner_item
 
 		scaner.process_queue.put(ScanProgress("search_dirs", scaner.mf.mf_alias))
 
+		stop = StopList(scaner.mf.mf_stop_list)
 		dirs: list[DirItem] = []
 		stack = [scaner.mf.mf_current_path]
 
 		while stack:
 			try:
 				scandir_iterator = os.scandir(stack.pop())
-			except Exception as e:
+			except Exception:
 				print(traceback.format_exc())
 				continue
 
 			for entry in scandir_iterator:
 				try:
-					# is_allowed = entry.name not in scaner.mf.mf_stop_list
-					is_allowed = True
-					stmt = (entry.is_dir() and is_allowed)
-				except Exception as e:
+					if not entry.is_dir():
+						continue
+				except Exception:
 					print(traceback.format_exc())
 					continue
 
-				if stmt:
-					stack.append(entry.path)
-					rel_path = Utils.remove_mf_path(
-						mf_path=scaner.mf.mf_current_path,
-						abs_path=entry.path
-					)
-					stats = entry.stat()
-					mod = int(stats.st_mtime)
-					dir_item = DirItem(entry.path, rel_path, mod)
-					dirs.append(dir_item)
+				rel_path = Utils.remove_mf_path(
+					mf_path=scaner.mf.mf_current_path,
+					abs_path=entry.path
+				)
+
+				if stop.contains(rel_path):
+					dirs.append(DirItem(entry.path, rel_path, StopList.MOD))
+					continue
+
+				stack.append(entry.path)
+				mod = int(entry.stat().st_mtime)
+				dirs.append(DirItem(entry.path, rel_path, mod))
 
 		try:
 			stats = os.stat(scaner.mf.mf_current_path)
-			mod = int(stats.st_mtime)
-			dir_item = DirItem(
-				scaner.mf.mf_current_path,
-				os.sep,
-				mod
-			)
-			dirs.append(dir_item)
-		except Exception as e:
+			dirs.append(DirItem(scaner.mf.mf_current_path, os.sep, int(stats.st_mtime)))
+		except Exception:
 			print(traceback.format_exc())
 
 		return dirs
@@ -718,25 +749,41 @@ class BaseScaner:
 		if not is_changed:
 			print(scaner_item.mf.mf_alias, "not changed")
 			return
+
 		dirs_loader = DirsLoader(scaner_item)
 		finder_dirs = dirs_loader.get_finder_dirs()
 		if not finder_dirs:
 			return
+
 		dirs_comparator = DirsComparator(scaner_item, finder_dirs, db_dirs)
 		removed_dirs = dirs_comparator.get_dirs_to_remove()
 		dirs_to_scan = dirs_comparator.get_dirs_to_scan()
-		# это нужно, когда удалена вся папка "имя папки"
-		# то есть не когда "имя папки" пуста, но существует,
-		# а когда папка "имя папки" не существует
-		if removed_dirs:
-			BaseScaner.log_removed_dirs(scaner_item, finder_dirs, removed_dirs)
-			if len(finder_dirs) != len(removed_dirs):
-				cleaner = RemovedDirsCleaner(scaner_item, removed_dirs)
+
+		# папки, которые только что попали в стоп-лист: в БД у них был реальный mod
+		db_mod = {d.rel_path: d.mod for d in db_dirs}
+		newly_stopped = [
+			d for d in finder_dirs
+			if d.mod == StopList.MOD
+			and db_mod.get(d.rel_path, StopList.MOD) != StopList.MOD
+		]
+		to_clean = removed_dirs + newly_stopped
+
+		if to_clean:
+			BaseScaner.log_removed_dirs(scaner_item, finder_dirs, to_clean)
+			if len(finder_dirs) != len(to_clean):
+				cleaner = RemovedDirsCleaner(scaner_item, to_clean)
 				cleaner.remove_thumbs()
 				cleaner.remove_dirs()
+
 		if dirs_to_scan:
-			updater = DirImagesUpdater(scaner_item, dirs_to_scan)
-			updater.start()
+			stop_dirs = [d for d in dirs_to_scan if d.mod == StopList.MOD]
+			image_dirs = [d for d in dirs_to_scan if d.mod != StopList.MOD]
+
+			if stop_dirs:
+				# только запись в Dirs, изображения не трогаем
+				DirsDbUpdater(scaner_item, stop_dirs).upsert_records()
+			if image_dirs:
+				DirImagesUpdater(scaner_item, image_dirs).start()
 
 	@staticmethod
 	def log_removed_dirs(
@@ -784,7 +831,7 @@ class ForcedScaner:
 	def single_mf_scan(mf: Mf, dirs_to_scan: list[str], queue: Queue, response_queue: Queue):
 		"""
 		Сканирует заданные директории в пределах Mf на предмет новых или
-		удаленных изображений.
+		удаленных изображений. Стоп-папки и их поддерево пропускаются.
 
 		Параметры:
 		- mf: сканируемая директория должна принадлежать определенному Mf
@@ -804,15 +851,19 @@ class ForcedScaner:
 		if avaiable_mf_path:
 			scaner_item.mf.set_mf_current_path(avaiable_mf_path)
 			dir_items: list[DirItem] = []
+			stop = StopList(mf.mf_stop_list)
 			for i in dirs_to_scan:
+				rel_path = Utils.remove_mf_path(mf.mf_current_path, i)
+				if stop.contains(rel_path):
+					continue
 				try:
 					mod = int(os.stat(i).st_mtime)
-				except Exception as e:
+				except Exception:
 					print(traceback.format_exc())
 					continue
 				item = DirItem(
 					abs_path=i,
-					rel_path=Utils.remove_mf_path(mf.mf_current_path, i),
+					rel_path=rel_path,
 					mod=mod
 				)
 				if item not in dir_items:

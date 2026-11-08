@@ -215,6 +215,19 @@ class DbImagesLoader(URunnable):
 			thumbs.append(item)
 		return thumbs
 
+	@staticmethod
+	def stop_list_patterns() -> list[str]:
+		"""
+		LIKE-шаблоны для стоп-папок и всего их поддерева: '/Downloads/%'.
+		rel_img_path имеет вид '/папка/файл.jpg', поэтому шаблон начинается с разделителя.
+		"""
+		patterns = []
+		for path in Mf.current_mf.mf_stop_list:
+			clean = path.strip(os.sep)
+			if clean:
+				patterns.append(f"{os.sep}{Utils.escape_like(clean)}{os.sep}%")
+		return patterns
+
 	def get_stmt(self):
 		rel_path = Dynamic.current_dir
 		if rel_path == os.sep:
@@ -232,6 +245,10 @@ class DbImagesLoader(URunnable):
 			.limit(Static.THUMBS_LOAD_LIMIT)
 			.offset(Dynamic.loaded_thumbs)
 		)
+
+		# стоп-папки и их поддерево не показываем, даже если миниатюры ещё не удалены сканером
+		for pattern in self.stop_list_patterns():
+			stmt = stmt.where(Thumbs.rel_img_path.not_ilike(pattern, escape="\\"))
 
 		if Dynamic.favs_tag_enabled:
 			stmt = stmt.where(Thumbs.fav == 1)
