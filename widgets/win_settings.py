@@ -68,14 +68,17 @@ class SaveGroupBox(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		self.attention_wid = QSvgWidget(str(Static.GRAY_ICONS / "attention_gray.svg"))
-		self.attention_wid.setFixedSize(15, 15)
-		self.attention_wid.hide()
-		self.h_lay.addWidget(self.attention_wid)
+		# self.attention_wid = QSvgWidget(str(Static.GRAY_ICONS / "attention_gray.svg"))
+		# self.attention_wid.setFixedSize(15, 15)
+		# self.attention_wid.hide()
+		# self.h_lay.addWidget(self.attention_wid)
 
-		self.save_text = GrayTextLabel(text=Lng.unsaved_changes)
-		self.h_lay.addWidget(self.save_text)
-		self.save_text.hide()
+		# self.save_text = GrayTextLabel(text=Lng.unsaved_changes)
+		# self.h_lay.addWidget(self.save_text)
+		# self.save_text.hide()
+
+		self.attention_wid = UTagWidget(Lng.unsaved_changes, UTagWidget.qss_yellow, Static.GRAY_ICONS / "attention_gray.svg")
+		self.h_lay.addWidget(self.attention_wid)
 
 		self.h_lay.addSpacing(5)
 
@@ -85,9 +88,10 @@ class SaveGroupBox(TransparentWidget):
 		self.h_lay.addWidget(self.cancel_button)
 
 		self.save_button = ActiveButton(Lng.save_changes_text)
-		# self.save_button.setIcon(QIcon(str(Static.GRAY_ICONS / "diskette_gray.svg")))
 		self.save_button.clicked.connect(self.save_clicked.emit)
 		self.h_lay.addWidget(self.save_button)
+
+		self.hide_warning()
 
 	def _fix_cancel_button_width(self):
 		# Ширина по самой широкой подписи из двух возможных
@@ -101,12 +105,10 @@ class SaveGroupBox(TransparentWidget):
 
 	def show_warning(self):
 		self.attention_wid.show()
-		self.save_text.show()
 		self.cancel_button.setText(Lng.cancel)
 
 	def hide_warning(self):
 		self.attention_wid.hide()
-		self.save_text.hide()
 		self.cancel_button.setText(Lng.close)
 
 
@@ -639,28 +641,6 @@ class MfRemoveWidget(UGroupBox):
 
 		button_layout.addStretch()
 
-# class MfTitleWid(TransparentWidget):
-# 	def __init__(self, title: str):
-# 		super().__init__()
-# 		self.v_lay = QVBoxLayout(self)
-# 		self.v_lay.setContentsMargins(10, 5, 10, 5)
-# 		self.v_lay.setSpacing(5)
-
-# 		self.title_label = TitleTextWidget(title)
-# 		self.title_label.text_widget.set_elide(True, ignore_width=False)
-# 		self.v_lay.addWidget(self.title_label)
-
-# 		self.title_label.h_layout.addStretch()
-
-# 		self.title_tag = UTagWidget(text=Lng.status_no_changes, style=UTagWidget.qss_gray)
-# 		self.title_tag.text_widget.set_font_size(10)
-# 		self.title_label.h_layout.addWidget(self.title_tag)
-
-# 		self.v_lay.addWidget(USep())
-
-# 		self.text_label = GrayTextLabel(Lng.catalog_settings)
-# 		self.v_lay.addWidget(self.text_label)
-
 	def set_has_changes(self, has_changes: bool):
 		if has_changes:
 			self.title_tag.set_qss_style(UTagWidget.qss_yellow)
@@ -693,10 +673,10 @@ class MfSettings(UGroupBox):
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
-		title = f" {self.mf.mf_alias}"
-		self.title_label = TitleTextWidget(title)
+		self.title_label = TitleTextWidget(self.mf.mf_alias, Static.COLOR_ICONS / "image_folder.svg")
 		self.title_label.text_widget.set_elide(True, ignore_width=False)
 		self.main_lay.addWidget(self.title_label)
+		self.title_label.h_layout.setContentsMargins(5, 0, 0, 0)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
 		main_lay.addWidget(self.path_widget)
@@ -730,7 +710,6 @@ class MfSettings(UGroupBox):
 		return self._snapshot() != self._initial
 
 	def _on_fields_changed(self):
-		self.title_wid.set_has_changes(self.has_changes())
 		self.changed.emit()
 
 	def save_changes(self):
