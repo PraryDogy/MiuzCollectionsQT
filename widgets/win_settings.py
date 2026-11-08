@@ -599,7 +599,7 @@ class MfRepairWidget(UGroupBox):
 
 		self.start_btn = UPushButton(Lng.repair_catalog_short)
 		self.start_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "repair_gray.svg")))
-		self.start_btn.clicked.connect(self.start_clicked)
+		self.start_btn.clicked.connect(self.start_clicked.emit)
 		button_layout.addWidget(self.start_btn)
 
 		button_layout.addStretch()
@@ -635,7 +635,7 @@ class MfRemoveWidget(UGroupBox):
 
 		self.start_btn = RedButton(Lng.remove_folder)
 		self.start_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "red_trash.svg")))
-		self.start_btn.clicked.connect(self.start_clicked)
+		self.start_btn.clicked.connect(self.start_clicked.emit)
 		button_layout.addWidget(self.start_btn)
 
 		button_layout.addStretch()
