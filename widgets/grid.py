@@ -793,6 +793,8 @@ class Grid(UScrollVerticalArea):
 
 	# @Utils.timed("rearrange")
 	def rearrange(self):
+		# import random
+		# print(random.randint(10000, 100000))
 		spacing = self.get_grid_spacing()
 		self.grid_lay.setSpacing(spacing)
 		max_col = self.get_max_columns()
@@ -821,10 +823,15 @@ class Grid(UScrollVerticalArea):
 
 	# --- Ресайз и сглаживание ---
 
+	def _kick_settle(self):
+		"""Запускает таймер раскладки, если он ещё не запущен: события не сбрасывают отсчёт."""
+		if not self._settle_timer.isActive():
+			self._settle_timer.start(self._settle_debounce_ms)
+
 	def resize_thumbnails(self):
 		# слайдер: сразу меняем геометрию и ставим быстрые картинки видимым
 		self._apply_resize_fast()
-		self._settle_timer.start(self._settle_debounce_ms)
+		self._kick_settle()
 
 	def _apply_resize_fast(self):
 		self.thumb_cls.calculate_size()
@@ -849,7 +856,7 @@ class Grid(UScrollVerticalArea):
 		top = self.verticalScrollBar().value() - self.grid_wid.y()
 		bottom = top + self.viewport().height()
 		total_rows = (len(self.ordered) + self._cols - 1) // self._cols
-		row_from = max(0, top // row_h - 1)              # запас в одну строку сверху
+		row_from = max(0, top // row_h - 1)                # запас в одну строку сверху
 		row_to = min(total_rows - 1, bottom // row_h + 1)  # и снизу
 
 		result = []
@@ -910,7 +917,7 @@ class Grid(UScrollVerticalArea):
 	def checkScrollValue(self, value: int):
 		self.up_btn.setVisible(value > 0)
 		self._refresh_visible()
-		self._settle_timer.start(self._settle_debounce_ms)
+		self._kick_settle()
 		self._fill_if_needed()
 
 	def _content_bottom(self) -> int:
@@ -1098,7 +1105,7 @@ class Grid(UScrollVerticalArea):
 
 	def resizeEvent(self, a0: QResizeEvent | None) -> None:
 		super().resizeEvent(a0)
-		self._settle_timer.start(self._settle_debounce_ms)
+		self._kick_settle()
 		QTimer.singleShot(0, self.position_up_btn)
 
 	def contextMenuEvent(self, a0: QContextMenuEvent | None) -> None:
@@ -1341,8 +1348,8 @@ class GridStandart(Grid):
 	def __init__(self):
 		super().__init__()
 		self.setAcceptDrops(True)
-		self._load_id = 0
-		self._tasks: dict[int, DbImagesLoader] = {}
+		self._load_id = 0              # номер текущего запроса к БД
+		self._tasks: dict[int, DbImagesLoader] = {}  # держим ссылки на работающие задачи
 		self._empty_lbl: TransparentLabel | None = None
 		self.load_db_images_task(reset=True)
 
@@ -1371,6 +1378,7 @@ class GridStandart(Grid):
 		self._load_id += 1
 		lid = self._load_id
 		task = DbImagesLoader()
+		# лямбда без receiver'а выполняется в потоке GUI, поэтому виджеты создаются безопасно
 		task.sigs.finished_.connect(
 			lambda items, lid=lid, reset=reset: self._on_loaded(items, lid, reset)
 		)
@@ -1380,6 +1388,7 @@ class GridStandart(Grid):
 	def _on_loaded(self, items: list[DbImagesLoaderItem], load_id: int, reset: bool):
 		self._tasks.pop(load_id, None)
 		if load_id != self._load_id:
+			# результат устарел, сбрасываем флаг, иначе дозагрузка заблокируется
 			self._loading_more = False
 			return
 		if reset:
@@ -1427,6 +1436,7 @@ class GridStandart(Grid):
 		self.grid_wid.setUpdatesEnabled(False)
 		try:
 			for image_item in db_images:
+				# при догрузке уже созданные миниатюры не пересоздаём
 				if image_item.rel_img_path in self.url_to_wid:
 					continue
 
@@ -1452,8 +1462,8 @@ class GridStandart(Grid):
 		if not self.url_to_wid:
 			self.show_empty_state()
 		else:
-			self.rearrange()
-			self._settle_timer.start(self._settle_debounce_ms)
+			# раскладку делает таймер: один вызов rearrange после затихания
+			self._kick_settle()
 		self.finished_.emit()
 
 	def dragEnterEvent(self, a0):
