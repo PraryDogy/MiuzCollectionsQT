@@ -1474,6 +1474,8 @@ class GridStandart(Grid):
 			return
 		elif Dynamic.search_words_list:
 			return
+		elif Dynamic.current_dir in Mf.current_mf.mf_stop_list:
+			return
 
 		paths: list[str] = [
 			i.toLocalFile().rstrip(os.sep)
