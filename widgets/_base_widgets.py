@@ -1639,7 +1639,7 @@ class MfPathWidget(UGroupBox):
 			self.watch_timer.stop()
 			self.copy_path_btn.show()
 		else:
-			self.title_widget.svg_widget.load(str(Static.COLOR_ICONS / "warning_blue.svg"))
+			self.title_widget.svg_widget.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 			self.path_label.setText(Lng.path_hint_texts)
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
