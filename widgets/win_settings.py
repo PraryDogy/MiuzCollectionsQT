@@ -642,6 +642,8 @@ class MfRemoveWidget(UGroupBox):
 
 
 class IgnoreListWin(UMainWindow):
+	ok_clicked = pyqtSignal(list)
+
 	def __init__(self, mf: Mf, parent=None):
 		super().__init__(parent)
 		self.set_always_on_top()
@@ -687,9 +689,23 @@ class IgnoreListWin(UMainWindow):
 
 		self.central_layout.addWidget(self.group_box)
 
+		self.cancel_button = UPushButton(Lng.cancel)
+		self.cancel_button.clicked.connect(self.deleteLater)
+		self.central_layout.addWidget(self.cancel_button)
+
+		self.apply_button = ActiveButton(Lng.apply)
+		self.apply_button.clicked.connect(self.ok_clicked_cmd)
+		self.central_layout.addWidget(self.apply_button)
+
 		self.setMinimumWidth(420)
 		self.setMinimumHeight(hh)
 		self.adjustSize()
+
+	def ok_clicked_cmd(self):
+		self.ok_clicked.emit(lambda: self.ok_clicked.emit(self.mf.mf_stop_list))
+
+	def remove_from_stop_list(self, path: str):
+		self.mf.mf_stop_list.remove(path)
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
