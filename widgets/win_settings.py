@@ -641,14 +641,6 @@ class MfRemoveWidget(UGroupBox):
 
 		button_layout.addStretch()
 
-	def set_has_changes(self, has_changes: bool):
-		if has_changes:
-			self.title_tag.set_qss_style(UTagWidget.qss_yellow)
-			self.title_tag.text_widget.setText(Lng.unsaved_changes)
-		else:
-			self.title_tag.set_qss_style(UTagWidget.qss_gray)
-			self.title_tag.text_widget.setText(Lng.status_no_changes)
-	
 
 class MfSettings(UGroupBox):
 	changed = pyqtSignal()
@@ -812,6 +804,8 @@ class NewMfWin(UMainWindow):
 		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
 		self.mf_stop_list.changed.connect(self._on_changed)
 		self.central_layout.addWidget(self.mf_stop_list)
+
+		self.central_layout.addStretch()
 
 		# Футер с кнопками без «Новый каталог»
 		self.save_group = SaveGroupBox(show_new_catalog=False)
