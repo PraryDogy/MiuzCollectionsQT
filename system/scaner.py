@@ -188,7 +188,8 @@ class DirsLoader(ScanerParent):
 
 			for entry in scandir_iterator:
 				try:
-					is_allowed = entry.name not in scaner.mf.mf_stop_list
+					# is_allowed = entry.name not in scaner.mf.mf_stop_list
+					is_allowed = True
 					stmt = (entry.is_dir() and is_allowed)
 				except Exception as e:
 					print(traceback.format_exc())
