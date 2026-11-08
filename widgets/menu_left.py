@@ -162,10 +162,12 @@ class MenuLeftTreeWidget(UTreeWidget):
 		def add_stop_list_cmd():
 			Mf.current_mf.mf_stop_list.append(rel_path)
 			Mf.write_json_data()
+			item.setIcon(0, self.base_stop_list_icon)
 
 		def rem_stop_list_cmd():
 			if rel_path in Mf.current_mf.mf_stop_list:
 				Mf.current_mf.mf_stop_list.remove(rel_path)
+				item.setIcon(0, self.base_stop_list_icon)
 
 		item: MenuLeftTreeWidgetItem = self.itemAt(a0.pos())
 		menu = UMenu(parent=self)
