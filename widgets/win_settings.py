@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal, QEvent
 from PyQt6.QtGui import (QAction, QContextMenuEvent, QFontMetrics, QIcon,
                          QImage, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
@@ -45,7 +45,7 @@ class CancelChangesWin(ConfirmWindow):
 		self.cancel_btn.setText(Lng.go_back)
 
 
-class SaveGroupBox(TransparentWidget):
+class SaveRowWidget(TransparentWidget):
 	save_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 	new_catalog_clicked = pyqtSignal()
@@ -651,6 +651,10 @@ class IgnoreListWin(UMainWindow):
 		self.setWindowTitle(Lng.ignore_list)
 
 		self.mf = mf
+		# черновик: все изменения окна касаются только него
+		self.draft_stop_list = list(self.mf.mf_stop_list)
+		self.has_unsaved = False
+		self.discard_win = None
 
 		self.central_layout.setContentsMargins(5, 5, 5, 5)
 		self.central_layout.setSpacing(5)
@@ -667,49 +671,109 @@ class IgnoreListWin(UMainWindow):
 		self.group_lay.addWidget(self.title_widget)
 		self.group_lay.addWidget(USep())
 
-		self.descr_widget = GrayTextLabel(
-			text=Lng.ignore_list_descr_short
-		)
+		self.descr_widget = GrayTextLabel(text=Lng.ignore_list_descr_short)
 		self.descr_widget.setWordWrap(True)
 		self.group_lay.addWidget(self.descr_widget)
 
-		if len(self.mf.mf_stop_list) > 0:
-			hh = 300
-			self.v_list_widget = UListWidget()
-			for i in self.mf.mf_stop_list * 10:
-				item = UListWidgetItem(parent=self.v_list_widget, text=i * 10)
-				item.setToolTip(i)
-				self.v_list_widget.addItem(item)
-			self.group_lay.addWidget(self.v_list_widget)
-		else:
-			hh = 300
-			self.group_lay.addWidget(USep())
-			self.v_list_widget = TransparentLabel(Lng.ignore_list_empty)
-			self.group_lay.addWidget(self.v_list_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+		self.v_list_widget = UListWidget()
+		self.v_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+		self.v_list_widget.customContextMenuRequested.connect(self._show_item_menu)
+		self.group_lay.addWidget(self.v_list_widget)
+		self.v_list_widget.installEventFilter(self)
+
+		# заглушка живёт внутри списка и центрируется в его области
+		self.empty_lbl = TransparentLabel(Lng.ignore_list_empty, parent=self.v_list_widget)
+		self.empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.empty_lbl.hide()
+
+		self._refresh_list()
 
 		self.central_layout.addWidget(self.group_box)
 
-		self.cancel_button = UPushButton(Lng.cancel)
-		self.cancel_button.clicked.connect(self.deleteLater)
-		self.central_layout.addWidget(self.cancel_button)
+		self.save_group = SaveRowWidget(show_new_catalog=False)
+		self.save_group.save_clicked.connect(self.save_changes)
+		self.save_group.cancel_clicked.connect(self._try_close)
+		self.central_layout.addWidget(self.save_group)
 
-		self.apply_button = ActiveButton(Lng.apply)
-		self.apply_button.clicked.connect(self.ok_clicked_cmd)
-		self.central_layout.addWidget(self.apply_button)
-
-		self.setMinimumWidth(420)
-		self.setMinimumHeight(hh)
+		self.setMinimumWidth(480)
+		self.setMinimumHeight(380)
 		self.adjustSize()
 
-	def ok_clicked_cmd(self):
-		self.ok_clicked.emit(lambda: self.ok_clicked.emit(self.mf.mf_stop_list))
+	def _refresh_list(self):
+		"""Перерисовывает список по черновику; при пустом списке показывает заглушку поверх него."""
+		self.v_list_widget.clear()
+		for path in self.draft_stop_list:
+			item = UListWidgetItem(parent=self.v_list_widget, text=path)
+			item.setToolTip(path)
+			self.v_list_widget.addItem(item)
+
+		self.empty_lbl.setVisible(not self.draft_stop_list)
+		self._place_empty_lbl()
+
+	def _place_empty_lbl(self):
+		"""Центрирует заглушку в области списка."""
+		lw = self.v_list_widget
+		self.empty_lbl.setGeometry(0, 0, lw.width(), lw.height())
+
+	def eventFilter(self, obj, event):
+		if obj is self.v_list_widget and event.type() == QEvent.Type.Resize:
+			self._place_empty_lbl()
+		return super().eventFilter(obj, event)
+
+	def _show_item_menu(self, pos):
+		item = self.v_list_widget.itemAt(pos)
+		if item is None:
+			return
+		menu = UMenu(parent=self)
+		act = QAction(Lng.remove_from_ignore_list, menu)
+		act.triggered.connect(lambda: self.remove_from_stop_list(item.text()))
+		menu.addAction(act)
+		menu.exec(self.v_list_widget.mapToGlobal(pos))
 
 	def remove_from_stop_list(self, path: str):
-		self.mf.mf_stop_list.remove(path)
+		"""Черновое удаление: меняет только draft, в основной список не пишет."""
+		if path not in self.draft_stop_list:
+			return
+		self.draft_stop_list.remove(path)
+		self.has_unsaved = True
+		self.save_group.show_warning()
+		self._refresh_list()
+
+	def save_changes(self):
+		# передаём черновик родителю; на диск он попадёт только после «Сохранить» в WinSettings
+		if self.has_unsaved:
+			self.ok_clicked.emit(list(self.draft_stop_list))
+		self.has_unsaved = False
+		self.deleteLater()
+
+	def _try_close(self):
+		if self.has_unsaved:
+			self._ask_discard()
+			return
+		self.deleteLater()
+
+	def _ask_discard(self):
+		win = CancelChangesWin(Lng.unsaved_changes_confirm)
+		win.ok_clicked.connect(self._on_discard_confirmed)
+		win.center_to_parent(self)
+		win.show()
+		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
+
+	def _on_discard_confirmed(self):
+		self.has_unsaved = False
+		self.deleteLater()
+
+	def closeEvent(self, a0):
+		if self.has_unsaved:
+			a0.ignore()
+			self._ask_discard()
+			return
+		return super().closeEvent(a0)
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
-			self.deleteLater()
+			self._try_close()
+			return
 		return super().keyPressEvent(a0)
 
 
@@ -750,8 +814,16 @@ class MfStopListWidget(UGroupBox):
 
 	def open_ignore_list_win(self):
 		self.ignore_win = IgnoreListWin(self.mf)
+		self.ignore_win.ok_clicked.connect(self.apply_draft)
 		self.ignore_win.center_to_parent(self.window())
 		self.ignore_win.show()
+
+	def apply_draft(self, stop_list: list[str]):
+		if stop_list == self.draft_stop_list:
+			return
+		self.draft_stop_list = list(stop_list)
+		# сигнал уходит в MfSettings, затем в WinSettings, где помечается несохранённое состояние
+		self.changed.emit()
 
 
 class MfSettings(UGroupBox):
@@ -920,7 +992,7 @@ class NewMfWin(UMainWindow):
 		self.central_layout.addStretch()
 
 		# Футер с кнопками без «Новый каталог»
-		self.save_group = SaveGroupBox(show_new_catalog=False)
+		self.save_group = SaveRowWidget(show_new_catalog=False)
 		self.save_group.save_clicked.connect(self.save_changes)
 		self.save_group.cancel_clicked.connect(self._try_close)
 		self.central_layout.addWidget(self.save_group)
@@ -1029,7 +1101,7 @@ class WinSettings(UMainWindow):
 
 		self.central_layout.addSpacing(10)
 		# Единственная кнопка сохранения: футер окна
-		self.save_widget = SaveGroupBox()
+		self.save_widget = SaveRowWidget()
 		self.save_widget.new_catalog_clicked.connect(self.open_new_catalog_win)
 		self.save_widget.save_clicked.connect(self.save_settings_cmd)
 		self.save_widget.cancel_clicked.connect(self.close)
