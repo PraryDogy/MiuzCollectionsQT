@@ -672,14 +672,15 @@ class IgnoreListWin(UMainWindow):
 		self.group_lay.addWidget(self.descr_widget)
 
 		if len(self.mf.mf_stop_list) > 0:
-			hh = 100
+			hh = 300
 			self.v_list_widget = UListWidget()
 			for i in self.mf.mf_stop_list * 10:
 				item = UListWidgetItem(parent=self.v_list_widget, text=i * 10)
+				item.setToolTip(i)
 				self.v_list_widget.addItem(item)
 			self.group_lay.addWidget(self.v_list_widget)
 		else:
-			hh = 100
+			hh = 300
 			self.group_lay.addWidget(USep())
 			self.v_list_widget = TransparentLabel(Lng.ignore_list_empty)
 			self.group_lay.addWidget(self.v_list_widget, alignment=Qt.AlignmentFlag.AlignCenter)
