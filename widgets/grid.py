@@ -804,9 +804,6 @@ class Grid(UScrollVerticalArea):
 			QTimer.singleShot(0, self._fill_if_needed)
 			return
 
-		import random
-		print(random.randint(10000, 100000), len(self.url_to_wid))
-
 		self.grid_wid.hide()
 		self._cols = max_col
 		self.ordered = list(self.url_to_wid.values())
