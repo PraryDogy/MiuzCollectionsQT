@@ -130,6 +130,13 @@ class MenuLeftTreeWidget(UTreeWidget):
 
 		root.setExpanded(True)
 		self.expand_to_path(self.abs_selected_path)
+		self._refresh_geometry()
+
+	def _refresh_geometry(self):
+		"""Пересчитывает высоты элементов после перестройки, иначе корень может остаться низким."""
+		self.doItemsLayout()
+		self.updateGeometry()
+		self.viewport().update()
 
 	def expand_to_path(self, path: str):
 		item = self.items.get(path)
