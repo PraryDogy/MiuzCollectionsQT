@@ -353,8 +353,8 @@ UTagWidget[style="green"] {
 }
 
 UTagWidget[style="yellow"] {
-    background: #713f12;
-    border: 1px solid #eab308;
+    background: #3a2c12;
+    border: 1px solid #6b5420;
 }
 
 UTagWidget[style="red"] {
