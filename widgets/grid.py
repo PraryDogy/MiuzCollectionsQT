@@ -793,8 +793,6 @@ class Grid(UScrollVerticalArea):
 
 	# @Utils.timed("rearrange")
 	def rearrange(self):
-		# import random
-		# print(random.randint(10000, 100000))
 		spacing = self.get_grid_spacing()
 		self.grid_lay.setSpacing(spacing)
 		max_col = self.get_max_columns()
@@ -805,6 +803,9 @@ class Grid(UScrollVerticalArea):
 			self._refresh_visible()
 			QTimer.singleShot(0, self._fill_if_needed)
 			return
+
+		import random
+		print(random.randint(10000, 100000), len(self.url_to_wid))
 
 		self.grid_wid.hide()
 		self._cols = max_col
