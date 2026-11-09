@@ -68,9 +68,10 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		self.attention_wid = UTagWidget("", UTagWidget.qss_yellow, Static.GRAY_ICONS / "attention_gray.svg")
-		self.attention_wid.setToolTip(Lng.unsaved_changes)
-		self.h_lay.addWidget(self.attention_wid)
+		self.attention_icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		self.attention_icon.setFixedSize(16, 16)
+		self.attention_icon.setToolTip(Lng.unsaved_changes)
+		self.h_lay.addWidget(self.attention_icon)
 
 		self.h_lay.addSpacing(5)
 
@@ -96,11 +97,11 @@ class SaveRowWidget(TransparentWidget):
 		self.cancel_button.setFixedWidth(text_w + opt_w)
 
 	def show_warning(self):
-		self.attention_wid.show()
+		self.attention_icon.show()
 		self.cancel_button.setText(Lng.cancel)
 
 	def hide_warning(self):
-		self.attention_wid.hide()
+		self.attention_icon.hide()
 		self.cancel_button.setText(Lng.close)
 
 
