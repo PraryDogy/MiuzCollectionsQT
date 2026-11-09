@@ -563,7 +563,6 @@ class WinMain(UMainWindow):
 		self.bar_top.settings_btn.set_selected_style()
 		self.settings_win = WinSettings(settings_item)
 		self.settings_win.closed.connect(self.bar_top.settings_btn.set_base_style)
-		self.settings_win.restart_scaner.connect(self.restart_scaner_task)
 		self.settings_win.center_to_parent(self.window())
 		self.settings_win.show()
 

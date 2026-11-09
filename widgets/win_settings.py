@@ -823,7 +823,6 @@ class MfStopListWidget(UGroupBox):
 
 class MfSettings(UGroupBox):
 	changed = pyqtSignal()
-	restart_scaner = pyqtSignal()
 
 	def __init__(self, mf_index: int):
 		super().__init__()
@@ -902,8 +901,7 @@ class MfSettings(UGroupBox):
 			current_mf.mf_current_path = self.path_widget.mf_path
 			current_mf.mf_stop_list = self.mf_stop_list.get_stop_list()
 			Mf.write_json_data()
-			# restart_app()
-			self.restart_scaner.emit()
+			restart_app()
 
 		win = ConfirmWindow(Lng.app_will_restarted)
 		win.ok_clicked.connect(final)
@@ -1013,13 +1011,11 @@ class NewMfWin(UMainWindow):
 		if not mf_path:
 			return
 
-		mf_stop_list = self.mf_stop_list.get_stop_list()
-
 		def fin():
 			mf = Mf(
 				mf_alias=mf_alias,
 				mf_paths=[mf_path],
-				mf_stop_list=mf_stop_list,
+				mf_stop_list=[],
 				mf_current_path=mf_path
 			)
 			Mf.items.append(mf)
@@ -1070,7 +1066,6 @@ class NewMfWin(UMainWindow):
 
 class WinSettings(UMainWindow):
 	closed = pyqtSignal()
-	restart_scaner = pyqtSignal()
 
 	def __init__(self, settings_item: SettingsItem):
 		super().__init__()
@@ -1160,7 +1155,6 @@ class WinSettings(UMainWindow):
 					r_wid = MfSettings(index)
 					self.settings_item.type_ = "general"
 					self.settings_item.content = ""
-					r_wid.restart_scaner.connect(self.restart_scaner.emit)
 					break
 
 		# Любое изменение на странице помечает окно как несохранённое
