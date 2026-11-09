@@ -147,7 +147,7 @@ class DirsChangeWatcher(ScanerParent):
 		db_dirs: list[DirItem] = []
 		mf = self.scaner_item.mf
 		stop = StopList(mf.mf_stop_list)
-		base_path = mf.mf_current_path.strip(os.sep)
+		base_path = mf.mf_paths[0].strip(os.sep)
 		q = (
 			sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
 			.where(Dirs.mf_alias == mf.mf_alias)
@@ -213,7 +213,7 @@ class DirsLoader(ScanerParent):
 
 		stop = StopList(scaner.mf.mf_stop_list)
 		dirs: list[DirItem] = []
-		stack = [scaner.mf.mf_current_path]
+		stack = [scaner.mf.mf_paths[0]]
 
 		while stack:
 			try:
@@ -231,7 +231,7 @@ class DirsLoader(ScanerParent):
 					continue
 
 				rel_path = Utils.remove_mf_path(
-					mf_path=scaner.mf.mf_current_path,
+					mf_path=scaner.mf.mf_paths[0],
 					abs_path=entry.path
 				)
 
@@ -244,8 +244,8 @@ class DirsLoader(ScanerParent):
 				dirs.append(DirItem(entry.path, rel_path, mod))
 
 		try:
-			stats = os.stat(scaner.mf.mf_current_path)
-			dirs.append(DirItem(scaner.mf.mf_current_path, os.sep, int(stats.st_mtime)))
+			stats = os.stat(scaner.mf.mf_paths[0])
+			dirs.append(DirItem(scaner.mf.mf_paths[0], os.sep, int(stats.st_mtime)))
 		except Exception:
 			print(traceback.format_exc())
 
@@ -300,7 +300,7 @@ class DirsDbUpdater(ScanerParent):
 		"""
 		scaner = self.scaner_item
 
-		if not os.path.exists(scaner.mf.mf_current_path):
+		if not os.path.exists(scaner.mf.mf_paths[0]):
 			return
 
 		with scaner.engine.begin() as conn:
@@ -384,7 +384,7 @@ class ImgLoader(ScanerParent):
 				if folder not in wanted_dirs:
 					continue
 				abs_img_path = Utils.add_mf_path(
-					mf_path=scaner.mf.mf_current_path,
+					mf_path=scaner.mf.mf_paths[0],
 					rel_path=rel_path
 				)
 				db_images.append(
@@ -490,7 +490,7 @@ class ThumbsUpdater(ScanerParent):
 			for i in range(0, len(self.removed_images), step)
 		]
 		for chunk in chunked_del_images:
-			if not os.path.exists(scaner.mf.mf_current_path):
+			if not os.path.exists(scaner.mf.mf_paths[0]):
 				break
 			good_chunk: list[ImgItem] = []
 			for img_item in chunk:
@@ -523,7 +523,7 @@ class ThumbsUpdater(ScanerParent):
 				values_list = []
 				for img_item in good_chunk:
 					rel_img_path = Utils.remove_mf_path(
-						mf_path=scaner.mf.mf_current_path,
+						mf_path=scaner.mf.mf_paths[0],
 						abs_path=img_item.abs_img_path
 					)
 					abs_thumb_path = Utils.create_abs_thumb_path(
@@ -555,7 +555,7 @@ class ThumbsUpdater(ScanerParent):
 			img = ImgUtils.read_img(img_item.abs_img_path)
 			img = ImgUtils.fit_to_thumb(img, Static.THUMB_MAX_SIZE)
 			rel_img_path = Utils.remove_mf_path(
-				mf_path=scaner.mf.mf_current_path,
+				mf_path=scaner.mf.mf_paths[0],
 				abs_path=img_item.abs_img_path
 			)
 			thumb_path = Utils.create_abs_thumb_path(
@@ -572,7 +572,7 @@ class ThumbsUpdater(ScanerParent):
 			for i in range(0, len(self.new_images), step)
 		]
 		for chunk in chunked_new_images:
-			if not os.path.exists(scaner.mf.mf_current_path):
+			if not os.path.exists(scaner.mf.mf_paths[0]):
 				break
 			good_chunk: list[ImgItem] = []
 			for img_item in chunk:
@@ -755,7 +755,6 @@ class BaseScaner:
 			)
 			avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
 			if avaiable_mf_path:
-				scaner_item.mf.set_mf_current_path(avaiable_mf_path)
 				try:
 					print("scaner started", scaner_item.mf.mf_alias)
 					BaseScaner.single_mf_scan(scaner_item)
@@ -878,11 +877,10 @@ class ForcedScaner:
 		)
 		avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
 		if avaiable_mf_path:
-			scaner_item.mf.set_mf_current_path(avaiable_mf_path)
 			dir_items: list[DirItem] = []
 			stop = StopList(mf.mf_stop_list)
 			for i in dirs_to_scan:
-				rel_path = Utils.remove_mf_path(mf.mf_current_path, i)
+				rel_path = Utils.remove_mf_path(mf.mf_paths[0], i)
 				if stop.contains(rel_path):
 					continue
 				try:

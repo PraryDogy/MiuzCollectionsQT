@@ -110,9 +110,6 @@ class Mf:
 			if os.path.exists(i):
 				return i
 		return None
-
-	def set_mf_current_path(self, path: str):
-		self.mf_current_path = path
 	
 	def get_data(self):
 		return {i: getattr(self, i) for i in self.__slots__}

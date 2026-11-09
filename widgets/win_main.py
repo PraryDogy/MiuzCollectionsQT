@@ -281,7 +281,6 @@ class WinMain(UMainWindow):
 		def wrapper(self: "WinMain", *args):
 			avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
 			if avaiable_mf_path:
-				Mf.current_mf.set_mf_current_path(avaiable_mf_path)
 				return fn(self, *args)
 			self.open_win_smb(Mf.current_mf)
 			return None
@@ -379,7 +378,7 @@ class WinMain(UMainWindow):
 	@with_conn
 	def on_tree_clicked(self, abs_path: str):
 		rel_path = Utils.remove_mf_path(
-			mf_path=Mf.current_mf.mf_current_path,
+			mf_path=Mf.current_mf.mf_paths[0],
 			abs_path=abs_path
 		)
 		Dynamic.current_dir = rel_path
@@ -426,7 +425,7 @@ class WinMain(UMainWindow):
 	def save_to_downloads(self, rel_paths: list[str]):
 		downloads = os.path.expanduser("~/Downloads")
 		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
 			for i in rel_paths
 		]
 		copy_files_win = self.copy_files_win(
@@ -440,7 +439,7 @@ class WinMain(UMainWindow):
 	@with_conn
 	def set_files_to_copy(self, rel_paths: tuple):
 		abs_files_to_copy = set(
-			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
 			for i in rel_paths
 		)
 
@@ -465,7 +464,7 @@ class WinMain(UMainWindow):
 	@with_conn
 	def open_in_app(self, rel_paths: list[str], app_path: str):
 		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
 			for i in rel_paths
 		]
 		if not abs_paths:
@@ -477,7 +476,7 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def reveal_in_finder(self, rel_paths: list):
-		abs_paths = to_abs_paths(Mf.current_mf.mf_current_path, rel_paths)
+		abs_paths = to_abs_paths(Mf.current_mf.mf_paths[0], rel_paths)
 		if not abs_paths:
 			return
 		if os.path.isdir(abs_paths[0]):
@@ -488,7 +487,7 @@ class WinMain(UMainWindow):
 	@with_conn
 	def copy_path(self, rel_paths: list[str]):
 		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
 			for i in rel_paths
 		]
 		Utils.pyqt_copy_text("\n".join(abs_paths))
@@ -512,7 +511,7 @@ class WinMain(UMainWindow):
 			file_remover.start()
 			QTimer.singleShot(ms, poll_file_remover)
 
-		abs_paths = to_abs_paths(Mf.current_mf.mf_current_path, rel_paths)
+		abs_paths = to_abs_paths(Mf.current_mf.mf_paths[0], rel_paths)
 		if not abs_paths:
 			return
 		dirs_to_scan = dirs_to_rescan(abs_paths)
@@ -549,7 +548,7 @@ class WinMain(UMainWindow):
 	def open_info_win(self, rel_paths: list[str]):
 
 		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_current_path, i)
+			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
 			for i in rel_paths
 		]
 		wid = self.grid.url_to_wid.get(rel_paths[0])
@@ -617,7 +616,7 @@ class WinMain(UMainWindow):
 		self.grid.paste_files.connect(
 			lambda: self.paste_files(
 				self.files_to_copy,
-				destination_dir(Mf.current_mf.mf_current_path, Dynamic.current_dir)
+				destination_dir(Mf.current_mf.mf_paths[0], Dynamic.current_dir)
 			)
 		)
 		self.grid.set_files_to_copy.connect(
@@ -879,7 +878,7 @@ class WinMain(UMainWindow):
 
 		if a0.key() == Qt.Key.Key_V:
 			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier and self.files_to_copy:
-				dest = destination_dir(Mf.current_mf.mf_current_path, Dynamic.current_dir)
+				dest = destination_dir(Mf.current_mf.mf_paths[0], Dynamic.current_dir)
 				self.paste_files(self.files_to_copy, dest)
 
 		elif a0.key() == Qt.Key.Key_W:

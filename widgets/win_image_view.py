@@ -296,7 +296,6 @@ class WinImageView(UMainWindow):
 
 		avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
 		if avaiable_mf_path:
-			Mf.current_mf.set_mf_current_path(avaiable_mf_path)
 			abs_path = Utils.add_mf_path(
 				avaiable_mf_path,
 				self.current_data_item.rel_path
@@ -349,7 +348,7 @@ class WinImageView(UMainWindow):
 		else:
 
 			abs_path = Utils.add_mf_path(
-				mf_path=Mf.current_mf.mf_current_path,
+				mf_path=Mf.current_mf.mf_paths[0],
 				rel_path=self.current_data_item.rel_path
 			)
 
