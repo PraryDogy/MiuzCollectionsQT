@@ -1268,9 +1268,9 @@ class Grid(UScrollVerticalArea):
 		self.origin_pos = a0.pos()
 		self.wid_under_mouse = self.get_clicked_widget(a0)
 		if self.wid_under_mouse:
-			self.path_bar_update.emit(self.wid_under_mouse.data_item.rel_path)
+			self.path_bar_update.emit(self.wid_under_mouse.data_item.abs_path)
 		else:
-			self.path_bar_update.emit(Dynamic.current_dir)
+			self.path_bar_update.emit(Utils.add_mf_path(Mf.current_mf.mf_paths[0], Dynamic.current_dir))
 		return super().mousePressEvent(a0)
 
 	def mouseMoveEvent(self, a0):
