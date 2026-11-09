@@ -44,11 +44,6 @@ from .win_upload import UploadWin
 SUPPORTED_EXT_LOWER = tuple(ext.lower() for ext in ImgUtils.ext_all)
 
 
-def to_abs_paths(mf_current_path: str, rel_paths) -> list[str]:
-	"""Относительные пути грида -> абсолютные пути на диске."""
-	return [Utils.add_mf_path(mf_current_path, i) for i in rel_paths]
-
-
 def destination_dir(mf_current_path: str, current_dir: str) -> str:
 	"""Каталог, куда вставляются файлы из буфера."""
 	return os.path.join(mf_current_path, current_dir.strip(os.sep))
@@ -179,7 +174,7 @@ class WinMain(UMainWindow):
 
 		self.left_menu = MenuLeft()
 		self.left_menu.reveal.connect(
-			lambda rel_paths: self.reveal_in_finder(rel_paths)
+			lambda abs_paths: self.reveal_in_finder(abs_paths)
 		)
 		self.left_menu.on_tree_clicked.connect(
 			lambda abs_path: self.on_tree_clicked(abs_path)
@@ -191,7 +186,7 @@ class WinMain(UMainWindow):
 			lambda: self.on_hide_digits_clicked()
 		)
 		self.left_menu.copy_path.connect(
-			lambda rel_paths: self.copy_path(rel_paths)
+			lambda abs_paths: self.copy_path(abs_paths)
 		)
 		self.left_menu.removed_from_stop_list.connect(
 			lambda: self.removed_from_stop_list_cmd()
@@ -290,8 +285,8 @@ class WinMain(UMainWindow):
 		self.load_st_grid()
 		self.left_menu.tree_wid.expand_to_path(current_dir)
 
-	def path_bar_update(self, path: str):
-		dir = f"/{Mf.current_mf.mf_paths[0]}{path}"
+	def path_bar_update(self, abs_path: str):
+		dir = os.path.dirname(abs_path)
 		self.bar_bottom.bar_path.update_path(dir)
 
 	def on_hide_digits_clicked(self):
@@ -330,11 +325,7 @@ class WinMain(UMainWindow):
 			self.open_win_smb(mf)
 
 	@with_conn
-	def on_tree_clicked(self, abs_path: str):
-		rel_path = Utils.remove_mf_path(
-			mf_path=Mf.current_mf.mf_paths[0],
-			abs_path=abs_path
-		)
+	def on_tree_clicked(self, rel_path: str):
 		Dynamic.current_dir = rel_path
 		self.load_st_grid()
 		self.path_bar_update(Dynamic.current_dir)
@@ -376,12 +367,8 @@ class WinMain(UMainWindow):
 		QTimer.singleShot(300, poll_task)
 
 	@with_conn
-	def save_to_downloads(self, rel_paths: list[str]):
+	def save_to_downloads(self, abs_paths: list[str]):
 		downloads = os.path.expanduser("~/Downloads")
-		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
-			for i in rel_paths
-		]
 		copy_files_win = self.copy_files_win(
 			files_to_copy=abs_paths,
 			dest=downloads
@@ -391,12 +378,7 @@ class WinMain(UMainWindow):
 		)
 
 	@with_conn
-	def set_files_to_copy(self, rel_paths: tuple):
-		abs_files_to_copy = set(
-			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
-			for i in rel_paths
-		)
-
+	def set_files_to_copy(self, abs_files_to_copy: list):
 		self.files_to_copy = abs_files_to_copy
 		self.grid.files_to_copy = abs_files_to_copy
 
@@ -416,38 +398,25 @@ class WinMain(UMainWindow):
 		self.grid.files_to_copy.clear()
 
 	@with_conn
-	def open_in_app(self, rel_paths: list[str], app_path: str):
-		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
-			for i in rel_paths
-		]
-		if not abs_paths:
-			return
+	def open_in_app(self, abs_paths: list[str], app_path: str):
 		cmd = ["open"]
 		if app_path:
 			cmd += ["-a", app_path]
 		subprocess.Popen(cmd + abs_paths)
 
 	@with_conn
-	def reveal_in_finder(self, rel_paths: list):
-		abs_paths = to_abs_paths(Mf.current_mf.mf_paths[0], rel_paths)
-		if not abs_paths:
-			return
+	def reveal_in_finder(self, abs_paths: list):
 		if os.path.isdir(abs_paths[0]):
 			subprocess.Popen(["open", abs_paths[0]])
 		else:
 			Utils.macos_reveal_files(abs_paths)
 
 	@with_conn
-	def copy_path(self, rel_paths: list[str]):
-		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
-			for i in rel_paths
-		]
+	def copy_path(self, abs_paths: list[str]):
 		Utils.pyqt_copy_text("\n".join(abs_paths))
 
 	@with_conn
-	def remove_files(self, rel_paths: list, ms = 300):
+	def remove_files(self, abs_paths: list, ms = 300):
 
 		def poll_file_remover():
 			while not file_remover.process_queue.empty():
@@ -465,9 +434,6 @@ class WinMain(UMainWindow):
 			file_remover.start()
 			QTimer.singleShot(ms, poll_file_remover)
 
-		abs_paths = to_abs_paths(Mf.current_mf.mf_paths[0], rel_paths)
-		if not abs_paths:
-			return
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
 		self.remove_files_win = ConfirmWindow(text)
@@ -500,11 +466,6 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def open_info_win(self, rel_paths: list[str]):
-
-		abs_paths = [
-			Utils.add_mf_path(Mf.current_mf.mf_paths[0], i)
-			for i in rel_paths
-		]
 		wid = self.grid.url_to_wid.get(rel_paths[0])
 		if wid:
 			data_item = wid.data_item
@@ -543,22 +504,22 @@ class WinMain(UMainWindow):
 			lambda: self.restart_scaner_task()
 		)
 		self.grid.remove_files.connect(
-			lambda rel_paths: self.remove_files(rel_paths)
+			lambda abs_paths: self.remove_files(abs_paths)
 		)
 		self.grid.open_img_view.connect(
 			lambda: self.open_view_win(Mf.current_mf)
 		)
 		self.grid.save_files.connect(
-			lambda rel_paths: self.save_to_downloads(rel_paths)
+			lambda abs_paths: self.save_to_downloads(abs_paths)
 		)
 		self.grid.open_info_win.connect(
 			lambda rel_paths: self.open_info_win(rel_paths)
 		)
 		self.grid.copy_path.connect(
-			lambda rel_paths: self.copy_path(rel_paths)
+			lambda abs_paths: self.copy_path(abs_paths)
 		)
 		self.grid.reveal_in_finder.connect(
-			lambda rel_paths: self.reveal_in_finder(rel_paths)
+			lambda abs_paths: self.reveal_in_finder(abs_paths)
 		)
 		self.grid.set_fav.connect(
 			lambda data: self.set_fav(data)
@@ -574,7 +535,7 @@ class WinMain(UMainWindow):
 			)
 		)
 		self.grid.set_files_to_copy.connect(
-			lambda rel_paths: self.set_files_to_copy(rel_paths)
+			lambda abs_paths: self.set_files_to_copy(abs_paths)
 		)
 		self.grid.setup_mf.connect(
 			lambda item: self.open_settings_win(item)
@@ -630,16 +591,16 @@ class WinMain(UMainWindow):
 			lambda rel_paths: self.open_info_win(rel_paths)
 		)
 		self.view_win.copy_path.connect(
-			lambda rel_paths: self.copy_path(rel_paths)
+			lambda abs_paths: self.copy_path(abs_paths)
 		)
 		self.view_win.reveal_in_finder.connect(
-			lambda rel_paths: self.reveal_in_finder(rel_paths)
+			lambda abs_paths: self.reveal_in_finder(abs_paths)
 		)
 		self.view_win.set_fav.connect(
 			self.set_fav
 		)
 		self.view_win.save_files.connect(
-			lambda rel_paths: self.save_to_downloads(rel_paths)
+			lambda abs_paths: self.save_to_downloads(abs_paths)
 		)
 		self.view_win.select_thumb.connect(
 			lambda path: self.grid.select_by_url(path)

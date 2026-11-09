@@ -187,7 +187,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 				return
 			Mf.current_mf.mf_stop_list.append(rel_path)
 			Mf.write_json_data()
-			self.on_tree_clicked.emit(self._to_abs(rel_path))
+			self.on_tree_clicked.emit(rel_path)
 			self._rebuild()
 
 		def rem_stop_list_cmd():
@@ -195,7 +195,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 				Mf.current_mf.mf_stop_list.remove(rel_path)
 				Mf.write_json_data()
 				print("папка удалена из игнор листа")
-			self.on_tree_clicked.emit(self._to_abs(rel_path))
+			self.on_tree_clicked.emit(rel_path)
 			self.removed_from_stop_list.emit()
 			self._rebuild()
 
@@ -283,7 +283,7 @@ class MenuLeft(TransparentFrame):
 			lambda rel_paths: self.reveal.emit(rel_paths)
 		)
 		self.tree_wid.on_tree_clicked.connect(
-			lambda abs_path: self.on_tree_clicked.emit(abs_path)
+			lambda rel_path: self.on_tree_clicked.emit(rel_path)
 		)
 		self.tree_wid.on_hide_digits_clicked.connect(
 			lambda: self.on_hide_digits_clicked.emit()
