@@ -484,13 +484,13 @@ class WinImageView(UMainWindow):
 
 		reveal = RevealInFinder(self.menu_, 1)
 		reveal.triggered.connect(
-			lambda: self.reveal_in_finder.emit(rel_paths)
+			lambda: self.reveal_in_finder.emit(abs_paths)
 		)
 		self.menu_.addAction(reveal)
 
 		copy_path = CopyPath(self.menu_, 1)
 		copy_path.triggered.connect(
-			lambda: self.copy_path.emit(rel_paths)
+			lambda: self.copy_path.emit(abs_paths)
 		)
 		self.menu_.addAction(copy_path)
 
