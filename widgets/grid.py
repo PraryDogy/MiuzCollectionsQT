@@ -1169,7 +1169,7 @@ class Grid(UScrollVerticalArea):
 				)
 				act = QAction(Lng.open_default, open_menu)
 				act.triggered.connect(
-					lambda: self.open_in_app.emit((rel_paths, None))
+					lambda: self.open_in_app.emit((abs_paths, None))
 				)
 				open_menu.addAction(act)
 				open_menu.addSeparator()

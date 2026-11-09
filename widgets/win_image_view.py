@@ -455,7 +455,7 @@ class WinImageView(UMainWindow):
 
 		act = QAction(Lng.open_default, open_menu)
 		act.triggered.connect(
-			lambda: self.open_in_app.emit((rel_paths, None))
+			lambda: self.open_in_app.emit((abs_paths, None))
 		)
 		open_menu.addAction(act)
 		open_menu.addSeparator()
@@ -463,7 +463,7 @@ class WinImageView(UMainWindow):
 		for app_path, basename in self.image_apps.items():
 			act = QAction(basename, open_menu)
 			act.triggered.connect(
-				lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
+				lambda _, x=app_path: self.open_in_app.emit((abs_paths, x))
 			)
 			open_menu.addAction(act)
 
