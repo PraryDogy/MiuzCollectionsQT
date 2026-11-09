@@ -688,7 +688,7 @@ class IgnoreListWin(UMainWindow):
 		self.save_group.cancel_clicked.connect(self._try_close)
 		self.central_layout.addWidget(self.save_group)
 
-		self.setMinimumWidth(480)
+		self.setMinimumWidth(380)
 		self.setMinimumHeight(380)
 		self.adjustSize()
 
