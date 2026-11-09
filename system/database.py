@@ -52,7 +52,7 @@ _table_dirs = sqlalchemy.Table(
 
 class Dirs:
 	"""
-	Класс-обёртка для колонок таблицы `dirs` в базе данных.   
+	Класс-обёртка для колонок таблицы `dirs` в базе данных.
 	Предоставляет удобный доступ к колонкам через атрибуты класса.
 	"""
 	table = _table_dirs
@@ -60,6 +60,20 @@ class Dirs:
 	rel_dir_path = _table_dirs.c.short_src
 	mod = _table_dirs.c.mod
 	mf_alias = _table_dirs.c.brand
+
+	@classmethod
+	def reset_mod(cls, mf_alias: str):
+		"""
+		Сбрасывает mod всех папок Mf в 0, чтобы сканер при следующем запуске
+		сравнил содержимое каждой папки, а не пропустил её по совпадению mtime.
+		"""
+		with Dbase.main_engine.begin() as conn:
+			stmt = (
+				sqlalchemy.update(cls.table)
+				.where(cls.mf_alias == mf_alias)
+				.values({cls.mod.name: 0})
+			)
+			conn.execute(stmt)
 
 
 _table_properties = sqlalchemy.Table(
@@ -131,3 +145,7 @@ class Dbase:
 				conn.execute(stmt)
 		except Exception as e:
 			print("database vacuum error", e)
+
+	@classmethod
+	def clear_root_mf(cls):
+		...

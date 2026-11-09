@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSizePolicy,
                              QTableWidgetItem, QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
+from system.database import Dirs
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
@@ -897,8 +898,14 @@ class MfSettings(UGroupBox):
 			)
 			if current_mf is None:
 				return
-			current_mf.mf_paths = [self.path_widget.mf_path]
-			current_mf.mf_current_path = self.path_widget.mf_path
+
+			new_path = self.path_widget.mf_path
+			if new_path != current_mf.mf_paths[0]:
+				# индекс относится к старому каталогу: заставляем сканер пересравнить все папки
+				Dirs.reset_mod(current_mf.mf_alias)
+
+			current_mf.mf_paths = [new_path]
+			current_mf.mf_current_path = new_path
 			current_mf.mf_stop_list = self.mf_stop_list.get_stop_list()
 			Mf.write_json_data()
 			restart_app()

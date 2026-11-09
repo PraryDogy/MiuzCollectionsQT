@@ -760,7 +760,7 @@ class BaseScaner:
 					print("scaner started", scaner_item.mf.mf_alias)
 					BaseScaner.single_mf_scan(scaner_item)
 					print("scaner finished", scaner_item.mf.mf_alias)
-				except Exception as e:
+				except Exception:
 					print(traceback.format_exc())
 					continue
 			else:
@@ -827,7 +827,7 @@ class BaseScaner:
 		lines = [
 			sep,
 			now_line,
-			f"Mf: {scaner_item.mf.mf_alias}, {scaner_item.mf.mf_current_path}",
+			f"Mf: {scaner_item.mf.mf_alias}, {scaner_item.mf.mf_paths[0]}",
 			"Удаление директорий:",
 			f"finder dirs: {len(finder_lines)}",
 			f"removed dirs: {len(removed_lines)}",
