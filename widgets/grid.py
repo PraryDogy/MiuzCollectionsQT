@@ -1135,13 +1135,6 @@ class Grid(UScrollVerticalArea):
 			)
 			self.menu_.addAction(reload)
 
-			self.menu_.addSeparator()
-			reveal = QAction(Lng.reveal_in_finder, self.menu_)
-			reveal.triggered.connect(
-				lambda: self.reveal_in_finder.emit([Dynamic.current_dir, ])
-			)
-			self.menu_.addAction(reveal)
-
 		def menu_widget(clicked: Thumb):
 			if not self._sel:
 				self._add_sel(clicked)
@@ -1206,9 +1199,9 @@ class Grid(UScrollVerticalArea):
 
 			self.menu_.addSeparator()
 
-			act = RevealInFinder(self.menu_, len(rel_paths))
+			act = RevealInFinder(self.menu_, len(abs_paths))
 			act.triggered.connect(
-				lambda: self.reveal_in_finder.emit(rel_paths)
+				lambda: self.reveal_in_finder.emit(abs_paths)
 			)
 			self.menu_.addAction(act)
 
@@ -1227,13 +1220,13 @@ class Grid(UScrollVerticalArea):
 
 			self.menu_.addSeparator()
 
-			act = CopyFiles(self.menu_, rel_paths)
+			act = CopyFiles(self.menu_, abs_paths)
 			act.triggered.connect(
-				lambda: self.set_files_to_copy.emit(rel_paths)
+				lambda: self.set_files_to_copy.emit(abs_paths)
 			)
 			self.menu_.addAction(act)
 
-			act = CopyPath(self.menu_, len(rel_paths))
+			act = CopyPath(self.menu_, len(abs_paths))
 			act.triggered.connect(
 				lambda: self.copy_path.emit(abs_paths)
 			)
@@ -1241,7 +1234,7 @@ class Grid(UScrollVerticalArea):
 
 			self.menu_.addSeparator()
 
-			act = Save(self.menu_, len(rel_paths))
+			act = Save(self.menu_, len(abs_paths))
 			act.triggered.connect(
 				lambda: self.save_files.emit(abs_paths)
 			)
@@ -1249,7 +1242,7 @@ class Grid(UScrollVerticalArea):
 
 			act = RemoveFiles(self.menu_, len(self._sel))
 			act.triggered.connect(
-				lambda: self.remove_files.emit(rel_paths)
+				lambda: self.remove_files.emit(abs_paths)
 			)
 			self.menu_.addAction(act)
 
