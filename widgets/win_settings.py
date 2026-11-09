@@ -565,6 +565,11 @@ class GeneralSettings(TransparentWidget):
 		win.show()
 
 
+
+TITLE_BTN_W = 135
+
+
+
 class MfRepairWidget(UGroupBox):
 	start_clicked = pyqtSignal()
 
@@ -581,6 +586,7 @@ class MfRepairWidget(UGroupBox):
 
 		self.start_btn = UPushButton(Lng.repair_catalog_short)
 		self.start_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "repair_gray.svg")))
+		self.start_btn.setFixedWidth(TITLE_BTN_W)
 		self.start_btn.clicked.connect(self.start_clicked.emit)
 
 		title_row = TransparentWidget()
@@ -616,6 +622,7 @@ class MfRemoveWidget(UGroupBox):
 
 		self.start_btn = RedButton(Lng.remove_folder)
 		self.start_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "red_trash.svg")))
+		self.start_btn.setFixedWidth(TITLE_BTN_W - 1)
 		self.start_btn.clicked.connect(self.start_clicked.emit)
 
 		title_row = TransparentWidget()
@@ -794,6 +801,7 @@ class MfStopListWidget(UGroupBox):
 		add_button = UPushButton(Lng.open_list)
 		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
 		add_button.setIconSize(QSize(10, 10))
+		add_button.setFixedWidth(TITLE_BTN_W)
 		add_button.clicked.connect(self.open_ignore_list_win)
 
 		title_row = TransparentWidget()
@@ -859,6 +867,7 @@ class MfSettings(UGroupBox):
 		self.title_label.h_layout.setContentsMargins(5, 0, 0, 0)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
+		self.path_widget.choose_btn.setFixedWidth(TITLE_BTN_W)
 		main_lay.addWidget(self.path_widget)
 
 		self.mf_stop_list = MfStopListWidget(self.mf)
