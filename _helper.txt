@@ -2,209 +2,143 @@
 Помогает найти тексты которые не попали в Lng
 (["'])(?!\1)(?![^"' ]*\.svg\1).*?\1
 
+
+======
+
+Mf
+
+class Mf:
+    mf_paths = ["Абсолютный путь к каталогу", ]
+    mf_alias = "Псевдоним каталога любой, задается 1 раз и не меняется"
+    mf_stop_list = [относительные пути, ]
+
+mf_paths, mf_alias, mf_stop_list хранятся в json файле и подгружаются в класс Mf
+
+===========
+
+путь к каталогу который берется из mf_paths[0]:
+/Downloads/images folder
+
+субдиректории каталога
+/Downloads/images folder/folder 1
+/Downloads/images folder/folder 2
+
+в базе данных в таблице DIRS хранятся субдиректории:
+- относительный путь к субдиректории 
+- дата изменения mod 
+- mf_alias
+
+то есть запись субдиртектории в DIRS будет вида
+(
+    относительный путь /folder 1,
+    mod 123456789,
+    mf_alias Псевдоним каталога
+)
+
+в таблице THUMBS хранятся записи об изображениях по такому же принципу:
+относительный путь и mf_alias
+
+_table_thumbs = sqlalchemy.Table(
+	"thumbs", METADATA,
+	sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+	sqlalchemy.Column("short_src", sqlalchemy.Text),
+	sqlalchemy.Column("short_hash", sqlalchemy.Text),
+	sqlalchemy.Column("size", sqlalchemy.Integer),
+	sqlalchemy.Column("birth", sqlalchemy.Integer),
+	sqlalchemy.Column("mod", sqlalchemy.Integer),
+	sqlalchemy.Column("resol", sqlalchemy.Text),
+	sqlalchemy.Column("coll", sqlalchemy.Text),
+	sqlalchemy.Column("fav", sqlalchemy.Integer),
+	sqlalchemy.Column("brand", sqlalchemy.Text),
+)
+
+
+class Thumbs:
+
+	table = _table_thumbs
+	id = _table_thumbs.c.id
+	rel_img_path = _table_thumbs.c.short_src
+	rel_thumb_path = _table_thumbs.c.short_hash
+	size = _table_thumbs.c.size
+	birth = _table_thumbs.c.birth
+	mod = _table_thumbs.c.mod
+	root = _table_thumbs.c.resol
+	coll = _table_thumbs.c.coll
+	fav = _table_thumbs.c.fav
+	mf_alias = _table_thumbs.c.brand
+
+
+_table_dirs = sqlalchemy.Table(
+	"dirs", METADATA,
+	sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+	sqlalchemy.Column("short_src", sqlalchemy.Text),
+	sqlalchemy.Column("mod", sqlalchemy.Integer),
+	sqlalchemy.Column("brand", sqlalchemy.Text),
+)
+
+
+class Dirs:
+	"""
+	Класс-обёртка для колонок таблицы `dirs` в базе данных.
+	Предоставляет удобный доступ к колонкам через атрибуты класса.
+	"""
+	table = _table_dirs
+	id = _table_dirs.c.id
+	rel_dir_path = _table_dirs.c.short_src
+	mod = _table_dirs.c.mod
+	mf_alias = _table_dirs.c.brand
+
+	@classmethod
+	def reset_mod(cls, mf_alias: str):
+		"""
+		Сбрасывает mod всех папок Mf в 0, чтобы сканер при следующем запуске
+		сравнил содержимое каждой папки, а не пропустил её по совпадению mtime.
+		"""
+		with Dbase.main_engine.begin() as conn:
+			stmt = (
+				sqlalchemy.update(cls.table)
+				.where(cls.mf_alias == mf_alias)
+				.values({cls.mod.name: 0})
+			)
+			conn.execute(stmt)
+
+=============
+
+Как должен работать сканер
+
+берется mf_alias и mf_paths[0]
+и базы данных из DIRS берутся ВСЕ записи соответствующие mf_alias
+у нас получится список оносительных путей + mod + mf_alias
+
+из Finder scandir берутся все директории по mf_paths[0]
+затем это превращается в список относительных путей
+превращение = убираем из абсолютного пути mf_paths[0]
+
+Получается мы будем сравнивать списки относительных путей и так мы узнаем:
+какие директории изменились удалились добавились и уже оттталикваясь от этого далее работаем
+
+
+=================
+
+ВАЖНОЕ ДОПОЛНЕНИЕ
+
+есть еще mf_stop_list где хранятся относительные пути, это должно учитываться в работе
+
+
+
+=============
+
+
+
+
 - пользователь добавляет каталог /Downloads/Folder 1
 - в Json файле хранится путь к каталогу /Downloads/Folder 1
 - в базе данных хранятся относительные пути /subfolder 1/image.jpg
 - при работе с приложением путь складывается в /Downloads/Folder 1/subfolder 1/image.jpg
 - таким образом место каталога может меняться но все данные сохранятся
 - сделано это в основном когда каталог на смб диске а потом порядок подключения дисков изменился
-- однако если пользователь укажет вообще другую папку то все содержимое сотрется и проиндексируется новое
-- сейчас есть защита если приложение видит более 50 удалений из индекса то предупреждение
+- если пользователь укажет вообще другую папку то все содержимое сотрется и проиндексируется новое
 
-
-
-FONTS Mac os PyQt6
-
-.AppleSystemUIFont
-Academy Engraved LET
-Al Bayan
-Al Nile
-Al Tarikh
-AlayaRoza Demo
-American Typewriter
-Andale Mono
-Antarctic
-Apple Braille
-Apple Chancery
-Apple Color Emoji
-Apple SD Gothic Neo
-Apple Symbols
-AppleGothic
-AppleMyungjo
-Arial
-Arial Black
-Arial Hebrew
-Arial Hebrew Scholar
-Arial Narrow
-Arial Rounded MT Bold
-Arial Unicode MS
-Avengeance
-Avengeance Heroic Avenger
-Avengeance Mightiest Avenger
-Avenir
-Avenir Next
-Avenir Next Condensed
-Ayuthaya
-Baghdad
-Bangla MN
-Bangla Sangam MN
-Baron MT Modern Cyr
-Baskerville
-Beirut
-Big Caslon
-Bodoni 72
-Bodoni 72 Oldstyle
-Bodoni 72 Smallcaps
-Bodoni Ornaments
-Bradley Hand
-Brush Script MT
-Brusher
-Caravan
-Chalkboard
-Chalkboard SE
-Chalkduster
-Charter
-Cochin
-Comic Sans MS
-Copperplate
-Corsiva Hebrew
-Courier New
-DIN Alternate
-DIN Condensed
-Damascus
-DecoType Naskh
-Devanagari MT
-Devanagari Sangam MN
-Didot
-Diwan Kufi
-Diwan Thuluth
-Euphemia UCAS
-Farah
-Farisi
-Futura
-GB18030 Bitmap
-Galvji
-Geeza Pro
-Geneva
-Georgia
-Gill Sans
-Gogol
-Grantha Sangam MN
-Gujarati MT
-Gujarati Sangam MN
-Gurmukhi MN
-Gurmukhi MT
-Gurmukhi Sangam MN
-Harry Potter (Russian Version of Gfdtk)
-Heiti SC
-Heiti TC
-Helvetica
-Helvetica Neue
-Herculanum
-Hiragino Maru Gothic ProN
-Hiragino Mincho ProN
-Hiragino Sans
-Hiragino Sans GB
-Hoefler Text
-ITF Devanagari
-ITF Devanagari Marathi
-Impact
-InaiMathi
-Kailasa
-Kannada MN
-Kannada Sangam MN
-Kefa
-Khmer MN
-Khmer Sangam MN
-Kohinoor Bangla
-Kohinoor Devanagari
-Kohinoor Gujarati
-Kohinoor Telugu
-Kokonor
-Krungthep
-KufiStandardGK
-Lao MN
-Lao Sangam MN
-Lucida Grande
-Luminari
-Malayalam MN
-Malayalam Sangam MN
-Marker Felt
-Menlo
-Microsoft Sans Serif
-Mishafi
-Mishafi Gold
-Monaco
-Montserrat
-Mshtakan
-Mukta Mahee
-Muna
-Myanmar MN
-Myanmar Sangam MN
-Nadeem
-New Peninim MT
-Noteworthy
-Noto Nastaliq Urdu
-Noto Sans Batak
-Noto Sans Kannada
-Noto Sans Myanmar
-Noto Sans NKo
-Noto Sans Oriya
-Noto Sans Syriac
-Noto Sans Tagalog
-Noto Serif Myanmar
-Optima
-Oriya MN
-Oriya Sangam MN
-PT Mono
-PT Sans
-PT Sans Caption
-PT Sans Narrow
-PT Serif
-PT Serif Caption
-Palatino
-Papyrus
-Party LET
-Phosphate
-PingFang HK
-PingFang MO
-PingFang SC
-PingFang TC
-Plantagenet Cherokee
-Playfair Display SC
-Raanana
-Rockwell
-SF Pro Display
-SF Pro Rounded
-SF Pro Text
-SF UI Text
-STIX Two Math
-STIX Two Text
-STSong
-Sana
-Sathu
-Savoye LET
-Second Lesson PERSONAL USE
-Shree Devanagari 714
-SignPainter
-Silom
-Sinhala MN
-Sinhala Sangam MN
-Skia
-Snell Roundhand
-Songti SC
-Songti TC
-Sukhumvit Set
-Symbol
-Tahoma
-Tamil MN
-Tamil Sangam MN
-Telugu MN
-Telugu Sangam MN
-Thonburi
-Times New Roman
-Trattatello
-Trebuchet MS
-Verdana
-Waseem
-Webdings
+как работает сканер
+- сканер берет все директории из каталога mf_paths[0] через scandir
+- 

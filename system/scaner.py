@@ -49,8 +49,7 @@ class ScanProgress:
 class ScanerWorker(BaseProcessWorker):
 	def __init__(self, target: callable, args: tuple):
 		self.process_queue = Queue()
-		self.response_queue = Queue()
-		super().__init__(target, (*args, self.process_queue, self.response_queue))
+		super().__init__(target, (*args, self.process_queue))
 
 
 @dataclass(slots=True)
@@ -119,10 +118,41 @@ class BaseScanerItem:
 	mf: Mf
 	engine: sqlalchemy.Engine
 	process_queue: Queue
-	response_queue: Queue
 	total_count: int
 	current_count: int
 	scaner_type: Literal["forced", "base"]
+
+
+@dataclass(slots=True)
+class DirsDiff:
+	removed: list[DirItem]        # удалены с диска
+	added: list[DirItem]          # новые на диске
+	changed: list[DirItem]        # mod отличается (включая сброшенный в 0)
+	stopped: list[DirItem]        # стоп-папки на диске, mod = StopList.MOD
+	newly_stopped: list[DirItem]  # стали стоп-папкой только что
+
+
+def diff_dirs(finder: list[DirItem], db: list[DirItem]) -> DirsDiff:
+	"""Сравнивает папки с диска и из БД по относительному пути."""
+	db_map = {d.rel_path: d for d in db}
+	finder_map = {d.rel_path: d for d in finder}
+
+	removed = [d for p, d in db_map.items() if p not in finder_map]
+
+	added, changed, stopped, newly_stopped = [], [], [], []
+	for p, f in finder_map.items():
+		old = db_map.get(p)
+		if f.mod == StopList.MOD:
+			stopped.append(f)
+			if old is not None and old.mod != StopList.MOD:
+				newly_stopped.append(f)
+			continue
+		if old is None:
+			added.append(f)
+		elif old.mod != f.mod:
+			changed.append(f)
+
+	return DirsDiff(removed, added, changed, stopped, newly_stopped)
 
 
 class ScanerParent:
@@ -132,6 +162,8 @@ class ScanerParent:
 
 
 class DirsChangeWatcher(ScanerParent):
+	"""Быстрая проверка: есть ли вообще изменения. Нужна только как оптимизация."""
+
 	def __init__(self, scaner_item: BaseScanerItem):
 		super().__init__(scaner_item)
 
@@ -178,7 +210,7 @@ class DirsChangeWatcher(ScanerParent):
 				print("DirsChangeWatcher error", item.abs_path, e)
 				continue
 
-			# MOD у обычной папки означает, что её только что убрали из стоп-листа
+			# mod = 0 у обычной папки означает сброс (смена каталога или возврат из стоп-листа)
 			if item.mod == StopList.MOD or int(stat.st_mtime) > item.mod:
 				is_changed_flag = True
 				break
@@ -242,42 +274,6 @@ class DirsLoader(ScanerParent):
 			print(traceback.format_exc())
 
 		return dirs
-
-
-class DirsComparator(ScanerParent):
-	def __init__(self, scaner_item: BaseScanerItem, finder_dirs: list[DirItem], db_dirs: list[DirItem]):
-		super().__init__(scaner_item)
-		self.finder_dirs = finder_dirs
-		self.db_dirs = db_dirs
-
-	def get_dirs_to_remove(self):
-		"""
-		Собирает список `DirItem`:
-		- которых больше нет в Finder, но есть в базе данных
-		- которые нужно удалить из базы данных
-		"""
-		rel_paths = [dir_item.rel_path for dir_item in self.finder_dirs]
-		return [
-			dir_item
-			for dir_item in self.db_dirs
-			if dir_item.rel_path not in rel_paths
-		]
-
-	def get_dirs_to_scan(self):
-		"""
-		Собирает список `DirItem`:
-		- которые есть в Finder, но нет в базе данных
-		- которые нужно добавить в базу данных
-		"""
-		rel_paths = [
-			(dir_item.rel_path, dir_item.mod)
-			for dir_item in self.db_dirs
-		]
-		return [
-			dir_item
-			for dir_item in self.finder_dirs
-			if (dir_item.rel_path, dir_item.mod) not in rel_paths
-		]
 
 
 class DirsDbUpdater(ScanerParent):
@@ -670,7 +666,7 @@ class RemovedDirsCleaner(ScanerParent):
 
 class BaseScaner:
 	@staticmethod
-	def start(mf_list: list[Mf], queue: Queue, response_queue: Queue):
+	def start(mf_list: list[Mf], queue: Queue):
 		engine = Dbase.create_engine()
 		# нельзя обращаться сразу к Mf так как это мультипроцесс
 		for mf in mf_list:
@@ -678,7 +674,6 @@ class BaseScaner:
 				mf=mf,
 				engine=engine,
 				process_queue=queue,
-				response_queue=response_queue,
 				total_count=0,
 				current_count=0,
 				scaner_type="base"
@@ -708,40 +703,28 @@ class BaseScaner:
 			print(scaner_item.mf.mf_alias, "not changed")
 			return
 
-		dirs_loader = DirsLoader(scaner_item)
-		finder_dirs = dirs_loader.get_finder_dirs()
+		finder_dirs = DirsLoader(scaner_item).get_finder_dirs()
 		if not finder_dirs:
 			return
 
-		dirs_comparator = DirsComparator(scaner_item, finder_dirs, db_dirs)
-		removed_dirs = dirs_comparator.get_dirs_to_remove()
-		dirs_to_scan = dirs_comparator.get_dirs_to_scan()
+		diff = diff_dirs(finder_dirs, db_dirs)
 
-		# папки, которые только что попали в стоп-лист: в БД у них был реальный mod
-		db_mod = {d.rel_path: d.mod for d in db_dirs}
-		newly_stopped = [
-			d for d in finder_dirs
-			if d.mod == StopList.MOD
-			and db_mod.get(d.rel_path, StopList.MOD) != StopList.MOD
-		]
-		to_clean = removed_dirs + newly_stopped
-
+		# удаление: пропавшие папки и папки, ставшие стоп-папками
+		to_clean = diff.removed + diff.newly_stopped
 		if to_clean:
 			BaseScaner.log_removed_dirs(scaner_item, finder_dirs, to_clean)
-			if len(finder_dirs) != len(to_clean):
-				cleaner = RemovedDirsCleaner(scaner_item, to_clean)
-				cleaner.remove_thumbs()
-				cleaner.remove_dirs()
+			cleaner = RemovedDirsCleaner(scaner_item, to_clean)
+			cleaner.remove_thumbs()
+			cleaner.remove_dirs()
 
-		if dirs_to_scan:
-			stop_dirs = [d for d in dirs_to_scan if d.mod == StopList.MOD]
-			image_dirs = [d for d in dirs_to_scan if d.mod != StopList.MOD]
+		# стоп-папки: только запись mod = 0 в Dirs, изображения не трогаем
+		if diff.stopped:
+			DirsDbUpdater(scaner_item, diff.stopped).upsert_records()
 
-			if stop_dirs:
-				# только запись в Dirs, изображения не трогаем
-				DirsDbUpdater(scaner_item, stop_dirs).upsert_records()
-			if image_dirs:
-				DirImagesUpdater(scaner_item, image_dirs).start()
+		# добавленные и изменённые: сверяем изображения и обновляем Dirs
+		to_scan = diff.added + diff.changed
+		if to_scan:
+			DirImagesUpdater(scaner_item, to_scan).start()
 
 	@staticmethod
 	def log_removed_dirs(
@@ -775,18 +758,17 @@ class BaseScaner:
 class ForcedScaner:
 
 	@staticmethod
-	def start(item: ForcedScanerItem, queue: Queue, response_queue: Queue):
+	def start(item: ForcedScanerItem, queue: Queue):
 		print("single dir scaner started, mf:", item.mf.mf_alias)
 		ForcedScaner.single_mf_scan(
 			mf=item.mf,
 			dirs_to_scan=item.dirs_to_scan,
 			queue=queue,
-			response_queue=response_queue
 		)
 		print("single dir scaner finished, mf:", item.mf.mf_alias)
 
 	@staticmethod
-	def single_mf_scan(mf: Mf, dirs_to_scan: list[str], queue: Queue, response_queue: Queue):
+	def single_mf_scan(mf: Mf, dirs_to_scan: list[str], queue: Queue):
 		"""
 		Сканирует заданные директории в пределах Mf на предмет новых или
 		удаленных изображений. Стоп-папки и их поддерево пропускаются.
@@ -800,7 +782,6 @@ class ForcedScaner:
 			mf=mf,
 			engine=engine,
 			process_queue=queue,
-			response_queue=response_queue,
 			total_count=0,
 			current_count=0,
 			scaner_type="forced"
