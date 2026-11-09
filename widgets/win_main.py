@@ -14,7 +14,7 @@ from system.main_folder import Mf
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
-                           ScanConfirmRequest, ScanerWorker, ScanProgress)
+                           ScanerWorker, ScanProgress)
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils, ThumbScale
 
@@ -87,12 +87,6 @@ def db_changed(previous_mtime: int, current_mtime: int) -> bool:
 	return previous_mtime != current_mtime
 
 
-def reset_mf_after_rejection(mf) -> None:
-	"""Пользователь отказался от найденных опасных файлов: сбрасываем хранилище в корень."""
-	mf.set_mf_current_path(None)
-	mf.mf_paths = [""]
-
-
 def scan_progress_text(progress: ScanProgress) -> str:
 	"""Текст прогресса сканера. Строится только в GUI-потоке, где доступен Lng."""
 	if progress.kind == "search_dirs":
@@ -136,7 +130,6 @@ class TestWid(TransparentLabel):
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 	def reload(self):
-		from ._base_widgets import ConfirmWindow
 		self.confirm_win = ConfirmWindow(
 			text="Стандратное окно подтверждения, другая строка и другой текстовый текст"
 		)
@@ -146,23 +139,6 @@ class TestWid(TransparentLabel):
 	def mouseReleaseEvent(self, a0):
 		self.reload()
 		return super().mouseReleaseEvent(a0)
-
-
-class DangerWarn(ConfirmWindow):
-	def __init__(self, mf_alias: str, removed_images_count: int):
-		text = (
-			f"{Lng.dangerous_text}".format(removed_images_count)
-		)
-		super().__init__(text)
-		self.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
-		self.ok_btn.setText(Lng.allow)
-		self.cancel_btn.setText(Lng.deny)
-
-	def closeEvent(self, a0):
-		a0.ignore()
-
-	def keyPressEvent(self, a0):
-		return
 
 
 class WinMain(UMainWindow):
@@ -179,13 +155,6 @@ class WinMain(UMainWindow):
 		self.setMinimumWidth(750)
 		self.setMenuBar(BarMacos())
 		self.ww = 1200 if JsonData.square_thumbs else 1160
-
-		# self.test = DangerWarn(Mf.current_mf.mf_alias, 35)
-		# self.test.center_to_parent(self)
-		# self.test.show()
-
-		# test_wid = TestWid()
-		# self.central_layout.addWidget(test_wid)
 
 		self.forced_scaner_dirs = ForcedDirsRegistry()
 		self.go_to_url: str | None = None
@@ -272,8 +241,6 @@ class WinMain(UMainWindow):
 			self.bar_bottom.progress_widget.setText("СКАНЕР ВЫКЛЮЧЕН")
 
 		self.path_bar_update("")
-
-		# QTimer.singleShot(100, lambda: self.open_win_smb(Mf.current_mf))
 
 	@staticmethod
 	def with_conn(fn: callable):
@@ -706,19 +673,6 @@ class WinMain(UMainWindow):
 		self.view_win.show()
 
 	def poll_scaner_task(self, ms: int = 3000):
-
-		def can_continue(can_continue: bool, mf_alias: str):
-			"""
-			True = продолжить сканирование, False = прервать сканирование
-			"""
-			self.win_warn.deleteLater()
-			self.scaner_task.response_queue.put(can_continue)
-			if not can_continue:
-				mf = next((m for m in Mf.items if m.mf_alias == mf_alias), None)
-				if mf:
-					reset_mf_after_rejection(mf)
-					self.open_win_smb(mf)
-
 		if not getattr(self, "scaner_task", None):
 			self.scaner_poll_timer.start(ms)
 			return
@@ -726,15 +680,7 @@ class WinMain(UMainWindow):
 		progress = self.bar_bottom.progress_widget
 		while not self.scaner_task.process_queue.empty():
 			data = self.scaner_task.process_queue.get()
-
-			if isinstance(data, ScanConfirmRequest):
-				self.win_warn = DangerWarn(data.mf_alias, data.removed_count)
-				self.win_warn.center_to_parent(self)
-				self.win_warn.ok_clicked.connect(lambda: can_continue(True, data.mf_alias))
-				self.win_warn.cancel_clicked.connect(lambda: can_continue(False, data.mf_alias))
-				self.win_warn.show()
-
-			elif isinstance(data, ScanProgress):
+			if isinstance(data, ScanProgress):
 				progress.show_status(data)
 
 		if not self.scaner_task.is_alive():

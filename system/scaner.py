@@ -5,7 +5,6 @@ from datetime import datetime
 from multiprocessing import Queue
 from time import sleep
 from typing import Literal
-from queue import Empty
 
 import sqlalchemy
 
@@ -47,13 +46,6 @@ class ScanProgress:
 	total: int = 0
 
 
-@dataclass(slots=True)
-class ScanConfirmRequest:
-	"""Запрос подтверждения у GUI перед удалением большого числа миниатюр."""
-	mf_alias: str
-	removed_count: int
-
-
 class ScanerWorker(BaseProcessWorker):
 	def __init__(self, target: callable, args: tuple):
 		self.process_queue = Queue()
@@ -65,9 +57,9 @@ class ScanerWorker(BaseProcessWorker):
 class DirItem:
 	"""
 	Параметры:
-	- rel_path: относительный путь к подкаталогу относительно `Mf.curr_path`.
+	- rel_path: относительный путь к подкаталогу относительно корня Mf (`mf_paths[0]`).
 	  Пример:
-		- Mf.curr_path = /User/Downloads/parent/folder
+		- корень = /User/Downloads/parent/folder
 		- подкаталог = /User/Downloads/parent/folder/subfolder
 		- rel_path = /subfolder
 	- mod: дата модификации каталога (os.stat.st_mtime), либо StopList.MOD для стоп-папки
@@ -339,7 +331,7 @@ class ImgLoader(ScanerParent):
 		for dir_item in self.dirs_to_scan:
 			try:
 				scandir_iterator = os.scandir(dir_item.abs_path)
-			except Exception as e:
+			except Exception:
 				print(traceback.format_exc())
 				continue
 
@@ -347,7 +339,7 @@ class ImgLoader(ScanerParent):
 				if entry.path.endswith(ImgUtils.ext_all):
 					try:
 						stat = entry.stat()
-					except Exception as e:
+					except Exception:
 						print(traceback.format_exc())
 						continue
 
@@ -480,7 +472,7 @@ class ThumbsUpdater(ScanerParent):
 				except OSError:
 					pass
 				return True
-			except Exception as e:
+			except Exception:
 				print(traceback.format_exc())
 				return False
 
@@ -583,58 +575,14 @@ class ThumbsUpdater(ScanerParent):
 
 
 class DirImagesUpdater(ScanerParent):
-	# пороги для подозрительных изменений, при которых нужно подтверждение
-	removed_images_count = 50          # абсолютный объём удалений (прежняя защита)
-	removed_share_threshold = 0.5      # доля удалений от записей в индексе
-	min_removed_for_share = 5          # доля учитывается только при заметном числе удалений
-	min_records_for_match_check = 5    # проверка совпадений работает только на достаточном объёме
-
 	def __init__(self, scaner_item: BaseScanerItem, dirs_to_scan: list[DirItem]):
 		super().__init__(scaner_item)
 		self.dirs_to_scan = dirs_to_scan
 
-	@staticmethod
-	def wait_for_answer(scaner: BaseScanerItem, timeout_sec: int = 600) -> bool:
-		"""
-		Ждёт решения пользователя из GUI (продолжить или отменить).
-		Нет ответа за timeout_sec секунд = отмена, ничего не удаляем.
-		"""
-		try:
-			return bool(scaner.response_queue.get(timeout=timeout_sec))
-		except Empty:
-			return False
-
-	def _looks_replaced(self, removed: int, total: int, matched: int) -> bool:
-		"""
-		Признаки того, что папка подменена, а не изменена:
-		- при достаточном объёме индекса не совпал ни один файл
-		- удалена большая доля записей
-		- абсолютный объём удалений больше порога
-		"""
-		if total == 0:
-			return False
-		if total >= self.min_records_for_match_check and matched == 0:
-			return True
-		if removed >= self.min_removed_for_share and removed / total > self.removed_share_threshold:
-			return True
-		return removed > self.removed_images_count
-
-	def _dirs_without_changes(self, removed_images: list[ImgItem],
-							  new_images: list[ImgItem]) -> list[DirItem]:
-		"""Папки, в которых нет ни удалённых, ни новых изображений."""
-		busy = {
-			os.path.normpath(os.path.dirname(i.abs_img_path))
-			for i in removed_images + new_images
-		}
-		return [
-			d for d in self.dirs_to_scan
-			if os.path.normpath(d.abs_path) not in busy
-		]
-
 	def start(self):
 		"""
-		На основе сохраненного списка добавляются и удаляются миниатюры в "hashdir",
-		а также обновляются базы данных THUMBS и DIRS.
+		Добавляет и удаляет миниатюры в hashdir, затем обновляет таблицы Thumbs и Dirs.
+		Изменения применяются сразу, без подтверждения.
 		"""
 		scaner = self.scaner_item
 
@@ -645,25 +593,7 @@ class DirImagesUpdater(ScanerParent):
 		img_comparator = ImgComparator(scaner, finder_images, db_images)
 		removed_images, new_images = img_comparator.start()
 
-		removed = len(removed_images)
-		total = len(db_images)
-		matched = len(finder_images) - len(new_images)
-
-		looks_replaced = self._looks_replaced(removed, total, matched)
-		print(looks_replaced)
-
-		if scaner.scaner_type == "base" and looks_replaced:
-			scaner.process_queue.put(
-				ScanConfirmRequest(scaner.mf.mf_alias, removed)
-			)
-			if not self.wait_for_answer(scaner):
-				# изменений без подтверждения не применяем, но папки без изменений записываем
-				safe_dirs = self._dirs_without_changes(removed_images, new_images)
-				if safe_dirs:
-					DirsDbUpdater(scaner, safe_dirs).upsert_records()
-				return
-
-		scaner.total_count = removed + len(new_images)
+		scaner.total_count = len(removed_images) + len(new_images)
 
 		thumbs_updater = ThumbsUpdater(scaner, removed_images, new_images)
 		thumbs_updater.del_thumbs()
@@ -699,7 +629,7 @@ class RemovedDirsCleaner(ScanerParent):
 			abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
 			try:
 				os.remove(abs_thumb_path)
-			except Exception as e:
+			except Exception:
 				print(traceback.format_exc())
 			try:
 				os.rmdir(os.path.dirname(abs_thumb_path))
@@ -753,8 +683,8 @@ class BaseScaner:
 				current_count=0,
 				scaner_type="base"
 			)
-			avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
-			if avaiable_mf_path:
+			# проверка доступности хранилища: при недоступности записи не трогаем
+			if scaner_item.mf.get_avaiable_mf_path():
 				try:
 					print("scaner started", scaner_item.mf.mf_alias)
 					BaseScaner.single_mf_scan(scaner_item)
@@ -875,8 +805,7 @@ class ForcedScaner:
 			current_count=0,
 			scaner_type="forced"
 		)
-		avaiable_mf_path = scaner_item.mf.get_avaiable_mf_path()
-		if avaiable_mf_path:
+		if scaner_item.mf.get_avaiable_mf_path():
 			dir_items: list[DirItem] = []
 			stop = StopList(mf.mf_stop_list)
 			for i in dirs_to_scan:
