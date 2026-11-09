@@ -89,7 +89,7 @@ class DestinyFolderWidget(UGroupBox):
 		self.path_row_layout.addWidget(self.copy_path_button)
 
 		# Кнопка вне GroupBox
-		self.change_btn = UPushButton(Lng.choose_folder)
+		self.change_btn = UPushButton(Lng.find_catalog)
 		self.change_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
 		self.change_btn.clicked.connect(self.change_dir)
 		self.main_layout.addWidget(self.change_btn)

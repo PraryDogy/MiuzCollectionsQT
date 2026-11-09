@@ -1610,7 +1610,7 @@ class MfPathWidget(UGroupBox):
 		buttons_layout.setContentsMargins(0, 5, 0, 0)
 		buttons_layout.setSpacing(10)
 
-		self.choose_btn = UPushButton(Lng.choose_folder)
+		self.choose_btn = UPushButton(Lng.find_catalog)
 		self.choose_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
 		self.choose_btn.clicked.connect(self.dialog_dir)
 		buttons_layout.addWidget(self.choose_btn)
@@ -1641,7 +1641,7 @@ class MfPathWidget(UGroupBox):
 			self.copy_path_btn.show()
 		else:
 			self.title_widget.svg_widget.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
-			self.path_label.setText(Lng.path_hint_texts)
+			self.path_label.setText(Lng.no_catalog_path)
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
 			self.copy_path_btn.hide()
