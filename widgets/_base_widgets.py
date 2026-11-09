@@ -1599,16 +1599,28 @@ class MfPathWidget(UGroupBox):
 		self.v_lay.setContentsMargins(10, 5, 10, 5)
 		self.v_lay.setSpacing(5)
 
+		# иконка заголовка статичная, динамически не меняется
 		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "green_checkmark.svg")
 		self.v_lay.addWidget(self.title_widget)
 
-		# заголовок создаётся в _set_title_icon, здесь только разделитель и описание
 		self.v_lay.addWidget(USep())
+
+		# строка статуса: иконка слева, описание пути справа
+		self.status_widget = QWidget()
+		self.status_layout = QHBoxLayout(self.status_widget)
+		self.status_layout.setContentsMargins(0, 0, 0, 0)
+		self.status_layout.setSpacing(6)
+
+		self.status_icon = QSvgWidget()
+		self.status_icon.setFixedSize(16, 16)
+		self.status_layout.addWidget(self.status_icon, 0, Qt.AlignmentFlag.AlignTop)
 
 		self.path_label = GrayTextLabel("")
 		self.path_label.setWordWrap(True)
 		self.path_label.set_elide(True)
-		self.v_lay.addWidget(self.path_label)
+		self.status_layout.addWidget(self.path_label, 1)
+
+		self.v_lay.addWidget(self.status_widget)
 
 		self.v_lay.addLayout(self._create_buttons_layout())
 
@@ -1639,17 +1651,25 @@ class MfPathWidget(UGroupBox):
 	def _path_exists(self) -> bool:
 		return bool(self.mf_path) and os.path.exists(self.mf_path)
 
+	def _status_icon_name(self) -> str:
+		"""Иконка статуса: нет пути / путь не существует / путь есть"""
+		if not self.mf_path:
+			return "yellow_warning.svg"
+		if not self._path_exists():
+			return "stop.svg"
+		return "green_checkmark.svg"
+
 	def update_ui(self):
-		"""Обновляет заголовок, описание, кнопки и таймер по текущему пути"""
+		"""Обновляет иконку статуса, описание, кнопки и таймер по текущему пути"""
 		has_path = self._path_exists()
 
+		self.status_icon.load(str(Static.COLOR_ICONS / self._status_icon_name()))
+
 		if has_path:
-			self.title_widget.svg_widget.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
 			self.path_label.setText(self.mf_path)
 			self.watch_timer.stop()
 			self.copy_path_btn.show()
 		else:
-			self.title_widget.svg_widget.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 			self.path_label.setText(Lng.no_catalog_path)
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
