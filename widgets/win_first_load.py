@@ -187,8 +187,7 @@ class FirstLoadWin(UMainWindow):
 			mf = Mf(
 				mf_alias=mf_alias,
 				mf_paths=[mf_path, ],
-				mf_stop_list=[],
-				mf_current_path=mf_path
+				mf_stop_list=[]
 			)
 			Mf.items.clear()
 			Mf.items.append(mf)

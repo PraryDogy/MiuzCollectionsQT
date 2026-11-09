@@ -9,8 +9,6 @@ class Strings:
 	mf_alias = "mf_alias"
 	mf_paths = "mf_paths"
 	mf_stop_list = "mf_stop_list"
-	mf_current_path = "mf_current_path"
-
 
 
 class Mf:
@@ -20,15 +18,13 @@ class Mf:
 		Strings.mf_alias,
 		Strings.mf_paths,
 		Strings.mf_stop_list,
-		Strings.mf_current_path,
 	]
 
-	def __init__(self, mf_alias, mf_paths, mf_stop_list, mf_current_path):
+	def __init__(self, mf_alias, mf_paths, mf_stop_list):
 		super().__init__()
 		self.mf_alias: str = mf_alias
 		self.mf_paths: list[str] = mf_paths
 		self.mf_stop_list: list[str] = mf_stop_list
-		self.mf_current_path: str = mf_current_path
 
 	@classmethod
 	def validate_json(cls):
@@ -70,8 +66,7 @@ class Mf:
 			base_types_ok = (
 				isinstance(d[Strings.mf_alias], str),
 				isinstance(d[Strings.mf_paths], list),
-				isinstance(d[Strings.mf_stop_list], list),
-				isinstance(d[Strings.mf_current_path], str)
+				isinstance(d[Strings.mf_stop_list], list)
 			)
 			if all(base_types_ok):
 				lists_are_strings = (
@@ -101,15 +96,9 @@ class Mf:
 		cls.items.clear()
 		for d in data:
 			cls.items.append(Mf(**d))
-		# for i in cls.items:
-		#     print(i.mf_alias)
-		# os._exit(1)
 
 	def get_avaiable_mf_path(self):
-		for i in self.mf_paths:
-			if os.path.exists(i):
-				return i
-		return None
+		return os.path.exists(self.mf_paths[0])
 	
 	def get_data(self):
 		return {i: getattr(self, i) for i in self.__slots__}
