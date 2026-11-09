@@ -296,12 +296,7 @@ class WinImageView(UMainWindow):
 
 		avaiable_mf_path = Mf.current_mf.is_root_alive()
 		if avaiable_mf_path:
-			abs_path = Utils.add_mf_path(
-				avaiable_mf_path,
-				self.current_data_item.rel_path
-			)
-			
-			if not os.path.exists(abs_path):
+			if not os.path.exists(self.current_data_item.abs_path):
 				self.image_not_exists.emit()
 			else:
 				self.set_title()

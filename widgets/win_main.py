@@ -734,11 +734,13 @@ class WinMain(UMainWindow):
 	def set_fav(self, data: tuple[str, int]):
 
 		def finished(rel_path: str, value: int):
-			self.grid.set_thumb_fav(rel_path, value)
-			try:
-				self.view_win.set_title()
-			except AttributeError:
-				...
+			wid = self.grid.url_to_wid.get(rel_path)
+			if wid:
+				wid.set_fav(value)
+				try:
+					self.view_win.set_title()
+				except AttributeError:
+					...
 
 		rel_path, value = data
 		self.task = SetFav(rel_path, value)
