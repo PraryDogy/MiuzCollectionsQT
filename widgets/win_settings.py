@@ -979,6 +979,7 @@ class NewMfWin(UMainWindow):
 		self.central_layout.setSpacing(10)
 
 		self.mf_alias_widget = MfAliasWidget()
+		self.mf_alias_widget.auto_name_clicked.connect(self.autoname_cmd)
 		self.mf_alias_widget.changed.connect(self._on_changed)
 		self.central_layout.addWidget(self.mf_alias_widget)
 
@@ -997,9 +998,22 @@ class NewMfWin(UMainWindow):
 		if mf_path:
 			self.mf_path_widget_changed()
 
-		self.setFixedWidth(550)
+		self.setFixedWidth(510)
 		self.adjustSize()
 		self.setFixedHeight(self.height())
+
+	def autoname_cmd(self):
+		if self.mf_path_widget.mf_path:
+			base = os.path.basename(self.mf_path_widget.mf_path)
+		else:
+			base = Lng.catalog
+		taken = {mf.mf_alias for mf in Mf.items}
+		name = base
+		n = 1
+		while name in taken:
+			name = f"{base} {n}"
+			n += 1
+		self.mf_alias_widget.set_mf_name(name)
 
 	def _on_changed(self):
 		self.has_unsaved = True

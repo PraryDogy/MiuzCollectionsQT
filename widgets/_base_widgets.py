@@ -1278,6 +1278,7 @@ class SaveRowArrowWidget(RowArrowWidget):
 
 class MfAliasWidget(UGroupBox):
 	changed = pyqtSignal()
+	auto_name_clicked = pyqtSignal()
 
 	PATTERN = re.compile(r'^[A-Za-zА-Яа-яЁё0-9 ]+$')
 	VALIDATE_DELAY_MS = 500
@@ -1299,8 +1300,13 @@ class MfAliasWidget(UGroupBox):
 
 		title = TitleTextWidget(Lng.catalog_name, Static.GRAY_ICONS / "text_edit_gray.svg")
 		title_lay.addWidget(title)
-		title_lay.addStretch()
 		v_layout.addWidget(title_wrapper)
+
+		autoname_button = UPushButton(Lng.auto_name)
+		autoname_button.setIcon(QIcon(str(Static.GRAY_ICONS / "wand_gray.svg")))
+		autoname_button.clicked.connect(self.auto_name_clicked.emit)
+		title_lay.addStretch()
+		title_lay.addWidget(autoname_button)
 
 		v_layout.addWidget(USep())
 
@@ -1341,6 +1347,9 @@ class MfAliasWidget(UGroupBox):
 		self._show_state(None)
 
 	# --- Отложенная проверка при вводе ---
+
+	def set_mf_name(self, text: str):
+		self.line_edit.setText(text)
 
 	def _on_text_changed(self, _text: str):
 		self.changed.emit()

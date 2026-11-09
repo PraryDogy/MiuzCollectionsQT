@@ -380,6 +380,7 @@ class Lng:
 	choose_period = ("Выбрать период", "Choose period")
 	find_catalog = ("Найти каталог", "Find catalog")
 	no_catalog_path = ("Каталог не найден", "Catalog not found")
+	auto_name = ("Подобрать имя", "Suggest name")
 	period = ("Период", "Period")
 	selected_dates = ("Выбранные даты", "Selected dates")
 	all_time = ("За все время", "All time")
