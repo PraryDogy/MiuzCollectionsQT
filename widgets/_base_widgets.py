@@ -891,9 +891,10 @@ class UTagWidget(TransparentFrame):
 			self.left_svg_widget.setFixedSize(14, 14)
 			self.h_lay.addWidget(self.left_svg_widget)
 
-		self.text_widget = TransparentLabel(text)
-		self.text_widget.mouseReleaseEvent = self.text_widget_cmd
-		self.h_lay.addWidget(self.text_widget)
+		if text:
+			self.text_widget = TransparentLabel(text)
+			self.text_widget.mouseReleaseEvent = self.text_widget_cmd
+			self.h_lay.addWidget(self.text_widget)
 
 		if r_svg:
 			right_svg_wrapper = TransparentWidget()

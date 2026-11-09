@@ -644,6 +644,10 @@ class Lng:
 		"Вернуться",  # ru
 		"Go back",  # en
 	)
+	keep_editing = (
+		"Продолжить редактирование",
+		"Keep editing"
+	)
 	do_not_save = (
 		"Не сохранять",  # ru
 		"Do not save",  # en

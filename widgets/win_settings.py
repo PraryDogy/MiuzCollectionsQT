@@ -42,7 +42,7 @@ class CancelChangesWin(ConfirmWindow):
 	def __init__(self, text):
 		super().__init__(text)
 		self.ok_btn.setText(Lng.do_not_save)
-		self.cancel_btn.setText(Lng.go_back)
+		self.cancel_btn.setText(Lng.keep_editing)
 
 
 class SaveRowWidget(TransparentWidget):
@@ -67,16 +67,8 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		# self.attention_wid = QSvgWidget(str(Static.GRAY_ICONS / "attention_gray.svg"))
-		# self.attention_wid.setFixedSize(15, 15)
-		# self.attention_wid.hide()
-		# self.h_lay.addWidget(self.attention_wid)
-
-		# self.save_text = GrayTextLabel(text=Lng.unsaved_changes)
-		# self.h_lay.addWidget(self.save_text)
-		# self.save_text.hide()
-
-		self.attention_wid = UTagWidget(Lng.unsaved_changes, UTagWidget.qss_yellow, Static.GRAY_ICONS / "attention_gray.svg")
+		self.attention_wid = UTagWidget("", UTagWidget.qss_yellow, Static.GRAY_ICONS / "attention_gray.svg")
+		self.attention_wid.setToolTip(Lng.unsaved_changes)
 		self.h_lay.addWidget(self.attention_wid)
 
 		self.h_lay.addSpacing(5)
@@ -987,10 +979,6 @@ class NewMfWin(UMainWindow):
 		self.mf_path_widget = MfPathWidget(mf=None)
 		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
 		self.central_layout.addWidget(self.mf_path_widget)
-
-		self.mf_stop_list = MfStopListWidget(mf_stop_list=[])
-		self.mf_stop_list.changed.connect(self._on_changed)
-		self.central_layout.addWidget(self.mf_stop_list)
 
 		self.central_layout.addStretch()
 

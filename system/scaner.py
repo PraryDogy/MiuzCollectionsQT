@@ -583,8 +583,11 @@ class ThumbsUpdater(ScanerParent):
 
 
 class DirImagesUpdater(ScanerParent):
-	# Константу класса оставляем на уровне класса
-	removed_images_count = 50
+	# пороги для подозрительных изменений, при которых нужно подтверждение
+	removed_images_count = 50          # абсолютный объём удалений (прежняя защита)
+	removed_share_threshold = 0.5      # доля удалений от записей в индексе
+	min_removed_for_share = 5          # доля учитывается только при заметном числе удалений
+	min_records_for_match_check = 5    # проверка совпадений работает только на достаточном объёме
 
 	def __init__(self, scaner_item: BaseScanerItem, dirs_to_scan: list[DirItem]):
 		super().__init__(scaner_item)
@@ -600,6 +603,21 @@ class DirImagesUpdater(ScanerParent):
 			return bool(scaner.response_queue.get(timeout=timeout_sec))
 		except Empty:
 			return False
+
+	def _looks_replaced(self, removed: int, total: int, matched: int) -> bool:
+		"""
+		Признаки того, что папка подменена, а не изменена:
+		- при достаточном объёме индекса не совпал ни один файл
+		- удалена большая доля записей
+		- абсолютный объём удалений больше порога
+		"""
+		if total == 0:
+			return False
+		if total >= self.min_records_for_match_check and matched == 0:
+			return True
+		if removed >= self.min_removed_for_share and removed / total > self.removed_share_threshold:
+			return True
+		return removed > self.removed_images_count
 
 	def _dirs_without_changes(self, removed_images: list[ImgItem],
 							  new_images: list[ImgItem]) -> list[DirItem]:
@@ -627,23 +645,25 @@ class DirImagesUpdater(ScanerParent):
 		img_comparator = ImgComparator(scaner, finder_images, db_images)
 		removed_images, new_images = img_comparator.start()
 
-		stmt = all((
-			len(removed_images) > self.removed_images_count,
-			scaner.scaner_type == "base",
-		))
-		if stmt:
+		removed = len(removed_images)
+		total = len(db_images)
+		matched = len(finder_images) - len(new_images)
+
+		looks_replaced = self._looks_replaced(removed, total, matched)
+		print(looks_replaced)
+
+		if scaner.scaner_type == "base" and looks_replaced:
 			scaner.process_queue.put(
-				ScanConfirmRequest(scaner.mf.mf_alias, len(removed_images))
+				ScanConfirmRequest(scaner.mf.mf_alias, removed)
 			)
-			can_continue = self.wait_for_answer(scaner)
-			if not can_continue:
+			if not self.wait_for_answer(scaner):
 				# изменений без подтверждения не применяем, но папки без изменений записываем
 				safe_dirs = self._dirs_without_changes(removed_images, new_images)
 				if safe_dirs:
 					DirsDbUpdater(scaner, safe_dirs).upsert_records()
 				return
 
-		scaner.total_count = len(removed_images) + len(new_images)
+		scaner.total_count = removed + len(new_images)
 
 		thumbs_updater = ThumbsUpdater(scaner, removed_images, new_images)
 		thumbs_updater.del_thumbs()
