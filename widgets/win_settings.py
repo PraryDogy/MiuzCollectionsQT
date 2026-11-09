@@ -703,9 +703,12 @@ class IgnoreListWin(UMainWindow):
 		"""Перерисовывает список по черновику; при пустом списке показывает заглушку поверх него."""
 		self.v_list_widget.clear()
 		for path in self.draft_stop_list:
-			item = UListWidgetItem(parent=self.v_list_widget, text=path)
-			item.setToolTip(path)
+			p = Utils.add_mf_path(self.mf.mf_paths[0], path)
+			item = UListWidgetItem(parent=self.v_list_widget, text=p)
+			item.setToolTip(p)
 			self.v_list_widget.addItem(item)
+
+			item.rel_path = path
 
 		self.empty_lbl.setVisible(not self.draft_stop_list)
 		self._place_empty_lbl()
@@ -726,7 +729,7 @@ class IgnoreListWin(UMainWindow):
 			return
 		menu = UMenu(parent=self)
 		act = QAction(Lng.remove_from_ignore_list, menu)
-		act.triggered.connect(lambda: self.remove_from_stop_list(item.text()))
+		act.triggered.connect(lambda: self.remove_from_stop_list(item.rel_path))
 		menu.addAction(act)
 		menu.exec(self.v_list_widget.mapToGlobal(pos))
 
