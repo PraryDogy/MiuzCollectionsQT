@@ -446,6 +446,7 @@ class WinImageView(UMainWindow):
 
 		self.menu_ = UMenu(parent=self)
 		rel_paths = [self.current_data_item.rel_path, ]
+		abs_paths = [self.current_data_item.abs_path, ]
 		# открыть в приложении
 		open_menu = UMenu(
 			title=f"{Lng.open_in}",
@@ -512,7 +513,7 @@ class WinImageView(UMainWindow):
 
 		save = Save(self.menu_, 1)
 		save.triggered.connect(
-			lambda: self.save_files.emit(rel_paths)
+			lambda: self.save_files.emit(abs_paths)
 		)
 		self.menu_.addAction(save)
 

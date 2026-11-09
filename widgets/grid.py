@@ -1152,6 +1152,7 @@ class Grid(UScrollVerticalArea):
 
 			data_items = [w.data_item for w in self.selected_widgets]
 			rel_paths = [di.rel_path for di in data_items]
+			abs_paths = [di.abs_path for di in data_items]
 
 			# просмотр
 			act = OpenInView(rel_paths, self.menu_)
@@ -1243,7 +1244,7 @@ class Grid(UScrollVerticalArea):
 
 			act = Save(self.menu_, len(rel_paths))
 			act.triggered.connect(
-				lambda: self.save_files.emit(rel_paths)
+				lambda: self.save_files.emit(abs_paths)
 			)
 			self.menu_.addAction(act)
 
