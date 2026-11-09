@@ -24,7 +24,7 @@ from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
 							UPushButton, UScrollVerticalArea, USep, UTagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, OpenInView,
 					  PasteFiles, RemoveFiles, RevealInFinder, Save,
-					  ScanerRestart, SetFav, ShowInFolder, UpdateThumbAction,
+					  ScanerRestart, SetFav, GoToThumbnail, UpdateThumbAction,
 					  WinInfoAction)
 from .win_filters import DatesWidget
 
@@ -599,7 +599,7 @@ class Grid(UScrollVerticalArea):
 	save_files = pyqtSignal(list)
 	path_bar_update = pyqtSignal(str)
 	open_img_view = pyqtSignal()
-	open_info_win = pyqtSignal(list)
+	open_info_win = pyqtSignal(DataItem)
 	copy_path = pyqtSignal(list)
 	reveal_in_finder = pyqtSignal(list)
 	set_fav = pyqtSignal(tuple)
@@ -608,7 +608,7 @@ class Grid(UScrollVerticalArea):
 	set_files_to_copy = pyqtSignal(list)
 	setup_mf = pyqtSignal(SettingsItem)
 	update_thumb = pyqtSignal(list)
-	show_in_app = pyqtSignal(str)
+	go_to_thumbnail = pyqtSignal(str)
 	finished_ = pyqtSignal()
 	collage = pyqtSignal(list)
 	open_filters_win = pyqtSignal()
@@ -978,14 +978,13 @@ class Grid(UScrollVerticalArea):
 	def keyPressEvent(self, event: QKeyEvent | None) -> None:
 		def remove_files():
 			self.remove_files.emit(
-				[i.data_item.rel_path for i in self.selected_widgets]
+				[i.data_item.abs_path for i in self.selected_widgets]
 			)
 
 		def open_info():
 			"""Открывает окно информации для выбранных виджетов."""
 			if self._sel:
-				rel_paths = [self.wid_under_mouse.data_item.rel_path, ]
-				self.open_info_win.emit(rel_paths)
+				self.open_info_win.emit(self.wid_under_mouse.data_item)
 
 		def select_all():
 			"""Выделяет все виджеты в сетке."""
@@ -1014,7 +1013,7 @@ class Grid(UScrollVerticalArea):
 			select_all()
 		elif event.modifiers() == CTRL and event.key() == Qt.Key.Key_C:
 			self.set_files_to_copy.emit(
-				[i.data_item.rel_path for i in self.selected_widgets]
+				[i.data_item.abs_path for i in self.selected_widgets]
 			)
 		elif event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
 			if not event.isAutoRepeat():
@@ -1155,7 +1154,7 @@ class Grid(UScrollVerticalArea):
 			abs_paths = [di.abs_path for di in data_items]
 
 			# просмотр
-			act = OpenInView(rel_paths, self.menu_)
+			act = OpenInView(self.menu_)
 			act.triggered.connect(
 				lambda: self.open_img_view.emit()
 			)
@@ -1178,7 +1177,7 @@ class Grid(UScrollVerticalArea):
 				for app_path, basename in self._image_apps.items():
 					act = QAction(basename, open_menu)
 					act.triggered.connect(
-						lambda _, x=app_path: self.open_in_app.emit((rel_paths, x))
+						lambda _, x=app_path: self.open_in_app.emit((abs_paths, x))
 					)
 					open_menu.addAction(act)
 
@@ -1192,16 +1191,16 @@ class Grid(UScrollVerticalArea):
 				)
 				self.menu_.addAction(fav)
 
-				show_in_app = ShowInFolder(self.menu_)
-				show_in_app.triggered.connect(
-					lambda: self.show_in_app.emit(clicked.data_item.rel_path)
+				go_to_thumb = GoToThumbnail(self.menu_)
+				go_to_thumb.triggered.connect(
+					lambda: self.go_to_thumbnail.emit(clicked.data_item.rel_path)
 				)
-				self.menu_.addAction(show_in_app)
+				self.menu_.addAction(go_to_thumb)
 
 				# инфо
 				act = WinInfoAction(self.menu_)
 				act.triggered.connect(
-					lambda: self.open_info_win.emit(rel_paths)
+					lambda: self.open_info_win.emit(self.wid_under_mouse.data_item)
 				)
 				self.menu_.addAction(act)
 
@@ -1236,7 +1235,7 @@ class Grid(UScrollVerticalArea):
 
 			act = CopyPath(self.menu_, len(rel_paths))
 			act.triggered.connect(
-				lambda: self.copy_path.emit(rel_paths)
+				lambda: self.copy_path.emit(abs_paths)
 			)
 			self.menu_.addAction(act)
 

@@ -214,7 +214,7 @@ class NextButton(ImgViewSvg):
 
 class WinImageView(UMainWindow):
 	select_thumb = pyqtSignal(str)
-	open_win_info = pyqtSignal(list)
+	open_win_info = pyqtSignal(DataItem)
 	copy_path = pyqtSignal(list)
 	reveal_in_finder = pyqtSignal(list)
 	set_fav = pyqtSignal(tuple)
@@ -408,7 +408,7 @@ class WinImageView(UMainWindow):
 
 		if ev.modifiers() & Qt.KeyboardModifier.ControlModifier:
 			if ev.key() == Qt.Key.Key_I:
-				self.open_win_info.emit([self.current_data_item.rel_path, ])
+				self.open_win_info.emit(self.current_data_item)
 			
 			elif ev.key() == Qt.Key.Key_Left:
 				self.rotate(-90)
@@ -481,7 +481,7 @@ class WinImageView(UMainWindow):
 
 		info = WinInfoAction(self.menu_)
 		info.triggered.connect(
-			lambda: self.open_win_info.emit(rel_paths)
+			lambda: self.open_win_info.emit(self.current_data_item)
 		)
 		self.menu_.addAction(info)
 

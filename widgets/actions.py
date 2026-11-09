@@ -10,12 +10,8 @@ from system.lang import Lng
 
 
 class OpenInView(QAction):
-	def __init__(self, rel_paths: list[str], parent_: QMenu):
-		if len(rel_paths) > 1:
-			end_text =  f" ({len(rel_paths)})"
-		else:
-			end_text = ""
-		super().__init__(parent=parent_, text=f"{Lng.open}{end_text}")
+	def __init__(self, parent_: QMenu):
+		super().__init__(parent=parent_, text=Lng.open)
 
 
 class ScanerRestart(QAction):
@@ -102,7 +98,7 @@ class UpdateThumbAction(QAction):
 		super().__init__(text=text, parent=parent)
 
 
-class ShowInFolder(QAction):
+class GoToThumbnail(QAction):
 	def __init__(self, parent: QMenu):
 		super().__init__(
 			text=Lng.show_in_folder,

@@ -465,13 +465,10 @@ class WinMain(UMainWindow):
 		self.upload_win.show()
 
 	@with_conn
-	def open_info_win(self, rel_paths: list[str]):
-		wid = self.grid.url_to_wid.get(rel_paths[0])
-		if wid:
-			data_item = wid.data_item
-			self.info_win = WinInfo(data_item)
-			self.info_win.center_to_parent(UMainWindow.win_list[-2])
-			self.info_win.show()
+	def open_info_win(self, data_item: DataItem):
+		self.info_win = WinInfo(data_item)
+		self.info_win.center_to_parent(UMainWindow.win_list[-2])
+		self.info_win.show()
 
 	def open_settings_win(self, settings_item: SettingsItem):
 		self.bar_top.settings_btn.set_selected_style()
@@ -513,7 +510,7 @@ class WinMain(UMainWindow):
 			lambda abs_paths: self.save_to_downloads(abs_paths)
 		)
 		self.grid.open_info_win.connect(
-			lambda rel_paths: self.open_info_win(rel_paths)
+			lambda data_item: self.open_info_win(data_item)
 		)
 		self.grid.copy_path.connect(
 			lambda abs_paths: self.copy_path(abs_paths)
@@ -546,7 +543,7 @@ class WinMain(UMainWindow):
 		self.grid.update_thumb.connect(
 			lambda rel_paths: self.start_update_thumb(rel_paths)
 		)
-		self.grid.show_in_app.connect(
+		self.grid.go_to_thumbnail.connect(
 			self.go_to_thumbnail
 		)
 		self.grid.finished_.connect(
@@ -588,7 +585,7 @@ class WinMain(UMainWindow):
 		)
 		self.view_win = WinImageView(item)
 		self.view_win.open_win_info.connect(
-			lambda rel_paths: self.open_info_win(rel_paths)
+			lambda data_item: self.open_info_win(data_item)
 		)
 		self.view_win.copy_path.connect(
 			lambda abs_paths: self.copy_path(abs_paths)
