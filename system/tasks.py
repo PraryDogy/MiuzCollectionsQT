@@ -204,7 +204,7 @@ class DbImagesLoader(URunnable):
 
 			item = DbImagesLoaderItem(
 				rel_img_path=rel_img_path,
-				abs_img_path=Utils.add_mf_path(Mf.current_mf.mf_paths[0], rel_img_path),
+				abs_img_path=Mf.current_mf.create_abs_path(rel_img_path),
 				rel_thumb_path=rel_thumb_path,
 				fav=fav,
 				base_qimage=base_qimage,

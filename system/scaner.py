@@ -387,10 +387,7 @@ class ImgLoader(ScanerParent):
 				folder = os.path.dirname(rel_path)
 				if folder not in wanted_dirs:
 					continue
-				abs_img_path = Utils.add_mf_path(
-					mf_path=scaner.mf.mf_paths[0],
-					rel_path=rel_path
-				)
+				abs_img_path = scaner.mf.create_abs_path(rel_path)
 				db_images.append(
 					ImgItem(abs_img_path, size, mod, rel_thumb_path)
 				)

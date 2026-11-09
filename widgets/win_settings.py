@@ -696,7 +696,7 @@ class IgnoreListWin(UMainWindow):
 		"""Перерисовывает список по черновику; при пустом списке показывает заглушку поверх него."""
 		self.v_list_widget.clear()
 		for path in self.draft_stop_list:
-			p = Utils.add_mf_path(self.mf.mf_paths[0], path)
+			p = self.mf.create_abs_path(path)
 			item = UListWidgetItem(parent=self.v_list_widget, text=p)
 			item.setToolTip(p)
 			self.v_list_widget.addItem(item)

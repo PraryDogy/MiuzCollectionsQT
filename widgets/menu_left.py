@@ -22,7 +22,7 @@ class MenuLeftTreeWidgetItem(UTreeWidgetItem):
 	def __init__(self, parent, text, rel_path: str):
 		super().__init__(parent, text)
 		self.rel_path = rel_path
-		self.abs_path = Utils.add_mf_path(Mf.current_mf.mf_paths[0], rel_path)
+		self.abs_path = Mf.current_mf.create_abs_path(rel_path)
 
 
 class MenuLeftTreeWidget(UTreeWidget):

@@ -97,6 +97,15 @@ class Mf:
 		for d in data:
 			cls.items.append(Mf(**d))
 
+	def create_abs_path(self, rel_path: str) -> str:
+		return os.path.join(self.mf_paths[0], rel_path.lstrip(os.sep))
+
+	def create_rel_path(self, abs_path: str) -> str:
+		rel = os.path.relpath(abs_path, self.mf_paths[0])
+		if rel == os.curdir:
+			return os.sep
+		return os.sep + rel
+
 	def is_root_alive(self):
 		return os.path.exists(self.mf_paths[0])
 	
