@@ -19,9 +19,10 @@ from ._base_widgets import (TransparentFrame, TransparentLabel,
 
 
 class MenuLeftTreeWidgetItem(UTreeWidgetItem):
-	def __init__(self, parent, text, path):
+	def __init__(self, parent, text, rel_path: str):
 		super().__init__(parent, text)
-		self.path = path
+		self.rel_path = rel_path
+		self.abs_path = Utils.add_mf_path(Mf.current_mf.mf_paths[0], rel_path)
 
 
 class MenuLeftTreeWidget(UTreeWidget):
@@ -40,7 +41,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 		super().__init__()
 		self.itemClicked.connect(self.on_item_click)
 		self.verticalScrollBar().valueChanged.connect(self.on_scroll_changed)
-		self.abs_selected_path: str = os.sep
+		self.rel_selected_path: str = os.sep
 		self.items: dict[str, MenuLeftTreeWidgetItem] = {}
 		self.stop_paths: set[str] = set()
 		self.root_item: MenuLeftTreeWidgetItem | None = None
@@ -129,7 +130,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 				stack.append(path)
 
 		root.setExpanded(True)
-		self.expand_to_path(self.abs_selected_path)
+		self.expand_to_path(self.rel_selected_path)
 		self._refresh_geometry()
 
 	def _refresh_geometry(self):
@@ -138,11 +139,11 @@ class MenuLeftTreeWidget(UTreeWidget):
 		self.updateGeometry()
 		self.viewport().update()
 
-	def expand_to_path(self, path: str):
-		item = self.items.get(path)
+	def expand_to_path(self, rel_path: str):
+		item = self.items.get(rel_path)
 		if item is None:
 			return
-		self.abs_selected_path = path
+		self.rel_selected_path = rel_path
 		parent = item.parent()
 		while parent:
 			parent.setExpanded(True)
@@ -152,15 +153,11 @@ class MenuLeftTreeWidget(UTreeWidget):
 		self.scrollToItem(item, UTreeWidget.ScrollHint.PositionAtCenter)
 
 	def on_item_click(self, item: MenuLeftTreeWidgetItem, col: int):
-		abs_path = item.path
-		if abs_path == self.abs_selected_path:
+		rel_path = item.rel_path
+		if rel_path == self.rel_selected_path:
 			return
-		self.abs_selected_path = abs_path
-		self.on_tree_clicked.emit(abs_path)
-
-	def _to_abs(self, rel_path: str) -> str:
-		"""Абсолютный путь из относительного: /subfolder -> /Volumes/Shares/My Folder/subfolder."""
-		return os.path.join(Mf.current_mf.mf_paths[0], rel_path.lstrip(os.sep))
+		self.rel_selected_path = rel_path
+		self.on_tree_clicked.emit(rel_path)
 
 	def contextMenuEvent(self, a0):
 
@@ -204,14 +201,14 @@ class MenuLeftTreeWidget(UTreeWidget):
 
 		rel_path = os.sep
 		if item:
-			rel_path = item.path  # уже относительный, как в mf_stop_list
-			self.abs_selected_path = rel_path
+			rel_path = item.rel_path  # относительный, как в mf_stop_list
+			self.rel_selected_path = rel_path
 			view = QAction(Lng.open, menu)
-			view.triggered.connect(lambda: self.on_tree_clicked.emit(self.abs_selected_path))
+			view.triggered.connect(lambda: self.on_tree_clicked.emit(self.rel_selected_path))
 			menu.addAction(view)
 			menu.addSeparator()
 
-		if self.abs_selected_path == os.sep:
+		if self.rel_selected_path == os.sep:
 			update = QAction(Lng.update_grid, menu)
 			update.triggered.connect(self.init_ui)
 			menu.addAction(update)
@@ -239,11 +236,11 @@ class MenuLeftTreeWidget(UTreeWidget):
 		menu.addSeparator()
 
 		copy_path = QAction(Lng.copy_dirpath, menu)
-		copy_path.triggered.connect(lambda: self.copy_path.emit([rel_path]))
+		copy_path.triggered.connect(lambda: self.copy_path.emit([item.abs_path, ]))
 		menu.addAction(copy_path)
 
 		reveal = QAction(Lng.reveal_in_finder, menu)
-		reveal.triggered.connect(lambda: self.reveal.emit([rel_path]))
+		reveal.triggered.connect(lambda: self.reveal.emit([item.abs_path, ]))
 		menu.addAction(reveal)
 
 		# корень Mf нельзя добавить в стоп-лист
@@ -280,7 +277,7 @@ class MenuLeft(TransparentFrame):
 		self.tree_wid = MenuLeftTreeWidget()
 		v_lay.addWidget(self.tree_wid)
 		self.tree_wid.reveal.connect(
-			lambda rel_paths: self.reveal.emit(rel_paths)
+			lambda abs_paths: self.reveal.emit(abs_paths)
 		)
 		self.tree_wid.on_tree_clicked.connect(
 			lambda rel_path: self.on_tree_clicked.emit(rel_path)
@@ -289,7 +286,7 @@ class MenuLeft(TransparentFrame):
 			lambda: self.on_hide_digits_clicked.emit()
 		)
 		self.tree_wid.copy_path.connect(
-			lambda rel_paths: self.copy_path.emit(rel_paths)
+			lambda abs_paths: self.copy_path.emit(abs_paths)
 		)
 		self.tree_wid.removed_from_stop_list.connect(
 			lambda: self.removed_from_stop_list.emit()

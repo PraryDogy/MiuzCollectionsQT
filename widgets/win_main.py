@@ -177,7 +177,7 @@ class WinMain(UMainWindow):
 			lambda abs_paths: self.reveal_in_finder(abs_paths)
 		)
 		self.left_menu.on_tree_clicked.connect(
-			lambda abs_path: self.on_tree_clicked(abs_path)
+			lambda rel_path: self.on_tree_clicked(rel_path)
 		)
 		self.left_menu.on_mf_clicked.connect(
 			lambda mf: self.on_mf_clicked(mf)
