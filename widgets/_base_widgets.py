@@ -1617,6 +1617,10 @@ class MfPathWidget(UGroupBox):
 
 		self.v_lay.addWidget(USep())
 
+		descr_label = GrayTextLabel(Lng.catalog_path_descr)
+		descr_label.setWordWrap(True)
+		self.v_lay.addWidget(descr_label)
+
 		# строка статуса: иконка слева, описание пути справа
 		self.status_widget = QWidget()
 		self.status_layout = QHBoxLayout(self.status_widget)
@@ -1627,7 +1631,7 @@ class MfPathWidget(UGroupBox):
 		self.status_icon.setFixedSize(16, 16)
 		self.status_layout.addWidget(self.status_icon, 0, Qt.AlignmentFlag.AlignTop)
 
-		self.path_label = GrayTextLabel("")
+		self.path_label = TransparentLabel("")
 		self.path_label.setWordWrap(True)
 		self.path_label.set_elide(True)
 		self.status_layout.addWidget(self.path_label, 1)

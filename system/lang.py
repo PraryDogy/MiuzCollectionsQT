@@ -686,3 +686,7 @@ class Lng:
 		"Игнор лист",
 		"Ignore list"
 	)
+	catalog_path_descr = (
+		"Если каталог не найден, укажите его кнопкой «Найти каталог» или перетащите каталог сюда.",
+		"If the catalog is not found, select it with «Find catalog» or drag a catalog here.",
+	)
