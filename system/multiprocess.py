@@ -425,7 +425,7 @@ class MfRemover:
 			res = conn.execute(stmt).scalars().all()
 
 			for rel_thumb_path in res:
-				abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+				abs_thumb_path = Mf.get_abs_thumb_path(rel_thumb_path)
 				try:
 					os.remove(abs_thumb_path)
 				except (Exception, FileNotFoundError) as e:
@@ -500,10 +500,8 @@ class UpdateThumb:
 			
 			for rel_img_path in chunk_rel_img_paths:
 				abs_img_path = mf.create_abs_path(rel_img_path)
-				abs_thumb_path = Utils.create_abs_thumb_path(
-					rel_img_path, mf.mf_alias
-				)
-				rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+				abs_thumb_path = mf.create_abs_thumb_path(rel_img_path)
+				rel_thumb_path = Mf.get_rel_thumb_path(abs_thumb_path)
 				
 				thumb = _write_thumb(abs_img_path, abs_thumb_path)
 				if thumb is not None:

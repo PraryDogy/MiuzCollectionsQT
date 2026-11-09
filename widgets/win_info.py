@@ -67,7 +67,7 @@ class ImageWidget(TransparentLabel):
 		self.thumb_path = self.get_thumb_path()
 
 	def get_thumb_path(self):
-		return Utils.create_abs_thumb_path(self.data_item.rel_path, Mf.current_mf.mf_alias)
+		return Mf.current_mf.create_abs_thumb_path(self.data_item.rel_path)
 
 	def open_thumb(self, reveal: bool):
 		if reveal:

@@ -179,7 +179,7 @@ class DbImagesLoader(URunnable):
 		size = Static.THUMB_WIDTHS[ind]
 
 		for rel_img_path, rel_thumb_path, mod, fav in res:
-			abs_thumb_path_ = Utils.get_abs_thumb_path(rel_thumb_path)
+			abs_thumb_path_ = Mf.get_abs_thumb_path(rel_thumb_path)
 
 			# cv2.imread вернёт None, если файла нет или он не читается
 			img_bgr = cv2.imread(abs_thumb_path_)
@@ -384,7 +384,7 @@ class MfDataCleaner(URunnable):
 	def get_non_exist_rel_paths(self, rel_paths: list[str]):
 		non_exist_thumbs = []
 		for i in rel_paths:
-			abs_thumb_path = Utils.get_abs_thumb_path(i)
+			abs_thumb_path = Mf.get_abs_thumb_path(i)
 			if not os.path.exists(abs_thumb_path):
 				non_exist_thumbs.append(i)
 		return non_exist_thumbs
@@ -463,9 +463,9 @@ class HashDirSize(URunnable):
 				)
 				rel_thumb_paths = conn.execute(stmt).scalars().all()
 				size = sum([
-					os.path.getsize(Utils.get_abs_thumb_path(x))
+					os.path.getsize(Mf.get_abs_thumb_path(x))
 					for x in rel_thumb_paths
-					if os.path.exists(Utils.get_abs_thumb_path(x))
+					if os.path.exists(Mf.get_abs_thumb_path(x))
 				])
 				item = HashDirSizeItem(
 					mf=mf,
@@ -656,7 +656,7 @@ class ImageSearcher(URunnable):
 				print("индексация гистограмм остановлена")
 				return
 			self.current_count += 1
-			abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+			abs_thumb_path = Mf.get_abs_thumb_path(rel_thumb_path)
 			hist = self.calc_hist(abs_thumb_path)
 			bytes_hist = hist.tobytes()
 			self.thumbs_with_hist.append((id_, rel_thumb_path, hist))
@@ -719,7 +719,7 @@ class WriteNewThumb(URunnable):
 		self.rel_thumb_path = rel_thumb_path
 
 	def task(self):
-		abs_path = Utils.get_abs_thumb_path(self.rel_thumb_path)
+		abs_path = Mf.get_abs_thumb_path(self.rel_thumb_path)
 		scaled = ImgUtils.fit_to_thumb(self.img_array, Static.THUMB_MAX_SIZE)
 		result = ImgUtils.write_thumb(abs_path, scaled)
 		if result:

@@ -1,5 +1,7 @@
+import hashlib
 import json
 import os
+from pathlib import Path
 from typing import get_type_hints
 
 from cfg import Static
@@ -105,6 +107,27 @@ class Mf:
 		if rel == os.curdir:
 			return os.sep
 		return os.sep + rel
+
+	def create_abs_thumb_path(self, rel_img_path: str) -> str:
+		clean_rel_path = rel_img_path.strip(os.sep)
+		encoded = clean_rel_path.encode('utf-8')
+		filename = hashlib.md5(encoded).hexdigest() + ".jpg"
+		folder_name = f"{self.mf_alias}-{filename[:2]}"
+		new_folder = Static.HASHDIR / folder_name
+		new_folder.mkdir(parents=True, exist_ok=True)
+		return str(new_folder / filename)
+
+	@classmethod
+	def get_rel_thumb_path(cls, abs_thumb_path: str):
+		p_base = Path(str(Static.APP_DATA_DIR).strip(os.sep))
+		p_abs = Path(abs_thumb_path.strip(os.sep))
+		if p_abs.is_relative_to(p_base):
+			return os.sep + str(p_abs.relative_to(p_base))
+
+	@classmethod
+	def get_abs_thumb_path(cls, rel_thumb_path: str):
+		rel_thumb_path = Path(rel_thumb_path.strip(os.sep))
+		return Static.APP_DATA_DIR / rel_thumb_path
 
 	def is_root_alive(self):
 		return os.path.exists(self.mf_paths[0])

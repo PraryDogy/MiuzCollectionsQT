@@ -265,10 +265,7 @@ class DirsLoader(ScanerParent):
 						print(traceback.format_exc())
 						continue
 
-					rel_path = Utils.remove_mf_path(
-						mf_path=root,
-						abs_path=entry.path
-					)
+					rel_path = self.scaner_item.mf.create_rel_path(entry.path)
 
 					if stop.contains(rel_path):
 						dirs.append(DirItem(entry.path, rel_path, StopList.MOD))
@@ -469,7 +466,7 @@ class ThumbsUpdater(ScanerParent):
 		def _remove_thumb(img_item: ImgItem) -> bool:
 			scaner.current_count += 1
 			scaner.process_queue.put(self._progress())
-			abs_thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
+			abs_thumb_path = Mf.get_abs_thumb_path(img_item.rel_thumb_path)
 			try:
 				os.remove(abs_thumb_path)
 			except FileNotFoundError:
@@ -516,15 +513,9 @@ class ThumbsUpdater(ScanerParent):
 
 				values_list = []
 				for img_item in good_chunk:
-					rel_img_path = Utils.remove_mf_path(
-						mf_path=scaner.mf.mf_paths[0],
-						abs_path=img_item.abs_img_path
-					)
-					abs_thumb_path = Utils.create_abs_thumb_path(
-						rel_img_path=rel_img_path,
-						mf_alias=scaner.mf.mf_alias
-					)
-					rel_thumb_path = Utils.get_rel_thumb_path(abs_thumb_path)
+					rel_img_path = self.scaner_item.mf.create_rel_path(img_item.abs_img_path)
+					abs_thumb_path = self.scaner_item.mf.create_abs_thumb_path(rel_img_path)
+					rel_thumb_path = Mf.get_rel_thumb_path(abs_thumb_path)
 					root = os.path.dirname(rel_img_path)
 					values_list.append({
 						Thumbs.rel_img_path.name: rel_img_path,
@@ -545,14 +536,8 @@ class ThumbsUpdater(ScanerParent):
 			scaner.process_queue.put(self._progress())
 			img = ImgUtils.read_img(img_item.abs_img_path)
 			img = ImgUtils.fit_to_thumb(img, Static.THUMB_MAX_SIZE)
-			rel_img_path = Utils.remove_mf_path(
-				mf_path=scaner.mf.mf_paths[0],
-				abs_path=img_item.abs_img_path
-			)
-			thumb_path = Utils.create_abs_thumb_path(
-				rel_img_path=rel_img_path,
-				mf_alias=scaner.mf.mf_alias
-			)
+			rel_img_path = scaner.mf.create_rel_path(img_item.abs_img_path)
+			thumb_path = scaner.mf.create_abs_thumb_path(rel_img_path)
 			return bool(ImgUtils.write_thumb(thumb_path, img))
 
 		step = 10
@@ -630,7 +615,7 @@ class RemovedDirsCleaner(ScanerParent):
 			return conn.execute(stmt).scalars().all()
 
 		def _remove_file(rel_thumb_path: str):
-			abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
+			abs_thumb_path = Mf.get_abs_thumb_path(rel_thumb_path)
 			try:
 				os.remove(abs_thumb_path)
 			except FileNotFoundError:
@@ -810,7 +795,7 @@ class ForcedScaner:
 		stop = StopList(mf.mf_stop_list)
 		dir_items: list[DirItem] = []
 		for abs_path in dirs_to_scan:
-			rel_path = Utils.remove_mf_path(mf.mf_paths[0], abs_path)
+			rel_path = mf.create_rel_path(abs_path)
 			if stop.contains(rel_path):
 				continue
 			try:
