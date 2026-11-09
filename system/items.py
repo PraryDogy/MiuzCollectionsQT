@@ -16,6 +16,7 @@ class DataItem:
 	resized_qimages: list[QImage]
 	rel_thumb_path: str
 	rel_path: str
+	abs_path: str
 	fav: bool
 	day_month_year: str
 	hour_min_sec: str

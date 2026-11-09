@@ -1077,7 +1077,7 @@ class WinSettings(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.settings)
-		self.setMinimumSize(730, 600)
+		self.setFixedSize(700, 670)
 
 		self.settings_item = settings_item
 		self.current_page = None

@@ -160,7 +160,7 @@ class Thumb(TransparentFrame):
 
 		ext = f"{Lng.type_}: {self.data_item.ext}"
 		filename = f"{Lng.file_name}: {self.data_item.filename}"
-		location = f"{Lng.location}: {Mf.current_mf.mf_paths[0]}{self.data_item.rel_path}"
+		location = f"{Lng.location}: {self.data_item.abs_path}"
 		modified = f"{Lng.modified}: {self.data_item.day_month_year} {self.data_item.hour_min_sec}"
 		self.setToolTip("\n".join([ext, filename, location, modified]))
 
@@ -1443,6 +1443,7 @@ class GridStandart(Grid):
 					resized_qimages=image_item.resized_qimages,
 					rel_thumb_path=image_item.rel_thumb_path,
 					rel_path=image_item.rel_img_path,
+					abs_path=image_item.abs_img_path,
 					fav=image_item.fav,
 					day_month_year=image_item.day_month_year,
 					hour_min_sec=image_item.hour_min_sec,
