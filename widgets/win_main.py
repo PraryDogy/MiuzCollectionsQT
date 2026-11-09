@@ -177,7 +177,7 @@ class WinMain(UMainWindow):
 			lambda abs_paths: self.reveal_in_finder(abs_paths)
 		)
 		self.left_menu.on_tree_clicked.connect(
-			lambda rel_path: self.on_tree_clicked(rel_path)
+			lambda data: self.on_tree_clicked(data)
 		)
 		self.left_menu.on_mf_clicked.connect(
 			lambda mf: self.on_mf_clicked(mf)
@@ -222,7 +222,7 @@ class WinMain(UMainWindow):
 			self.bar_bottom.progress_widget.reset()
 			self.bar_bottom.progress_widget.setText("СКАНЕР ВЫКЛЮЧЕН")
 
-		self.path_bar_update("")
+		self.path_bar_update(Mf.current_mf.mf_paths[0])
 
 	@staticmethod
 	def with_conn(fn: callable):
@@ -278,7 +278,7 @@ class WinMain(UMainWindow):
 		self.win_img_search.raise_()
 		self.win_img_search.activateWindow()
 
-	def show_in_app(self, rel_path: str):
+	def go_to_thumbnail(self, rel_path: str):
 		current_dir = os.path.dirname(rel_path)
 		Dynamic.current_dir = current_dir
 		self.go_to_url = rel_path
@@ -286,8 +286,7 @@ class WinMain(UMainWindow):
 		self.left_menu.tree_wid.expand_to_path(current_dir)
 
 	def path_bar_update(self, abs_path: str):
-		dir = os.path.dirname(abs_path)
-		self.bar_bottom.bar_path.update_path(dir)
+		self.bar_bottom.bar_path.update_path(abs_path)
 
 	def on_hide_digits_clicked(self):
 		self.win_warn = WarningWindow(Lng.hide_digits_full)
@@ -315,7 +314,7 @@ class WinMain(UMainWindow):
 	def on_mf_clicked(self, mf: Mf):
 		Mf.current_mf = mf
 		Dynamic.current_dir = os.sep
-		self.path_bar_update(Dynamic.current_dir)
+		self.path_bar_update(Mf.current_mf.mf_paths[0])
 		self.left_menu.tree_wid.abs_selected_path = os.sep
 		self.left_menu.tree_wid.init_ui()
 		self.load_st_grid()
@@ -325,10 +324,11 @@ class WinMain(UMainWindow):
 			self.open_win_smb(mf)
 
 	@with_conn
-	def on_tree_clicked(self, rel_path: str):
+	def on_tree_clicked(self, data: tuple):
+		abs_path, rel_path = data
 		Dynamic.current_dir = rel_path
 		self.load_st_grid()
-		self.path_bar_update(Dynamic.current_dir)
+		self.path_bar_update(abs_path)
 
 	def _on_thumb_ready(self, rel_img_path: str, base_qimage, resized_qimages):
 		wid = self.grid.url_to_wid.get(rel_img_path)
@@ -541,13 +541,13 @@ class WinMain(UMainWindow):
 			lambda item: self.open_settings_win(item)
 		)
 		self.grid.path_bar_update.connect(
-			lambda rel_path: self.path_bar_update(rel_path)
+			lambda abs_path: self.path_bar_update(abs_path)
 		)
 		self.grid.update_thumb.connect(
 			lambda rel_paths: self.start_update_thumb(rel_paths)
 		)
 		self.grid.show_in_app.connect(
-			self.show_in_app
+			self.go_to_thumbnail
 		)
 		self.grid.finished_.connect(
 			finished

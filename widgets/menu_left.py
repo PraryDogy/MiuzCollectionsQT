@@ -30,7 +30,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 	removed_from_stop_list = pyqtSignal()
 	reveal = pyqtSignal(list)
 	copy_path = pyqtSignal(list)
-	on_tree_clicked = pyqtSignal(str)
+	on_tree_clicked = pyqtSignal(tuple)
 	on_hide_digits_clicked = pyqtSignal()
 	on_scroll_changed = pyqtSignal(int)
 
@@ -42,6 +42,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 		self.itemClicked.connect(self.on_item_click)
 		self.verticalScrollBar().valueChanged.connect(self.on_scroll_changed)
 		self.rel_selected_path: str = os.sep
+		self.abs_selected_path: str = os.sep
 		self.items: dict[str, MenuLeftTreeWidgetItem] = {}
 		self.stop_paths: set[str] = set()
 		self.root_item: MenuLeftTreeWidgetItem | None = None
@@ -144,6 +145,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 		if item is None:
 			return
 		self.rel_selected_path = rel_path
+		self.abs_selected_path = item.abs_path
 		parent = item.parent()
 		while parent:
 			parent.setExpanded(True)
@@ -157,7 +159,8 @@ class MenuLeftTreeWidget(UTreeWidget):
 		if rel_path == self.rel_selected_path:
 			return
 		self.rel_selected_path = rel_path
-		self.on_tree_clicked.emit(rel_path)
+		self.abs_selected_path = item.abs_path
+		self.on_tree_clicked.emit((item.abs_path, item.rel_path))
 
 	def contextMenuEvent(self, a0):
 
@@ -184,7 +187,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 				return
 			Mf.current_mf.mf_stop_list.append(rel_path)
 			Mf.write_json_data()
-			self.on_tree_clicked.emit(rel_path)
+			self.on_tree_clicked.emit((item.abs_path, item.rel_path))
 			self._rebuild()
 
 		def rem_stop_list_cmd():
@@ -192,7 +195,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 				Mf.current_mf.mf_stop_list.remove(rel_path)
 				Mf.write_json_data()
 				print("папка удалена из игнор листа")
-			self.on_tree_clicked.emit(rel_path)
+			self.on_tree_clicked.emit((item.abs_path, item.rel_path))
 			self.removed_from_stop_list.emit()
 			self._rebuild()
 
@@ -203,8 +206,11 @@ class MenuLeftTreeWidget(UTreeWidget):
 		if item:
 			rel_path = item.rel_path  # относительный, как в mf_stop_list
 			self.rel_selected_path = rel_path
+			self.abs_selected_path = item.abs_path
 			view = QAction(Lng.open, menu)
-			view.triggered.connect(lambda: self.on_tree_clicked.emit(self.rel_selected_path))
+			view.triggered.connect(
+				lambda: self.on_tree_clicked.emit((self.abs_selected_path, self.rel_selected_path))
+			)
 			menu.addAction(view)
 			menu.addSeparator()
 
@@ -259,7 +265,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 
 
 class MenuLeft(TransparentFrame):
-	on_tree_clicked = pyqtSignal(str)
+	on_tree_clicked = pyqtSignal(tuple)
 	on_mf_clicked = pyqtSignal(Mf)
 	reveal = pyqtSignal(list)
 	copy_path = pyqtSignal(list)
@@ -280,7 +286,7 @@ class MenuLeft(TransparentFrame):
 			lambda abs_paths: self.reveal.emit(abs_paths)
 		)
 		self.tree_wid.on_tree_clicked.connect(
-			lambda rel_path: self.on_tree_clicked.emit(rel_path)
+			lambda data: self.on_tree_clicked.emit(data)
 		)
 		self.tree_wid.on_hide_digits_clicked.connect(
 			lambda: self.on_hide_digits_clicked.emit()
