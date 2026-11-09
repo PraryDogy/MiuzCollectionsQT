@@ -76,7 +76,7 @@ class PathBar(TransparentWidget):
 		self.h_layout.setSpacing(5)
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-	def update(self, dir: str, last_item_limit=40):
+	def update_path(self, dir: str, last_item_limit=40):
 		"""
 		Отобразить новый путь сетки / папки / файла
 		src: путь сетки / папки / файла

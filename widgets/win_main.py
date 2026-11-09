@@ -291,8 +291,8 @@ class WinMain(UMainWindow):
 		self.left_menu.tree_wid.expand_to_path(current_dir)
 
 	def path_bar_update(self, path: str):
-		dir = f"/{Mf.current_mf.mf_alias}{path}"
-		self.bar_bottom.bar_path.update(dir)
+		dir = f"/{Mf.current_mf.mf_paths[0]}{path}"
+		self.bar_bottom.bar_path.update_path(dir)
 
 	def on_hide_digits_clicked(self):
 		self.win_warn = WarningWindow(Lng.hide_digits_full)
