@@ -1115,7 +1115,7 @@ class WinSettings(UMainWindow):
 		self.left_menu.addItem(main_settings_item)
 
 		spacer = UListSpacerItem(self.left_menu)
-		self.left_menu.addItem(spacer)
+		# self.left_menu.addItem(spacer)
 
 		for i in Mf.items:
 			new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
