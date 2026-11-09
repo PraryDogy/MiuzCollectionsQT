@@ -294,7 +294,7 @@ class WinImageView(UMainWindow):
 		pixmap = QPixmap.fromImage(qimage)
 		self.restart_img_wid(pixmap)
 
-		avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
+		avaiable_mf_path = Mf.current_mf.is_root_alive()
 		if avaiable_mf_path:
 			abs_path = Utils.add_mf_path(
 				avaiable_mf_path,

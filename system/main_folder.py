@@ -97,7 +97,7 @@ class Mf:
 		for d in data:
 			cls.items.append(Mf(**d))
 
-	def get_avaiable_mf_path(self):
+	def is_root_alive(self):
 		return os.path.exists(self.mf_paths[0])
 	
 	def get_data(self):

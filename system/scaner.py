@@ -46,6 +46,10 @@ class ScanProgress:
 	total: int = 0
 
 
+class ScanIncomplete(Exception):
+	"""Сбор данных прерван: корень недоступен, результат неполный и не должен использоваться."""
+
+
 class ScanerWorker(BaseProcessWorker):
 	def __init__(self, target: callable, args: tuple):
 		self.process_queue = Queue()
@@ -230,48 +234,55 @@ class DirsLoader(ScanerParent):
 		Собирает список директорий:
 		- стоп-папка записывается в список с mod = StopList.MOD, внутрь не заходим
 		- её подпапки и изображения не попадают в список вообще
+		- если недоступен сам корень, поднимает ScanIncomplete
 		"""
 		scaner = self.scaner_item
+		root = scaner.mf.mf_paths[0]
 
 		scaner.process_queue.put(ScanProgress("search_dirs", scaner.mf.mf_alias))
 
 		stop = StopList(scaner.mf.mf_stop_list)
 		dirs: list[DirItem] = []
-		stack = [scaner.mf.mf_paths[0]]
+		stack = [root]
 
 		while stack:
+			path = stack.pop()
 			try:
-				scandir_iterator = os.scandir(stack.pop())
-			except Exception:
+				scandir_iterator = os.scandir(path)
+			except OSError:
+				# ошибка на корне = диск пропал, список неполный
+				if path == root:
+					raise ScanIncomplete(root)
 				print(traceback.format_exc())
 				continue
 
-			for entry in scandir_iterator:
-				try:
-					if not entry.is_dir():
+			with scandir_iterator:
+				for entry in scandir_iterator:
+					try:
+						if not entry.is_dir():
+							continue
+					except OSError:
+						print(traceback.format_exc())
 						continue
-				except Exception:
-					print(traceback.format_exc())
-					continue
 
-				rel_path = Utils.remove_mf_path(
-					mf_path=scaner.mf.mf_paths[0],
-					abs_path=entry.path
-				)
+					rel_path = Utils.remove_mf_path(
+						mf_path=root,
+						abs_path=entry.path
+					)
 
-				if stop.contains(rel_path):
-					dirs.append(DirItem(entry.path, rel_path, StopList.MOD))
-					continue
+					if stop.contains(rel_path):
+						dirs.append(DirItem(entry.path, rel_path, StopList.MOD))
+						continue
 
-				stack.append(entry.path)
-				mod = int(entry.stat().st_mtime)
-				dirs.append(DirItem(entry.path, rel_path, mod))
+					stack.append(entry.path)
+					mod = int(entry.stat().st_mtime)
+					dirs.append(DirItem(entry.path, rel_path, mod))
 
 		try:
-			stats = os.stat(scaner.mf.mf_paths[0])
-			dirs.append(DirItem(scaner.mf.mf_paths[0], os.sep, int(stats.st_mtime)))
-		except Exception:
-			print(traceback.format_exc())
+			stats = os.stat(root)
+		except OSError:
+			raise ScanIncomplete(root)
+		dirs.append(DirItem(root, os.sep, int(stats.st_mtime)))
 
 		return dirs
 
@@ -283,12 +294,12 @@ class DirsDbUpdater(ScanerParent):
 
 	def upsert_records(self):
 		"""
-		Запускать в самом конце сканирования, когда обновлена таблица Thumbs
-		и произведена работа с миниатюрами в `hashdir`.
+		Записывает папки в Dirs одной транзакцией.
+		Проверка корня стоит до DELETE, поэтому при отказе откатываются оба шага.
 		"""
 		scaner = self.scaner_item
-
-		if not os.path.exists(scaner.mf.mf_paths[0]):
+		if not scaner.mf.is_root_alive():
+			print("root lost, skip Dirs update", scaner.mf.mf_alias)
 			return
 
 		with scaner.engine.begin() as conn:
@@ -321,29 +332,34 @@ class ImgLoader(ScanerParent):
 	def get_finder_images(self) -> list[ImgItem]:
 		"""
 		Собирает список `ImgItem` из указанных директорий.
+		Если недоступен корень, поднимает ScanIncomplete.
+		Ошибка отдельной папки при живом корне пропускается.
 		"""
+		root = self.scaner_item.mf.mf_paths[0]
 		finder_images: list[ImgItem] = []
 
 		for dir_item in self.dirs_to_scan:
 			try:
 				scandir_iterator = os.scandir(dir_item.abs_path)
-			except Exception:
+			except OSError:
+				if not os.path.isdir(root):
+					raise ScanIncomplete(root)
 				print(traceback.format_exc())
 				continue
 
-			for entry in scandir_iterator:
-				if entry.path.endswith(ImgUtils.ext_all):
+			with scandir_iterator:
+				for entry in scandir_iterator:
+					if not entry.path.endswith(ImgUtils.ext_all):
+						continue
 					try:
 						stat = entry.stat()
-					except Exception:
+					except OSError:
 						print(traceback.format_exc())
 						continue
 
 					size = int(stat.st_size)
 					mod = int(stat.st_mtime)
-
-					img_item = ImgItem(entry.path, size, mod)
-					finder_images.append(img_item)
+					finder_images.append(ImgItem(entry.path, size, mod))
 
 		return finder_images
 
@@ -436,10 +452,8 @@ class ThumbsUpdater(ScanerParent):
 
 	def del_thumbs(self):
 		"""
-		Удаляет миниатюры и соответствующие записи из БД пакетами по 10.
-
-		Перед каждым пакетом проверяет доступность источника (Mf) и
-		прерывается при его недоступности.
+		Удаляет миниатюры и записи из БД пакетами по 10.
+		Перед каждым пакетом проверяет доступность корня и прерывается, если он пропал.
 		"""
 		scaner = self.scaner_item
 
@@ -455,33 +469,30 @@ class ThumbsUpdater(ScanerParent):
 				)
 				conn.execute(stmt)
 
-		def _remove_thumb(img_item: ImgItem):
+		def _remove_thumb(img_item: ImgItem) -> bool:
 			scaner.current_count += 1
 			scaner.process_queue.put(self._progress())
-			abs_thumb_path = Utils.get_abs_thumb_path(
-				img_item.rel_thumb_path
-			)
+			abs_thumb_path = Utils.get_abs_thumb_path(img_item.rel_thumb_path)
 			try:
 				os.remove(abs_thumb_path)
-				try:
-					os.rmdir(os.path.dirname(abs_thumb_path))
-				except OSError:
-					pass
+			except FileNotFoundError:
 				return True
 			except Exception:
 				print(traceback.format_exc())
 				return False
+			try:
+				os.rmdir(os.path.dirname(abs_thumb_path))
+			except OSError:
+				pass
+			return True
 
 		step = 10
-		chunked_del_images = [
-			self.removed_images[i:i+step]
-			for i in range(0, len(self.removed_images), step)
-		]
-		for chunk in chunked_del_images:
-			if not os.path.exists(scaner.mf.mf_paths[0]):
-				break
+		for i in range(0, len(self.removed_images), step):
+			if not scaner.mf.is_root_alive():
+				print("root lost, stop thumbs deletion", scaner.mf.mf_alias)
+				return
 			good_chunk: list[ImgItem] = []
-			for img_item in chunk:
+			for img_item in self.removed_images[i:i + step]:
 				if _remove_thumb(img_item):
 					good_chunk.append(img_item)
 			if good_chunk:
@@ -489,10 +500,8 @@ class ThumbsUpdater(ScanerParent):
 
 	def add_thumbs(self):
 		"""
-		Создает миниатюры и соответствующие записи из БД пакетами по 10.
-
-		Перед каждым пакетом проверяет доступность источника (Mf) и
-		прерывается при его недоступности.
+		Создаёт миниатюры и записи в БД пакетами по 10.
+		Перед каждым пакетом проверяет доступность корня.
 		"""
 		scaner = self.scaner_item
 
@@ -534,10 +543,7 @@ class ThumbsUpdater(ScanerParent):
 				stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
 				conn.execute(stmt)
 
-		def _create_thumb(img_item: ImgItem):
-			"""
-			Создает и записывает в `hashdir` миниатюру.
-			"""
+		def _create_thumb(img_item: ImgItem) -> bool:
 			scaner.current_count += 1
 			scaner.process_queue.put(self._progress())
 			img = ImgUtils.read_img(img_item.abs_img_path)
@@ -550,20 +556,15 @@ class ThumbsUpdater(ScanerParent):
 				rel_img_path=rel_img_path,
 				mf_alias=scaner.mf.mf_alias
 			)
-			if ImgUtils.write_thumb(thumb_path, img):
-				return True
-			return False
+			return bool(ImgUtils.write_thumb(thumb_path, img))
 
 		step = 10
-		chunked_new_images = [
-			self.new_images[i:i+step]
-			for i in range(0, len(self.new_images), step)
-		]
-		for chunk in chunked_new_images:
-			if not os.path.exists(scaner.mf.mf_paths[0]):
-				break
+		for i in range(0, len(self.new_images), step):
+			if not scaner.mf.is_root_alive():
+				print("root lost, stop thumbs creation", scaner.mf.mf_alias)
+				return
 			good_chunk: list[ImgItem] = []
-			for img_item in chunk:
+			for img_item in self.new_images[i:i + step]:
 				if _create_thumb(img_item):
 					good_chunk.append(img_item)
 			if good_chunk:
@@ -577,26 +578,34 @@ class DirImagesUpdater(ScanerParent):
 
 	def start(self):
 		"""
-		Добавляет и удаляет миниатюры в hashdir, затем обновляет таблицы Thumbs и Dirs.
-		Изменения применяются сразу, без подтверждения.
+		Сравнивает изображения выбранных папок с БД и применяет изменения.
+		Если корень пропал во время сбора, ничего не меняет.
 		"""
 		scaner = self.scaner_item
 
-		img_loader = ImgLoader(scaner, self.dirs_to_scan)
-		finder_images = img_loader.get_finder_images()
-		db_images = img_loader.get_db_images()
+		try:
+			finder_images = ImgLoader(scaner, self.dirs_to_scan).get_finder_images()
+		except ScanIncomplete:
+			print("scan incomplete, root lost", scaner.mf.mf_alias)
+			return
+
+		db_images = ImgLoader(scaner, self.dirs_to_scan).get_db_images()
+
+		# диск мог пропасть во время сбора: неполный finder_images нельзя сравнивать
+		if not scaner.mf.is_root_alive():
+			print("root lost before compare, skip", scaner.mf.mf_alias)
+			return
 
 		img_comparator = ImgComparator(scaner, finder_images, db_images)
 		removed_images, new_images = img_comparator.start()
 
 		scaner.total_count = len(removed_images) + len(new_images)
 
-		thumbs_updater = ThumbsUpdater(scaner, removed_images, new_images)
-		thumbs_updater.del_thumbs()
-		thumbs_updater.add_thumbs()
+		ThumbsUpdater(scaner, removed_images, new_images).del_thumbs()
+		ThumbsUpdater(scaner, removed_images, new_images).add_thumbs()
 
-		dirs_updater = DirsDbUpdater(scaner, self.dirs_to_scan)
-		dirs_updater.upsert_records()
+		if scaner.mf.is_root_alive():
+			DirsDbUpdater(scaner, self.dirs_to_scan).upsert_records()
 
 
 class RemovedDirsCleaner(ScanerParent):
@@ -607,24 +616,28 @@ class RemovedDirsCleaner(ScanerParent):
 
 	def remove_thumbs(self):
 		"""
-		Удаляет миниатюры из 'hashdir' и записи в базе данных Thumbs
+		Удаляет миниатюры папок из hashdir и записи Thumbs пакетами по 10.
+		Перед каждым пакетом проверяет доступность корня.
 		"""
 		scaner = self.scaner_item
+		step = 10
 
 		def _get_thumbs(conn: sqlalchemy.Connection, dir_item: DirItem):
 			prefix = Utils.escape_like(dir_item.rel_path)
 			one_slash = f"{prefix}/%"
-			stmt_thumbs_to_remove = (
+			stmt = (
 				sqlalchemy.select(Thumbs.rel_thumb_path)
 				.where(Thumbs.rel_img_path.ilike(one_slash, escape="\\"))
 				.where(Thumbs.mf_alias == scaner.mf.mf_alias)
 			)
-			return conn.execute(stmt_thumbs_to_remove).scalars().all()
+			return conn.execute(stmt).scalars().all()
 
-		def _remove_thumb(rel_thumb_path: str):
+		def _remove_file(rel_thumb_path: str):
 			abs_thumb_path = Utils.get_abs_thumb_path(rel_thumb_path)
 			try:
 				os.remove(abs_thumb_path)
+			except FileNotFoundError:
+				pass
 			except Exception:
 				print(traceback.format_exc())
 			try:
@@ -632,27 +645,28 @@ class RemovedDirsCleaner(ScanerParent):
 			except OSError:
 				pass
 
-		def _remove_records(conn: sqlalchemy.Connection, thumbs_to_remove):
-			del_stmt = (
-				sqlalchemy.delete(Thumbs.table)
-				.where(Thumbs.rel_thumb_path.in_(thumbs_to_remove))
-				.where(Thumbs.mf_alias == scaner.mf.mf_alias)
-			)
-			conn.execute(del_stmt)
-
 		with scaner.engine.begin() as conn:
 			for dir_item in self.removed_dirs:
 				thumbs_to_remove = _get_thumbs(conn, dir_item)
-				if thumbs_to_remove:
-					for rel_thumb_path in thumbs_to_remove:
-						_remove_thumb(rel_thumb_path)
-					_remove_records(conn, thumbs_to_remove)
+				for i in range(0, len(thumbs_to_remove), step):
+					if not scaner.mf.is_root_alive():
+						print("root lost, stop removing thumbs", scaner.mf.mf_alias)
+						return
+					chunk = thumbs_to_remove[i:i + step]
+					for rel_thumb_path in chunk:
+						_remove_file(rel_thumb_path)
+					conn.execute(
+						sqlalchemy.delete(Thumbs.table)
+						.where(Thumbs.rel_thumb_path.in_(chunk))
+						.where(Thumbs.mf_alias == scaner.mf.mf_alias)
+					)
 
 	def remove_dirs(self):
-		"""
-		Удаляет записи в базе данных Dirs
-		"""
+		"""Удаляет записи папок из Dirs."""
 		scaner = self.scaner_item
+		if not scaner.mf.is_root_alive():
+			print("root lost, skip Dirs removal", scaner.mf.mf_alias)
+			return
 
 		with scaner.engine.begin() as conn:
 			for dir_item in self.removed_dirs:
@@ -678,52 +692,62 @@ class BaseScaner:
 				current_count=0,
 				scaner_type="base"
 			)
-			# проверка доступности хранилища: при недоступности записи не трогаем
-			if scaner_item.mf.get_avaiable_mf_path():
+			if mf.is_root_alive():
 				try:
-					print("scaner started", scaner_item.mf.mf_alias)
+					print("scaner started", mf.mf_alias)
 					BaseScaner.single_mf_scan(scaner_item)
-					print("scaner finished", scaner_item.mf.mf_alias)
+					print("scaner finished", mf.mf_alias)
 				except Exception:
 					print(traceback.format_exc())
 					continue
 			else:
 				scaner_item.process_queue.put(
-					ScanProgress("no_connection", scaner_item.mf.mf_alias)
+					ScanProgress("no_connection", mf.mf_alias)
 				)
-				print("no connection", scaner_item.mf.mf_alias)
+				print("no connection", mf.mf_alias)
 				sleep(3)
 		engine.dispose()
 
 	@staticmethod
 	def single_mf_scan(scaner_item: BaseScanerItem):
+		mf = scaner_item.mf
+
 		watcher = DirsChangeWatcher(scaner_item)
 		is_changed, db_dirs = watcher.is_changed()
 		if not is_changed:
-			print(scaner_item.mf.mf_alias, "not changed")
+			print(mf.mf_alias, "not changed")
 			return
 
-		finder_dirs = DirsLoader(scaner_item).get_finder_dirs()
+		try:
+			finder_dirs = DirsLoader(scaner_item).get_finder_dirs()
+		except ScanIncomplete:
+			print("scan incomplete, root lost", mf.mf_alias)
+			return
 		if not finder_dirs:
+			return
+
+		# корень мог пропасть во время обхода: неполный список не сравниваем
+		if not mf.is_root_alive():
+			print("root lost after dirs scan, skip", mf.mf_alias)
 			return
 
 		diff = diff_dirs(finder_dirs, db_dirs)
 
 		# удаление: пропавшие папки и папки, ставшие стоп-папками
 		to_clean = diff.removed + diff.newly_stopped
-		if to_clean:
+		if to_clean and mf.is_root_alive():
 			BaseScaner.log_removed_dirs(scaner_item, finder_dirs, to_clean)
 			cleaner = RemovedDirsCleaner(scaner_item, to_clean)
 			cleaner.remove_thumbs()
 			cleaner.remove_dirs()
 
 		# стоп-папки: только запись mod = 0 в Dirs, изображения не трогаем
-		if diff.stopped:
+		if diff.stopped and mf.is_root_alive():
 			DirsDbUpdater(scaner_item, diff.stopped).upsert_records()
 
 		# добавленные и изменённые: сверяем изображения и обновляем Dirs
 		to_scan = diff.added + diff.changed
-		if to_scan:
+		if to_scan and mf.is_root_alive():
 			DirImagesUpdater(scaner_item, to_scan).start()
 
 	@staticmethod
@@ -772,10 +796,6 @@ class ForcedScaner:
 		"""
 		Сканирует заданные директории в пределах Mf на предмет новых или
 		удаленных изображений. Стоп-папки и их поддерево пропускаются.
-
-		Параметры:
-		- mf: сканируемая директория должна принадлежать определенному Mf
-		- dirs_to_scan: директории, которые нужно просканировать
 		"""
 		engine = Dbase.create_engine()
 		scaner_item = BaseScanerItem(
@@ -786,25 +806,25 @@ class ForcedScaner:
 			current_count=0,
 			scaner_type="forced"
 		)
-		if scaner_item.mf.get_avaiable_mf_path():
-			dir_items: list[DirItem] = []
-			stop = StopList(mf.mf_stop_list)
-			for i in dirs_to_scan:
-				rel_path = Utils.remove_mf_path(mf.mf_paths[0], i)
-				if stop.contains(rel_path):
-					continue
-				try:
-					mod = int(os.stat(i).st_mtime)
-				except Exception:
-					print(traceback.format_exc())
-					continue
-				item = DirItem(
-					abs_path=i,
-					rel_path=rel_path,
-					mod=mod
-				)
-				if item not in dir_items:
-					dir_items.append(item)
-			if dir_items:
-				updater = DirImagesUpdater(scaner_item, dir_items)
-				updater.start()
+		if not mf.is_root_alive():
+			engine.dispose()
+			return
+
+		stop = StopList(mf.mf_stop_list)
+		dir_items: list[DirItem] = []
+		for abs_path in dirs_to_scan:
+			rel_path = Utils.remove_mf_path(mf.mf_paths[0], abs_path)
+			if stop.contains(rel_path):
+				continue
+			try:
+				mod = int(os.stat(abs_path).st_mtime)
+			except OSError:
+				print(traceback.format_exc())
+				continue
+			item = DirItem(abs_path=abs_path, rel_path=rel_path, mod=mod)
+			if item not in dir_items:
+				dir_items.append(item)
+
+		if dir_items:
+			DirImagesUpdater(scaner_item, dir_items).start()
+		engine.dispose()

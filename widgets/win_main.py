@@ -233,7 +233,7 @@ class WinMain(UMainWindow):
 	def with_conn(fn: callable):
 		@functools.wraps(fn)
 		def wrapper(self: "WinMain", *args):
-			avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
+			avaiable_mf_path = Mf.current_mf.is_root_alive()
 			if avaiable_mf_path:
 				return fn(self, *args)
 			self.open_win_smb(Mf.current_mf)
@@ -325,7 +325,7 @@ class WinMain(UMainWindow):
 		self.left_menu.tree_wid.init_ui()
 		self.load_st_grid()
 
-		mf_path = mf.get_avaiable_mf_path()
+		mf_path = mf.is_root_alive()
 		if not mf_path:
 			self.open_win_smb(mf)
 

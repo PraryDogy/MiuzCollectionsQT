@@ -532,9 +532,9 @@ class UpdateThumb:
 class SmbChecker:
 	@staticmethod
 	def start(mf: Mf, queue: Queue):
-		avaiable_path = mf.get_avaiable_mf_path()
+		avaiable_path = mf.is_root_alive()
 		while not avaiable_path:
-			avaiable_path = mf.get_avaiable_mf_path()
+			avaiable_path = mf.is_root_alive()
 			if avaiable_path:
 				queue.put(avaiable_path)
 				break

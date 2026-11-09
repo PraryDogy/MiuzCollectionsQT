@@ -1306,7 +1306,7 @@ class Grid(UScrollVerticalArea):
 
 			# собираем пути выбранных изображений
 			paths = []
-			avaiable_mf_path = Mf.current_mf.get_avaiable_mf_path()
+			avaiable_mf_path = Mf.current_mf.is_root_alive()
 			if avaiable_mf_path:
 				paths = [
 					Utils.add_mf_path(Mf.current_mf.mf_paths[0], wid.data_item.rel_path)
