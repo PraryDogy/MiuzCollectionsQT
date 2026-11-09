@@ -1302,7 +1302,7 @@ class Grid(UScrollVerticalArea):
 			avaiable_mf_path = Mf.current_mf.is_root_alive()
 			if avaiable_mf_path:
 				paths = [
-					Utils.add_mf_path(Mf.current_mf.mf_paths[0], wid.data_item.rel_path)
+					wid.data_item.abs_path
 					for wid in self.selected_widgets
 				]
 

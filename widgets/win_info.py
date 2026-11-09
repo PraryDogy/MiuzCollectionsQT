@@ -109,10 +109,7 @@ class WinInfo(UMainWindow):
 		self.readable_date = ReadableDate(JsonData.lng_index)
 		self.labels: dict[str, WinInfoSelectableLabel] = {}
 		self.data_item = data_item
-		self.abs_path = Utils.add_mf_path(
-			mf_path=Mf.current_mf.mf_paths[0],
-			rel_path=self.data_item.rel_path
-		)
+		self.abs_path = data_item.abs_path
 
 		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(10)

@@ -322,7 +322,7 @@ class WinImageView(UMainWindow):
 				shm = shared_memory.SharedMemory(name=read_img_item.shm_name)
 				img_array = np.ndarray(read_img_item.shape, dtype=np.dtype(read_img_item.dtype), buffer=shm.buf)
 
-				if read_img_item.src == abs_path:
+				if read_img_item.src == self.current_data_item.abs_path:
 					qimage_task = ImgArrayQImage(img_array)
 					qimage_task.sigs.finished_.connect(
 						lambda qimage: fin(qimage, shm)
@@ -342,14 +342,9 @@ class WinImageView(UMainWindow):
 			self.restart_img_wid(self.url_to_pixmap[self.current_data_item.rel_path])
 		else:
 
-			abs_path = Utils.add_mf_path(
-				mf_path=Mf.current_mf.mf_paths[0],
-				rel_path=self.current_data_item.rel_path
-			)
-
 			self.read_img_task = ProcessWorker(
 				target=ReadImg.start,
-				args=(abs_path, 0, )
+				args=(self.current_data_item.abs_path, 0, )
 			)
 			self.read_img_timer = QTimer(self)
 			self.read_img_timer.setSingleShot(True)
