@@ -87,19 +87,6 @@ def db_changed(previous_mtime: int, current_mtime: int) -> bool:
 	return previous_mtime != current_mtime
 
 
-def scan_progress_text(progress: ScanProgress) -> str:
-	"""Текст прогресса сканера. Строится только в GUI-потоке, где доступен Lng."""
-	if progress.kind == "search_dirs":
-		return f"{progress.mf_alias}: {Lng.search_in.lower()}"
-	if progress.kind == "indexing":
-		return (
-			f"{progress.mf_alias}: "
-			f"{Lng.indexing_files.lower()} "
-			f"{progress.current} {Lng.from_} {progress.total}"
-		)
-	return f"{progress.mf_alias}: {Lng.no_connection.lower()}"
-
-
 class ForcedDirsRegistry:
 	"""Каталоги, которые нужно пересканировать принудительно."""
 
