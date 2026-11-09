@@ -30,25 +30,10 @@ class WinSmb(UMainWindow):
 		self.set_close_only()
 		self.set_always_on_top()
 		self.setWindowTitle(Lng.attention)
-		self.show_titlebar_sep()
 
 		# Делаем отступы аккуратными
-		self.central_layout.setContentsMargins(15, 5, 15, 15)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
-
-		self.group_box = TransparentWidget()
-		group_lay = QVBoxLayout(self.group_box)
-		group_lay.setContentsMargins(0, 0, 0, 0)
-		group_lay.setSpacing(5)
-
-		title_lbl = TitleTextWidget(Lng.no_connection, Static.COLOR_ICONS / "yellow_warning.svg")
-		group_lay.addWidget(title_lbl)
-
-		# Описание добавляем туда же, под заголовок
-		descr_lbl = GrayTextLabel(Lng.network_error_text)
-		group_lay.addWidget(descr_lbl)
-
-		self.central_layout.addWidget(self.group_box)
 		
 		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(mf)
@@ -78,8 +63,9 @@ class WinSmb(UMainWindow):
 		self.ok_btn.clicked.connect(self.ok_cmd)
 		btns_lay.addWidget(self.ok_btn)
 
+		self.setFixedWidth(380)
 		self.adjustSize()
-		self.setFixedSize(self.width(), self.height())
+		self.setFixedHeight(self.height())
 
 	def open_servers(self):
 		self.servers_win = ServersWin()

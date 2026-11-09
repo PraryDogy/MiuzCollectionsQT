@@ -150,8 +150,8 @@ class Lng:
 	data_size = ("Размер данных", "Data size")
 	calculating = ("Вычисление", "Calculating")
 	repair_catalog_long = (
-		"Исправить ошибки в каталоге",
-		"Fix errors in the catalog"
+		"Ошибки в каталоге",
+		"Errors in the catalog"
 	)
 	repair_catalog_short = (
 		"Исправить каталог",

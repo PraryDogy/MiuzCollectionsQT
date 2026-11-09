@@ -576,27 +576,28 @@ class MfRepairWidget(UGroupBox):
 
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
-		title_layout = TitleTextWidget(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
-		self.v_lay.addWidget(title_layout)
+		# заголовок и кнопка запуска в одной строке
+		title_widget = TitleTextWidget(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
+
+		self.start_btn = UPushButton(Lng.repair_catalog_short)
+		self.start_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "repair_gray.svg")))
+		self.start_btn.clicked.connect(self.start_clicked.emit)
+
+		title_row = TransparentWidget()
+		title_layout = QHBoxLayout(title_row)
+		title_layout.setContentsMargins(0, 0, 0, 0)
+		title_layout.setSpacing(10)
+		title_layout.addWidget(title_widget)
+		title_layout.addStretch()
+		title_layout.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
+
+		self.v_lay.addWidget(title_row)
 
 		self.v_lay.addWidget(USep())
 
 		descr = GrayTextLabel(Lng.catalog_reindex_warning)
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
-
-		button_container = TransparentWidget()
-		self.v_lay.addWidget(button_container)
-		button_layout = QHBoxLayout(button_container)
-		button_layout.setContentsMargins(0, 0, 0, 0)
-		button_layout.setSpacing(10)
-
-		self.start_btn = UPushButton(Lng.repair_catalog_short)
-		self.start_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "repair_gray.svg")))
-		self.start_btn.clicked.connect(self.start_clicked.emit)
-		button_layout.addWidget(self.start_btn)
-
-		button_layout.addStretch()
 
 
 class MfRemoveWidget(UGroupBox):
@@ -610,29 +611,28 @@ class MfRemoveWidget(UGroupBox):
 		self.v_lay.setContentsMargins(10, 5, 10, 5)
 		self.v_lay.setSpacing(7)
 
-		title_layout = TitleTextWidget(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
-		self.v_lay.addWidget(title_layout)
+		# заголовок и кнопка удаления в одной строке
+		title_widget = TitleTextWidget(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
+
+		self.start_btn = RedButton(Lng.remove_folder)
+		self.start_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "red_trash.svg")))
+		self.start_btn.clicked.connect(self.start_clicked.emit)
+
+		title_row = TransparentWidget()
+		title_layout = QHBoxLayout(title_row)
+		title_layout.setContentsMargins(0, 0, 0, 0)
+		title_layout.setSpacing(10)
+		title_layout.addWidget(title_widget)
+		title_layout.addStretch()
+		title_layout.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
+
+		self.v_lay.addWidget(title_row)
 
 		self.v_lay.addWidget(USep())
 
 		descr = GrayTextLabel(Lng.catalog_delete_warning)
 		descr.setWordWrap(True)
 		self.v_lay.addWidget(descr)
-
-		self.v_lay.addSpacing(3)
-
-		button_container = TransparentWidget()
-		self.v_lay.addWidget(button_container)
-		button_layout = QHBoxLayout(button_container)
-		button_layout.setContentsMargins(0, 0, 0, 0)
-		button_layout.setSpacing(10)
-
-		self.start_btn = RedButton(Lng.remove_folder)
-		self.start_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "red_trash.svg")))
-		self.start_btn.clicked.connect(self.start_clicked.emit)
-		button_layout.addWidget(self.start_btn)
-
-		button_layout.addStretch()
 
 
 class IgnoreListWin(UMainWindow):
@@ -788,8 +788,23 @@ class MfStopListWidget(UGroupBox):
 		v_layout.setContentsMargins(10, 5, 10, 5)
 		v_layout.setSpacing(5)
 
+		# заголовок и кнопка открытия списка в одной строке
 		title_label = TitleTextWidget(Lng.ignore_list, Static.COLOR_ICONS / "stop.svg")
-		v_layout.addWidget(title_label)
+
+		add_button = UPushButton(Lng.open_list)
+		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
+		add_button.setIconSize(QSize(10, 10))
+		add_button.clicked.connect(self.open_ignore_list_win)
+
+		title_row = TransparentWidget()
+		title_layout = QHBoxLayout(title_row)
+		title_layout.setContentsMargins(0, 0, 0, 0)
+		title_layout.setSpacing(10)
+		title_layout.addWidget(title_label)
+		title_layout.addStretch()
+		title_layout.addWidget(add_button, 0, Qt.AlignmentFlag.AlignVCenter)
+
+		v_layout.addWidget(title_row)
 
 		v_layout.addWidget(USep())
 
@@ -797,14 +812,6 @@ class MfStopListWidget(UGroupBox):
 		description.setWordWrap(True)
 		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 		v_layout.addWidget(description)
-
-		v_layout.addSpacing(5)
-
-		add_button = UPushButton(Lng.open_list)
-		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
-		add_button.setIconSize(QSize(10, 10))
-		add_button.clicked.connect(self.open_ignore_list_win)
-		v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignLeft)
 
 	def get_stop_list(self) -> list[str]:
 		return list(self.draft_stop_list)
@@ -1092,7 +1099,7 @@ class WinSettings(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.settings)
-		self.setFixedSize(700, 670)
+		self.setFixedSize(700, 570)
 
 		self.settings_item = settings_item
 		self.current_page = None

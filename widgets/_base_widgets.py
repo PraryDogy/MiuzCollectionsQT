@@ -1585,7 +1585,6 @@ class MfPathWidget(UGroupBox):
 		super().__init__()
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 		self.setAcceptDrops(True)
-		self.copy_path_btn_locked = False
 		self.mf = mf
 		self.title_ = Lng.catalog_path
 		self.mf_path = mf.mf_paths[0] if mf else None
@@ -1599,9 +1598,22 @@ class MfPathWidget(UGroupBox):
 		self.v_lay.setContentsMargins(10, 5, 10, 5)
 		self.v_lay.setSpacing(5)
 
-		# иконка заголовка статичная, динамически не меняется
+		# заголовок и кнопка поиска в одной строке
 		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
-		self.v_lay.addWidget(self.title_widget)
+
+		self.choose_btn = UPushButton(Lng.find_catalog)
+		self.choose_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
+		self.choose_btn.clicked.connect(self.dialog_dir)
+
+		self.title_row = QWidget()
+		self.title_layout = QHBoxLayout(self.title_row)
+		self.title_layout.setContentsMargins(0, 0, 0, 0)
+		self.title_layout.setSpacing(10)
+		self.title_layout.addWidget(self.title_widget)
+		self.title_layout.addStretch()
+		self.title_layout.addWidget(self.choose_btn, 0, Qt.AlignmentFlag.AlignVCenter)
+
+		self.v_lay.addWidget(self.title_row)
 
 		self.v_lay.addWidget(USep())
 
@@ -1622,31 +1634,7 @@ class MfPathWidget(UGroupBox):
 
 		self.v_lay.addWidget(self.status_widget)
 
-		self.v_lay.addLayout(self._create_buttons_layout())
-
 		self.update_ui()
-
-	def _create_buttons_layout(self) -> QHBoxLayout:
-		buttons_layout = QHBoxLayout()
-		buttons_layout.setContentsMargins(0, 5, 0, 0)
-		buttons_layout.setSpacing(10)
-
-		self.choose_btn = UPushButton(Lng.find_catalog)
-		self.choose_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
-		self.choose_btn.clicked.connect(self.dialog_dir)
-		buttons_layout.addWidget(self.choose_btn)
-
-		# buttons_layout.addStretch()
-
-		self.copy_path_btn = UPushButton(Lng.copy_dirpath)
-		self.copy_path_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
-		self.copy_path_btn.setToolTip(Lng.copy_dirpath)
-		self.copy_path_btn.clicked.connect(self.copy_path)
-		buttons_layout.addWidget(self.copy_path_btn)
-
-		buttons_layout.addStretch()
-
-		return buttons_layout
 
 	def _path_exists(self) -> bool:
 		return bool(self.mf_path) and os.path.exists(self.mf_path)
@@ -1656,11 +1644,11 @@ class MfPathWidget(UGroupBox):
 		if not self.mf_path:
 			return "yellow_warning.svg"
 		if not self._path_exists():
-			return "stop.svg"
+			return "yellow_warning.svg"
 		return "green_checkmark.svg"
 
 	def update_ui(self):
-		"""Обновляет иконку статуса, описание, кнопки и таймер по текущему пути"""
+		"""Обновляет иконку статуса, описание и таймер по текущему пути"""
 		has_path = self._path_exists()
 
 		self.status_icon.load(str(Static.COLOR_ICONS / self._status_icon_name()))
@@ -1668,34 +1656,10 @@ class MfPathWidget(UGroupBox):
 		if has_path:
 			self.path_label.setText(self.mf_path)
 			self.watch_timer.stop()
-			self.copy_path_btn.show()
 		else:
 			self.path_label.setText(Lng.no_catalog_path)
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
-			self.copy_path_btn.hide()
-
-	def copy_path(self):
-
-		def unlock():
-			self.set_copy_path_btn_locked(False)
-			try:
-				self.copy_path_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "copy_gray.svg")))
-			except RuntimeError:
-				# на случай если окно уничтожилось раньше действия
-				pass
-
-		if self.copy_path_btn_locked or not self._path_exists():
-			return
-
-		Utils.pyqt_copy_text(self.mf_path)
-		self.copy_path_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "green_checkmark.svg")))
-		self.set_copy_path_btn_locked(True)
-
-		QTimer.singleShot(1000, unlock)
-
-	def set_copy_path_btn_locked(self, value: bool):
-		self.copy_path_btn_locked = value
 
 	def check_path_by_timer(self):
 		"""Срабатывание таймера в режиме ожидания пути"""
