@@ -1600,7 +1600,7 @@ class MfPathWidget(UGroupBox):
 		self.v_lay.setSpacing(5)
 
 		# иконка заголовка статичная, динамически не меняется
-		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "green_checkmark.svg")
+		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
 		self.v_lay.addWidget(self.title_widget)
 
 		self.v_lay.addWidget(USep())
