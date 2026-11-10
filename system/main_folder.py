@@ -28,6 +28,10 @@ class Mf:
 		self.mf_paths: list[str] = mf_paths
 		self.mf_stop_list: list[str] = mf_stop_list
 
+	@property
+	def mf_path(self):
+		return self.mf_paths[0]
+
 	@classmethod
 	def json_to_app(cls, data: list[dict]):
 		cls.items.clear()
@@ -35,10 +39,10 @@ class Mf:
 			cls.items.append(Mf(**d))
 
 	def create_abs_path(self, rel_path: str) -> str:
-		return os.path.join(self.mf_paths[0], rel_path.lstrip(os.sep))
+		return os.path.join(self.mf_path, rel_path.lstrip(os.sep))
 
 	def create_rel_path(self, abs_path: str) -> str:
-		rel = os.path.relpath(abs_path, self.mf_paths[0])
+		rel = os.path.relpath(abs_path, self.mf_path)
 		if rel == os.curdir:
 			return os.sep
 		return os.sep + rel
@@ -65,7 +69,7 @@ class Mf:
 		return Static.APP_DATA_DIR / rel_thumb_path
 
 	def is_root_alive(self):
-		return os.path.exists(self.mf_paths[0])
+		return os.path.exists(self.mf_path)
 	
 	def get_data(self):
 		return {i: getattr(self, i) for i in self.__slots__}

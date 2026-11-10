@@ -913,7 +913,7 @@ class MfSettings(UGroupBox):
 				return
 
 			new_path = self.path_widget.mf_path
-			if new_path != current_mf.mf_paths[0]:
+			if new_path != current_mf.mf_path:
 				# индекс относится к старому каталогу: заставляем сканер пересравнить все папки
 				Dirs.reset_mod(current_mf.mf_alias)
 

@@ -60,7 +60,7 @@ class ScanerWorker(BaseProcessWorker):
 class DirItem:
 	"""
 	Параметры:
-	- rel_path: относительный путь к подкаталогу относительно корня Mf (`mf_paths[0]`).
+	- rel_path: относительный путь к подкаталогу относительно корня Mf (`mf_path`).
 	  Пример:
 		- корень = /User/Downloads/parent/folder
 		- подкаталог = /User/Downloads/parent/folder/subfolder
@@ -175,7 +175,7 @@ class DirsChangeWatcher(ScanerParent):
 		db_dirs: list[DirItem] = []
 		mf = self.scaner_item.mf
 		stop = StopList(mf.mf_stop_list)
-		base_path = mf.mf_paths[0].strip(os.sep)
+		base_path = mf.mf_path.strip(os.sep)
 		q = (
 			sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
 			.where(Dirs.mf_alias == mf.mf_alias)
@@ -237,7 +237,7 @@ class DirsLoader(ScanerParent):
 		- если недоступен сам корень, поднимает ScanIncomplete
 		"""
 		scaner = self.scaner_item
-		root = scaner.mf.mf_paths[0]
+		root = scaner.mf.mf_path
 
 		scaner.process_queue.put(ScanProgress("search_dirs", scaner.mf.mf_alias))
 
@@ -332,7 +332,7 @@ class ImgLoader(ScanerParent):
 		Если недоступен корень, поднимает ScanIncomplete.
 		Ошибка отдельной папки при живом корне пропускается.
 		"""
-		root = self.scaner_item.mf.mf_paths[0]
+		root = self.scaner_item.mf.mf_path
 		finder_images: list[ImgItem] = []
 
 		for dir_item in self.dirs_to_scan:
@@ -745,7 +745,7 @@ class BaseScaner:
 		lines = [
 			sep,
 			now_line,
-			f"Mf: {scaner_item.mf.mf_alias}, {scaner_item.mf.mf_paths[0]}",
+			f"Mf: {scaner_item.mf.mf_alias}, {scaner_item.mf.mf_path}",
 			"Удаление директорий:",
 			f"finder dirs: {len(finder_lines)}",
 			f"removed dirs: {len(removed_lines)}",

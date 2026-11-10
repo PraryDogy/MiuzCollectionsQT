@@ -222,7 +222,7 @@ class WinMain(UMainWindow):
 			self.bar_bottom.progress_widget.reset()
 			self.bar_bottom.progress_widget.setText("СКАНЕР ВЫКЛЮЧЕН")
 
-		self.path_bar_update(Mf.current_mf.mf_paths[0])
+		self.path_bar_update(Mf.current_mf.mf_path)
 
 	@staticmethod
 	def with_conn(fn: callable):
@@ -314,7 +314,7 @@ class WinMain(UMainWindow):
 	def on_mf_clicked(self, mf: Mf):
 		Mf.current_mf = mf
 		Dynamic.current_dir = os.sep
-		self.path_bar_update(Mf.current_mf.mf_paths[0])
+		self.path_bar_update(Mf.current_mf.mf_path)
 		self.left_menu.tree_wid.abs_selected_path = os.sep
 		self.left_menu.tree_wid.init_ui()
 		self.load_st_grid()
@@ -528,7 +528,7 @@ class WinMain(UMainWindow):
 		self.grid.paste_files.connect(
 			lambda: self.paste_files(
 				self.files_to_copy,
-				destination_dir(Mf.current_mf.mf_paths[0], Dynamic.current_dir)
+				destination_dir(Mf.current_mf.mf_path, Dynamic.current_dir)
 			)
 		)
 		self.grid.set_files_to_copy.connect(
@@ -771,7 +771,7 @@ class WinMain(UMainWindow):
 
 		if a0.key() == Qt.Key.Key_V:
 			if a0.modifiers() == Qt.KeyboardModifier.ControlModifier and self.files_to_copy:
-				dest = destination_dir(Mf.current_mf.mf_paths[0], Dynamic.current_dir)
+				dest = destination_dir(Mf.current_mf.mf_path, Dynamic.current_dir)
 				self.paste_files(self.files_to_copy, dest)
 
 		elif a0.key() == Qt.Key.Key_W:

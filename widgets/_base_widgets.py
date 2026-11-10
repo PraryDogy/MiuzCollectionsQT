@@ -1587,7 +1587,7 @@ class MfPathWidget(UGroupBox):
 		self.setAcceptDrops(True)
 		self.mf = mf
 		self.title_ = Lng.catalog_path
-		self.mf_path = mf.mf_paths[0] if mf else None
+		self.mf_path = mf.mf_path if mf else None
 		self._title_icon = None
 		self.title = None
 
