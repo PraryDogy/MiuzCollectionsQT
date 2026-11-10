@@ -19,7 +19,7 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import MfRemover, ProcessWorker
 from system.shared_utils import SharedUtils
-from system.tasks import (HashDirSize, HashDirSizeItem, MfDataCleaner,
+from system.tasks import (HashDirSize, HashDirSizeItem, MfCleaner,
                           UThreadPool)
 from system.themes import ThemeChanger
 from system.utils import Utils
@@ -987,7 +987,7 @@ class MfSettings(UGroupBox):
 
 	def repair_mf(self, *args):
 		def reset_data():
-			self.reset_task = MfDataCleaner(self.mf.mf_alias)
+			self.reset_task = MfCleaner(self.mf.mf_alias)
 			self.reset_task.sigs.finished_.connect(restart_app)
 			UThreadPool.start(self.reset_task)
 

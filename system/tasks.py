@@ -320,22 +320,16 @@ class DbImagesLoader(URunnable):
 		return start.timestamp(), end.timestamp()
 
 
-class MfDataCleaner(URunnable):
+class MfCleaner(URunnable):
 
 	class Sigs(QObject):
 		finished_ = pyqtSignal()
 
-	"""
-	Сбрасывает данные в БД для пересканирования:
-
-	- Удаляет записи из THUMBS, если файл миниатюры отсутствует.
-	- Удаляет запись о папке `mf` из DIRS.
-	"""
-
-	def __init__(self, mf_alias: str):
+	def __init__(self, mf: Mf, is_remove_mf = False):
 		super().__init__()
-		self.sigs = MfDataCleaner.Sigs()
-		self.mf_alias = mf_alias
+		self.sigs = MfCleaner.Sigs()
+		self.mf = mf
+		self.is_remove_mf = is_remove_mf
 
 	def task(self):
 		try:
@@ -353,10 +347,14 @@ class MfDataCleaner(URunnable):
 				self.remove_thumb_images(rel_paths)
 				self.clean_thumbs_table(conn)
 
+		if self.is_remove_mf:
+			Mf.items.remove(self.mf)
+			Mf.write_json_data()
+
 	def clean_dir_table(self, conn: sqlalchemy.Connection):
 		stmt = (
 			sqlalchemy.delete(Dirs.table)
-			.where(Dirs.mf_alias == self.mf_alias)
+			.where(Dirs.mf_alias == self.mf.mf_alias)
 		)
 		conn.execute(stmt)
 		return True
@@ -364,7 +362,7 @@ class MfDataCleaner(URunnable):
 	def clean_thumbs_table(self, conn: sqlalchemy.Connection):
 		stmt = (
 			sqlalchemy.delete(Thumbs.table)
-			.where(Thumbs.mf_alias == self.mf_alias)
+			.where(Thumbs.mf_alias == self.mf.mf_alias)
 		)
 		conn.execute(stmt)
 		return True
@@ -372,7 +370,7 @@ class MfDataCleaner(URunnable):
 	def get_rel_thumb_paths(self, conn: sqlalchemy.Connection):
 		stmt = (
 			sqlalchemy.select(Thumbs.rel_thumb_path)
-			.where(Thumbs.mf_alias == self.mf_alias)
+			.where(Thumbs.mf_alias == self.mf.mf_alias)
 		)
 		return conn.execute(stmt).scalars().all()
 
