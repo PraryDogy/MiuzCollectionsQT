@@ -77,8 +77,7 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addSpacing(5)
 
-		self.cancel_button = UPushButton(Lng.close)
-		self._fix_cancel_button_width()
+		self.cancel_button = UPushButton(Lng.cancel)
 		self.cancel_button.clicked.connect(self.cancel_clicked.emit)
 		self.h_lay.addWidget(self.cancel_button)
 
@@ -88,23 +87,11 @@ class SaveRowWidget(TransparentWidget):
 
 		self.hide_warning()
 
-	def _fix_cancel_button_width(self):
-		# Ширина по самой широкой подписи из двух возможных
-		fm = QFontMetrics(self.cancel_button.font())
-		texts = (Lng.close, Lng.cancel)
-		text_w = max(fm.horizontalAdvance(t) for t in texts)
-
-		# Учитываем внутренние отступы стиля кнопки
-		opt_w = self.cancel_button.sizeHint().width() - fm.horizontalAdvance(self.cancel_button.text())
-		self.cancel_button.setFixedWidth(text_w + opt_w)
-
 	def show_warning(self):
 		self.attention_icon.show()
-		self.cancel_button.setText(Lng.cancel)
 
 	def hide_warning(self):
 		self.attention_icon.hide()
-		self.cancel_button.setText(Lng.close)
 
 
 class RebootableSettings(UGroupBox):
@@ -658,7 +645,7 @@ class IgnoreListWin(UMainWindow):
 		self.has_unsaved = False
 		self.discard_win = None
 
-		self.central_layout.setContentsMargins(5, 5, 5, 5)
+		self.central_layout.setContentsMargins(5, 5, 5, 10)
 		self.central_layout.setSpacing(5)
 
 		self.group_box = UGroupBox()
