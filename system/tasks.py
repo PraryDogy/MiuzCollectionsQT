@@ -366,10 +366,9 @@ class MfDataCleaner(URunnable):
 		conn.execute(stmt)
 		return True
 
-	def clean_thumbs_table(self, conn: sqlalchemy.Connection, rel_paths):
+	def clean_thumbs_table(self, conn: sqlalchemy.Connection):
 		stmt = (
 			sqlalchemy.delete(Thumbs.table)
-			.where(Thumbs.rel_thumb_path.in_(rel_paths))
 			.where(Thumbs.mf_alias == self.mf_alias)
 		)
 		conn.execute(stmt)
