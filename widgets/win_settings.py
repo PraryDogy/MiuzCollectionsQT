@@ -82,7 +82,7 @@ class SaveRowWidget(TransparentWidget):
 		self.cancel_button.clicked.connect(self.cancel_clicked.emit)
 		self.h_lay.addWidget(self.cancel_button)
 
-		self.save_button = ActiveButton(Lng.save)
+		self.save_button = ActiveButton(Lng.save_changes_text)
 		self.save_button.clicked.connect(self.save_clicked.emit)
 		self.h_lay.addWidget(self.save_button)
 
