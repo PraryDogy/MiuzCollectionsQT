@@ -41,7 +41,7 @@ def restart_app():
 
 class CancelChangesWin(ConfirmWindow):
 	def __init__(self, text):
-		super().__init__(text)
+		super().__init__(text, danger=True)
 		self.ok_btn.setText(Lng.do_not_save)
 		self.cancel_btn.setText(Lng.keep_editing)
 
