@@ -986,8 +986,9 @@ class MfSettings(UGroupBox):
 		win.show()
 
 	def repair_mf(self, *args):
+
 		def reset_data():
-			self.reset_task = MfCleaner(self.mf.mf_alias)
+			self.reset_task = MfCleaner(self.mf, is_remove_mf=False)
 			self.reset_task.sigs.finished_.connect(restart_app)
 			UThreadPool.start(self.reset_task)
 

@@ -325,7 +325,7 @@ class MfCleaner(URunnable):
 	class Sigs(QObject):
 		finished_ = pyqtSignal()
 
-	def __init__(self, mf: Mf, is_remove_mf = False):
+	def __init__(self, mf: Mf, is_remove_mf: bool):
 		super().__init__()
 		self.sigs = MfCleaner.Sigs()
 		self.mf = mf
