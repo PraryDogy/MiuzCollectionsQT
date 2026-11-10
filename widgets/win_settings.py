@@ -701,6 +701,14 @@ class IgnoreListWin(UMainWindow):
 		btns_lay.setSpacing(5)
 
 		btns_lay.addStretch()
+
+		self.warning_icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		self.warning_icon.setFixedSize(20, 20)
+		btns_lay.addWidget(self.warning_icon)
+		self.warning_icon.hide()
+
+		btns_lay.addSpacing(5)
+
 		close_btn = UPushButton(Lng.close)
 		close_btn.clicked.connect(self._try_close)
 		btns_lay.addWidget(close_btn)
@@ -753,12 +761,14 @@ class IgnoreListWin(UMainWindow):
 			return
 		self.draft_stop_list.remove(path)
 		self.has_unsaved = True
+		self.warning_icon.show()
 		self._refresh_list()
 
 	def save_changes(self):
 		if self.has_unsaved:
 			self.ok_clicked.emit(list(self.draft_stop_list))
 			self.has_unsaved = False
+			self.warning_icon.hide()
 
 	def _try_close(self):
 		if self.has_unsaved:
@@ -775,6 +785,7 @@ class IgnoreListWin(UMainWindow):
 
 	def _on_discard_confirmed(self):
 		self.has_unsaved = False
+		self.warning_icon.hide()
 		self.deleteLater()
 
 	def closeEvent(self, a0):
