@@ -18,6 +18,8 @@ from .main_folder import Mf
 from .shared_utils import ImgUtils
 from .utils import Utils, ReadableDate
 from .scaner import StopList
+import shutil
+
 
 class URunnable(QRunnable):
 	def __init__(self):
@@ -323,7 +325,7 @@ class DbImagesLoader(URunnable):
 class MfCleaner(URunnable):
 
 	class Sigs(QObject):
-		finished_ = pyqtSignal()
+		finished_ = pyqtSignal(bool)
 
 	def __init__(self, mf: Mf, is_remove_mf: bool):
 		super().__init__()
@@ -332,11 +334,13 @@ class MfCleaner(URunnable):
 		self.is_remove_mf = is_remove_mf
 
 	def task(self):
+		success = False
 		try:
 			self._task()
-		except Exception as e:
+			success = True
+		except Exception:
 			print(traceback.format_exc())
-		self.sigs.finished_.emit()
+		self.sigs.finished_.emit(success)
 
 	def _task(self):
 		with Dbase.main_engine.begin() as conn:
@@ -347,45 +351,42 @@ class MfCleaner(URunnable):
 				self.remove_thumb_images(rel_paths)
 				self.clean_thumbs_table(conn)
 
+		# изменяем список и JSON только после успешной очистки БД
 		if self.is_remove_mf:
-			if self.mf in Mf.items:
-				Mf.items.remove(self.mf)
-				Mf.write_json_data()
+			Mf.items[:] = [m for m in Mf.items if m.mf_alias != self.mf.mf_alias]
+			Mf.write_json_data()
 
 			if self.mf.mf_alias in JsonData.hide_digits_mf_lst:
 				JsonData.hide_digits_mf_lst.remove(self.mf.mf_alias)
 				JsonData.write_json_data()
 
 	def clean_dir_table(self, conn: sqlalchemy.Connection):
-		stmt = (
-			sqlalchemy.delete(Dirs.table)
-			.where(Dirs.mf_alias == self.mf.mf_alias)
-		)
+		stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias == self.mf.mf_alias)
 		conn.execute(stmt)
-		return True
 
 	def clean_thumbs_table(self, conn: sqlalchemy.Connection):
-		stmt = (
-			sqlalchemy.delete(Thumbs.table)
-			.where(Thumbs.mf_alias == self.mf.mf_alias)
-		)
+		stmt = sqlalchemy.delete(Thumbs.table).where(Thumbs.mf_alias == self.mf.mf_alias)
 		conn.execute(stmt)
-		return True
 
-	def get_rel_thumb_paths(self, conn: sqlalchemy.Connection):
+	def get_rel_thumb_paths(self, conn: sqlalchemy.Connection) -> list[str]:
 		stmt = (
 			sqlalchemy.select(Thumbs.rel_thumb_path)
 			.where(Thumbs.mf_alias == self.mf.mf_alias)
 		)
-		return conn.execute(stmt).scalars().all()
+		return [p for p in conn.execute(stmt).scalars().all() if p]
 
 	def remove_thumb_images(self, rel_paths: list[str]):
-		for i in rel_paths:
-			abs_thumb_path = Mf.get_abs_thumb_path(i)
+		parents = set()
+		for rel_path in rel_paths:
+			abs_thumb_path = Mf.get_abs_thumb_path(rel_path)
 			try:
 				os.remove(abs_thumb_path)
-			except Exception as e:
-				print("Mf data cleaner erorr", e)
+			except OSError as e:
+				print(f"Mf data cleaner error: {abs_thumb_path}: {e}")
+			parents.add(os.path.dirname(abs_thumb_path))
+
+		for parent in parents:
+			shutil.rmtree(parent, ignore_errors=True)
 
 
 class DbDirsLoader(URunnable):
