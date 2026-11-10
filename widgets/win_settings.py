@@ -82,7 +82,7 @@ class SaveRowWidget(TransparentWidget):
 		self.cancel_button.clicked.connect(self.cancel_clicked.emit)
 		self.h_lay.addWidget(self.cancel_button)
 
-		self.save_button = ActiveButton(Lng.save_changes_text)
+		self.save_button = ActiveButton(Lng.save)
 		self.save_button.clicked.connect(self.save_clicked.emit)
 		self.h_lay.addWidget(self.save_button)
 
@@ -980,7 +980,7 @@ class MfSettings(UGroupBox):
 		if len(Mf.items) == 1:
 			win = WarningWindow(Lng.at_least_one_folder_required)
 		else:
-			win = ConfirmWindow(Lng.app_will_restarted)
+			win = ConfirmWindow(Lng.app_will_restarted, danger=True)
 			win.ok_clicked.connect(start_mf_remover)
 		win.center_to_parent(self.window())
 		win.show()
@@ -1075,7 +1075,7 @@ class NewMfWin(UMainWindow):
 			)
 			Mf.items.append(mf)
 			Mf.write_json_data()
-			restart_app()
+			QTimer.singleShot(100, restart_app)
 
 		win = ConfirmWindow(Lng.app_will_restarted)
 		win.ok_clicked.connect(fin)
