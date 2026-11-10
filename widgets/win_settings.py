@@ -973,13 +973,13 @@ class MfSettings(UGroupBox):
 		if len(Mf.items) == 1:
 			win = WarningWindow(Lng.at_least_one_folder_required)
 		else:
-			win = ConfirmWindow(Lng.app_will_restarted, danger=True)
+			win = ConfirmWindow(Lng.remove_catalog_warn, danger=True)
 			win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=True))
 		win.center_to_parent(self.window())
 		win.show()
 
 	def clean_mf_data(self):
-		win = ConfirmWindow(Lng.app_will_restarted)
+		win = ConfirmWindow(Lng.repair_catalog_warn)
 		win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=False))
 		win.center_to_parent(self.window())
 		win.show()

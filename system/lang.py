@@ -149,10 +149,6 @@ class Lng:
 	collapse_all = ("Свернуть всё", "Collapse All")
 	data_size = ("Размер данных", "Data size")
 	calculating = ("Вычисление", "Calculating")
-	repair_catalog_long = (
-		"Ошибки в каталоге",
-		"Errors in the catalog"
-	)
 	repair_errors = (
 		"Исправить ошибки",
 		"Repair errors"
@@ -687,4 +683,12 @@ class Lng:
 	make_sure_path = (
 		"Убедитесь, что вы указали тот же каталог. Если каталог указан неправильно, все кэшированные изображения будут удалены и добавлены новые из другого каталога.",
 		"Make sure you specify the same directory. If the directory is wrong, all cached images will be deleted and new ones added from the other directory.",
+	)
+	repair_catalog_warn = (
+		"Изображения в каталоге будут проиндексированы заново. Это может занять некоторое время. Приложение перезапустится.",
+		"Images in the catalog will be re-indexed. This may take some time. The app will restart.",
+	)
+	remove_catalog_warn = (
+		"Каталог будет удалён из приложения. Файлы на диске не будут затронуты.",
+		"The catalog will be removed from the app. Files on disk will not be affected.",
 	)
