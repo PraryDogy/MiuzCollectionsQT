@@ -348,8 +348,13 @@ class MfCleaner(URunnable):
 				self.clean_thumbs_table(conn)
 
 		if self.is_remove_mf:
-			Mf.items.remove(self.mf)
-			Mf.write_json_data()
+			if self.mf in Mf.items:
+				Mf.items.remove(self.mf)
+				Mf.write_json_data()
+
+			if self.mf.mf_alias in JsonData.hide_digits_mf_lst:
+				JsonData.hide_digits_mf_lst.remove(self.mf.mf_alias)
+				JsonData.write_json_data()
 
 	def clean_dir_table(self, conn: sqlalchemy.Connection):
 		stmt = (
