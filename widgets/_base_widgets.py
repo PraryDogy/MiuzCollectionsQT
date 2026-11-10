@@ -1581,6 +1581,23 @@ class SvgWithThemeBg(TransparentWidget):
 		super().mouseReleaseEvent(event)
 
 
+class _MfPathLabel(UGroupBox):
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+		self.status_layout = QHBoxLayout(self)
+		self.status_layout.setContentsMargins(10, 10, 10, 10)
+		self.status_layout.setSpacing(5)
+
+		self.status_icon = QSvgWidget()
+		self.status_icon.setFixedSize(16, 16)
+		self.status_layout.addWidget(self.status_icon, 0, Qt.AlignmentFlag.AlignTop)
+
+		self.path_label = TransparentLabel("")
+		self.path_label.setWordWrap(True)
+		self.path_label.set_elide(True)
+		self.status_layout.addWidget(self.path_label, 1)
+
+
 class MfPathWidget(UGroupBox):
 	changed = pyqtSignal()
 
@@ -1625,20 +1642,7 @@ class MfPathWidget(UGroupBox):
 		self.v_lay.addWidget(descr_label)
 
 		# строка статуса: иконка слева, описание пути справа
-		self.status_widget = UGroupBox()
-		self.status_layout = QHBoxLayout(self.status_widget)
-		self.status_layout.setContentsMargins(10, 10, 10, 10)
-		self.status_layout.setSpacing(5)
-
-		self.status_icon = QSvgWidget()
-		self.status_icon.setFixedSize(16, 16)
-		self.status_layout.addWidget(self.status_icon, 0, Qt.AlignmentFlag.AlignTop)
-
-		self.path_label = TransparentLabel("")
-		self.path_label.setWordWrap(True)
-		self.path_label.set_elide(True)
-		self.status_layout.addWidget(self.path_label, 1)
-
+		self.status_widget = _MfPathLabel()
 		self.v_lay.addWidget(self.status_widget)
 
 		self.update_ui()
@@ -1657,14 +1661,13 @@ class MfPathWidget(UGroupBox):
 	def update_ui(self):
 		"""Обновляет иконку статуса, описание и таймер по текущему пути"""
 		has_path = self._path_exists()
-
-		self.status_icon.load(str(Static.COLOR_ICONS / self._status_icon_name()))
+		self.status_widget.status_icon.load(str(Static.COLOR_ICONS / self._status_icon_name()))
 
 		if has_path:
-			self.path_label.setText(self.mf_path)
+			self.status_widget.path_label.setText(self.mf_path)
 			self.watch_timer.stop()
 		else:
-			self.path_label.setText(Lng.no_catalog_path)
+			self.status_widget.path_label.setText(Lng.no_catalog_path)
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
 

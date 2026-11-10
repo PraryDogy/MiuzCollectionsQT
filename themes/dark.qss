@@ -679,3 +679,8 @@ UTreeWidget::branch:has-children:open {
     image: url(./icons/gray/collapse_gray.svg);
 }
 
+
+
+_MfPathLabel {
+    background: #18212a;
+}

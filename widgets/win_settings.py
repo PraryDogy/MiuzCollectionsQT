@@ -883,9 +883,10 @@ class MfSettings(UGroupBox):
 		self.repair_widget.start_clicked.connect(self.clean_mf_data)
 		main_lay.addWidget(self.repair_widget)
 
-		self.remove_folder = MfRemoveWidget()
-		self.remove_folder.start_clicked.connect(self.remove_mf)
-		main_lay.addWidget(self.remove_folder)
+		if len(Mf.items) > 1:
+			self.remove_folder = MfRemoveWidget()
+			self.remove_folder.start_clicked.connect(self.remove_mf)
+			main_lay.addWidget(self.remove_folder)
 
 		main_lay.addStretch()
 
