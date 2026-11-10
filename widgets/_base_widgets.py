@@ -525,9 +525,6 @@ class USpinBox(QSpinBox):
 		return super().enterEvent(event)
 
 
-class UGroupBox(UGroupBox):
-	def __init__(self, title=None, parent=None):
-		super().__init__(title, parent)
 
 
 class UCheckBox(QCheckBox):
@@ -1611,28 +1608,13 @@ class SvgWithThemeBg(TransparentWidget):
 		super().mouseReleaseEvent(event)
 
 
-class _MfPathLabel(UGroupBox):
-	def __init__(self, title=None, parent=None):
-		super().__init__(title, parent)
-		self.status_layout = QHBoxLayout(self)
-		self.status_layout.setContentsMargins(10, 10, 10, 10)
-		self.status_layout.setSpacing(5)
-
-		self.status_icon = QSvgWidget()
-		self.status_icon.setFixedSize(16, 16)
-		self.status_layout.addWidget(self.status_icon, 0, Qt.AlignmentFlag.AlignTop)
-
-		self.path_label = TransparentLabel("")
-		self.path_label.setWordWrap(True)
-		self.path_label.set_elide(True)
-		self.status_layout.addWidget(self.path_label, 1)
-
-
-class MfPathWidget(UGroupBox):
+class MfPathWidget(HoverGroupBox):
 	changed = pyqtSignal()
 
 	def __init__(self, mf: Mf = None):
 		super().__init__()
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.setToolTip(Lng.find_catalog)
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 		self.setAcceptDrops(True)
 		self.mf = mf
@@ -1644,38 +1626,55 @@ class MfPathWidget(UGroupBox):
 		self.watch_timer = QTimer(self)
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 
-		self.v_lay = QVBoxLayout(self)
-		self.v_lay.setContentsMargins(10, 5, 10, 5)
-		self.v_lay.setSpacing(5)
+		# внешний горизонтальный layout: контент слева, стрелка справа
+		main_lay = QHBoxLayout(self)
+		main_lay.setContentsMargins(10, 5, 10, 5)
+		main_lay.setSpacing(10)
 
-		# заголовок и кнопка поиска в одной строке
+		# левая часть: заголовок, описание и статус пути
+		content = TransparentWidget()
+		content_lay = QVBoxLayout(content)
+		content_lay.setContentsMargins(0, 0, 0, 0)
+		content_lay.setSpacing(5)
+
 		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
-
-		self.choose_btn = AccentButton(Lng.find_catalog)
-		self.choose_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
-		self.choose_btn.clicked.connect(self.dialog_dir)
-
-		self.title_row = QWidget()
-		self.title_layout = QHBoxLayout(self.title_row)
-		self.title_layout.setContentsMargins(0, 0, 0, 0)
-		self.title_layout.setSpacing(10)
-		self.title_layout.addWidget(self.title_widget)
-		self.title_layout.addStretch()
-		self.title_layout.addWidget(self.choose_btn, 0, Qt.AlignmentFlag.AlignVCenter)
-
-		self.v_lay.addWidget(self.title_row)
-
-		# self.v_lay.addWidget(USep())
+		content_lay.addWidget(self.title_widget)
 
 		descr_label = GrayTextLabel(Lng.catalog_path_descr)
 		descr_label.setWordWrap(True)
-		self.v_lay.addWidget(descr_label)
+		content_lay.addWidget(descr_label)
 
-		# строка статуса: иконка слева, описание пути справа
-		self.status_widget = _MfPathLabel()
-		self.v_lay.addWidget(self.status_widget)
+		content_lay.addWidget(USep())
+
+		# строка статуса: иконка слева, путь справа
+		status_row = TransparentWidget()
+		status_lay = QHBoxLayout(status_row)
+		status_lay.setContentsMargins(0, 0, 0, 0)
+		status_lay.setSpacing(5)
+
+		self.status_icon = QSvgWidget()
+		self.status_icon.setFixedSize(16, 16)
+		status_lay.addWidget(self.status_icon)
+
+		self.path_label = TransparentLabel("")
+		self.path_label.set_elide(True)
+		status_lay.addWidget(self.path_label)
+
+		content_lay.addWidget(status_row)
+
+		# правая часть: стрелка, по центру по вертикали
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn.setFixedSize(15, 15)
+
+		main_lay.addWidget(content, 1)
+		main_lay.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
 
 		self.update_ui()
+
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
+			self.dialog_dir()
+		super().mouseReleaseEvent(event)
 
 	def _path_exists(self) -> bool:
 		return bool(self.mf_path) and os.path.exists(self.mf_path)
@@ -1691,13 +1690,13 @@ class MfPathWidget(UGroupBox):
 	def update_ui(self):
 		"""Обновляет иконку статуса, описание и таймер по текущему пути"""
 		has_path = self._path_exists()
-		self.status_widget.status_icon.load(str(Static.COLOR_ICONS / self._status_icon_name()))
+		self.status_icon.load(str(Static.COLOR_ICONS / self._status_icon_name()))
 
 		if has_path:
-			self.status_widget.path_label.setText(self.mf_path)
+			self.path_label.setText(self.mf_path)
 			self.watch_timer.stop()
 		else:
-			self.status_widget.path_label.setText(Lng.no_catalog_path)
+			self.path_label.setText(Lng.no_catalog_path)
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
 

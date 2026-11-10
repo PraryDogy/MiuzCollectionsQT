@@ -680,10 +680,10 @@ UTreeWidget::branch:has-children:open {
 
 
 
-_MfPathLabel {
-    background: #18212a;
+/* _MfPathLabel {
     border: 2px dashed #263440;
-}
+    background: transparent;
+} */
 
 HoverGroupBox {
     background: #101820;
