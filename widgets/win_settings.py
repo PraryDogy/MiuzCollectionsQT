@@ -30,7 +30,7 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
                             TransparentWidget, UGroupBox, UListSpacerItem,
                             UListWidget, UListWidgetItem, UMainWindow, UMenu,
                             UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            UTagWidget, WarningWindow)
+                            UTagWidget, WarningWindow, SuperConfirmWindow)
 
 
 def restart_app():
@@ -848,10 +848,10 @@ class MfStopListWidget(UGroupBox):
 class MfSettings(UGroupBox):
 	changed = pyqtSignal()
 
-	def __init__(self, mf_index: int):
+	def __init__(self, mf: Mf):
 		super().__init__()
 
-		self.mf = Mf.items[mf_index]
+		self.mf = mf
 
 		outer_lay = QVBoxLayout(self)
 		outer_lay.setContentsMargins(2, 2, 2, 2)
@@ -917,23 +917,20 @@ class MfSettings(UGroupBox):
 			return
 
 		def final():
-			current_mf = next(
-				(i for i in Mf.items if i.mf_alias == self.mf.mf_alias), None
-			)
-			if current_mf is None:
-				return
-
-			new_path = self.path_widget.mf_path
-			if new_path != current_mf.mf_path:
+			if self.path_widget.mf_path != self.mf_path:
 				# индекс относится к старому каталогу: заставляем сканер пересравнить все папки
-				Dirs.reset_mod(current_mf.mf_alias)
+				Dirs.reset_mod(self.mf.mf_alias)
 
-			current_mf.mf_paths = [new_path, ]
-			current_mf.mf_stop_list = self.mf_stop_list.get_stop_list()
+			self.mf.mf_paths = [self.path_widget.mf_path, ]
+			self.mf.mf_stop_list = self.mf_stop_list.get_stop_list()
 			Mf.write_json_data()
 			restart_app()
 
-		win = ConfirmWindow(Lng.app_will_restarted)
+		if self.path_widget.mf_path != self.mf.mf_path:
+			win = SuperConfirmWindow(Lng.make_sure_path)
+		else:
+			win = ConfirmWindow(Lng.app_will_restarted)
+
 		win.ok_clicked.connect(final)
 		win.center_to_parent(self.window())
 		win.show()
@@ -1169,7 +1166,7 @@ class WinSettings(UMainWindow):
 			item: UListWidgetItem = self.left_menu.item(idx)
 			for index, mf in enumerate(Mf.items):
 				if mf.mf_alias == item.text():
-					r_wid = MfSettings(index)
+					r_wid = MfSettings(mf)
 					self.settings_item.type_ = "general"
 					self.settings_item.content = ""
 					break

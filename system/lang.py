@@ -158,8 +158,8 @@ class Lng:
 		"Repair errors"
 	)
 	app_will_restarted = (
-		"Приложение будет перезапущено. Нажмите ок, чтобы продолжить.",
-		"The application will restart. Click OK to continue."
+		"Приложение будет перезапущено.",
+		"The application will restart."
 	)
 	remove_folder = (
 		"Удалить каталог",
@@ -689,4 +689,8 @@ class Lng:
 	catalog_path_descr = (
 		"Если каталог не найден, укажите его кнопкой «Найти каталог» или перетащите каталог сюда.",
 		"If the catalog is not found, select it with «Find catalog» or drag a catalog here.",
+	)
+	make_sure_path = (
+		"Убедитесь, что вы указали тот же каталог. Если каталог указан неправильно, все кэшированные изображения будут удалены и добавлены новые из другого каталога.",
+		"Make sure you specify the same directory. If the directory is wrong, all cached images will be deleted and new ones added from the other directory.",
 	)
