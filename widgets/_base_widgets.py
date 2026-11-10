@@ -1101,48 +1101,51 @@ class VerticalWindow(UMainWindow):
 		self.adjustSize()
 		self.setFixedSize(self.width(), ideal_size.height())
 
-
 class ConfirmWindow(VerticalWindow):
 	ok_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 
-	def __init__(self, text: str):
+	def __init__(self, text: str, danger: bool = True):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		# self.show_titlebar_underline()
 		self.setWindowTitle(Lng.attention)
 
-		self._setup_ui(text)
+		self._setup_ui(text, danger)
 		self.central_layout.activate()
 		self._adjust_window_size(self.text_wid, text)
 
-	def _setup_ui(self, text: str):
+	def _setup_ui(self, text: str, danger: bool):
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		self.svg_widget.setFixedSize(65, 65)
-		self.icon_text_layout.addWidget(
-			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
-		)
+		self.icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.text_wid = GrayTextLabel(text)
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
 
-		self.ok_btn = ActiveButton(Lng.confirm)
-		self.ok_btn.clicked.connect(self.ok_clicked.emit)
-		self.ok_btn.clicked.connect(self.deleteLater)
+		ok_cls = RedButton if danger else ActiveButton
+		self.ok_btn = ok_cls(Lng.confirm)
+		self.ok_btn.clicked.connect(self._confirm)
 		self.btn_layout.addWidget(self.ok_btn)
 
 		self.cancel_btn = UPushButton(Lng.cancel)
-		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
-		self.cancel_btn.clicked.connect(self.deleteLater)
+		self.cancel_btn.clicked.connect(self._cancel)
 		self.btn_layout.addWidget(self.cancel_btn)
+
+	def _confirm(self):
+		self.ok_clicked.emit()
+		self.deleteLater()
+
+	def _cancel(self):
+		self.cancel_clicked.emit()
+		self.deleteLater()
 
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key.Key_Escape:
-			self.cancel_clicked.emit()
-			self.deleteLater()
+			self._cancel()
 		else:
 			super().keyPressEvent(event)
 
