@@ -944,7 +944,7 @@ class MfSettings(UGroupBox):
 
 	def save_changes(self):
 		if not self.path_widget.validate_and_show_win():
-			win_warn = WarningWindow(Lng.select_folder_path)
+			win_warn = WarningWindow(Lng.select_catalog_path)
 			win_warn.center_to_parent(self.window())
 			win_warn.ok_clicked.connect(win_warn.deleteLater)
 			win_warn.show()

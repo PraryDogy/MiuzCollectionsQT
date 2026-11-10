@@ -695,3 +695,19 @@ HoverGroupBox[hovered="true"] {
     background: #1d2833;
     border: 1px solid #30404f;
 }
+
+AccentButton {
+    background: #22303d;
+    border: 1px solid #3a4f63;
+    color: #ffffff;
+}
+
+AccentButton:hover {
+    background: #2b3c4c;
+    border: 1px solid #4a6179;
+}
+
+AccentButton:pressed {
+    background: #1a2530;
+    border: 1px solid #3a4f63;
+}

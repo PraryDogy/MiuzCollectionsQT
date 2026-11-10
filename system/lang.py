@@ -64,9 +64,9 @@ class Lng:
 		"Пожалуйста, введите имя. Это поле не может быть пустым.",
 		"Please enter a name. This field cannot be left blank."
 	)
-	select_folder_path = (
-		"Для продолжения работы необходимо указать путь к папке с изображениями.",
-		"You need to specify the path to the image folder to continue."
+	select_catalog_path = (
+		"Для продолжения работы необходимо указать путь к каталогу.",
+		"Specify a catalog path to continue.",
 	)
 	catalog_path = ("Путь к каталогу", "Catalog path")
 	general = ("Основные", "General")
@@ -222,14 +222,8 @@ class Lng:
 		"digits, and spaces.",
 	)
 	folder_name_full = (
-		"Имя:\n"
-		"• уникальное\n"
-		"• от 5 до 30 символов\n"
-		"• русские и английские буквы, цифры и пробелы",
-		"Folder name:\n"
-		"• unique\n"
-		"• 5–30 characters\n"
-		"• Russian and English letters, digits, and spaces",
+		"Имя: уникальное, от 5 до 30 символов, русские и английские буквы, цифры и пробелы",
+		"Name: unique, 5–30 characters, Russian and English letters, digits and spaces",
 	)
 	update_thumb = (
 		"Обновить изображение",

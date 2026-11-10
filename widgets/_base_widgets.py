@@ -451,6 +451,11 @@ class RedButton(UPushButton):
 		super().__init__(text)
 
 
+class AccentButton(UPushButton):
+	def __init__(self, text):
+		super().__init__(text)
+
+
 class USep(TransparentFrame):
 	def __init__(self):
 		super().__init__()
@@ -1305,7 +1310,7 @@ class MfAliasWidget(UGroupBox):
 		title_lay.addWidget(title)
 		v_layout.addWidget(title_wrapper)
 
-		autoname_button = UPushButton(Lng.auto_name)
+		autoname_button = AccentButton(Lng.auto_name)
 		autoname_button.setIcon(QIcon(str(Static.GRAY_ICONS / "wand_gray.svg")))
 		autoname_button.clicked.connect(self.auto_name_clicked.emit)
 		title_lay.addStretch()
@@ -1314,6 +1319,7 @@ class MfAliasWidget(UGroupBox):
 		# v_layout.addWidget(USep())
 
 		name_text = GrayTextLabel(Lng.folder_name_full)
+		name_text.setWordWrap(True)
 		name_text.setContentsMargins(0, 0, 0, 0)
 		v_layout.addWidget(name_text)
 
@@ -1621,7 +1627,7 @@ class MfPathWidget(UGroupBox):
 		# заголовок и кнопка поиска в одной строке
 		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
 
-		self.choose_btn = UPushButton(Lng.find_catalog)
+		self.choose_btn = AccentButton(Lng.find_catalog)
 		self.choose_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg")))
 		self.choose_btn.clicked.connect(self.dialog_dir)
 
@@ -1685,7 +1691,7 @@ class MfPathWidget(UGroupBox):
 
 	def validate_and_show_win(self):
 		if not self._path_exists():
-			win_warn = WarningWindow(Lng.select_folder_path)
+			win_warn = WarningWindow(Lng.select_catalog_path)
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
 			return None
