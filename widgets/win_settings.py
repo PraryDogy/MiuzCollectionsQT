@@ -950,32 +950,25 @@ class MfSettings(UGroupBox):
 		win.center_to_parent(self.window())
 		win.show()
 
-	def remove_mf(self, *args):
-
-		def start_task():
-			self.reset_task = MfCleaner(self.mf, is_remove_mf=True)
-			self.reset_task.sigs.finished_.connect(restart_app)
-			UThreadPool.start(self.reset_task)
-	
+	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
 			win = WarningWindow(Lng.at_least_one_folder_required)
 		else:
 			win = ConfirmWindow(Lng.app_will_restarted, danger=True)
-			win.ok_clicked.connect(start_task)
+			win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=True))
 		win.center_to_parent(self.window())
 		win.show()
 
 	def clean_mf_data(self):
-
-		def start_task():
-			self.reset_task = MfCleaner(self.mf, is_remove_mf=False)
-			self.reset_task.sigs.finished_.connect(restart_app)
-			UThreadPool.start(self.reset_task)
-
 		win = ConfirmWindow(Lng.app_will_restarted)
-		win.ok_clicked.connect(start_task)
+		win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=False))
 		win.center_to_parent(self.window())
 		win.show()
+
+	def start_mf_cleaner(self, is_remove: bool):
+		self.reset_task = MfCleaner(self.mf, is_remove_mf=is_remove)
+		self.reset_task.sigs.finished_.connect(restart_app)
+		UThreadPool.start(self.reset_task)
 
 	def mouseReleaseEvent(self, a0):
 		self.setFocus()
