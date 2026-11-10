@@ -709,7 +709,7 @@ class IgnoreListWin(UMainWindow):
 
 		btns_lay.addSpacing(5)
 
-		close_btn = UPushButton(Lng.close)
+		close_btn = UPushButton(Lng.cancel)
 		close_btn.clicked.connect(self._try_close)
 		btns_lay.addWidget(close_btn)
 
@@ -769,6 +769,7 @@ class IgnoreListWin(UMainWindow):
 			self.ok_clicked.emit(list(self.draft_stop_list))
 			self.has_unsaved = False
 			self.warning_icon.hide()
+		self.deleteLater()
 
 	def _try_close(self):
 		if self.has_unsaved:
