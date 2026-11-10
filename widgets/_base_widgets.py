@@ -1105,7 +1105,7 @@ class ConfirmWindow(VerticalWindow):
 	ok_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 
-	def __init__(self, text: str, danger: bool = True):
+	def __init__(self, text: str, danger: bool = False):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
