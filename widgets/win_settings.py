@@ -68,11 +68,6 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		# self.attention_icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
-		# self.attention_icon.setFixedSize(16, 16)
-		# self.attention_icon.setToolTip(Lng.unsaved_changes)
-		# self.h_lay.addWidget(self.attention_icon)
-
 		self.attention_icon = UTagWidget(
 			text=Lng.unsaved_changes,
 			style=UTagWidget.qss_yellow,
@@ -668,7 +663,7 @@ class IgnoreListWin(UMainWindow):
 
 		self.group_box = UGroupBox()
 		self.group_lay = QVBoxLayout(self.group_box)
-		self.group_lay.setContentsMargins(10, 5, 10, 5)
+		self.group_lay.setContentsMargins(10, 5, 10, 10)
 		self.group_lay.setSpacing(5)
 
 		self.title_widget = TitleTextWidget(
@@ -697,10 +692,22 @@ class IgnoreListWin(UMainWindow):
 
 		self.central_layout.addWidget(self.group_box)
 
-		self.save_group = SaveRowWidget(show_new_catalog=False)
-		self.save_group.save_clicked.connect(self.save_changes)
-		self.save_group.cancel_clicked.connect(self._try_close)
-		self.central_layout.addWidget(self.save_group)
+		self.central_layout.addSpacing(5)
+
+		btns_wrapper = TransparentWidget()
+		self.central_layout.addWidget(btns_wrapper)
+		btns_lay = QHBoxLayout(btns_wrapper)
+		btns_lay.setContentsMargins(0, 0, 0, 0)
+		btns_lay.setSpacing(5)
+
+		btns_lay.addStretch()
+		close_btn = UPushButton(Lng.close)
+		close_btn.clicked.connect(self._try_close)
+		btns_lay.addWidget(close_btn)
+
+		save_btn = ActiveButton(Lng.save)
+		save_btn.clicked.connect(self.save_changes)
+		btns_lay.addWidget(save_btn)
 
 		self.setMinimumWidth(380)
 		self.setMinimumHeight(380)
@@ -746,15 +753,12 @@ class IgnoreListWin(UMainWindow):
 			return
 		self.draft_stop_list.remove(path)
 		self.has_unsaved = True
-		self.save_group.show_warning()
 		self._refresh_list()
 
 	def save_changes(self):
-		# передаём черновик родителю; на диск он попадёт только после «Сохранить» в WinSettings
 		if self.has_unsaved:
 			self.ok_clicked.emit(list(self.draft_stop_list))
-		self.has_unsaved = False
-		self.deleteLater()
+			self.has_unsaved = False
 
 	def _try_close(self):
 		if self.has_unsaved:
