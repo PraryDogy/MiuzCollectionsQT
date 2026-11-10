@@ -565,9 +565,10 @@ class GeneralSettings(TransparentWidget):
 		win.show()
 
 
-
-TITLE_BTN_W = 135
-
+class StartBtn(QSvgWidget):
+	def __init__(self, text = ""):
+		super().__init__(str(Static.GRAY_ICONS / "arrow_right_solid_gray.svg"))
+		self.setFixedSize(20, 20)
 
 
 class MfRepairWidget(UGroupBox):
@@ -584,12 +585,11 @@ class MfRepairWidget(UGroupBox):
 		# заголовок и кнопка запуска в одной строке
 		title_widget = TitleTextWidget(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
 
-		self.start_btn = UPushButton(Lng.repair_catalog_short)
-		self.start_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "repair_gray.svg")))
-		self.start_btn.setFixedWidth(TITLE_BTN_W)
-		self.start_btn.clicked.connect(self.start_clicked.emit)
+		self.start_btn = StartBtn()
 
 		title_row = TransparentWidget()
+		title_row.setCursor(Qt.CursorShape.PointingHandCursor)
+		title_row.mouseReleaseEvent = lambda e: self.start_clicked.emit()
 		title_layout = QHBoxLayout(title_row)
 		title_layout.setContentsMargins(0, 0, 0, 0)
 		title_layout.setSpacing(10)
@@ -620,12 +620,11 @@ class MfRemoveWidget(UGroupBox):
 		# заголовок и кнопка удаления в одной строке
 		title_widget = TitleTextWidget(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
 
-		self.start_btn = RedButton(Lng.remove_folder)
-		self.start_btn.setIcon(QIcon(str(Static.COLOR_ICONS / "red_trash.svg")))
-		self.start_btn.setFixedWidth(TITLE_BTN_W - 1)
-		self.start_btn.clicked.connect(self.start_clicked.emit)
+		self.start_btn = StartBtn()
 
 		title_row = TransparentWidget()
+		title_row.setCursor(Qt.CursorShape.PointingHandCursor)
+		title_row.mouseReleaseEvent = lambda e: self.start_clicked.emit()
 		title_layout = QHBoxLayout(title_row)
 		title_layout.setContentsMargins(0, 0, 0, 0)
 		title_layout.setSpacing(10)
@@ -798,13 +797,11 @@ class MfStopListWidget(UGroupBox):
 		# заголовок и кнопка открытия списка в одной строке
 		title_label = TitleTextWidget(Lng.ignore_list, Static.COLOR_ICONS / "stop.svg")
 
-		add_button = UPushButton(Lng.open_list)
-		add_button.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
-		add_button.setIconSize(QSize(10, 10))
-		add_button.setFixedWidth(TITLE_BTN_W)
-		add_button.clicked.connect(self.open_ignore_list_win)
+		add_button = StartBtn()
 
 		title_row = TransparentWidget()
+		title_row.setCursor(Qt.CursorShape.PointingHandCursor)
+		title_row.mouseReleaseEvent = lambda e: self.open_ignore_list_win()
 		title_layout = QHBoxLayout(title_row)
 		title_layout.setContentsMargins(0, 0, 0, 0)
 		title_layout.setSpacing(10)
@@ -867,7 +864,6 @@ class MfSettings(UGroupBox):
 		self.title_label.h_layout.setContentsMargins(5, 0, 0, 0)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
-		self.path_widget.choose_btn.setFixedWidth(TITLE_BTN_W)
 		main_lay.addWidget(self.path_widget)
 
 		self.mf_stop_list = MfStopListWidget(self.mf)
