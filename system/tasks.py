@@ -332,10 +332,10 @@ class MfDataCleaner(URunnable):
 	- Удаляет запись о папке `mf` из DIRS.
 	"""
 
-	def __init__(self, mf_name: str):
+	def __init__(self, mf_alias: str):
 		super().__init__()
 		self.sigs = MfDataCleaner.Sigs()
-		self.mf_alias = mf_name
+		self.mf_alias = mf_alias
 
 	def task(self):
 		try:
@@ -345,11 +345,6 @@ class MfDataCleaner(URunnable):
 		self.sigs.finished_.emit()
 
 	def _task(self):
-		"""
-		Удаляет содержимое Dirs table по mf alias
-		Проверяет существует ли миниатюра по записи БД thumbs по mf alias
-		Удаляет записи, миниатюры которых не существует
-		"""
 		with Dbase.main_engine.begin() as conn:
 			self.clean_dir_table(conn)
 
