@@ -585,7 +585,7 @@ class MfRepairWidget(UGroupBox):
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
 		# заголовок и кнопка запуска в одной строке
-		title_widget = TitleTextWidget(Lng.repair_catalog_long, Static.COLOR_ICONS / "repair.svg")
+		title_widget = TitleTextWidget(Lng.repair_errors, Static.COLOR_ICONS / "repair.svg")
 
 		self.start_btn = StartBtn()
 

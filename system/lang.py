@@ -153,9 +153,9 @@ class Lng:
 		"Ошибки в каталоге",
 		"Errors in the catalog"
 	)
-	repair_catalog_short = (
-		"Исправить каталог",
-		"Repair catalog"
+	repair_errors = (
+		"Исправить ошибки",
+		"Repair errors"
 	)
 	app_will_restarted = (
 		"Приложение будет перезапущено. Нажмите ок, чтобы продолжить.",

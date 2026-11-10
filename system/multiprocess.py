@@ -38,21 +38,24 @@ class BaseProcessWorker:
 
 	def is_alive(self):
 		return self.process.is_alive()
-	
+
+	def _is_running(self) -> bool:
+		# pid is None, пока процесс не запущен через start()
+		return self.process.pid is not None and self.process.is_alive()
+
 	def terminate_join(self):
-		"""Корректно terminate с join. Завершает все очереди Queue."""
-		if self.process is not None:
+		"""Корректно останавливает процесс и закрывает очереди."""
+		if self._is_running():
 			self.process.terminate()
 			self.process.join(timeout=0.2)
-		else:
-			print("process is none")
+
+		if self._is_running():
+			self.process.kill()
+			self.process.join(timeout=0.2)
 
 		for queue in self._queues:
 			queue.close()
 			queue.cancel_join_thread()
-
-		if self.process.is_alive():
-			self.process.kill()
 
 		if self in BaseProcessWorker._registry:
 			BaseProcessWorker._registry.remove(self)
@@ -60,7 +63,6 @@ class BaseProcessWorker:
 	@staticmethod
 	def stop_all():
 		for worker in BaseProcessWorker._registry.copy():
-			worker: BaseProcessWorker
 			worker.terminate_join()
 
 
