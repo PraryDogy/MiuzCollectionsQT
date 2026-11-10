@@ -1607,6 +1607,41 @@ class SvgWithThemeBg(TransparentWidget):
 
 		super().mouseReleaseEvent(event)
 
+class MfPathStatus(TransparentWidget):
+	"""Строка статуса пути: иконка и текст. Состояние задаётся свойством 'state' для QSS."""
+
+	def __init__(self, parent=None):
+		super().__init__(parent)
+		self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+		lay = QHBoxLayout(self)
+		lay.setContentsMargins(10, 10, 10, 10)
+		lay.setSpacing(5)
+
+		self.icon = QSvgWidget()
+		self.icon.setFixedSize(16, 16)
+		lay.addWidget(self.icon)
+
+		self.label = TransparentLabel("")
+		self.label.set_elide(True)
+		lay.addWidget(self.label)
+
+		self.set_state("warn")
+
+	def set_state(self, state: str):
+		"""state: 'ok' или 'warn'. Меняет свойство, стиль переприменяется."""
+		if self.property("state") == state:
+			return
+		self.setProperty("state", state)
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
+
+	def set_status(self, icon_path: Path, text: str, state: str):
+		self.icon.load(str(icon_path))
+		self.label.setText(text)
+		self.set_state(state)
+
 
 class MfPathWidget(HoverGroupBox):
 	changed = pyqtSignal()
@@ -1626,12 +1661,10 @@ class MfPathWidget(HoverGroupBox):
 		self.watch_timer = QTimer(self)
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
 
-		# внешний горизонтальный layout: контент слева, стрелка справа
 		main_lay = QHBoxLayout(self)
 		main_lay.setContentsMargins(10, 5, 10, 5)
 		main_lay.setSpacing(10)
 
-		# левая часть: заголовок, описание и статус пути
 		content = TransparentWidget()
 		content_lay = QVBoxLayout(content)
 		content_lay.setContentsMargins(0, 0, 0, 0)
@@ -1646,23 +1679,9 @@ class MfPathWidget(HoverGroupBox):
 
 		content_lay.addWidget(USep())
 
-		# строка статуса: иконка слева, путь справа
-		status_row = TransparentWidget()
-		status_lay = QHBoxLayout(status_row)
-		status_lay.setContentsMargins(0, 0, 0, 0)
-		status_lay.setSpacing(5)
+		self.status = MfPathStatus()
+		content_lay.addWidget(self.status)
 
-		self.status_icon = QSvgWidget()
-		self.status_icon.setFixedSize(16, 16)
-		status_lay.addWidget(self.status_icon)
-
-		self.path_label = TransparentLabel("")
-		self.path_label.set_elide(True)
-		status_lay.addWidget(self.path_label)
-
-		content_lay.addWidget(status_row)
-
-		# правая часть: стрелка, по центру по вертикали
 		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
 		self.start_btn.setFixedSize(15, 15)
 
@@ -1679,24 +1698,21 @@ class MfPathWidget(HoverGroupBox):
 	def _path_exists(self) -> bool:
 		return bool(self.mf_path) and os.path.exists(self.mf_path)
 
-	def _status_icon_name(self) -> str:
-		"""Иконка статуса: нет пути / путь не существует / путь есть"""
-		if not self.mf_path:
-			return "yellow_warning.svg"
-		if not self._path_exists():
-			return "yellow_warning.svg"
-		return "green_checkmark.svg"
-
 	def update_ui(self):
-		"""Обновляет иконку статуса, описание и таймер по текущему пути"""
-		has_path = self._path_exists()
-		self.status_icon.load(str(Static.COLOR_ICONS / self._status_icon_name()))
-
-		if has_path:
-			self.path_label.setText(self.mf_path)
+		"""Обновляет статус, описание и таймер по текущему пути"""
+		if self._path_exists():
+			self.status.set_status(
+				Static.COLOR_ICONS / "green_checkmark.svg",
+				self.mf_path,
+				"ok",
+			)
 			self.watch_timer.stop()
 		else:
-			self.path_label.setText(Lng.no_catalog_path)
+			self.status.set_status(
+				Static.COLOR_ICONS / "yellow_warning.svg",
+				Lng.no_catalog_path,
+				"warn",
+			)
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
 
@@ -1738,6 +1754,6 @@ class MfPathWidget(HoverGroupBox):
 		return super().dropEvent(a0)
 
 	def dragEnterEvent(self, a0):
-		if a0.mimeData().hasUrls():  # Принимаем дроп только если это ссылки/файлы
+		if a0.mimeData().hasUrls():
 			a0.accept()
 		return super().dragEnterEvent(a0)

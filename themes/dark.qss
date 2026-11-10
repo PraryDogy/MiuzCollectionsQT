@@ -711,3 +711,34 @@ AccentButton:pressed {
     background: #0d2c52;
     border: 1px solid #2a5c98;
 }
+
+
+/* Строка статуса пути */
+MfPathStatus {
+    background: #18212a;
+    border: 1px dashed #263440;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+MfPathStatus[state="ok"] {
+    border: 2px dashed #10b981;
+}
+
+MfPathStatus[state="warn"] {
+    border: 2px dashed #eab308;
+}
+
+/* Текст пути: крупнее и ярче, чтобы читался как значение */
+MfPathStatus TransparentLabel {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    background: transparent;
+    border: none;
+}
+
+/* Предупреждение: текст жёлтым */
+MfPathStatus[state="warn"] TransparentLabel {
+    color: #eab308;
+}
