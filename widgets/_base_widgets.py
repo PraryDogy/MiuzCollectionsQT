@@ -1625,10 +1625,10 @@ class MfPathWidget(UGroupBox):
 		self.v_lay.addWidget(descr_label)
 
 		# строка статуса: иконка слева, описание пути справа
-		self.status_widget = QWidget()
+		self.status_widget = UGroupBox()
 		self.status_layout = QHBoxLayout(self.status_widget)
-		self.status_layout.setContentsMargins(0, 0, 0, 0)
-		self.status_layout.setSpacing(6)
+		self.status_layout.setContentsMargins(10, 10, 10, 10)
+		self.status_layout.setSpacing(5)
 
 		self.status_icon = QSvgWidget()
 		self.status_icon.setFixedSize(16, 16)
