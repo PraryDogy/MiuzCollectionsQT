@@ -588,7 +588,7 @@ class MfRepairWidget(UGroupBox):
 
 		self.v_lay.addWidget(title_row)
 
-		self.v_lay.addWidget(USep())
+		# self.v_lay.addWidget(USep())
 
 		descr = GrayTextLabel(Lng.catalog_reindex_warning)
 		descr.setWordWrap(True)
@@ -623,7 +623,7 @@ class MfRemoveWidget(UGroupBox):
 
 		self.v_lay.addWidget(title_row)
 
-		self.v_lay.addWidget(USep())
+		# self.v_lay.addWidget(USep())
 
 		descr = GrayTextLabel(Lng.catalog_delete_warning)
 		descr.setWordWrap(True)
@@ -658,7 +658,7 @@ class IgnoreListWin(UMainWindow):
 			svg=Static.COLOR_ICONS / "stop.svg"
 		)
 		self.group_lay.addWidget(self.title_widget)
-		self.group_lay.addWidget(USep())
+		# self.group_lay.addWidget(USep())
 
 		self.descr_widget = GrayTextLabel(text=Lng.ignore_list_descr_short)
 		self.descr_widget.setWordWrap(True)
@@ -821,7 +821,7 @@ class MfStopListWidget(UGroupBox):
 
 		v_layout.addWidget(title_row)
 
-		v_layout.addWidget(USep())
+		# v_layout.addWidget(USep())
 
 		description = GrayTextLabel(Lng.ignore_list_descr_short)
 		description.setWordWrap(True)
