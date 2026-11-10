@@ -893,7 +893,7 @@ class MfSettings(UGroupBox):
 		main_lay.addWidget(self.mf_stop_list)
 
 		self.repair_widget = MfRepairWidget()
-		self.repair_widget.start_clicked.connect(self.repair_mf)
+		self.repair_widget.start_clicked.connect(self.clean_mf_data)
 		main_lay.addWidget(self.repair_widget)
 
 		self.remove_folder = MfRemoveWidget()
@@ -952,48 +952,28 @@ class MfSettings(UGroupBox):
 
 	def remove_mf(self, *args):
 
-		def poll_task():
-			if not self.mf_remover.is_alive():
-				for i in Mf.items:
-					if i.mf_alias == self.mf.mf_alias:
-						Mf.items.remove(i)
-						break
-				if self.mf.mf_alias in JsonData.hide_digits_mf_lst:
-					JsonData.hide_digits_mf_lst.remove(self.mf.mf_alias)
-					JsonData.write_json_data()
-				Mf.write_json_data()
-				restart_app()
-			else:
-				QTimer.singleShot(1000, poll_task)
-
-		def start_mf_remover():
-			for i in UMainWindow.win_list:
-				i.hide()
-			self.mf_remover.start()
-			QTimer.singleShot(1000, poll_task)
-
-		self.mf_remover = ProcessWorker(
-			target=MfRemover.start,
-			args=(self.mf.mf_alias, )
-		)
-
+		def start_task():
+			self.reset_task = MfCleaner(self.mf, is_remove_mf=True)
+			self.reset_task.sigs.finished_.connect(restart_app)
+			UThreadPool.start(self.reset_task)
+	
 		if len(Mf.items) == 1:
 			win = WarningWindow(Lng.at_least_one_folder_required)
 		else:
 			win = ConfirmWindow(Lng.app_will_restarted, danger=True)
-			win.ok_clicked.connect(start_mf_remover)
+			win.ok_clicked.connect(start_task)
 		win.center_to_parent(self.window())
 		win.show()
 
-	def repair_mf(self, *args):
+	def clean_mf_data(self):
 
-		def reset_data():
+		def start_task():
 			self.reset_task = MfCleaner(self.mf, is_remove_mf=False)
 			self.reset_task.sigs.finished_.connect(restart_app)
 			UThreadPool.start(self.reset_task)
 
 		win = ConfirmWindow(Lng.app_will_restarted)
-		win.ok_clicked.connect(reset_data)
+		win.ok_clicked.connect(start_task)
 		win.center_to_parent(self.window())
 		win.show()
 
