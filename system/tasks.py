@@ -354,13 +354,23 @@ class MfDataCleaner(URunnable):
 			self.clean_dir_table(conn)
 
 			rel_paths = self.get_rel_thumb_paths(conn)
-			non_exist_paths = self.get_non_exist_rel_paths(rel_paths)
-			self.del_rel_thumb_paths(conn, non_exist_paths)
+			if rel_paths:
+				self.remove_thumb_images(rel_paths)
+				self.clean_thumbs_table(conn)
 
 	def clean_dir_table(self, conn: sqlalchemy.Connection):
 		stmt = (
 			sqlalchemy.delete(Dirs.table)
 			.where(Dirs.mf_alias == self.mf_alias)
+		)
+		conn.execute(stmt)
+		return True
+
+	def clean_thumbs_table(self, conn: sqlalchemy.Connection, rel_paths):
+		stmt = (
+			sqlalchemy.delete(Thumbs.table)
+			.where(Thumbs.rel_thumb_path.in_(rel_paths))
+			.where(Thumbs.mf_alias == self.mf_alias)
 		)
 		conn.execute(stmt)
 		return True
@@ -372,22 +382,13 @@ class MfDataCleaner(URunnable):
 		)
 		return conn.execute(stmt).scalars().all()
 
-	def del_rel_thumb_paths(self, conn: sqlalchemy.Connection, rel_paths):
-		stmt = (
-			sqlalchemy.delete(Thumbs.table)
-			.where(Thumbs.rel_thumb_path.in_(rel_paths))
-			.where(Thumbs.mf_alias == self.mf_alias)
-		)
-		conn.execute(stmt)
-		return True
-
-	def get_non_exist_rel_paths(self, rel_paths: list[str]):
-		non_exist_thumbs = []
+	def remove_thumb_images(self, rel_paths: list[str]):
 		for i in rel_paths:
 			abs_thumb_path = Mf.get_abs_thumb_path(i)
-			if not os.path.exists(abs_thumb_path):
-				non_exist_thumbs.append(i)
-		return non_exist_thumbs
+			try:
+				os.remove(abs_thumb_path)
+			except Exception as e:
+				print("Mf data cleaner erorr", e)
 
 
 class DbDirsLoader(URunnable):
