@@ -685,7 +685,13 @@ _MfPathLabel {
     border: 2px dashed #263440;
 }
 
+HoverGroupBox {
+    background: #101820;
+    border: 1px solid #263440;
+    border-radius: 8px;
+}
 
-HoverGroupBox:hover {
-    background: #aaaaaa;
+HoverGroupBox[hovered="true"] {
+    background: #1d2833;
+    border: 1px solid #30404f;
 }

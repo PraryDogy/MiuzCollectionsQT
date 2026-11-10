@@ -1311,7 +1311,7 @@ class MfAliasWidget(UGroupBox):
 		title_lay.addStretch()
 		title_lay.addWidget(autoname_button)
 
-		v_layout.addWidget(USep())
+		# v_layout.addWidget(USep())
 
 		name_text = GrayTextLabel(Lng.folder_name_full)
 		name_text.setContentsMargins(0, 0, 0, 0)

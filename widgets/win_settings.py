@@ -49,6 +49,25 @@ class CancelChangesWin(ConfirmWindow):
 class HoverGroupBox(UGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
+		self.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
+		self.setProperty("hovered", False)
+
+	def _set_hovered(self, value: bool):
+		if self.property("hovered") == value:
+			return
+		self.setProperty("hovered", value)
+		# перерисовываем стиль с учётом нового значения свойства
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
+
+	def enterEvent(self, event):
+		self._set_hovered(True)
+		super().enterEvent(event)
+
+	def leaveEvent(self, event):
+		self._set_hovered(False)
+		super().leaveEvent(event)
 
 
 
