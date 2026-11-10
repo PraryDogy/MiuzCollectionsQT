@@ -697,17 +697,17 @@ HoverGroupBox[hovered="true"] {
 }
 
 AccentButton {
-    background: #22303d;
-    border: 1px solid #3a4f63;
-    color: #ffffff;
+    background: #15447f;
+    border: 1px solid #2a5c98;
+    color: #e6eefc;
 }
 
 AccentButton:hover {
-    background: #2b3c4c;
-    border: 1px solid #4a6179;
+    background: #1b5394;
+    border: 1px solid #3a6fb0;
 }
 
 AccentButton:pressed {
-    background: #1a2530;
-    border: 1px solid #3a4f63;
+    background: #0d2c52;
+    border: 1px solid #2a5c98;
 }

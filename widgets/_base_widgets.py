@@ -197,6 +197,30 @@ class UGroupBox(QGroupBox):
 		super().__init__(title, parent)
 
 
+class HoverGroupBox(UGroupBox):
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+		self.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
+		self.setProperty("hovered", False)
+
+	def _set_hovered(self, value: bool):
+		if self.property("hovered") == value:
+			return
+		self.setProperty("hovered", value)
+		# перерисовываем стиль с учётом нового значения свойства
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
+
+	def enterEvent(self, event):
+		self._set_hovered(True)
+		super().enterEvent(event)
+
+	def leaveEvent(self, event):
+		self._set_hovered(False)
+		super().leaveEvent(event)
+
+
 class TransparentListWidget(QListWidget):
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -1310,7 +1334,7 @@ class MfAliasWidget(UGroupBox):
 		title_lay.addWidget(title)
 		v_layout.addWidget(title_wrapper)
 
-		autoname_button = AccentButton(Lng.auto_name)
+		autoname_button = UPushButton(Lng.auto_name)
 		autoname_button.setIcon(QIcon(str(Static.GRAY_ICONS / "wand_gray.svg")))
 		autoname_button.clicked.connect(self.auto_name_clicked.emit)
 		title_lay.addStretch()

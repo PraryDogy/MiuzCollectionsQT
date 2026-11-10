@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal, QEvent
+from PyQt6.QtCore import QEvent, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QContextMenuEvent, QFontMetrics, QIcon,
                          QImage, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
@@ -19,18 +19,18 @@ from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 from system.shared_utils import SharedUtils
-from system.tasks import (HashDirSize, HashDirSizeItem, MfCleaner,
-                          UThreadPool)
+from system.tasks import HashDirSize, HashDirSizeItem, MfCleaner, UThreadPool
 from system.themes import ThemeChanger
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-                            MfAliasWidget, MfPathWidget, RedButton,
-                            RowArrowWidget, TitleTextWidget, TransparentLabel,
+                            HoverGroupBox, MfAliasWidget, MfPathWidget,
+                            RowArrowWidget, SuperConfirmWindow,
+                            TitleTextWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UListSpacerItem,
                             UListWidget, UListWidgetItem, UMainWindow, UMenu,
                             UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            UTagWidget, WarningWindow, SuperConfirmWindow)
+                            UTagWidget, WarningWindow)
 
 
 def restart_app():
@@ -44,31 +44,6 @@ class CancelChangesWin(ConfirmWindow):
 		super().__init__(text, danger=True)
 		self.ok_btn.setText(Lng.do_not_save)
 		self.cancel_btn.setText(Lng.keep_editing)
-
-
-class HoverGroupBox(UGroupBox):
-	def __init__(self, title=None, parent=None):
-		super().__init__(title, parent)
-		self.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
-		self.setProperty("hovered", False)
-
-	def _set_hovered(self, value: bool):
-		if self.property("hovered") == value:
-			return
-		self.setProperty("hovered", value)
-		# перерисовываем стиль с учётом нового значения свойства
-		self.style().unpolish(self)
-		self.style().polish(self)
-		self.update()
-
-	def enterEvent(self, event):
-		self._set_hovered(True)
-		super().enterEvent(event)
-
-	def leaveEvent(self, event):
-		self._set_hovered(False)
-		super().leaveEvent(event)
-
 
 
 class SaveRowWidget(TransparentWidget):
