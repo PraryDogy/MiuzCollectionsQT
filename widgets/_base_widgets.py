@@ -1635,7 +1635,7 @@ class MfPathWidget(UGroupBox):
 
 		self.v_lay.addWidget(self.title_row)
 
-		self.v_lay.addWidget(USep())
+		# self.v_lay.addWidget(USep())
 
 		descr_label = GrayTextLabel(Lng.catalog_path_descr)
 		descr_label.setWordWrap(True)
