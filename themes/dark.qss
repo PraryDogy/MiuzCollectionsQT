@@ -385,19 +385,19 @@ USlider::handle:horizontal {
    --------------------------------------------------------------------- */
 
 RedButton {
-    color: #ffffff;
-    background: #B8414C;
-    border: 1px solid #A23540;
+    color: #F2E6E7;
+    background: #8F3B43;
+    border: 1px solid #7A3239;
 }
 
 RedButton:hover {
-    background: #C94B56;
-    border: 1px solid #E0525B;
+    background: #9E444C;
+    border: 1px solid #8F3B43;
 }
 
 RedButton:pressed {
-    background: #8E2F38;
-    border: 1px solid #FF646D;
+    background: #6E2D34;
+    border: 1px solid #5C262C;
 }
 
 
