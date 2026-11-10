@@ -68,9 +68,16 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		self.attention_icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
-		self.attention_icon.setFixedSize(16, 16)
-		self.attention_icon.setToolTip(Lng.unsaved_changes)
+		# self.attention_icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		# self.attention_icon.setFixedSize(16, 16)
+		# self.attention_icon.setToolTip(Lng.unsaved_changes)
+		# self.h_lay.addWidget(self.attention_icon)
+
+		self.attention_icon = UTagWidget(
+			text=Lng.unsaved_changes,
+			style=UTagWidget.qss_yellow,
+			l_svg=Static.GRAY_ICONS / "attention_gray.svg"
+		)
 		self.h_lay.addWidget(self.attention_icon)
 
 		self.h_lay.addSpacing(5)
