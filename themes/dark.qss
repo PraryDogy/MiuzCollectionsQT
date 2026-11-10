@@ -682,4 +682,5 @@ UTreeWidget::branch:has-children:open {
 
 _MfPathLabel {
     background: #18212a;
+    border: 2px dashed #263440;
 }
