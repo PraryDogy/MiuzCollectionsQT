@@ -29,6 +29,60 @@ class Mf:
 		self.mf_stop_list: list[str] = mf_stop_list
 
 	@classmethod
+	def json_to_app(cls, data: list[dict]):
+		cls.items.clear()
+		for d in data:
+			cls.items.append(Mf(**d))
+
+	def create_abs_path(self, rel_path: str) -> str:
+		return os.path.join(self.mf_paths[0], rel_path.lstrip(os.sep))
+
+	def create_rel_path(self, abs_path: str) -> str:
+		rel = os.path.relpath(abs_path, self.mf_paths[0])
+		if rel == os.curdir:
+			return os.sep
+		return os.sep + rel
+
+	def create_abs_thumb_path(self, rel_img_path: str) -> str:
+		clean_rel_path = rel_img_path.strip(os.sep)
+		encoded = clean_rel_path.encode('utf-8')
+		filename = hashlib.md5(encoded).hexdigest() + ".jpg"
+		folder_name = f"{self.mf_alias}-{filename[:2]}"
+		new_folder = Static.HASHDIR / folder_name
+		new_folder.mkdir(parents=True, exist_ok=True)
+		return str(new_folder / filename)
+
+	@classmethod
+	def get_rel_thumb_path(cls, abs_thumb_path: str):
+		p_base = Path(str(Static.APP_DATA_DIR).strip(os.sep))
+		p_abs = Path(abs_thumb_path.strip(os.sep))
+		if p_abs.is_relative_to(p_base):
+			return os.sep + str(p_abs.relative_to(p_base))
+
+	@classmethod
+	def get_abs_thumb_path(cls, rel_thumb_path: str):
+		rel_thumb_path = Path(rel_thumb_path.strip(os.sep))
+		return Static.APP_DATA_DIR / rel_thumb_path
+
+	def is_root_alive(self):
+		return os.path.exists(self.mf_paths[0])
+	
+	def get_data(self):
+		return {i: getattr(self, i) for i in self.__slots__}
+
+	def repair_ignore_list(self):
+		self.mf_stop_list = [i for i in self.mf_stop_list if i]
+
+	@classmethod
+	def write_json_data(cls):
+		with open(Static.MF_JSON, "w", encoding="utf-8") as file:
+			data = []
+			for i in cls.items:
+				i.repair_ignore_list()
+				data.append(i.get_data())
+			json.dump(data, file, ensure_ascii=False, indent=4)
+
+	@classmethod
 	def validate_json(cls):
 		try:
 			with open(Static.MF_JSON, "r", encoding="utf-8") as file:
@@ -92,57 +146,3 @@ class Mf:
 			return None
 
 		return unique_mf
-
-	@classmethod
-	def json_to_app(cls, data: list[dict]):
-		cls.items.clear()
-		for d in data:
-			cls.items.append(Mf(**d))
-
-	def create_abs_path(self, rel_path: str) -> str:
-		return os.path.join(self.mf_paths[0], rel_path.lstrip(os.sep))
-
-	def create_rel_path(self, abs_path: str) -> str:
-		rel = os.path.relpath(abs_path, self.mf_paths[0])
-		if rel == os.curdir:
-			return os.sep
-		return os.sep + rel
-
-	def create_abs_thumb_path(self, rel_img_path: str) -> str:
-		clean_rel_path = rel_img_path.strip(os.sep)
-		encoded = clean_rel_path.encode('utf-8')
-		filename = hashlib.md5(encoded).hexdigest() + ".jpg"
-		folder_name = f"{self.mf_alias}-{filename[:2]}"
-		new_folder = Static.HASHDIR / folder_name
-		new_folder.mkdir(parents=True, exist_ok=True)
-		return str(new_folder / filename)
-
-	@classmethod
-	def get_rel_thumb_path(cls, abs_thumb_path: str):
-		p_base = Path(str(Static.APP_DATA_DIR).strip(os.sep))
-		p_abs = Path(abs_thumb_path.strip(os.sep))
-		if p_abs.is_relative_to(p_base):
-			return os.sep + str(p_abs.relative_to(p_base))
-
-	@classmethod
-	def get_abs_thumb_path(cls, rel_thumb_path: str):
-		rel_thumb_path = Path(rel_thumb_path.strip(os.sep))
-		return Static.APP_DATA_DIR / rel_thumb_path
-
-	def is_root_alive(self):
-		return os.path.exists(self.mf_paths[0])
-	
-	def get_data(self):
-		return {i: getattr(self, i) for i in self.__slots__}
-
-	def repair_ignore_list(self):
-		self.mf_stop_list = [i for i in self.mf_stop_list if i]
-
-	@classmethod
-	def write_json_data(cls):
-		with open(Static.MF_JSON, "w", encoding="utf-8") as file:
-			data = []
-			for i in cls.items:
-				i.repair_ignore_list()
-				data.append(i.get_data())
-			json.dump(data, file, ensure_ascii=False, indent=4)

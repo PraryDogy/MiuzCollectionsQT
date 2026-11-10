@@ -1,7 +1,13 @@
-abst = "/Downloads/test"
-filena = "subfolder/1.jpg"
+class Test:
+
+    def __init__(self):
+        super().__init__()
+        self.paths = [1, 2, 3, 4, 555]
+
+    @property
+    def path(self):
+        return self.paths[-1]
 
 
-import os
-
-print(os.path.join(abst, filena))
+test = Test()
+print(test.path)
