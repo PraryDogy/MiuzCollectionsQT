@@ -46,6 +46,12 @@ class CancelChangesWin(ConfirmWindow):
 		self.cancel_btn.setText(Lng.keep_editing)
 
 
+class HoverGroupBox(UGroupBox):
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+
+
+
 class SaveRowWidget(TransparentWidget):
 	save_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
@@ -560,7 +566,7 @@ class StartBtn(QSvgWidget):
 		self.setFixedSize(20, 20)
 
 
-class MfRepairWidget(UGroupBox):
+class MfRepairWidget(HoverGroupBox):
 	start_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -598,7 +604,7 @@ class MfRepairWidget(UGroupBox):
 		super().mouseReleaseEvent(event)
 
 
-class MfRemoveWidget(UGroupBox):
+class MfRemoveWidget(HoverGroupBox):
 	start_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -796,7 +802,7 @@ class IgnoreListWin(UMainWindow):
 		return super().keyPressEvent(a0)
 
 
-class MfStopListWidget(UGroupBox):
+class MfStopListWidget(HoverGroupBox):
 	changed = pyqtSignal()
 
 	def __init__(self, mf: Mf):

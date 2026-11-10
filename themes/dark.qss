@@ -684,3 +684,8 @@ _MfPathLabel {
     background: #18212a;
     border: 2px dashed #263440;
 }
+
+
+HoverGroupBox:hover {
+    background: #aaaaaa;
+}
