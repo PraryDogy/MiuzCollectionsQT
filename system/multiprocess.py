@@ -416,35 +416,6 @@ class FilesRemover:
 				deleted_files.append(path)
 		queue.put(deleted_files)
 
-class MfRemover:
-	@staticmethod
-	def start(mf_alias: str, queue: Queue):
-		with Dbase.create_engine().begin() as conn:
-			stmt = (
-				sqlalchemy.select(Thumbs.rel_thumb_path)
-				.where(Thumbs.mf_alias == mf_alias)
-			)
-			res = conn.execute(stmt).scalars().all()
-
-			for rel_thumb_path in res:
-				abs_thumb_path = Mf.get_abs_thumb_path(rel_thumb_path)
-				try:
-					os.remove(abs_thumb_path)
-				except (Exception, FileNotFoundError) as e:
-					print(traceback.format_exc())
-					continue
-				
-				try:
-					os.rmdir(os.path.dirname(abs_thumb_path))
-				except OSError:
-					pass
-					
-			stmt = sqlalchemy.delete(Thumbs.table).where(Thumbs.mf_alias == mf_alias)
-			conn.execute(stmt)
-			
-			stmt = sqlalchemy.delete(Dirs.table).where(Dirs.mf_alias == mf_alias)
-			conn.execute(stmt)
-
 
 @dataclass(slots=True)
 class UpdateThumbItem:

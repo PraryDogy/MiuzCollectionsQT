@@ -17,7 +17,7 @@ from system.database import Dirs
 from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
-from system.multiprocess import MfRemover, ProcessWorker
+from system.multiprocess import ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import (HashDirSize, HashDirSizeItem, MfCleaner,
                           UThreadPool)
