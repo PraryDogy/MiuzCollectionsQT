@@ -554,12 +554,6 @@ class GeneralSettings(TransparentWidget):
 		win.show()
 
 
-class StartBtn(QSvgWidget):
-	def __init__(self, text = ""):
-		super().__init__(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
-		self.setFixedSize(15, 15)
-
-
 class MfRepairWidget(HoverGroupBox):
 	start_clicked = pyqtSignal()
 
@@ -587,7 +581,8 @@ class MfRepairWidget(HoverGroupBox):
 		content_lay.addWidget(descr)
 
 		# правая часть: кнопка запуска, по центру по вертикали
-		self.start_btn = StartBtn()
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn.setFixedSize(15, 15)
 
 		main_lay.addWidget(content, 1)
 		main_lay.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -625,7 +620,8 @@ class MfRemoveWidget(HoverGroupBox):
 		content_lay.addWidget(descr)
 
 		# правая часть: кнопка запуска, по центру по вертикали
-		self.start_btn = StartBtn()
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn.setFixedSize(15, 15)
 
 		main_lay.addWidget(content, 1)
 		main_lay.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -827,10 +823,11 @@ class MfStopListWidget(HoverGroupBox):
 		content_lay.addWidget(description)
 
 		# правая часть: кнопка открытия списка, по центру по вертикали
-		self.add_button = StartBtn()
+		self.add_button = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.add_button.setFixedSize(15, 15)
 
-		main_lay.addWidget(content, 1)
-		main_lay.addWidget(self.add_button, 0, Qt.AlignmentFlag.AlignVCenter)
+		main_lay.addWidget(content)
+		main_lay.addWidget(self.add_button)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
