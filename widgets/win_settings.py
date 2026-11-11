@@ -93,6 +93,12 @@ class SaveRowWidget(TransparentWidget):
 		self.attention_icon.hide()
 
 
+class LangTimeWidget(UGroupBox):
+	def __init__(self, title=None, parent=None):
+		super().__init__(title, parent)
+
+
+
 class RebootableSettings(UGroupBox):
 	changed = pyqtSignal()
 	lang_changed = pyqtSignal()
