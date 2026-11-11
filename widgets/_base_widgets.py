@@ -1701,6 +1701,9 @@ class MfPathWidget(HoverGroupBox):
 	def update_ui(self):
 		"""Обновляет статус, описание и таймер по текущему пути"""
 		if self._path_exists():
+			self.setToolTip(
+				self.mf_path
+			)
 			self.status.set_status(
 				Static.COLOR_ICONS / "green_checkmark.svg",
 				self.mf_path,
@@ -1708,6 +1711,9 @@ class MfPathWidget(HoverGroupBox):
 			)
 			self.watch_timer.stop()
 		else:
+			self.setToolTip(
+				Lng.find_catalog
+			)
 			self.status.set_status(
 				Static.COLOR_ICONS / "yellow_warning.svg",
 				Lng.no_catalog_path,
