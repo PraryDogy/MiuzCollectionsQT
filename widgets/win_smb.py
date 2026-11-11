@@ -13,7 +13,7 @@ from system.multiprocess import ProcessWorker
 from system.servers import Servers
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget,
-                            SuperConfirmWindow, TitleTextWidget,
+                            QVBoxLayout, TitleTextWidget,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton)
 from .win_servers import ServersWin
@@ -36,10 +36,19 @@ class WinSmb(UMainWindow):
 		# Делаем отступы аккуратными
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
-		
+
+		main_wrapper = UGroupBox()
+		self.central_layout.addWidget(main_wrapper)
+		wrapper_lay = QVBoxLayout(main_wrapper)
+		wrapper_lay.setContentsMargins(5, 10, 5, 10)
+		wrapper_lay.setSpacing(10)
+
+		title_widget = TitleTextWidget(mf.mf_alias, Static.COLOR_ICONS / "image_folder.svg")
+		wrapper_lay.addWidget(title_widget)
+
 		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(mf)
-		self.central_layout.addWidget(self.path_widget)
+		wrapper_lay.addWidget(self.path_widget)
 
 		# --- Кнопки ---
 		btns_wid = TransparentWidget()
@@ -65,9 +74,10 @@ class WinSmb(UMainWindow):
 		self.ok_btn.clicked.connect(self.ok_cmd)
 		btns_lay.addWidget(self.ok_btn)
 
-		self.setFixedWidth(380)
-		self.adjustSize()
-		self.setFixedHeight(self.height())
+		self.setFixedWidth(400)
+		# self.setFixedHeight(400)
+		# self.adjustSize()
+		# self.setFixedHeight(self.height())
 
 	def open_servers(self):
 		self.servers_win = ServersWin()
