@@ -5,24 +5,24 @@ from pathlib import Path
 from typing import Literal
 
 from PyQt6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
-						  pyqtSignal)
+                          pyqtSignal)
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-						 QFontMetrics, QIcon, QMouseEvent, QPainter,
-						 QPainterPath, QPalette)
+                         QFontMetrics, QIcon, QMouseEvent, QPainter,
+                         QPainterPath, QPalette)
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout,
-							 QGroupBox, QHBoxLayout, QLabel, QLayout,
-							 QLineEdit, QListWidget, QListWidgetItem,
-							 QMainWindow, QMenu, QProgressBar, QPushButton,
-							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
-							 QStackedWidget, QStyle, QStyledItemDelegate,
-							 QApplication, QStyleOptionViewItem, QTextEdit,
-							 QTreeView, QTreeWidget, QTreeWidgetItem,
-							 QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
+                             QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+                             QLayout, QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QProgressBar, QPushButton,
+                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
+                             QStackedWidget, QStyle, QStyledItemDelegate,
+                             QStyleOptionViewItem, QTextEdit, QTreeView,
+                             QTreeWidget, QTreeWidgetItem, QVBoxLayout,
+                             QWidget)
 
 from cfg import JsonData, Static
+from system.items import Mf
 from system.lang import Lng
-from system.main_folder import Mf
 from system.themes import ThemeChanger
 from system.utils import Utils
 

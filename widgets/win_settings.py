@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import QSize, Qt, QTimer, pyqtSignal, QEvent
+from PyQt6.QtCore import QEvent, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (QAction, QContextMenuEvent, QFontMetrics, QIcon,
                          QImage, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
@@ -14,23 +14,22 @@ from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSizePolicy,
 
 from cfg import JsonData, Static, Themes
 from system.database import Dirs
-from system.items import SettingsItem
+from system.items import Mf, SettingsItem
 from system.lang import Lng
-from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
 from system.shared_utils import SharedUtils
-from system.tasks import (HashDirSize, HashDirSizeItem, MfCleaner,
-                          UThreadPool)
+from system.tasks import HashDirSize, HashDirSizeItem, MfCleaner, UThreadPool
 from system.themes import ThemeChanger
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-                            MfAliasWidget, MfPathWidget, HoverGroupBox,
-                            RowArrowWidget, TitleTextWidget, TransparentLabel,
+                            HoverGroupBox, MfAliasWidget, MfPathWidget,
+                            RowArrowWidget, SuperConfirmWindow,
+                            TitleTextWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UListSpacerItem,
                             UListWidget, UListWidgetItem, UMainWindow, UMenu,
                             UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            UTagWidget, WarningWindow, SuperConfirmWindow)
+                            UTagWidget, WarningWindow)
 
 
 def restart_app():

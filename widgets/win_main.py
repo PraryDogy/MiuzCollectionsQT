@@ -3,21 +3,19 @@ import os
 import subprocess
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeyEvent, QImage
+from PyQt6.QtGui import QCloseEvent, QGuiApplication, QImage, QKeyEvent
 from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.filters import Filters
-from system.items import DataItem, SettingsItem
+from system.items import DataItem, Filters, Mf, SettingsItem
 from system.lang import Lng
-from system.main_folder import Mf
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
                            PathCheckPassed, PathMismatch, ScanerWorker,
                            ScanProgress)
 from system.shared_utils import ImgUtils
-from system.tasks import SetFav, UThreadPool, Utils, ThumbScale
+from system.tasks import SetFav, ThumbScale, UThreadPool, Utils
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, USep, WarningWindow)

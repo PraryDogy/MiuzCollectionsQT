@@ -7,7 +7,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.filters import Filters
+from system.items import Filters
 from system.lang import Lng
 from system.utils import ReadableDate
 

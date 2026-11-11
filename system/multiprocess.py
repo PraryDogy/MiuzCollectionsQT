@@ -18,8 +18,8 @@ from typing_extensions import Literal
 from cfg import JsonData, Static
 
 from .database import Dbase, Dirs, Thumbs
+from .items import Mf
 from .lang import Lng
-from .main_folder import Mf
 from .shared_utils import ImgUtils, SharedUtils
 from .tasks import Utils
 

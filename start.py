@@ -9,10 +9,8 @@ from PyQt6.QtWidgets import (QApplication, QDialog, QPushButton, QTextEdit,
 
 from cfg import JsonData, Static
 from system.database import Dbase
-from system.filters import Filters
+from system.items import Filters, Mf, Servers
 from system.lang import Lng
-from system.main_folder import Mf
-from system.servers import Servers
 from system.tasks import UThreadPool
 from system.themes import ThemeChanger
 from widgets._base_widgets import UMainWindow

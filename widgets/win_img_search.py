@@ -10,18 +10,17 @@ from PyQt6.QtSvgWidgets import QSvgWidget  # Не забудьте импорт�
 from PyQt6.QtWidgets import QHBoxLayout, QStackedWidget, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
+from system.items import Mf
 from system.lang import Lng
-from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import ImgUtils
 from system.tasks import BlurImgBgTask, ImageSearcher, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
-                            TitleTextWidget, TransparentFrame, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, USep, USlider)
-
+                            TitleTextWidget, TransparentFrame,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UMainWindow, UPushButton, USep, USlider)
 
 DROP_WIDGET_SIZE = (350, 300)
 

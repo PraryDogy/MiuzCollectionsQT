@@ -10,7 +10,7 @@ import sqlalchemy
 
 from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
-from system.main_folder import Mf
+from system.items import Mf
 from system.multiprocess import BaseProcessWorker
 from system.shared_utils import ImgUtils
 from system.utils import Utils

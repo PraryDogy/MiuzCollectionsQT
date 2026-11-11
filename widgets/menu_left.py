@@ -7,15 +7,14 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QVBoxLayout
 
 from cfg import JsonData, Static
-from system.items import SettingsItem
+from system.items import Mf, SettingsItem
 from system.lang import Lng
-from system.main_folder import Mf
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,
-							TransparentWidget, USep, UMenu,
-							UTreeWidget, UTreeWidgetItem)
+                            TransparentWidget, UMenu, USep, UTreeWidget,
+                            UTreeWidgetItem)
 
 
 class MenuLeftTreeWidgetItem(UTreeWidgetItem):

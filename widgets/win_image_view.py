@@ -15,9 +15,8 @@ from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
 from typing_extensions import Literal
 
 from cfg import JsonData, Static
-from system.items import DataItem
+from system.items import DataItem, Mf
 from system.lang import Lng
-from system.main_folder import Mf
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import SharedUtils
 from system.tasks import ImgArrayQImage, UThreadPool, WriteNewThumb

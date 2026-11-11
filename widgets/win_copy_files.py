@@ -6,8 +6,8 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy
 
 from cfg import JsonData, Static
+from system.items import Mf
 from system.lang import Lng
-from system.main_folder import Mf
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,

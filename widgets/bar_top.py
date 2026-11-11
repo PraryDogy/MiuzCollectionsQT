@@ -6,13 +6,12 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QGridLayout, QHBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.items import SettingsItem
+from system.items import Mf, SettingsItem
 from system.lang import Lng
-from system.main_folder import Mf
 
-from ._base_widgets import (GrayTextLabel, USvgWidgetBg, TitleBar,
-                            TransparentFrame, TransparentWidget, ULineEdit,
-                            UMenu, UPushButton)
+from ._base_widgets import (GrayTextLabel, TitleBar, TransparentFrame,
+                            TransparentWidget, ULineEdit, UMenu, UPushButton,
+                            USvgWidgetBg)
 from .win_servers import ServersWin
 from .win_text_search import WinTextSearch
 

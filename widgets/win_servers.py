@@ -4,14 +4,14 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtCore import QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
+from system.items import Servers
 from system.lang import Lng
-from system.servers import Servers
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
                             TitleTextWidget, TransparentLabel,

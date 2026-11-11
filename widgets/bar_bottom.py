@@ -6,14 +6,12 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
+from system.items import Mf
 from system.lang import Lng
-from system.main_folder import Mf
 from system.scaner import ScanProgress
 from system.shared_utils import ImgUtils
 
-from ._base_widgets import (GrayTextLabel, TransparentWidget, USep,
-                            USlider)
-
+from ._base_widgets import GrayTextLabel, TransparentWidget, USep, USlider
 
 # =============================================================================
 # ПУТЬ (бывший bar_path.py)

@@ -10,14 +10,13 @@ from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
+from system.items import Mf
 from system.lang import Lng
-from system.main_folder import Mf
 from system.tasks import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
-							RowArrowWidget, SaveRowArrowWidget,
-							UGroupBox, UMainWindow, UMenu,
-							UPushButton)
+                            RowArrowWidget, SaveRowArrowWidget, UGroupBox,
+                            UMainWindow, UMenu, UPushButton)
 
 
 def restart_app():

@@ -1,25 +1,24 @@
 import os
+import subprocess
 from datetime import datetime
 from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QIcon, QKeyEvent, QPixmap, QAction
+from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
                              QSpacerItem, QVBoxLayout)
 
 from cfg import JsonData, Static
-from system.items import DataItem
+from system.items import DataItem, Mf
 from system.lang import Lng
-from system.main_folder import Mf
 from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import BlurImgBgTask, UThreadPool
-from system.utils import Utils, ReadableDate
+from system.utils import ReadableDate, Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
                             UPushButton)
-import subprocess
 
 
 class WinInfoSelectableLabel(TransparentLabel):

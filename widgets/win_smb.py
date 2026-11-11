@@ -7,15 +7,13 @@ from PyQt6.QtWidgets import QApplication, QHBoxLayout
 
 from cfg import Static
 from system.database import Dirs
+from system.items import Mf, Servers
 from system.lang import Lng
-from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
-from system.servers import Servers
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget,
-                            QVBoxLayout, TitleTextWidget,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton)
+                            QVBoxLayout, TitleTextWidget, TransparentWidget,
+                            UGroupBox, UMainWindow, UPushButton)
 from .win_servers import ServersWin
 
 
