@@ -914,15 +914,57 @@ class MfSettings(UGroupBox):
 	def _on_fields_changed(self):
 		self.changed.emit()
 
-	def clean_mf_data(self):
-		def fin():
-			Dirs.reset_mod(self.mf.mf_alias)
+	def save_changes(self):
+		if not self.path_widget.validate_and_show_win():
+			win_warn = WarningWindow(Lng.select_catalog_path)
+			win_warn.center_to_parent(self.window())
+			win_warn.ok_clicked.connect(win_warn.deleteLater)
+			win_warn.show()
+			return
+
+		def final():
+			if self.path_widget.draft_mf_path != self.mf.mf_path:
+				# индекс относится к старому каталогу: заставляем сканер пересравнить все папки
+				Dirs.reset_mod(self.mf.mf_alias)
+				self.mf.old_mf_path = self.mf.mf_path
+
+			self.mf.mf_path = self.path_widget.draft_mf_path
+			self.mf.mf_stop_list = self.mf_stop_list.get_stop_list()
+			Mf.write_json_data()
 			restart_app()
 
-		self.repair_win = ConfirmWindow(Lng.catalog_reindex_warning)
-		self.repair_win.ok_clicked.connect(fin)
-		self.repair_win.center_to_parent(self.window())
-		self.repair_win.show()
+		if self.path_widget.draft_mf_path != self.mf.mf_path:
+			win = SuperConfirmWindow(Lng.make_sure_path)
+		else:
+			win = ConfirmWindow(Lng.app_will_restarted)
+
+		win.ok_clicked.connect(final)
+		win.center_to_parent(self.window())
+		win.show()
+
+	def remove_mf(self, *args):	
+		if len(Mf.items) == 1:
+			win = WarningWindow(Lng.at_least_one_folder_required)
+		else:
+			win = ConfirmWindow(Lng.remove_catalog_warn, danger=True)
+			win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=True))
+		win.center_to_parent(self.window())
+		win.show()
+
+	def clean_mf_data(self):
+		win = ConfirmWindow(Lng.repair_catalog_warn)
+		win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=False))
+		win.center_to_parent(self.window())
+		win.show()
+
+	def start_mf_cleaner(self, is_remove: bool):
+		self.reset_task = MfCleaner(self.mf, is_remove_mf=is_remove)
+		self.reset_task.sigs.finished_.connect(restart_app)
+		UThreadPool.start(self.reset_task)
+
+	def mouseReleaseEvent(self, a0):
+		self.setFocus()
+		return super().mouseReleaseEvent(a0)
 
 
 class NewMfWin(UMainWindow):
