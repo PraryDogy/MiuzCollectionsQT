@@ -1520,95 +1520,49 @@ class FlowLayout(QLayout):
 		return y + line_height - rect.y() + margins.bottom()
 
 
-
-class _SvgWithThemeBg(TransparentLabel):
-	qss_base_style = "base"
-	qss_selected_style = "selected"
-	qss_pressed_style = "pressed"
-	attr_name = "style"
-
-	def __init__(self):
-		super().__init__()
-		self.set_base()
-
-	def set_style_state(self, state: str):
-		if self.property(self.attr_name) != state:
-			self.setProperty(self.attr_name, state)
-			self.style().unpolish(self)
-			self.style().polish(self)
-			self.update()
-
-	def set_base(self):
-		self.set_style_state(self.qss_base_style)
-
-	def set_selected(self):
-		self.set_style_state(self.qss_selected_style)
-
-	def set_pressed(self):
-		self.set_style_state(self.qss_pressed_style)
-
-	def mousePressEvent(self, ev):
-		ev.ignore()
-
-	def mouseReleaseEvent(self, ev):
-		ev.ignore()
-
-
-class USvgWidgetBg(TransparentWidget):
+class USvgWidgetBg(TransparentLabel):
 	clicked_ = pyqtSignal()
 
 	def __init__(self, svg: Path, ww0: int, ww1: int):
 		"""
-		ww0: размер главного контейнера / фона вокруг svg
-		ww1: размер svg 
+		ww0: размер подложки
+		ww1: размер svg внутри подложки
 		"""
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.setFixedSize(ww0, ww0)
+		self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+		self.setProperty("style", "base")
 
-		# Фоновая подложка с заданным размером
-		self.label = _SvgWithThemeBg()
-		self.label.setFixedSize(ww0, ww0)
-
-		# SVG-иконка с заданным размером
 		self.svg_widget = QSvgWidget(str(svg), self)
 		self.svg_widget.setFixedSize(ww1, ww1)
-		self.svg_widget.setAttribute(
-			Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
-		)
+		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+		self.svg_widget.move((ww0 - ww1) // 2, (ww0 - ww1) // 2)
 
-		# Наложение иконки на фон
-		layout = QGridLayout(self)
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setSpacing(0)
-
-		layout.addWidget(self.label, 0, 0)
-		layout.addWidget(
-			self.svg_widget, 0, 0,
-			Qt.AlignmentFlag.AlignCenter
-		)
-
-		self.label.stackUnder(self.svg_widget)
-		self.svg_widget.raise_()
+	def _set_style_state(self, state: str):
+		if self.property("style") == state:
+			return
+		self.setProperty("style", state)
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
 
 	def set_selected_style(self):
-		self.label.set_selected()
+		self._set_style_state("selected")
 
 	def set_base_style(self):
-		self.label.set_base()
+		self._set_style_state("base")
 
 	def mousePressEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
-			self.label.set_pressed()
-
+			self._set_style_state("pressed")
 		super().mousePressEvent(event)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
 			if self.rect().contains(event.pos()):
 				self.clicked_.emit()
-
-			self.label.set_base()
-
+			self._set_style_state("base")
 		super().mouseReleaseEvent(event)
 
 

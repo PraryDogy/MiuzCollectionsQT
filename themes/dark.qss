@@ -90,7 +90,7 @@ UCheckBox::indicator,
 UTagWidget,
 UpBtnLabel,
 ImgViewSvg,
-_SvgWithThemeBg {
+USvgWidgetBg {
     background: transparent;
     border: none;
     color: #ffffff;
@@ -209,7 +209,7 @@ USpinBox:hover {
     border: 1px solid #30404f;
 }
 
-_SvgWithThemeBg:hover[style="base"] {
+USvgWidgetBg:hover[style="base"] {
     background: #1d2833;
 }
 
@@ -239,11 +239,11 @@ USpinBox::down-button:pressed {
 }
 
 /* Иконочные кнопки */
-_SvgWithThemeBg[style="selected"] {
+USvgWidgetBg[style="selected"] {
     background: #283645;
 }
 
-_SvgWithThemeBg[style="pressed"] {
+USvgWidgetBg[style="pressed"] {
     background: #3a4b5e;
 }
 
@@ -439,7 +439,7 @@ UpBtnLabel {
 }
 
 UPushButton,
-_SvgWithThemeBg {
+USvgWidgetBg {
     border-radius: 8px;
 }
 
