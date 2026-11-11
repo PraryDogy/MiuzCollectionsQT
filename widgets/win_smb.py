@@ -74,10 +74,9 @@ class WinSmb(UMainWindow):
 		self.ok_btn.clicked.connect(self.ok_cmd)
 		btns_lay.addWidget(self.ok_btn)
 
-		self.setFixedWidth(400)
-		# self.setFixedHeight(400)
-		# self.adjustSize()
-		# self.setFixedHeight(self.height())
+		self.setFixedWidth(450)
+		self.adjustSize()
+		self.setFixedHeight(self.height())
 
 	def open_servers(self):
 		self.servers_win = ServersWin()
