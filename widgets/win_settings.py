@@ -914,129 +914,15 @@ class MfSettings(UGroupBox):
 	def _on_fields_changed(self):
 		self.changed.emit()
 
-import os
-import sys
-
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QApplication, QHBoxLayout
-
-from cfg import Static
-from system.database import Dirs
-from system.lang import Lng
-from system.main_folder import Mf
-from system.multiprocess import ProcessWorker
-from system.servers import Servers
-
-from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget,
-                            SuperConfirmWindow, TitleTextWidget,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton)
-from .win_servers import ServersWin
-
-
-def restart_app():
-	ProcessWorker.stop_all() 
-	os.execl(sys.executable, sys.executable, *sys.argv)
-	QApplication.exit(0)
-
-
-class WinSmb(UMainWindow):
-	def __init__(self, mf: Mf):
-		super().__init__()
-		self.mf = mf
-		self.set_close_only()
-		self.set_always_on_top()
-		self.setWindowTitle(Lng.attention)
-
-		# Делаем отступы аккуратными
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-		self.central_layout.setSpacing(10)
-		
-		# --- Виджет пути ---
-		self.path_widget = MfPathWidget(mf)
-		self.central_layout.addWidget(self.path_widget)
-
-		# --- Кнопки ---
-		btns_wid = TransparentWidget()
-		self.central_layout.addWidget(btns_wid)
-		btns_lay = QHBoxLayout(btns_wid)
-		btns_lay.setContentsMargins(0, 0, 0, 0)
-		btns_lay.setSpacing(10)
-
-		if Servers.items:
-
-			self.servers_btn = UPushButton(Lng.connections)
-			self.servers_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "connections_gray.svg")))
-			self.servers_btn.clicked.connect(self.open_servers)
-			btns_lay.addWidget(self.servers_btn)
-
-		btns_lay.addStretch()
-		
-		cancel_btn = UPushButton(Lng.cancel)
-		cancel_btn.clicked.connect(self.deleteLater)
-		btns_lay.addWidget(cancel_btn)
-		
-		self.ok_btn = ActiveButton(Lng.apply)
-		self.ok_btn.clicked.connect(self.ok_cmd)
-		btns_lay.addWidget(self.ok_btn)
-
-		self.setFixedWidth(380)
-		self.adjustSize()
-		self.setFixedHeight(self.height())
-
-	def open_servers(self):
-		self.servers_win = ServersWin()
-		self.servers_win.center_to_parent(self)
-		self.servers_win.show()
-
-	def ok_cmd(self):
-		new_path = self.path_widget.validate_and_show_win()
-		if not new_path:
-			return
-
-		if new_path == self.mf.mf_path:
-			self.deleteLater()
-			return
-
-		self.mf.old_mf_path = self.mf.mf_path  # текущий путь становится старым
-		self.mf.mf_path = new_path             # новый путь становится текущим
-
-		Dirs.reset_mod(self.mf.mf_alias)       # сброс, чтобы пересканировать
-		Mf.write_json_data()
-		restart_app()
-
-	def keyPressEvent(self, a0):
-		if a0.key() in (Qt.Key.Key_Escape, ):
-			self.deleteLater()
-		return super().keyPressEvent(a0)
-
-	def deleteLater(self):
-		return super().deleteLater()
-
-	def remove_mf(self, *args):	
-		if len(Mf.items) == 1:
-			win = WarningWindow(Lng.at_least_one_folder_required)
-		else:
-			win = ConfirmWindow(Lng.remove_catalog_warn, danger=True)
-			win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=True))
-		win.center_to_parent(self.window())
-		win.show()
-
 	def clean_mf_data(self):
-		win = ConfirmWindow(Lng.repair_catalog_warn)
-		win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=False))
-		win.center_to_parent(self.window())
-		win.show()
+		def fin():
+			Dirs.reset_mod(self.mf.mf_alias)
+			restart_app()
 
-	def start_mf_cleaner(self, is_remove: bool):
-		self.reset_task = MfCleaner(self.mf, is_remove_mf=is_remove)
-		self.reset_task.sigs.finished_.connect(restart_app)
-		UThreadPool.start(self.reset_task)
-
-	def mouseReleaseEvent(self, a0):
-		self.setFocus()
-		return super().mouseReleaseEvent(a0)
+		self.repair_win = ConfirmWindow(Lng.catalog_reindex_warning)
+		self.repair_win.ok_clicked.connect(fin)
+		self.repair_win.center_to_parent(self.window())
+		self.repair_win.show()
 
 
 class NewMfWin(UMainWindow):

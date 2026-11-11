@@ -730,7 +730,8 @@ class BaseScaner:
 		# добавленные и изменённые: сверяем изображения и обновляем Dirs
 		to_scan = diff.added + diff.changed
 		if to_scan and mf.is_root_alive():
-			print("сканируем изображения")
+			print("0---------------------------------")
+			print("12312312312 сканируем изображения")
 			DirImagesUpdater(scaner_item, to_scan).start()
 
 	@staticmethod

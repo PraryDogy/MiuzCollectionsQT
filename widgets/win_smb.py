@@ -75,18 +75,20 @@ class WinSmb(UMainWindow):
 		self.servers_win.show()
 
 	def ok_cmd(self):
-		mf_path = self.path_widget.validate_and_show_win()
-		if mf_path:
-			Dirs.reset_mod(self.mf.mf_alias)
-			Mf.write_json_data()
-			restart_app()
+		new_path = self.path_widget.validate_and_show_win()
+		if not new_path:
+			return
 
-		if mf_path and mf_path != self.mf.mf_path:
-			Dirs.reset_mod(self.mf.mf_alias)
+		if new_path == self.mf.mf_path:
+			self.deleteLater()
+			return
 
-			self.mf.mf_path = mf_path
-			Mf.write_json_data()
-			restart_app()
+		self.mf.old_mf_path = self.mf.mf_path  # текущий путь становится старым
+		self.mf.mf_path = new_path             # новый путь становится текущим
+
+		Dirs.reset_mod(self.mf.mf_alias)       # сброс, чтобы пересканировать
+		Mf.write_json_data()
+		restart_app()
 
 
 	def keyPressEvent(self, a0):
