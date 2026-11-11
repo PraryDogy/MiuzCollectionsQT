@@ -1677,16 +1677,16 @@ class MfPathWidget(HoverGroupBox):
 		descr_label.setWordWrap(True)
 		content_lay.addWidget(descr_label)
 
-		content_lay.addWidget(USep())
+		# content_lay.addWidget(USep())
 
 		self.status = MfPathStatus()
 		content_lay.addWidget(self.status)
 
 		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
-		self.start_btn.set_selected_style()
+		self.start_btn.setFixedSize(15, 15)
 
-		main_lay.addWidget(content, 1)
-		main_lay.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
+		main_lay.addWidget(content)
+		main_lay.addWidget(self.start_btn)
 
 		self.update_ui()
 
