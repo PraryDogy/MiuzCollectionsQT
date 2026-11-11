@@ -17,11 +17,9 @@ from typing_extensions import Literal
 
 from cfg import JsonData, Static
 
-from .database import Dbase, Dirs, Thumbs
-from .items import Mf
-from .lang import Lng
-from .shared_utils import ImgUtils, SharedUtils
-from .tasks import Utils
+from system.database import Dbase, Dirs, Thumbs
+from system.items import Mf
+from system.shared_utils import ImgUtils
 
 
 class BaseProcessWorker:
