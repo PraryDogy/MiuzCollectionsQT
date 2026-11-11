@@ -3,10 +3,9 @@ import sys
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLayout, QVBoxLayout
+from PyQt6.QtWidgets import QApplication, QHBoxLayout
 
-from cfg import JsonData, Static
+from cfg import Static
 from system.database import Dirs
 from system.lang import Lng
 from system.main_folder import Mf
