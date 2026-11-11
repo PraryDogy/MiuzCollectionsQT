@@ -36,6 +36,19 @@ class Mf:
 	def mf_path(self, value: str):
 		self.mf_paths[0] = value
 
+	@property
+	def old_mf_path(self):
+		return self.mf_paths[1] if len(self.mf_paths) > 1 else None
+
+	@old_mf_path.setter
+	def old_mf_path(self, value: str | None):
+		if value is None:
+			del self.mf_paths[1:]
+		elif len(self.mf_paths) > 1:
+			self.mf_paths[1] = value
+		else:
+			self.mf_paths.append(value)
+
 	@classmethod
 	def json_to_app(cls, data: list[dict]):
 		cls.items.clear()
