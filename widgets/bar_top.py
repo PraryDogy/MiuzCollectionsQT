@@ -126,33 +126,6 @@ class SearchWidLineEdit(ULineEdit):
 		super().keyPressEvent(event)
 
 
-class CommonSvgIconButton(USvgWidgetBg):
-	label_size = (28, 28)
-	icon_size = (14, 14)
-	base_svg: Path
-
-	def __init__(self):
-		super().__init__(
-			svg=self.base_svg,
-			container_size=self.label_size,
-			icon_size=self.icon_size,
-		)
-
-
-class SettingsSvgBtn(CommonSvgIconButton):
-	base_svg = Static.GRAY_ICONS / "settings_gray.svg"
-
-class ConnectServerSvgBtn(CommonSvgIconButton):
-	base_svg = Static.GRAY_ICONS / "connections_gray.svg"
-
-
-class ImgSearchSvgBtn(CommonSvgIconButton):
-	base_svg = Static.GRAY_ICONS / "camera_gray.svg"
-
-	def __init__(self):
-		super().__init__()
-
-
 class CatalogWidget(TransparentWidget):
 	mf_open = pyqtSignal(Mf)
 	mf_new = pyqtSignal(SettingsItem)
@@ -237,7 +210,7 @@ class BarTop(TransparentFrame):
 		self.h_layout.addStretch()
 
 		# --- Кнопка поиска по картинке ---
-		self.img_search_btn = ImgSearchSvgBtn()
+		self.img_search_btn = USvgWidgetBg(Static.GRAY_ICONS / "camera_gray.svg", 28, 14)
 		self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
 		self.h_layout.addWidget(self.img_search_btn)
 
@@ -255,7 +228,7 @@ class BarTop(TransparentFrame):
 		self.h_layout.addStretch(0)
 
 		# --- Кнопка подключения к серверам ---
-		self.connect_btn = ConnectServerSvgBtn()
+		self.connect_btn = USvgWidgetBg(Static.GRAY_ICONS / "connections_gray.svg", 28, 14)
 		self.connect_btn.clicked_.connect(self.open_server_window)
 		self.h_layout.addWidget(self.connect_btn)
 
@@ -263,7 +236,7 @@ class BarTop(TransparentFrame):
 
 		# --- Кнопка настроек ---
 		item = SettingsItem("general", "")
-		self.settings_btn = SettingsSvgBtn()
+		self.settings_btn = USvgWidgetBg(Static.GRAY_ICONS / "settings_gray.svg", 28, 14)
 		self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
 		self.h_layout.addWidget(self.settings_btn)
 

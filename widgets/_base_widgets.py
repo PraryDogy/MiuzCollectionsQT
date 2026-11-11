@@ -1653,7 +1653,6 @@ class MfPathWidget(HoverGroupBox):
 	def __init__(self, mf: Mf = None):
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		# self.setToolTip(Lng.find_catalog)
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 		self.setAcceptDrops(True)
 		self.mf = mf
@@ -1686,9 +1685,8 @@ class MfPathWidget(HoverGroupBox):
 		self.status = MfPathStatus()
 		content_lay.addWidget(self.status)
 
-		# self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
-		self.start_btn = USvgWidgetBg(Static.GRAY_ICONS / "arrow_right_gray.svg")
-		self.start_btn.setFixedSize(15, 15)
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn.set_selected_style()
 
 		main_lay.addWidget(content, 1)
 		main_lay.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
