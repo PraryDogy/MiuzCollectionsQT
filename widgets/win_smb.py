@@ -85,8 +85,6 @@ class WinSmb(UMainWindow):
 
 		self.mf.old_mf_path = self.mf.mf_path  # текущий путь становится старым
 		self.mf.mf_path = new_path             # новый путь становится текущим
-
-		Dirs.reset_mod(self.mf.mf_alias)       # сброс, чтобы пересканировать
 		Mf.write_json_data()
 		restart_app()
 

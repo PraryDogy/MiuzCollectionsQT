@@ -924,8 +924,6 @@ class MfSettings(UGroupBox):
 
 		def final():
 			if self.path_widget.draft_mf_path != self.mf.mf_path:
-				# индекс относится к старому каталогу: заставляем сканер пересравнить все папки
-				Dirs.reset_mod(self.mf.mf_alias)
 				self.mf.old_mf_path = self.mf.mf_path
 
 			self.mf.mf_path = self.path_widget.draft_mf_path
