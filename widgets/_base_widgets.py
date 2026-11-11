@@ -1612,8 +1612,6 @@ class MfPathStatus(HoverGroupBox):
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		# self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-		# self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)  # события уходят в MfPathWidget
 
 		lay = QHBoxLayout(self)
 		lay.setContentsMargins(10, 10, 10, 10)
@@ -1678,7 +1676,7 @@ class MfPathWidget(HoverGroupBox):
 		descr_label.setWordWrap(True)
 		content_lay.addWidget(descr_label)
 
-		# content_lay.addWidget(USep())
+		content_lay.addWidget(USep())
 
 		self.status = MfPathStatus()
 		content_lay.addWidget(self.status)
