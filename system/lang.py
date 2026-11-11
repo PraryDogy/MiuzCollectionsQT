@@ -692,3 +692,8 @@ class Lng:
 		"Каталог будет удалён из приложения. Файлы на диске не будут затронуты.",
 		"The catalog will be removed from the app. Files on disk will not be affected.",
 	)
+
+	catalog_mismatch_text = (
+		"Вы уверены, что правильно указали каталог? Все кэшированные изображения будут удалены и созданы заново. Это может занять время.",
+		"Are you sure you specified the correct folder? All cached images will be deleted and recreated. This may take a while.",
+	)

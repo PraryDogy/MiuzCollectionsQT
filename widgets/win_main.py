@@ -14,7 +14,8 @@ from system.main_folder import Mf
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
 from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
-                           ScanerWorker, ScanProgress)
+                           PathCheckPassed, PathMismatch, ScanerWorker,
+                           ScanProgress)
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, UThreadPool, Utils, ThumbScale
 
@@ -80,6 +81,11 @@ def next_size_index(current: int, sizes_count: int, step: int) -> int:
 def db_changed(previous_mtime: int, current_mtime: int) -> bool:
 	"""Нужно ли перезагрузить сетку и дерево после сканирования."""
 	return previous_mtime != current_mtime
+
+
+def find_mf(alias: str) -> Mf | None:
+	"""Каталог по алиасу из общего списка."""
+	return next((i for i in Mf.items if i.mf_alias == alias), None)
 
 
 class ForcedDirsRegistry:
@@ -436,7 +442,7 @@ class WinMain(UMainWindow):
 
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
-		self.remove_files_win = ConfirmWindow(text)
+		self.remove_files_win = ConfirmWindow(text, danger=True)
 		file_remover = ProcessWorker(
 				target=FilesRemover.start,
 				args=(abs_paths, )
@@ -617,18 +623,30 @@ class WinMain(UMainWindow):
 			self.view_win.move(WinImageView.xx, WinImageView.yy)
 		self.view_win.show()
 
+	# -------------------------------------------------------------------------
+	# Сканер: обработка сообщений из дочернего процесса
+	# -------------------------------------------------------------------------
+
 	def poll_scaner_task(self, ms: int = 3000):
 		if not getattr(self, "scaner_task", None):
 			self.scaner_poll_timer.start(ms)
 			return
 
+		# Сначала фиксируем, жив ли процесс, потом читаем очередь.
+		# Иначе сообщение, положенное перед завершением, может потеряться.
+		alive = self.scaner_task.is_alive()
 		progress = self.bar_bottom.progress_widget
+
 		while not self.scaner_task.process_queue.empty():
 			data = self.scaner_task.process_queue.get()
-			if isinstance(data, ScanProgress):
+			if isinstance(data, PathMismatch):
+				self.on_path_mismatch(data)
+			elif isinstance(data, PathCheckPassed):
+				self.on_path_check_passed(data)
+			elif isinstance(data, ScanProgress):
 				progress.show_status(data)
 
-		if not self.scaner_task.is_alive():
+		if not alive:
 			self.scaner_task.terminate_join()
 			progress.show_timer()
 			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
@@ -639,7 +657,42 @@ class WinMain(UMainWindow):
 		else:
 			self.scaner_poll_timer.start(ms)
 
-	def start_scaner_task(self, ms: int = 3000):
+	def on_path_check_passed(self, data: PathCheckPassed):
+		"""Каталог совпал: старый путь больше не нужен, сбрасываем флаг."""
+		mf = find_mf(data.mf_alias)
+		if mf is None:
+			return
+		mf.old_mf_path = None
+		Mf.write_json_data()
+
+	def on_path_mismatch(self, data: PathMismatch):
+		"""Каталог не совпал: спрашиваем пользователя, что делать."""
+		mf = find_mf(data.mf_alias)
+		if mf is None:
+			return
+
+		def confirm_other_catalog():
+			# OK: пользователь подтвердил, что это другой каталог
+			mf.old_mf_path = None
+			Mf.write_json_data()
+			self.start_scaner_task(force_full=True)
+
+		def revert_to_old_catalog():
+			# Cancel: новый путь отбрасывается, возвращаем старый.
+			# БД не менялась, сканер прервался до её изменения.
+			mf.mf_path = mf.old_mf_path
+			mf.old_mf_path = None
+			Mf.write_json_data()
+			self.on_mf_clicked(mf)
+			self.open_win_smb(mf)
+
+		self.mismatch_win = ConfirmWindow(Lng.catalog_mismatch_text, danger=True)
+		self.mismatch_win.ok_clicked.connect(confirm_other_catalog)
+		self.mismatch_win.cancel_clicked.connect(revert_to_old_catalog)
+		self.mismatch_win.center_to_parent(self)
+		self.mismatch_win.show()
+
+	def start_scaner_task(self, ms: int = 3000, force_full: bool = False):
 
 		if not hasattr(self, "scaner_task"):
 			# print("первая инициация сканера")
@@ -680,7 +733,7 @@ class WinMain(UMainWindow):
 				# print("штатно запускаю ОБЩИЙ сканер")
 				self.scaner_task = ScanerWorker(
 					target=BaseScaner.start,
-					args=(Mf.items, )
+					args=(Mf.items, force_full)
 				)
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
 			self.bar_bottom.progress_widget.show_loading()
@@ -700,6 +753,8 @@ class WinMain(UMainWindow):
 		except AttributeError as e:
 			print("Win main restart scaner task", e)
 		self.start_scaner_task()
+
+	# -------------------------------------------------------------------------
 
 	def center_screen(self):
 		# Получаем геометрию первичного (главного) экрана
