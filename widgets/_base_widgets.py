@@ -1631,10 +1631,15 @@ class MfPathWidget(HoverGroupBox):
 		descr_label.setWordWrap(True)
 		content_lay.addWidget(descr_label)
 
-		# content_lay.addWidget(USep())
+		content_lay.addSpacing(5)
 
+		status_wrap = TransparentWidget()
+		content_lay.addWidget(status_wrap)
+		status_lay = QHBoxLayout(status_wrap)
+		status_lay.setContentsMargins(10, 0, 10, 0)
+		status_lay.setSpacing(0)
 		self.status = MfPathStatus()
-		content_lay.addWidget(self.status)
+		status_lay.addWidget(self.status)
 
 		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
 		self.start_btn.setFixedSize(15, 15)
