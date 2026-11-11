@@ -4,17 +4,20 @@ import sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QLayout
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLayout, QVBoxLayout
 
 from cfg import JsonData, Static
+from system.database import Dirs
 from system.lang import Lng
 from system.main_folder import Mf
 from system.multiprocess import ProcessWorker
-
-from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget, SuperConfirmWindow, 
-							TitleTextWidget, TransparentWidget, UMainWindow, UPushButton, UGroupBox)
-from .win_servers import ServersWin
 from system.servers import Servers
+
+from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget,
+                            SuperConfirmWindow, TitleTextWidget,
+                            TransparentWidget, UGroupBox, UMainWindow,
+                            UPushButton)
+from .win_servers import ServersWin
 
 
 def restart_app():
@@ -80,11 +83,9 @@ class WinSmb(UMainWindow):
 			restart_app()
 
 		mf_path = self.path_widget.validate_and_show_win()
-		if mf_path:
-			self.super_win = SuperConfirmWindow(Lng.confirm_mf_path)
-			self.super_win.ok_clicked.connect(ok_clicked)
-			self.super_win.center_to_parent(self)
-			self.super_win.show()
+		if mf_path and mf_path != self.mf.mf_path:
+			Dirs.reset_mod(self.mf.mf_alias)
+			ok_clicked()
 
 	def keyPressEvent(self, a0):
 		if a0.key() in (Qt.Key.Key_Escape, ):
