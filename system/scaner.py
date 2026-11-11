@@ -16,6 +16,11 @@ from system.shared_utils import ImgUtils
 from system.utils import Utils
 
 
+# Порог совпадения при смене пути и размер выборки для проверки каталога
+MATCH_THRESHOLD = 80
+SAMPLE_SIZE = 500
+
+
 class Tools:
 	@staticmethod
 	def log(text: str) -> None:
@@ -44,6 +49,20 @@ class ScanProgress:
 	mf_alias: str
 	current: int = 0
 	total: int = 0
+
+
+@dataclass(slots=True)
+class PathMismatch:
+	"""Новый корень не совпал с сохранённым каталогом. Сканирование прервано."""
+	mf_alias: str
+	match_percent: int
+
+
+@dataclass(slots=True)
+class PathCheckPassed:
+	"""Новый корень совпал с сохранённым каталогом. GUI может сбросить old_mf_path."""
+	mf_alias: str
+	match_percent: int
 
 
 class ScanIncomplete(Exception):
@@ -131,7 +150,7 @@ class BaseScanerItem:
 class DirsDiff:
 	removed: list[DirItem]        # удалены с диска
 	added: list[DirItem]          # новые на диске
-	changed: list[DirItem]        # mod отличается (включая сброшенный в 0)
+	changed: list[DirItem]        # mod отличается (включая сброшенный в -1)
 	stopped: list[DirItem]        # стоп-папки на диске, mod = StopList.MOD
 	newly_stopped: list[DirItem]  # стали стоп-папкой только что
 
@@ -159,6 +178,39 @@ def diff_dirs(finder: list[DirItem], db: list[DirItem]) -> DirsDiff:
 	return DirsDiff(removed, added, changed, stopped, newly_stopped)
 
 
+class CatalogIdentity:
+	"""
+	Проверка, тот ли это каталог, что был сохранён в БД.
+	Берётся случайная выборка изображений из БД, их относительные пути
+	проверяются на новом корне, и сравниваются размеры файлов.
+	"""
+
+	@staticmethod
+	def sample_db_images(engine: sqlalchemy.Engine, mf_alias: str) -> list[tuple[str, int]]:
+		stmt = (
+			sqlalchemy.select(Thumbs.rel_img_path, Thumbs.size)
+			.where(Thumbs.mf_alias == mf_alias)
+			.order_by(sqlalchemy.func.random())
+			.limit(SAMPLE_SIZE)
+		)
+		with engine.connect() as conn:
+			return [(rel, size) for rel, size in conn.execute(stmt)]
+
+	@staticmethod
+	def match_percent(mf: Mf, sample: list[tuple[str, int]]) -> int:
+		if not sample:
+			return 100  # в БД нет изображений, сравнивать не с чем
+		matched = 0
+		for rel_path, size in sample:
+			try:
+				st = os.stat(mf.create_abs_path(rel_path))
+			except OSError:
+				continue
+			if int(st.st_size) == size:
+				matched += 1
+		return matched * 100 // len(sample)
+
+
 class ScanerParent:
 	def __init__(self, scaner_item: BaseScanerItem):
 		super().__init__()
@@ -172,31 +224,16 @@ class DirsChangeWatcher(ScanerParent):
 		super().__init__(scaner_item)
 
 	def is_changed(self) -> tuple[bool, list[DirItem]]:
-		db_dirs: list[DirItem] = []
+		db_dirs = BaseScaner.load_db_dirs(self.scaner_item)
 		mf = self.scaner_item.mf
 		stop = StopList(mf.mf_stop_list)
 		base_path = mf.mf_path.strip(os.sep)
-		q = (
-			sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
-			.where(Dirs.mf_alias == mf.mf_alias)
-		)
-		with self.scaner_item.engine.connect() as conn:
-			for rel_path, mod in conn.execute(q):
-				abs_dir_path = os.path.join(
-					os.sep,
-					base_path,
-					rel_path.strip(os.sep)
-				)
-				db_dirs.append(DirItem(
-					abs_path=abs_dir_path,
-					rel_path=rel_path,
-					mod=mod
-				))
 
 		is_changed_flag = False
 
 		for item in db_dirs:
-			if not os.path.exists(item.abs_path):
+			abs_dir_path = os.path.join(os.sep, base_path, item.rel_path.strip(os.sep))
+			if not os.path.exists(abs_dir_path):
 				is_changed_flag = True
 				break
 
@@ -209,12 +246,11 @@ class DirsChangeWatcher(ScanerParent):
 				continue
 
 			try:
-				stat = os.stat(item.abs_path)
+				stat = os.stat(abs_dir_path)
 			except Exception as e:
-				print("DirsChangeWatcher error", item.abs_path, e)
+				print("DirsChangeWatcher error", abs_dir_path, e)
 				continue
 
-			# mod = 0 у обычной папки означает сброс (смена каталога или возврат из стоп-листа)
 			if item.mod == StopList.MOD or int(stat.st_mtime) > item.mod:
 				is_changed_flag = True
 				break
@@ -265,7 +301,7 @@ class DirsLoader(ScanerParent):
 						print(traceback.format_exc())
 						continue
 
-					rel_path = self.scaner_item.mf.create_rel_path(entry.path)
+					rel_path = scaner.mf.create_rel_path(entry.path)
 
 					if stop.contains(rel_path):
 						dirs.append(DirItem(entry.path, rel_path, StopList.MOD))
@@ -513,8 +549,8 @@ class ThumbsUpdater(ScanerParent):
 
 				values_list = []
 				for img_item in good_chunk:
-					rel_img_path = self.scaner_item.mf.create_rel_path(img_item.abs_img_path)
-					abs_thumb_path = self.scaner_item.mf.create_abs_thumb_path(rel_img_path)
+					rel_img_path = scaner.mf.create_rel_path(img_item.abs_img_path)
+					abs_thumb_path = scaner.mf.create_abs_thumb_path(rel_img_path)
 					rel_thumb_path = Mf.get_rel_thumb_path(abs_thumb_path)
 					root = os.path.dirname(rel_img_path)
 					values_list.append({
@@ -662,7 +698,7 @@ class RemovedDirsCleaner(ScanerParent):
 
 class BaseScaner:
 	@staticmethod
-	def start(mf_list: list[Mf], queue: Queue):
+	def start(mf_list: list[Mf], force_full: bool, queue: Queue):
 		engine = Dbase.create_engine()
 		# нельзя обращаться сразу к Mf так как это мультипроцесс
 		for mf in mf_list:
@@ -677,7 +713,7 @@ class BaseScaner:
 			if mf.is_root_alive():
 				try:
 					print("scaner started", mf.mf_alias)
-					BaseScaner.single_mf_scan(scaner_item)
+					BaseScaner.single_mf_scan(scaner_item, force_full)
 					print("scaner finished", mf.mf_alias)
 				except Exception:
 					print(traceback.format_exc())
@@ -691,14 +727,47 @@ class BaseScaner:
 		engine.dispose()
 
 	@staticmethod
-	def single_mf_scan(scaner_item: BaseScanerItem):
+	def load_db_dirs(scaner_item: BaseScanerItem) -> list[DirItem]:
+		"""Читает записи папок из Dirs для текущего Mf."""
+		mf = scaner_item.mf
+		q = (
+			sqlalchemy.select(Dirs.rel_dir_path, Dirs.mod)
+			.where(Dirs.mf_alias == mf.mf_alias)
+		)
+		db_dirs: list[DirItem] = []
+		with scaner_item.engine.connect() as conn:
+			for rel_path, mod in conn.execute(q):
+				db_dirs.append(DirItem(
+					abs_path=os.path.join(os.sep, mf.mf_path.strip(os.sep), rel_path.strip(os.sep)),
+					rel_path=rel_path,
+					mod=mod,
+				))
+		return db_dirs
+
+	@staticmethod
+	def single_mf_scan(scaner_item: BaseScanerItem, force_full: bool = False):
 		mf = scaner_item.mf
 
-		watcher = DirsChangeWatcher(scaner_item)
-		is_changed, db_dirs = watcher.is_changed()
-		if not is_changed:
-			print(mf.mf_alias, "not changed")
-			return
+		# Смена корня: проверяем, тот ли это каталог, до любых изменений в БД
+		if mf.old_mf_path is not None:
+			sample = CatalogIdentity.sample_db_images(scaner_item.engine, mf.mf_alias)
+			percent = CatalogIdentity.match_percent(mf, sample)
+			if percent < MATCH_THRESHOLD:
+				scaner_item.process_queue.put(PathMismatch(mf.mf_alias, percent))
+				print("path mismatch", mf.mf_alias, percent)
+				return  # БД не трогаем, сканирование этого каталога прервано
+			scaner_item.process_queue.put(PathCheckPassed(mf.mf_alias, percent))
+
+		if force_full:
+			# полный пересказ: все папки помечаются как изменённые
+			db_dirs = BaseScaner.load_db_dirs(scaner_item)
+			db_dirs = [DirItem(d.abs_path, d.rel_path, -1) for d in db_dirs]
+		else:
+			watcher = DirsChangeWatcher(scaner_item)
+			is_changed, db_dirs = watcher.is_changed()
+			if not is_changed:
+				print(mf.mf_alias, "not changed")
+				return
 
 		try:
 			finder_dirs = DirsLoader(scaner_item).get_finder_dirs()
@@ -730,8 +799,6 @@ class BaseScaner:
 		# добавленные и изменённые: сверяем изображения и обновляем Dirs
 		to_scan = diff.added + diff.changed
 		if to_scan and mf.is_root_alive():
-			print("0---------------------------------")
-			print("12312312312 сканируем изображения")
 			DirImagesUpdater(scaner_item, to_scan).start()
 
 	@staticmethod
