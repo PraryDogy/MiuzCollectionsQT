@@ -75,16 +75,19 @@ class WinSmb(UMainWindow):
 		self.servers_win.show()
 
 	def ok_cmd(self):
+		mf_path = self.path_widget.validate_and_show_win()
+		if mf_path:
+			Dirs.reset_mod(self.mf.mf_alias)
+			Mf.write_json_data()
+			restart_app()
 
-		def ok_clicked():
+		if mf_path and mf_path != self.mf.mf_path:
+			Dirs.reset_mod(self.mf.mf_alias)
+
 			self.mf.mf_path = mf_path
 			Mf.write_json_data()
 			restart_app()
 
-		mf_path = self.path_widget.validate_and_show_win()
-		if mf_path and mf_path != self.mf.mf_path:
-			Dirs.reset_mod(self.mf.mf_alias)
-			ok_clicked()
 
 	def keyPressEvent(self, a0):
 		if a0.key() in (Qt.Key.Key_Escape, ):
