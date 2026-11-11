@@ -1656,10 +1656,7 @@ class MfPathWidget(HoverGroupBox):
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 		self.setAcceptDrops(True)
 		self.mf = mf
-		self.title_ = Lng.catalog_path
-		self.mf_path = mf.mf_path if mf else None
-		self._title_icon = None
-		self.title = None
+		self.draft_mf_path = mf.mf_path if mf else None
 
 		self.watch_timer = QTimer(self)
 		self.watch_timer.timeout.connect(self.check_path_by_timer)
@@ -1699,24 +1696,19 @@ class MfPathWidget(HoverGroupBox):
 		super().mouseReleaseEvent(event)
 
 	def _path_exists(self) -> bool:
-		return bool(self.mf_path) and os.path.exists(self.mf_path)
+		return bool(self.draft_mf_path) and os.path.exists(self.draft_mf_path)
 
 	def update_ui(self):
-		"""Обновляет статус, описание и таймер по текущему пути"""
 		if self._path_exists():
-			self.setToolTip(
-				self.mf_path
-			)
+			self.setToolTip(self.draft_mf_path)
 			self.status.set_status(
 				Static.COLOR_ICONS / "green_checkmark.svg",
-				self.mf_path,
+				self.draft_mf_path,
 				"ok",
 			)
 			self.watch_timer.stop()
 		else:
-			self.setToolTip(
-				Lng.find_catalog
-			)
+			self.setToolTip(Lng.find_catalog)
 			self.status.set_status(
 				Static.COLOR_ICONS / "yellow_warning.svg",
 				Lng.no_catalog_path,
@@ -1733,7 +1725,7 @@ class MfPathWidget(HoverGroupBox):
 
 	def update_path(self, new_path: str):
 		"""Единый метод обновления пути из любых событий"""
-		self.mf_path = new_path.rstrip(os.sep)
+		self.draft_mf_path = new_path.rstrip(os.sep)
 		self.changed.emit()
 		self.update_ui()
 
@@ -1743,13 +1735,13 @@ class MfPathWidget(HoverGroupBox):
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
 			return None
-		return self.mf_path
+		return self.draft_mf_path
 
 	def dialog_dir(self):
-		if not self.mf_path:
+		if not self.draft_mf_path:
 			directory = os.path.expanduser("~/Downloads")
 		else:
-			directory = self.mf_path
+			directory = self.draft_mf_path
 		self.dialog = QFileDialog(directory=directory)
 		url = self.dialog.getExistingDirectory()
 		if url and os.path.isdir(url):

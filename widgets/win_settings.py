@@ -907,7 +907,7 @@ class MfSettings(UGroupBox):
 
 	def _snapshot(self) -> tuple:
 		return (
-			self.path_widget.mf_path,
+			self.path_widget.draft_mf_path,
 			tuple(self.mf_stop_list.get_stop_list()),
 		)
 
@@ -926,16 +926,16 @@ class MfSettings(UGroupBox):
 			return
 
 		def final():
-			if self.path_widget.mf_path != self.mf_path:
+			if self.path_widget.draft_mf_path != self.mf_path:
 				# индекс относится к старому каталогу: заставляем сканер пересравнить все папки
 				Dirs.reset_mod(self.mf.mf_alias)
 
-			self.mf.mf_paths = [self.path_widget.mf_path, ]
+			self.mf.mf_paths = [self.path_widget.draft_mf_path, ]
 			self.mf.mf_stop_list = self.mf_stop_list.get_stop_list()
 			Mf.write_json_data()
 			restart_app()
 
-		if self.path_widget.mf_path != self.mf.mf_path:
+		if self.path_widget.draft_mf_path != self.mf.mf_path:
 			win = SuperConfirmWindow(Lng.make_sure_path)
 		else:
 			win = ConfirmWindow(Lng.app_will_restarted)
@@ -1007,8 +1007,8 @@ class NewMfWin(UMainWindow):
 		self.setFixedHeight(self.height())
 
 	def autoname_cmd(self):
-		if self.mf_path_widget.mf_path:
-			base = os.path.basename(self.mf_path_widget.mf_path)
+		if self.mf_path_widget.draft_mf_path:
+			base = os.path.basename(self.mf_path_widget.draft_mf_path)
 		else:
 			base = Lng.catalog
 		taken = {mf.mf_alias for mf in Mf.items}

@@ -135,10 +135,10 @@ class FirstLoadWin(UMainWindow):
 	def init_path_widget(self):
 
 		def mf_path_changed():
-			if self.path_widget.mf_path:
-				basename = os.path.basename(self.path_widget.mf_path).capitalize()
+			if self.path_widget.draft_mf_path:
+				basename = os.path.basename(self.path_widget.draft_mf_path).capitalize()
 				self.mf_alias_widget.line_edit.setText(basename)
-			self.path_widget.mf_path
+			self.path_widget.draft_mf_path
 			self.save_widget.show_warning()
 
 		self.path_widget = MfPathWidget()
