@@ -184,7 +184,12 @@ class CatalogWidget(TransparentWidget):
 		self.mf_open.emit(mf)
 
 	def catalog_btn_text(self, text: str):
-		self.button.setText(text)
+		metrics = self.button.fontMetrics()
+		# запас под иконку, стрелку меню и внутренние отступы кнопки
+		available = self.button.width() - 60
+		shown = metrics.elidedText(text, Qt.TextElideMode.ElideMiddle, max(available, 20))
+		self.button.setText(shown)
+		self.button.setToolTip(text)
 
 
 class BarTop(TransparentFrame):
