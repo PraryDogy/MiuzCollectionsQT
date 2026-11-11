@@ -714,7 +714,7 @@ AccentButton:pressed {
 
 
 MfPathStatus {
-    border-radius: 8px;
+    border-radius: 9px;
     padding: 8px 10px;
 }
 
