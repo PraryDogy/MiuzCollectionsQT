@@ -725,3 +725,8 @@ MfPathStatus[state="ok"] {
 MfPathStatus[state="warn"] {
     border: 2px dashed #eab308;
 }
+
+MfPathStatus TransparentLabel {
+    font-weight: bold;
+    font-size: 14px;
+}

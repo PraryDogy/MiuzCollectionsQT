@@ -1607,7 +1607,8 @@ class SvgWithThemeBg(TransparentWidget):
 
 		super().mouseReleaseEvent(event)
 
-class MfPathStatus(HoverGroupBox):
+
+class MfPathStatus(TransparentFrame):
 	"""Строка статуса пути: иконка и текст. Состояние задаётся свойством 'state' для QSS."""
 
 	def __init__(self, parent=None):
@@ -1648,7 +1649,7 @@ class MfPathWidget(HoverGroupBox):
 	def __init__(self, mf: Mf = None):
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		self.setToolTip(Lng.find_catalog)
+		# self.setToolTip(Lng.find_catalog)
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 		self.setAcceptDrops(True)
 		self.mf = mf
