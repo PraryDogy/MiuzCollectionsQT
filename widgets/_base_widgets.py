@@ -1554,20 +1554,24 @@ class _SvgWithThemeBg(TransparentLabel):
 		ev.ignore()
 
 
-class SvgWithThemeBg(TransparentWidget):
+class USvgWidgetBg(TransparentWidget):
 	clicked_ = pyqtSignal()
 
-	def __init__(self, svg: Path, container_size: tuple, icon_size: tuple):
+	def __init__(self, svg: Path, ww0: int, ww1: int):
+		"""
+		ww0: размер главного контейнера / фона вокруг svg
+		ww1: размер svg 
+		"""
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 		# Фоновая подложка с заданным размером
 		self.label = _SvgWithThemeBg()
-		self.label.setFixedSize(*container_size)
+		self.label.setFixedSize(ww0, ww0)
 
 		# SVG-иконка с заданным размером
 		self.svg_widget = QSvgWidget(str(svg), self)
-		self.svg_widget.setFixedSize(*icon_size)
+		self.svg_widget.setFixedSize(ww1, ww1)
 		self.svg_widget.setAttribute(
 			Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
 		)
@@ -1682,7 +1686,8 @@ class MfPathWidget(HoverGroupBox):
 		self.status = MfPathStatus()
 		content_lay.addWidget(self.status)
 
-		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		# self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn = USvgWidgetBg(Static.GRAY_ICONS / "arrow_right_gray.svg")
 		self.start_btn.setFixedSize(15, 15)
 
 		main_lay.addWidget(content, 1)

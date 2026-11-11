@@ -10,7 +10,7 @@ from system.items import SettingsItem
 from system.lang import Lng
 from system.main_folder import Mf
 
-from ._base_widgets import (GrayTextLabel, SvgWithThemeBg, TitleBar,
+from ._base_widgets import (GrayTextLabel, USvgWidgetBg, TitleBar,
                             TransparentFrame, TransparentWidget, ULineEdit,
                             UMenu, UPushButton)
 from .win_servers import ServersWin
@@ -126,7 +126,7 @@ class SearchWidLineEdit(ULineEdit):
 		super().keyPressEvent(event)
 
 
-class CommonSvgIconButton(SvgWithThemeBg):
+class CommonSvgIconButton(USvgWidgetBg):
 	label_size = (28, 28)
 	icon_size = (14, 14)
 	base_svg: Path
