@@ -77,7 +77,7 @@ class WinSmb(UMainWindow):
 	def ok_cmd(self):
 
 		def ok_clicked():
-			self.mf.mf_paths = [mf_path, ]
+			self.mf.mf_path = mf_path
 			Mf.write_json_data()
 			restart_app()
 

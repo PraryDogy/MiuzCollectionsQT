@@ -927,7 +927,7 @@ class MfSettings(UGroupBox):
 				# индекс относится к старому каталогу: заставляем сканер пересравнить все папки
 				Dirs.reset_mod(self.mf.mf_alias)
 
-			self.mf.mf_paths = [self.path_widget.draft_mf_path, ]
+			self.mf.mf_path = self.path_widget.draft_mf_path
 			self.mf.mf_stop_list = self.mf_stop_list.get_stop_list()
 			Mf.write_json_data()
 			restart_app()

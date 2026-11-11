@@ -32,6 +32,10 @@ class Mf:
 	def mf_path(self):
 		return self.mf_paths[0]
 
+	@mf_path.setter
+	def mf_path(self, value: str):
+		self.mf_paths[0] = value
+
 	@classmethod
 	def json_to_app(cls, data: list[dict]):
 		cls.items.clear()

@@ -8,6 +8,11 @@ class Test:
     def path(self):
         return self.paths[-1]
 
+    @path.setter
+    def path(self, value):
+        self.paths[-1] = value
+
 
 test = Test()
-print(test.path)
+test.path = "dafvsadfds"
+print(test.path)  # dafvsadfds
