@@ -49,11 +49,13 @@ class ScanProgress:
 	- kind: "search_dirs" — поиск папок,
 	        "indexing" — создание миниатюр (current из total),
 	        "no_connection" — нет доступа к хранилищу.
+	- dir_path: папка, в которой сейчас обрабатывается изображение (только для indexing)
 	"""
 	kind: Literal["search_dirs", "indexing", "no_connection"]
 	mf_alias: str
 	current: int = 0
 	total: int = 0
+	dir_path: str = ""
 
 
 @dataclass(slots=True)
@@ -484,13 +486,14 @@ class ThumbsUpdater(ScanerParent):
 		self.removed_images = removed_images
 		self.new_images = new_images
 
-	def _progress(self) -> ScanProgress:
+	def _progress(self, img_item: ImgItem) -> ScanProgress:
 		scaner = self.scaner_item
 		return ScanProgress(
 			kind="indexing",
 			mf_alias=scaner.mf.mf_alias,
 			current=scaner.current_count,
 			total=scaner.total_count,
+			dir_path=os.path.dirname(img_item.abs_img_path),
 		)
 
 	def del_thumbs(self):
@@ -514,7 +517,7 @@ class ThumbsUpdater(ScanerParent):
 
 		def _remove_thumb(img_item: ImgItem) -> bool:
 			scaner.current_count += 1
-			scaner.process_queue.put(self._progress())
+			scaner.process_queue.put(self._progress(img_item))
 			abs_thumb_path = Mf.get_abs_thumb_path(img_item.rel_thumb_path)
 			try:
 				os.remove(abs_thumb_path)
@@ -582,7 +585,7 @@ class ThumbsUpdater(ScanerParent):
 
 		def _create_thumb(img_item: ImgItem) -> bool:
 			scaner.current_count += 1
-			scaner.process_queue.put(self._progress())
+			scaner.process_queue.put(self._progress(img_item))
 			img = ImgUtils.read_img(img_item.abs_img_path)
 			img = ImgUtils.fit_to_thumb(img, Static.THUMB_MAX_SIZE)
 			rel_img_path = scaner.mf.create_rel_path(img_item.abs_img_path)

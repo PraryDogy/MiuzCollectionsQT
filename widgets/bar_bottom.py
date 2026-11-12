@@ -210,16 +210,15 @@ class ProgressWidget(TransparentWidget):
 		return f"{Lng.next_search} {minutes:02d}:{seconds:02d}"
 
 	def scan_progress_parts(self, progress: ScanProgress) -> tuple[str, str]:
-		"""Алиас папки и текст статуса отдельно. Строится только в GUI-потоке, где доступен Lng."""
-		alias = f"{progress.mf_alias}:"
+		"""Подпись слева и текст статуса отдельно. Строится только в GUI-потоке, где доступен Lng."""
 		if progress.kind == "search_dirs":
-			return alias, Lng.search_in.lower()
+			return f"{progress.mf_alias}:", Lng.search_in.lower()
 		if progress.kind == "indexing":
-			return alias, (
+			return f"{self._short_dir(progress.dir_path)}:", (
 				f"{Lng.indexing_files.lower()} "
 				f"{progress.current} {Lng.from_} {progress.total}"
 			)
-		return alias, Lng.no_connection.lower()
+		return f"{progress.mf_alias}:", Lng.no_connection.lower()
 
 	# --- Отладка: демо состояний и elide ---
 
@@ -240,6 +239,14 @@ class ProgressWidget(TransparentWidget):
 				lambda s=signal, a=alias, t=text: (s.emit(), self._set_texts(a, t)),
 			)
 		QTimer.singleShot(len(demo_steps) * step_ms, self.show_timer)
+
+	@staticmethod
+	def _short_dir(path: str, max_parts: int = 3) -> str:
+		"""/Users/me/Downloads/Folder 1/images folder -> /…/Folder 1/images folder"""
+		parts = [p for p in path.split(os.sep) if p]
+		if len(parts) <= max_parts:
+			return os.sep + os.sep.join(parts)
+		return os.sep + "…" + os.sep + os.sep.join(parts[-max_parts:])
 
 
 # =============================================================================
