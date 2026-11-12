@@ -713,22 +713,22 @@ AccentButton:pressed {
 }
 
 
-MfPathStatus {
+ChoosePathWidget {
     border-radius: 9px;
     padding: 8px 10px;
 }
 
-MfPathStatus[state="ok"] {
+ChoosePathWidget[state="ok"] {
     background: #27064e3b;
     border: 2px dashed #10b981;
 }
 
-MfPathStatus[state="warn"] {
+ChoosePathWidget[state="warn"] {
     background: #273a2c12;
     border: 2px dashed #6b5420;
 }
 
-MfPathStatus TransparentLabel {
+ChoosePathWidget TransparentLabel {
     font-weight: bold;
     font-size: 14px;
     color: #ffffff;

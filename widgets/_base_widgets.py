@@ -1561,7 +1561,7 @@ class USvgWidgetBg(TransparentLabel):
 		super().mouseReleaseEvent(event)
 
 
-class MfPathStatus(TransparentFrame):
+class ChoosePathWidget(TransparentFrame):
 	"""Строка статуса пути: иконка и текст. Состояние задаётся свойством 'state' для QSS."""
 
 	def __init__(self, parent=None):
@@ -1636,7 +1636,7 @@ class MfPathWidget(HoverGroupBox):
 		status_lay = QHBoxLayout(status_wrap)
 		status_lay.setContentsMargins(10, 0, 10, 0)
 		status_lay.setSpacing(0)
-		self.status = MfPathStatus()
+		self.status = ChoosePathWidget()
 		status_lay.addWidget(self.status)
 
 		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))

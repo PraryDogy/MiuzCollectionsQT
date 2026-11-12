@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, HoverGroupBox,
-                            MfPathStatus, TitleTextWidget, TransparentLabel,
+                            ChoosePathWidget, TitleTextWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton, USep)
 
@@ -83,7 +83,7 @@ class DestinyFolderWidget(HoverGroupBox):
 		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 		content_lay.addWidget(description)
 
-		self.path_status = MfPathStatus()
+		self.path_status = ChoosePathWidget()
 		content_lay.addWidget(self.path_status)
 		self.path_status.set_path(self.current_dir)
 		self.path_status.set_state("ok")
