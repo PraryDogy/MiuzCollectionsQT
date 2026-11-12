@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
                              QRubberBand, QSizePolicy, QVBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
-from system.items import DataItem, Mf, SettingsItem
+from system.items import DataItem, Mf
 from system.lang import Lng
 from system.shared_utils import SharedUtils
 from system.tasks import (AppsScanner, DbImagesLoader, DbImagesLoaderItem,
@@ -605,7 +605,6 @@ class Grid(UScrollVerticalArea):
 	open_in_app = pyqtSignal(tuple)
 	paste_files = pyqtSignal()
 	set_files_to_copy = pyqtSignal(list)
-	setup_mf = pyqtSignal(SettingsItem)
 	update_thumb = pyqtSignal(list)
 	go_to_thumbnail = pyqtSignal(str)
 	finished_ = pyqtSignal()

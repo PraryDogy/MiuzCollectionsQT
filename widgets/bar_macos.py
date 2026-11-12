@@ -3,7 +3,6 @@ from PyQt6.QtGui import QAction, QImage, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import QMenuBar
 
 from cfg import JsonData, Static
-from system.items import SettingsItem
 from system.lang import Lng
 from system.utils import Utils
 
@@ -47,9 +46,6 @@ class AboutWin(VerticalWindow):
 		self.setFixedSize(self.width(), self.height())
 		self.setFixedWidth(250)
 
-		if not self.icon_path.exists():
-			print("bar macos icon png not exists")
-
 	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 		"""Закрывает окно по Escape или Enter."""
 		if a0.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Return):
@@ -88,8 +84,7 @@ class BarMacos(QMenuBar):
 		self.server_win.show()
 
 	def open_settings_window(self):
-		item = SettingsItem("general", "")
-		self.settings_win = WinSettings(item)
+		self.settings_win = WinSettings()
 		self.settings_win.center_to_parent(self.window())
 		self.settings_win.show()
 

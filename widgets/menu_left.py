@@ -7,7 +7,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QVBoxLayout
 
 from cfg import JsonData, Static
-from system.items import Mf, SettingsItem
+from system.items import Mf
 from system.lang import Lng
 from system.tasks import DbDirsLoader, UThreadPool
 from system.utils import Utils
@@ -297,17 +297,3 @@ class MenuLeft(TransparentFrame):
 			lambda: self.removed_from_stop_list.emit()
 		)
 		self.tree_wid.init_ui()
-
-	def mf_edit_cmd(self, mf: Mf):
-		item = SettingsItem(
-			type_="edit_folder",
-			content=mf.mf_alias
-		)
-		self.mf_edit.emit(item)
-
-	def mf_new_cmd(self, path: str):
-		item = SettingsItem(
-			type_="new_folder",
-			content=path
-		)
-		self.mf_new.emit(item)

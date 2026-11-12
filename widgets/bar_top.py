@@ -6,7 +6,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QGridLayout, QHBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.items import Mf, SettingsItem
+from system.items import Mf
 from system.lang import Lng
 
 from ._base_widgets import (GrayTextLabel, TitleBar, TransparentFrame,
@@ -127,7 +127,7 @@ class SearchWidLineEdit(ULineEdit):
 
 class CatalogWidget(TransparentWidget):
 	mf_open = pyqtSignal(Mf)
-	mf_new = pyqtSignal(SettingsItem)
+	mf_new = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -172,11 +172,7 @@ class CatalogWidget(TransparentWidget):
 		self.button_menu.addAction(new_folder_action)
 
 	def mf_new_cmd(self):
-		setting_item = SettingsItem(
-			type_="new_folder",
-			content=""
-		)
-		self.mf_new.emit(setting_item)
+		self.mf_new.emit()
 
 	def mf_open_cmd(self, mf: Mf):
 		self.catalog_btn_text(mf.mf_alias)
@@ -192,11 +188,11 @@ class CatalogWidget(TransparentWidget):
 
 
 class BarTop(TransparentFrame):
-	open_settings_win = pyqtSignal(SettingsItem)
+	open_settings_win = pyqtSignal()
 	open_img_search_win = pyqtSignal()
 	start_text_search = pyqtSignal()
 	mf_open = pyqtSignal(Mf)
-	mf_new = pyqtSignal(SettingsItem)
+	mf_new = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -239,9 +235,8 @@ class BarTop(TransparentFrame):
 		self.h_layout.addSpacing(5)
 
 		# --- Кнопка настроек ---
-		item = SettingsItem("general", "")
 		self.settings_btn = USvgWidgetBg(Static.GRAY_ICONS / "settings_gray.svg", 28, 14)
-		self.settings_btn.clicked_.connect(lambda: self.open_settings_win.emit(item))
+		self.settings_btn.clicked_.connect(self.open_settings_win.emit)
 		self.h_layout.addWidget(self.settings_btn)
 
 		self.setFixedHeight(30)

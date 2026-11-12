@@ -13,8 +13,7 @@ from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSizePolicy,
                              QTableWidgetItem, QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
-from system.database import Dirs
-from system.items import Mf, SettingsItem
+from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker
 from system.shared_utils import SharedUtils
@@ -1091,14 +1090,14 @@ class NewMfWin(UMainWindow):
 class WinSettings(UMainWindow):
 	closed = pyqtSignal()
 
-	def __init__(self, settings_item: SettingsItem):
+	def __init__(self):
 		super().__init__()
+
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.settings)
 		self.setFixedSize(700, 570)
 
-		self.settings_item = settings_item
 		self.current_page = None
 		self.current_idx = 0
 		self.pending_idx = None
@@ -1124,21 +1123,19 @@ class WinSettings(UMainWindow):
 		self.left_menu.clicked.connect(self.left_menu_click)
 		self.splitter.addWidget(self.left_menu)
 
-		# Строки левого меню: 0 — общие настройки, 1 — пустой спейсер,
-		# с 2 — папки (catalog)
+		# Первая строка — общие настройки (data = None), остальные — папки (data = Mf)
 		main_settings_item = UListWidgetItem(
 			parent=self.left_menu,
 			text=Lng.general
 		)
 		main_settings_item.setIcon(QIcon(str(Static.COLOR_ICONS / "settings.svg")))
+		main_settings_item.setData(Qt.ItemDataRole.UserRole, None)
 		self.left_menu.addItem(main_settings_item)
 
-		spacer = UListSpacerItem(self.left_menu)
-		# self.left_menu.addItem(spacer)
-
-		for i in Mf.items:
-			new_folder = UListWidgetItem(self.left_menu, text=i.mf_alias)
+		for mf in Mf.items:
+			new_folder = UListWidgetItem(self.left_menu, text=mf.mf_alias)
 			new_folder.setIcon(QIcon(str(Static.COLOR_ICONS / "image_folder.svg")))
+			new_folder.setData(Qt.ItemDataRole.UserRole, mf)
 			self.left_menu.addItem(new_folder)
 
 		self.right_wid = TransparentWidget()
@@ -1151,35 +1148,18 @@ class WinSettings(UMainWindow):
 		self.splitter.setStretchFactor(1, 1)
 		self.splitter.setSizes([200, 600])
 
-		idx = 0
-		if settings_item.type_ == "edit_folder":
-			for x, i in enumerate(Mf.items, start=2):
-				if i.mf_alias == self.settings_item.content:
-					idx = x
-					break
-		elif settings_item.type_ == "new_folder":
-			QTimer.singleShot(10, self.open_new_catalog_win)
-
-		self.current_idx = idx
-		self.left_menu.setCurrentRow(idx)
-		self.init_right_side(idx)
+		self.left_menu.setCurrentRow(0)
+		self.init_right_side()
 
 	def open_new_catalog_win(self):
-		self.new_catalog_win = NewMfWin(mf_path=self.settings_item.content)
+		self.new_catalog_win = NewMfWin()
 		self.new_catalog_win.center_to_parent(self)
 		self.new_catalog_win.show()
 
-	def init_right_side(self, idx: int):
-		if idx == 0:
-			r_wid = GeneralSettings()
-		else:
-			item: UListWidgetItem = self.left_menu.item(idx)
-			for index, mf in enumerate(Mf.items):
-				if mf.mf_alias == item.text():
-					r_wid = MfSettings(mf)
-					self.settings_item.type_ = "general"
-					self.settings_item.content = ""
-					break
+	def init_right_side(self):
+		item = self.left_menu.currentItem()
+		mf = item.data(Qt.ItemDataRole.UserRole)  # None для пункта "Общие"
+		r_wid = GeneralSettings() if mf is None else MfSettings(mf)
 
 		# Любое изменение на странице помечает окно как несохранённое
 		r_wid.changed.connect(self._on_page_changed)
@@ -1217,7 +1197,7 @@ class WinSettings(UMainWindow):
 		self.left_menu.setCurrentRow(idx)
 		self.left_menu.blockSignals(False)
 		self.current_idx = idx
-		self.init_right_side(idx)
+		self.init_right_side()
 
 	def _restore_selection(self):
 		# Возвращаем выделение на открытую страницу без повторного вызова left_menu_click

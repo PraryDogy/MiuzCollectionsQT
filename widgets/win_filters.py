@@ -474,7 +474,6 @@ class TagsWidget(UGroupBox):
 class WinFilters(UMainWindow):
 	closed_ = pyqtSignal()
 	load_st_grid = pyqtSignal()
-	edit_filters = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()

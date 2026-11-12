@@ -7,7 +7,7 @@ from PyQt6.QtGui import QCloseEvent, QGuiApplication, QImage, QKeyEvent
 from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.items import DataItem, Filters, Mf, SettingsItem
+from system.items import DataItem, Filters, Mf
 from system.lang import Lng
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
@@ -21,7 +21,6 @@ from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, USep, WarningWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
-# from .bar_path import PathBar
 from .bar_top import BarTop
 from .grid import Grid, GridStandart, Thumb
 from .menu_left import MenuLeft
@@ -32,7 +31,7 @@ from .win_image_view import ImgViewItem, WinImageView
 from .win_img_search import WinImgSearch
 from .win_info import WinInfo
 from .win_servers import ServersWin
-from .win_settings import WinSettings
+from .win_settings import WinSettings, NewMfWin
 from .win_smb import WinSmb
 from .win_upload import UploadWin
 
@@ -156,7 +155,7 @@ class WinMain(UMainWindow):
 		self.set_titlebar_height(self.bar_top.height() + 8)
 
 		self.bar_top.open_settings_win.connect(
-			lambda settings_item: self.open_settings_win(settings_item)
+			lambda: self.open_settings_win()
 		)
 		self.bar_top.open_img_search_win.connect(
 			lambda: self.open_img_search_win()
@@ -165,7 +164,7 @@ class WinMain(UMainWindow):
 			lambda: self.base_search_start()
 		)
 		self.bar_top.mf_new.connect(
-			lambda settings_item: self.open_settings_win(settings_item)
+			lambda: self.open_new_mf_win()
 		)
 		self.bar_top.mf_open.connect(
 			lambda mf: self.on_mf_clicked(mf)
@@ -300,14 +299,8 @@ class WinMain(UMainWindow):
 		self.win_warn.show()
 
 	def open_filters_win(self):
-
-		def edit_filters():
-			settings_item = SettingsItem("filters", "")
-			self.open_settings_win(settings_item)
-
 		self.filters_win = WinFilters()
 		self.filters_win.load_st_grid.connect(self.load_st_grid)
-		self.filters_win.edit_filters.connect(edit_filters)
 		self.filters_win.center_to_parent(self.window())
 		self.filters_win.show()
 
@@ -479,9 +472,14 @@ class WinMain(UMainWindow):
 		self.info_win.center_to_parent(UMainWindow.win_list[-2])
 		self.info_win.show()
 
-	def open_settings_win(self, settings_item: SettingsItem):
+	def open_new_mf_win(self):
+		self.new_mf_win = NewMfWin()
+		self.new_mf_win.center_to_parent(self)
+		self.new_mf_win.show()
+
+	def open_settings_win(self):
 		self.bar_top.settings_btn.set_selected_style()
-		self.settings_win = WinSettings(settings_item)
+		self.settings_win = WinSettings()
 		self.settings_win.closed.connect(self.bar_top.settings_btn.set_base_style)
 		self.settings_win.center_to_parent(self.window())
 		self.settings_win.show()
@@ -542,9 +540,6 @@ class WinMain(UMainWindow):
 		)
 		self.grid.set_files_to_copy.connect(
 			lambda abs_paths: self.set_files_to_copy(abs_paths)
-		)
-		self.grid.setup_mf.connect(
-			lambda item: self.open_settings_win(item)
 		)
 		self.grid.path_bar_update.connect(
 			lambda abs_path: self.path_bar_update(abs_path)
