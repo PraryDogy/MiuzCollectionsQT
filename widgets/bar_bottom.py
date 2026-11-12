@@ -126,24 +126,20 @@ class ProgressWidget(TransparentWidget):
 	set_warning = pyqtSignal()
 	set_green_checkmark = pyqtSignal()
 	set_arrow_terminal = pyqtSignal()
-
-	ALIAS_MAX_WIDTH = 400
+	path_visible_changed = pyqtSignal(bool)  # True, когда показан путь
 
 	def __init__(self):
 		super().__init__()
 		self._last_alias: str | None = None
 		self._last_text: str | None = None
 
-		# Алиас папки: обрезается многоточием, максимум 200 px
+		# Путь показывается полностью, без обрезки
 		self.alias_label = GrayTextLabel("")
 		self.alias_label.set_font_size(11)
-		self.alias_label.setMaximumWidth(self.ALIAS_MAX_WIDTH)
-		self.alias_label.set_elide(True, ignore_width=False)
 
-		# Статус: занимает всё оставшееся место
+		# Статус идёт сразу за путём
 		self.status_label = GrayTextLabel("")
 		self.status_label.set_font_size(11)
-		# self.status_label.set_elide(True, ignore_width=False)
 
 		self.h_layout = QHBoxLayout(self)
 		self.h_layout.setContentsMargins(0, 0, 0, 0)
@@ -201,6 +197,7 @@ class ProgressWidget(TransparentWidget):
 		self.alias_label.setText(alias)
 		self.alias_label.setVisible(bool(alias))
 		self.status_label.setText(text)
+		self.path_visible_changed.emit(bool(alias))
 		QTimer.singleShot(50, lambda: self.alias_label.setToolTip(alias[:-1]))
 
 	def _on_tick(self):
@@ -247,7 +244,7 @@ class ProgressWidget(TransparentWidget):
 		QTimer.singleShot(len(demo_steps) * step_ms, self.show_timer)
 
 	@staticmethod
-	def _short_dir(path: str, max_parts: int = 3) -> str:
+	def _short_dir(path: str, max_parts: int = 15) -> str:
 		"""/Users/me/Downloads/Folder 1/images folder -> /…/Folder 1/images folder"""
 		parts = [p for p in path.split(os.sep) if p]
 		if len(parts) <= max_parts:
@@ -307,7 +304,7 @@ class BarBottom(TransparentWidget):
 
 		self.h_layout.addSpacing(5)
 
-		# --- Прогресс ---
+		# --- Прогресс: растягивается, когда выделение скрыто ---
 		self.progress_widget = ProgressWidget()
 		self.progress_widget.set_arrow_terminal.connect(
 			lambda: self.progress_svg.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
@@ -318,14 +315,23 @@ class BarBottom(TransparentWidget):
 		self.progress_widget.set_green_checkmark.connect(
 			lambda: self.progress_svg.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
 		)
-		self.h_layout.addWidget(self.progress_widget)
+		self.h_layout.addWidget(self.progress_widget, 1)
 
-		# --- Подпись выделения строго по центру ---
-		self.h_layout.addStretch(1)
+		# --- Выделение по центру: скрывается, когда показан путь ---
+		self.selection_box = TransparentWidget()
+		sel_lay = QHBoxLayout(self.selection_box)
+		sel_lay.setContentsMargins(0, 0, 0, 0)
+		sel_lay.setSpacing(0)
+		sel_lay.addStretch(1)
 		self.selection_label = GrayTextLabel("")
 		self.selection_label.set_font_size(11)
-		self.h_layout.addWidget(self.selection_label)
-		self.h_layout.addStretch(1)
+		sel_lay.addWidget(self.selection_label)
+		sel_lay.addStretch(1)
+		self.h_layout.addWidget(self.selection_box, 1)
+
+		self.progress_widget.path_visible_changed.connect(
+			lambda visible: self.selection_box.setVisible(not visible)
+		)
 
 		# --- Слайдер справа ---
 		self.slider = BarBottomSlider()
