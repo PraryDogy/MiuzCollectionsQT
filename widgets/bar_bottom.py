@@ -127,10 +127,12 @@ class ProgressWidget(TransparentWidget):
 	set_green_checkmark = pyqtSignal()
 	set_arrow_terminal = pyqtSignal()
 
-	ALIAS_MAX_WIDTH = 200
+	ALIAS_MAX_WIDTH = 400
 
 	def __init__(self):
 		super().__init__()
+		self._last_alias: str | None = None
+		self._last_text: str | None = None
 
 		# Алиас папки: обрезается многоточием, максимум 200 px
 		self.alias_label = GrayTextLabel("")
@@ -191,10 +193,14 @@ class ProgressWidget(TransparentWidget):
 	# --- Внутреннее ---
 
 	def _set_texts(self, alias: str, text: str):
+		if alias == self._last_alias and text == self._last_text:
+			return
+		self._last_alias = alias
+		self._last_text = text
+
 		self.alias_label.setText(alias)
 		self.alias_label.setVisible(bool(alias))
 		self.status_label.setText(text)
-		# убираем двоеточие с тултипа
 		QTimer.singleShot(50, lambda: self.alias_label.setToolTip(alias[:-1]))
 
 	def _on_tick(self):
@@ -212,13 +218,13 @@ class ProgressWidget(TransparentWidget):
 	def scan_progress_parts(self, progress: ScanProgress) -> tuple[str, str]:
 		"""Подпись слева и текст статуса отдельно. Строится только в GUI-потоке, где доступен Lng."""
 		if progress.kind == "search_dirs":
-			return f"{progress.mf_alias}:", Lng.search_in.lower()
+			return f"{progress.mf_alias}: ", Lng.search_in.lower()
 		if progress.kind == "indexing":
-			return f"{self._short_dir(progress.dir_path)}:", (
+			return f"{self._short_dir(progress.dir_path)}: ", (
 				f"{Lng.indexing_files.lower()} "
 				f"{progress.current} {Lng.from_} {progress.total}"
 			)
-		return f"{progress.mf_alias}:", Lng.no_connection.lower()
+		return f"{progress.mf_alias}: ", Lng.no_connection.lower()
 
 	# --- Отладка: демо состояний и elide ---
 
