@@ -324,7 +324,7 @@ class BarBottom(TransparentWidget):
 		self.slider.clicked.connect(self.resize_thumbnails)
 		self.h_layout.addWidget(self.slider)
 
-		QTimer.singleShot(1000, self.progress_widget.run_demo)
+		# QTimer.singleShot(1000, self.progress_widget.run_demo)
 
 	def _objects_word(self, n: int) -> str:
 		if JsonData.lng_index == 0:  # русский: три формы по правилам склонения
