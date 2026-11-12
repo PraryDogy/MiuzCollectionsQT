@@ -1076,6 +1076,8 @@ class WinProgressbar(UMainWindow):
 
 
 class VerticalWindow(UMainWindow):
+	WIDTH = 300  # одна ширина на все диалоги, подклассы могут переопределить
+
 	def __init__(self):
 		super().__init__()
 
@@ -1096,36 +1098,29 @@ class VerticalWindow(UMainWindow):
 		self.btn_layout.setContentsMargins(0, 0, 0, 0)
 		self.btn_layout.setSpacing(6)
 
-	def _calculate_optimal_text_width(
-		self, text_wid: TransparentLabel, text: str,
-		min_width: int = 250, max_width: int = 800,
-	) -> int:
-		fm = text_wid.fontMetrics()
-		single_line_width = fm.horizontalAdvance(text)
-
-		if single_line_width <= min_width:
-			return single_line_width + 2
-
-		for width in range(min_width, max_width + 1, 5):
-			rect = fm.boundingRect(
-				0, 0, width, 10000,
-				Qt.TextFlag.TextWordWrap | Qt.AlignmentFlag.AlignLeft,
-				text,
-			)
-			if rect.height() > 0 and width / rect.width() <= 1.05:
-				return width
-
-		return max_width
+		self.setFixedWidth(self.WIDTH)
 
 	def _adjust_window_size(self, text_wid: TransparentLabel, text: str):
-		text_wid.setFixedWidth(self._calculate_optimal_text_width(text_wid, text))
+		text_wid.setWordWrap(True)
 
+		# ширина, доступная тексту: окно минус отступы central_layout и icon_text_layout
+		cm = self.central_layout.contentsMargins()
+		im = self.icon_text_layout.contentsMargins()
+		text_w = self.WIDTH - cm.left() - cm.right() - im.left() - im.right()
+		text_wid.setFixedWidth(text_w)
+
+		# высота метки = реальная высота текста с переносом при этой ширине
+		text_h = text_wid.heightForWidth(text_w)
+		if text_h <= 0:
+			text_h = text_wid.sizeHint().height()
+		text_wid.setFixedHeight(text_h)
+
+		# окно = содержимое + заголовок
 		self.icon_text_layout.activate()
 		self.central_layout.activate()
+		titlebar_h = max(self.height() - self.centralWidget().height(), 0)
+		self.setFixedHeight(self.centralWidget().sizeHint().height() + titlebar_h)
 
-		ideal_size = self.centralWidget().sizeHint()
-		self.adjustSize()
-		self.setFixedSize(self.width(), ideal_size.height())
 
 class ConfirmWindow(VerticalWindow):
 	ok_clicked = pyqtSignal()
