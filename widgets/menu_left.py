@@ -32,6 +32,8 @@ class MenuLeftTreeWidget(UTreeWidget):
 	on_tree_clicked = pyqtSignal(tuple)
 	on_hide_digits_clicked = pyqtSignal()
 	on_scroll_changed = pyqtSignal(int)
+	added_to_stop_list = pyqtSignal()
+
 
 	# компилируем один раз, а не при каждом вызове
 	_leading_non_letters = re.compile(r'^[^A-Za-zА-Яа-я]+')
@@ -187,6 +189,7 @@ class MenuLeftTreeWidget(UTreeWidget):
 			Mf.current_mf.mf_stop_list.append(rel_path)
 			Mf.write_json_data()
 			self.on_tree_clicked.emit((item.abs_path, item.rel_path))
+			self.added_to_stop_list.emit()
 			self._rebuild()
 
 		def rem_stop_list_cmd():
@@ -270,6 +273,7 @@ class MenuLeft(TransparentFrame):
 	copy_path = pyqtSignal(list)
 	on_hide_digits_clicked = pyqtSignal()
 	removed_from_stop_list = pyqtSignal()
+	added_to_stop_list = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -295,5 +299,8 @@ class MenuLeft(TransparentFrame):
 		)
 		self.tree_wid.removed_from_stop_list.connect(
 			lambda: self.removed_from_stop_list.emit()
+		)
+		self.tree_wid.added_to_stop_list.connect(
+			lambda: self.added_to_stop_list.emit()
 		)
 		self.tree_wid.init_ui()

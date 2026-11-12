@@ -145,7 +145,7 @@ class WinMain(UMainWindow):
 		self.go_to_url: str | None = None
 		self.files_to_copy = set()
 		self.stop_scaner = True
-		self.removed_from_stop_list = False
+		self.stop_list_changed = False
 		self.win_smb = None
 
 		self.bar_top = BarTop()
@@ -193,7 +193,10 @@ class WinMain(UMainWindow):
 			lambda abs_paths: self.copy_path(abs_paths)
 		)
 		self.left_menu.removed_from_stop_list.connect(
-			lambda: self.removed_from_stop_list_cmd()
+			lambda: self.stop_list_changed_cmd()
+		)
+		self.left_menu.added_to_stop_list.connect(
+			lambda: self.stop_list_changed_cmd()
 		)
 		self.splitter.addWidget(self.left_menu)
 
@@ -239,8 +242,9 @@ class WinMain(UMainWindow):
 			return None
 		return wrapper
 
-	def removed_from_stop_list_cmd(self):
-		self.removed_from_stop_list = True
+	def stop_list_changed_cmd(self):
+		"""Стоп-лист изменился в любую сторону: сканер пересчитает папки и миниатюры."""
+		self.stop_list_changed = True
 		self.restart_scaner_task()
 
 		win_warn = WarningWindow(Lng.wait_for_scan)
@@ -648,10 +652,10 @@ class WinMain(UMainWindow):
 			self.scaner_task.terminate_join()
 			progress.show_timer()
 			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
-			if db_changed(self.db_mtime, new_db_time) or self.removed_from_stop_list:
+			if db_changed(self.db_mtime, new_db_time) or self.stop_list_changed:
 				self.load_st_grid()
 				self.left_menu.tree_wid.init_ui()
-				self.removed_from_stop_list = False
+				self.stop_list_changed = False
 		else:
 			self.scaner_poll_timer.start(ms)
 
