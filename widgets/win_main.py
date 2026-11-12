@@ -571,7 +571,7 @@ class WinMain(UMainWindow):
 		)
 
 		self.grid.selection_count_changed.connect(
-			lambda x: self.bar_bottom.set_selection_count(x)
+			lambda x: print("куда выделение вписать?")
 		)
 
 		self.right_layout.addWidget(self.grid)

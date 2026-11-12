@@ -315,23 +315,9 @@ class BarBottom(TransparentWidget):
 		self.progress_widget.set_green_checkmark.connect(
 			lambda: self.progress_svg.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
 		)
-		self.h_layout.addWidget(self.progress_widget, 1)
+		self.h_layout.addWidget(self.progress_widget)
 
-		# --- Выделение по центру: скрывается, когда показан путь ---
-		self.selection_box = TransparentWidget()
-		sel_lay = QHBoxLayout(self.selection_box)
-		sel_lay.setContentsMargins(0, 0, 0, 0)
-		sel_lay.setSpacing(0)
-		sel_lay.addStretch(1)
-		self.selection_label = GrayTextLabel("")
-		self.selection_label.set_font_size(11)
-		sel_lay.addWidget(self.selection_label)
-		sel_lay.addStretch(1)
-		self.h_layout.addWidget(self.selection_box, 1)
-
-		self.progress_widget.path_visible_changed.connect(
-			lambda visible: self.selection_box.setVisible(not visible)
-		)
+		self.h_layout.addStretch()
 
 		# --- Слайдер справа ---
 		self.slider = BarBottomSlider()
@@ -344,24 +330,3 @@ class BarBottom(TransparentWidget):
 		self.h_layout.addWidget(self.slider)
 
 		# QTimer.singleShot(1000, self.progress_widget.run_demo)
-
-	def _objects_word(self, n: int) -> str:
-		if JsonData.lng_index == 0:  # русский: три формы по правилам склонения
-			n_abs = abs(n) % 100
-			n1 = n_abs % 10
-			if 11 <= n_abs <= 14:
-				return Lng.selected_objects_many
-			if n1 == 1:
-				return Lng.selected_objects_one
-			if 2 <= n1 <= 4:
-				return Lng.selected_objects_few
-			return Lng.selected_objects_many
-		# английский: одна форма для 1, остальные во множественном
-		return Lng.selected_objects_one if n == 1 else Lng.selected_objects_few
-
-	def set_selection_count(self, n: int):
-		if n <= 0:
-			self.selection_label.setText("")
-			return
-		prefix = Lng.selected_prefix
-		self.selection_label.setText(f"{prefix} {n} {self._objects_word(n)}")
