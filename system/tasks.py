@@ -20,6 +20,7 @@ from .lang import Lng
 from .scaner import StopList
 from .shared_utils import ImgUtils
 from .utils import ReadableDate, Utils
+from typing import Literal
 
 
 class URunnable(QRunnable):
@@ -328,11 +329,11 @@ class MfCleaner(URunnable):
 	class Sigs(QObject):
 		finished_ = pyqtSignal(bool)
 
-	def __init__(self, mf: Mf, is_remove_mf: bool):
+	def __init__(self, mf: Mf, clean_type: Literal["remove_mf", "simple_repair", "full_repair"]):
 		super().__init__()
 		self.sigs = MfCleaner.Sigs()
 		self.mf = mf
-		self.is_remove_mf = is_remove_mf
+		self.clean_type = clean_type
 
 	def task(self):
 		success = False
@@ -345,15 +346,18 @@ class MfCleaner(URunnable):
 
 	def _task(self):
 		with Dbase.main_engine.begin() as conn:
-			self.clean_dir_table(conn)
 
-			rel_paths = self.get_rel_thumb_paths(conn)
-			if rel_paths:
-				self.remove_thumb_images(rel_paths)
-				self.clean_thumbs_table(conn)
+			if self.clean_type == "simple_repair":
+				self.clean_dir_table(conn)
+
+			if self.clean_type == "full_repair":
+				rel_paths = self.get_rel_thumb_paths(conn)
+				if rel_paths:
+					self.remove_thumb_images(rel_paths)
+					self.clean_thumbs_table(conn)
 
 		# изменяем список и JSON только после успешной очистки БД
-		if self.is_remove_mf:
+		if self.clean_type == "remove_mf":
 			Mf.items[:] = [m for m in Mf.items if m.mf_alias != self.mf.mf_alias]
 			Mf.write_json_data()
 

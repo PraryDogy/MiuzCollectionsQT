@@ -578,8 +578,8 @@ class MfRepairGroup(HoverGroupBox):
 
 
 class MfRepairWin(UMainWindow):
-	small_repair = pyqtSignal()
-	big_repair = pyqtSignal()
+	simple_repair_clicked = pyqtSignal()
+	full_repair_clicked = pyqtSignal()
 	
 	def __init__(self):
 		super().__init__()
@@ -596,11 +596,11 @@ class MfRepairWin(UMainWindow):
 		self.h_lay.setSpacing(10)
 
 		small_repair = MfRepairGroup("Простой сброс", "Будет заново просканирован весь каталог. Подойдет, если каких-то изображений не хватает.")
-		small_repair.clicked.connect(self.small_repair.emit)
+		small_repair.clicked.connect(self.simple_repair_clicked.emit)
 		self.h_lay.addWidget(small_repair)
 
 		big_repair = MfRepairGroup("Полный сброс", "Будут удалены и заново добавлены все кешированные изображения. Подойдет при серьезных ошибках.")
-		big_repair.clicked.connect(self.big_repair.emit)
+		big_repair.clicked.connect(self.full_repair_clicked.emit)
 		self.h_lay.addWidget(big_repair)
 
 		btn_wrapper = TransparentWidget()
@@ -626,6 +626,8 @@ class MfRepairWin(UMainWindow):
 
 class MfRepairWidget(HoverGroupBox):
 	start_clicked = pyqtSignal()
+	simple_repair_clicked = pyqtSignal()
+	full_repair_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
@@ -660,14 +662,15 @@ class MfRepairWidget(HoverGroupBox):
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
 			self.mf_repair_win = MfRepairWin()
+			self.mf_repair_win.simple_repair_clicked.connect(self.simple_repair_clicked.emit)
+			self.mf_repair_win.full_repair_clicked.connect(self.full_repair_clicked.emit)
 			self.mf_repair_win.center_to_parent(self.window())
 			self.mf_repair_win.show()
-			# self.start_clicked.emit()
 		super().mouseReleaseEvent(event)
 
 
 class MfRemoveWidget(HoverGroupBox):
-	start_clicked = pyqtSignal()
+	remove_mf_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
@@ -701,7 +704,7 @@ class MfRemoveWidget(HoverGroupBox):
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
-			self.start_clicked.emit()
+			self.remove_mf_clicked.emit()
 		super().mouseReleaseEvent(event)
 
 
@@ -960,11 +963,13 @@ class MfSettings(UGroupBox):
 
 		self.repair_widget = MfRepairWidget()
 		self.repair_widget.start_clicked.connect(self.clean_mf_data)
+		self.repair_widget.full_repair_clicked.connect(...)
+		self.repair_widget.simple_repair_clicked.connect(...)
 		main_lay.addWidget(self.repair_widget)
 
 		if len(Mf.items) > 1:
 			self.remove_folder = MfRemoveWidget()
-			self.remove_folder.start_clicked.connect(self.remove_mf)
+			self.remove_folder.remove_mf_clicked.connect(self.remove_mf)
 			main_lay.addWidget(self.remove_folder)
 
 		main_lay.addStretch()
