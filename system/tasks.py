@@ -331,6 +331,10 @@ class MfCleaner(URunnable):
 
 	def __init__(self, mf: Mf, clean_type: Literal["remove_mf", "simple_repair", "full_repair"]):
 		super().__init__()
+
+		if clean_type not in ["remove_mf", "simple_repair", "full_repair"]:
+			raise Exception ("mf cleaner wrong clean type")
+
 		self.sigs = MfCleaner.Sigs()
 		self.mf = mf
 		self.clean_type = clean_type
@@ -349,15 +353,18 @@ class MfCleaner(URunnable):
 
 			if self.clean_type == "simple_repair":
 				self.clean_dir_table(conn)
+				# print("clean dirs mf cleaner")
 
 			if self.clean_type == "full_repair":
 				rel_paths = self.get_rel_thumb_paths(conn)
 				if rel_paths:
 					self.remove_thumb_images(rel_paths)
 					self.clean_thumbs_table(conn)
+					# print("clean thumbs mf cleaner")
 
 		# изменяем список и JSON только после успешной очистки БД
 		if self.clean_type == "remove_mf":
+			# print("remove mf mf cleaner")
 			Mf.items[:] = [m for m in Mf.items if m.mf_alias != self.mf.mf_alias]
 			Mf.write_json_data()
 

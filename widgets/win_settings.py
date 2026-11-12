@@ -562,6 +562,7 @@ class GeneralSettings(TransparentWidget):
 class MfRepairGroup(HoverGroupBox):
 	def __init__(self, title, description):
 		super().__init__()
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(10, 10, 10, 10)
 		self.v_lay.setSpacing(10)
@@ -574,6 +575,11 @@ class MfRepairGroup(HoverGroupBox):
 		self.v_lay.addWidget(descr_widget)
 
 		self.setFixedWidth(200)
+
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.clicked.emit()
+		return super().mouseReleaseEvent(event)
 
 
 
@@ -625,9 +631,7 @@ class MfRepairWin(UMainWindow):
 
 
 class MfRepairWidget(HoverGroupBox):
-	start_clicked = pyqtSignal()
-	simple_repair_clicked = pyqtSignal()
-	full_repair_clicked = pyqtSignal()
+	open_repair_win = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
@@ -660,12 +664,9 @@ class MfRepairWidget(HoverGroupBox):
 		main_lay.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
 
 	def mouseReleaseEvent(self, event):
-		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
-			self.mf_repair_win = MfRepairWin()
-			self.mf_repair_win.simple_repair_clicked.connect(self.simple_repair_clicked.emit)
-			self.mf_repair_win.full_repair_clicked.connect(self.full_repair_clicked.emit)
-			self.mf_repair_win.center_to_parent(self.window())
-			self.mf_repair_win.show()
+		# if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.open_repair_win.emit()
 		super().mouseReleaseEvent(event)
 
 
@@ -962,9 +963,7 @@ class MfSettings(UGroupBox):
 		main_lay.addWidget(self.mf_stop_list)
 
 		self.repair_widget = MfRepairWidget()
-		self.repair_widget.start_clicked.connect(self.clean_mf_data)
-		self.repair_widget.full_repair_clicked.connect(...)
-		self.repair_widget.simple_repair_clicked.connect(...)
+		self.repair_widget.open_repair_win.connect(self.open_repair_win)
 		main_lay.addWidget(self.repair_widget)
 
 		if len(Mf.items) > 1:
@@ -1023,18 +1022,19 @@ class MfSettings(UGroupBox):
 			win = WarningWindow(Lng.at_least_one_folder_required)
 		else:
 			win = ConfirmWindow(Lng.remove_catalog_warn, danger=True)
-			win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=True))
+			win.ok_clicked.connect(lambda: self.start_mf_cleaner("remove_mf"))
 		win.center_to_parent(self.window())
 		win.show()
 
-	def clean_mf_data(self):
-		win = ConfirmWindow(Lng.repair_catalog_warn)
-		win.ok_clicked.connect(lambda: self.start_mf_cleaner(is_remove=False))
-		win.center_to_parent(self.window())
-		win.show()
+	def open_repair_win(self):
+		self.repair_win = MfRepairWin()
+		self.repair_win.simple_repair_clicked.connect(lambda: self.start_mf_cleaner("simple_repair"))
+		self.repair_win.full_repair_clicked.connect(lambda: self.start_mf_cleaner("full_repair"))
+		self.repair_win.center_to_parent(self.window())
+		self.repair_win.show()
 
-	def start_mf_cleaner(self, is_remove: bool):
-		self.reset_task = MfCleaner(self.mf, is_remove_mf=is_remove)
+	def start_mf_cleaner(self, clean_type: str):
+		self.reset_task = MfCleaner(self.mf, clean_type)
 		self.reset_task.sigs.finished_.connect(restart_app)
 		UThreadPool.start(self.reset_task)
 
