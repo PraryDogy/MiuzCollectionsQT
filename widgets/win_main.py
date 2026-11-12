@@ -147,6 +147,7 @@ class WinMain(UMainWindow):
 		self.files_to_copy = set()
 		self.stop_scaner = True
 		self.removed_from_stop_list = False
+		self.win_smb = None
 
 		self.bar_top = BarTop()
 		# отступ справа в заголовке окна
@@ -311,8 +312,12 @@ class WinMain(UMainWindow):
 		self.filters_win.show()
 
 	def open_win_smb(self, mf: Mf):
+		if self.win_smb is not None and self.win_smb.isVisible():
+			self.win_smb.activateWindow()
+			self.win_smb.raise_()
+			return
+
 		self.win_smb = WinSmb(mf)
-		self.win_smb.center_to_parent(self.win_list[-2])
 		self.win_smb.show()
 
 	def on_mf_clicked(self, mf: Mf):
