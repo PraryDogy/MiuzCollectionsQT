@@ -1076,7 +1076,7 @@ class WinProgressbar(UMainWindow):
 
 
 class VerticalWindow(UMainWindow):
-	WIDTH = 300  # одна ширина на все диалоги, подклассы могут переопределить
+	WIDTH = 280  # одна ширина на все диалоги, подклассы могут переопределить
 
 	def __init__(self):
 		super().__init__()
