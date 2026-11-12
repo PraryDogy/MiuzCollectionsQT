@@ -122,16 +122,34 @@ class PathBar(TransparentWidget):
 # ПРОГРЕСС (ProgressWidget)
 # =============================================================================
 
-class ProgressWidget(GrayTextLabel):
+class ProgressWidget(TransparentWidget):
 	set_warning = pyqtSignal()
 	set_green_checkmark = pyqtSignal()
 	set_arrow_terminal = pyqtSignal()
 
+	ALIAS_MAX_WIDTH = 200
+
 	def __init__(self):
-		super().__init__("")
-		self.set_font_size(11)
-		self.setMaximumWidth(350)
-		self.set_elide(True, ignore_width=False)
+		super().__init__()
+
+		# Алиас папки: обрезается многоточием, максимум 200 px
+		self.alias_label = GrayTextLabel("")
+		self.alias_label.set_font_size(11)
+		self.alias_label.setMaximumWidth(self.ALIAS_MAX_WIDTH)
+		self.alias_label.set_elide(True, ignore_width=False)
+
+		# Статус: занимает всё оставшееся место
+		self.status_label = GrayTextLabel("")
+		self.status_label.set_font_size(11)
+		# self.status_label.set_elide(True, ignore_width=False)
+
+		self.h_layout = QHBoxLayout(self)
+		self.h_layout.setContentsMargins(0, 0, 0, 0)
+		self.h_layout.setSpacing(0)
+		self.h_layout.addWidget(self.alias_label)
+		self.h_layout.addWidget(self.status_label)
+		self.h_layout.addStretch()
+
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self.timer = QTimer(self)
 		self.timer.timeout.connect(self._on_tick)
@@ -142,10 +160,11 @@ class ProgressWidget(GrayTextLabel):
 	def show_status(self, progress: ScanProgress):
 		"""Прогресс сканера. Таймер останавливается, чтобы не перебивать текст."""
 		self.timer.stop()
-		self.setText(self.scan_progress_text(progress))
+		alias, text = self.scan_progress_parts(progress)
+		self._set_texts(alias, text)
 		if progress.kind == "indexing":
 			self.set_green_checkmark.emit()
-		elif progress.kind in ("no_connection", ):
+		elif progress.kind in ("no_connection",):
 			self.set_warning.emit()
 		else:
 			self.set_arrow_terminal.emit()
@@ -153,66 +172,73 @@ class ProgressWidget(GrayTextLabel):
 	def show_loading(self):
 		"""Запуск сканера до первого прогресса."""
 		self.timer.stop()
-		self.setText(Lng.loading)
+		self._set_texts("", Lng.loading)
 		self.set_arrow_terminal.emit()
 
 	def show_timer(self):
 		"""Обратный отсчёт до следующего сканирования."""
 		self.total_seconds = JsonData.scaner_minutes * 60
-		self.setText(self._timer_text())
+		self._set_texts("", self._timer_text())
 		self.set_arrow_terminal.emit()
 		self.timer.start(1000)
 
 	def reset(self):
 		"""Пустое состояние без таймера."""
 		self.timer.stop()
-		self.setText("")
+		self._set_texts("", "")
 		self.set_arrow_terminal.emit()
 
 	# --- Внутреннее ---
+
+	def _set_texts(self, alias: str, text: str):
+		self.alias_label.setText(alias)
+		self.alias_label.setVisible(bool(alias))
+		self.status_label.setText(text)
+		# убираем двоеточие с тултипа
+		QTimer.singleShot(50, lambda: self.alias_label.setToolTip(alias[:-1]))
 
 	def _on_tick(self):
 		self.total_seconds -= 1
 		if self.total_seconds <= 0:
 			self.timer.stop()
 			return
-		self.setText(self._timer_text())
+		self.status_label.setText(self._timer_text())
 
 	def _timer_text(self) -> str:
 		minutes = self.total_seconds // 60
 		seconds = self.total_seconds % 60
 		return f"{Lng.next_search} {minutes:02d}:{seconds:02d}"
 
-	def scan_progress_text(self, progress: ScanProgress) -> str:
-		"""Текст прогресса сканера. Строится только в GUI-потоке, где доступен Lng."""
+	def scan_progress_parts(self, progress: ScanProgress) -> tuple[str, str]:
+		"""Алиас папки и текст статуса отдельно. Строится только в GUI-потоке, где доступен Lng."""
+		alias = f"{progress.mf_alias}:"
 		if progress.kind == "search_dirs":
-			return f"{progress.mf_alias}: {Lng.search_in.lower()}"
+			return alias, Lng.search_in.lower()
 		if progress.kind == "indexing":
-			return (
-				f"{progress.mf_alias}: "
+			return alias, (
 				f"{Lng.indexing_files.lower()} "
 				f"{progress.current} {Lng.from_} {progress.total}"
 			)
-		return f"{progress.mf_alias}: {Lng.no_connection.lower()}"
+		return alias, Lng.no_connection.lower()
 
 	# --- Отладка: демо состояний и elide ---
 
-	def run_demo(self, step_ms: int = 1500):
+	def run_demo(self, step_ms: int = 15500):
 		"""
-		Отладка: показывает иконки и тексты разной длины, в конце запускает таймер.
+		Отладка: короткий и длинный алиас с одинаковым статусом, в конце запускает таймер.
 		Удаляется целиком этим методом.
 		"""
+		status = "индексация файлов 12 из 340"
 		demo_steps = [
-			(self.set_arrow_terminal, "mf: ищу папки"),
-			(self.set_warning, "mf: индексация файлов 12 из 340"),
-			(self.set_green_checkmark, (
-				"очень длинное имя хранилища для проверки elide: "
-				"индексация файлов 12345 из 987654 и ещё очень много текста"
-			)),
+			# (self.set_green_checkmark, "mf:", status),
+			(self.set_green_checkmark, "очень длинное имя хранилища для проверки elide:", status),
 		]
 		self.timer.stop()
-		for i, (signal, text) in enumerate(demo_steps):
-			QTimer.singleShot(i * step_ms, lambda s=signal, t=text: (s.emit(), self.setText(t)))
+		for i, (signal, alias, text) in enumerate(demo_steps):
+			QTimer.singleShot(
+				i * step_ms,
+				lambda s=signal, a=alias, t=text: (s.emit(), self._set_texts(a, t)),
+			)
 		QTimer.singleShot(len(demo_steps) * step_ms, self.show_timer)
 
 
@@ -298,7 +324,7 @@ class BarBottom(TransparentWidget):
 		self.slider.clicked.connect(self.resize_thumbnails)
 		self.h_layout.addWidget(self.slider)
 
-		# self.progress_widget.run_demo()
+		QTimer.singleShot(1000, self.progress_widget.run_demo)
 
 	def _objects_word(self, n: int) -> str:
 		if JsonData.lng_index == 0:  # русский: три формы по правилам склонения

@@ -224,7 +224,7 @@ class WinMain(UMainWindow):
 		else:
 			print("СКАНЕР ВЫКЛЮЧЕН")
 			self.bar_bottom.progress_widget.reset()
-			self.bar_bottom.progress_widget.setText("СКАНЕР ВЫКЛЮЧЕН")
+			self.bar_bottom.progress_widget.status_label.setText("СКАНЕР ВЫКЛЮЧЕН")
 
 		self.path_bar_update(Mf.current_mf.mf_path)
 
