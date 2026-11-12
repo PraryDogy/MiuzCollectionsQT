@@ -1575,9 +1575,9 @@ class MfPathStatus(TransparentFrame):
 		self.icon.setFixedSize(16, 16)
 		lay.addWidget(self.icon)
 
-		self.label = TransparentLabel("")
-		self.label.set_elide(True)
-		lay.addWidget(self.label)
+		self.path_label = TransparentLabel("")
+		self.path_label.set_elide(True)
+		lay.addWidget(self.path_label)
 
 		self.set_state("warn")
 
@@ -1592,8 +1592,11 @@ class MfPathStatus(TransparentFrame):
 
 	def set_status(self, icon_path: Path, text: str, state: str):
 		self.icon.load(str(icon_path))
-		self.label.setText(text)
+		self.path_label.setText(text)
 		self.set_state(state)
+
+	def set_path(self, path: str):
+		self.path_label.setText(path)
 
 
 class MfPathWidget(HoverGroupBox):
