@@ -11,9 +11,9 @@ from system.items import DataItem, Filters, Mf
 from system.lang import Lng
 from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
                                  UpdateThumbItem)
-from system.scaner import (BaseScaner, ForcedScaner, ForcedScanerItem,
-                           PathCheckPassed, PathMismatch, ScanerWorker,
-                           ScanProgress)
+from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
+                           ForcedScanerItem, PathCheckPassed, PathMismatch,
+                           ScanerWorker, ScanProgress)
 from system.shared_utils import ImgUtils
 from system.tasks import SetFav, ThumbScale, UThreadPool, Utils
 
@@ -31,7 +31,7 @@ from .win_image_view import ImgViewItem, WinImageView
 from .win_img_search import WinImgSearch
 from .win_info import WinInfo
 from .win_servers import ServersWin
-from .win_settings import WinSettings, NewMfWin
+from .win_settings import NewMfWin, WinSettings
 from .win_smb import WinSmb
 from .win_upload import UploadWin
 
@@ -630,8 +630,6 @@ class WinMain(UMainWindow):
 			self.scaner_poll_timer.start(ms)
 			return
 
-		# Сначала фиксируем, жив ли процесс, потом читаем очередь.
-		# Иначе сообщение, положенное перед завершением, может потеряться.
 		alive = self.scaner_task.is_alive()
 		progress = self.bar_bottom.progress_widget
 
@@ -641,6 +639,8 @@ class WinMain(UMainWindow):
 				self.on_path_mismatch(data)
 			elif isinstance(data, PathCheckPassed):
 				self.on_path_check_passed(data)
+			elif isinstance(data, DirsReady):
+				self.on_dirs_ready(data)
 			elif isinstance(data, ScanProgress):
 				progress.show_status(data)
 
@@ -654,6 +654,12 @@ class WinMain(UMainWindow):
 				self.removed_from_stop_list = False
 		else:
 			self.scaner_poll_timer.start(ms)
+
+	def on_dirs_ready(self, data: DirsReady):
+		"""Папки записаны в Dirs: перестраиваем дерево, сетку не трогаем."""
+		if Mf.current_mf is None or Mf.current_mf.mf_alias != data.mf_alias:
+			return
+		self.left_menu.tree_wid.init_ui()
 
 	def on_path_check_passed(self, data: PathCheckPassed):
 		"""Каталог совпал: старый путь больше не нужен, сбрасываем флаг."""

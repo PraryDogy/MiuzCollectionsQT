@@ -1,6 +1,6 @@
 import os
 import traceback
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from multiprocessing import Queue
 from time import sleep
@@ -19,6 +19,11 @@ from system.utils import Utils
 # Порог совпадения при смене пути и размер выборки для проверки каталога
 MATCH_THRESHOLD = 80
 SAMPLE_SIZE = 500
+
+# mod = StopList.MOD (0): стоп-папка
+# mod = PENDING_MOD (-1): папка найдена, но её изображения ещё не проверены.
+# Такая папка всегда считается изменённой, пока скан не дойдёт до неё.
+PENDING_MOD = -1
 
 
 class Tools:
@@ -49,6 +54,12 @@ class ScanProgress:
 	mf_alias: str
 	current: int = 0
 	total: int = 0
+
+
+@dataclass(slots=True)
+class DirsReady:
+	"""Папки Mf записаны в Dirs (пока с PENDING_MOD). Можно строить левое меню."""
+	mf_alias: str
 
 
 @dataclass(slots=True)
@@ -84,7 +95,8 @@ class DirItem:
 		- корень = /User/Downloads/parent/folder
 		- подкаталог = /User/Downloads/parent/folder/subfolder
 		- rel_path = /subfolder
-	- mod: дата модификации каталога (os.stat.st_mtime), либо StopList.MOD для стоп-папки
+	- mod: дата модификации каталога (os.stat.st_mtime),
+	  StopList.MOD для стоп-папки или PENDING_MOD для непроверенной папки
 	"""
 	abs_path: str
 	rel_path: str
@@ -150,7 +162,7 @@ class BaseScanerItem:
 class DirsDiff:
 	removed: list[DirItem]        # удалены с диска
 	added: list[DirItem]          # новые на диске
-	changed: list[DirItem]        # mod отличается (включая сброшенный в -1)
+	changed: list[DirItem]        # mod отличается (включая PENDING_MOD)
 	stopped: list[DirItem]        # стоп-папки на диске, mod = StopList.MOD
 	newly_stopped: list[DirItem]  # стали стоп-папкой только что
 
@@ -251,6 +263,7 @@ class DirsChangeWatcher(ScanerParent):
 				print("DirsChangeWatcher error", abs_dir_path, e)
 				continue
 
+			# PENDING_MOD (-1) всегда меньше mtime, поэтому папка считается изменённой
 			if item.mod == StopList.MOD or int(stat.st_mtime) > item.mod:
 				is_changed_flag = True
 				break
@@ -598,6 +611,7 @@ class DirImagesUpdater(ScanerParent):
 		"""
 		Сравнивает изображения выбранных папок с БД и применяет изменения.
 		Если корень пропал во время сбора, ничего не меняет.
+		В конце записывает реальные mod папок вместо PENDING_MOD.
 		"""
 		scaner = self.scaner_item
 
@@ -761,7 +775,7 @@ class BaseScaner:
 		if force_full:
 			# полный пересказ: все папки помечаются как изменённые
 			db_dirs = BaseScaner.load_db_dirs(scaner_item)
-			db_dirs = [DirItem(d.abs_path, d.rel_path, -1) for d in db_dirs]
+			db_dirs = [replace(d, mod=PENDING_MOD) for d in db_dirs]
 		else:
 			watcher = DirsChangeWatcher(scaner_item)
 			is_changed, db_dirs = watcher.is_changed()
@@ -792,13 +806,18 @@ class BaseScaner:
 			cleaner.remove_thumbs()
 			cleaner.remove_dirs()
 
-		# стоп-папки: только запись mod = 0 в Dirs, изображения не трогаем
+		# стоп-папки: только запись mod = StopList.MOD в Dirs, изображения не трогаем
 		if diff.stopped and mf.is_root_alive():
 			DirsDbUpdater(scaner_item, diff.stopped).upsert_records()
 
-		# добавленные и изменённые: сверяем изображения и обновляем Dirs
+		# добавленные и изменённые: сначала папки в БД с PENDING_MOD, затем картинки
 		to_scan = diff.added + diff.changed
 		if to_scan and mf.is_root_alive():
+			pending = [replace(d, mod=PENDING_MOD) for d in to_scan]
+			DirsDbUpdater(scaner_item, pending).upsert_records()
+			scaner_item.process_queue.put(DirsReady(mf.mf_alias))
+
+			# DirImagesUpdater запишет реальные mod, когда пройдёт сравнение
 			DirImagesUpdater(scaner_item, to_scan).start()
 
 	@staticmethod
