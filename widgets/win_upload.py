@@ -85,8 +85,12 @@ class DestinyFolderWidget(HoverGroupBox):
 
 		self.path_status = ChoosePathWidget()
 		content_lay.addWidget(self.path_status)
-		self.path_status.set_path(self.current_dir)
-		self.path_status.set_state("ok")
+		self.path_status.set_status(
+			Static.COLOR_ICONS / "green_checkmark.svg",
+			self.current_dir,
+			state="ok"
+		)
+		self.setToolTip(self.current_dir)
 
 		# правая часть: стрелка по центру по вертикали
 		self.change_dir_svg = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
@@ -102,10 +106,13 @@ class DestinyFolderWidget(HoverGroupBox):
 		if url and url != self.current_dir:
 			url = url.rstrip(os.sep)
 			self.current_dir = url
-			self.path_status.set_path(self.current_dir)
-			self.path_status.set_state("ok")
 			self.dir_changed.emit(self.current_dir)
-			self.copy_path_button.current_text = self.current_dir
+			self.path_status.set_status(
+				Static.COLOR_ICONS / "green_checkmark.svg",
+				self.current_dir,
+				state="ok"
+			)
+			self.setToolTip(self.current_dir)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
