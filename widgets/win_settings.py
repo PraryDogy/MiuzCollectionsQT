@@ -558,6 +558,72 @@ class GeneralSettings(TransparentWidget):
 		win.show()
 
 
+
+class MfRepairGroup(HoverGroupBox):
+	def __init__(self, title, description):
+		super().__init__()
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(10, 10, 10, 10)
+		self.v_lay.setSpacing(10)
+
+		title_widget = TitleTextWidget(title)
+		self.v_lay.addWidget(title_widget)
+
+		descr_widget = GrayTextLabel(description)
+		descr_widget.setWordWrap(True)
+		self.v_lay.addWidget(descr_widget)
+
+		self.setFixedWidth(200)
+
+
+
+class MfRepairWin(UMainWindow):
+	small_repair = pyqtSignal()
+	big_repair = pyqtSignal()
+	
+	def __init__(self):
+		super().__init__()
+		self.set_always_on_top()
+		self.set_close_only()
+		self.setWindowTitle(Lng.repair_errors)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
+		self.central_layout.setSpacing(10)
+
+		h_wrapper = TransparentWidget()
+		self.central_layout.addWidget(h_wrapper)
+		self.h_lay = QHBoxLayout(h_wrapper)
+		self.h_lay.setContentsMargins(0, 0, 0, 0)
+		self.h_lay.setSpacing(10)
+
+		small_repair = MfRepairGroup("Простой сброс", "Будет заново просканирован весь каталог. Подойдет, если каких-то изображений не хватает.")
+		small_repair.clicked.connect(self.small_repair.emit)
+		self.h_lay.addWidget(small_repair)
+
+		big_repair = MfRepairGroup("Полный сброс", "Будут удалены и заново добавлены все кешированные изображения. Подойдет при серьезных ошибках.")
+		big_repair.clicked.connect(self.big_repair.emit)
+		self.h_lay.addWidget(big_repair)
+
+		btn_wrapper = TransparentWidget()
+		self.central_layout.addWidget(btn_wrapper)
+		btn_wrapper_lay = QHBoxLayout(btn_wrapper)
+		btn_wrapper_lay.setContentsMargins(0, 0, 0, 0)
+		btn_wrapper_lay.setSpacing(5)
+
+		btn_wrapper_lay.addStretch()
+
+		close_btn = ActiveButton(Lng.close)
+		close_btn.clicked.connect(self.deleteLater)
+		btn_wrapper_lay.addWidget(close_btn)
+
+		self.adjustSize()
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		return super().keyPressEvent(a0)
+
+
+
 class MfRepairWidget(HoverGroupBox):
 	start_clicked = pyqtSignal()
 
@@ -593,7 +659,10 @@ class MfRepairWidget(HoverGroupBox):
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
-			self.start_clicked.emit()
+			self.mf_repair_win = MfRepairWin()
+			self.mf_repair_win.center_to_parent(self.window())
+			self.mf_repair_win.show()
+			# self.start_clicked.emit()
 		super().mouseReleaseEvent(event)
 
 
