@@ -16,52 +16,52 @@ from ._base_widgets import (ActiveButton, GrayTextLabel, HoverGroupBox,
                             UPushButton, USep)
 
 
-class TitleWidget(UGroupBox):
-	def __init__(self, files_count: int):
-		super().__init__()
+# class TitleWidget(UGroupBox):
+# 	def __init__(self, files_count: int):
+# 		super().__init__()
 
-		self.h_layout = QHBoxLayout(self)
-		self.h_layout.setContentsMargins(10, 10, 10, 10)
-		self.h_layout.setSpacing(10)
+# 		self.h_layout = QHBoxLayout(self)
+# 		self.h_layout.setContentsMargins(10, 10, 10, 10)
+# 		self.h_layout.setSpacing(10)
 
-		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "upload_file_gray.svg"))
-		self.svg_widget.setFixedSize(45, 45)
-		self.h_layout.addWidget(self.svg_widget)
+# 		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "upload_file_gray.svg"))
+# 		self.svg_widget.setFixedSize(45, 45)
+# 		self.h_layout.addWidget(self.svg_widget)
 
-		self.text_container = TransparentWidget()
-		self.h_layout.addWidget(self.text_container)
-		self.text_layout = QVBoxLayout(self.text_container)
-		self.text_layout.setContentsMargins(0, 0, 0, 0)
-		self.text_layout.setSpacing(5)
+# 		self.text_container = TransparentWidget()
+# 		self.h_layout.addWidget(self.text_container)
+# 		self.text_layout = QVBoxLayout(self.text_container)
+# 		self.text_layout.setContentsMargins(0, 0, 0, 0)
+# 		self.text_layout.setSpacing(5)
 
-		self.title_label = TitleTextWidget(self.get_plural_text(files_count))
-		self.text_layout.addWidget(self.title_label)
+# 		self.title_label = TitleTextWidget(self.get_plural_text(files_count))
+# 		self.text_layout.addWidget(self.title_label)
 
-		self.description_label = GrayTextLabel(Lng.upload_files_description)
-		self.text_layout.addWidget(self.description_label)
+# 		self.description_label = GrayTextLabel(Lng.upload_files_description)
+# 		self.text_layout.addWidget(self.description_label)
 
-	def get_plural_text(self, count):
-		# 1. Определяем, какой кортеж использовать на основе правил русского языка
-		if count % 10 == 1 and count % 100 != 11:
-			chosen_tuple = Lng.chosen_x_files   # ... 1 файл
-		elif 2 <= count % 10 <= 4 and not (12 <= count % 100 <= 14):
-			chosen_tuple = Lng.chosen_xx_files  # ... 2-4 файла
-		else:
-			chosen_tuple = Lng.chosen_xxx_files # ... 5-20 файлов
+# 	def get_plural_text(self, count):
+# 		# 1. Определяем, какой кортеж использовать на основе правил русского языка
+# 		if count % 10 == 1 and count % 100 != 11:
+# 			chosen_tuple = Lng.chosen_x_files   # ... 1 файл
+# 		elif 2 <= count % 10 <= 4 and not (12 <= count % 100 <= 14):
+# 			chosen_tuple = Lng.chosen_xx_files  # ... 2-4 файла
+# 		else:
+# 			chosen_tuple = Lng.chosen_xxx_files # ... 5-20 файлов
 
-		# 2. Берем строку под нужный язык и сразу подставляем число
-		return chosen_tuple.format(files_count=count)
+# 		# 2. Берем строку под нужный язык и сразу подставляем число
+# 		return chosen_tuple.format(files_count=count)
 
 
 class DestinyFolderWidget(HoverGroupBox):
 	dir_changed = pyqtSignal(str)
 
-	def __init__(self, current_dir: str):
+	def __init__(self, current_dir: str, files_to_copy):
 		super().__init__()
 		self.current_dir = current_dir
 		self.copy_path_btn_locked = False
 
-		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		# self.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
 		# внешний горизонтальный layout: контент слева, стрелка справа
@@ -75,7 +75,7 @@ class DestinyFolderWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(5)
 
-		self.title_label = TitleTextWidget(Lng.dest_folder, Static.GRAY_ICONS / "folder_gray.svg")
+		self.title_label = TitleTextWidget(Lng.upload_files, Static.GRAY_ICONS / "folder_gray.svg")
 		content_lay.addWidget(self.title_label)
 
 		description = GrayTextLabel("описание")
@@ -132,14 +132,10 @@ class UploadWin(UMainWindow):
 
 		self.current_dir = (mf.mf_path + current_dir).rstrip(os.sep)
 
-		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(10)
 
-		self.title_widget = TitleWidget(len(files_to_copy))
-		self.central_layout.addWidget(self.title_widget)
-
-		self.destiny_widget = DestinyFolderWidget(self.current_dir)
+		self.destiny_widget = DestinyFolderWidget(self.current_dir, files_to_copy)
 		self.destiny_widget.dir_changed.connect(self.dir_changed_cmd)
 		self.central_layout.addWidget(self.destiny_widget)
 

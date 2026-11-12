@@ -500,6 +500,10 @@ class Lng:
 		"Файлы будут загружены в указанную папку.",
 		"Files will be uploaded to the specified folder.",
 	)
+	upload_files = (
+		"Загрузка файлов",
+		"Upload files"
+	)
 	# 1 файл (например: 1, 21, 31, 101)
 	chosen_x_files = (
 		"Выбран {files_count} файл",
