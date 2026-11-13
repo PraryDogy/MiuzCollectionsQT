@@ -9,8 +9,7 @@ from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, Filters, Mf
 from system.lang import Lng
-from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb,
-                                 UpdateThumbItem)
+from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb)
 from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
                            ForcedScanerItem, PathCheckPassed, PathMismatch,
                            ScanerWorker, ScanProgress)
@@ -352,10 +351,10 @@ class WinMain(UMainWindow):
 			queue = task.process_queue
 			scaled_fn = Utils.thumb_scaler()
 			while not queue.empty():
-				item: UpdateThumbItem = queue.get()
-				if item.rel_img_path not in self.grid.url_to_wid:
+				rel_img_path, array = queue.get()
+				if rel_img_path not in self.grid.url_to_wid:
 					continue
-				job = ThumbScale(item.rel_img_path, item.array, Static.THUMB_WIDTHS, scaled_fn)
+				job = ThumbScale(rel_img_path, array, Static.THUMB_WIDTHS, scaled_fn)
 				job.sigs.finished_.connect(self._on_thumb_ready)
 				UThreadPool.start(job)
 			if alive:

@@ -407,12 +407,6 @@ class FilesRemover:
 		queue.put(deleted_files)
 
 
-@dataclass(slots=True)
-class UpdateThumbItem:
-	rel_img_path: str
-	array: np.ndarray
-
-
 class UpdateThumb:
 	@staticmethod
 	def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
@@ -452,7 +446,6 @@ class UpdateThumb:
 				Thumbs.mf_alias.name: mf.mf_alias
 			}
 
-		update_thumb_items: list[UpdateThumbItem] = []
 		step = 10
 		chunked_rel_img_paths = [
 			rel_img_paths[i:i+step] for i in range(0, len(rel_img_paths), step)
@@ -473,7 +466,7 @@ class UpdateThumb:
 					)
 					if result:
 						values_list.append(result)
-						item = UpdateThumbItem(rel_img_path, thumb)
+						item = (rel_img_path, thumb)
 						queue.put(item)
 
 			engine = Dbase.create_engine()
@@ -488,15 +481,3 @@ class UpdateThumb:
 				if values_list:
 					stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
 					conn.execute(stmt)
-
-
-class SmbChecker:
-	@staticmethod
-	def start(mf: Mf, queue: Queue):
-		avaiable_path = mf.is_root_alive()
-		while not avaiable_path:
-			avaiable_path = mf.is_root_alive()
-			if avaiable_path:
-				queue.put(avaiable_path)
-				break
-			sleep(1)
