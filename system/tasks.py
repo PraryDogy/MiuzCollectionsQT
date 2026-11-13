@@ -15,7 +15,7 @@ from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPixmap
 from cfg import Dynamic, JsonData, Static
 
 from .database import Dbase, Dirs, Properties, Thumbs
-from .items import Mf
+from .items import Mf, DataItem
 from .lang import Lng
 from .scaner import StopList
 from .shared_utils import ImgUtils
@@ -137,24 +137,9 @@ class AppsScanner(URunnable):
 		self.sigs.finished_.emit(find_image_apps(self.app_names))
 
 
-@dataclass(slots=True)
-class DbImagesLoaderItem:
-	rel_img_path: str
-	abs_img_path: str
-	rel_thumb_path: str
-	fav: int
-	base_qimage: QImage
-	resized_qimages: list[QImage]
-	day_month_year: str
-	hour_min_sec: str
-	filename: str
-	ext: str
-
-
-class DbImagesLoader(URunnable):
+class ThumbnailsLoader(URunnable):
 	"""
 	Загружает изображения из БД и формирует список DbImagesLoaderItem для UI.
-
 	Сигнал finished_ возвращает список DbImagesLoaderItem.
 	"""
 
@@ -163,7 +148,7 @@ class DbImagesLoader(URunnable):
 
 	def __init__(self):
 		super().__init__()
-		self.sigs = DbImagesLoader.Sigs()
+		self.sigs = ThumbnailsLoader.Sigs()
 		self.readable_date = ReadableDate(JsonData.lng_index)
 
 	def task(self):
@@ -206,13 +191,13 @@ class DbImagesLoader(URunnable):
 			q_date = self.readable_date.qdate_from_timestamp(mod)
 			str_date = self.readable_date.get_readable_date(q_date)
 
-			item = DbImagesLoaderItem(
-				rel_img_path=rel_img_path,
-				abs_img_path=Mf.current_mf.create_abs_path(rel_img_path),
-				rel_thumb_path=rel_thumb_path,
-				fav=fav,
+			item = DataItem(
 				base_qimage=base_qimage,
 				resized_qimages=resized_qimages,
+				rel_thumb_path=rel_thumb_path,
+				rel_path=rel_img_path,
+				abs_path=Mf.current_mf.create_abs_path(rel_img_path),
+				fav=fav,
 				day_month_year=str_date,
 				hour_min_sec=hour_min_sec,
 				filename=os.path.basename(rel_img_path),

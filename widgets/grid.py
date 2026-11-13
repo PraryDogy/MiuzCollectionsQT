@@ -14,8 +14,8 @@ from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, Mf
 from system.lang import Lng
 from system.shared_utils import SharedUtils
-from system.tasks import (AppsScanner, DbImagesLoader, DbImagesLoaderItem,
-                          SmoothSignals, SmoothThumbsTask, UThreadPool)
+from system.tasks import (AppsScanner, ThumbnailsLoader, SmoothSignals,
+                          SmoothThumbsTask, UThreadPool)
 from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
@@ -1337,7 +1337,7 @@ class GridStandart(Grid):
 		super().__init__()
 		self.setAcceptDrops(True)
 		self._load_id = 0
-		self._tasks: dict[int, DbImagesLoader] = {}
+		self._tasks: dict[int, ThumbnailsLoader] = {}
 
 		# заглушка живёт поверх вьюпорта и центрируется вручную, без участия layout
 		self._empty_container = TransparentWidget(self.viewport())
@@ -1354,7 +1354,7 @@ class GridStandart(Grid):
 		self.load_db_images_task(reset=True)
 
 	def is_current_dir_stopped(self) -> bool:
-		return DbImagesLoader.is_stopped_path(Dynamic.current_dir)
+		return ThumbnailsLoader.is_stopped_path(Dynamic.current_dir)
 
 	def load_more_thumbnails(self):
 		if self._exhausted:
@@ -1375,14 +1375,14 @@ class GridStandart(Grid):
 
 		self._load_id += 1
 		lid = self._load_id
-		task = DbImagesLoader()
+		task = ThumbnailsLoader()
 		task.sigs.finished_.connect(
 			lambda items, lid=lid, reset=reset: self._on_loaded(items, lid, reset)
 		)
 		self._tasks[lid] = task
 		UThreadPool.start(task)
 
-	def _on_loaded(self, items: list[DbImagesLoaderItem], load_id: int, reset: bool):
+	def _on_loaded(self, items: list[DataItem], load_id: int, reset: bool):
 		self._tasks.pop(load_id, None)
 		if load_id != self._load_id:
 			self._loading_more = False
@@ -1420,27 +1420,15 @@ class GridStandart(Grid):
 	def hide_empty_state(self):
 		self._empty_container.hide()
 
-	def create_thumbnails(self, db_images: list[DbImagesLoaderItem]):
+	def create_thumbnails(self, db_images: list[DataItem]):
 		self.thumb_cls = SquareThumb if JsonData.square_thumbs else Thumb
 		self.thumb_cls.calculate_size()
 
 		self.grid_wid.setUpdatesEnabled(False)
 		try:
-			for image_item in db_images:
-				if image_item.rel_img_path in self.url_to_wid:
+			for data_item in db_images:
+				if data_item.rel_path in self.url_to_wid:
 					continue
-				data_item = DataItem(
-					base_qimage=image_item.base_qimage,
-					resized_qimages=image_item.resized_qimages,
-					rel_thumb_path=image_item.rel_thumb_path,
-					rel_path=image_item.rel_img_path,
-					abs_path=image_item.abs_img_path,
-					fav=image_item.fav,
-					day_month_year=image_item.day_month_year,
-					hour_min_sec=image_item.hour_min_sec,
-					filename=image_item.filename,
-					ext=image_item.ext
-				)
 				thumbnail = self.thumb_cls(data_item)
 				thumbnail.set_no_frame()
 				self.url_to_wid[thumbnail.data_item.rel_path] = thumbnail
