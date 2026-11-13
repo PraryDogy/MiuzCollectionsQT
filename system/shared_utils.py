@@ -118,18 +118,6 @@ class ImageReader:
 		*ext_svg,
 	)
 
-	@classmethod
-	def _get_broken_thumbnail(cls):
-		path = Static.JPEG_ICONS / "broken_thumbnail.jpg"
-		with Image.open(path) as img:
-			return np.array(img.convert("RGB"))
-
-	@classmethod
-	def _get_broken_image(cls):
-		path = Static.JPEG_ICONS / "broken_image.jpg"
-		with Image.open(path) as img:
-			return np.array(img.convert("RGB"))
-
 	@staticmethod
 	def _sniff(path: str) -> str | None:
 		"""Определяет формат по сигнатуре файла, а не по расширению."""
@@ -187,7 +175,7 @@ class ImageReader:
 				return cls._to_srgb_array(img, icc)
 		except Exception as e:
 			print("read pil error", e)
-			return cls._get_broken_image()
+			return None
 
 	@classmethod
 	def _read_jpg(cls, path: str):
@@ -266,13 +254,12 @@ class ImageReader:
 					timeout=timeout,
 				)
 			except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
-				# Возвращаем "пустую" картинку при ошибке или таймауте
-				return np.zeros((100, 100, 3), dtype=np.uint8)
+				return None
 
 			# Ищем файл только в нашей изолированной папке
 			generated_files = list(tmp_dir.glob("*.png"))
 			if not generated_files:
-				return cls._get_broken_image()
+				return None
 
 			with Image.open(generated_files[0]) as img:
 				arr = np.array(img.convert("RGB"))
@@ -282,7 +269,7 @@ class ImageReader:
 
 	@classmethod
 	def _read_svg(cls, path: str):
-		return cls._get_broken_image()
+		return None
 
 	@classmethod
 	def _read_raw(cls, path: str):
@@ -296,14 +283,14 @@ class ImageReader:
 			elif thumb.format == rawpy.ThumbFormat.BITMAP:
 				img = Image.fromarray(thumb.data)
 			else:
-				return cls._get_broken_image()
+				return None
 
 			icc = img.info.get("icc_profile")
 			img = ImageOps.exif_transpose(img)  # поворот по EXIF эскиза
 			return cls._to_srgb_array(img, icc)
 		except Exception as e:
 			print("read raw error", e)
-			return cls._get_broken_image()
+			return None
 
 	@classmethod
 	def _read_movie(cls, path: str, time_sec=1):
@@ -314,10 +301,10 @@ class ImageReader:
 			cap.release()
 			if success:
 				return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-			return cls._get_broken_image()
+			return None
 		except Exception as e:
 			print("read movie error", e)
-			return cls._get_broken_image()
+			return None
 
 	@classmethod
 	def read_img(cls, path: str):
@@ -344,7 +331,7 @@ class ImageReader:
 		if ext in cls.ext_icns or ext in cls.ext_png or ext in cls.ext_jpeg:
 			return cls._read_pil(path)
 
-		return cls._get_broken_image()
+		return None
 
 	@classmethod
 	def get_psd_size(cls, path):
@@ -357,27 +344,6 @@ class ImageReader:
 		height, width = struct.unpack(">II", header[14:22])
 		return width, height
 
-	# перенес
-	@classmethod
-	def resize(cls, image: np.ndarray, size: int) -> np.ndarray:
-		try:
-			if image is None:
-				return cls.resize(cls._get_broken_image(), size)
-			h, w = image.shape[:2]
-			if w > h:  # Горизонтальное изображение
-				new_w = size
-				new_h = int(h * (size / w))
-			elif h > w:  # Вертикальное изображение
-				new_h = size
-				new_w = int(w * (size / h))
-			else:  # Квадратное изображение
-				new_w, new_h = size, size
-			return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-		except Exception as e:
-			print("fit image error", e)
-			return cls.resize(cls._get_broken_image(), size)
-
-	# перенес
 	@classmethod
 	def get_img_res(cls, path: str):
 
@@ -400,61 +366,6 @@ class ImageReader:
 			return psd_read(path)
 		return read(path)
 
-	@classmethod
-	def fit_to_thumb(cls, image: np.ndarray, size: int) -> np.ndarray:
-		try:
-			h, w = image.shape[:2]
-			if h == 0 or w == 0:
-				print("fit_to_thumb: пустое изображение")
-				return cls.fit_to_thumb(cls._get_broken_image(), size)
-
-			scale = size / max(h, w)
-			new_w = max(1, int(w * scale))
-			new_h = max(1, int(h * scale))
-
-			return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_LANCZOS4)
-
-		except Exception as e:
-			print(f"fit_to_thumb: ошибка масштабирования: {e}")
-			return cls.fit_to_thumb(cls._get_broken_image(), size)
-
-	@classmethod
-	def write_thumb(cls, thumb_path: str, thumb: np.ndarray):
-		try:
-			if len(thumb.shape) == 2:  # grayscale
-				img = thumb
-			elif thumb.shape[2] == 3:  # RGB -> BGR для cv2
-				img = cv2.cvtColor(thumb, cv2.COLOR_RGB2BGR)
-			elif thumb.shape[2] == 4:  # RGBA -> BGRA для cv2
-				img = cv2.cvtColor(thumb, cv2.COLOR_RGBA2BGRA)
-			else:
-				print(f"write_thumb: неподдерживаемое число каналов {thumb.shape}")
-				return False
-			cv2.imwrite(thumb_path, img)
-			return True
-		except Exception as e:
-			print(f"write_thumb: ошибка записи thumb на диск: {e}")
-			return False
-
-	@classmethod
-	def read_thumb(cls, thumb_path: str) -> np.ndarray | None:
-		try:
-			if not os.path.exists(thumb_path):
-				print(f"read_thumb: файл не существует {thumb_path}")
-				return None
-			img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
-			if img is None:
-				return None
-			if img.ndim == 2:
-				return img
-			if img.shape[2] == 4:
-				return cv2.cvtColor(img, cv2.COLOR_BGRA2RGBA)
-			return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-		except Exception as e:
-			print(f"read_thumb: ошибка чтения thumb: {e}")
-			return None
-
-	# перенес
 	@staticmethod
 	def is_grayscale(img: np.ndarray) -> bool:
 		return len(img.shape) < 3 or img.shape[2] == 1

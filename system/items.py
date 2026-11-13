@@ -306,11 +306,11 @@ class ImageArrayItem:
 	def __init__(self, image_path: Path | str):
 		super().__init__()
 		self.image_path = str(image_path)
-		self.image_array: np.ndarray = None
-		self.shm: shared_memory = None
-		self.shm_name: str = None
-		self.shape: tuple[int, ...] = None
-		self.dtype: str = None
+		self.image_array: np.ndarray
+		self.shm: shared_memory
+		self.shm_name: str
+		self.shape: tuple[int, ...]
+		self.dtype: str
 
 	def load(self):
 		self.image_array = ImageReader.read_img(self.image_path)
@@ -378,10 +378,3 @@ class ImageArrayItem:
 			self.image_array = self.get_broken_image()
 
 		return self.image_array
-
-	def get_broken_image(self):
-		path = Static.JPEG_ICONS / "broken_image.jpg"
-		if not path.exists():
-			raise Exception(f"Img Utils {path} not exists")
-		with Image.open(path) as img:
-			self.image_array = np.array(img.convert("RGB"))

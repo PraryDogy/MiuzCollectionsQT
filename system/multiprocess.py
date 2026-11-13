@@ -1,24 +1,20 @@
 import errno
 import os
-import shutil
 import traceback
 from dataclasses import dataclass
-from datetime import datetime
 from enum import Enum, auto
-from multiprocessing import Process, Queue, shared_memory
+from multiprocessing import Process, Queue
 from pathlib import Path
 from queue import Empty
 from time import sleep
 from typing import Literal
 
-import numpy as np
 import sqlalchemy
 from typing_extensions import Literal
 
-from cfg import JsonData, Static
-from system.database import Dbase, Dirs, Thumbs
+from cfg import Static
+from system.database import Dbase, Thumbs
 from system.items import ImageArrayItem, Mf
-from system.shared_utils import ImageReader
 from system.utils import Utils
 
 
@@ -71,19 +67,12 @@ class ProcessWorker(BaseProcessWorker):
 		super().__init__(target, (*args, self.process_queue))
 
 
-@dataclass(slots=True)
-class ReadImgItem:
-	src: str
-	shm_name: str
-	shape: tuple[int, ...]
-	dtype: str
-
-
 class ReadImg:
 	@staticmethod
 	def start(src: str, size: int, queue: Queue):
 		array_item = ImageArrayItem(src)
 		array_item.load()
+		array_item.create_shared_memory()
 		if size > 0:
 			array_item.resize(size)
 		queue.put(array_item)
@@ -412,7 +401,7 @@ class UpdateThumb:
 			result = Utils.write_thumbnail(image_item.image_array, abs_thumb_path)
 			result = None
 			if result is None:
-				broken_thumbnail = ImageReader._get_broken_thumbnail()
+				broken_thumbnail = Utils.get_broken_thumbnail()
 				Utils.write_thumbnail(broken_thumbnail, abs_thumb_path)
 				return broken_thumbnail
 			else:

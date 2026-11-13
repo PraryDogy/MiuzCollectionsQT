@@ -1,12 +1,6 @@
-import os
-import traceback
-from typing import Literal
-
 import sqlalchemy
-from sqlalchemy.exc import IntegrityError, OperationalError
 
 from cfg import Static
-from system.utils import Utils
 
 METADATA = sqlalchemy.MetaData()
 

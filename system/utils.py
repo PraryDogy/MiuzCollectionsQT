@@ -9,7 +9,7 @@ import numpy as np
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColorSpace, QImage
 from PyQt6.QtWidgets import QApplication
-
+from PIL import Image
 from cfg import Static
 
 
@@ -169,3 +169,15 @@ class Utils:
 		except Exception as e:
 			print(f"write_thumbnail: ошибка записи миниатюры на диск: {e}")
 			return False
+
+	@classmethod
+	def get_broken_thumbnail(cls):
+		path = Static.JPEG_ICONS / "broken_thumbnail.jpg"
+		with Image.open(path) as img:
+			return np.array(img.convert("RGB"))
+
+	@classmethod
+	def _get_broken_image(cls):
+		path = Static.JPEG_ICONS / "broken_image.jpg"
+		with Image.open(path) as img:
+			return np.array(img.convert("RGB"))

@@ -10,9 +10,9 @@ from PyQt6.QtSvgWidgets import QSvgWidget  # Не забудьте импорт�
 from PyQt6.QtWidgets import QHBoxLayout, QStackedWidget, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.items import Mf
+from system.items import ImageArrayItem, Mf
 from system.lang import Lng
-from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
+from system.multiprocess import ProcessWorker, ReadImg
 from system.shared_utils import ImageReader
 from system.tasks import BlurImgBgTask, ImageSearcher, UThreadPool
 from system.utils import Utils
@@ -464,7 +464,7 @@ class WinImgSearch(UMainWindow):
 			return
 
 		if not self.read_img_task.process_queue.empty():
-			item: ReadImgItem = self.read_img_task.process_queue.get()
+			item: ImageArrayItem = self.read_img_task.process_queue.get()
 			try:
 				self.shm = shared_memory.SharedMemory(name=item.shm_name)
 				self.img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=self.shm.buf)
