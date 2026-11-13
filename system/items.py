@@ -315,7 +315,7 @@ class ImageArrayItem:
 	def load(self):
 		self.image_array = ImageReader.read_img(self.image_path)
 
-	def create_shared_memory(self):
+	def load_shared_memory(self):
 		self.shm = shared_memory.SharedMemory(create=True, size=self.image_array.nbytes)
 		buffer = np.ndarray(self.image_array.shape, dtype=self.image_array.dtype, buffer=self.shm.buf)
 		buffer[:] = self.image_array
