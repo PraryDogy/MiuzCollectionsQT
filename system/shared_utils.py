@@ -119,12 +119,14 @@ class ImageReader:
 	)
 
 	@classmethod
+	def _get_broken_thumbnail(cls):
+		path = Static.JPEG_ICONS / "broken_thumbnail.jpg"
+		with Image.open(path) as img:
+			return np.array(img.convert("RGB"))
+
+	@classmethod
 	def _get_broken_image(cls):
 		path = Static.JPEG_ICONS / "broken_image.jpg"
-
-		if not path.exists():
-			raise Exception(f"Img Utils {path} not exists")
-
 		with Image.open(path) as img:
 			return np.array(img.convert("RGB"))
 

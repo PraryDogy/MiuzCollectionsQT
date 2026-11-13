@@ -151,6 +151,8 @@ class Utils:
 	@classmethod
 	def write_thumbnail(cls, image_array: np.ndarray, thumbnail_path: Path | str) -> bool:
 		thumbnail_path = str(thumbnail_path)
+		if Static.APP_DATA_DIR not in thumbnail_path:
+			raise Exception ("неправильный путь к thumbnail", thumbnail_path)
 		try:
 			if image_array.ndim == 2:  # grayscale, конвертация не нужна
 				img = image_array

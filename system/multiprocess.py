@@ -410,14 +410,12 @@ class UpdateThumb:
 			image_item.load()
 			image_item.resize(Static.THUMB_MAX_SIZE)
 			result = Utils.write_thumbnail(image_item.image_array, abs_thumb_path)
-			if not result:
-				broken_array = ImageReader._get_broken_image()
-				
-
-			thumb_array = ImageReader.fit_to_thumb(image_item, Static.THUMB_MAX_SIZE)
-			if ImageReader.write_thumb(abs_thumb_path, thumb_array):
-				return thumb_array
-			return None
+			if result is None:
+				broken_thumbnail = ImageReader._get_broken_thumbnail()
+				Utils.write_thumbnail(broken_thumbnail, abs_thumb_path)
+				return broken_thumbnail
+			else:
+				return image_item.image_array
 		
 		def _get_values(abs_img_path: str, rel_img_path: str, rel_thumb_path: str):
 			try:
