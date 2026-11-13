@@ -179,7 +179,7 @@ class Utils:
 			return np.array(img.convert("RGB"))
 
 	@classmethod
-	def _get_broken_image(cls):
+	def get_broken_image(cls):
 		path = Static.JPEG_ICONS / "broken_image.jpg"
 		with Image.open(path) as img:
 			return np.array(img.convert("RGB"))
