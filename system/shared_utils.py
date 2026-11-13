@@ -32,27 +32,6 @@ _TIFF_ORIENT = {
 }
 
 
-class SharedUtils:
-
-	@classmethod
-	def get_f_size(cls, bytes_size: int, round_value: int = 2) -> str:
-		def format_size(size: float) -> str:
-			if round_value == 0:
-				return str(int(round(size)))
-			return str(round(size, round_value))
-
-		if bytes_size < 1024:
-			return f"{bytes_size} байт"
-		elif bytes_size < pow(1024, 2):
-			return f"{format_size(bytes_size / 1024)} КБ"
-		elif bytes_size < pow(1024, 3):
-			return f"{format_size(bytes_size / pow(1024, 2))} МБ"
-		elif bytes_size < pow(1024, 4):
-			return f"{format_size(bytes_size / pow(1024, 3))} ГБ"
-		elif bytes_size < pow(1024, 5):
-			return f"{format_size(bytes_size / pow(1024, 4))} ТБ"
-
-
 class ImgUtils:
 
 	ext_jpeg = (
