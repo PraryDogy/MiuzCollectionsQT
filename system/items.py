@@ -14,9 +14,7 @@ from PyQt6.QtCore import QDate, QLocale
 from PyQt6.QtGui import QImage
 
 from cfg import Static
-
-from .shared_utils import ImageReader
-
+from .utils import ImageReader
 
 @dataclass(slots=True)
 class DataItem:

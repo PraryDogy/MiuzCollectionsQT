@@ -12,8 +12,7 @@ from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
 from system.items import ImageArrayItem, Mf
 from system.multiprocess import BaseProcessWorker
-from system.shared_utils import ImageReader
-from system.utils import Utils
+from system.utils import ImageReader, Utils
 
 # Порог совпадения при смене пути и размер выборки для проверки каталога
 MATCH_THRESHOLD = 80

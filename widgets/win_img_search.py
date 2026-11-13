@@ -13,9 +13,8 @@ from cfg import Dynamic, JsonData, Static
 from system.items import ImageArrayItem, Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg
-from system.shared_utils import ImageReader
 from system.tasks import BlurImgBgTask, ImageSearcher, UThreadPool
-from system.utils import Utils
+from system.utils import ImageReader
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
                             TitleTextWidget, TransparentFrame,

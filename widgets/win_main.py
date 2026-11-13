@@ -9,12 +9,12 @@ from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, Filters, Mf
 from system.lang import Lng
-from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb)
+from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
 from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
                            ForcedScanerItem, PathCheckPassed, PathMismatch,
                            ScanerWorker, ScanProgress)
-from system.shared_utils import ImageReader
 from system.tasks import SetFav, ThumbScale, UThreadPool, Utils
+from system.utils import ImageReader
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, USep, WarningWindow)
