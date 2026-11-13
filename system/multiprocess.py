@@ -72,7 +72,7 @@ class ReadImg:
 	def start(src: str, size: int, queue: Queue):
 		array_item = ImageArrayItem(src)
 		array_item.load()
-		array_item.create_shared_memory()
+		array_item.load_shared_memory()
 		if size > 0:
 			array_item.resize(size)
 		queue.put(array_item)
