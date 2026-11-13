@@ -10,11 +10,10 @@ import sqlalchemy
 
 from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
-from system.items import Mf
+from system.items import ImageArrayItem, Mf
 from system.multiprocess import BaseProcessWorker
 from system.shared_utils import ImageReader
 from system.utils import Utils
-
 
 # Порог совпадения при смене пути и размер выборки для проверки каталога
 MATCH_THRESHOLD = 80
@@ -584,13 +583,26 @@ class ThumbsUpdater(ScanerParent):
 				conn.execute(stmt)
 
 		def _create_thumb(img_item: ImgItem) -> bool:
+			"""
+			В любом случае будет записана миниатюра
+			"""
+
 			scaner.current_count += 1
 			scaner.process_queue.put(self._progress(img_item))
-			img = ImageReader.read_img(img_item.abs_img_path)
-			img = ImageReader.fit_to_thumb(img, Static.THUMB_MAX_SIZE)
+
+			array_item = ImageArrayItem(img_item.abs_img_path)
+			array_item.load()
+			if array_item.image_array is None:
+				thumbnail = Utils.get_broken_thumbnail()
+			else:
+				thumbnail = array_item.resize(Static.THUMB_MAX_SIZE)
 			rel_img_path = scaner.mf.create_rel_path(img_item.abs_img_path)
 			thumb_path = scaner.mf.create_abs_thumb_path(rel_img_path)
-			return bool(ImageReader.write_thumb(thumb_path, img))
+
+			result = Utils.write_thumbnail(thumbnail, thumb_path)
+			if result is None:
+				thumbnail = Utils.get_broken_thumbnail()
+				Utils.write_thumbnail(thumbnail, thumb_path)
 
 		step = 10
 		for i in range(0, len(self.new_images), step):
@@ -599,8 +611,8 @@ class ThumbsUpdater(ScanerParent):
 				return
 			good_chunk: list[ImgItem] = []
 			for img_item in self.new_images[i:i + step]:
-				if _create_thumb(img_item):
-					good_chunk.append(img_item)
+				_create_thumb(img_item)
+				good_chunk.append(img_item)
 			if good_chunk:
 				_upsert_records(good_chunk)
 

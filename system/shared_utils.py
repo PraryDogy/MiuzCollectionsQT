@@ -307,7 +307,7 @@ class ImageReader:
 			return None
 
 	@classmethod
-	def read_img(cls, path: str):
+	def read_img(cls, path: str) -> np.ndarray | None:
 		ext = os.path.splitext(path)[1].lower()
 
 		# RAW проверяем первым: CR2, NEF, DNG и др. основаны на TIFF
