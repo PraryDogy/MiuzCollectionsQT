@@ -183,24 +183,3 @@ class Utils:
 		path = Static.JPEG_ICONS / "broken_image.jpg"
 		with Image.open(path) as img:
 			return np.array(img.convert("RGB"))
-
-	@classmethod
-	def get_psd_res(cls, path: str):
-		with open(path, "rb") as f:
-			header = f.read(26)
-
-		if header[:4] != b"8BPS":
-			raise ValueError("Не PSD")
-
-		height, width = struct.unpack(">II", header[14:22])
-		return width, height
-
-	@classmethod
-	def get_img_res(cls, image_array: np.ndarray):
-		if image_array is not None and len(image_array.shape) > 1:
-			h, w = image_array.shape[0], image_array.shape[1]
-			return f"{w}x{h}"
-
-	@staticmethod
-	def is_grayscale(image_array: np.ndarray) -> bool:
-		return len(image_array.shape) < 3 or image_array.shape[2] == 1

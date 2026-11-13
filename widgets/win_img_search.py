@@ -471,7 +471,7 @@ class WinImgSearch(UMainWindow):
 				self.image_stack.setCurrentIndex(1)
 				self.preview_widget.set_pixmap(self.img_array)
 
-				if ImageReader.is_grayscale(self.img_array):
+				if item.is_grayscale():
 					self.cleanup_shm()
 					self.img_array = None
 					QTimer.singleShot(1500, self.reset_img_search)

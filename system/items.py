@@ -378,3 +378,6 @@ class ImageArrayItem:
 			self.image_array = self.get_broken_image()
 
 		return self.image_array
+
+	def is_grayscale(self) -> bool:
+		return len(self.image_array.shape) < 3 or self.image_array.shape[2] == 1
