@@ -407,6 +407,8 @@ class UpdateThumb:
 		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
 			image_item = ImageArrayItem(abs_img_path)
 			image_item.load()
+			image_item.resize(Static.THUMB_MAX_SIZE)
+
 			thumb_array = ImageReader.fit_to_thumb(image_item, Static.THUMB_MAX_SIZE)
 			if ImageReader.write_thumb(abs_thumb_path, thumb_array):
 				return thumb_array

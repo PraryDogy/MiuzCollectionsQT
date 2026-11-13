@@ -1,7 +1,10 @@
+import os
 import subprocess
 import time
 from functools import wraps
+from pathlib import Path
 
+import cv2
 import numpy as np
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColorSpace, QImage
@@ -120,3 +123,47 @@ class Utils:
 			return f"{format_size(bytes_size / pow(1024, 3))} ГБ"
 		elif bytes_size < pow(1024, 5):
 			return f"{format_size(bytes_size / pow(1024, 4))} ТБ"
+
+	@classmethod
+	def load_thumbnail(cls, thumb_path: str | Path) -> np.ndarray | None:
+		thumb_path = str(thumb_path)
+		try:
+			if not os.path.exists(thumb_path):
+				print(f"load_thumbnail: файл не существует {thumb_path}")
+				return None
+
+			img = cv2.imread(thumb_path, cv2.IMREAD_UNCHANGED)
+			if img is None:
+				return None
+
+			if img.ndim == 2:  # grayscale, конвертация не нужна
+				return img
+
+			if img.shape[2] == 4:  # BGRA -> RGBA
+				return cv2.cvtColor(img, cv2.COLOR_BGRA2RGBA)
+
+			return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # BGR -> RGB
+
+		except Exception as e:
+			print(f"load_thumbnail: ошибка чтения миниатюры: {e}")
+			return None
+
+	@classmethod
+	def write_thumbnail(cls, image_array: np.ndarray, thumbnail_path: Path | str) -> bool:
+		thumbnail_path = str(thumbnail_path)
+		try:
+			if image_array.ndim == 2:  # grayscale, конвертация не нужна
+				img = image_array
+			elif image_array.shape[2] == 3:  # RGB -> BGR для cv2
+				img = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
+			elif image_array.shape[2] == 4:  # RGBA -> BGRA для cv2
+				img = cv2.cvtColor(image_array, cv2.COLOR_RGBA2BGRA)
+			else:
+				print(f"write_thumbnail: неподдерживаемое число каналов {image_array.shape}")
+				return False
+
+			return bool(cv2.imwrite(thumbnail_path, img))
+
+		except Exception as e:
+			print(f"write_thumbnail: ошибка записи миниатюры на диск: {e}")
+			return False
