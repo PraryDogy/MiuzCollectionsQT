@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
 from cfg import JsonData, Static
 from system.items import DataItem, Mf
 from system.lang import Lng
-from system.multiprocess import OneFileInfo, OneFileInfoItem, ProcessWorker
+from system.multiprocess import OneFileInfo, ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import BlurImgBgTask, UThreadPool
 from system.utils import ReadableDate, Utils
@@ -243,15 +243,17 @@ class WinInfo(UMainWindow):
 		if self.workers:
 			self.task_timer.start(self.POLL_MS)
 
-	def apply_info(self, info_item: OneFileInfoItem | None):
+	def apply_info(self, info_item: tuple | None):
 		if info_item is None:
 			for key in ("type", "size", "changed"):
 				self.labels[key].setText("—")
 			return
 
-		self.labels["type"].setText(f"{Lng.image} {info_item.ext}")
-		self.labels["size"].setText(SharedUtils.get_f_size(info_item.size_bytes))
-		self.labels["changed"].setText(self.format_mod(info_item.mtime))
+		name, ext, size_bytes, mtime = info_item
+
+		self.labels["type"].setText(f"{Lng.image} {ext}")
+		self.labels["size"].setText(SharedUtils.get_f_size(size_bytes))
+		self.labels["changed"].setText(self.format_mod(mtime))
 
 	def apply_res(self, res: str | None):
 		self.labels["resol"].setText(res or "—")

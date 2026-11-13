@@ -100,14 +100,6 @@ class ReadImg:
 		shm.close()
 
 
-@dataclass(slots=True)
-class OneFileInfoItem:
-	name: str
-	ext: str
-	size_bytes: int
-	mtime: float
-
-
 class OneFileInfo:
 	@staticmethod
 	def start(path: str, process_queue: Queue):
@@ -128,16 +120,16 @@ class OneFileInfo:
 			process_queue.put(None)
 
 	@staticmethod
-	def _gather_info(path: str) -> OneFileInfoItem:
+	def _gather_info(path: str) -> tuple:
 		name = os.path.basename(path)
 		_, ext = os.path.splitext(name)
 		stats = os.stat(path)
 
-		return OneFileInfoItem(
-			name=name,
-			ext=ext.lstrip(".").lower(),
-			size_bytes=stats.st_size,
-			mtime=stats.st_mtime,
+		return (
+			name,
+			ext.lstrip(".").lower(),
+			stats.st_size,
+			stats.st_mtime
 		)
 
 
