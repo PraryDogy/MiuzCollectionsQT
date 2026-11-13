@@ -16,9 +16,8 @@ import sqlalchemy
 from typing_extensions import Literal
 
 from cfg import JsonData, Static
-
 from system.database import Dbase, Dirs, Thumbs
-from system.items import Mf
+from system.items import ImageArrayItem, Mf
 from system.shared_utils import ImageReader
 
 
@@ -82,22 +81,12 @@ class ReadImgItem:
 class ReadImg:
 	@staticmethod
 	def start(src: str, size: int, queue: Queue):
-		img_array = ImageReader.read_img(src)
+		array_item = ImageArrayItem(src)
+		array_item.load()
 		if size > 0:
-			img_array = ImageReader.resize(img_array, size)
-		
-		shm = shared_memory.SharedMemory(create=True, size=img_array.nbytes)
-		buffer = np.ndarray(
-			img_array.shape, dtype=img_array.dtype, buffer=shm.buf
-		)
-		buffer[:] = img_array
-		
-		item = ReadImgItem(
-			src=src, shm_name=shm.name, shape=img_array.shape,
-			dtype=img_array.dtype.str
-		)
-		queue.put(item)
-		shm.close()
+			array_item.resize(size)
+		queue.put(array_item)
+		array_item.shm.close()
 
 
 class OneFileInfo:

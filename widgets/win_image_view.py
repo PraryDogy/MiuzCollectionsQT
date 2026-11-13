@@ -14,10 +14,10 @@ from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
                              QGraphicsView)
 from typing_extensions import Literal
 
-from cfg import JsonData, Static
-from system.items import DataItem, Mf
+from cfg import Static
+from system.items import DataItem, ImageArrayItem, Mf
 from system.lang import Lng
-from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
+from system.multiprocess import ProcessWorker, ReadImg
 from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
@@ -316,11 +316,11 @@ class WinImageView(UMainWindow):
 			self.read_img_timer.stop()
 			queue = self.read_img_task.process_queue
 			if not queue.empty():
-				read_img_item: ReadImgItem = queue.get()
-				shm = shared_memory.SharedMemory(name=read_img_item.shm_name)
-				img_array = np.ndarray(read_img_item.shape, dtype=np.dtype(read_img_item.dtype), buffer=shm.buf)
+				array_item: ImageArrayItem = queue.get()
+				shm = shared_memory.SharedMemory(name=array_item.shm_name)
+				img_array = np.ndarray(array_item.shape, dtype=np.dtype(array_item.dtype), buffer=shm.buf)
 
-				if read_img_item.src == self.current_data_item.abs_path:
+				if array_item.image_path == self.current_data_item.abs_path:
 					qimage_task = ImgArrayQImage(img_array)
 					qimage_task.sigs.finished_.connect(
 						lambda qimage: fin(qimage, shm)

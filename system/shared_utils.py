@@ -4,6 +4,7 @@ import struct
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
+from multiprocessing import Process, Queue, shared_memory
 from pathlib import Path
 
 import cv2
@@ -455,74 +456,3 @@ class ImageReader:
 	@staticmethod
 	def is_grayscale(img: np.ndarray) -> bool:
 		return len(img.shape) < 3 or img.shape[2] == 1
-
-
-class MyImage:
-	def __init__(self, image_path: Path):
-		super().__init__()
-		self.image_path = image_path
-		self.image_array: np.ndarray = None
-
-	def load(self):
-		self.image_array = ImageReader.read_img(str(self.image_path))
-
-	def is_grayscale(self) -> bool:
-		return len(self.image_array.shape) < 3 or self.image_array.shape[2] == 1
-
-	def get_img_res(self):
-
-		def read():
-			if len(self.image_array.shape) > 1:
-				h, w = self.image_array.shape[0], self.image_array.shape[1]
-				return f"{w}x{h}"
-			return None
-
-		def psd_read():
-			try:
-				w, h = self.get_psd_size()
-				return f"{w}x{h}"
-			except Exception as e:
-				print("multiprocess > ImgRes psd error", e)
-				return None
-
-		if self.image_path.endswith(ImageReader.ext_psd):
-			return psd_read()
-		return read()
-
-	def get_psd_size(self):
-		with open(self.image_path, "rb") as f:
-			header = f.read(26)
-
-		if header[:4] != b"8BPS":
-			raise ValueError("Не PSD")
-
-		height, width = struct.unpack(">II", header[14:22])
-		return width, height
-
-	def resize(self, size: int) -> np.ndarray:
-		try:
-			if self.image_array is None:
-				return self.resize(self._get_broken_image(), size)
-			h, w = self.image_array.shape[:2]
-			if w > h:  # Горизонтальное изображение
-				new_w = size
-				new_h = int(h * (size / w))
-			elif h > w:  # Вертикальное изображение
-				new_h = size
-				new_w = int(w * (size / h))
-			else:  # Квадратное изображение
-				new_w, new_h = size, size
-			return cv2.resize(self.image_array, (new_w, new_h), interpolation=cv2.INTER_AREA)
-		except Exception as e:
-			print("fit image error", e)
-			return self.image_array.resize(self._get_broken_image(), size)
-
-		
-	def _get_broken_image(self):
-		path = Static.JPEG_ICONS / "broken_image.jpg"
-
-		if not path.exists():
-			raise Exception(f"Img Utils {path} not exists")
-
-		with Image.open(path) as img:
-			return np.array(img.convert("RGB"))
