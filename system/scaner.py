@@ -12,7 +12,7 @@ from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
 from system.items import Mf
 from system.multiprocess import BaseProcessWorker
-from system.shared_utils import ImgUtils
+from system.shared_utils import ImageReader
 from system.utils import Utils
 
 
@@ -397,7 +397,7 @@ class ImgLoader(ScanerParent):
 
 			with scandir_iterator:
 				for entry in scandir_iterator:
-					if not entry.path.endswith(ImgUtils.ext_all):
+					if not entry.path.endswith(ImageReader.ext_all):
 						continue
 					try:
 						stat = entry.stat()
@@ -586,11 +586,11 @@ class ThumbsUpdater(ScanerParent):
 		def _create_thumb(img_item: ImgItem) -> bool:
 			scaner.current_count += 1
 			scaner.process_queue.put(self._progress(img_item))
-			img = ImgUtils.read_img(img_item.abs_img_path)
-			img = ImgUtils.fit_to_thumb(img, Static.THUMB_MAX_SIZE)
+			img = ImageReader.read_img(img_item.abs_img_path)
+			img = ImageReader.fit_to_thumb(img, Static.THUMB_MAX_SIZE)
 			rel_img_path = scaner.mf.create_rel_path(img_item.abs_img_path)
 			thumb_path = scaner.mf.create_abs_thumb_path(rel_img_path)
-			return bool(ImgUtils.write_thumb(thumb_path, img))
+			return bool(ImageReader.write_thumb(thumb_path, img))
 
 		step = 10
 		for i in range(0, len(self.new_images), step):

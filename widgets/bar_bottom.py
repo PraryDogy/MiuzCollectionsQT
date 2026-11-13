@@ -9,7 +9,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import Mf
 from system.lang import Lng
 from system.scaner import ScanProgress
-from system.shared_utils import ImgUtils
+from system.shared_utils import ImageReader
 
 from ._base_widgets import GrayTextLabel, TransparentWidget, USep, USlider
 
@@ -104,7 +104,7 @@ class PathBar(TransparentWidget):
 		)
 
 		last_item = path_items.get(len(root))
-		if dir.endswith(ImgUtils.ext_all):
+		if dir.endswith(ImageReader.ext_all):
 			last_item.img_wid.load(
 				str(Static.GRAY_ICONS / "image_icon_gray.svg")
 			)

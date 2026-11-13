@@ -19,7 +19,7 @@ from .database import Dbase, Dirs, Properties, Thumbs
 from .items import DataItem, Mf, ReadableDateItem
 from .lang import Lng
 from .scaner import StopList
-from .shared_utils import ImgUtils
+from .shared_utils import ImageReader
 from .utils import Utils
 
 
@@ -665,7 +665,7 @@ class ImageSearcher(URunnable):
 			db_data.clear()
 
 	def calc_hist(self, abs_thumb_path: str):
-		img = ImgUtils.read_img(abs_thumb_path)
+		img = ImageReader.read_img(abs_thumb_path)
 		hsv2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 		hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
 		cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)

@@ -32,7 +32,7 @@ _TIFF_ORIENT = {
 }
 
 
-class ImgUtils:
+class ImageReader:
 
 	ext_jpeg = (
 		".jpg", ".JPG",
@@ -354,6 +354,7 @@ class ImgUtils:
 		height, width = struct.unpack(">II", header[14:22])
 		return width, height
 
+	# перенес
 	@classmethod
 	def resize(cls, image: np.ndarray, size: int) -> np.ndarray:
 		try:
@@ -373,22 +374,12 @@ class ImgUtils:
 			print("fit image error", e)
 			return cls.resize(cls._get_broken_image(), size)
 
-	@classmethod
-	def read_icc(cls, path: str):
-		try:
-			with Image.open(path) as img:
-				icc_profile = img.info.get("icc_profile")
-				if icc_profile:
-					return icc_profile  # уже байты
-		except Exception as e:
-			print("error profile read:", e)
-		return None
-
+	# перенес
 	@classmethod
 	def get_img_res(cls, path: str):
 
 		def read(path: str):
-			img_ = ImgUtils.read_img(path)
+			img_ = ImageReader.read_img(path)
 			if img_ is not None and len(img_.shape) > 1:
 				h, w = img_.shape[0], img_.shape[1]
 				return f"{w}x{h}"
@@ -396,13 +387,13 @@ class ImgUtils:
 
 		def psd_read(path: str):
 			try:
-				w, h = ImgUtils.get_psd_size(path)
+				w, h = ImageReader.get_psd_size(path)
 				return f"{w}x{h}"
 			except Exception as e:
 				print("multiprocess > ImgRes psd error", e)
 				return None
 
-		if path.endswith(ImgUtils.ext_psd):
+		if path.endswith(ImageReader.ext_psd):
 			return psd_read(path)
 		return read(path)
 
@@ -460,6 +451,7 @@ class ImgUtils:
 			print(f"read_thumb: ошибка чтения thumb: {e}")
 			return None
 
+	# перенес
 	@staticmethod
 	def is_grayscale(img: np.ndarray) -> bool:
 		return len(img.shape) < 3 or img.shape[2] == 1
@@ -472,7 +464,7 @@ class MyImage:
 		self.image_array: np.ndarray = None
 
 	def load(self):
-		self.image_array = ImgUtils.read_img(str(self.image_path))
+		self.image_array = ImageReader.read_img(str(self.image_path))
 
 	def is_grayscale(self) -> bool:
 		return len(self.image_array.shape) < 3 or self.image_array.shape[2] == 1
@@ -493,7 +485,7 @@ class MyImage:
 				print("multiprocess > ImgRes psd error", e)
 				return None
 
-		if self.image_path.endswith(ImgUtils.ext_psd):
+		if self.image_path.endswith(ImageReader.ext_psd):
 			return psd_read()
 		return read()
 
@@ -506,3 +498,31 @@ class MyImage:
 
 		height, width = struct.unpack(">II", header[14:22])
 		return width, height
+
+	def resize(self, size: int) -> np.ndarray:
+		try:
+			if self.image_array is None:
+				return self.resize(self._get_broken_image(), size)
+			h, w = self.image_array.shape[:2]
+			if w > h:  # Горизонтальное изображение
+				new_w = size
+				new_h = int(h * (size / w))
+			elif h > w:  # Вертикальное изображение
+				new_h = size
+				new_w = int(w * (size / h))
+			else:  # Квадратное изображение
+				new_w, new_h = size, size
+			return cv2.resize(self.image_array, (new_w, new_h), interpolation=cv2.INTER_AREA)
+		except Exception as e:
+			print("fit image error", e)
+			return self.image_array.resize(self._get_broken_image(), size)
+
+		
+	def _get_broken_image(self):
+		path = Static.JPEG_ICONS / "broken_image.jpg"
+
+		if not path.exists():
+			raise Exception(f"Img Utils {path} not exists")
+
+		with Image.open(path) as img:
+			return np.array(img.convert("RGB"))

@@ -19,7 +19,7 @@ from cfg import JsonData, Static
 
 from system.database import Dbase, Dirs, Thumbs
 from system.items import Mf
-from system.shared_utils import ImgUtils
+from system.shared_utils import ImageReader
 
 
 class BaseProcessWorker:
@@ -82,9 +82,9 @@ class ReadImgItem:
 class ReadImg:
 	@staticmethod
 	def start(src: str, size: int, queue: Queue):
-		img_array = ImgUtils.read_img(src)
+		img_array = ImageReader.read_img(src)
 		if size > 0:
-			img_array = ImgUtils.resize(img_array, size)
+			img_array = ImageReader.resize(img_array, size)
 		
 		shm = shared_memory.SharedMemory(create=True, size=img_array.nbytes)
 		buffer = np.ndarray(
@@ -114,7 +114,7 @@ class OneFileInfo:
 	def start_res(path: str, process_queue: Queue):
 		"""Медленное разрешение: отдельный процесс, чтобы не задерживать остальные данные."""
 		try:
-			process_queue.put(ImgUtils.get_img_res(path))
+			process_queue.put(ImageReader.get_img_res(path))
 		except Exception:
 			print("multiprocess one file res error:\n", traceback.format_exc())
 			process_queue.put(None)
@@ -412,9 +412,9 @@ class UpdateThumb:
 	def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
 		
 		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
-			img_array = ImgUtils.read_img(abs_img_path)
-			img_array = ImgUtils.fit_to_thumb(img_array, Static.THUMB_MAX_SIZE)
-			if ImgUtils.write_thumb(abs_thumb_path, img_array):
+			img_array = ImageReader.read_img(abs_img_path)
+			img_array = ImageReader.fit_to_thumb(img_array, Static.THUMB_MAX_SIZE)
+			if ImageReader.write_thumb(abs_thumb_path, img_array):
 				return img_array
 			return None
 		

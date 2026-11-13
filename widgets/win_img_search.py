@@ -13,7 +13,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
-from system.shared_utils import ImgUtils
+from system.shared_utils import ImageReader
 from system.tasks import BlurImgBgTask, ImageSearcher, UThreadPool
 from system.utils import Utils
 
@@ -192,7 +192,7 @@ class WinImgSearchDropWidget(TransparentFrame):
 		if not a0.mimeData().hasUrls():
 			return
 		path = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
-		if not path.endswith(ImgUtils.ext_all):
+		if not path.endswith(ImageReader.ext_all):
 			return
 		self.image_dropped.emit(path)
 		a0.acceptProposedAction()
@@ -471,7 +471,7 @@ class WinImgSearch(UMainWindow):
 				self.image_stack.setCurrentIndex(1)
 				self.preview_widget.set_pixmap(self.img_array)
 
-				if ImgUtils.is_grayscale(self.img_array):
+				if ImageReader.is_grayscale(self.img_array):
 					self.cleanup_shm()
 					self.img_array = None
 					QTimer.singleShot(1500, self.reset_img_search)

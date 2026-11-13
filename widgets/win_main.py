@@ -13,7 +13,7 @@ from system.multiprocess import (FilesRemover, ProcessWorker, UpdateThumb)
 from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
                            ForcedScanerItem, PathCheckPassed, PathMismatch,
                            ScanerWorker, ScanProgress)
-from system.shared_utils import ImgUtils
+from system.shared_utils import ImageReader
 from system.tasks import SetFav, ThumbScale, UThreadPool, Utils
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
@@ -38,7 +38,7 @@ from .win_upload import UploadWin
 # БИЗНЕС-ЛОГИКА (без зависимостей от виджетов Qt)
 # =============================================================================
 
-SUPPORTED_EXT_LOWER = tuple(ext.lower() for ext in ImgUtils.ext_all)
+SUPPORTED_EXT_LOWER = tuple(ext.lower() for ext in ImageReader.ext_all)
 
 
 def destination_dir(mf_current_path: str, current_dir: str) -> str:
