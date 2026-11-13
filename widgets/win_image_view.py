@@ -19,7 +19,7 @@ from system.items import DataItem, Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg, ReadImgItem
 from system.shared_utils import SharedUtils
-from system.tasks import ImgArrayQImage, UThreadPool, WriteNewThumb
+from system.tasks import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import UMainWindow, UMenu, USep

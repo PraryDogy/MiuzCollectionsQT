@@ -703,26 +703,6 @@ class ImageSearcher(URunnable):
 		return similarity
 
 
-class WriteNewThumb(URunnable):
-
-	class Sigs(QObject):
-		finished = pyqtSignal(QImage)
-
-	def __init__(self, rel_thumb_path: str, img_array: np.ndarray):
-		super().__init__()
-		self.sigs = WriteNewThumb.Sigs()
-		self.img_array = img_array
-		self.rel_thumb_path = rel_thumb_path
-
-	def task(self):
-		abs_path = Mf.get_abs_thumb_path(self.rel_thumb_path)
-		scaled = ImgUtils.fit_to_thumb(self.img_array, Static.THUMB_MAX_SIZE)
-		result = ImgUtils.write_thumb(abs_path, scaled)
-		if result:
-			qimage = Utils.qimage_from_array(scaled)
-			self.sigs.finished.emit(qimage)
-
-
 class ThumbScale(URunnable):
 	"""
 	Готовит миниатюры для сетки в фоновом потоке.
