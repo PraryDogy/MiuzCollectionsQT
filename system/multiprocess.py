@@ -103,7 +103,11 @@ class OneFileInfo:
 	def start_res(path: str, process_queue: Queue):
 		"""Медленное разрешение: отдельный процесс, чтобы не задерживать остальные данные."""
 		try:
-			process_queue.put(ImageReader.get_img_res(path))
+			image_path = Path(path)
+			array_item = ImageArrayItem(image_path)
+			array_item.load()
+			res = array_item.get_img_res()
+			process_queue.put(res)
 		except Exception:
 			print("multiprocess one file res error:\n", traceback.format_exc())
 			process_queue.put(None)
@@ -401,10 +405,11 @@ class UpdateThumb:
 	def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
 		
 		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
-			img_array = ImageReader.read_img(abs_img_path)
-			img_array = ImageReader.fit_to_thumb(img_array, Static.THUMB_MAX_SIZE)
-			if ImageReader.write_thumb(abs_thumb_path, img_array):
-				return img_array
+			image_item = ImageArrayItem(abs_img_path)
+			image_item.load()
+			thumb_array = ImageReader.fit_to_thumb(image_item, Static.THUMB_MAX_SIZE)
+			if ImageReader.write_thumb(abs_thumb_path, thumb_array):
+				return thumb_array
 			return None
 		
 		def _get_values(abs_img_path: str, rel_img_path: str, rel_thumb_path: str):

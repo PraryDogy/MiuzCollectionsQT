@@ -303,9 +303,9 @@ class ReadableDateItem:
 
 
 class ImageArrayItem:
-	def __init__(self, image_path: Path):
+	def __init__(self, image_path: Path | str):
 		super().__init__()
-		self.image_path = image_path
+		self.image_path = str(image_path)
 		self.image_array: np.ndarray = None
 		self.shm: shared_memory = None
 		self.shm_name: str = None
@@ -313,7 +313,7 @@ class ImageArrayItem:
 		self.dtype: str = None
 
 	def load(self):
-		self.image_array = ImageReader.read_img(str(self.image_path))
+		self.image_array = ImageReader.read_img(self.image_path)
 
 		self.shm = shared_memory.SharedMemory(create=True, size=self.image_array.nbytes)
 		buffer = np.ndarray(self.image_array.shape, dtype=self.image_array.dtype, buffer=self.shm.buf)
@@ -359,7 +359,7 @@ class ImageArrayItem:
 	def resize(self, size: int) -> np.ndarray:
 		try:
 			if self.image_array is None:
-				self.image_array = self.resize(self._get_broken_image(), size)
+				self.image_array = self.resize(self.get_broken_image(), size)
 			h, w = self.image_array.shape[:2]
 			if w > h:  # Горизонтальное изображение
 				new_w = size
@@ -372,13 +372,77 @@ class ImageArrayItem:
 			self.image_array = cv2.resize(self.image_array, (new_w, new_h), interpolation=cv2.INTER_AREA)
 		except Exception as e:
 			print("fit image error", e)
-			self.image_array = self.image_array.resize(self._get_broken_image(), size)
-		
-	def _get_broken_image(self):
-		path = Static.JPEG_ICONS / "broken_image.jpg"
+			self.image_array = self.image_array.resize(self.get_broken_image(), size)
 
+	def get_broken_image(self):
+		path = Static.JPEG_ICONS / "broken_image.jpg"
 		if not path.exists():
 			raise Exception(f"Img Utils {path} not exists")
-
 		with Image.open(path) as img:
 			self.image_array = np.array(img.convert("RGB"))
+
+
+class ThumbArrayItem:
+	def __init__(self, thumb_path: Path | str):
+		super().__init__()
+		self.thumb_path = thumb_path
+		self.thumb_array: np.ndarray = None
+
+	def load(self):
+		try:
+			if not os.path.exists(self.thumb_path):
+				print(f"read_thumb: файл не существует {self.thumb_path}")
+				self.thumb_array =  self.get_broken_thumb()
+			img = cv2.imread(self.thumb_path, cv2.IMREAD_UNCHANGED)
+			if img is None:
+				self.thumb_array = self.get_broken_thumb()
+			if img.ndim == 2:
+				self.thumb_array = img
+			if img.shape[2] == 4:
+				self.thumb_array = cv2.cvtColor(img, cv2.COLOR_BGRA2RGBA)
+			self.thumb_array = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+		except Exception as e:
+			print(f"read_thumb: ошибка чтения thumb: {e}")
+			self.thumb_array = self.get_broken_thumb()
+
+	def write(self):
+		try:
+			if len(self.thumb_array.shape) == 2:  # grayscale
+				img = self.thumb_array
+			elif self.thumb_array.shape[2] == 3:  # RGB -> BGR для cv2
+				img = cv2.cvtColor(self.thumb_array, cv2.COLOR_RGB2BGR)
+			elif self.thumb_array.shape[2] == 4:  # RGBA -> BGRA для cv2
+				img = cv2.cvtColor(self.thumb_array, cv2.COLOR_RGBA2BGRA)
+			else:
+				print(f"write_thumb: неподдерживаемое число каналов {self.thumb_array.shape}")
+				img = self.get_broken_thumb()
+			cv2.imwrite(self.thumb_path, img)
+
+		except Exception as e:
+			print(f"write_thumb: ошибка записи thumb на диск: {e}")
+			cv2.imwrite(self.thumb_path, self.get_broken_thumb())
+
+	def fit(self):
+		try:
+			h, w = self.thumb_array.shape[:2]
+			if h == 0 or w == 0:
+				print("fit_to_thumb: пустое изображение")
+				self.thumb_array = self.get_broken_thumb()
+
+			scale = Static.THUMB_MAX_SIZE / max(h, w)
+			new_w = max(1, int(w * scale))
+			new_h = max(1, int(h * scale))
+
+			return cv2.resize(self.thumb_array, (new_w, new_h), interpolation=cv2.INTER_LANCZOS4)
+
+		except Exception as e:
+			print(f"fit_to_thumb: ошибка масштабирования: {e}")
+			self.thumb_array = self.get_broken_thumb()
+
+	def get_broken_thumb(self):
+		path = Static.JPEG_ICONS / "broken_image.jpg"
+		if not path.exists():
+			raise Exception(f"Img Utils {path} not exists")
+		with Image.open(path) as img:
+			self.thumb_array = np.array(img.convert("RGB"))
+			self.fit()
