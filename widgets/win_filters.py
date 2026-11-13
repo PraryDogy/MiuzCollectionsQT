@@ -7,9 +7,8 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.items import Filters
+from system.items import Filters, ReadableDateItem
 from system.lang import Lng
-from system.utils import ReadableDate
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             GrayTextLabel, InputTextWin, TitleTextWidget,
@@ -47,7 +46,7 @@ class DatesWidget(UGroupBox):
 		super().__init__(parent)
 
 		_today = QDate.currentDate()
-		self.readable_date_wid = ReadableDate(JsonData.lng_index)
+		self.readable_date_wid = ReadableDateItem(JsonData.lng_index)
 
 		self.dates_dict = {
 			(_today, _today): Lng.preset_today,

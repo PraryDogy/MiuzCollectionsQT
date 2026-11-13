@@ -5,7 +5,8 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.lang import Lng
-from system.utils import Utils, ReadableDate
+from system.utils import Utils
+from system.items import ReadableDateItem
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
 							TransparentWidget, UMainWindow, UMenu, UPushButton,
@@ -115,7 +116,7 @@ class WinCalendar(UMainWindow):
 	# Теперь принимаем date, который может быть невалидным или None
 	def __init__(self, date=None):
 		super().__init__()
-		self.readable_date = ReadableDate(JsonData.lng_index)
+		self.readable_date = ReadableDateItem(JsonData.lng_index)
 		self.date_now = QDate.currentDate()
 
 		qimg = QImage(str(Static.COLOR_ICONS / "blue_circle.svg"))

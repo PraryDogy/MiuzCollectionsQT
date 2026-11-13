@@ -9,12 +9,11 @@ from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
                              QSpacerItem, QVBoxLayout)
 
 from cfg import JsonData, Static
-from system.items import DataItem, Mf
+from system.items import DataItem, Mf, ReadableDateItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
 from system.shared_utils import SharedUtils
 from system.tasks import BlurImgBgTask, UThreadPool
-from system.utils import ReadableDate, Utils
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
@@ -105,7 +104,7 @@ class WinInfo(UMainWindow):
 		self.set_close_only()
 		self.setWindowTitle(Lng.info)
 
-		self.readable_date = ReadableDate(JsonData.lng_index)
+		self.readable_date = ReadableDateItem(JsonData.lng_index)
 		self.labels: dict[str, WinInfoSelectableLabel] = {}
 		self.data_item = data_item
 		self.abs_path = data_item.abs_path

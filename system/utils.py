@@ -1,18 +1,13 @@
-import hashlib
-import os
 import subprocess
 import time
-import traceback
-from datetime import date, datetime, timezone
 from functools import wraps
-from pathlib import Path
 
 import numpy as np
-from PyQt6.QtCore import QDate, QLocale, QSize, Qt
-from PyQt6.QtGui import QColorSpace, QIcon, QImage, QPixmap
-from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QVBoxLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColorSpace, QImage
+from PyQt6.QtWidgets import QApplication
 
-from cfg import JsonData, Static
+from cfg import Static
 
 
 class Utils:
@@ -72,10 +67,6 @@ class Utils:
 		)
 		scaled.setDevicePixelRatio(dpr)
 		return scaled
-
-	# @classmethod
-	# def thumb_scaler(cls):
-		# return cls.scale_qimage_square if JsonData.square_thumbs else cls.scale_qimage_dpr
 	
 	# даже когда сетка квадратная мы не будем обрезать изображения
 	@classmethod
@@ -95,15 +86,6 @@ class Utils:
 	def macos_reveal_files(cls, paths: list[str], scpt = Static.SCRIPTS_REVEAL_FILES):
 		subprocess.Popen(["osascript", scpt] + paths)
 	
-	@classmethod
-	def clear_layout(cls, layout: QVBoxLayout | QHBoxLayout | QGridLayout):
-		while layout.count():
-			item = layout.takeAt(0)
-			widget = item.widget()
-			if widget is not None:
-				widget.setParent(None)
-				widget.deleteLater()
-
 	@staticmethod
 	def escape_like(text: str) -> str:
 		"""Экранирует спецсимволы LIKE, чтобы путь сравнивался буквально."""
@@ -120,29 +102,3 @@ class Utils:
 					print(f"[timing] {label}: {(time.perf_counter() - t0) * 1000:.1f} ms")
 			return wrapper
 		return deco
-
-
-class ReadableDate:
-	def __init__(self, lng_index: int):
-		data = {
-			0: (QLocale.Language.Russian, QLocale.Country.Russia),
-			1: (QLocale.Language.English, QLocale.Country.UnitedStates),
-		}
-		lng, country = data.get(lng_index)
-		self.q_locale = QLocale(lng, country)
-
-	def get_readable_date(self, date: QDate):
-		"""
-		10 января 1991
-		"""
-		return self.q_locale.toString(date, "d MMMM yyyy")
-
-	@staticmethod
-	def qdate_from_timestamp(timestamp: float) -> QDate:
-		# Берём локальную дату, соответствующую timestamp
-		dt = datetime.fromtimestamp(timestamp)
-		return QDate(dt.year, dt.month, dt.day)
-
-	@staticmethod
-	def qdate_from_date(d: date) -> QDate:
-		return QDate(d.year, d.month, d.day)

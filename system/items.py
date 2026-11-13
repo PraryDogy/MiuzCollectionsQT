@@ -2,9 +2,10 @@ import hashlib
 import json
 import os
 from dataclasses import dataclass
+from datetime import date, datetime
 from pathlib import Path
-from typing import Literal
 
+from PyQt6.QtCore import QDate, QLocale
 from PyQt6.QtGui import QImage
 
 from cfg import Static
@@ -266,3 +267,29 @@ class Servers:
 	def write_json_data(cls):
 		with open(Static.SERVERS_JSON, "w", encoding="utf-8") as file:
 			json.dump(cls.items, file, indent=4, ensure_ascii=False)
+
+
+class ReadableDateItem:
+	def __init__(self, lng_index: int):
+		data = {
+			0: (QLocale.Language.Russian, QLocale.Country.Russia),
+			1: (QLocale.Language.English, QLocale.Country.UnitedStates),
+		}
+		lng, country = data.get(lng_index)
+		self.q_locale = QLocale(lng, country)
+
+	def get_readable_date(self, date: QDate):
+		"""
+		10 января 1991
+		"""
+		return self.q_locale.toString(date, "d MMMM yyyy")
+
+	@staticmethod
+	def qdate_from_timestamp(timestamp: float) -> QDate:
+		# Берём локальную дату, соответствующую timestamp
+		dt = datetime.fromtimestamp(timestamp)
+		return QDate(dt.year, dt.month, dt.day)
+
+	@staticmethod
+	def qdate_from_date(d: date) -> QDate:
+		return QDate(d.year, d.month, d.day)

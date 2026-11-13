@@ -4,6 +4,7 @@ import traceback
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
+from typing import Literal
 
 import cv2
 import numpy as np
@@ -15,12 +16,11 @@ from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPixmap
 from cfg import Dynamic, JsonData, Static
 
 from .database import Dbase, Dirs, Properties, Thumbs
-from .items import Mf, DataItem
+from .items import DataItem, Mf, ReadableDateItem
 from .lang import Lng
 from .scaner import StopList
 from .shared_utils import ImgUtils
-from .utils import ReadableDate, Utils
-from typing import Literal
+from .utils import Utils
 
 
 class URunnable(QRunnable):
@@ -149,7 +149,7 @@ class ThumbnailsLoader(URunnable):
 	def __init__(self):
 		super().__init__()
 		self.sigs = ThumbnailsLoader.Sigs()
-		self.readable_date = ReadableDate(JsonData.lng_index)
+		self.readable_date = ReadableDateItem(JsonData.lng_index)
 
 	def task(self):
 		try:
