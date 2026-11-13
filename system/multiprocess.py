@@ -410,6 +410,7 @@ class UpdateThumb:
 			image_item.load()
 			image_item.resize(Static.THUMB_MAX_SIZE)
 			result = Utils.write_thumbnail(image_item.image_array, abs_thumb_path)
+			result = None
 			if result is None:
 				broken_thumbnail = ImageReader._get_broken_thumbnail()
 				Utils.write_thumbnail(broken_thumbnail, abs_thumb_path)
