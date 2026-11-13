@@ -15,7 +15,6 @@ from PIL import Image, ImageCms, ImageOps
 
 from cfg import Static
 
-
 pillow_heif.register_heif_opener()
 Image.MAX_IMAGE_PIXELS = None
 

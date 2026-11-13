@@ -12,7 +12,7 @@ from cfg import JsonData, Static
 from system.items import DataItem, Mf, ReadableDateItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
-from system.shared_utils import SharedUtils
+from system.utils import Utils
 from system.tasks import BlurImgBgTask, UThreadPool
 
 from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
@@ -251,7 +251,7 @@ class WinInfo(UMainWindow):
 		name, ext, size_bytes, mtime = info_item
 
 		self.labels["type"].setText(f"{Lng.image} {ext}")
-		self.labels["size"].setText(SharedUtils.get_f_size(size_bytes))
+		self.labels["size"].setText(Utils.get_f_size(size_bytes))
 		self.labels["changed"].setText(self.format_mod(mtime))
 
 	def apply_res(self, res: str | None):

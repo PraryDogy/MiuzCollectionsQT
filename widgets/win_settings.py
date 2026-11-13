@@ -16,7 +16,6 @@ from cfg import JsonData, Static, Themes
 from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker
-from system.shared_utils import SharedUtils
 from system.tasks import HashDirSize, HashDirSizeItem, MfCleaner, UThreadPool
 from system.themes import ThemeChanger
 from system.utils import Utils
@@ -245,7 +244,7 @@ class SizesWin(UMainWindow):
 		self.resize(500, 330)
 		self.central_layout.setSpacing(10)
 
-		total_size = SharedUtils.get_f_size(sum(
+		total_size = Utils.get_f_size(sum(
 			item.size for item in size_items
 		))
 		first_row = TransparentLabel(f"{Lng.data_size}: {total_size}")
@@ -295,7 +294,7 @@ class SizesWin(UMainWindow):
 				Qt.AlignmentFlag.AlignLeft | v_center
 			)
 
-			size_item = QTableWidgetItem(SharedUtils.get_f_size(item.size))
+			size_item = QTableWidgetItem(Utils.get_f_size(item.size))
 			size_item.setFlags(item_flags)
 			size_item.setTextAlignment(
 				Qt.AlignmentFlag.AlignLeft | v_center

@@ -13,9 +13,8 @@ from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, Mf
 from system.lang import Lng
-from system.shared_utils import SharedUtils
-from system.tasks import (AppsScanner, ThumbnailsLoader, SmoothSignals,
-                          SmoothThumbsTask, UThreadPool)
+from system.tasks import (AppsScanner, SmoothSignals, SmoothThumbsTask,
+                          ThumbnailsLoader, UThreadPool)
 from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
