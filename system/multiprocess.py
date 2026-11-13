@@ -19,6 +19,7 @@ from cfg import JsonData, Static
 from system.database import Dbase, Dirs, Thumbs
 from system.items import ImageArrayItem, Mf
 from system.shared_utils import ImageReader
+from system.utils import Utils
 
 
 class BaseProcessWorker:
@@ -408,6 +409,10 @@ class UpdateThumb:
 			image_item = ImageArrayItem(abs_img_path)
 			image_item.load()
 			image_item.resize(Static.THUMB_MAX_SIZE)
+			result = Utils.write_thumbnail(image_item.image_array, abs_thumb_path)
+			if not result:
+				broken_array = ImageReader._get_broken_image()
+				
 
 			thumb_array = ImageReader.fit_to_thumb(image_item, Static.THUMB_MAX_SIZE)
 			if ImageReader.write_thumb(abs_thumb_path, thumb_array):
