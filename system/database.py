@@ -117,6 +117,7 @@ class Dbase:
 				}
 				)
 		METADATA.create_all(engine)
+		cls.ensure_properties_trigger(engine)
 		return engine
 		
 	@classmethod
@@ -141,5 +142,20 @@ class Dbase:
 			print("database vacuum error", e)
 
 	@classmethod
-	def clear_root_mf(cls):
-		...
+	def ensure_properties_trigger(cls, engine: sqlalchemy.Engine) -> None:
+		with engine.begin() as conn:
+			conn.execute(sqlalchemy.text(
+				"CREATE INDEX IF NOT EXISTS ix_properties_thumb_id ON properties(thumb_id)"
+			))
+			conn.execute(sqlalchemy.text("""
+				CREATE TRIGGER IF NOT EXISTS thumbs_delete_properties
+				AFTER DELETE ON thumbs
+				BEGIN
+					DELETE FROM properties WHERE thumb_id = OLD.id;
+				END
+			"""))
+
+			# ищем неиспользуемые строки
+			conn.execute(sqlalchemy.text(
+				"DELETE FROM properties WHERE thumb_id NOT IN (SELECT id FROM thumbs)"
+			))
