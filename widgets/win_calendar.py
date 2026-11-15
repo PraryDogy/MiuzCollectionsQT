@@ -8,12 +8,12 @@ from system.lang import Lng
 from system.utils import Utils
 from system.items import ReadableDateItem
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
+from ._base_widgets import (ActiveButton, TransparentLabel,
 							TransparentWidget, UMainWindow, UMenu, UPushButton,
 							USep)
 
 
-class CalendarBigDate(GrayTextLabel):
+class CalendarBigDate(TransparentLabel):
 
 	def __init__(self):
 		super().__init__(text="30 сентября 2026")
@@ -22,6 +22,7 @@ class CalendarBigDate(GrayTextLabel):
 		self.adjustSize()
 		self.setFixedWidth(self.width())
 		self.clear()
+		self.set_state("gray")
 
 
 class CalendarSvgNavi(QSvgWidget):
@@ -68,12 +69,13 @@ class CalendarDay(_CalendarDayBase):
 	pass
 
 
-class CalendarDayInactive(GrayTextLabel):
+class CalendarDayInactive(TransparentLabel):
 	clicked = pyqtSignal(QDate)
 
 	def __init__(self, text: str, date: QDate):
 		super().__init__(text)
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.set_state("gray")
 		self.date = date
 
 	def mouseReleaseEvent(self, ev: QMouseEvent):
@@ -220,7 +222,8 @@ class WinCalendar(UMainWindow):
 
 		for col in range(7):
 			week_name = self.readable_date.q_locale.dayName(col + 1, self.readable_date.q_locale.FormatType.ShortFormat)
-			lbl_day = GrayTextLabel(week_name.capitalize())
+			lbl_day = TransparentLabel(week_name.capitalize())
+			lbl_day.set_state("gray")
 			lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			lbl_day.setFixedSize(*self.cell_size)
 			header_layout.addWidget(lbl_day)

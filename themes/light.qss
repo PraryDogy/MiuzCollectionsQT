@@ -300,10 +300,6 @@ UTagWidget {
     color: #1a2430;
 }
 
-GrayTextLabel {
-    color: #5f6d7b;
-}
-
 CalendarDaySelectedText {
     color: #ffffff;
 }

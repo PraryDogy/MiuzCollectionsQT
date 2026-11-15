@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.scaner import ScanProgress
 from system.utils import ImageReader
 
-from ._base_widgets import GrayTextLabel, TransparentWidget, USep, USlider
+from ._base_widgets import TransparentWidget, USep, USlider, UTagWidget, TransparentLabel
 
 # =============================================================================
 # ПУТЬ (бывший bar_path.py)
@@ -38,7 +38,8 @@ class PathItem(TransparentWidget):
 		self.img_wid.setFixedSize(12, 12)
 		item_layout.addWidget(self.img_wid)
 
-		self.text_wid = GrayTextLabel(text=name)
+		self.text_wid = TransparentLabel(text=name)
+		self.text_wid.set_state("gray")
 		self.text_wid.set_font_size(11)
 		self.collapse()
 		item_layout.addWidget(self.text_wid)
@@ -134,11 +135,13 @@ class ProgressWidget(TransparentWidget):
 		self._last_text: str | None = None
 
 		# Путь показывается полностью, без обрезки
-		self.alias_label = GrayTextLabel("")
+		self.alias_label = TransparentLabel("")
+		self.alias_label.set_state("gray")
 		self.alias_label.set_font_size(11)
 
 		# Статус идёт сразу за путём
-		self.status_label = GrayTextLabel("")
+		self.status_label = TransparentLabel("")
+		self.status_label.set_state("gray")
 		self.status_label.set_font_size(11)
 
 		self.h_layout = QHBoxLayout(self)
@@ -146,6 +149,13 @@ class ProgressWidget(TransparentWidget):
 		self.h_layout.setSpacing(0)
 		self.h_layout.addWidget(self.alias_label)
 		self.h_layout.addWidget(self.status_label)
+
+
+		self.tag_widget = UTagWidget(text="", style=UTagWidget.qss_transparent)
+		self.h_layout.addWidget(self.tag_widget)
+		self.tag_widget.hide()
+
+
 		self.h_layout.addStretch()
 
 		self.total_seconds = JsonData.scaner_minutes * 60

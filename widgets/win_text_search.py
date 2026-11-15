@@ -8,8 +8,8 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 from cfg import JsonData, Static
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, TitleTextWidget,
-							TransparentFrame, TransparentWidget, UGroupBox,
+from ._base_widgets import (ActiveButton, TitleTextWidget,
+							TransparentLabel, TransparentWidget, UGroupBox,
 							UMainWindow, UPushButton, USep, UTextEdit)
 
 
@@ -41,7 +41,8 @@ class WinTextSearch(UMainWindow):
 		group_layout.addWidget(USep())
 
 		# 1. Текст описания форматов (RU / EN)
-		self.description_label = GrayTextLabel(Lng.text_search_descr)
+		self.description_label = TransparentLabel(Lng.text_search_descr)
+		self.description_label.set_state("gray")
 		self.description_label.setWordWrap(True) 
 		group_layout.addWidget(self.description_label)
 

@@ -17,7 +17,7 @@ from system.tasks import (AppsScanner, SmoothSignals, SmoothThumbsTask,
                           ThumbnailsLoader, UThreadPool)
 from system.utils import Utils
 
-from ._base_widgets import (FlowLayout, GrayTextLabel, TransparentFrame,
+from ._base_widgets import (FlowLayout, TransparentFrame,
                             TransparentLabel, TransparentWidget, UMenu,
                             UPushButton, UScrollVerticalArea, USep, UTagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, GoToThumbnail,
@@ -96,15 +96,16 @@ class ThumbFilenameWid(TransparentLabel):
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
-class ThumbBlueTextWidget(GrayTextLabel):
+class ThumbBlueTextWidget(TransparentLabel):
 	def __init__(self, data_item: DataItem):
 		day_month_year = f"{Lng.changed_short} {data_item.day_month_year}"
 		super().__init__(day_month_year)
 		self.set_elide(True)
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.set_state("gray")
 
 
-class ThumbMiuzBlueTextWidget(GrayTextLabel):
+class ThumbMiuzBlueTextWidget(TransparentLabel):
 	COLLECTION_RE = re.compile(r"^/+(?:\d+\s+)?([^/]+)")
 
 	def __init__(self, data_item: DataItem):
@@ -118,6 +119,7 @@ class ThumbMiuzBlueTextWidget(GrayTextLabel):
 		super().__init__(f"{day_month_year}\n{miuz_collection_name}")
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.set_elide(True)
+		self.set_state("gray")
 
 
 class Thumb(TransparentFrame):

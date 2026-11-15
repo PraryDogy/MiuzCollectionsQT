@@ -11,9 +11,9 @@ from system.items import Mf, Servers
 from system.lang import Lng
 from system.multiprocess import ProcessWorker
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, MfPathWidget,
-                            QVBoxLayout, TitleTextWidget, TransparentWidget,
-                            UGroupBox, UMainWindow, UPushButton)
+from ._base_widgets import (ActiveButton, MfPathWidget, QVBoxLayout,
+                            TitleTextWidget, TransparentWidget, UGroupBox,
+                            UMainWindow, UPushButton)
 from .win_servers import ServersWin
 
 

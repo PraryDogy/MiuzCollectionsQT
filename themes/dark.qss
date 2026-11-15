@@ -304,9 +304,6 @@ UTagWidget {
     color: #ffffff;
 }
 
-GrayTextLabel {
-    color: #7b8792;
-}
 
 CalendarDaySelectedText {
     color: #ffffff;
@@ -732,4 +729,23 @@ ChoosePathWidget TransparentLabel {
     font-weight: bold;
     font-size: 14px;
     color: #ffffff;
+}
+
+
+TransparentLabel[state="regular"] {
+    color: #ffffff;
+}
+
+TransparentLabel[state="gray"] {
+    color: #7b8792;
+}
+
+TransparentLabel[state="regular_bold"] {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+TransparentLabel[state="gray_bold"] {
+    color: #7b8792;
+    font-weight: bold;
 }

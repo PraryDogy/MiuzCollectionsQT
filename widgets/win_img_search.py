@@ -16,8 +16,7 @@ from system.multiprocess import ProcessWorker, ReadImg
 from system.tasks import BlurImgBgTask, ImageSearcher, UThreadPool
 from system.utils import ImageReader
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, RowArrowWidget,
-                            TitleTextWidget, TransparentFrame,
+from ._base_widgets import (ActiveButton, TitleTextWidget, TransparentFrame,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UMainWindow, UPushButton, USep, USlider)
 
@@ -166,7 +165,8 @@ class WinImgSearchDropWidget(TransparentFrame):
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
 
-		self.descr_label = GrayTextLabel("")
+		self.descr_label = TransparentLabel("")
+		self.descr_label.set_state("gray")
 		self.descr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.v_layout.addWidget(
 			self.descr_label,
@@ -291,7 +291,8 @@ class ControlsWidget(UGroupBox):
 		self.slider_widget = SliderWidget()
 		self.v_layout.addWidget(self.slider_widget)
 
-		descr = GrayTextLabel(Lng.image_search_descr)
+		descr = TransparentLabel(Lng.image_search_descr)
+		descr.set_state("gray")
 		self.v_layout.addWidget(descr)
 
 

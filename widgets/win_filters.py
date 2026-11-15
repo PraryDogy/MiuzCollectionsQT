@@ -11,9 +11,9 @@ from system.items import Filters, ReadableDateItem
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
-                            GrayTextLabel, InputTextWin, TitleTextWidget,
-                            TransparentLabel, TransparentWidget, UGroupBox,
-                            UMainWindow, UMenu, UPushButton, USep, UTagWidget)
+                            InputTextWin, TitleTextWidget, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
+                            UPushButton, USep, UTagWidget)
 from .win_calendar import WinCalendar
 
 
@@ -115,7 +115,8 @@ class DatesWidget(UGroupBox):
 
 		self.date_btns_layout.addSpacing(10)
 
-		from_label = GrayTextLabel(Lng.start_date)
+		from_label = TransparentLabel(Lng.start_date)
+		from_label.set_state("gray")
 		self.date_btns_layout.addWidget(from_label)
 
 		self.left_calendar_tag = CalendarTag()
@@ -124,7 +125,8 @@ class DatesWidget(UGroupBox):
 
 		self.date_btns_layout.addSpacing(10)
 
-		to_label = GrayTextLabel(Lng.end_date)
+		to_label = TransparentLabel(Lng.end_date)
+		to_label.set_state("gray")
 		self.date_btns_layout.addWidget(to_label)
 
 		self.right_calendar_tag = CalendarTag()
@@ -446,14 +448,16 @@ class TagsWidget(UGroupBox):
 
 		self.v_lay.addWidget(USep())
 
-		st_tags_title = GrayTextLabel(Lng.standart_tags)
+		st_tags_title = TransparentLabel(Lng.standart_tags)
+		st_tags_title.set_state("gray")
 		self.v_lay.addWidget(st_tags_title)
 
 		self.standart_tags = StandartTags()
 		self.standart_tags.load_st_grid.connect(self.load_st_grid.emit)
 		self.v_lay.addWidget(self.standart_tags)
 
-		user_tags_title = GrayTextLabel(Lng.user_tags)
+		user_tags_title = TransparentLabel(Lng.user_tags)
+		user_tags_title.set_state("gray")
 		self.v_lay.addWidget(user_tags_title)
 
 		self.user_tags = UserTags()

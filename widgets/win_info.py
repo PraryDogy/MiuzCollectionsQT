@@ -12,12 +12,11 @@ from cfg import JsonData, Static
 from system.items import DataItem, Mf, ReadableDateItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
-from system.utils import Utils
 from system.tasks import BlurImgBgTask, UThreadPool
+from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
-                            UPushButton)
+from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
+                            UGroupBox, UMainWindow, UMenu, UPushButton)
 
 
 class WinInfoSelectableLabel(TransparentLabel):
@@ -171,7 +170,8 @@ class WinInfo(UMainWindow):
 		l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
 
 		for row, (key, caption, value) in enumerate(rows):
-			left_lbl = GrayTextLabel(caption + ":")
+			left_lbl = TransparentLabel(caption + ":")
+			left_lbl.set_state("gray")
 			right_lbl = WinInfoSelectableLabel(value)
 			for i in left_lbl, right_lbl:
 				i.set_font_size(11)

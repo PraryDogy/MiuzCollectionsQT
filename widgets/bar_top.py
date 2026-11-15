@@ -9,7 +9,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import Mf
 from system.lang import Lng
 
-from ._base_widgets import (GrayTextLabel, TitleBar, TransparentFrame,
+from ._base_widgets import (TitleBar, TransparentFrame, TransparentLabel,
                             TransparentWidget, ULineEdit, UMenu, UPushButton,
                             USvgWidgetBg)
 from .win_servers import ServersWin
@@ -138,7 +138,8 @@ class CatalogWidget(TransparentWidget):
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
 		self.h_lay.setSpacing(0)
 
-		self.title = GrayTextLabel(Lng.catalog)
+		self.title = TransparentLabel(Lng.catalog)
+		self.title.set_state("gray")
 		self.h_lay.addWidget(self.title)
 
 		self.h_lay.addSpacing(10)

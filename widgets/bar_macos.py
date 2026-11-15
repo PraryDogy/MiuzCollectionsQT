@@ -6,7 +6,7 @@ from cfg import JsonData, Static
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import GrayTextLabel, UMenu, UPushButton, VerticalWindow
+from ._base_widgets import UMenu, UPushButton, VerticalWindow, TransparentLabel
 from .win_servers import ServersWin
 from .win_settings import WinSettings
 
@@ -25,7 +25,8 @@ class AboutWin(VerticalWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 
-		icon = GrayTextLabel("")
+		icon = TransparentLabel("")
+		icon.set_state("gray")
 		qimage = QImage(str(Static.APP_ICONS / "icon.png"))
 		qimage_saled = Utils.scale_qimage_dpr(
 			qimage=qimage,
@@ -34,7 +35,8 @@ class AboutWin(VerticalWindow):
 		icon.setPixmap(QPixmap.fromImage(qimage_saled))
 		self.icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
-		lbl = GrayTextLabel(self.INFO_TEXT)
+		lbl = TransparentLabel(self.INFO_TEXT)
+		lbl.set_state("gray")
 		lbl.set_selectable(True)
 		self.icon_text_layout.addWidget(lbl)
 

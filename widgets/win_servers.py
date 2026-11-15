@@ -13,11 +13,10 @@ from cfg import JsonData, Static
 from system.items import Servers
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-                            TitleTextWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, ULineEdit,
-                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
-                            UPushButton, USep)
+from ._base_widgets import (ActiveButton, ConfirmWindow, TitleTextWidget,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            ULineEdit, UListWidget, UListWidgetItem,
+                            UMainWindow, UMenu, UPushButton, USep)
 
 
 @dataclass(slots=True)
@@ -281,7 +280,8 @@ class ServersWin(UMainWindow):
 		group_lay.addWidget(USep())
 
 		# --- Описание ---
-		description_label = GrayTextLabel(Lng.servers_description)
+		description_label = TransparentLabel(Lng.servers_description)
+		description_label.set_state("gray")
 		description_label.setWordWrap(True)
 		group_lay.addWidget(description_label)
 

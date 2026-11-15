@@ -36,12 +36,34 @@ class TransparentLabel(QLabel):
 	sym_line_feed = "\u000a"
 	sym_paragraph_sep = "\u2029"
 
+	states = ("regular", "gray", "regular_bold", "gray_bold")  # допустимые состояния
+
 	def __init__(self, text="", parent=None):
 		super().__init__(text or "", parent)
 
 		self._original_text = text or ""
 		self._elide_enabled = False
 		self._context_menu_enabled = False
+		self._state = "regular"
+		self.setProperty("state", self._state)
+
+	def set_state(self, state: str):
+		if state not in self.states:
+			raise ValueError(f"Unknown state: {state!r}, expected one of {self.states}")
+		if state == self._state:
+			return
+
+		self._state = state
+		self.setProperty("state", state)
+		# Без repolish QSS не применит новое значение свойства
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
+
+	def get_state(self) -> str:
+		return self._state
+
+	# ... остальной код без изменений
 
 	def setText(self, text: str):
 		self._original_text = text
@@ -1142,7 +1164,8 @@ class ConfirmWindow(VerticalWindow):
 		self.svg_widget.setFixedSize(65, 65)
 		self.icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-		self.text_wid = GrayTextLabel(text)
+		self.text_wid = TransparentLabel(text)
+		self.text_wid.set_state("gray")
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
@@ -1193,7 +1216,8 @@ class WarningWindow(VerticalWindow):
 			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
 		)
 
-		self.text_wid = GrayTextLabel(text)
+		self.text_wid = TransparentLabel(text)
+		self.text_wid.set_state("gray")
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
@@ -1247,7 +1271,8 @@ class InputTextWin(UMainWindow):
 			svg_icon.setFixedSize(15, 15)
 			svg_text_layout.addWidget(svg_icon)
 
-		self.description_label = GrayTextLabel(description)
+		self.description_label = TransparentLabel(description)
+		self.description_label.set_state("gray")
 		svg_text_layout.addWidget(self.description_label)
 
 		self.central_layout.addSpacing(10)
@@ -1334,7 +1359,8 @@ class MfAliasWidget(UGroupBox):
 
 		# v_layout.addWidget(USep())
 
-		name_text = GrayTextLabel(Lng.folder_name_full)
+		name_text = TransparentLabel(Lng.folder_name_full)
+		name_text.set_state("gray")
 		name_text.setWordWrap(True)
 		name_text.setContentsMargins(0, 0, 0, 0)
 		v_layout.addWidget(name_text)
@@ -1362,7 +1388,8 @@ class MfAliasWidget(UGroupBox):
 		self.checker_svg.setFixedSize(13, 13)
 		checker_lay.addWidget(self.checker_svg)
 
-		self.checker_text = GrayTextLabel("")
+		self.checker_text = TransparentLabel("")
+		self.checker_text.set_state("gray")
 		self.checker_text.set_elide(True, ignore_width=False)
 		self.checker_text.set_selectable(True)
 		checker_lay.addWidget(self.checker_text)
@@ -1625,7 +1652,8 @@ class MfPathWidget(HoverGroupBox):
 		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
 		content_lay.addWidget(self.title_widget)
 
-		descr_label = GrayTextLabel(Lng.catalog_path_descr)
+		descr_label = TransparentLabel(Lng.catalog_path_descr)
+		descr_label.set_state("gray")
 		descr_label.setWordWrap(True)
 		content_lay.addWidget(descr_label)
 

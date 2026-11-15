@@ -20,14 +20,14 @@ from system.tasks import HashDirSize, HashDirSizeItem, MfCleaner, UThreadPool
 from system.themes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, ConfirmWindow, GrayTextLabel,
-                            HoverGroupBox, MfAliasWidget, MfPathWidget,
-                            RowArrowWidget, SuperConfirmWindow,
-                            TitleTextWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UListSpacerItem,
-                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
-                            UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            UTagWidget, WarningWindow)
+from ._base_widgets import (ActiveButton, ConfirmWindow, HoverGroupBox,
+                            MfAliasWidget, MfPathWidget, RowArrowWidget,
+                            SuperConfirmWindow, TitleTextWidget,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UListSpacerItem, UListWidget, UListWidgetItem,
+                            UMainWindow, UMenu, UPushButton,
+                            UScrollVerticalArea, USep, USpinBox, UTagWidget,
+                            WarningWindow)
 
 
 def restart_app():
@@ -569,7 +569,8 @@ class MfRepairGroup(HoverGroupBox):
 		title_widget = TitleTextWidget(title)
 		self.v_lay.addWidget(title_widget)
 
-		descr_widget = GrayTextLabel(description)
+		descr_widget = TransparentLabel(description)
+		descr_widget.set_state("gray")
 		descr_widget.setWordWrap(True)
 		self.v_lay.addWidget(descr_widget)
 
@@ -651,7 +652,8 @@ class MfRepairWidget(HoverGroupBox):
 		title_widget = TitleTextWidget(Lng.repair_errors, Static.COLOR_ICONS / "repair.svg")
 		content_lay.addWidget(title_widget)
 
-		descr = GrayTextLabel(Lng.catalog_reindex_warning)
+		descr = TransparentLabel(Lng.catalog_reindex_warning)
+		descr.set_state("gray")
 		descr.setWordWrap(True)
 		content_lay.addWidget(descr)
 
@@ -691,7 +693,8 @@ class MfRemoveWidget(HoverGroupBox):
 		title_widget = TitleTextWidget(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
 		content_lay.addWidget(title_widget)
 
-		descr = GrayTextLabel(Lng.catalog_delete_warning)
+		descr = TransparentLabel(Lng.catalog_delete_warning)
+		descr.set_state("gray")
 		descr.setWordWrap(True)
 		content_lay.addWidget(descr)
 
@@ -738,7 +741,8 @@ class IgnoreListWin(UMainWindow):
 		self.group_lay.addWidget(self.title_widget)
 		# self.group_lay.addWidget(USep())
 
-		self.descr_widget = GrayTextLabel(text=Lng.ignore_list_descr_short)
+		self.descr_widget = TransparentLabel(text=Lng.ignore_list_descr_short)
+		self.descr_widget.set_state("gray")
 		self.descr_widget.setWordWrap(True)
 		self.group_lay.addWidget(self.descr_widget)
 
@@ -893,7 +897,8 @@ class MfStopListWidget(HoverGroupBox):
 		title_label = TitleTextWidget(Lng.ignore_list, Static.COLOR_ICONS / "stop.svg")
 		content_lay.addWidget(title_label)
 
-		description = GrayTextLabel(Lng.ignore_list_descr_short)
+		description = TransparentLabel(Lng.ignore_list_descr_short)
+		description.set_state("gray")
 		description.setWordWrap(True)
 		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 		content_lay.addWidget(description)

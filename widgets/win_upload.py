@@ -10,7 +10,7 @@ from system.items import Mf
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, GrayTextLabel, HoverGroupBox,
+from ._base_widgets import (ActiveButton, HoverGroupBox,
                             ChoosePathWidget, TitleTextWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton, USep)
@@ -42,7 +42,8 @@ class DestinyFolderWidget(HoverGroupBox):
 		self.title_label = TitleTextWidget(Lng.upload_files, Static.GRAY_ICONS / "folder_gray.svg")
 		content_lay.addWidget(self.title_label)
 
-		description = GrayTextLabel(self.get_plural_text(len(files_to_copy)) + "\n" + Lng.upload_files_description)
+		description = TransparentLabel(self.get_plural_text(len(files_to_copy)) + "\n" + Lng.upload_files_description)
+		description.set_state("gray")
 		description.setWordWrap(True)
 		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 		content_lay.addWidget(description)
