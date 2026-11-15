@@ -169,7 +169,7 @@ class ProgressWidget(TransparentWidget):
 		"""Прогресс сканера. Таймер останавливается, чтобы не перебивать текст."""
 		self.timer.stop()
 		alias, text = self.scan_progress_parts(progress)
-		self._set_texts(alias, text)
+		self._set_texts(alias, text, "regular_bold")
 		if progress.kind == "indexing":
 			self.set_green_checkmark.emit()
 		elif progress.kind in ("no_connection",):
@@ -180,25 +180,25 @@ class ProgressWidget(TransparentWidget):
 	def show_loading(self):
 		"""Запуск сканера до первого прогресса."""
 		self.timer.stop()
-		self._set_texts("", Lng.loading)
+		self._set_texts("", Lng.loading, "gray")
 		self.set_arrow_terminal.emit()
 
 	def show_timer(self):
 		"""Обратный отсчёт до следующего сканирования."""
 		self.total_seconds = JsonData.scaner_minutes * 60
-		self._set_texts("", self._timer_text())
+		self._set_texts("", self._timer_text(), "gray")
 		self.set_arrow_terminal.emit()
 		self.timer.start(1000)
 
 	def reset(self):
 		"""Пустое состояние без таймера."""
 		self.timer.stop()
-		self._set_texts("", "")
+		self._set_texts("", "", "gray")
 		self.set_arrow_terminal.emit()
 
 	# --- Внутреннее ---
 
-	def _set_texts(self, alias: str, text: str):
+	def _set_texts(self, alias: str, text: str, state: str = "gray"):
 		if alias == self._last_alias and text == self._last_text:
 			return
 		self._last_alias = alias
@@ -208,6 +208,10 @@ class ProgressWidget(TransparentWidget):
 		self.alias_label.setVisible(bool(alias))
 		self.status_label.setText(text)
 		self.path_visible_changed.emit(bool(alias))
+
+		self.alias_label.set_state(state)
+		self.status_label.set_state(state)
+
 		QTimer.singleShot(50, lambda: self.alias_label.setToolTip(alias[:-1]))
 
 	def _on_tick(self):
