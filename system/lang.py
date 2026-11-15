@@ -218,8 +218,8 @@ class Lng:
 		"digits, and spaces.",
 	)
 	folder_name_full = (
-		"Имя: уникальное, от 5 до 30 символов, русские и английские буквы, цифры и пробелы",
-		"Name: unique, 5–30 characters, Russian and English letters, digits and spaces",
+		"Уникальное имя длиной от {minim} до {maxim} символов",
+		"A unique name, {minim}–{maxim} characters long",
 	)
 	update_thumb = (
 		"Обновить изображение",

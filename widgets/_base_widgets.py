@@ -1335,6 +1335,8 @@ class MfAliasWidget(UGroupBox):
 
 	PATTERN = re.compile(r'^[A-Za-zА-Яа-яЁё0-9 ]+$')
 	VALIDATE_DELAY_MS = 500
+	MINIM = 3
+	MAXIM = 30
 
 	def __init__(self):
 		super().__init__()
@@ -1363,7 +1365,8 @@ class MfAliasWidget(UGroupBox):
 
 		# v_layout.addWidget(USep())
 
-		name_text = TransparentLabel(Lng.folder_name_full)
+		text = Lng.folder_name_full.format(minim=self.MINIM, maxim=self.MAXIM)
+		name_text = TransparentLabel(text)
 		name_text.set_state("gray")
 		name_text.setWordWrap(True)
 		name_text.setContentsMargins(0, 0, 0, 0)
@@ -1432,13 +1435,13 @@ class MfAliasWidget(UGroupBox):
 
 	# --- Правила проверки (одно место для ввода и для сохранения) ---
 
-	def _get_error(self, mf_alias: str, minim=3, maxim=50) -> str | None:
+	def _get_error(self, mf_alias: str) -> str | None:
 		if not mf_alias:
 			return Lng.enter_alias_warning
-		if len(mf_alias) < minim or len(mf_alias) > maxim:
-			return Lng.string_limit.format(minim=minim, maxim=maxim)
-		if not self.PATTERN.fullmatch(mf_alias):
-			return Lng.valid_message
+		if len(mf_alias) < self.MINIM or len(mf_alias) > self.MAXIM:
+			return Lng.string_limit.format(minim=self.MINIM, maxim=self.MAXIM)
+		# if not self.PATTERN.fullmatch(mf_alias):
+			# return Lng.valid_message
 		if any(i.mf_alias.lower() == mf_alias.lower() for i in Mf.items):
 			return Lng.alias_taken
 		return None
