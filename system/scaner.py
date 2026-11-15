@@ -1,10 +1,11 @@
 import os
 import traceback
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from datetime import datetime
 from multiprocessing import Queue
 from time import sleep
-from typing import Literal
+from typing import Callable, Literal
 
 import sqlalchemy
 
@@ -91,7 +92,7 @@ class ScanIncomplete(Exception):
 
 
 class ScanerWorker(BaseProcessWorker):
-    def __init__(self, target: callable, args: tuple):
+    def __init__(self, target: Callable, args: tuple):
         self.process_queue = Queue()
         super().__init__(target, (*args, self.process_queue))
 
@@ -127,12 +128,6 @@ class ImgItem:
     size: int
     mod: int
     rel_thumb_path: str = ""
-
-
-@dataclass(slots=True)
-class ForcedScanerItem:
-    mf: Mf
-    dirs_to_scan: list[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -279,6 +274,7 @@ class MfScan:
     """
     Один проход по одному Mf. Окружение лежит в self.env,
     счётчики прогресса — в self.progress. Остальные поля — удобные ссылки.
+    Проверку идентичности каталога делает вызывающий код (см. _run_mf).
     """
 
     def __init__(self, env: ScanEnv):
@@ -289,11 +285,19 @@ class MfScan:
 
     # ---------- публичные точки входа ----------
 
-    def run(self, force_full: bool) -> None:
-        """Полный цикл: проверка каталога → поиск изменений → обновление папок и изображений."""
-        if self.mf.old_mf_path is not None and not self._check_identity():
-            return  # БД не трогаем
+    def check_identity(self) -> bool:
+        """True, если каталог совпал с БД (или совпадение не требуется)."""
+        sample = CatalogIdentity.sample_db_images(self.engine, self.mf.mf_alias)
+        percent = CatalogIdentity.match_percent(self.mf, sample)
+        if percent < MATCH_THRESHOLD:
+            self.env.queue.put(PathMismatch(self.mf.mf_alias, percent))
+            print("path mismatch", self.mf.mf_alias, percent)
+            return False
+        self.env.queue.put(PathCheckPassed(self.mf.mf_alias, percent))
+        return True
 
+    def run(self, force_full: bool) -> None:
+        """Полный цикл: поиск изменений на диске → обновление папок и изображений."""
         db_dirs = self._load_db_dirs()
         if force_full:
             # полный пересказ: все папки помечаются как изменённые
@@ -359,17 +363,26 @@ class MfScan:
         if self.mf.is_root_alive():
             self._write_dirs(dirs)
 
-    # ---------- проверка каталога ----------
+    @staticmethod
+    def build_dir_items(mf: Mf, dirs_to_scan: list[str]) -> list[DirItem]:
+        """Превращает абсолютные пути в DirItem. Стоп-папки и недоступные пути пропускаются."""
+        stop = StopList(mf.mf_stop_list)
+        items: list[DirItem] = []
+        for abs_path in dirs_to_scan:
+            rel_path = mf.create_rel_path(abs_path)
+            if stop.contains(rel_path):
+                continue
+            try:
+                mod = int(os.stat(abs_path).st_mtime)
+            except OSError:
+                print(traceback.format_exc())
+                continue
+            item = DirItem(abs_path=abs_path, rel_path=rel_path, mod=mod)
+            if item not in items:
+                items.append(item)
+        return items
 
-    def _check_identity(self) -> bool:
-        sample = CatalogIdentity.sample_db_images(self.engine, self.mf.mf_alias)
-        percent = CatalogIdentity.match_percent(self.mf, sample)
-        if percent < MATCH_THRESHOLD:
-            self.env.queue.put(PathMismatch(self.mf.mf_alias, percent))
-            print("path mismatch", self.mf.mf_alias, percent)
-            return False
-        self.env.queue.put(PathCheckPassed(self.mf.mf_alias, percent))
-        return True
+    # ---------- быстрая проверка изменений ----------
 
     def _has_changes(self, db_dirs: list[DirItem]) -> bool:
         """Быстрая проверка: есть ли вообще изменения. Нужна только как оптимизация."""
@@ -717,67 +730,66 @@ class MfScan:
 
 
 # ==========================================
+# Общие части точек входа
+# ==========================================
+
+@contextmanager
+def _engine():
+    """Engine создаётся внутри дочернего процесса и гарантированно освобождается."""
+    engine = Dbase.create_engine()
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+
+
+def _run_mf(
+    mf: Mf,
+    engine: sqlalchemy.Engine,
+    queue: Queue,
+    action: Callable[[MfScan], None],
+) -> None:
+    """
+    Общая обёртка одного Mf: проверка доступности корня, проверка идентичности
+    каталога (если выставлен old_mf_path) и выполнение действия. Исключения логируются.
+    """
+    if not mf.is_root_alive():
+        queue.put(ScanProgress("no_connection", mf.mf_alias))
+        print("no connection", mf.mf_alias)
+        sleep(3)
+        return
+
+    try:
+        scan = MfScan(ScanEnv(mf, engine, queue))
+        if mf.old_mf_path is not None and not scan.check_identity():
+            return  # БД не трогаем
+        action(scan)
+    except Exception:
+        print(traceback.format_exc())
+
+
+# ==========================================
 # Точки входа для дочернего процесса
 # ==========================================
 
 class BaseScaner:
     @staticmethod
     def start(mf_list: list[Mf], force_full: bool, queue: Queue) -> None:
-        engine = Dbase.create_engine()  # создаём внутри процесса, не на уровне модуля
-        try:
+        """Полный проход: поиск изменений по всему дереву каждого Mf."""
+        with _engine() as engine:
             for mf in mf_list:
-                if mf.is_root_alive():
-                    try:
-                        print("scaner started", mf.mf_alias)
-                        MfScan(ScanEnv(mf, engine, queue)).run(force_full)
-                        print("scaner finished", mf.mf_alias)
-                    except Exception:
-                        print(traceback.format_exc())
-                else:
-                    queue.put(ScanProgress("no_connection", mf.mf_alias))
-                    print("no connection", mf.mf_alias)
-                    sleep(3)
-        finally:
-            engine.dispose()
+                print("scaner started", mf.mf_alias)
+                _run_mf(mf, engine, queue, lambda scan: scan.run(force_full))
+                print("scaner finished", mf.mf_alias)
 
 
 class ForcedScaner:
     @staticmethod
-    def start(item: ForcedScanerItem, queue: Queue) -> None:
-        print("single dir scaner started, mf:", item.mf.mf_alias)
-        ForcedScaner.single_mf_scan(item.mf, item.dirs_to_scan, queue)
-        print("single dir scaner finished, mf:", item.mf.mf_alias)
-
-    @staticmethod
-    def single_mf_scan(mf: Mf, dirs_to_scan: list[str], queue: Queue) -> None:
-        """Сканирует заданные папки. Стоп-папки и их поддерево пропускаются."""
-        if not mf.is_root_alive():
-            return
-
-        dir_items = ForcedScaner._build_dir_items(mf, dirs_to_scan)
-        if not dir_items:
-            return
-
-        engine = Dbase.create_engine()
-        try:
-            MfScan(ScanEnv(mf, engine, queue)).sync_images(dir_items)
-        finally:
-            engine.dispose()
-
-    @staticmethod
-    def _build_dir_items(mf: Mf, dirs_to_scan: list[str]) -> list[DirItem]:
-        stop = StopList(mf.mf_stop_list)
-        items: list[DirItem] = []
-        for abs_path in dirs_to_scan:
-            rel_path = mf.create_rel_path(abs_path)
-            if stop.contains(rel_path):
-                continue
-            try:
-                mod = int(os.stat(abs_path).st_mtime)
-            except OSError:
-                print(traceback.format_exc())
-                continue
-            item = DirItem(abs_path=abs_path, rel_path=rel_path, mod=mod)
-            if item not in items:
-                items.append(item)
-        return items
+    def start(mf: Mf, dirs: list[str], queue: Queue) -> None:
+        """Точечный проход: только переданные папки, без обхода дерева."""
+        print("single dir scaner started, mf:", mf.mf_alias)
+        dir_items = MfScan.build_dir_items(mf, dirs)
+        if dir_items:
+            with _engine() as engine:
+                _run_mf(mf, engine, queue, lambda scan: scan.sync_images(dir_items))
+        print("single dir scaner finished, mf:", mf.mf_alias)

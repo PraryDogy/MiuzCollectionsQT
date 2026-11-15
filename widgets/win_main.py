@@ -11,8 +11,8 @@ from system.items import DataItem, Filters, Mf
 from system.lang import Lng
 from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
 from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
-                           ForcedScanerItem, PathCheckPassed, PathMismatch,
-                           ScanerWorker, ScanProgress)
+                           PathCheckPassed, PathMismatch, ScanerWorker,
+                           ScanProgress)
 from system.runnable import SetFav, ThumbScale, UThreadPool, Utils
 from system.utils import ImageReader
 
@@ -85,22 +85,29 @@ def find_mf(alias: str) -> Mf | None:
 
 
 class ForcedDirsRegistry:
-	"""Каталоги, которые нужно пересканировать принудительно."""
+	"""
+	Папки, которые нужно пересканировать точечно, сгруппированные по каталогу.
+	Каталог сохраняется вместе с папками, поэтому переключение Mf после
+	вставки не перенаправит сканирование в другой каталог.
+	"""
 
 	def __init__(self):
-		self._dirs: set[str] = set()
+		self._by_alias: dict[str, tuple[Mf, set[str]]] = {}
 
-	def add(self, *dirs: str) -> None:
-		self._dirs.update(dirs)
+	def add(self, mf: Mf, *dirs: str) -> None:
+		_, current = self._by_alias.setdefault(mf.mf_alias, (mf, set()))
+		current.update(dirs)
 
-	def take(self) -> set[str]:
-		"""Забирает накопленные каталоги и очищает реестр."""
-		dirs = self._dirs.copy()
-		self._dirs.clear()
-		return dirs
+	def take_next(self) -> tuple[Mf, list[str]] | None:
+		"""Забирает папки одного каталога и удаляет их из реестра. None, если пусто."""
+		if not self._by_alias:
+			return None
+		alias = next(iter(self._by_alias))
+		mf, dirs = self._by_alias.pop(alias)
+		return mf, sorted(dirs)
 
 	def __bool__(self) -> bool:
-		return bool(self._dirs)
+		return bool(self._by_alias)
 
 
 # =============================================================================
@@ -398,7 +405,7 @@ class WinMain(UMainWindow):
 			dest=dest
 		)
 		copy_files_win.finished_.connect(lambda *_: self.start_scaner_task())
-		self.forced_scaner_dirs.add(dest)
+		self.forced_scaner_dirs.add(Mf.current_mf, dest)
 		self.files_to_copy.clear()
 		self.grid.files_to_copy.clear()
 
@@ -428,9 +435,7 @@ class WinMain(UMainWindow):
 				file_remover.process_queue.get_nowait()
 			if not file_remover.is_alive():
 				file_remover.terminate_join()
-				for i in dirs_to_scan:
-					self.forced_scaner_dirs.add(i)
-
+				self.forced_scaner_dirs.add(mf, *dirs_to_scan)
 				self.start_scaner_task()
 			else:
 				QTimer.singleShot(ms, poll_file_remover)
@@ -439,6 +444,7 @@ class WinMain(UMainWindow):
 			file_remover.start()
 			QTimer.singleShot(ms, poll_file_remover)
 
+		mf = Mf.current_mf
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
 		self.remove_files_win = ConfirmWindow(text, danger=True)
@@ -655,6 +661,9 @@ class WinMain(UMainWindow):
 				self.load_st_grid()
 				self.left_menu.tree_wid.init_ui()
 				self.stop_list_changed = False
+			# во время сканирования могли добавиться точечные задачи: запускаем их
+			if self.forced_scaner_dirs:
+				self.start_scaner_task()
 		else:
 			self.scaner_poll_timer.start(ms)
 
@@ -726,21 +735,18 @@ class WinMain(UMainWindow):
 			can_start = True
 
 		if can_start:
-			forced_dirs = self.forced_scaner_dirs.take()
-			if forced_dirs:
-				forced_scaner_item = ForcedScanerItem(
-					mf=Mf.current_mf,
-					dirs_to_scan=forced_dirs,
-				)
+			forced = self.forced_scaner_dirs.take_next()
+			if forced:
+				mf, dirs = forced
 				self.scaner_task = ScanerWorker(
 					target=ForcedScaner.start,
-					args=(forced_scaner_item, )
-					)
+					args=(mf, dirs),
+				)
 			else:
 				# print("штатно запускаю ОБЩИЙ сканер")
 				self.scaner_task = ScanerWorker(
 					target=BaseScaner.start,
-					args=(Mf.items, force_full)
+					args=(Mf.items, force_full),
 				)
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
 			self.bar_bottom.progress_widget.show_loading()
