@@ -16,7 +16,7 @@ from cfg import JsonData, Static, Themes
 from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker
-from system.tasks import HashDirSize, HashDirSizeItem, MfCleaner, UThreadPool
+from system.runnable import HashDirSize, HashDirSizeItem, MfCleaner, UThreadPool
 from system.themes import ThemeChanger
 from system.utils import Utils
 

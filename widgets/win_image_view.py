@@ -18,7 +18,7 @@ from cfg import Static
 from system.items import DataItem, ImageArrayItem, Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg
-from system.tasks import ImgArrayQImage, UThreadPool
+from system.runnable import ImgArrayQImage, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import UMainWindow, UMenu, USep

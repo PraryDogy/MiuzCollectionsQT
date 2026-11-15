@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, Mf
 from system.lang import Lng
-from system.tasks import (AppsScanner, SmoothSignals, SmoothThumbsTask,
+from system.runnable import (AppsScanner, SmoothSignals, SmoothThumbsTask,
                           ThumbnailsLoader, UThreadPool)
 from system.utils import Utils
 

@@ -11,7 +11,7 @@ from cfg import JsonData, Static
 from system.database import Dbase
 from system.items import Filters, Mf, Servers
 from system.lang import Lng
-from system.tasks import UThreadPool
+from system.runnable import UThreadPool
 from system.themes import ThemeChanger
 from widgets._base_widgets import UMainWindow
 from widgets.win_first_load import FirstLoadWin

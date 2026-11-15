@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
 from cfg import JsonData, Static
 from system.items import Mf
 from system.lang import Lng
-from system.tasks import URunnable, UThreadPool
+from system.runnable import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             RowArrowWidget, SaveRowArrowWidget, UGroupBox,

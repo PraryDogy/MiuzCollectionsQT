@@ -12,7 +12,7 @@ from cfg import JsonData, Static
 from system.items import DataItem, Mf, ReadableDateItem
 from system.lang import Lng
 from system.multiprocess import OneFileInfo, ProcessWorker
-from system.tasks import BlurImgBgTask, UThreadPool
+from system.runnable import BlurImgBgTask, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,

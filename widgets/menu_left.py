@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import QVBoxLayout
 from cfg import JsonData, Static
 from system.items import Mf
 from system.lang import Lng
-from system.tasks import DbDirsLoader, UThreadPool
+from system.runnable import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (TransparentFrame, TransparentLabel,

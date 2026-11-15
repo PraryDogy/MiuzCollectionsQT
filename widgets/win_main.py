@@ -13,7 +13,7 @@ from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
 from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
                            ForcedScanerItem, PathCheckPassed, PathMismatch,
                            ScanerWorker, ScanProgress)
-from system.tasks import SetFav, ThumbScale, UThreadPool, Utils
+from system.runnable import SetFav, ThumbScale, UThreadPool, Utils
 from system.utils import ImageReader
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
