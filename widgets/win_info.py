@@ -195,15 +195,28 @@ class WinInfo(UMainWindow):
 		layout.setSpacing(5)
 		layout.addStretch()
 
-		copy_btn = CopyPathButton()
-		copy_btn.copy_clicked.connect(lambda: QApplication.clipboard().setText(self.abs_path))
-		layout.addWidget(copy_btn)
+		self.copy_path_btn = CopyPathButton()
+		self.copy_path_btn.copy_clicked.connect(lambda: QApplication.clipboard().setText(self.abs_path))
+		layout.addWidget(self.copy_path_btn)
 
 		# layout.addStretch(1)
 
 		close_btn = ActiveButton(Lng.close)
 		close_btn.clicked.connect(self.close)
 		layout.addWidget(close_btn)
+
+		self.copy_path_btn.enterEvent = self.copy_enter
+		self.copy_path_btn.leaveEvent = self.copy_leave
+		self.copy_path_btn.setToolTip(self.labels["location"]._original_text)
+
+	def copy_enter(self, e):
+		loc = self.labels["location"]
+		loc.set_state("regular_bold")
+		loc.set_underline(True)
+
+	def copy_leave(self, e):
+		self.labels["location"].set_state("regular")
+		self.labels["location"].set_underline(False)
 
 	def _load_info(self):
 		self.workers: dict[str, ProcessWorker] = {

@@ -45,7 +45,19 @@ class TransparentLabel(QLabel):
 		self._elide_enabled = False
 		self._context_menu_enabled = False
 		self._state = "regular"
+		self._underline = False
 		self.setProperty("state", self._state)
+
+	def set_underline(self, enabled: bool):
+		enabled = bool(enabled)
+		if enabled == self._underline:
+			return
+
+		self._underline = enabled
+		font = self.font()
+		font.setUnderline(enabled)
+		self.setFont(font)
+		self.update()
 
 	def set_state(self, state: str):
 		if state not in self.states:
@@ -62,8 +74,6 @@ class TransparentLabel(QLabel):
 
 	def get_state(self) -> str:
 		return self._state
-
-	# ... остальной код без изменений
 
 	def setText(self, text: str):
 		self._original_text = text
