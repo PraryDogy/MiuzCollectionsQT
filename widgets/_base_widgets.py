@@ -878,12 +878,6 @@ class UMainWindow(QMainWindow):
 			self.dim_overlay.raise_()
 
 
-# если переименовываешь, не забудь qss
-class GrayTextLabel(TransparentLabel):
-	def __init__(self, text: str):
-		super().__init__(text)
-
-
 class _TitleTextLabel(TransparentLabel):
 	def __init__(self, text="", parent=None):
 		super().__init__(text, parent)
