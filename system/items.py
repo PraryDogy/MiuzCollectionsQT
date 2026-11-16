@@ -75,6 +75,7 @@ class Strings:
 	mf_alias = "mf_alias"
 	mf_paths = "mf_paths"
 	mf_stop_list = "mf_stop_list"
+	mf_current_path = "mf_current_path"
 
 
 class Mf:
@@ -84,13 +85,15 @@ class Mf:
 		Strings.mf_alias,
 		Strings.mf_paths,
 		Strings.mf_stop_list,
+		Strings.mf_current_path,
 	]
 
-	def __init__(self, mf_alias, mf_paths, mf_stop_list):
+	def __init__(self, mf_alias, mf_paths, mf_stop_list, mf_current_path=None):
 		super().__init__()
 		self.mf_alias: str = mf_alias
 		self.mf_paths: list[str] = mf_paths
 		self.mf_stop_list: list[str] = mf_stop_list
+		self.mf_current_path: str | None = mf_current_path
 
 	@property
 	def mf_path(self):
@@ -151,7 +154,7 @@ class Mf:
 
 	def is_root_alive(self):
 		return os.path.exists(self.mf_path)
-	
+
 	def get_data(self):
 		return {i: getattr(self, i) for i in self.__slots__}
 
@@ -185,17 +188,22 @@ class Mf:
 			return None
 
 		# валидация по списку словарей
-		mf_dicts = (i for i in data if isinstance(i, dict))
+		mf_dicts = [i for i in data if isinstance(i, dict)]
 		if not mf_dicts:
 			print("Mf: список пуст, нет словарей в списке")
 			return None
 
-		# валидация по ключам
+		# обязательные ключи; mf_current_path необязателен (заглушка для старых версий)
+		required_keys = {
+			Strings.mf_alias,
+			Strings.mf_paths,
+			Strings.mf_stop_list,
+		}
 		slots_set = set(Mf.__slots__)
 		all_slots_dicts = []
 		for d in mf_dicts:
-			if slots_set.issubset(d.keys()):
-				cleaned_dict = {key: d[key] for key in slots_set}
+			if required_keys.issubset(d.keys()):
+				cleaned_dict = {key: d.get(key) for key in slots_set}
 				all_slots_dicts.append(cleaned_dict)
 		if not all_slots_dicts:
 			print("Mf: список пуст по валидации по ключам")
@@ -207,12 +215,13 @@ class Mf:
 			base_types_ok = (
 				isinstance(d[Strings.mf_alias], str),
 				isinstance(d[Strings.mf_paths], list),
-				isinstance(d[Strings.mf_stop_list], list)
+				isinstance(d[Strings.mf_stop_list], list),
+				d[Strings.mf_current_path] is None or isinstance(d[Strings.mf_current_path], str),
 			)
 			if all(base_types_ok):
 				lists_are_strings = (
 					all(isinstance(i, str) for i in d[Strings.mf_paths]),
-					all(isinstance(i, str) for i in d[Strings.mf_stop_list])
+					all(isinstance(i, str) for i in d[Strings.mf_stop_list]),
 				)
 				if all(lists_are_strings):
 					all_types_dicts.append(d)
@@ -221,7 +230,7 @@ class Mf:
 			return None
 
 		# валидация по mf_alias
-		unique_mf= {}
+		unique_mf = {}
 		for d in all_types_dicts:
 			if d[Strings.mf_alias] not in unique_mf:
 				unique_mf[d[Strings.mf_alias]] = d
