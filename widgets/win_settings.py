@@ -1115,7 +1115,7 @@ class NewMfWin(UMainWindow):
 
 		def fin():
 			mf = Mf(
-				mf_alias=mf_alias,
+				mf_alias=mf_alias.replace("\n", " "),
 				mf_paths=[mf_path],
 				mf_stop_list=[]
 			)

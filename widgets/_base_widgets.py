@@ -1333,7 +1333,6 @@ class MfAliasWidget(UGroupBox):
 	changed = pyqtSignal()
 	auto_name_clicked = pyqtSignal()
 
-	PATTERN = re.compile(r'^[A-Za-zА-Яа-яЁё0-9 ]+$')
 	VALIDATE_DELAY_MS = 500
 	MINIM = 3
 	MAXIM = 30
