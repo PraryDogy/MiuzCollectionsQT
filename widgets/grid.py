@@ -652,6 +652,11 @@ class Grid(UScrollVerticalArea):
 	open_filters_win = pyqtSignal()
 	selection_count_changed = pyqtSignal(int)
 	thumb_cls = Thumb
+	clear_word_search = pyqtSignal()
+	open_word_search = pyqtSignal()
+	clear_img_search = pyqtSignal()
+	open_img_search = pyqtSignal()
+
 
 	def __init__(self):
 		super().__init__()
@@ -737,6 +742,10 @@ class Grid(UScrollVerticalArea):
 			self.tags_widget = TagsWidget()
 			self.tags_widget.open_filters_win.connect(self.open_filters_win.emit)
 			self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
+			self.tags_widget.open_img_search.connect(self.open_img_search.emit)
+			self.tags_widget.open_word_search.connect(self.open_word_search.emit)
+			self.tags_widget.clear_img_search.connect(self.clear_img_search.emit)
+			self.tags_widget.clear_word_search.connect(self.clear_word_search.emit)
 			self.scroll_layout.addWidget(self.tags_widget)
 
 		self.grid_wid = TransparentFrame()

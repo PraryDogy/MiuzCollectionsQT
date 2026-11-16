@@ -579,7 +579,30 @@ class WinMain(UMainWindow):
 			lambda x: print("куда выделение вписать?")
 		)
 
+		self.grid.clear_word_search.connect(
+			lambda: self.bar_top.search_wid.clear_search()
+		)
+
+		self.grid.open_word_search.connect(
+			lambda: self.bar_top.search_wid.open_win_text_search()
+		)
+
+		self.grid.open_img_search.connect(
+			lambda: self.open_img_search_win()
+		)
+
+		self.grid.clear_img_search.connect(
+			lambda: self.reset_img_search()
+		)
+
 		self.right_layout.addWidget(self.grid)
+
+	def reset_img_search(self):
+		if getattr(self, "win_img_search", UMainWindow):
+			self.win_img_search.reset_img_search()
+			self.bar_top.img_search_btn.set_base_style()
+			self.win_img_search.deleteLater()
+			delattr(self, "win_img_search")
 
 	@with_conn
 	def open_view_win(self, mf: Mf):

@@ -81,22 +81,6 @@ class ProgressWin(UMainWindow):
 
 		self.text_label.setText(text)
 
-	def set_text(self, current_count, total_count):
-		if current_count > total_count:
-			current_count = total_count
-
-		if total_count == 0:
-			text = Lng.please_wait
-		else:
-			text = (
-				f"{Lng.indexing} "
-				f"{current_count} "
-				f"{Lng.from_} "
-				f"{total_count}"
-			)
-
-		self.text_label.setText(text)
-
 	def closeEvent(self, a0):
 		a0.ignore()
 
