@@ -544,9 +544,30 @@ class GridNoSubfoldersTag(GridTag):
 		return super().right_svg_cmd(*args)
 
 
+class GridTextSearchTag(GridTag):
+	def __init__(self):
+		super().__init__(
+			text="Поиск по тексту",
+			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
+		)
+
+
+class GridImgSearchTag(GridTag):
+	def __init__(self):
+		super().__init__(
+			text="Поиск по картинке",
+			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
+		)
+
+
+
 class TagsWidget(TransparentWidget):
 	load_st_grid = pyqtSignal()
 	open_filters_win = pyqtSignal()
+	clear_word_search = pyqtSignal()
+	open_word_search = pyqtSignal()
+	clear_img_search = pyqtSignal()
+	open_img_search = pyqtSignal()
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -556,10 +577,39 @@ class TagsWidget(TransparentWidget):
 		self._create_tags()
 
 	def _create_tags(self):
+		if Dynamic.search_words_list:
+			tag = GridTextSearchTag()
+			tag.right_svg_clicked.connect(self.clear_word_search.emit)
+			tag.text_clicked.connect(self.open_word_search.emit)
+			tag.left_svg_clicked.connect(self.open_word_search.emit)
+			self.flow_layout.addWidget(tag)
+
+		if Dynamic.img_search_thumb_paths:
+			tag = GridImgSearchTag()
+			tag.right_svg_clicked.connect(self.clear_img_search.emit)
+			tag.text_clicked.connect(self.open_img_search.emit)
+			tag.left_svg_clicked.connect(self.open_img_search.emit)
+			self.flow_layout.addWidget(tag)
+
+		if Dynamic.favs_tag_enabled:
+			tag = GridFavTag()
+			tag.right_svg_clicked.connect(self.load_st_grid.emit)
+			tag.text_clicked.connect(self.open_filters_win.emit)
+			tag.left_svg_clicked.connect(self.open_filters_win.emit)
+			self.flow_layout.addWidget(tag)
+
+		if Dynamic.no_subfolders_tag_enabled:
+			tag = GridNoSubfoldersTag()
+			tag.right_svg_clicked.connect(self.load_st_grid.emit)
+			tag.text_clicked.connect(self.open_filters_win.emit)
+			tag.left_svg_clicked.connect(self.open_filters_win.emit)
+			self.flow_layout.addWidget(tag)
+
 		if Dynamic.py_date_start or Dynamic.py_date_end:
 			tag = GridDatesTag()
 			tag.right_svg_clicked.connect(self.load_st_grid.emit)
 			tag.text_clicked.connect(self.open_filters_win.emit)
+			tag.left_svg_clicked.connect(self.open_filters_win.emit)
 			self.flow_layout.addWidget(tag)
 
 		if Dynamic.word_tags_list:
@@ -567,19 +617,8 @@ class TagsWidget(TransparentWidget):
 				tag = GridWordTag(word)
 				tag.right_svg_clicked.connect(self.load_st_grid.emit)
 				tag.text_clicked.connect(self.open_filters_win.emit)
+				tag.left_svg_clicked.connect(self.open_filters_win.emit)
 				self.flow_layout.addWidget(tag)
-
-		if Dynamic.favs_tag_enabled:
-			tag = GridFavTag()
-			tag.right_svg_clicked.connect(self.load_st_grid.emit)
-			tag.text_clicked.connect(self.open_filters_win.emit)
-			self.flow_layout.addWidget(tag)
-
-		if Dynamic.no_subfolders_tag_enabled:
-			tag = GridNoSubfoldersTag()
-			tag.right_svg_clicked.connect(self.load_st_grid.emit)
-			tag.text_clicked.connect(self.open_filters_win.emit)
-			self.flow_layout.addWidget(tag)
 
 	def hasHeightForWidth(self):
 		return True
@@ -688,6 +727,8 @@ class Grid(UScrollVerticalArea):
 			Dynamic.word_tags_list,
 			Dynamic.favs_tag_enabled,
 			Dynamic.no_subfolders_tag_enabled,
+			Dynamic.search_words_list,
+			Dynamic.img_search_thumb_paths
 		))
 
 		if has_filters:
