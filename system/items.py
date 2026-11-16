@@ -88,6 +88,8 @@ class Mf:
 		Strings.mf_current_path,
 	]
 
+	REQUIRED_KEYS = (Strings.mf_alias, Strings.mf_paths, Strings.mf_stop_list)
+
 	def __init__(self, mf_alias, mf_paths, mf_stop_list, mf_current_path=None):
 		super().__init__()
 		self.mf_alias: str = mf_alias
@@ -170,76 +172,95 @@ class Mf:
 				data.append(i.get_data())
 			json.dump(data, file, ensure_ascii=False, indent=4)
 
+	# --- Валидация ---
+
+	@staticmethod
+	def _check_item(raw) -> tuple[dict | None, str | None]:
+		"""Проверяет один элемент. Возвращает (очищенный словарь, None) или (None, причина)."""
+		if not isinstance(raw, dict):
+			return None, "элемент не является объектом"
+
+		missing = [k for k in Mf.REQUIRED_KEYS if k not in raw]
+		if missing:
+			return None, f"нет обязательных ключей: {missing}"
+
+		alias = raw[Strings.mf_alias]
+		paths = raw[Strings.mf_paths]
+		stops = raw[Strings.mf_stop_list]
+		current = raw.get(Strings.mf_current_path)
+
+		if not isinstance(alias, str) or not alias.strip():
+			return None, "mf_alias должен быть непустой строкой"
+
+		if not isinstance(paths, list) or not paths:
+			return None, "mf_paths должен быть непустым списком"
+		if not all(isinstance(p, str) and p.strip() for p in paths):
+			return None, "mf_paths содержит не строки или пустые пути"
+
+		if not isinstance(stops, list):
+			return None, "mf_stop_list должен быть списком"
+		if not all(isinstance(s, str) for s in stops):
+			return None, "mf_stop_list содержит не строки"
+
+		if current is not None and not isinstance(current, str):
+			return None, "mf_current_path должен быть строкой или null"
+
+		cleaned = {
+			Strings.mf_alias: alias,
+			Strings.mf_paths: paths,
+			Strings.mf_stop_list: stops,
+			Strings.mf_current_path: current,
+		}
+		return cleaned, None
+
 	@classmethod
-	def validate_json(cls):
+	def validate_json(cls) -> list[dict] | None:
+		"""
+		Читает mf.json и возвращает список валидных словарей для Mf(**d).
+		Невалидные элементы пропускаются с причиной в консоли.
+		Возвращает None, если файл не читается или валидных элементов нет.
+		"""
 		try:
 			with open(Static.MF_JSON, "r", encoding="utf-8") as file:
-				data: list[dict] = json.load(file)
-		except Exception as e:
-			print("Mf, error reading file", e)
+				data = json.load(file)
+		except (OSError, json.JSONDecodeError) as e:
+			print("Mf: не удалось прочитать файл:", e)
 			return None
 
 		if not isinstance(data, list):
-			print("Mf: json data не является списком")
+			print("Mf: корень JSON должен быть списком")
 			return None
 
-		if len(data) == 0:
-			print("Mf: json data список пуст")
+		valid: list[dict] = []
+		seen_aliases: set[str] = set()
+		rejected = 0
+
+		for index, raw in enumerate(data):
+			cleaned, error = cls._check_item(raw)
+
+			# уникальность alias без учёта регистра, как в UI (_get_error)
+			if error is None:
+				key = cleaned[Strings.mf_alias].lower()
+				if key in seen_aliases:
+					error = f"дубликат mf_alias: {cleaned[Strings.mf_alias]!r}"
+				else:
+					seen_aliases.add(key)
+
+			if error is not None:
+				rejected += 1
+				print(f"Mf: элемент #{index} пропущен: {error}")
+				continue
+
+			valid.append(cleaned)
+
+		if rejected:
+			print(f"Mf: пропущено элементов: {rejected}, валидных: {len(valid)}")
+
+		if not valid:
+			print("Mf: нет ни одного валидного архива")
 			return None
 
-		# валидация по списку словарей
-		mf_dicts = [i for i in data if isinstance(i, dict)]
-		if not mf_dicts:
-			print("Mf: список пуст, нет словарей в списке")
-			return None
-
-		# обязательные ключи; mf_current_path необязателен (заглушка для старых версий)
-		required_keys = {
-			Strings.mf_alias,
-			Strings.mf_paths,
-			Strings.mf_stop_list,
-		}
-		slots_set = set(Mf.__slots__)
-		all_slots_dicts = []
-		for d in mf_dicts:
-			if required_keys.issubset(d.keys()):
-				cleaned_dict = {key: d.get(key) for key in slots_set}
-				all_slots_dicts.append(cleaned_dict)
-		if not all_slots_dicts:
-			print("Mf: список пуст по валидации по ключам")
-			return None
-
-		# валидация по типу данных
-		all_types_dicts = []
-		for d in all_slots_dicts:
-			base_types_ok = (
-				isinstance(d[Strings.mf_alias], str),
-				isinstance(d[Strings.mf_paths], list),
-				isinstance(d[Strings.mf_stop_list], list),
-				d[Strings.mf_current_path] is None or isinstance(d[Strings.mf_current_path], str),
-			)
-			if all(base_types_ok):
-				lists_are_strings = (
-					all(isinstance(i, str) for i in d[Strings.mf_paths]),
-					all(isinstance(i, str) for i in d[Strings.mf_stop_list]),
-				)
-				if all(lists_are_strings):
-					all_types_dicts.append(d)
-		if not all_types_dicts:
-			print("Mf: список пуст по валидации по типу данных")
-			return None
-
-		# валидация по mf_alias
-		unique_mf = {}
-		for d in all_types_dicts:
-			if d[Strings.mf_alias] not in unique_mf:
-				unique_mf[d[Strings.mf_alias]] = d
-		unique_mf = list(unique_mf.values())
-		if not unique_mf:
-			print("Mf: не пройдена проверка по уникальности mf_alias")
-			return None
-
-		return unique_mf
+		return valid
 
 
 class Servers:
