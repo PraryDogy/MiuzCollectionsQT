@@ -923,14 +923,13 @@ class TagWidget(TransparentFrame):
 	qss_yellow = "yellow"
 	qss_red = "red"
 
-	def __init__(self, text: str = None, l_svg: Path = None, r_svg: Path = None, max_w: int = 150):
+	def __init__(self, text: str = None, l_svg: Path = None, r_svg: Path = None, max_text_width: int = 150):
 		super().__init__()
 		self.qss_style = self.qss_gray
 		self.setFixedHeight(25)
 		self.setProperty(self.qss_property_name, self.qss_gray)
 		self.set_qss_style(self.qss_gray)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		self.setMaximumWidth(max_w)
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(7, 2, 7, 2)
@@ -944,6 +943,7 @@ class TagWidget(TransparentFrame):
 
 		text = text if text else ""
 		self.text_widget = TransparentLabel(text)
+		self.text_widget.setMaximumWidth(max_text_width)
 		self.text_widget.set_elide(True, ignore_width=False)
 		self.h_lay.addWidget(self.text_widget)
 

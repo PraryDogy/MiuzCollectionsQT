@@ -225,9 +225,9 @@ class DatesWidget(UGroupBox):
 			str_to = self.readable_date_wid.get_readable_date(end)
 			text = f"{Lng.from_text} {str_from} {Lng.to_text.lower()} {str_to}"
 
+		DatesWidget.readable_date = text.lower()
 		text = f"{Lng.selected_dates}: {text.lower()}"
 		self.dynamic_label.setText(text)
-		DatesWidget.readable_date = text
 
 	def reset_dates(self, with_sig: bool) -> bool:
 		"""Сбрасывает даты сразу. Возвращает True, если даты были применены в Dynamic."""

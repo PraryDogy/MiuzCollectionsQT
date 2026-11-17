@@ -493,6 +493,7 @@ class GridDatesTag(GridTag):
 	def __init__(self):
 		super().__init__(DatesWidget.readable_date, Static.GRAY_ICONS / "calendar_gray.svg")
 		self.right_svg_clicked.connect(self.reset_dates)
+		self.text_widget.setMaximumWidth(250)
 
 	def reset_dates(self, *args):
 		Dynamic.py_date_start = None
