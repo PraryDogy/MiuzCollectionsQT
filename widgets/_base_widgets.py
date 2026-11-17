@@ -913,8 +913,7 @@ class TitleTextWidget(TransparentWidget):
 # если переименовываешь, не забудь qss
 class UTagWidget(TransparentFrame):
 	right_svg_clicked = pyqtSignal()
-	text_clicked = pyqtSignal()
-	left_svg_clicked = pyqtSignal()
+	clicked = pyqtSignal()
 
 	qss_property_name = "style"
 	qss_blue = "blue"
@@ -924,13 +923,14 @@ class UTagWidget(TransparentFrame):
 	qss_yellow = "yellow"
 	qss_red = "red"
 
-	def __init__(self, text: str, style: str, l_svg: Path = None, r_svg: Path = None):
+	def __init__(self, text: str = None, l_svg: Path = None, r_svg: Path = None, max_w: int = 150):
 		super().__init__()
-		self.qss_style = style
+		self.qss_style = self.qss_gray
 		self.setFixedHeight(25)
-		self.setProperty(UTagWidget.qss_property_name, style)
-		self.set_qss_style(style)
+		self.setProperty(self.qss_property_name, self.qss_gray)
+		self.set_qss_style(self.qss_gray)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.setMaximumWidth(max_w)
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(7, 2, 7, 2)
@@ -939,14 +939,15 @@ class UTagWidget(TransparentFrame):
 
 		if l_svg:
 			self.left_svg_widget = QSvgWidget(str(l_svg))
-			self.left_svg_widget.mouseReleaseEvent = self.text_widget_cmd
+			self.left_svg_widget.mouseReleaseEvent = self.cmd
 			self.left_svg_widget.setFixedSize(14, 14)
 			self.h_lay.addWidget(self.left_svg_widget)
 
-		if text:
-			self.text_widget = TransparentLabel(text)
-			self.text_widget.mouseReleaseEvent = self.text_widget_cmd
-			self.h_lay.addWidget(self.text_widget)
+		text = text if text else ""
+		self.text_widget = TransparentLabel(text)
+		self.text_widget.mouseReleaseEvent = self.cmd
+		self.text_widget.set_elide(True, ignore_width=False)
+		self.h_lay.addWidget(self.text_widget)
 
 		if r_svg:
 			right_svg_wrapper = TransparentWidget()
@@ -962,7 +963,7 @@ class UTagWidget(TransparentFrame):
 
 	def set_qss_style(self, qss_style: str):
 		self.qss_style = qss_style
-		self.setProperty(UTagWidget.qss_property_name, qss_style)
+		self.setProperty(self.qss_property_name, qss_style)
 		self.style().unpolish(self)
 		self.style().polish(self)
 		self.update()
@@ -970,8 +971,11 @@ class UTagWidget(TransparentFrame):
 	def right_svg_cmd(self, *args):
 		self.right_svg_clicked.emit()
 
-	def text_widget_cmd(self, *args):
-		self.text_clicked.emit()
+	def cmd(self, *args):
+		self.clicked.emit()
+
+	def set_text(self, text: str):
+		self.text_widget.setText(text)
 
 
 class RowArrowWidget(TransparentWidget):

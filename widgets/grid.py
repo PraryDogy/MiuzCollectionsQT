@@ -483,16 +483,10 @@ class GridControlsWidget(TransparentWidget):
 
 class GridTag(UTagWidget):
 	def __init__(self, l_svg, text):
-		super().__init__(
-			style=self.qss_green,
-			l_svg=l_svg,
-			text=text,
-			r_svg=Static.GRAY_ICONS / "cancel_solid_gray.svg"
-		)
+		super().__init__(text, l_svg, Static.GRAY_ICONS / "cancel_solid_gray.svg")
+		self.set_qss_style(self.qss_green)
 		self.right_svg_widget.setFixedSize(12, 12)
 		self.right_svg_lay.setContentsMargins(0, 1, 0, 0)
-		self.text_widget.set_elide(True, ignore_width=False)
-		self.setMaximumWidth(150)
 
 
 class GridDatesTag(GridTag):

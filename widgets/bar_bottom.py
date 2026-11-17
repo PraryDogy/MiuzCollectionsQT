@@ -151,10 +151,10 @@ class ProgressWidget(TransparentWidget):
 		self.h_layout.addWidget(self.status_label)
 
 
-		self.tag_widget = UTagWidget(text="", style=UTagWidget.qss_transparent)
+		self.tag_widget = UTagWidget()
+		self.tag_widget.set_qss_style(self.tag_widget.qss_transparent)
 		self.h_layout.addWidget(self.tag_widget)
 		self.tag_widget.hide()
-
 
 		self.h_layout.addStretch()
 

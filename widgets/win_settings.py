@@ -65,11 +65,8 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		self.attention_icon = UTagWidget(
-			text=Lng.unsaved_changes,
-			style=UTagWidget.qss_yellow,
-			l_svg=Static.GRAY_ICONS / "attention_gray.svg"
-		)
+		self.attention_icon = UTagWidget(Lng.unsaved_changes, Static.GRAY_ICONS / "attention_gray.svg")
+		self.attention_icon.set_qss_style(self.attention_icon.qss_yellow)
 		self.h_lay.addWidget(self.attention_icon)
 
 		self.h_lay.addSpacing(5)

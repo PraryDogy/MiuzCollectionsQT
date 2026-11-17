@@ -30,10 +30,7 @@ class WinFiltersTitleWidget(TitleTextWidget):
 
 class CalendarTag(UTagWidget):
 	def __init__(self):
-		super().__init__(
-			text=Lng.not_selected,
-			style=self.qss_gray,
-		)
+		super().__init__(Lng.not_selected)
 		self.adjustSize()
 		self.setFixedWidth(self.width())
 
@@ -258,21 +255,12 @@ class DatesWidget(UGroupBox):
 
 class WinFiltersUserTag(UTagWidget):
 	def __init__(self, text: str, l_svg: Path):
-		super().__init__(
-			text=text,
-			style=UTagWidget.qss_gray,
-			l_svg=l_svg,
-			r_svg=Static.GRAY_ICONS / "trash_gray.svg"
-		)
+		super().__init__(text, l_svg, Static.GRAY_ICONS / "trash_gray.svg")
 
 
 class WinFiltersStantartTag(UTagWidget):
 	def __init__(self, text: str, l_svg: Path):
-		super().__init__(
-			text=text,
-			style=self.qss_gray,
-			l_svg=l_svg
-		)
+		super().__init__(text, l_svg)
 
 
 class WinFiltersFavTag(WinFiltersStantartTag):
@@ -334,11 +322,8 @@ class WordFiltersTagWidget(WinFiltersUserTag):
 
 class AddTagWidget(UTagWidget):
 	def __init__(self):
-		super().__init__(
-			text=Lng.new_tag,
-			style=self.qss_transparent,
-			l_svg=Static.GRAY_ICONS / "crest_gray.svg"
-		)
+		super().__init__(Lng.new_tag, Static.GRAY_ICONS / "crest_gray.svg")
+		self.set_qss_style(self.qss_transparent)
 		self.left_svg_widget.setFixedSize(10, 10)
 
 
@@ -469,7 +454,7 @@ class TagsWidget(UGroupBox):
 		Dynamic.no_subfolders_tag_enabled = False
 		Dynamic.word_tags_list.clear()
 		for i in self.findChildren(UTagWidget)[:-1]:
-			i.set_qss_style(UTagWidget.qss_gray)
+			i.set_qss_style(i.qss_gray)
 		if with_sig:
 			self.load_st_grid.emit()
 
