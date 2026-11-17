@@ -146,7 +146,7 @@ class WinImgSearchDropWidget(TransparentFrame):
 		self.v_layout.setSpacing(10)
 		self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "image_icon_gray.svg"))
+		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "image.svg"))
 		self.svg_widget.setFixedSize(50, 50)
 
 		self.v_layout.addWidget(
