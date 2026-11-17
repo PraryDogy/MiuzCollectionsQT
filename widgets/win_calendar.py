@@ -244,7 +244,7 @@ class WinCalendar(UMainWindow):
 		self.central_layout.addWidget(self.btn_container)
 		self.btn_container_layout = QHBoxLayout(self.btn_container)
 		self.btn_container_layout.setContentsMargins(0, 0, 0, 0)
-		self.btn_container_layout.setSpacing(10)
+		self.btn_container_layout.setSpacing(5)
 		self.btn_container_layout.addStretch(1)
 
 		cancel_btn = UPushButton(Lng.cancel)

@@ -64,7 +64,7 @@ class WinTextSearch(UMainWindow):
 
 		btns_layout = QHBoxLayout(self.btns_container)
 		btns_layout.setContentsMargins(0, 0, 0, 0)
-		btns_layout.setSpacing(10)
+		btns_layout.setSpacing(5)
 
 		self.format_button = UPushButton(Lng.enhance_text)
 		self.format_button.clicked.connect(self.format_input_text)

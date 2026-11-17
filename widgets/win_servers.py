@@ -206,7 +206,7 @@ class LoginWin(UMainWindow):
 		# --- Кнопки ---
 		btn_layout = QHBoxLayout()
 		btn_layout.setContentsMargins(0, 0, 0, 0)
-		btn_layout.setSpacing(10)
+		btn_layout.setSpacing(5)
 		self.central_layout.addLayout(btn_layout)
 
 		btn_layout.addStretch()
@@ -300,7 +300,7 @@ class ServersWin(UMainWindow):
 		# --- Кнопки ---
 		btn_layout = QHBoxLayout()
 		btn_layout.setContentsMargins(0, 0, 0, 0)
-		btn_layout.setSpacing(10)
+		btn_layout.setSpacing(5)
 		self.central_layout.addLayout(btn_layout)
 
 		self.add_btn = UPushButton(Lng.add)

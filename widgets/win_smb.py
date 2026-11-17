@@ -53,7 +53,7 @@ class WinSmb(UMainWindow):
 		self.central_layout.addWidget(btns_wid)
 		btns_lay = QHBoxLayout(btns_wid)
 		btns_lay.setContentsMargins(0, 0, 0, 0)
-		btns_lay.setSpacing(10)
+		btns_lay.setSpacing(5)
 
 		if Servers.items:
 

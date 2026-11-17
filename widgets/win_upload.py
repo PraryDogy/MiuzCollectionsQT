@@ -122,7 +122,7 @@ class UploadWin(UMainWindow):
 		self.central_layout.addWidget(self.button_widget)
 		self.button_layout = QHBoxLayout(self.button_widget)
 		self.button_layout.setContentsMargins(0, 0, 0, 0)
-		self.button_layout.setSpacing(10)
+		self.button_layout.setSpacing(5)
 
 		self.button_layout.addStretch()
 

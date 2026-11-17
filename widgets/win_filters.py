@@ -499,7 +499,7 @@ class WinFilters(UMainWindow):
 		self.central_layout.addWidget(buttons_widget)
 		self.buttons_layout = QHBoxLayout(buttons_widget)
 		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
-		self.buttons_layout.setSpacing(10)
+		self.buttons_layout.setSpacing(5)
 
 		self.reset_all_button = UPushButton(Lng.reset_all)
 		self.reset_all_button.clicked.connect(self.reset_all_cmd)
