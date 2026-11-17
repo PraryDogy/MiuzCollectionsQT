@@ -1252,7 +1252,6 @@ class SuperConfirmWindow(ConfirmWindow):
 
 class InputTextWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
-	cancel_clicked = pyqtSignal()
 
 	def __init__(self, description: str, svg: Path = None):
 		super().__init__()
@@ -1292,16 +1291,19 @@ class InputTextWin(UMainWindow):
 
 		btn_layout = QHBoxLayout(btn_widget)
 		btn_layout.setContentsMargins(0, 0, 0, 0)
-		btn_layout.setSpacing(10)
+		btn_layout.setSpacing(5)
+
+		reset_btn = UPushButton(Lng.reset)
+		reset_btn.clicked.connect(self.line_edit_widget.clear)
+		btn_layout.addWidget(reset_btn)
 
 		btn_layout.addStretch()
 
-		self.cancel_btn = UPushButton(Lng.cancel)
-		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
+		self.cancel_btn = UPushButton(Lng.close)
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		btn_layout.addWidget(self.cancel_btn)
 
-		self.ok_btn = ActiveButton(Lng.confirm)
+		self.ok_btn = ActiveButton(Lng.apply)
 		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
 		btn_layout.addWidget(self.ok_btn)
 

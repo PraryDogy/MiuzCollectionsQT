@@ -298,7 +298,7 @@ class SubfoldersTag(TagWidget):
 
 class WordTag(TagWidget):
 	def __init__(self, text: str, pending: PendingTagsState):
-		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg")
+		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg", Static.GRAY_ICONS / "trash_gray.svg")
 		self.pending = pending
 		self.word = text
 		self.clicked.connect(self.toggle_word_tag)
@@ -378,6 +378,7 @@ class UserTags(TransparentWidget):
 			description=Lng.new_tag_desc,
 			svg=Static.GRAY_ICONS / "tags_gray.svg"
 		)
+		self.text_win.setWindowTitle(Lng.new_tag)
 		self.text_win.center_to_parent(self.window())
 		self.text_win.ok_clicked.connect(ok_clicked)
 		self.text_win.show()
