@@ -563,37 +563,32 @@ class TagsWidget(TransparentWidget):
 		if Dynamic.img_search_thumb_paths:
 			tag = GridImgSearchTag()
 			tag.right_svg_clicked.connect(self.clear_img_search.emit)
-			tag.text_clicked.connect(self.open_img_search.emit)
-			tag.left_svg_clicked.connect(self.open_img_search.emit)
+			tag.clicked.connect(self.open_img_search.emit)
 			self.flow_layout.addWidget(tag)
 
 		if Dynamic.favs_tag_enabled:
 			tag = GridFavTag()
 			tag.right_svg_clicked.connect(self.load_st_grid.emit)
-			tag.text_clicked.connect(self.open_filters_win.emit)
-			tag.left_svg_clicked.connect(self.open_filters_win.emit)
+			tag.clicked.connect(self.open_filters_win.emit)
 			self.flow_layout.addWidget(tag)
 
 		if Dynamic.no_subfolders_tag_enabled:
 			tag = GridNoSubfoldersTag()
 			tag.right_svg_clicked.connect(self.load_st_grid.emit)
-			tag.text_clicked.connect(self.open_filters_win.emit)
-			tag.left_svg_clicked.connect(self.open_filters_win.emit)
+			tag.clicked.connect(self.open_filters_win.emit)
 			self.flow_layout.addWidget(tag)
 
 		if Dynamic.py_date_start or Dynamic.py_date_end:
 			tag = GridDatesTag()
 			tag.right_svg_clicked.connect(self.load_st_grid.emit)
-			tag.text_clicked.connect(self.open_filters_win.emit)
-			tag.left_svg_clicked.connect(self.open_filters_win.emit)
+			tag.clicked.connect(self.open_filters_win.emit)
 			self.flow_layout.addWidget(tag)
 
 		if Dynamic.word_tags_list:
 			for word in Dynamic.word_tags_list:
 				tag = GridWordTag(word)
 				tag.right_svg_clicked.connect(self.load_st_grid.emit)
-				tag.text_clicked.connect(self.open_filters_win.emit)
-				tag.left_svg_clicked.connect(self.open_filters_win.emit)
+				tag.clicked.connect(self.open_filters_win.emit)
 				self.flow_layout.addWidget(tag)
 
 	def hasHeightForWidth(self):
