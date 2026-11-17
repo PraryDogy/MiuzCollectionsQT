@@ -288,7 +288,7 @@ class WinImgSearch(UMainWindow):
 		header_layout.setContentsMargins(0, 0, 0, 0)
 		header_layout.setSpacing(5)
 
-		self.title_widget = TitleTextWidget(Lng.image_search)
+		self.title_widget = TitleTextWidget(Lng.image_search, Static.GRAY_ICONS / "camera_gray.svg")
 		header_layout.addWidget(self.title_widget)
 
 		header_layout.addWidget(USep())
@@ -332,7 +332,7 @@ class WinImgSearch(UMainWindow):
 		self.close_button.clicked.connect(self.request_close)
 		btn_layout.addWidget(self.close_button)
 
-		self.start_btn = ActiveButton(Lng.search)
+		self.start_btn = ActiveButton(Lng.find_matches)
 		self.start_btn.setIcon(self.magnifier_icon)
 		self.start_btn.clicked.connect(self.search_cmd)
 		btn_layout.addWidget(self.start_btn)
