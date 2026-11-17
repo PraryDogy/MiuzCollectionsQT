@@ -65,7 +65,7 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		self.attention_icon = TagWidget(Lng.unsaved_changes, Static.GRAY_ICONS / "attention_gray.svg")
+		self.attention_icon = TagWidget(Lng.unsaved_changes, Static.GRAY_ICONS / "attention_gray.svg", max_text_width=210)
 		self.attention_icon.set_qss_style(self.attention_icon.qss_yellow)
 		self.h_lay.addWidget(self.attention_icon)
 
