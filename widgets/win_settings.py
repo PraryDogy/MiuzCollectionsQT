@@ -598,11 +598,11 @@ class MfRepairWin(UMainWindow):
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
 		self.h_lay.setSpacing(10)
 
-		small_repair = MfRepairGroup("Простой сброс", "Будет заново просканирован весь каталог. Подойдет, если каких-то изображений не хватает.")
+		small_repair = MfRepairGroup(Lng.rescan_folder_title, Lng.rescan_folder_description)
 		small_repair.clicked.connect(self.simple_repair_clicked.emit)
 		self.h_lay.addWidget(small_repair)
 
-		big_repair = MfRepairGroup("Полный сброс", "Будут удалены и заново добавлены все кешированные изображения. Подойдет при серьезных ошибках.")
+		big_repair = MfRepairGroup(Lng.reset_cache_title, Lng.reset_cache_description)
 		big_repair.clicked.connect(self.full_repair_clicked.emit)
 		self.h_lay.addWidget(big_repair)
 
