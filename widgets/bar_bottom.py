@@ -11,7 +11,7 @@ from system.lang import Lng
 from system.scaner import ScanProgress
 from system.utils import ImageReader
 
-from ._base_widgets import TransparentWidget, USep, USlider, UTagWidget, TransparentLabel
+from ._base_widgets import TransparentWidget, USep, USlider, TagWidget, TransparentLabel
 
 # =============================================================================
 # ПУТЬ (бывший bar_path.py)
@@ -151,7 +151,7 @@ class ProgressWidget(TransparentWidget):
 		self.h_layout.addWidget(self.status_label)
 
 
-		self.tag_widget = UTagWidget()
+		self.tag_widget = TagWidget()
 		self.tag_widget.set_qss_style(self.tag_widget.qss_transparent)
 		self.h_layout.addWidget(self.tag_widget)
 		self.tag_widget.hide()

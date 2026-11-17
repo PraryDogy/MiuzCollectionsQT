@@ -13,7 +13,7 @@ from system.lang import Lng
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             InputTextWin, TitleTextWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
-                            UPushButton, USep, UTagWidget)
+                            UPushButton, USep, TagWidget)
 from .win_calendar import WinCalendar
 
 
@@ -28,7 +28,7 @@ class WinFiltersTitleWidget(TitleTextWidget):
 		self.h_layout.addWidget(self.reset_button)
 
 
-class CalendarTag(UTagWidget):
+class CalendarTag(TagWidget):
 	def __init__(self):
 		super().__init__(Lng.not_selected)
 		self.adjustSize()
@@ -253,39 +253,43 @@ class DatesWidget(UGroupBox):
 		self.handle_preset_change()
 
 
-class WinFiltersFavTag(UTagWidget):
+class FavTag(TagWidget):
 	def __init__(self):
 		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star_gray.svg")
 		self.clicked.connect(self.toggle_fav)
 		if Dynamic.favs_tag_enabled:
 			self.set_qss_style(self.qss_green)
 
+		self.favs_tag_enabled = Dynamic.favs_tag_enabled
+
 	def toggle_fav(self, *args):
-		if Dynamic.favs_tag_enabled:
+		if self.favs_tag_enabled:
 			self.set_qss_style(self.qss_gray)
-			Dynamic.favs_tag_enabled = False
+			self.favs_tag_enabled = False
 		else:
 			self.set_qss_style(self.qss_green)
-			Dynamic.favs_tag_enabled = True
+			self.favs_tag_enabled = True
 
 
-class SubfoldersTagWidget(UTagWidget):
+class SubfoldersTag(TagWidget):
 	def __init__(self):
 		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder_gray.svg")
 		self.clicked.connect(self.toggle_subfolders)
 		if Dynamic.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_green)
 
+		self.no_subfolders_tag_enabled = Dynamic.no_subfolders_tag_enabled
+
 	def toggle_subfolders(self, *args):
-		if Dynamic.no_subfolders_tag_enabled:
+		if self.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_gray)
-			Dynamic.no_subfolders_tag_enabled = False
+			self.no_subfolders_tag_enabled = False
 		else:
 			self.set_qss_style(self.qss_green)
-			Dynamic.no_subfolders_tag_enabled = True
+			self.no_subfolders_tag_enabled = True
 
 
-class WordFiltersTagWidget(UTagWidget):
+class WordTag(TagWidget):
 	def __init__(self, text):
 		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg")
 		self.clicked.connect(self.toggle_word_tag)
@@ -302,7 +306,7 @@ class WordFiltersTagWidget(UTagWidget):
 		return super().text_widget_cmd(*args)
 
 
-class AddTagWidget(UTagWidget):
+class AddTag(TagWidget):
 	def __init__(self):
 		super().__init__(Lng.new_tag, Static.GRAY_ICONS / "crest_gray.svg")
 		self.set_qss_style(self.qss_transparent)
@@ -320,11 +324,11 @@ class StandartTags(TransparentWidget):
 		self._create_tags()
 
 	def _create_tags(self):
-		tag = WinFiltersFavTag()
-		self.flow_layout.addWidget(tag)
+		self.fav_tag = FavTag()
+		self.flow_layout.addWidget(self.fav_tag)
 
-		tag = SubfoldersTagWidget()
-		self.flow_layout.addWidget(tag)
+		self.subfolders_tag = SubfoldersTag()
+		self.flow_layout.addWidget(self.subfolders_tag)
 
 
 class UserTags(TransparentWidget):
@@ -343,11 +347,11 @@ class UserTags(TransparentWidget):
 
 	def _create_tags(self):
 		for word in Filters.items:
-			tag = WordFiltersTagWidget(word)
+			tag = WordTag(word)
 			tag.right_svg_clicked.connect(lambda w=tag: self.show_remove_tag_win(w))
 			self.flow_layout.addWidget(tag)
 
-		self.add_tag = AddTagWidget()
+		self.add_tag = AddTag()
 		self.add_tag.clicked.connect(self.show_text_win)
 		self.flow_layout.addWidget(self.add_tag)
 
@@ -368,7 +372,7 @@ class UserTags(TransparentWidget):
 		self.text_win.ok_clicked.connect(ok_clicked)
 		self.text_win.show()
 
-	def show_remove_tag_win(self, widget: WordFiltersTagWidget):
+	def show_remove_tag_win(self, widget: WordTag):
 
 		def ok_clicked():
 			text = widget.text_widget.text() 
@@ -430,7 +434,7 @@ class TagsWidget(UGroupBox):
 		Dynamic.favs_tag_enabled = False
 		Dynamic.no_subfolders_tag_enabled = False
 		Dynamic.word_tags_list.clear()
-		for i in self.findChildren(UTagWidget)[:-1]:
+		for i in self.findChildren(TagWidget)[:-1]:
 			i.set_qss_style(i.qss_gray)
 		if with_sig:
 			self.load_st_grid.emit()
@@ -500,6 +504,9 @@ class WinFilters(UMainWindow):
 		return False
 
 	def apply_cmd(self):
+		Dynamic.favs_tag_enabled = self.tags_widget.standart_tags.fav_tag.favs_tag_enabled
+		Dynamic.no_subfolders_tag_enabled = self.tags_widget.standart_tags.subfolders_tag.no_subfolders_tag_enabled
+
 		if self.filters_enabled() or self.dates_enabled():
 			self.load_st_grid.emit()
 		self.deleteLater()

@@ -26,7 +26,7 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, HoverGroupBox,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton,
-                            UScrollVerticalArea, USep, USpinBox, UTagWidget,
+                            UScrollVerticalArea, USep, USpinBox, TagWidget,
                             WarningWindow)
 
 
@@ -65,7 +65,7 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		self.attention_icon = UTagWidget(Lng.unsaved_changes, Static.GRAY_ICONS / "attention_gray.svg")
+		self.attention_icon = TagWidget(Lng.unsaved_changes, Static.GRAY_ICONS / "attention_gray.svg")
 		self.attention_icon.set_qss_style(self.attention_icon.qss_yellow)
 		self.h_lay.addWidget(self.attention_icon)
 

@@ -911,7 +911,7 @@ class TitleTextWidget(TransparentWidget):
 
 
 # если переименовываешь, не забудь qss
-class UTagWidget(TransparentFrame):
+class TagWidget(TransparentFrame):
 	right_svg_clicked = pyqtSignal()
 	clicked = pyqtSignal()
 

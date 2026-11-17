@@ -87,7 +87,7 @@ USpinBox::down-button,
 USep,
 UCheckBox,
 UCheckBox::indicator,
-UTagWidget,
+TagWidget,
 UpBtnLabel,
 ImgViewSvg,
 USvgWidgetBg {
@@ -300,7 +300,7 @@ UTreeView::item,
 UListWidget::item,
 UTreeWidget::item,
 UMenu::item,
-UTagWidget {
+TagWidget {
     color: #ffffff;
 }
 
@@ -334,32 +334,32 @@ ActiveButton:pressed {
    2.7 ТЕГИ
    --------------------------------------------------------------------- */
 
-UTagWidget[style="blue"] {
+TagWidget[style="blue"] {
     background: #0059d1;
     border: 1px solid #156ee3;
 }
 
-UTagWidget[style="gray"] {
+TagWidget[style="gray"] {
     background: #303b46;
     border: 1px solid #3d4a56;
 }
 
-UTagWidget[style="green"] {
+TagWidget[style="green"] {
     background: #064e3b;
     border: 1px solid #10b981;
 }
 
-UTagWidget[style="yellow"] {
+TagWidget[style="yellow"] {
     background: #3a2c12;
     border: 1px solid #6b5420;
 }
 
-UTagWidget[style="red"] {
+TagWidget[style="red"] {
     background: #7f1d1d;
     border: 1px solid #ef4444;
 }
 
-UTagWidget[style="transparent"] {
+TagWidget[style="transparent"] {
     border: 1px solid #30404f;
 }
 
@@ -423,7 +423,7 @@ ThumbImgWidget {
     border-radius: 6px;
 }
 
-UTagWidget {
+TagWidget {
     border-radius: 12px;
 }
 

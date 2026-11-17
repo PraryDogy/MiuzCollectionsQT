@@ -19,7 +19,7 @@ from system.utils import Utils
 
 from ._base_widgets import (FlowLayout, TransparentFrame,
                             TransparentLabel, TransparentWidget, UMenu,
-                            UPushButton, UScrollVerticalArea, USep, UTagWidget)
+                            UPushButton, UScrollVerticalArea, USep, TagWidget)
 from .actions import (CollageAction, CopyFiles, CopyPath, GoToThumbnail,
                       OpenInView, PasteFiles, RemoveFiles, RevealInFinder,
                       Save, ScanerRestart, SetFav, UpdateThumbAction,
@@ -481,7 +481,7 @@ class GridControlsWidget(TransparentWidget):
 		self.v_lay.addStretch()
 
 
-class GridTag(UTagWidget):
+class GridTag(TagWidget):
 	def __init__(self, text, l_svg):
 		super().__init__(text, l_svg, Static.GRAY_ICONS / "cancel_solid_gray.svg")
 		self.set_qss_style(self.qss_green)
