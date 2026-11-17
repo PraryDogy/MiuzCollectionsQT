@@ -320,7 +320,7 @@ class UpBtn(TransparentWidget):
 		self.label = UpBtnLabel()
 
 		# 2. Фиксированная SVG-иконка
-		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "arrow_up_gray.svg"), self)
+		self.svg_widget = QSvgWidget(str(Static.GRAY_ICONS / "arrow_up.svg"), self)
 		self.svg_widget.setFixedSize(20, 20)
 		self.svg_widget.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
@@ -353,7 +353,7 @@ class GridModeWidget(UPushButton):
 		current = JsonData.square_thumbs
 		super().__init__(self.MODES[current])
 
-		self.setIcon(QIcon(str(Static.GRAY_ICONS / "view_mode_gray.svg")))
+		self.setIcon(QIcon(str(Static.GRAY_ICONS / "view_mode.svg")))
 
 		self.menu_ = UMenu(parent=self)
 		self.setMenu(self.menu_)
@@ -389,7 +389,7 @@ class GridSortWidget(TransparentWidget):
 	def __init__(self):
 		super().__init__()
 
-		self.sort_icon = QIcon(str(Static.GRAY_ICONS / "sort_gray.svg"))
+		self.sort_icon = QIcon(str(Static.GRAY_ICONS / "sort.svg"))
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
@@ -439,7 +439,7 @@ class GridFiltersWidget(TransparentWidget):
 	def __init__(self):
 		super().__init__()
 
-		self.sort_icon = QIcon(str(Static.GRAY_ICONS / "filters_gray.svg"))
+		self.sort_icon = QIcon(str(Static.GRAY_ICONS / "filters.svg"))
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
@@ -483,7 +483,7 @@ class GridControlsWidget(TransparentWidget):
 
 class GridTag(TagWidget):
 	def __init__(self, text, l_svg):
-		super().__init__(text, l_svg, Static.GRAY_ICONS / "cancel_solid_gray.svg")
+		super().__init__(text, l_svg, Static.GRAY_ICONS / "cancel_solid.svg")
 		self.set_qss_style(self.qss_green)
 		self.right_svg_widget.setFixedSize(12, 12)
 		self.right_svg_lay.setContentsMargins(0, 1, 0, 0)
@@ -491,7 +491,7 @@ class GridTag(TagWidget):
 
 class GridDatesTag(GridTag):
 	def __init__(self):
-		super().__init__(DatesWidget.readable_date, Static.GRAY_ICONS / "calendar_gray.svg")
+		super().__init__(DatesWidget.readable_date, Static.GRAY_ICONS / "calendar.svg")
 		self.right_svg_clicked.connect(self.reset_dates)
 		self.text_widget.setMaximumWidth(250)
 
@@ -502,7 +502,7 @@ class GridDatesTag(GridTag):
 
 class GridWordTag(GridTag):
 	def __init__(self, text):
-		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg")
+		super().__init__(text, Static.GRAY_ICONS / "tags.svg")
 		self.right_svg_clicked.connect(self.remove_word_tag)
 
 	def remove_word_tag(self, *args):
@@ -511,7 +511,7 @@ class GridWordTag(GridTag):
 
 class GridFavTag(GridTag):
 	def __init__(self):
-		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star_gray.svg")
+		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star.svg")
 		self.right_svg_clicked.connect(self.disable_fav_tag)
 
 	def disable_fav_tag(self):
@@ -520,7 +520,7 @@ class GridFavTag(GridTag):
 
 class GridNoSubfoldersTag(GridTag):
 	def __init__(self):
-		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder_gray.svg")
+		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder.svg")
 		self.right_svg_clicked.connect(self.disable_subfolders_tag)
 
 	def disable_subfolders_tag(self, *args):
@@ -529,12 +529,12 @@ class GridNoSubfoldersTag(GridTag):
 
 class GridTextSearchTag(GridTag):
 	def __init__(self):
-		super().__init__(", ".join(Dynamic.search_words_list), Static.GRAY_ICONS / "folder_gray.svg")
+		super().__init__(", ".join(Dynamic.search_words_list), Static.GRAY_ICONS / "folder.svg")
 
 
 class GridImgSearchTag(GridTag):
 	def __init__(self):
-		super().__init__(Lng.image_search, Static.GRAY_ICONS / "folder_gray.svg")
+		super().__init__(Lng.image_search, Static.GRAY_ICONS / "folder.svg")
 
 
 
@@ -1423,7 +1423,7 @@ class GridStandart(Grid):
 			self.icon_wid.load(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
 			self._empty_lbl.setText(Lng.folder_in_ignore_list)
 		else:
-			self.icon_wid.load(str(Static.GRAY_ICONS / "image_icon_gray.svg"))
+			self.icon_wid.load(str(Static.GRAY_ICONS / "image_icon.svg"))
 			self._empty_lbl.setText(Lng.no_photo)
 		self._empty_container.adjustSize()
 		self._place_empty_state()

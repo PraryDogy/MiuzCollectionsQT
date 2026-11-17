@@ -125,7 +125,7 @@ class WinCalendar(UMainWindow):
 		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
 		self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
-		qimg = QImage(str(Static.GRAY_ICONS / "circle_gray.svg"))
+		qimg = QImage(str(Static.GRAY_ICONS / "circle.svg"))
 		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
 		self.gray_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
@@ -168,7 +168,7 @@ class WinCalendar(UMainWindow):
 		dynamic_container_lay.addWidget(self.dynamic_label)
 		dynamic_container_lay.addStretch(1)
 
-		reset_icon = QIcon(str(Static.GRAY_ICONS / "cancel_solid_gray.svg"))
+		reset_icon = QIcon(str(Static.GRAY_ICONS / "cancel_solid.svg"))
 		self.reset_button = UPushButton(Lng.reset)
 		self.reset_button.clicked.connect(self.reset_button_cmd)
 		self.reset_button.setIcon(reset_icon)
@@ -187,7 +187,7 @@ class WinCalendar(UMainWindow):
 		self.nav_layout.setSpacing(0)
 		self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-		self.btn_prev = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_left_gray.svg"))
+		self.btn_prev = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_left.svg"))
 		self.btn_prev.setFixedSize(*self.svg_nav_size)
 		self.btn_prev.clicked.connect(self.prev_month)
 		self.nav_layout.addWidget(self.btn_prev)
@@ -207,7 +207,7 @@ class WinCalendar(UMainWindow):
 		self.nav_layout.addWidget(self.btn_year)
 		self.nav_layout.addStretch()
 
-		self.btn_next = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.btn_next = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_right.svg"))
 		self.btn_next.setFixedSize(*self.svg_nav_size)
 		self.btn_next.clicked.connect(self.next_month)
 		self.nav_layout.addWidget(self.btn_next)

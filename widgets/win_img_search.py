@@ -32,7 +32,7 @@ class ProgressWin(UMainWindow):
 		self.set_close_only()
 		self.setWindowTitle(Lng.progress)
 
-		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square_gray.svg"))
+		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square.svg"))
 
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 10, 10, 10)
@@ -44,7 +44,7 @@ class ProgressWin(UMainWindow):
 		self.text_layout.setContentsMargins(5, 0, 5, 0)
 		self.text_layout.setSpacing(10)
 
-		self.svg_icon = QSvgWidget(str(Static.GRAY_ICONS / "image_icon_gray.svg")) 
+		self.svg_icon = QSvgWidget(str(Static.GRAY_ICONS / "image_icon.svg")) 
 		self.svg_icon.setFixedSize(28, 28)
 		self.text_layout.addWidget(self.svg_icon)
 
@@ -265,7 +265,7 @@ class WinImgSearch(UMainWindow):
 		self.shm = None
 		self.progress_win = None
 		self.read_img_poll_ms = 300
-		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg"))
+		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier.svg"))
 
 		self.found_image_timer = QTimer(self)
 		self.found_image_timer.setSingleShot(True)

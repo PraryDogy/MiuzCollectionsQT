@@ -35,7 +35,7 @@ class ServerListItem(UListWidgetItem):
 
 class EyeSvg(QSvgWidget):
 	def __init__(self):
-		super().__init__(str(Static.GRAY_ICONS / "eye_off_gray.svg"))
+		super().__init__(str(Static.GRAY_ICONS / "eye_off.svg"))
 		self.setFixedSize(16, 16)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 	
@@ -132,10 +132,10 @@ class PassLineEdit(ULineEdit):
 	def show_hide_pass(self, *args):
 		if self.echoMode() == ULineEdit.EchoMode.Password:
 			self.setEchoMode(ULineEdit.EchoMode.Normal)
-			self.eye_svg.load(str(Static.GRAY_ICONS / "eye_on_gray.svg"))
+			self.eye_svg.load(str(Static.GRAY_ICONS / "eye_on.svg"))
 		else:
 			self.setEchoMode(ULineEdit.EchoMode.Password)
-			self.eye_svg.load(str(Static.GRAY_ICONS / "eye_off_gray.svg"))
+			self.eye_svg.load(str(Static.GRAY_ICONS / "eye_off.svg"))
 
 
 class ServerLabel(TransparentLabel):
@@ -273,7 +273,7 @@ class ServersWin(UMainWindow):
 		group_lay = QVBoxLayout(group)
 		group_lay.setContentsMargins(12, 12, 12, 12)
 		group_lay.setSpacing(8)
-		title_lbl = TitleTextWidget(Lng.favorite_servers, Static.COLOR_ICONS / "connect_color.svg")
+		title_lbl = TitleTextWidget(Lng.favorite_servers, Static.COLOR_ICONS / "connections.svg")
 		group_lay.addWidget(title_lbl)
 
 		group_lay.addWidget(USep())
@@ -303,7 +303,7 @@ class ServersWin(UMainWindow):
 		self.central_layout.addLayout(btn_layout)
 
 		self.add_btn = UPushButton(Lng.add)
-		self.add_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
+		self.add_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest.svg")))
 		self.add_btn.setIconSize(QSize(10, 10))
 		self.add_btn.clicked.connect(self.show_login_win)
 		btn_layout.addWidget(self.add_btn)

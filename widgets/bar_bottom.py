@@ -107,7 +107,7 @@ class PathBar(TransparentWidget):
 		last_item = path_items.get(len(root))
 		if dir.endswith(ImageReader.ext_all):
 			last_item.img_wid.load(
-				str(Static.GRAY_ICONS / "image_icon_gray.svg")
+				str(Static.GRAY_ICONS / "image_icon.svg")
 			)
 
 		text_ = last_item.text_wid.text()
@@ -312,7 +312,7 @@ class BarBottom(TransparentWidget):
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 		self.v_layout.addWidget(bottom)
 
-		self.progress_svg = QSvgWidget(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+		self.progress_svg = QSvgWidget(str(Static.GRAY_ICONS / "arrow_terminal.svg"))
 		self.progress_svg.setFixedSize(12, 12)
 		self.h_layout.addWidget(self.progress_svg)
 
@@ -321,7 +321,7 @@ class BarBottom(TransparentWidget):
 		# --- Прогресс: растягивается, когда выделение скрыто ---
 		self.progress_widget = ProgressWidget()
 		self.progress_widget.set_arrow_terminal.connect(
-			lambda: self.progress_svg.load(str(Static.GRAY_ICONS / "arrow_terminal_gray.svg"))
+			lambda: self.progress_svg.load(str(Static.GRAY_ICONS / "arrow_terminal.svg"))
 		)
 		self.progress_widget.set_warning.connect(
 			lambda: self.progress_svg.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))

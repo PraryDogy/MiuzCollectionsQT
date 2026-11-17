@@ -33,11 +33,11 @@ class SearchWidBaseSvg(QSvgWidget):
 
 
 class SearchWidClearSvg(SearchWidBaseSvg):
-	icon_path = Static.GRAY_ICONS / "cancel_solid_gray.svg"
+	icon_path = Static.GRAY_ICONS / "cancel_solid.svg"
 
 
 class SearchWidTextSearchSvg(SearchWidBaseSvg):
-	icon_path = Static.GRAY_ICONS / "text_edit_gray.svg" 
+	icon_path = Static.GRAY_ICONS / "text_edit.svg" 
 
 
 class SearchWidLineEdit(ULineEdit):
@@ -212,7 +212,7 @@ class BarTop(TransparentFrame):
 		self.h_layout.addStretch()
 
 		# --- Кнопка поиска по картинке ---
-		self.img_search_btn = USvgWidgetBg(Static.GRAY_ICONS / "camera_gray.svg", 28, 14)
+		self.img_search_btn = USvgWidgetBg(Static.GRAY_ICONS / "camera.svg", 28, 14)
 		self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
 		self.h_layout.addWidget(self.img_search_btn)
 
@@ -230,14 +230,14 @@ class BarTop(TransparentFrame):
 		self.h_layout.addStretch(0)
 
 		# --- Кнопка подключения к серверам ---
-		self.connect_btn = USvgWidgetBg(Static.GRAY_ICONS / "connections_gray.svg", 28, 14)
+		self.connect_btn = USvgWidgetBg(Static.GRAY_ICONS / "connections.svg", 28, 14)
 		self.connect_btn.clicked_.connect(self.open_server_window)
 		self.h_layout.addWidget(self.connect_btn)
 
 		self.h_layout.addSpacing(5)
 
 		# --- Кнопка настроек ---
-		self.settings_btn = USvgWidgetBg(Static.GRAY_ICONS / "settings_gray.svg", 28, 14)
+		self.settings_btn = USvgWidgetBg(Static.GRAY_ICONS / "settings.svg", 28, 14)
 		self.settings_btn.clicked_.connect(self.open_settings_win.emit)
 		self.h_layout.addWidget(self.settings_btn)
 

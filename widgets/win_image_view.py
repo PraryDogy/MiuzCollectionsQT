@@ -201,13 +201,13 @@ class ZoomWidget(ImgViewSvg):
 class PrevButton(ImgViewSvg):
 	def __init__(self) -> None:
 		super().__init__()
-		self.load(str(Static.GRAY_ICONS / "arrow_left_solid_gray.svg"))
+		self.load(str(Static.GRAY_ICONS / "arrow_left_solid.svg"))
 
 
 class NextButton(ImgViewSvg):
 	def __init__(self) -> None:
 		super().__init__()
-		self.load(str(Static.GRAY_ICONS / "arrow_right_solid_gray.svg"))
+		self.load(str(Static.GRAY_ICONS / "arrow_right_solid.svg"))
 
 
 class WinImageView(UMainWindow):

@@ -24,8 +24,8 @@ class WinTextSearch(UMainWindow):
 		self.setFixedSize(380, 330)
 		self.setWindowTitle(Lng.search_window)
 
-		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg"))
-		self.wand_icon = QIcon(str(Static.GRAY_ICONS / "wand_gray.svg"))
+		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier.svg"))
+		self.wand_icon = QIcon(str(Static.GRAY_ICONS / "wand.svg"))
 
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)

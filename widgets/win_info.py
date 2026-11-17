@@ -36,7 +36,7 @@ class CopyPathButton(UPushButton):
 
 	def __init__(self):
 		super().__init__(Lng.copy_dirpath)
-		self.copy_qicon = QIcon(str(Static.GRAY_ICONS / "copy_gray.svg"))
+		self.copy_qicon = QIcon(str(Static.GRAY_ICONS / "copy.svg"))
 		self.green_qicon = QIcon(str(Static.COLOR_ICONS / "green_checkmark.svg"))
 		self.is_locked = False
 		self.setIcon(self.copy_qicon)

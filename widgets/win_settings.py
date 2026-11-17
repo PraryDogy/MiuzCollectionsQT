@@ -57,7 +57,7 @@ class SaveRowWidget(TransparentWidget):
 		self.h_lay.setSpacing(5)
 
 		self.new_catalog_btn = UPushButton(Lng.new_catalog)
-		self.new_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest_gray.svg")))
+		self.new_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest.svg")))
 		self.new_catalog_btn.setIconSize(QSize(10, 10))
 		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
 		self.new_catalog_btn.setVisible(show_new_catalog)
@@ -65,7 +65,7 @@ class SaveRowWidget(TransparentWidget):
 
 		self.h_lay.addStretch()
 
-		self.attention_icon = TagWidget(Lng.unsaved_changes, Static.GRAY_ICONS / "attention_gray.svg", max_text_width=210)
+		self.attention_icon = TagWidget(Lng.unsaved_changes, Static.GRAY_ICONS / "attention.svg", max_text_width=210)
 		self.attention_icon.set_qss_style(self.attention_icon.qss_yellow)
 		self.h_lay.addWidget(self.attention_icon)
 
@@ -655,7 +655,7 @@ class MfRepairWidget(HoverGroupBox):
 		content_lay.addWidget(descr)
 
 		# правая часть: кнопка запуска, по центру по вертикали
-		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
 		self.start_btn.setFixedSize(15, 15)
 
 		main_lay.addWidget(content, 1)
@@ -687,7 +687,7 @@ class MfRemoveWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(7)
 
-		title_widget = TitleTextWidget(Lng.remove_folder, Static.GRAY_ICONS / "trash_gray.svg")
+		title_widget = TitleTextWidget(Lng.remove_folder, Static.COLOR_ICONS / "red_trash.svg")
 		content_lay.addWidget(title_widget)
 
 		descr = TransparentLabel(Lng.catalog_delete_warning)
@@ -696,7 +696,7 @@ class MfRemoveWidget(HoverGroupBox):
 		content_lay.addWidget(descr)
 
 		# правая часть: кнопка запуска, по центру по вертикали
-		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
 		self.start_btn.setFixedSize(15, 15)
 
 		main_lay.addWidget(content, 1)
@@ -901,7 +901,7 @@ class MfStopListWidget(HoverGroupBox):
 		content_lay.addWidget(description)
 
 		# правая часть: кнопка открытия списка, по центру по вертикали
-		self.add_button = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.add_button = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
 		self.add_button.setFixedSize(15, 15)
 
 		main_lay.addWidget(content)

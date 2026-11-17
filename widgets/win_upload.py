@@ -39,7 +39,7 @@ class DestinyFolderWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(5)
 
-		self.title_label = TitleTextWidget(Lng.upload_files, Static.GRAY_ICONS / "folder_gray.svg")
+		self.title_label = TitleTextWidget(Lng.upload_files, Static.GRAY_ICONS / "folder.svg")
 		content_lay.addWidget(self.title_label)
 
 		description = TransparentLabel(self.get_plural_text(len(files_to_copy)) + "\n" + Lng.upload_files_description)
@@ -60,7 +60,7 @@ class DestinyFolderWidget(HoverGroupBox):
 		self.setToolTip(self.current_dir)
 
 		# правая часть: стрелка по центру по вертикали
-		self.change_dir_svg = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.change_dir_svg = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
 		self.change_dir_svg.setFixedSize(15, 15)
 
 		main_lay.addWidget(content)

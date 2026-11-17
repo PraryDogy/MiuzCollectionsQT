@@ -58,7 +58,7 @@ class WinSmb(UMainWindow):
 		if Servers.items:
 
 			self.servers_btn = UPushButton(Lng.connections)
-			self.servers_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "connections_gray.svg")))
+			self.servers_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "connections.svg")))
 			self.servers_btn.clicked.connect(self.open_servers)
 			btns_lay.addWidget(self.servers_btn)
 

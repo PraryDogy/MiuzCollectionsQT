@@ -270,7 +270,7 @@ class PendingTagsState:
 
 class FavTag(TagWidget):
 	def __init__(self, pending: PendingTagsState):
-		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star_gray.svg")
+		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star.svg")
 		self.pending = pending
 		self.clicked.connect(self.toggle_fav)
 		if pending.favs_tag_enabled:
@@ -283,7 +283,7 @@ class FavTag(TagWidget):
 
 class SubfoldersTag(TagWidget):
 	def __init__(self, pending: PendingTagsState):
-		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder_gray.svg")
+		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder.svg")
 		self.pending = pending
 		self.clicked.connect(self.toggle_subfolders)
 		if pending.no_subfolders_tag_enabled:
@@ -298,7 +298,7 @@ class SubfoldersTag(TagWidget):
 
 class WordTag(TagWidget):
 	def __init__(self, text: str, pending: PendingTagsState):
-		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg", Static.GRAY_ICONS / "trash_gray.svg")
+		super().__init__(text, Static.GRAY_ICONS / "tags.svg", Static.GRAY_ICONS / "trash.svg")
 		self.pending = pending
 		self.word = text
 		self.clicked.connect(self.toggle_word_tag)
@@ -316,7 +316,7 @@ class WordTag(TagWidget):
 
 class AddTag(TagWidget):
 	def __init__(self):
-		super().__init__(Lng.new_tag, Static.GRAY_ICONS / "crest_gray.svg")
+		super().__init__(Lng.new_tag, Static.GRAY_ICONS / "crest.svg")
 		self.set_qss_style(self.qss_transparent)
 		self.left_svg_widget.setFixedSize(10, 10)
 
@@ -376,7 +376,7 @@ class UserTags(TransparentWidget):
 
 		self.text_win = InputTextWin(
 			description=Lng.new_tag_desc,
-			svg=Static.GRAY_ICONS / "tags_gray.svg"
+			svg=Static.GRAY_ICONS / "tags.svg"
 		)
 		self.text_win.setWindowTitle(Lng.new_tag)
 		self.text_win.center_to_parent(self.window())
@@ -425,7 +425,7 @@ class TagsWidget(UGroupBox):
 		self.v_lay.setContentsMargins(5, 5, 5, 5)
 		self.v_lay.setSpacing(7)
 
-		self.title_widget = WinFiltersTitleWidget(Lng.tag_management, Static.COLOR_ICONS / "tags_color.svg")
+		self.title_widget = WinFiltersTitleWidget(Lng.tag_management, Static.COLOR_ICONS / "tags.svg")
 		self.title_widget.reset_clicked.connect(lambda: self.reset_tags(True))
 		self.v_lay.addWidget(self.title_widget)
 

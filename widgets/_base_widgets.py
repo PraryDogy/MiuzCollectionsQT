@@ -995,7 +995,7 @@ class RowArrowWidget(TransparentWidget):
 		self.text_widget = TransparentLabel(text)
 		
 		# Стрелка справа
-		self.arrow_wid = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.arrow_wid = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
 		self.arrow_wid.setFixedSize(12, 12)
 		
 		# Сборка в один ряд
@@ -1081,7 +1081,7 @@ class WinProgressbar(UMainWindow):
 		self.progressbar.adjustSize()
 		progressbar_lay.addWidget(self.progressbar)
 
-		self.cancel_btn = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid_gray.svg"))
+		self.cancel_btn = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid.svg"))
 		self.cancel_btn.setFixedSize(13, 13)
 		self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
@@ -1328,7 +1328,7 @@ class InputTextWin(UMainWindow):
 class SaveRowArrowWidget(RowArrowWidget):
 	def __init__(self):
 		super().__init__(Lng.save)
-		self.set_left_icon(Static.GRAY_ICONS / "diskette_gray.svg")
+		self.set_left_icon(Static.GRAY_ICONS / "diskette.svg")
 
 
 class MfAliasWidget(UGroupBox):
@@ -1354,12 +1354,12 @@ class MfAliasWidget(UGroupBox):
 		title_lay.setContentsMargins(0, 0, 0, 0)
 		title_lay.setSpacing(0)
 
-		title = TitleTextWidget(Lng.catalog_name, Static.GRAY_ICONS / "text_edit_gray.svg")
+		title = TitleTextWidget(Lng.catalog_name, Static.GRAY_ICONS / "text_edit.svg")
 		title_lay.addWidget(title)
 		v_layout.addWidget(title_wrapper)
 
 		autoname_button = UPushButton(Lng.auto_name)
-		autoname_button.setIcon(QIcon(str(Static.GRAY_ICONS / "wand_gray.svg")))
+		autoname_button.setIcon(QIcon(str(Static.GRAY_ICONS / "wand.svg")))
 		autoname_button.clicked.connect(self.auto_name_clicked.emit)
 		title_lay.addStretch()
 		title_lay.addWidget(autoname_button)
@@ -1425,7 +1425,7 @@ class MfAliasWidget(UGroupBox):
 		self.name_is_valid = bool(text) and error_text is None
 
 		if not text:
-			self.checker_svg.load(str(Static.GRAY_ICONS / "attention_gray.svg"))
+			self.checker_svg.load(str(Static.GRAY_ICONS / "attention.svg"))
 			self.checker_text.setText(Lng.enter_alias_warning)
 		elif error_text:
 			self.checker_svg.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
@@ -1675,7 +1675,7 @@ class MfPathWidget(HoverGroupBox):
 		self.status = ChoosePathWidget()
 		status_lay.addWidget(self.status)
 
-		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right_gray.svg"))
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
 		self.start_btn.setFixedSize(15, 15)
 
 		main_lay.addWidget(content)
