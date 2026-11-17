@@ -66,6 +66,7 @@ class SearchWidLineEdit(ULineEdit):
 		text = ", ".join(Dynamic.search_words_list)
 		self.win_text_search = WinTextSearch(text)
 		self.win_text_search.ok_clicked.connect(self.win_text_search_cmd)
+		self.win_text_search.reset_clicked.connect(self.clear_search)
 		self.win_text_search.center_to_parent(self.window())
 		self.win_text_search.show()
 

@@ -15,13 +15,13 @@ from ._base_widgets import (ActiveButton, TitleTextWidget,
 
 class WinTextSearch(UMainWindow):
 	ok_clicked = pyqtSignal(str)
+	reset_clicked = pyqtSignal()
 
 	def __init__(self, text: str):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setFixedSize(380, 330)
-		# self.insert_sep()
 
 		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg"))
 		self.wand_icon = QIcon(str(Static.GRAY_ICONS / "wand_gray.svg"))
@@ -38,6 +38,13 @@ class WinTextSearch(UMainWindow):
 		self.title_row = TitleTextWidget(Lng.search, Static.COLOR_ICONS / "magnifier.svg")
 		group_layout.addWidget(self.title_row)
 
+		self.title_row.h_layout.addStretch()
+
+		reset_button = UPushButton(Lng.reset)
+		reset_button.clicked.connect(lambda: self.text_edit.clear())
+		reset_button.clicked.connect(self.reset_clicked.emit)
+		self.title_row.h_layout.addWidget(reset_button)
+
 		group_layout.addWidget(USep())
 
 		# 1. Текст описания форматов (RU / EN)
@@ -48,7 +55,7 @@ class WinTextSearch(UMainWindow):
 
 		self.text_edit = UTextEdit()
 		self.text_edit.setPlaceholderText(Lng.search_placeholder_texts)
-		self.central_layout.addWidget(self.text_edit)
+		group_layout.addWidget(self.text_edit)
 		self.text_edit.setPlainText(text)
 		self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
 
