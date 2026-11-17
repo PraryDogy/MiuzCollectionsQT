@@ -518,14 +518,40 @@ class WinFilters(UMainWindow):
 		self.tags_widget.adjustSize()
 		self.adjustSize()
 
+	def filters_enabled(self):
+		filters = (
+			Dynamic.word_tags_list,
+			Dynamic.favs_tag_enabled,
+			Dynamic.no_subfolders_tag_enabled
+		)
+		if any(filters):
+			return True
+		return False
+
+	def dates_enabled(self):
+		dates = (
+			Dynamic.py_date_start,
+			Dynamic.py_date_end
+		)
+		if any(dates):
+			return True
+		return False
+
 	def apply_cmd(self):
-		self.load_st_grid.emit()
+		if self.filters_enabled() or self.dates_enabled():
+			self.load_st_grid.emit()
 		self.deleteLater()
 
 	def reset_all_cmd(self):
-		self.dates_widget.reset_all(False)
-		self.tags_widget.reset_tags(False)
-		self.load_st_grid.emit()
+		load_st_grid = False
+		if self.dates_enabled():
+			self.dates_widget.reset_all(False)
+			load_st_grid = True
+		if self.filters_enabled():
+			self.tags_widget.reset_tags(False)
+			load_st_grid = True
+		if load_st_grid:
+			self.load_st_grid.emit()
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
