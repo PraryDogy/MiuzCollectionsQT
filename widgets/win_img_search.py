@@ -81,6 +81,17 @@ class ProgressWin(UMainWindow):
 
 		self.text_label.setText(text)
 
+	def progress_stop_cmd(self):
+		# пользователь отменил поиск: останавливаем и возвращаем окно поиска
+		self.stop_img_search()
+		self.show_main_window()
+
+	def show_main_window(self):
+		if not self.isVisible():
+			self.show()
+			self.raise_()
+			self.activateWindow()
+
 	def closeEvent(self, a0):
 		a0.ignore()
 
@@ -307,13 +318,23 @@ class WinImgSearch(UMainWindow):
 
 		self.start_btn = ActiveButton(Lng.search)
 		self.start_btn.setIcon(self.magnifier_icon)
-		self.start_btn.clicked.connect(self.start_img_search)
+		self.start_btn.clicked.connect(self.search_cmd)
 		btn_layout.addWidget(self.start_btn)
 
 		self.set_close_button_width()
 
 		self.adjustSize()
 		self.setFixedSize(self.width(), self.height())
+
+	def search_cmd(self):
+		# нет изображения: просто закрываем окно
+		if self.img_array is None:
+			self.request_close()
+			return
+
+		# есть изображение: запускаем поиск и прячем основное окно на время прогресса
+		self.start_img_search()
+		self.hide()
 
 	def set_close_button_width(self):
 		max_word = max((Lng.close, Lng.hide), key=len)
@@ -373,12 +394,24 @@ class WinImgSearch(UMainWindow):
 				pass
 			self.progress_win = None
 
+	def show_main_window(self):
+		# возвращаем окно поиска после прогресса; не трогаем, если оно уже закрыто
+		if not self.isVisible():
+			self.show()
+			self.raise_()
+			self.activateWindow()
+
 	def open_progress_win(self):
 		self.close_progress_win()
 		self.progress_win = ProgressWin()
 		self.progress_win.center_to_parent(self)
-		self.progress_win.stop_img_search.connect(self.stop_img_search)
+		self.progress_win.stop_img_search.connect(self.progress_stop_cmd)
 		self.progress_win.show()
+
+	def progress_stop_cmd(self):
+		# пользователь нажал «Стоп» в окне прогресса: останавливаем поиск и возвращаем окно
+		self.stop_img_search()
+		self.show_main_window()
 
 	def close_progress_win(self):
 		if self.progress_win is not None:
