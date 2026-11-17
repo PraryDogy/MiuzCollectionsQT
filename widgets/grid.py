@@ -491,6 +491,8 @@ class GridTag(UTagWidget):
 		)
 		self.right_svg_widget.setFixedSize(12, 12)
 		self.right_svg_lay.setContentsMargins(0, 1, 0, 0)
+		self.text_widget.set_elide(True, ignore_width=False)
+		self.setMaximumWidth(150)
 
 
 class GridDatesTag(GridTag):
@@ -547,7 +549,7 @@ class GridNoSubfoldersTag(GridTag):
 class GridTextSearchTag(GridTag):
 	def __init__(self):
 		super().__init__(
-			text="Поиск по тексту",
+			text=", ".join(Dynamic.search_words_list),
 			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
 		)
 

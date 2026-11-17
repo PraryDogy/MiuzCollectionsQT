@@ -501,11 +501,11 @@ class WinFilters(UMainWindow):
 		self.buttons_layout.setContentsMargins(0, 0, 0, 0)
 		self.buttons_layout.setSpacing(10)
 
-		self.buttons_layout.addStretch(1)
-
 		self.reset_all_button = UPushButton(Lng.reset_all)
 		self.reset_all_button.clicked.connect(self.reset_all_cmd)
 		self.buttons_layout.addWidget(self.reset_all_button)
+
+		self.buttons_layout.addStretch(1)
 
 		self.close_button = ActiveButton(Lng.close)
 		self.close_button.clicked.connect(self.deleteLater)
