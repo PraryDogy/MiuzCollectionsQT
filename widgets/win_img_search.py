@@ -133,7 +133,7 @@ class SliderWidget(TransparentWidget):
 
 
 
-class WinImgSearchDropWidget(TransparentWidget):
+class WinImgSearchDropWidget(TransparentFrame):
 	image_dropped = pyqtSignal(str)
 
 	def __init__(self, parent=None):
@@ -217,7 +217,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 		self.qimage_task = BlurImgBgTask(
 			img=img_array,
 			size=DROP_WIDGET_SIZE,
-			radius=10.0
+			radius=8.0
 		)
 		self.qimage_task.sigs.finished_.connect(finished)
 		UThreadPool.start(self.qimage_task)
@@ -243,7 +243,7 @@ class ControlsWidget(UGroupBox):
 		self.slider_widget = SliderWidget()
 		self.v_layout.addWidget(self.slider_widget)
 
-		descr = TransparentLabel(Lng.image_search_descr)
+		descr = TransparentLabel(Lng.accuracy_descr)
 		descr.set_state("gray")
 		self.v_layout.addWidget(descr)
 
@@ -282,6 +282,22 @@ class WinImgSearch(UMainWindow):
 		self.content_layout = QVBoxLayout(self.content_box)
 		self.content_layout.setContentsMargins(5, 5, 5, 5)
 		self.content_layout.setSpacing(10)
+
+		header_widget = TransparentWidget()
+		header_layout = QVBoxLayout(header_widget)
+		header_layout.setContentsMargins(0, 0, 0, 0)
+		header_layout.setSpacing(5)
+
+		self.title_widget = TitleTextWidget(Lng.image_search)
+		header_layout.addWidget(self.title_widget)
+
+		header_layout.addWidget(USep())
+
+		self.descr = TransparentLabel(Lng.image_search_descr)
+		self.descr.set_state("gray")
+		header_layout.addWidget(self.descr)
+
+		self.content_layout.addWidget(header_widget)
 
 		self.image_stack = QStackedWidget()
 		self.drop_widget = WinImgSearchDropWidget()

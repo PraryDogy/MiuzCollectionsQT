@@ -464,9 +464,13 @@ class Lng:
 		"Find matches"
 	)
 	image_search_descr = (
-			"Поиск по цветовой гистограмме.\nЧем выше точность, тем меньше результатов.",
-			"Color histogram search.\nHigher accuracy returns fewer results."
+			"Поиск по цветовой гистограмме.",
+			"Color histogram search."
 		)
+	accuracy_descr = (
+			"Чем выше точность, тем меньше результатов.",
+			"Higher accuracy returns fewer results."
+	)
 	please_wait = (
 		"Пожалуйста, подождите.",
 		"Please wait."
