@@ -141,9 +141,9 @@ UMenu {
     background: #101820;
 }
 
-WinImgSearchDropWidget {
+/* WinImgSearchDropWidget {
     background: #111a23;
-}
+} */
 
 UPushButton,
 ULineEdit,
@@ -191,9 +191,9 @@ QToolTip {
     border: 1px solid #263440;
 }
 
-WinImgSearchDropWidget {
+/* WinImgSearchDropWidget {
     border: 2px dashed #263440;
-}
+} */
 
 
 /* ---------------------------------------------------------------------
@@ -427,9 +427,9 @@ TagWidget {
     border-radius: 12px;
 }
 
-WinImgSearchDropWidget {
+/* WinImgSearchDropWidget {
     border-radius: 20px;
-}
+} */
 
 UpBtnLabel {
     border-radius: 18px;

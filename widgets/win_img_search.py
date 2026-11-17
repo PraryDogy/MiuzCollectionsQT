@@ -122,7 +122,7 @@ class SliderWidget(TransparentWidget):
 
 
 
-class WinImgSearchDropWidget(TransparentFrame):
+class WinImgSearchDropWidget(TransparentWidget):
 	image_dropped = pyqtSignal(str)
 
 	def __init__(self, parent=None):
@@ -183,7 +183,6 @@ class WinImgSearchDropWidget(TransparentFrame):
 
 class WinImgSearchPreviewWidget(TransparentFrame):
 	pixmap_finished = pyqtSignal()
-	cancel_clicked = pyqtSignal()
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -196,15 +195,6 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setSpacing(0)
 		layout.addWidget(self.image_label)
-
-		self.create_cancel_button()
-
-		self.cancel_timer = QTimer(self)
-		self.cancel_timer.setSingleShot(True)
-		self.cancel_timer.timeout.connect(self.hide_cancel_icon)
-
-	def clear_image_cmd(self, e):
-		self.cancel_clicked.emit()
 
 	def set_pixmap(self, img_array: np.ndarray):
 
@@ -224,39 +214,6 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 	def clear(self):
 		self.pixmap = QPixmap()
 		self.image_label.clear()
-
-	def create_cancel_button(self):
-		self.cancel_icon = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid_gray.svg"))
-		self.cancel_icon.setParent(self)
-		self.cancel_icon.setFixedSize(20, 20)
-		self.cancel_icon.mouseReleaseEvent = self.clear_image_cmd
-		self.cancel_icon.setCursor(Qt.CursorShape.PointingHandCursor)
-
-		x, y = self.width() - self.cancel_icon.width() - 10, 10
-		self.cancel_icon.move(x, y)
-		self.cancel_icon.hide()
-
-	def hide_cancel_icon(self):
-		pos = self.mapFromGlobal(QCursor.pos())
-
-		if not self.rect().contains(pos):
-			self.cancel_icon.hide()
-		else:
-			self.cancel_timer.start(2000)
-
-	def enterEvent(self, event):
-		self.cancel_icon.show()
-		return super().enterEvent(event)
-
-	def leaveEvent(self, a0):
-		self.cancel_icon.hide()
-		return super().leaveEvent(a0)
-
-	def showEvent(self, event):
-		super().showEvent(event)
-
-		self.cancel_icon.show()
-		self.cancel_timer.start(2000)
 
 
 class ControlsWidget(UGroupBox):
@@ -288,7 +245,6 @@ class WinImgSearch(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.image_search)
 		self.img_array = None
 		self.img_search_task = None
 		self.read_img_task = None
@@ -307,25 +263,35 @@ class WinImgSearch(UMainWindow):
 		self.read_img_timer.setSingleShot(True)
 		self.read_img_timer.timeout.connect(self.poll_read_img)
 
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
+
+		# --- Основной контент внутри UGroupBox ---
+		self.content_box = UGroupBox()
+		self.content_layout = QVBoxLayout(self.content_box)
+		self.content_layout.setContentsMargins(5, 5, 5, 5)
+		self.content_layout.setSpacing(10)
 
 		self.image_stack = QStackedWidget()
 		self.drop_widget = WinImgSearchDropWidget()
 		self.preview_widget = WinImgSearchPreviewWidget()
-		self.preview_widget.cancel_clicked.connect(self.reset_img_search)
 		self.preview_widget.pixmap_finished.connect(self.set_close_button_text)
 		self.image_stack.addWidget(self.drop_widget)
 		self.image_stack.addWidget(self.preview_widget)
 		self.image_stack.setCurrentIndex(0)
-		self.central_layout.addWidget(self.image_stack, alignment=Qt.AlignmentFlag.AlignCenter)
+		self.content_layout.addWidget(self.image_stack, alignment=Qt.AlignmentFlag.AlignCenter)
 		self.drop_widget.image_dropped.connect(self.image_dropped)
 
 		self.controls_widget = ControlsWidget()
-		self.central_layout.addWidget(self.controls_widget)
+		self.content_layout.addWidget(self.controls_widget)
 
+		self.central_layout.addWidget(self.content_box)
+
+		# --- Кнопки под группой ---
 		btn_layout = QHBoxLayout()
 		self.central_layout.addLayout(btn_layout)
+		btn_layout.setContentsMargins(0, 0, 0, 0)
+		btn_layout.setSpacing(5)
 
 		reset_btn = UPushButton(Lng.reset)
 		reset_btn.clicked.connect(self.reset_img_search)
