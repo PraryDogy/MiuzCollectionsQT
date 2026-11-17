@@ -482,7 +482,7 @@ class GridControlsWidget(TransparentWidget):
 
 
 class GridTag(UTagWidget):
-	def __init__(self, l_svg, text):
+	def __init__(self, text, l_svg):
 		super().__init__(text, l_svg, Static.GRAY_ICONS / "cancel_solid_gray.svg")
 		self.set_qss_style(self.qss_green)
 		self.right_svg_widget.setFixedSize(12, 12)
@@ -491,69 +491,49 @@ class GridTag(UTagWidget):
 
 class GridDatesTag(GridTag):
 	def __init__(self):
-		super().__init__(
-			text=DatesWidget.readable_date,
-			l_svg=Static.GRAY_ICONS / "calendar_gray.svg"
-		)
+		super().__init__(DatesWidget.readable_date, Static.GRAY_ICONS / "calendar_gray.svg")
+		self.right_svg_clicked.connect(self.reset_dates)
 
-	def right_svg_cmd(self, *args):
+	def reset_dates(self, *args):
 		Dynamic.py_date_start = None
 		Dynamic.py_date_end = None
-		return super().right_svg_cmd(*args)
 
 
 class GridWordTag(GridTag):
 	def __init__(self, text):
-		super().__init__(
-			text=text,
-			l_svg=Static.GRAY_ICONS / "tags_gray.svg"
-		)
+		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg")
+		self.right_svg_clicked.connect(self.remove_word_tag)
 
-	def right_svg_cmd(self, *args):
+	def remove_word_tag(self, *args):
 		Dynamic.word_tags_list.remove(self.text_widget.text())
-		return super().right_svg_cmd(*args)
 
 
 class GridFavTag(GridTag):
 	def __init__(self):
-		super().__init__(
-			text=Lng.favorites,
-			l_svg=Static.GRAY_ICONS / "star_gray.svg"
-		)
+		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star_gray.svg")
+		self.right_svg_clicked.connect(self.disable_fav_tag)
 
-	def right_svg_cmd(self, *args):
+	def disable_fav_tag(self):
 		Dynamic.favs_tag_enabled = False
-		return super().right_svg_cmd(*args)
 
 
 class GridNoSubfoldersTag(GridTag):
-	l_svg = Static.GRAY_ICONS / "folder_gray.svg"
-
 	def __init__(self):
-		super().__init__(
-			text=Lng.without_subfolders,
-			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
-		)
+		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder_gray.svg")
+		self.right_svg_clicked.connect(self.disable_subfolders_tag)
 
-	def right_svg_cmd(self, *args):
+	def disable_subfolders_tag(self, *args):
 		Dynamic.no_subfolders_tag_enabled = False
-		return super().right_svg_cmd(*args)
 
 
 class GridTextSearchTag(GridTag):
 	def __init__(self):
-		super().__init__(
-			text=", ".join(Dynamic.search_words_list),
-			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
-		)
+		super().__init__(", ".join(Dynamic.search_words_list), Static.GRAY_ICONS / "folder_gray.svg")
 
 
 class GridImgSearchTag(GridTag):
 	def __init__(self):
-		super().__init__(
-			text="Поиск по картинке",
-			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
-		)
+		super().__init__(Lng.image_search, Static.GRAY_ICONS / "folder_gray.svg")
 
 
 
