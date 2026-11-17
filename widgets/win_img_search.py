@@ -257,7 +257,7 @@ class WinImgSearch(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.search_window)
-		
+
 		self.img_array = None
 		self.img_search_task = None
 		self.read_img_task = None
@@ -290,7 +290,7 @@ class WinImgSearch(UMainWindow):
 		header_layout.setContentsMargins(0, 0, 0, 0)
 		header_layout.setSpacing(5)
 
-		self.title_widget = TitleTextWidget(Lng.image_search, Static.GRAY_ICONS / "camera_gray.svg")
+		self.title_widget = TitleTextWidget(Lng.image_search, Static.COLOR_ICONS / "camera.svg")
 		header_layout.addWidget(self.title_widget)
 
 		header_layout.addWidget(USep())

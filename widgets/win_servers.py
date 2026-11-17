@@ -260,8 +260,7 @@ class ServersWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		
-		title = Lng.connect_to_server_title
-		self.setWindowTitle(title)
+		self.setWindowTitle(Lng.connections)
 		self.setFixedWidth(400)
 		
 		# Сепаратор включаем, так как под ним будет заголовок, а не UGroupBox
