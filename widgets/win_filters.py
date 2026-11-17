@@ -17,6 +17,36 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
 from .win_calendar import WinCalendar
 
 
+class PendingDatesState:
+	"""Выбор дат до нажатия «Применить». Dynamic не меняется, пока не нажата кнопка."""
+
+	def __init__(self):
+		self.start: QDate | None = self._to_qdate(Dynamic.py_date_start)
+		self.end: QDate | None = self._to_qdate(Dynamic.py_date_end)
+
+	@staticmethod
+	def _to_qdate(py_date):
+		return QDate(py_date.year, py_date.month, py_date.day) if py_date else None
+
+	@staticmethod
+	def _to_py(q_date: QDate | None):
+		return q_date.toPyDate() if q_date else None
+
+	def differs_from_dynamic(self) -> bool:
+		return (
+			self._to_py(self.start) != Dynamic.py_date_start
+			or self._to_py(self.end) != Dynamic.py_date_end
+		)
+
+	def commit(self):
+		Dynamic.py_date_start = self._to_py(self.start)
+		Dynamic.py_date_end = self._to_py(self.end)
+
+	def reset(self):
+		self.start = None
+		self.end = None
+
+
 class WinFiltersTitleWidget(TitleTextWidget):
 	reset_clicked = pyqtSignal()
 
@@ -39,8 +69,9 @@ class DatesWidget(UGroupBox):
 	load_st_grid = pyqtSignal()
 	readable_date = None
 
-	def __init__(self, parent=None):
+	def __init__(self, pending: PendingDatesState, parent=None):
 		super().__init__(parent)
+		self.pending = pending
 
 		_today = QDate.currentDate()
 		self.readable_date_wid = ReadableDateItem(JsonData.lng_index)
@@ -54,28 +85,12 @@ class DatesWidget(UGroupBox):
 			(_today.addYears(-1), _today): Lng.preset_year,
 		}
 
-		# Загружаем даты независимо друг от друга
-		if Dynamic.py_date_start:
-			dt_s = Dynamic.py_date_start
-			self.q_date_start = QDate(dt_s.year, dt_s.month, dt_s.day)
-		else:
-			self.q_date_start = None
-
-		if Dynamic.py_date_end:
-			dt_e = Dynamic.py_date_end
-			self.q_date_end = QDate(dt_e.year, dt_e.month, dt_e.day)
-		else:
-			self.q_date_end = None
-
-		self.py_date_start = Dynamic.py_date_start
-		self.py_date_end = Dynamic.py_date_end
-
 		self.main_layout = QVBoxLayout(self)
 		self.main_layout.setContentsMargins(5, 5, 5, 5)
 		self.main_layout.setSpacing(7)
 
 		self.title_widget = WinFiltersTitleWidget(Lng.dates_management, Static.COLOR_ICONS / "calendar.svg")
-		self.title_widget.reset_clicked.connect(lambda: self.reset_all(True))
+		self.title_widget.reset_clicked.connect(lambda: self.reset_dates(True))
 		self.main_layout.addWidget(self.title_widget)
 		self.main_layout.addWidget(USep())
 
@@ -98,8 +113,6 @@ class DatesWidget(UGroupBox):
 				lambda _, d=qdates: self.action_cmd(d[0], d[1])
 			)
 			self.preset_menu.addAction(action)
-
-		# КНОПКИ КАЛЕНДАРЕЙ
 
 		self.date_btns_widget = TransparentWidget()
 		self.date_btns_layout = QHBoxLayout(self.date_btns_widget)
@@ -137,55 +150,43 @@ class DatesWidget(UGroupBox):
 		self.set_date_buttons_text()
 
 	def is_all_time(self) -> bool:
-		# Фильтр считается отключенным, ТОЛЬКО если обе даты None
-		return self.q_date_start is None and self.q_date_end is None
+		return self.pending.start is None and self.pending.end is None
 
 	def date_digits(self, q_date: QDate) -> str:
 		return q_date.toString("dd.MM.yyyy")
 
 	def show_calendar_win(self, flag: str):
-		# Просто передаем текущее значение (даже если это None)
-		if flag == "start":
-			qdate = self.q_date_start
-		else:
-			qdate = self.q_date_end
+		qdate = self.pending.start if flag == "start" else self.pending.end
 
 		self.calendar_win = WinCalendar(qdate)
 		self.calendar_win.center_to_parent(self.window())
 
 		def on_date_selected(date: QDate):
-			# Если пришла невалидная дата (нажали "Сбросить/Очистить")
+			# только черновик: в Dynamic попадёт после «Применить»
 			if not date.isValid():
 				if flag == "start":
-					self.q_date_start = None
-				elif flag == "end":
-					self.q_date_end = None
-			
-			# Если пришла нормальная дата (нажали "Готово")
+					self.pending.start = None
+				else:
+					self.pending.end = None
 			else:
 				if flag == "start":
-					self.q_date_start = date
-					# Защита от конфликта
-					if self.q_date_end is not None and self.q_date_start > self.q_date_end:
-						self.q_date_end = self.q_date_start
-
-				elif flag == "end":
-					self.q_date_end = date
-					# Защита от конфликта
-					if self.q_date_start is not None and self.q_date_start > self.q_date_end:
-						self.q_date_start = self.q_date_end
+					self.pending.start = date
+					if self.pending.end is not None and self.pending.start > self.pending.end:
+						self.pending.end = self.pending.start
+				else:
+					self.pending.end = date
+					if self.pending.start is not None and self.pending.start > self.pending.end:
+						self.pending.start = self.pending.end
 
 			self.handle_preset_change()
-			self.apply_filter(True)
 
 		self.calendar_win.date_selected.connect(on_date_selected)
 		self.calendar_win.show()
 
 	def action_cmd(self, q_date_start: QDate, q_date_end: QDate):
-		self.q_date_start = q_date_start
-		self.q_date_end = q_date_end
+		self.pending.start = q_date_start
+		self.pending.end = q_date_end
 		self.handle_preset_change()
-		self.apply_filter(True)
 
 	def handle_preset_change(self):
 		self.set_date_buttons_text()
@@ -194,63 +195,52 @@ class DatesWidget(UGroupBox):
 	def set_date_buttons_text(self):
 		empty_text = Lng.not_selected
 
-		# Обрабатываем кнопку "Старт" независимо
-		if self.q_date_start is None:
+		if self.pending.start is None:
 			self.left_calendar_tag.text_widget.setText(empty_text)
 			self.left_calendar_tag.set_qss_style(self.left_calendar_tag.qss_gray)
 		else:
-			self.left_calendar_tag.text_widget.setText(self.date_digits(self.q_date_start))
+			self.left_calendar_tag.text_widget.setText(self.date_digits(self.pending.start))
 			self.left_calendar_tag.set_qss_style(self.left_calendar_tag.qss_green)
 
-		# Обрабатываем кнопку "Конец" независимо
-		if self.q_date_end is None:
+		if self.pending.end is None:
 			self.right_calendar_tag.text_widget.setText(empty_text)
 			self.right_calendar_tag.set_qss_style(self.right_calendar_tag.qss_gray)
 		else:
-			self.right_calendar_tag.text_widget.setText(self.date_digits(self.q_date_end))
+			self.right_calendar_tag.text_widget.setText(self.date_digits(self.pending.end))
 			self.right_calendar_tag.set_qss_style(self.right_calendar_tag.qss_green)
 
 	def update_readable_date_label(self):
+		start, end = self.pending.start, self.pending.end
+
 		if self.is_all_time():
 			text = Lng.all_time
-			
-		elif self.q_date_start is not None and self.q_date_end is not None and (self.q_date_start, self.q_date_end) in self.dates_dict:
-			text = self.dates_dict[self.q_date_start, self.q_date_end]
-			
-		elif self.q_date_start is not None and self.q_date_end is None:
-			str_from = self.readable_date_wid.get_readable_date(self.q_date_start)
-			text = f"{Lng.from_text} {str_from}"
-			
-		elif self.q_date_start is None and self.q_date_end is not None:
-			str_to = self.readable_date_wid.get_readable_date(self.q_date_end)
-			text = f"{Lng.to_text} {str_to}"
-			
+		elif start is not None and end is not None and (start, end) in self.dates_dict:
+			text = self.dates_dict[start, end]
+		elif start is not None and end is None:
+			text = f"{Lng.from_text} {self.readable_date_wid.get_readable_date(start)}"
+		elif start is None and end is not None:
+			text = f"{Lng.to_text} {self.readable_date_wid.get_readable_date(end)}"
 		else:
-			str_from = self.readable_date_wid.get_readable_date(self.q_date_start)
-			str_to = self.readable_date_wid.get_readable_date(self.q_date_end)
+			str_from = self.readable_date_wid.get_readable_date(start)
+			str_to = self.readable_date_wid.get_readable_date(end)
 			text = f"{Lng.from_text} {str_from} {Lng.to_text.lower()} {str_to}"
 
 		text = f"{Lng.selected_dates}: {text.lower()}"
 		self.dynamic_label.setText(text)
 		DatesWidget.readable_date = text
 
-	def apply_filter(self, load_st_grid: bool):
-		# Конвертируем по отдельности (каждый может быть None)
-		self.py_date_start = self.q_date_start.toPyDate() if self.q_date_start else None
-		self.py_date_end = self.q_date_end.toPyDate() if self.q_date_end else None
+	def reset_dates(self, with_sig: bool) -> bool:
+		"""Сбрасывает даты сразу. Возвращает True, если даты были применены в Dynamic."""
+		applied = bool(Dynamic.py_date_start or Dynamic.py_date_end)
 
-		Dynamic.py_date_start = self.py_date_start
-		Dynamic.py_date_end = self.py_date_end
-
-		if load_st_grid:
-			self.load_st_grid.emit()
-
-	def reset_all(self, load_st_grid: bool):
-		self.q_date_start = None
-		self.q_date_end = None
-
-		self.apply_filter(load_st_grid)
+		self.pending.reset()
+		self.pending.commit()
 		self.handle_preset_change()
+
+		if with_sig and applied:
+			self.load_st_grid.emit()
+		return applied
+
 
 class PendingTagsState:
 	"""Выбор тегов до нажатия «Применить». Dynamic не меняется, пока не нажата кнопка."""
@@ -492,10 +482,12 @@ class WinFilters(UMainWindow):
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
-		# выбор тегов, который попадает в Dynamic только по кнопке «Применить»
+		# черновики: попадают в Dynamic только по «Применить» или при сбросе
+		self.pending_dates = PendingDatesState()
 		self.pending_tags = PendingTagsState()
 
-		self.dates_widget = DatesWidget()
+		self.dates_widget = DatesWidget(self.pending_dates)
+		self.dates_widget.load_st_grid.connect(self.load_st_grid.emit)
 		self.central_layout.addWidget(self.dates_widget)
 
 		self.tags_widget = TagsWidget(self.pending_tags)
@@ -527,21 +519,19 @@ class WinFilters(UMainWindow):
 		self.adjustSize()
 
 	def apply_cmd(self):
-		# теги применяются только здесь; грид перезагружаем, только если что-то реально изменилось
-		if self.pending_tags.differs_from_dynamic():
+		# применяем только то, что изменилось относительно Dynamic; грид перезагружаем один раз
+		dates_changed = self.pending_dates.differs_from_dynamic()
+		tags_changed = self.pending_tags.differs_from_dynamic()
+
+		if dates_changed or tags_changed:
+			self.pending_dates.commit()
 			self.pending_tags.commit()
 			self.load_st_grid.emit()
 		self.deleteLater()
 
-	def _applied_dates_active(self) -> bool:
-		# даты применяются сразу, поэтому смотрим на Dynamic
-		return bool(Dynamic.py_date_start or Dynamic.py_date_end)
-
 	def reset_all_cmd(self):
-		# проверяем до сброса, иначе после него Dynamic уже пустой
-		dates_applied = self._applied_dates_active()
-
-		self.dates_widget.reset_all(False)
+		# сбрасываем даты и теги сразу; сигнал один, и только если было что-то применено
+		dates_applied = self.dates_widget.reset_dates(False)
 		tags_applied = self.tags_widget.reset_tags(False)
 
 		if dates_applied or tags_applied:
