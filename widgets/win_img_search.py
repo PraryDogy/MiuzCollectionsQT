@@ -326,18 +326,23 @@ class WinImgSearch(UMainWindow):
 
 		btn_layout = QHBoxLayout()
 		self.central_layout.addLayout(btn_layout)
+
+		reset_btn = UPushButton(Lng.reset)
+		reset_btn.clicked.connect(self.reset_img_search)
+		btn_layout.addWidget(reset_btn)
+
 		btn_layout.addStretch()
-		self.start_btn = ActiveButton(Lng.find_matches)
-		self.start_btn.setIcon(self.magnifier_icon)
-		self.start_btn.clicked.connect(self.start_img_search)
-		btn_layout.addWidget(self.start_btn)
 
 		self.close_button = UPushButton("")
 		self.set_close_button_width()
 		self.set_close_button_text()
 		self.close_button.clicked.connect(self.request_close)
 		btn_layout.addWidget(self.close_button)
-		btn_layout.addStretch()
+
+		self.start_btn = ActiveButton(Lng.search)
+		self.start_btn.setIcon(self.magnifier_icon)
+		self.start_btn.clicked.connect(self.start_img_search)
+		btn_layout.addWidget(self.start_btn)
 
 		self.set_close_button_width()
 
