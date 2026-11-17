@@ -557,8 +557,7 @@ class TagsWidget(TransparentWidget):
 		if Dynamic.search_words_list:
 			tag = GridTextSearchTag()
 			tag.right_svg_clicked.connect(self.clear_word_search.emit)
-			tag.text_clicked.connect(self.open_word_search.emit)
-			tag.left_svg_clicked.connect(self.open_word_search.emit)
+			tag.clicked.connect(self.open_word_search.emit)
 			self.flow_layout.addWidget(tag)
 
 		if Dynamic.img_search_thumb_paths:
