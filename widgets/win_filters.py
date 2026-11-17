@@ -117,7 +117,7 @@ class DatesWidget(UGroupBox):
 		self.date_btns_layout.addWidget(from_label)
 
 		self.left_calendar_tag = CalendarTag()
-		self.left_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("start"))
+		self.left_calendar_tag.clicked.connect(lambda: self.show_calendar_win("start"))
 		self.date_btns_layout.addWidget(self.left_calendar_tag)
 
 		self.date_btns_layout.addSpacing(10)
@@ -127,7 +127,7 @@ class DatesWidget(UGroupBox):
 		self.date_btns_layout.addWidget(to_label)
 
 		self.right_calendar_tag = CalendarTag()
-		self.right_calendar_tag.text_clicked.connect(lambda: self.show_calendar_win("end"))
+		self.right_calendar_tag.clicked.connect(lambda: self.show_calendar_win("end"))
 		self.date_btns_layout.addWidget(self.right_calendar_tag)
 
 		self.date_btns_layout.addStretch(1)
@@ -253,64 +253,46 @@ class DatesWidget(UGroupBox):
 		self.handle_preset_change()
 
 
-class WinFiltersUserTag(UTagWidget):
-	def __init__(self, text: str, l_svg: Path):
-		super().__init__(text, l_svg, Static.GRAY_ICONS / "trash_gray.svg")
-
-
-class WinFiltersStantartTag(UTagWidget):
-	def __init__(self, text: str, l_svg: Path):
-		super().__init__(text, l_svg)
-
-
-class WinFiltersFavTag(WinFiltersStantartTag):
+class WinFiltersFavTag(UTagWidget):
 	def __init__(self):
-		super().__init__(
-			text=Lng.favorites,
-			l_svg=Static.GRAY_ICONS / "star_gray.svg",
-		)
+		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star_gray.svg")
+		self.clicked.connect(self.toggle_fav)
 		if Dynamic.favs_tag_enabled:
 			self.set_qss_style(self.qss_green)
 
-	def text_widget_cmd(self, *args):
+	def toggle_fav(self, *args):
 		if Dynamic.favs_tag_enabled:
 			self.set_qss_style(self.qss_gray)
 			Dynamic.favs_tag_enabled = False
 		else:
 			self.set_qss_style(self.qss_green)
 			Dynamic.favs_tag_enabled = True
-		return super().text_widget_cmd(*args)
 
 
-class SubfoldersTagWidget(WinFiltersStantartTag):
+class SubfoldersTagWidget(UTagWidget):
 	def __init__(self):
-		super().__init__(
-			text=Lng.without_subfolders, 
-			l_svg=Static.GRAY_ICONS / "folder_gray.svg"
-		)
+		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder_gray.svg")
+		self.clicked.connect(self.toggle_subfolders)
 		if Dynamic.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_green)
 
-	def text_widget_cmd(self, *args):
+	def toggle_subfolders(self, *args):
 		if Dynamic.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_gray)
 			Dynamic.no_subfolders_tag_enabled = False
 		else:
 			self.set_qss_style(self.qss_green)
 			Dynamic.no_subfolders_tag_enabled = True
-		return super().text_widget_cmd(*args)
 
 
-class WordFiltersTagWidget(WinFiltersUserTag):
+class WordFiltersTagWidget(UTagWidget):
 	def __init__(self, text):
-		super().__init__(
-			text=text,
-			l_svg=Static.GRAY_ICONS / "tags_gray.svg"
-		)
+		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg")
+		self.clicked.connect(self.toggle_word_tag)
 		if text in Dynamic.word_tags_list:
 			self.set_qss_style(self.qss_green)
 
-	def text_widget_cmd(self, *args):
+	def toggle_word_tag(self, *args):
 		if self.text_widget.text() in Dynamic.word_tags_list:
 			self.set_qss_style(self.qss_gray)
 			Dynamic.word_tags_list.remove(self.text_widget.text())
@@ -339,11 +321,9 @@ class StandartTags(TransparentWidget):
 
 	def _create_tags(self):
 		tag = WinFiltersFavTag()
-		tag.text_clicked.connect(self.load_st_grid.emit)
 		self.flow_layout.addWidget(tag)
 
 		tag = SubfoldersTagWidget()
-		tag.text_clicked.connect(self.load_st_grid.emit)
 		self.flow_layout.addWidget(tag)
 
 
@@ -364,14 +344,11 @@ class UserTags(TransparentWidget):
 	def _create_tags(self):
 		for word in Filters.items:
 			tag = WordFiltersTagWidget(word)
-			tag.text_clicked.connect(self.load_st_grid.emit)
-			tag.right_svg_clicked.connect(
-				lambda w=tag: self.show_remove_tag_win(w)
-			)
+			tag.right_svg_clicked.connect(lambda w=tag: self.show_remove_tag_win(w))
 			self.flow_layout.addWidget(tag)
 
 		self.add_tag = AddTagWidget()
-		self.add_tag.text_clicked.connect(self.show_text_win)
+		self.add_tag.clicked.connect(self.show_text_win)
 		self.flow_layout.addWidget(self.add_tag)
 
 	def show_text_win(self):
