@@ -148,6 +148,7 @@ class WinImgSearchDropWidget(TransparentFrame):
 
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "image.svg"))
 		self.svg_widget.setFixedSize(50, 50)
+		
 
 		self.v_layout.addWidget(
 			self.svg_widget,
