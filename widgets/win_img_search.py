@@ -153,12 +153,12 @@ class WinImgSearchDropWidget(TransparentFrame):
 			self.svg_widget,
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
-		self.title_label = TitleTextWidget(Lng.image_search)
+		# self.title_label = TitleTextWidget(Lng.image_search)
 
-		self.v_layout.addWidget(
-			self.title_label,
-			alignment=Qt.AlignmentFlag.AlignCenter,
-		)
+		# self.v_layout.addWidget(
+		# 	self.title_label,
+		# 	alignment=Qt.AlignmentFlag.AlignCenter,
+		# )
 
 		self.descr_label = TransparentLabel("")
 		self.descr_label.set_state("gray")
@@ -169,9 +169,9 @@ class WinImgSearchDropWidget(TransparentFrame):
 		)
 
 		lines_base_text = (
-			f"{Lng.search} "
-			f"{Lng.in_} "
-			f"\"{Mf.current_mf.mf_alias}\"",
+			# f"{Lng.search} "
+			# f"{Lng.in_} "
+			f"{Lng.catalog}: \"{Mf.current_mf.mf_alias}\"",
 
 			f"{Lng.image_search_drop}.",
 		)
