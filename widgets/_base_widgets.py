@@ -969,11 +969,8 @@ class UTagWidget(TransparentFrame):
 	def right_svg_cmd(self, *args):
 		self.right_svg_clicked.emit()
 
-	def set_text(self, text: str):
-		self.text_widget.setText(text)
-
 	def mouseReleaseEvent(self, a0):
-		self.clicked.emit
+		self.clicked.emit()
 		return super().mouseReleaseEvent(a0)
 
 
