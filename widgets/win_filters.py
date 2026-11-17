@@ -252,58 +252,76 @@ class DatesWidget(UGroupBox):
 		self.apply_filter(load_st_grid)
 		self.handle_preset_change()
 
+class PendingTagsState:
+	"""Выбор тегов до нажатия «Применить». Dynamic не меняется, пока не нажата кнопка."""
+
+	def __init__(self):
+		self.favs_tag_enabled: bool = Dynamic.favs_tag_enabled
+		self.no_subfolders_tag_enabled: bool = Dynamic.no_subfolders_tag_enabled
+		self.word_tags_list: list[str] = list(Dynamic.word_tags_list)
+
+	def differs_from_dynamic(self) -> bool:
+		return (
+			self.favs_tag_enabled != Dynamic.favs_tag_enabled
+			or self.no_subfolders_tag_enabled != Dynamic.no_subfolders_tag_enabled
+			or self.word_tags_list != Dynamic.word_tags_list
+		)
+
+	def commit(self):
+		Dynamic.favs_tag_enabled = self.favs_tag_enabled
+		Dynamic.no_subfolders_tag_enabled = self.no_subfolders_tag_enabled
+		Dynamic.word_tags_list[:] = self.word_tags_list
+
+	def reset(self):
+		self.favs_tag_enabled = False
+		self.no_subfolders_tag_enabled = False
+		self.word_tags_list.clear()
+
 
 class FavTag(TagWidget):
-	def __init__(self):
+	def __init__(self, pending: PendingTagsState):
 		super().__init__(Lng.favorites, Static.GRAY_ICONS / "star_gray.svg")
+		self.pending = pending
 		self.clicked.connect(self.toggle_fav)
-		if Dynamic.favs_tag_enabled:
+		if pending.favs_tag_enabled:
 			self.set_qss_style(self.qss_green)
-
-		self.favs_tag_enabled = Dynamic.favs_tag_enabled
 
 	def toggle_fav(self, *args):
-		if self.favs_tag_enabled:
-			self.set_qss_style(self.qss_gray)
-			self.favs_tag_enabled = False
-		else:
-			self.set_qss_style(self.qss_green)
-			self.favs_tag_enabled = True
+		self.pending.favs_tag_enabled = not self.pending.favs_tag_enabled
+		self.set_qss_style(self.qss_green if self.pending.favs_tag_enabled else self.qss_gray)
 
 
 class SubfoldersTag(TagWidget):
-	def __init__(self):
+	def __init__(self, pending: PendingTagsState):
 		super().__init__(Lng.without_subfolders, Static.GRAY_ICONS / "folder_gray.svg")
+		self.pending = pending
 		self.clicked.connect(self.toggle_subfolders)
-		if Dynamic.no_subfolders_tag_enabled:
+		if pending.no_subfolders_tag_enabled:
 			self.set_qss_style(self.qss_green)
-
-		self.no_subfolders_tag_enabled = Dynamic.no_subfolders_tag_enabled
 
 	def toggle_subfolders(self, *args):
-		if self.no_subfolders_tag_enabled:
-			self.set_qss_style(self.qss_gray)
-			self.no_subfolders_tag_enabled = False
-		else:
-			self.set_qss_style(self.qss_green)
-			self.no_subfolders_tag_enabled = True
+		self.pending.no_subfolders_tag_enabled = not self.pending.no_subfolders_tag_enabled
+		self.set_qss_style(
+			self.qss_green if self.pending.no_subfolders_tag_enabled else self.qss_gray
+		)
 
 
 class WordTag(TagWidget):
-	def __init__(self, text):
+	def __init__(self, text: str, pending: PendingTagsState):
 		super().__init__(text, Static.GRAY_ICONS / "tags_gray.svg")
+		self.pending = pending
+		self.word = text
 		self.clicked.connect(self.toggle_word_tag)
-		if text in Dynamic.word_tags_list:
+		if text in pending.word_tags_list:
 			self.set_qss_style(self.qss_green)
 
 	def toggle_word_tag(self, *args):
-		if self.text_widget.text() in Dynamic.word_tags_list:
+		if self.word in self.pending.word_tags_list:
+			self.pending.word_tags_list.remove(self.word)
 			self.set_qss_style(self.qss_gray)
-			Dynamic.word_tags_list.remove(self.text_widget.text())
 		else:
+			self.pending.word_tags_list.append(self.word)
 			self.set_qss_style(self.qss_green)
-			Dynamic.word_tags_list.append(self.text_widget.text())
-		return super().text_widget_cmd(*args)
 
 
 class AddTag(TagWidget):
@@ -316,29 +334,31 @@ class AddTag(TagWidget):
 class StandartTags(TransparentWidget):
 	load_st_grid = pyqtSignal()
 
-	def __init__(self, parent=None):
+	def __init__(self, pending: PendingTagsState, parent=None):
 		super().__init__(parent)
+		self.pending = pending
 
 		self.flow_layout = FlowLayout(self, spacing=7)
 		self.flow_layout.setContentsMargins(0, 0, 0, 0)
 		self._create_tags()
 
 	def _create_tags(self):
-		self.fav_tag = FavTag()
+		self.fav_tag = FavTag(self.pending)
 		self.flow_layout.addWidget(self.fav_tag)
 
-		self.subfolders_tag = SubfoldersTag()
+		self.subfolders_tag = SubfoldersTag(self.pending)
 		self.flow_layout.addWidget(self.subfolders_tag)
 
 
 class UserTags(TransparentWidget):
 	load_st_grid = pyqtSignal()
 
-	def __init__(self, parent=None):
+	def __init__(self, pending: PendingTagsState, parent=None):
 		super().__init__(parent)
+		self.pending = pending
 
 		policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-		policy.setHeightForWidth(True) # Включаем зависимость высоты от ширины!
+		policy.setHeightForWidth(True)
 		self.setSizePolicy(policy)
 
 		self.flow_layout = FlowLayout(self, spacing=7)
@@ -347,7 +367,7 @@ class UserTags(TransparentWidget):
 
 	def _create_tags(self):
 		for word in Filters.items:
-			tag = WordTag(word)
+			tag = WordTag(word, self.pending)
 			tag.right_svg_clicked.connect(lambda w=tag: self.show_remove_tag_win(w))
 			self.flow_layout.addWidget(tag)
 
@@ -375,9 +395,13 @@ class UserTags(TransparentWidget):
 	def show_remove_tag_win(self, widget: WordTag):
 
 		def ok_clicked():
-			text = widget.text_widget.text() 
+			text = widget.word
 			Filters.items.remove(text)
 			Filters.write_json_data()
+
+			# удаление тега — необратимое действие, поэтому убираем его и из выбора, и из применённых
+			if text in self.pending.word_tags_list:
+				self.pending.word_tags_list.remove(text)
 			if text in Dynamic.word_tags_list:
 				Dynamic.word_tags_list.remove(text)
 				self.load_st_grid.emit()
@@ -402,8 +426,10 @@ class UserTags(TransparentWidget):
 class TagsWidget(UGroupBox):
 	load_st_grid = pyqtSignal()
 
-	def __init__(self):
+	def __init__(self, pending: PendingTagsState):
 		super().__init__()
+		self.pending = pending
+
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(5, 5, 5, 5)
 		self.v_lay.setSpacing(7)
@@ -418,26 +444,40 @@ class TagsWidget(UGroupBox):
 		st_tags_title.set_state("gray")
 		self.v_lay.addWidget(st_tags_title)
 
-		self.standart_tags = StandartTags()
-		self.standart_tags.load_st_grid.connect(self.load_st_grid.emit)
+		self.standart_tags = StandartTags(self.pending)
 		self.v_lay.addWidget(self.standart_tags)
 
 		user_tags_title = TransparentLabel(Lng.user_tags)
 		user_tags_title.set_state("gray")
 		self.v_lay.addWidget(user_tags_title)
 
-		self.user_tags = UserTags()
+		self.user_tags = UserTags(self.pending)
 		self.user_tags.load_st_grid.connect(self.load_st_grid.emit)
 		self.v_lay.addWidget(self.user_tags)
 
-	def reset_tags(self, with_sig: bool):
-		Dynamic.favs_tag_enabled = False
-		Dynamic.no_subfolders_tag_enabled = False
-		Dynamic.word_tags_list.clear()
-		for i in self.findChildren(TagWidget)[:-1]:
-			i.set_qss_style(i.qss_gray)
-		if with_sig:
+	@staticmethod
+	def tags_applied_in_dynamic() -> bool:
+		# сигнал нужен только если теги реально применены, а не просто отмечены в черновике
+		return bool(
+			Dynamic.favs_tag_enabled
+			or Dynamic.no_subfolders_tag_enabled
+			or Dynamic.word_tags_list
+		)
+
+	def reset_tags(self, with_sig: bool) -> bool:
+		# возвращает, были ли теги применены до сброса
+		applied = self.tags_applied_in_dynamic()
+
+		self.pending.reset()
+		self.pending.commit()
+
+		for tag in self.findChildren(TagWidget):
+			if not isinstance(tag, AddTag):
+				tag.set_qss_style(tag.qss_gray)
+
+		if with_sig and applied:
 			self.load_st_grid.emit()
+		return applied
 
 
 class WinFilters(UMainWindow):
@@ -452,12 +492,14 @@ class WinFilters(UMainWindow):
 		self.central_layout.setSpacing(10)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
+		# выбор тегов, который попадает в Dynamic только по кнопке «Применить»
+		self.pending_tags = PendingTagsState()
+
 		self.dates_widget = DatesWidget()
-		# self.dates_widget.load_st_grid.connect(self.load_st_grid.emit)
 		self.central_layout.addWidget(self.dates_widget)
 
-		self.tags_widget = TagsWidget()
-		# self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
+		self.tags_widget = TagsWidget(self.pending_tags)
+		self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
 		self.central_layout.addWidget(self.tags_widget)
 
 		buttons_widget = TransparentWidget()
@@ -484,42 +526,25 @@ class WinFilters(UMainWindow):
 		self.tags_widget.adjustSize()
 		self.adjustSize()
 
-	def filters_enabled(self):
-		filters = (
-			Dynamic.word_tags_list,
-			Dynamic.favs_tag_enabled,
-			Dynamic.no_subfolders_tag_enabled
-		)
-		if any(filters):
-			return True
-		return False
-
-	def dates_enabled(self):
-		dates = (
-			Dynamic.py_date_start,
-			Dynamic.py_date_end
-		)
-		if any(dates):
-			return True
-		return False
-
 	def apply_cmd(self):
-		Dynamic.favs_tag_enabled = self.tags_widget.standart_tags.fav_tag.favs_tag_enabled
-		Dynamic.no_subfolders_tag_enabled = self.tags_widget.standart_tags.subfolders_tag.no_subfolders_tag_enabled
-
-		if self.filters_enabled() or self.dates_enabled():
+		# теги применяются только здесь; грид перезагружаем, только если что-то реально изменилось
+		if self.pending_tags.differs_from_dynamic():
+			self.pending_tags.commit()
 			self.load_st_grid.emit()
 		self.deleteLater()
 
+	def _applied_dates_active(self) -> bool:
+		# даты применяются сразу, поэтому смотрим на Dynamic
+		return bool(Dynamic.py_date_start or Dynamic.py_date_end)
+
 	def reset_all_cmd(self):
-		load_st_grid = False
-		if self.dates_enabled():
-			self.dates_widget.reset_all(False)
-			load_st_grid = True
-		if self.filters_enabled():
-			self.tags_widget.reset_tags(False)
-			load_st_grid = True
-		if load_st_grid:
+		# проверяем до сброса, иначе после него Dynamic уже пустой
+		dates_applied = self._applied_dates_active()
+
+		self.dates_widget.reset_all(False)
+		tags_applied = self.tags_widget.reset_tags(False)
+
+		if dates_applied or tags_applied:
 			self.load_st_grid.emit()
 
 	def keyPressEvent(self, a0):
