@@ -939,13 +939,11 @@ class UTagWidget(TransparentFrame):
 
 		if l_svg:
 			self.left_svg_widget = QSvgWidget(str(l_svg))
-			self.left_svg_widget.mouseReleaseEvent = self.cmd
 			self.left_svg_widget.setFixedSize(14, 14)
 			self.h_lay.addWidget(self.left_svg_widget)
 
 		text = text if text else ""
 		self.text_widget = TransparentLabel(text)
-		self.text_widget.mouseReleaseEvent = self.cmd
 		self.text_widget.set_elide(True, ignore_width=False)
 		self.h_lay.addWidget(self.text_widget)
 
@@ -971,11 +969,12 @@ class UTagWidget(TransparentFrame):
 	def right_svg_cmd(self, *args):
 		self.right_svg_clicked.emit()
 
-	def cmd(self, *args):
-		self.clicked.emit()
-
 	def set_text(self, text: str):
 		self.text_widget.setText(text)
+
+	def mouseReleaseEvent(self, a0):
+		self.clicked.emit
+		return super().mouseReleaseEvent(a0)
 
 
 class RowArrowWidget(TransparentWidget):
