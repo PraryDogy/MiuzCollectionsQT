@@ -475,7 +475,6 @@ class TagsWidget(UGroupBox):
 
 
 class WinFilters(UMainWindow):
-	closed_ = pyqtSignal()
 	load_st_grid = pyqtSignal()
 
 	def __init__(self):
@@ -488,11 +487,11 @@ class WinFilters(UMainWindow):
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		self.dates_widget = DatesWidget()
-		self.dates_widget.load_st_grid.connect(self.load_st_grid.emit)
+		# self.dates_widget.load_st_grid.connect(self.load_st_grid.emit)
 		self.central_layout.addWidget(self.dates_widget)
 
 		self.tags_widget = TagsWidget()
-		self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
+		# self.tags_widget.load_st_grid.connect(self.load_st_grid.emit)
 		self.central_layout.addWidget(self.tags_widget)
 
 		buttons_widget = TransparentWidget()
@@ -507,30 +506,27 @@ class WinFilters(UMainWindow):
 
 		self.buttons_layout.addStretch(1)
 
-		self.close_button = ActiveButton(Lng.close)
-		self.close_button.clicked.connect(self.deleteLater)
-		self.buttons_layout.addWidget(self.close_button)
+		close_button = UPushButton(Lng.close)
+		close_button.clicked.connect(self.deleteLater)
+		self.buttons_layout.addWidget(close_button)
+
+		self.apply_button = ActiveButton(Lng.apply)
+		self.apply_button.clicked.connect(self.apply_cmd)
+		self.buttons_layout.addWidget(self.apply_button)
 
 		self.tags_widget.user_tags.adjustSize()
 		self.tags_widget.adjustSize()
 		self.adjustSize()
+
+	def apply_cmd(self):
+		self.load_st_grid.emit()
+		self.deleteLater()
 
 	def reset_all_cmd(self):
 		self.dates_widget.reset_all(False)
 		self.tags_widget.reset_tags(False)
 		self.load_st_grid.emit()
 
-	def mouseReleaseEvent(self, a0):
-		return super().mouseReleaseEvent(a0)
-
-	def closeEvent(self, a0):
-		self.closed_.emit()
-		return super().closeEvent(a0)
-	
-	def deleteLater(self):
-		self.closed_.emit()
-		return super().deleteLater()
-	
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
 			self.deleteLater()
