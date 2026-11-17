@@ -311,7 +311,7 @@ class ServersWin(UMainWindow):
 
 		btn_layout.addStretch()
 
-		self.cancel_btn = UPushButton(Lng.cancel)
+		self.cancel_btn = UPushButton(Lng.close)
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		btn_layout.addWidget(self.cancel_btn)
 
@@ -323,6 +323,9 @@ class ServersWin(UMainWindow):
 		self.setFixedHeight(self.height())
 		self.setFocus()
 		self.init_data()
+
+		self.v_list.clearSelection()
+		self.v_list.setCurrentRow(-1)
 
 	# Загрузка данных из JSON
 	def init_data(self):
@@ -428,6 +431,7 @@ class ServersWin(UMainWindow):
 	def connect_cmd(self):
 		list_item: ServerListItem = self.v_list.currentItem()
 		if not list_item:
+			self.deleteLater()
 			return
 		server_item = list_item.server_item
 		s, l, p = server_item.server, server_item.login, server_item.password
@@ -435,6 +439,8 @@ class ServersWin(UMainWindow):
 		ip = s.split(smb)[-1]
 		cmd = f"{smb}{l}:{p}@{ip}"
 		subprocess.run(["open", cmd])
+
+		self.deleteLater()
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
