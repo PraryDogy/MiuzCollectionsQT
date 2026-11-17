@@ -256,6 +256,8 @@ class WinImgSearch(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
+		self.setWindowTitle(Lng.search_window)
+		
 		self.img_array = None
 		self.img_search_task = None
 		self.read_img_task = None

@@ -22,12 +22,13 @@ class WinTextSearch(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setFixedSize(380, 330)
+		self.setWindowTitle(Lng.search_window)
 
 		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier_gray.svg"))
 		self.wand_icon = QIcon(str(Static.GRAY_ICONS / "wand_gray.svg"))
 
 		self.central_layout.setSpacing(10)
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		group_container = UGroupBox()
 		self.central_layout.addWidget(group_container)

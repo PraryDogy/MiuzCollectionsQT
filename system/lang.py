@@ -715,3 +715,7 @@ class Lng:
 		"Все кешированные изображения будут удалены и добавлены заново. Используйте при серьёзных ошибках.",
 		"All cached images will be deleted and added again. Use this if there are serious errors.",
 	)
+	search_window = (
+		"Окно поиска",
+		"Search window"
+	)
