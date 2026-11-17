@@ -35,7 +35,7 @@ class WinTextSearch(UMainWindow):
 		group_layout.setContentsMargins(5, 5, 5, 5)
 		group_layout.setSpacing(7)
 
-		self.title_row = TitleTextWidget(Lng.text_editor, Static.COLOR_ICONS / "text_edit_color.svg")
+		self.title_row = TitleTextWidget(Lng.search, Static.COLOR_ICONS / "magnifier.svg")
 		group_layout.addWidget(self.title_row)
 
 		group_layout.addWidget(USep())
@@ -59,14 +59,12 @@ class WinTextSearch(UMainWindow):
 		btns_layout.setContentsMargins(0, 0, 0, 0)
 		btns_layout.setSpacing(10)
 
-		btns_layout.addStretch(1)
-
 		self.format_button = UPushButton(Lng.enhance_text)
 		self.format_button.clicked.connect(self.format_input_text)
 		self.format_button.setIconSize(QSize(10, 10))
 		self.format_button.setIcon(self.wand_icon)
-		self.title_row.h_layout.addStretch()
-		self.title_row.h_layout.addWidget(self.format_button)
+		btns_layout.addWidget(self.format_button)
+		btns_layout.addStretch()
 		# btns_layout.addWidget(self.format_button)
 
 		close_btn = UPushButton(Lng.close)

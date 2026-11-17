@@ -455,8 +455,8 @@ class Lng:
 		"Для поиска нескольких слов введите их через запятую или с новой строки.",
 		"Separate search words with commas or line breaks."
 	)
-	text_editor = (
-		"Редактор текста",
+	text_search = (
+		"Поиск",
 		"Text editor"
 	)
 	find_matches = (
