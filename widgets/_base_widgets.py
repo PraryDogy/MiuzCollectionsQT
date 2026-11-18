@@ -911,7 +911,7 @@ class TitleTextWidget(TransparentWidget):
 
 
 class TitleWidget(TransparentWidget):
-	def __init__(self, title: str, description: str, title_svg: Path):
+	def __init__(self, title: str, description: str, title_svg: Path = None):
 		super().__init__()
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(0, 0, 0, 0)

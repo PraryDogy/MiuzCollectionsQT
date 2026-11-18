@@ -18,7 +18,7 @@ from system.utils import ImageReader
 
 from ._base_widgets import (ActiveButton, TitleTextWidget, TransparentFrame,
                             TransparentLabel, TransparentWidget, UGroupBox,
-                            UMainWindow, UPushButton, USep, USlider)
+                            UMainWindow, UPushButton, USep, USlider, TitleWidget)
 
 DROP_WIDGET_SIZE = (350, 300)
 
@@ -291,14 +291,8 @@ class WinImgSearch(UMainWindow):
 		header_layout.setContentsMargins(0, 0, 0, 0)
 		header_layout.setSpacing(5)
 
-		self.title_widget = TitleTextWidget(Lng.image_search, Static.COLOR_ICONS / "camera.svg")
+		self.title_widget = TitleWidget(Lng.image_search, Lng.image_search_descr)
 		header_layout.addWidget(self.title_widget)
-
-		header_layout.addWidget(USep())
-
-		self.descr = TransparentLabel(Lng.image_search_descr)
-		self.descr.set_state("gray")
-		header_layout.addWidget(self.descr)
 
 		self.content_layout.addWidget(header_widget)
 
