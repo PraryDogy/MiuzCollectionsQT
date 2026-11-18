@@ -189,9 +189,6 @@ class WinMain(UMainWindow):
 		self.left_menu.on_tree_clicked.connect(
 			lambda data: self.on_tree_clicked(data)
 		)
-		self.left_menu.on_mf_clicked.connect(
-			lambda mf: self.on_mf_clicked(mf)
-		)
 		self.left_menu.on_hide_digits_clicked.connect(
 			lambda: self.on_hide_digits_clicked()
 		)
@@ -235,6 +232,7 @@ class WinMain(UMainWindow):
 			self.bar_bottom.progress_widget.reset()
 			self.bar_bottom.progress_widget.status_label.setText("СКАНЕР ВЫКЛЮЧЕН")
 
+		self.left_menu.init_ui()
 		self.path_bar_update(Mf.current_mf.mf_path)
 
 	@staticmethod
@@ -266,7 +264,7 @@ class WinMain(UMainWindow):
 			...
 
 	def base_search_start(self):
-		self.left_menu.tree_wid.expand_to_path(os.sep)
+		self.left_menu.expand_to_path(os.sep)
 		self.load_st_grid()
 
 	def open_img_search_win(self):
@@ -297,7 +295,7 @@ class WinMain(UMainWindow):
 		Dynamic.current_dir = current_dir
 		self.go_to_url = rel_path
 		self.load_st_grid()
-		self.left_menu.tree_wid.expand_to_path(current_dir)
+		self.left_menu.expand_to_path(current_dir)
 
 	def path_bar_update(self, abs_path: str):
 		self.bar_bottom.bar_path.update_path(abs_path)
@@ -327,8 +325,8 @@ class WinMain(UMainWindow):
 		Mf.current_mf = mf
 		Dynamic.current_dir = os.sep
 		self.path_bar_update(Mf.current_mf.mf_path)
-		self.left_menu.tree_wid.abs_selected_path = os.sep
-		self.left_menu.tree_wid.init_ui()
+		self.left_menu.abs_selected_path = os.sep
+		self.left_menu.init_ui()
 		self.load_st_grid()
 
 		mf_path = mf.is_root_alive()
@@ -682,7 +680,7 @@ class WinMain(UMainWindow):
 			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
 			if db_changed(self.db_mtime, new_db_time) or self.stop_list_changed:
 				self.load_st_grid()
-				self.left_menu.tree_wid.init_ui()
+				self.left_menu.init_ui()
 				self.stop_list_changed = False
 			# во время сканирования могли добавиться точечные задачи: запускаем их
 			if self.forced_scaner_dirs:
@@ -694,7 +692,7 @@ class WinMain(UMainWindow):
 		"""Папки записаны в Dirs: перестраиваем дерево, сетку не трогаем."""
 		if Mf.current_mf is None or Mf.current_mf.mf_alias != data.mf_alias:
 			return
-		self.left_menu.tree_wid.init_ui()
+		self.left_menu.init_ui()
 
 	def on_path_check_passed(self, data: PathCheckPassed):
 		"""Каталог совпал: старый путь больше не нужен, сбрасываем флаг."""

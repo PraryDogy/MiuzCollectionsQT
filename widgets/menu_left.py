@@ -1,10 +1,8 @@
 import os
 import re
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QVBoxLayout
 
 from cfg import JsonData, Static
 from system.items import Mf
@@ -12,9 +10,7 @@ from system.lang import Lng
 from system.runnable import DbDirsLoader, UThreadPool
 from system.utils import Utils
 
-from ._base_widgets import (TransparentFrame, TransparentLabel,
-                            TransparentWidget, UMenu, USep, UTreeWidget,
-                            UTreeWidgetItem)
+from ._base_widgets import UMenu, UTreeWidget, UTreeWidgetItem
 
 
 class MenuLeftTreeWidgetItem(UTreeWidgetItem):
@@ -24,7 +20,7 @@ class MenuLeftTreeWidgetItem(UTreeWidgetItem):
 		self.abs_path = Mf.current_mf.create_abs_path(rel_path)
 
 
-class MenuLeftTreeWidget(UTreeWidget):
+class MenuLeft(UTreeWidget):
 	load_st_grid = pyqtSignal()
 	removed_from_stop_list = pyqtSignal()
 	reveal = pyqtSignal(list)
@@ -264,43 +260,3 @@ class MenuLeftTreeWidget(UTreeWidget):
 				menu.addAction(add_stop_list)
 
 		menu.show_menu_under_cursor(a0)
-
-
-class MenuLeft(TransparentFrame):
-	on_tree_clicked = pyqtSignal(tuple)
-	on_mf_clicked = pyqtSignal(Mf)
-	reveal = pyqtSignal(list)
-	copy_path = pyqtSignal(list)
-	on_hide_digits_clicked = pyqtSignal()
-	removed_from_stop_list = pyqtSignal()
-	added_to_stop_list = pyqtSignal()
-
-	def __init__(self):
-		super().__init__()
-		self.scroll_value = 0
-
-		v_lay = QVBoxLayout(self)
-		v_lay.setContentsMargins(0, 0, 0, 0)
-		v_lay.setSpacing(0)
-
-		self.tree_wid = MenuLeftTreeWidget()
-		v_lay.addWidget(self.tree_wid)
-		self.tree_wid.reveal.connect(
-			lambda abs_paths: self.reveal.emit(abs_paths)
-		)
-		self.tree_wid.on_tree_clicked.connect(
-			lambda data: self.on_tree_clicked.emit(data)
-		)
-		self.tree_wid.on_hide_digits_clicked.connect(
-			lambda: self.on_hide_digits_clicked.emit()
-		)
-		self.tree_wid.copy_path.connect(
-			lambda abs_paths: self.copy_path.emit(abs_paths)
-		)
-		self.tree_wid.removed_from_stop_list.connect(
-			lambda: self.removed_from_stop_list.emit()
-		)
-		self.tree_wid.added_to_stop_list.connect(
-			lambda: self.added_to_stop_list.emit()
-		)
-		self.tree_wid.init_ui()
