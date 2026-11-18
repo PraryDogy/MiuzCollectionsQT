@@ -35,7 +35,6 @@ class WinTextSearch(UMainWindow):
 
 		self.title_row = TitleWidget(Lng.text_search, Lng.text_search_descr)
 		self.title_row.set_margins(5, 0, 5, 0)
-		self.title_row.description_widget.setWordWrap(True)
 		group_layout.addWidget(self.title_row)
 
 		self.format_button = UPushButton(Lng.enhance_text)

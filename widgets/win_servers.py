@@ -265,7 +265,6 @@ class ServersWin(UMainWindow):
 		group_lay.setContentsMargins(12, 12, 12, 12)
 		group_lay.setSpacing(8)
 		title_lbl = TitleWidget(Lng.favorite_servers, Lng.servers_description, Static.COLOR_ICONS / "connections.svg")
-		title_lbl.description_widget.setWordWrap(True)
 		group_lay.addWidget(title_lbl)
 		self.central_layout.addWidget(group)
 

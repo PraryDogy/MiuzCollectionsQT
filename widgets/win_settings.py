@@ -22,7 +22,7 @@ from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, HoverGroupBox,
                             MfAliasWidget, MfPathWidget, RowArrowWidget,
-                            SuperConfirmWindow, TitleTextWidget,
+                            SuperConfirmWindow, TitleWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UListSpacerItem, UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton,
@@ -560,7 +560,7 @@ class MfRepairGroup(HoverGroupBox):
 		self.v_lay.setContentsMargins(10, 10, 10, 10)
 		self.v_lay.setSpacing(10)
 
-		title_widget = TitleTextWidget(title)
+		title_widget = TitleWidget(title, description, sep=False)
 		self.v_lay.addWidget(title_widget)
 
 		descr_widget = TransparentLabel(description)
@@ -641,13 +641,8 @@ class MfRepairWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(7)
 
-		title_widget = TitleTextWidget(Lng.repair_errors, Static.COLOR_ICONS / "repair.svg")
+		title_widget = TitleWidget(Lng.repair_errors, Lng.catalog_reindex_warning, Static.COLOR_ICONS / "repair.svg", sep=False)
 		content_lay.addWidget(title_widget)
-
-		descr = TransparentLabel(Lng.catalog_reindex_warning)
-		descr.set_state("gray")
-		descr.setWordWrap(True)
-		content_lay.addWidget(descr)
 
 		# правая часть: кнопка запуска, по центру по вертикали
 		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
@@ -682,13 +677,8 @@ class MfRemoveWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(7)
 
-		title_widget = TitleTextWidget(Lng.remove_folder, Static.COLOR_ICONS / "red_trash.svg")
+		title_widget = TitleWidget(Lng.remove_folder, Lng.catalog_delete_warning, Static.COLOR_ICONS / "red_trash.svg", sep=False)
 		content_lay.addWidget(title_widget)
-
-		descr = TransparentLabel(Lng.catalog_delete_warning)
-		descr.set_state("gray")
-		descr.setWordWrap(True)
-		content_lay.addWidget(descr)
 
 		# правая часть: кнопка запуска, по центру по вертикали
 		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
@@ -723,12 +713,8 @@ class IgnoreListWin(UMainWindow):
 		self.group_lay.setContentsMargins(10, 5, 10, 10)
 		self.group_lay.setSpacing(5)
 
-		self.title_widget = TitleTextWidget(
-			text=Lng.ignore_list,
-			svg=Static.COLOR_ICONS / "stop.svg"
-		)
+		self.title_widget = TitleWidget(Lng.ignore_list, Lng.ignore_list_descr_short, Static.COLOR_ICONS / "stop.svg", sep=False)
 		self.group_lay.addWidget(self.title_widget)
-		# self.group_lay.addWidget(USep())
 
 		self.descr_widget = TransparentLabel(text=Lng.ignore_list_descr_short)
 		self.descr_widget.set_state("gray")
@@ -883,14 +869,8 @@ class MfStopListWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(5)
 
-		title_label = TitleTextWidget(Lng.ignore_list, Static.COLOR_ICONS / "stop.svg")
+		title_label = TitleWidget(Lng.ignore_list, Lng.ignore_list_descr_short, Static.COLOR_ICONS / "stop.svg", sep=False)
 		content_lay.addWidget(title_label)
-
-		description = TransparentLabel(Lng.ignore_list_descr_short)
-		description.set_state("gray")
-		description.setWordWrap(True)
-		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
-		content_lay.addWidget(description)
 
 		# правая часть: кнопка открытия списка, по центру по вертикали
 		self.add_button = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
@@ -944,10 +924,8 @@ class MfSettings(UGroupBox):
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
-		self.title_label = TitleTextWidget(self.mf.mf_alias, Static.COLOR_ICONS / "image_folder.svg")
-		self.title_label.text_widget.set_elide(True, ignore_width=False)
+		self.title_label = TitleWidget(title=self.mf.mf_alias, title_svg=Static.COLOR_ICONS / "image_folder.svg", sep=False)
 		self.main_lay.addWidget(self.title_label)
-		self.title_label.h_layout.setContentsMargins(5, 0, 0, 0)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
 		main_lay.addWidget(self.path_widget)

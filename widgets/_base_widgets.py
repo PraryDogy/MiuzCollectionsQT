@@ -930,6 +930,7 @@ class TitleWidget(TransparentWidget):
 
 		if descr:
 			self.description_widget = TransparentLabel(descr)
+			self.description_widget.setWordWrap(True)
 			self.description_widget.set_state("gray")
 			self.v_lay.addWidget(self.description_widget)
 
@@ -1673,7 +1674,6 @@ class MfPathWidget(HoverGroupBox):
 			Static.COLOR_ICONS / "finder.svg",
 			sep=False
 		)
-		self.title_widget.description_widget.setWordWrap(True)
 		content_lay.addWidget(self.title_widget)
 
 		content_lay.addSpacing(5)
