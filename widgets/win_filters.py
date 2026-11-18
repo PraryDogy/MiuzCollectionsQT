@@ -56,6 +56,7 @@ class WinFiltersTitleWidget(TitleWidget):
 		self.reset_button = UPushButton(Lng.reset)
 		self.reset_button.clicked.connect(self.reset_clicked.emit)
 		self.add_title_button(self.reset_button)
+		self.set_margins(5, 0, 5, 0)
 
 
 class CalendarTag(TagWidget):
@@ -92,7 +93,6 @@ class DatesWidget(UGroupBox):
 		self.title_widget = WinFiltersTitleWidget(Lng.dates_management, Static.COLOR_ICONS / "calendar.svg")
 		self.title_widget.reset_clicked.connect(lambda: self.reset_dates(True))
 		self.main_layout.addWidget(self.title_widget)
-		self.main_layout.addWidget(USep())
 
 		dynamic_container = TransparentWidget()
 		dynamic_container_lay = QHBoxLayout(dynamic_container)
@@ -428,8 +428,6 @@ class TagsWidget(UGroupBox):
 		self.title_widget = WinFiltersTitleWidget(Lng.tag_management, Static.COLOR_ICONS / "tags.svg")
 		self.title_widget.reset_clicked.connect(lambda: self.reset_tags(True))
 		self.v_lay.addWidget(self.title_widget)
-
-		self.v_lay.addWidget(USep())
 
 		st_tags_title = TransparentLabel(Lng.standart_tags)
 		st_tags_title.set_state("gray")
