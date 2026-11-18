@@ -206,6 +206,7 @@ class WinImgSearchDropWidget(ImageDropFrame):
 
 	def show_loading(self, file_name: str):
 		self.descr_label.setText(f"{Lng.loading}\n{file_name}")
+		self.svg_widget.load(str(Static.COLOR_ICONS / "loading.svg"))
 
 	def show_default(self):
 		lines_base_text = (
@@ -215,6 +216,7 @@ class WinImgSearchDropWidget(ImageDropFrame):
 		)
 		self.base_text = "\n".join(lines_base_text)
 		self.descr_label.setText(self.base_text)
+		self.svg_widget.load(str(Static.COLOR_ICONS / "image.svg"))
 
 
 class WinImgSearchPreviewWidget(ImageDropFrame):
