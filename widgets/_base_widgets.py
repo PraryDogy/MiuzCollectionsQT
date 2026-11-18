@@ -1630,7 +1630,7 @@ class ChoosePathWidget(TransparentFrame):
 
 		lay = QHBoxLayout(self)
 		lay.setContentsMargins(10, 10, 10, 10)
-		lay.setSpacing(5)
+		lay.setSpacing(10)
 
 		self.icon = QSvgWidget()
 		self.icon.setFixedSize(26, 26)
