@@ -719,3 +719,7 @@ class Lng:
 		"Окно поиска",
 		"Search window"
 	)
+	choose_another_image = (
+		"Выбрать другое изображение",
+		"Choose another image"
+	)

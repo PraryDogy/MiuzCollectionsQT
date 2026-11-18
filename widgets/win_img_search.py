@@ -4,10 +4,10 @@ from multiprocessing import shared_memory
 import cv2
 import numpy as np
 import sqlalchemy
-from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QCursor, QIcon, QImage, QPixmap
-from PyQt6.QtSvgWidgets import QSvgWidget  # Не забудьте импортировать
-from PyQt6.QtWidgets import QHBoxLayout, QStackedWidget, QVBoxLayout
+from PyQt6.QtCore import QPoint, QStandardPaths, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QCursor, QIcon, QImage, QPixmap
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QStackedWidget, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
 from system.items import ImageArrayItem, Mf
@@ -19,9 +19,10 @@ from system.utils import ImageReader
 from ._base_widgets import (ActiveButton, SubGroup, TitleWidget,
                             TransparentFrame, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, USlider)
+                            UMenu, UPushButton, USlider)
 
 DROP_WIDGET_SIZE = (350, 300)
+
 
 class ProgressWin(UMainWindow):
 	stop_img_search = pyqtSignal()
@@ -132,16 +133,22 @@ class SliderWidget(TransparentWidget):
 
 
 class ImageDropFrame(TransparentFrame):
-	"""Общая логика приёма изображения перетаскиванием.
+	"""Общая логика приёма изображения: перетаскивание, клик и контекстное меню.
 
 	Подсвечивает зону (свойство active), если файл подходит,
 	и отклоняет всё остальное.
 	"""
 	image_dropped = pyqtSignal(str)
+	reset_requested = pyqtSignal()
+	# в контекстном меню показывать пункт «Сброс» (включается в наследниках)
+	show_reset = False
+	# папка последнего выбранного файла, общая для всех зон
+	_last_dir: str = ""
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.setAcceptDrops(True)
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 	def _set_active(self, value: bool):
 		self.setProperty("active", value)
@@ -174,6 +181,41 @@ class ImageDropFrame(TransparentFrame):
 		a0.acceptProposedAction()
 		self.image_dropped.emit(path)
 
+	def mouseReleaseEvent(self, a0):
+		if a0.button() == Qt.MouseButton.LeftButton:
+			self._open_file_dialog()
+		super().mouseReleaseEvent(a0)
+
+	def contextMenuEvent(self, a0):
+		menu = UMenu(parent=self)
+
+		choose = QAction(Lng.choose_another_image, menu)
+		choose.triggered.connect(lambda: self._open_file_dialog())
+		menu.addAction(choose)
+
+		if self.show_reset:
+			menu.addSeparator()
+			reset = QAction(Lng.reset, menu)
+			reset.triggered.connect(lambda: self.reset_requested.emit())
+			menu.addAction(reset)
+
+		menu.show_menu_under_cursor(a0)
+
+	def _open_file_dialog(self):
+		if not ImageDropFrame._last_dir:
+			ImageDropFrame._last_dir = QStandardPaths.writableLocation(
+				QStandardPaths.StandardLocation.DownloadLocation
+			)
+
+		file_filter = "Images (" + " ".join(f"*{ext}" for ext in ImageReader.ext_all) + ")"
+		path, _ = QFileDialog.getOpenFileName(self, "", ImageDropFrame._last_dir, file_filter)
+		if not path:
+			return
+
+		ImageDropFrame._last_dir = os.path.dirname(path)
+		if path.endswith(ImageReader.ext_all):
+			self.image_dropped.emit(path)
+
 
 class WinImgSearchDropWidget(ImageDropFrame):
 	def __init__(self, parent=None):
@@ -187,7 +229,6 @@ class WinImgSearchDropWidget(ImageDropFrame):
 
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "image.svg"))
 		self.svg_widget.setFixedSize(50, 50)
-
 		self.v_layout.addWidget(
 			self.svg_widget,
 			alignment=Qt.AlignmentFlag.AlignCenter,
@@ -221,15 +262,16 @@ class WinImgSearchDropWidget(ImageDropFrame):
 
 class WinImgSearchPreviewWidget(ImageDropFrame):
 	pixmap_finished = pyqtSignal()
+	show_reset = True
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.setFixedSize(*DROP_WIDGET_SIZE)
 
+		# номер текущей загрузки: результаты старых задач игнорируются
+		self._generation = 0
 		self.pixmap = QPixmap()
 		self.image_label = TransparentLabel(Lng.loading)
-		self.image_label.set_state("gray")
-		self.image_label.set_elide(True, ignore_width=False)
 		self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		layout = QVBoxLayout(self)
 		layout.setContentsMargins(0, 0, 0, 0)
@@ -237,8 +279,12 @@ class WinImgSearchPreviewWidget(ImageDropFrame):
 		layout.addWidget(self.image_label)
 
 	def set_pixmap(self, img_array: np.ndarray):
+		generation = self._generation
 
 		def finished(qimage: QImage):
+			# пришёл результат для изображения, которое уже заменили: игнорируем
+			if generation != self._generation:
+				return
 			self.pixmap = QPixmap.fromImage(qimage)
 			self.image_label.setPixmap(self.pixmap)
 			self.pixmap_finished.emit()
@@ -252,6 +298,7 @@ class WinImgSearchPreviewWidget(ImageDropFrame):
 		UThreadPool.start(self.qimage_task)
 
 	def clear(self):
+		self._generation += 1
 		self.pixmap = QPixmap()
 		self.image_label.clear()
 
@@ -331,6 +378,7 @@ class WinImgSearch(UMainWindow):
 		# бросок принимают обе зоны: пустая и превью
 		self.drop_widget.image_dropped.connect(self.image_dropped)
 		self.preview_widget.image_dropped.connect(self.image_dropped)
+		self.preview_widget.reset_requested.connect(self.reset_img_search)
 
 		self.controls_widget = ControlsWidget()
 		self.content_layout.addWidget(self.controls_widget)
@@ -388,8 +436,10 @@ class WinImgSearch(UMainWindow):
 			self.close_button.setText(Lng.hide)
 
 	def image_dropped(self, path: str):
-		# сразу показываем состояние загрузки, не дожидаясь чтения файла
+		# новое изображение: старое убираем сразу, показываем загрузку в зоне drop
+		self.preview_widget.clear()
 		self.drop_widget.show_loading(os.path.basename(path))
+		self.image_stack.setCurrentIndex(0)
 		self.set_close_button_text()
 		self.start_read_img_task(path)
 
@@ -399,6 +449,7 @@ class WinImgSearch(UMainWindow):
 		self.img_array = None
 		self.preview_widget.clear()
 		self.image_stack.setCurrentIndex(0)
+		self.drop_widget.show_default()
 		Dynamic.img_search_thumb_paths.clear()
 		self.reload_thumbnails.emit()
 		self.set_close_button_text()
@@ -519,7 +570,6 @@ class WinImgSearch(UMainWindow):
 		elif is_alive:
 			self.read_img_timer.start(self.read_img_poll_ms)
 		else:
-			# процесс завершился без результата: чтение не удалось
 			self.read_img_failed()
 
 	def read_img_failed(self):
@@ -534,12 +584,8 @@ class WinImgSearch(UMainWindow):
 
 		self.preview_widget.clear()
 		self.image_stack.setCurrentIndex(0)
+		self.drop_widget.show_default()
 		self.set_close_button_text()
-
-		# временно показываем ошибку в зоне drop, потом возвращаем обычный текст
-		label = self.drop_widget.descr_label
-		label.setText(Lng.image_read_error)
-		QTimer.singleShot(3000, lambda: label.setText(self.drop_widget.base_text))
 
 	def found_image_cmd(self, rel_path: str):
 		Dynamic.img_search_thumb_paths.add(rel_path)
