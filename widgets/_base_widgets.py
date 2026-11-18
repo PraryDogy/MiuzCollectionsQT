@@ -910,6 +910,25 @@ class TitleTextWidget(TransparentWidget):
 		self.h_layout.addWidget(self.text_widget)
 
 
+class TitleWidget(TransparentWidget):
+	def __init__(self, title: str, description: str, title_svg: Path):
+		super().__init__()
+		self.v_lay = QVBoxLayout(self)
+		self.v_lay.setContentsMargins(0, 0, 0, 0)
+		self.v_lay.setSpacing(5)
+
+		self.title_widget = TitleTextWidget(title, title_svg)
+		self.v_lay.addWidget(self.title_widget)
+
+		self.sep = USep()
+		self.v_lay.addWidget(self.sep)
+
+		self.description_widget = TransparentLabel(description)
+		self.description_widget.set_state("gray")
+		self.v_lay.addWidget(self.description_widget)
+
+
+
 # если переименовываешь, не забудь qss
 class TagWidget(TransparentFrame):
 	right_svg_clicked = pyqtSignal()
