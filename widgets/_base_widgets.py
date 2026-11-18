@@ -1727,7 +1727,7 @@ class MfPathWidget(HoverGroupBox):
 		status_wrap = TransparentWidget()
 		content_lay.addWidget(status_wrap)
 		status_lay = QHBoxLayout(status_wrap)
-		status_lay.setContentsMargins(10, 0, 10, 0)
+		status_lay.setContentsMargins(0, 0, 0, 0)
 		status_lay.setSpacing(0)
 		self.status = ChoosePathWidget()
 		status_lay.addWidget(self.status)

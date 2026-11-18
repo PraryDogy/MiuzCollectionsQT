@@ -13,6 +13,7 @@ cfg.json при этом не записывается.
 """
 import argparse
 import atexit
+import importlib
 import os
 import shutil
 import sys
@@ -32,6 +33,21 @@ THEME_CHOICES = [
     ("Светлая", "light"),
     ("Авто", "auto"),
 ]
+
+
+def reload_window_modules() -> None:
+    """Перечитывает модули окон из widgets/, чтобы подхватить правки без перезапуска.
+
+    Базовые классы (widgets/_base_widgets.py) и system/* не трогаются: их изменения
+    требуют перезапуска debug_launcher.py. Перезапуск быстрый, песочница создаётся заново.
+    """
+    skip = {"widgets", "widgets._base_widgets"}
+    for name in sorted(list(sys.modules)):
+        if name.startswith("widgets.") and name not in skip:
+            try:
+                importlib.reload(sys.modules[name])
+            except Exception:
+                print(f"[перезагрузка] ошибка в {name}\n{traceback.format_exc()}", flush=True)
 
 
 class CloseFilter(QObject):
@@ -126,6 +142,7 @@ class Launcher(UMainWindow):
 
     def open_one(self, index: int):
         name, factory = self.factories[index]
+        reload_window_modules()          # свежий код окна при каждом открытии
         try:
             win = factory()
         except Exception:
