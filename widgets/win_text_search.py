@@ -2,15 +2,13 @@ import re
 
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QIcon, QTextCursor
-from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Static
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, UTextEdit)
+from ._base_widgets import (ActiveButton, TitleWidget, TransparentWidget,
+                            UGroupBox, UMainWindow, UPushButton, UTextEdit)
 
 
 class WinTextSearch(UMainWindow):
@@ -42,23 +40,6 @@ class WinTextSearch(UMainWindow):
 		self.format_button.setIconSize(QSize(10, 10))
 		self.format_button.setIcon(self.wand_icon)
 		self.title_row.add_title_button(self.format_button)
-
-
-		# self.title_row.h_layout.addStretch()
-
-		# self.format_button = UPushButton(Lng.enhance_text)
-		# self.format_button.clicked.connect(self.format_input_text)
-		# self.format_button.setIconSize(QSize(10, 10))
-		# self.format_button.setIcon(self.wand_icon)
-		# self.title_row.h_layout.addWidget(self.format_button)
-
-		# group_layout.addWidget(USep())
-
-		# # Текст описания форматов (RU / EN)
-		# self.description_label = TransparentLabel(Lng.text_search_descr)
-		# self.description_label.set_state("gray")
-		# self.description_label.setWordWrap(True)
-		# group_layout.addWidget(self.description_label)
 
 		self.text_edit = UTextEdit()
 		self.text_edit.setPlaceholderText(Lng.search_placeholder_texts)
