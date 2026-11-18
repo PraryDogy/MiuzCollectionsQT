@@ -48,20 +48,13 @@ class SaveRowWidget(TransparentWidget):
 	cancel_clicked = pyqtSignal()
 	new_catalog_clicked = pyqtSignal()
 
-	def __init__(self, show_new_catalog: bool = True):
+	def __init__(self):
 		super().__init__()
 		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
 		self.h_lay = QHBoxLayout(self)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
 		self.h_lay.setSpacing(5)
-
-		self.new_catalog_btn = UPushButton(Lng.new_catalog)
-		self.new_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest.svg")))
-		self.new_catalog_btn.setIconSize(QSize(10, 10))
-		self.new_catalog_btn.clicked.connect(self.new_catalog_clicked.emit)
-		self.new_catalog_btn.setVisible(show_new_catalog)
-		self.h_lay.addWidget(self.new_catalog_btn)
 
 		self.h_lay.addStretch()
 
@@ -86,6 +79,10 @@ class SaveRowWidget(TransparentWidget):
 
 	def hide_warning(self):
 		self.attention_icon.hide()
+
+	def add_left_button(self, widget: UPushButton):
+		self.h_lay.insertWidget(0, widget)
+		# self.h_lay.insertStretch(1)
 
 
 class LangTimeWidget(UGroupBox):
@@ -1075,10 +1072,15 @@ class NewMfWin(UMainWindow):
 		self.central_layout.addSpacing(10)
 
 		# Футер с кнопками без «Новый каталог»
-		self.save_group = SaveRowWidget(show_new_catalog=False)
+		self.save_group = SaveRowWidget()
 		self.save_group.save_clicked.connect(self.save_changes)
 		self.save_group.cancel_clicked.connect(self._try_close)
 		self.central_layout.addWidget(self.save_group)
+
+		find_catalog = UPushButton(Lng.find_catalog)
+		find_catalog.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier.svg")))
+		find_catalog.clicked.connect(self.mf_path_widget.dialog_dir)
+		self.save_group.add_left_button(find_catalog)
 
 		if mf_path:
 			self.mf_path_widget_changed()
@@ -1102,7 +1104,7 @@ class NewMfWin(UMainWindow):
 
 	def _on_changed(self):
 		self.has_unsaved = True
-		self.save_group.show_warning()
+		# self.save_group.show_warning()
 
 	def mf_path_widget_changed(self):
 		self._on_changed()
@@ -1195,10 +1197,18 @@ class WinSettings(UMainWindow):
 		self.central_layout.addSpacing(10)
 		# Единственная кнопка сохранения: футер окна
 		self.save_widget = SaveRowWidget()
-		self.save_widget.new_catalog_clicked.connect(self.open_new_catalog_win)
 		self.save_widget.save_clicked.connect(self.save_settings_cmd)
 		self.save_widget.cancel_clicked.connect(self.close)
 		self.central_layout.addWidget(self.save_widget)
+
+
+		self.new_catalog_btn = UPushButton(Lng.new_catalog)
+		self.new_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "crest.svg")))
+		self.new_catalog_btn.setIconSize(QSize(10, 10))
+		self.new_catalog_btn.clicked.connect(self.open_new_catalog_win)
+		self.save_widget.add_left_button(self.new_catalog_btn)
+
+
 
 		self.left_menu = UListWidget()
 		self.left_menu.clicked.connect(self.left_menu_click)

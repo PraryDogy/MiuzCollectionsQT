@@ -1377,7 +1377,7 @@ class MfAliasWidget(TransparentWidget):
 		self.name_is_valid: bool = False
 
 		v_layout = QVBoxLayout(self)
-		v_layout.setContentsMargins(10, 5, 10, 5)
+		v_layout.setContentsMargins(10, 0, 10, 10)
 		v_layout.setSpacing(5)
 
 		title_wrapper = TransparentWidget()
@@ -1626,9 +1626,9 @@ class ChoosePathWidget(TransparentFrame):
 		lay.setContentsMargins(10, 10, 10, 10)
 		lay.setSpacing(5)
 
-		self.icon = QSvgWidget()
-		self.icon.setFixedSize(16, 16)
-		lay.addWidget(self.icon)
+		# self.icon = QSvgWidget()
+		# self.icon.setFixedSize(16, 16)
+		# lay.addWidget(self.icon)
 
 		self.path_label = TransparentLabel("")
 		self.path_label.set_elide(True)
@@ -1646,7 +1646,7 @@ class ChoosePathWidget(TransparentFrame):
 		self.update()
 
 	def set_status(self, icon_path: Path, text: str, state: str):
-		self.icon.load(str(icon_path))
+		# self.icon.load(str(icon_path))
 		self.path_label.setText(text)
 		self.set_state(state)
 
