@@ -293,7 +293,7 @@ class BarBottom(TransparentWidget):
 
 		# --- Вертикальный лэйаут: путь сверху, нижняя строка снизу ---
 		self.v_layout = QVBoxLayout(self)
-		self.v_layout.setContentsMargins(self.FOOTER_MARGINS, 5, self.FOOTER_MARGINS, 0)
+		self.v_layout.setContentsMargins(self.FOOTER_MARGINS, 0, self.FOOTER_MARGINS, 0)
 		self.v_layout.setSpacing(0)
 
 		# --- Путь ---

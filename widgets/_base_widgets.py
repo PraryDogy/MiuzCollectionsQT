@@ -825,8 +825,8 @@ class UMainWindow(QMainWindow):
 		self.sep_container.setVisible(False)
 
 		self.central_layout = QVBoxLayout()
-		self.central_layout.setContentsMargins(5, 5, 5, 5)
-		self.central_layout.setSpacing(5)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
+		self.central_layout.setSpacing(10)
 
 		self.window_layout.addLayout(self.central_layout)
 
