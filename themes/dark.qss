@@ -242,10 +242,10 @@ WinImgSearchPreviewWidget {
 
 /* PY: размер и пунктирная рамка оставить здесь,
    отступы внутри — setContentsMargins у layout.
-   Единственная зона с акцентной рамкой: здесь пользователь бросает файл. */
+   Рамка приглушённая: зона выделяется формой, а не яркостью. */
 WinImgSearchDropWidget {
     background: #111a22;
-    border: 2px dashed #2f5f96;
+    border: 2px dashed #243a52;
     border-radius: 8px;
 }
 

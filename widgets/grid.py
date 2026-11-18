@@ -529,12 +529,12 @@ class GridNoSubfoldersTag(GridTag):
 
 class GridTextSearchTag(GridTag):
 	def __init__(self):
-		super().__init__(", ".join(Dynamic.search_words_list), Static.GRAY_ICONS / "folder.svg")
+		super().__init__(", ".join(Dynamic.search_words_list), Static.GRAY_ICONS / "text_edit.svg")
 
 
 class GridImgSearchTag(GridTag):
 	def __init__(self):
-		super().__init__(Lng.image_search, Static.GRAY_ICONS / "folder.svg")
+		super().__init__(Lng.image_search, Static.GRAY_ICONS / "camera.svg")
 
 
 

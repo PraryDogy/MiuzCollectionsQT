@@ -45,7 +45,7 @@ class ProgressWin(UMainWindow):
 		self.text_layout.setContentsMargins(5, 0, 5, 0)
 		self.text_layout.setSpacing(10)
 
-		self.svg_icon = QSvgWidget(str(Static.GRAY_ICONS / "image_icon.svg")) 
+		self.svg_icon = QSvgWidget(str(Static.GRAY_ICONS / "image_icon.svg"))
 		self.svg_icon.setFixedSize(28, 28)
 		self.text_layout.addWidget(self.svg_icon)
 
@@ -64,7 +64,6 @@ class ProgressWin(UMainWindow):
 
 		self.adjustSize()
 		self.setFixedSize(self.width(), self.height())
-		# self.text_label.setText(Lng.please_wait)
 
 	def set_text(self, current_count, total_count):
 		if current_count > total_count:
@@ -132,15 +131,54 @@ class SliderWidget(TransparentWidget):
 		self.current_value = value
 
 
+class ImageDropFrame(TransparentFrame):
+	"""Общая логика приёма изображения перетаскиванием.
 
-
-class WinImgSearchDropWidget(TransparentFrame):
+	Подсвечивает зону (свойство active), если файл подходит,
+	и отклоняет всё остальное.
+	"""
 	image_dropped = pyqtSignal(str)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		self.setFixedSize(*DROP_WIDGET_SIZE)
 		self.setAcceptDrops(True)
+
+	def _set_active(self, value: bool):
+		self.setProperty("active", value)
+		self.style().unpolish(self)
+		self.style().polish(self)
+
+	@staticmethod
+	def _path_from_mime(mime) -> str | None:
+		if not mime.hasUrls():
+			return None
+		path = mime.urls()[0].toLocalFile().rstrip(os.sep)
+		return path if path.endswith(ImageReader.ext_all) else None
+
+	def dragEnterEvent(self, a0):
+		if self._path_from_mime(a0.mimeData()):
+			a0.acceptProposedAction()
+			self._set_active(True)
+		else:
+			a0.ignore()
+
+	def dragLeaveEvent(self, a0):
+		self._set_active(False)
+
+	def dropEvent(self, a0):
+		self._set_active(False)
+		path = self._path_from_mime(a0.mimeData())
+		if path is None:
+			a0.ignore()
+			return
+		a0.acceptProposedAction()
+		self.image_dropped.emit(path)
+
+
+class WinImgSearchDropWidget(ImageDropFrame):
+	def __init__(self, parent=None):
+		super().__init__(parent)
+		self.setFixedSize(*DROP_WIDGET_SIZE)
 
 		self.v_layout = QVBoxLayout(self)
 		self.v_layout.setContentsMargins(0, 0, 0, 0)
@@ -149,7 +187,6 @@ class WinImgSearchDropWidget(TransparentFrame):
 
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "image.svg"))
 		self.svg_widget.setFixedSize(50, 50)
-		
 
 		self.v_layout.addWidget(
 			self.svg_widget,
@@ -180,21 +217,8 @@ class WinImgSearchDropWidget(TransparentFrame):
 		self.base_text = "\n".join(lines_base_text)
 		self.descr_label.setText(self.base_text)
 
-	def dragEnterEvent(self, a0):
-		a0.acceptProposedAction()
-		return super().dragEnterEvent(a0)
 
-	def dropEvent(self, a0):
-		if not a0.mimeData().hasUrls():
-			return
-		path = a0.mimeData().urls()[0].toLocalFile().rstrip(os.sep)
-		if not path.endswith(ImageReader.ext_all):
-			return
-		self.image_dropped.emit(path)
-		a0.acceptProposedAction()
-
-
-class WinImgSearchPreviewWidget(TransparentFrame):
+class WinImgSearchPreviewWidget(ImageDropFrame):
 	pixmap_finished = pyqtSignal()
 
 	def __init__(self, parent=None):
@@ -208,6 +232,11 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setSpacing(0)
 		layout.addWidget(self.image_label)
+
+	def show_loading(self, file_name: str):
+		self.pixmap = QPixmap()
+		self.image_label.clear()
+		self.image_label.setText(f"{Lng.loading}\n{file_name}")
 
 	def set_pixmap(self, img_array: np.ndarray):
 
@@ -301,7 +330,9 @@ class WinImgSearch(UMainWindow):
 		self.image_stack.addWidget(self.preview_widget)
 		self.image_stack.setCurrentIndex(0)
 		self.content_layout.addWidget(self.image_stack, alignment=Qt.AlignmentFlag.AlignCenter)
+		# бросок принимают обе зоны: пустая и превью
 		self.drop_widget.image_dropped.connect(self.image_dropped)
+		self.preview_widget.image_dropped.connect(self.image_dropped)
 
 		self.controls_widget = ControlsWidget()
 		self.content_layout.addWidget(self.controls_widget)
@@ -359,6 +390,10 @@ class WinImgSearch(UMainWindow):
 			self.close_button.setText(Lng.hide)
 
 	def image_dropped(self, path: str):
+		# сразу показываем состояние загрузки, не дожидаясь чтения файла
+		self.preview_widget.show_loading(os.path.basename(path))
+		self.image_stack.setCurrentIndex(1)
+		self.set_close_button_text()
 		self.start_read_img_task(path)
 
 	def reset_img_search(self):
@@ -461,6 +496,10 @@ class WinImgSearch(UMainWindow):
 		if self.read_img_task is None:
 			return
 
+		# сначала проверяем, жив ли процесс, и только потом очередь:
+		# так результат, который процесс положил перед выходом, не потеряется
+		is_alive = self.read_img_task.is_alive()
+
 		if not self.read_img_task.process_queue.empty():
 			item: ImageArrayItem = self.read_img_task.process_queue.get()
 			try:
@@ -474,20 +513,35 @@ class WinImgSearch(UMainWindow):
 					self.img_array = None
 					QTimer.singleShot(1500, self.reset_img_search)
 
-				if not self.read_img_task.is_alive():
+				if not is_alive:
 					self.read_img_task.terminate_join()
 					self.read_img_task = None
 			except Exception:
-				self.cleanup_shm()
-				self.img_array = None
-				if self.read_img_task is not None:
-					try:
-						self.read_img_task.terminate_join()
-					except Exception:
-						pass
-					self.read_img_task = None
-		else:
+				self.read_img_failed()
+		elif is_alive:
 			self.read_img_timer.start(self.read_img_poll_ms)
+		else:
+			# процесс завершился без результата: чтение не удалось
+			self.read_img_failed()
+
+	def read_img_failed(self):
+		self.cleanup_shm()
+		self.img_array = None
+		if self.read_img_task is not None:
+			try:
+				self.read_img_task.terminate_join()
+			except Exception:
+				pass
+			self.read_img_task = None
+
+		self.preview_widget.clear()
+		self.image_stack.setCurrentIndex(0)
+		self.set_close_button_text()
+
+		# временно показываем ошибку в зоне drop, потом возвращаем обычный текст
+		label = self.drop_widget.descr_label
+		label.setText(Lng.image_read_error)
+		QTimer.singleShot(3000, lambda: label.setText(self.drop_widget.base_text))
 
 	def found_image_cmd(self, rel_path: str):
 		Dynamic.img_search_thumb_paths.add(rel_path)
