@@ -236,7 +236,8 @@ WinImageView {
 
 /* PY: размер области — setMinimumSize, радиус оставить здесь. */
 WinImgSearchPreviewWidget {
-    background: #000000;
+    background: #111a22;
+    border: 2px dashed #243a52;
     border-radius: 8px;
 }
 
@@ -248,6 +249,7 @@ WinImgSearchDropWidget {
     border: 2px dashed #243a52;
     border-radius: 8px;
 }
+
 
 /* PY: размер кнопки «вверх» — setFixedSize (например 36x36),
    радиус 18px даёт круг. */

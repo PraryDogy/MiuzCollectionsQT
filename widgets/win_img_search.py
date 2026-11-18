@@ -227,18 +227,19 @@ class WinImgSearchPreviewWidget(ImageDropFrame):
 
 		self.pixmap = QPixmap()
 		self.image_label = TransparentLabel(Lng.loading)
+		self.image_label.set_state("gray")
+		self.image_label.set_elide(True, ignore_width=False)
 		self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		layout = QVBoxLayout(self)
-		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setContentsMargins(10, 10, 10, 10)
 		layout.setSpacing(0)
 		layout.addWidget(self.image_label)
 
 	def show_loading(self, file_name: str):
-		self.pixmap = QPixmap()
-		self.image_label.clear()
 		self.image_label.setText(f"{Lng.loading}\n{file_name}")
 
 	def set_pixmap(self, img_array: np.ndarray):
+		return
 
 		def finished(qimage: QImage):
 			self.pixmap = QPixmap.fromImage(qimage)
