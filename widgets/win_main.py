@@ -141,6 +141,8 @@ class WinMain(UMainWindow):
 		# отступы от окна слева справа, кроме заголовка окна
 		self.setMinimumWidth(750)
 		self.setMenuBar(BarMacos())
+		self.central_layout.setContentsMargins(10, 5, 10, 0)
+
 		self.ww = 1200 if JsonData.square_thumbs else 1160
 
 		self.forced_scaner_dirs = ForcedDirsRegistry()
