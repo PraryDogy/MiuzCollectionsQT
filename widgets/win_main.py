@@ -141,8 +141,6 @@ class WinMain(UMainWindow):
 	def __init__(self, argv: list):
 		super().__init__()
 		# отступы от окна слева справа, кроме заголовка окна
-		self.central_layout.setContentsMargins(5, 0, 5, 0)
-		self.central_layout.setSpacing(0)
 		self.setMinimumWidth(750)
 		self.setMenuBar(BarMacos())
 		self.ww = 1200 if JsonData.square_thumbs else 1160

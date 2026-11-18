@@ -825,8 +825,8 @@ class UMainWindow(QMainWindow):
 		self.sep_container.setVisible(False)
 
 		self.central_layout = QVBoxLayout()
-		self.central_layout.setContentsMargins(0, 0, 0, 0)
-		self.central_layout.setSpacing(0)
+		self.central_layout.setContentsMargins(5, 5, 5, 5)
+		self.central_layout.setSpacing(5)
 
 		self.window_layout.addLayout(self.central_layout)
 
@@ -915,7 +915,7 @@ class TitleTextWidget(TransparentWidget):
 
 
 class TitleWidget(TransparentWidget):
-	def __init__(self, title: str, description: str, title_svg: Path = None):
+	def __init__(self, title: str, description: str = None, title_svg: Path = None):
 		super().__init__()
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(0, 0, 0, 0)
@@ -924,12 +924,13 @@ class TitleWidget(TransparentWidget):
 		self.title_widget = TitleTextWidget(title, title_svg)
 		self.v_lay.addWidget(self.title_widget)
 
-		self.sep = USep()
-		self.v_lay.addWidget(self.sep)
+		if description:
+			self.sep = USep()
+			self.v_lay.addWidget(self.sep)
 
-		self.description_widget = TransparentLabel(description)
-		self.description_widget.set_state("gray")
-		self.v_lay.addWidget(self.description_widget)
+			self.description_widget = TransparentLabel(description)
+			self.description_widget.set_state("gray")
+			self.v_lay.addWidget(self.description_widget)
 
 	def add_title_button(self, widget: TransparentButton):
 		self.title_widget.h_layout.addStretch()
@@ -1074,7 +1075,6 @@ class WinProgressbar(UMainWindow):
 		self.setWindowTitle(title)
 		self.setFixedWidth(370)
 
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
 		self.central_layout.setSpacing(0)
 		self.show_titlebar_sep()
 		self.central_layout.addSpacing(10)
@@ -1136,9 +1136,6 @@ class VerticalWindow(UMainWindow):
 
 	def __init__(self):
 		super().__init__()
-
-		self.central_layout.setSpacing(10)
-		self.central_layout.setContentsMargins(15, 10, 15, 15)
 
 		self.icon_text_widget = TransparentWidget()
 		self.central_layout.addWidget(self.icon_text_widget)
@@ -1290,8 +1287,6 @@ class InputTextWin(UMainWindow):
 		self.setWindowTitle(Lng.text_input)
 		self.show_titlebar_sep()
 		self.central_layout.addSpacing(10)
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.setSpacing(0)
 
 		svg_text_widget = TransparentWidget()
 		self.central_layout.addWidget(svg_text_widget)
@@ -1671,13 +1666,21 @@ class MfPathWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(5)
 
-		self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
+		self.title_widget = TitleWidget(
+			Lng.catalog_path,
+			Lng.catalog_path_descr,
+			Static.COLOR_ICONS / "finder.svg"
+		)
+		self.title_widget.description_widget.setWordWrap(True)
 		content_lay.addWidget(self.title_widget)
 
-		descr_label = TransparentLabel(Lng.catalog_path_descr)
-		descr_label.set_state("gray")
-		descr_label.setWordWrap(True)
-		content_lay.addWidget(descr_label)
+		# self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
+		# content_lay.addWidget(self.title_widget)
+
+		# descr_label = TransparentLabel(Lng.catalog_path_descr)
+		# descr_label.set_state("gray")
+		# descr_label.setWordWrap(True)
+		# content_lay.addWidget(descr_label)
 
 		content_lay.addSpacing(5)
 

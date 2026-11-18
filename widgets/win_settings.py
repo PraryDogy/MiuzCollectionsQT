@@ -586,8 +586,6 @@ class MfRepairWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.repair_errors)
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-		self.central_layout.setSpacing(10)
 
 		h_wrapper = TransparentWidget()
 		self.central_layout.addWidget(h_wrapper)
@@ -719,9 +717,6 @@ class IgnoreListWin(UMainWindow):
 		self.draft_stop_list = list(self.mf.mf_stop_list)
 		self.has_unsaved = False
 		self.discard_win = None
-
-		self.central_layout.setContentsMargins(5, 5, 5, 10)
-		self.central_layout.setSpacing(5)
 
 		self.group_box = UGroupBox()
 		self.group_lay = QVBoxLayout(self.group_box)
@@ -1051,9 +1046,6 @@ class NewMfWin(UMainWindow):
 		self.has_unsaved = False
 		self.discard_win = None
 
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.setSpacing(0)
-
 		group_wrapper = UGroupBox()
 		self.central_layout.addWidget(group_wrapper)
 		group_lay = QVBoxLayout(group_wrapper)
@@ -1186,8 +1178,6 @@ class WinSettings(UMainWindow):
 		self.pending_idx = None
 		self.has_unsaved = False
 		self.discard_win = None
-
-		self.central_layout.setContentsMargins(5, 5, 5, 10)
 
 		self.splitter = QSplitter()
 		self.splitter.setHandleWidth(15)

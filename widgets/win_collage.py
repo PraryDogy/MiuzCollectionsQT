@@ -22,7 +22,6 @@ class WinCollage(UMainWindow):
 		self.setMinimumSize(400, 400)
 		self.setWindowTitle(Lng.collage)
 		self.show_titlebar_sep()
-		self.central_layout.setContentsMargins(5, 0, 5, 0)
 
 		self.pixmaps: list[QPixmap] = [
 			QPixmap.fromImage(i.base_qimage)

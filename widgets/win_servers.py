@@ -13,7 +13,7 @@ from cfg import JsonData, Static
 from system.items import Servers
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, ConfirmWindow, TitleTextWidget,
+from ._base_widgets import (ActiveButton, ConfirmWindow, TitleWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             ULineEdit, UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton, USep)
@@ -160,10 +160,6 @@ class LoginWin(UMainWindow):
 		title_word = Lng.edit if is_edit else Lng.add
 		self.setWindowTitle(f"{title_word}")
 
-		# Уменьшили рамки вокруг виджетов
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.setSpacing(10)
-
 		# --- GroupBox для формы ---
 		group = UGroupBox()
 		self.central_layout.addWidget(group)
@@ -262,30 +258,16 @@ class ServersWin(UMainWindow):
 		
 		self.setWindowTitle(Lng.connections)
 		self.setFixedWidth(400)
-		
-		# Сепаратор включаем, так как под ним будет заголовок, а не UGroupBox
-
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-		self.central_layout.setSpacing(10)
 
 		# --- Группа "Избранное" ---
 		group = UGroupBox()
 		group_lay = QVBoxLayout(group)
 		group_lay.setContentsMargins(12, 12, 12, 12)
 		group_lay.setSpacing(8)
-		title_lbl = TitleTextWidget(Lng.favorite_servers, Static.COLOR_ICONS / "connections.svg")
+		title_lbl = TitleWidget(Lng.favorite_servers, Lng.servers_description, Static.COLOR_ICONS / "connections.svg")
+		title_lbl.description_widget.setWordWrap(True)
 		group_lay.addWidget(title_lbl)
-
-		group_lay.addWidget(USep())
-
-		# --- Описание ---
-		description_label = TransparentLabel(Lng.servers_description)
-		description_label.set_state("gray")
-		description_label.setWordWrap(True)
-		group_lay.addWidget(description_label)
-
 		self.central_layout.addWidget(group)
-
 
 		# --- Список серверов напрямую ---
 		self.v_list = ServerList()

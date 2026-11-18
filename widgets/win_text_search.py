@@ -27,9 +27,6 @@ class WinTextSearch(UMainWindow):
 		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier.svg"))
 		self.wand_icon = QIcon(str(Static.GRAY_ICONS / "wand.svg"))
 
-		self.central_layout.setSpacing(10)
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-
 		group_container = UGroupBox()
 		self.central_layout.addWidget(group_container)
 		group_layout = QVBoxLayout(group_container)

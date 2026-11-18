@@ -58,8 +58,6 @@ class FirstLoadWin(UMainWindow):
 		self.set_close_only()
 		UThreadPool.init()
 		Lng.init_lang(0)
-		self.central_layout.setContentsMargins(5, 7, 5, 10)
-		self.central_layout.setSpacing(10)
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.init_ui()
 		self.adjustSize()

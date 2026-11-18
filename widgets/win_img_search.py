@@ -36,9 +36,6 @@ class ProgressWin(UMainWindow):
 
 		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square.svg"))
 
-		self.central_layout.setSpacing(10)
-		self.central_layout.setContentsMargins(10, 10, 10, 10)
-
 		self.text_container = TransparentWidget()
 		self.central_layout.addWidget(self.text_container)
 
@@ -347,9 +344,6 @@ class WinImgSearch(UMainWindow):
 		self.read_img_timer = QTimer(self)
 		self.read_img_timer.setSingleShot(True)
 		self.read_img_timer.timeout.connect(self.poll_read_img)
-
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-		self.central_layout.setSpacing(10)
 
 		# --- Основной контент внутри UGroupBox ---
 		self.content_box = UGroupBox()

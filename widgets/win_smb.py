@@ -31,10 +31,6 @@ class WinSmb(UMainWindow):
 		self.set_always_on_top()
 		self.setWindowTitle(Lng.attention)
 
-		# Делаем отступы аккуратными
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-		self.central_layout.setSpacing(10)
-
 		main_wrapper = UGroupBox()
 		self.central_layout.addWidget(main_wrapper)
 		wrapper_lay = QVBoxLayout(main_wrapper)

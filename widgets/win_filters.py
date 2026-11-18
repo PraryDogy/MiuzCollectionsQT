@@ -11,7 +11,7 @@ from system.items import Filters, ReadableDateItem
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
-                            InputTextWin, TitleTextWidget, TransparentLabel,
+                            InputTextWin, TitleWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
                             UPushButton, USep, TagWidget)
 from .win_calendar import WinCalendar
@@ -47,15 +47,15 @@ class PendingDatesState:
 		self.end = None
 
 
-class WinFiltersTitleWidget(TitleTextWidget):
+class WinFiltersTitleWidget(TitleWidget):
 	reset_clicked = pyqtSignal()
 
-	def __init__(self, text: str, svg: Path):
-		super().__init__(text, svg)
-		self.h_layout.addStretch(1)
+	def __init__(self, title, title_svg):
+		super().__init__(title=title, title_svg=title_svg)
+
 		self.reset_button = UPushButton(Lng.reset)
 		self.reset_button.clicked.connect(self.reset_clicked.emit)
-		self.h_layout.addWidget(self.reset_button)
+		self.add_title_button(self.reset_button)
 
 
 class CalendarTag(TagWidget):
@@ -480,8 +480,6 @@ class WinFilters(UMainWindow):
 		self.set_close_only()
 		self.setWindowTitle(Lng.filters)
 		self.setFixedWidth(590)
-		self.central_layout.setSpacing(10)
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		# черновики: попадают в Dynamic только по «Применить» или при сбросе
 		self.pending_dates = PendingDatesState()

@@ -108,9 +108,6 @@ class WinInfo(UMainWindow):
 		self.data_item = data_item
 		self.abs_path = data_item.abs_path
 
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.setSpacing(10)
-
 		self.build_img_wid()
 		self.create_qimage()
 		self._build_info()

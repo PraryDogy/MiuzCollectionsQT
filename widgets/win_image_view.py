@@ -233,8 +233,6 @@ class WinImageView(UMainWindow):
 
 		self.setMinimumSize(QSize(500, 400))
 		self.installEventFilter(self)
-		self.central_layout.setContentsMargins(0, 0, 0, 0)
-		self.central_layout.setSpacing(0)
 
 		self.mouse_move_timer = QTimer(self)
 		self.mouse_move_timer.setSingleShot(True)

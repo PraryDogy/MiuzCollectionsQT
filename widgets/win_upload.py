@@ -111,9 +111,6 @@ class UploadWin(UMainWindow):
 
 		self.current_dir = (mf.mf_path + current_dir).rstrip(os.sep)
 
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.setSpacing(10)
-
 		self.destiny_widget = DestinyFolderWidget(self.current_dir, files_to_copy)
 		self.destiny_widget.dir_changed.connect(self.dir_changed_cmd)
 		self.central_layout.addWidget(self.destiny_widget)

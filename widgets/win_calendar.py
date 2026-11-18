@@ -146,8 +146,6 @@ class WinCalendar(UMainWindow):
 		self.adjustSize()
 		self.setFixedSize(self.width(), self.height())
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.central_layout.setContentsMargins(10, 10, 10, 12)
-		self.central_layout.setSpacing(0)
 
 	def init_ui(self):
 		spacing = 10
