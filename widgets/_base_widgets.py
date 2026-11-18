@@ -1621,12 +1621,12 @@ class ChoosePathStatus(TransparentLabel):
 		self.update()
 
 
-# именно он а не group box для прозрачности
 class ChoosePathWidget(TransparentFrame):
-	"""Строка статуса пути: иконка и текст. Состояние задаётся свойством 'state' для QSS."""
-
 	def __init__(self, parent=None):
 		super().__init__(parent)
+		# мышь проходит сквозь строку к MfPathWidget
+		for w in (self, ):
+			w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
 		lay = QHBoxLayout(self)
 		lay.setContentsMargins(10, 10, 10, 10)
@@ -1634,22 +1634,38 @@ class ChoosePathWidget(TransparentFrame):
 
 		self.icon = QSvgWidget()
 		self.icon.setFixedSize(26, 26)
+		self.icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		lay.addWidget(self.icon)
 
 		text_wrapper = TransparentWidget()
+		text_wrapper.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		lay.addWidget(text_wrapper)
 		text_lay = QVBoxLayout(text_wrapper)
 		text_lay.setContentsMargins(0, 0, 0, 0)
 		text_lay.setSpacing(0)
 
 		self.status_label = ChoosePathStatus("")
+		self.status_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		text_lay.addWidget(self.status_label)
 
 		self.path_label = TransparentLabel("")
+		self.path_label.setObjectName("choosePathPath")
 		self.path_label.set_elide(True)
+		self.path_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		text_lay.addWidget(self.path_label)
 
 		self.set_state("warn")
+
+	def set_hovered(self, value: bool):
+		"""Вызывается из MfPathWidget: наведение на весь блок, а не на строку."""
+		new_value = "true" if value else "false"
+		if self.property("hovered") == new_value:
+			return
+		self.setProperty("hovered", new_value)
+		for w in (self, self.status_label, self.path_label):
+			w.style().unpolish(w)
+			w.style().polish(w)
+		self.update()
 
 	def set_state(self, state: str):
 		"""state: 'ok' или 'warn'. Меняет свойство, стиль переприменяется."""
@@ -1784,3 +1800,11 @@ class MfPathWidget(HoverGroupBox):
 		if a0.mimeData().hasUrls():
 			a0.accept()
 		return super().dragEnterEvent(a0)
+
+	def enterEvent(self, a0):
+		super().enterEvent(a0)
+		self.status.set_hovered(True)
+
+	def leaveEvent(self, a0):
+		super().leaveEvent(a0)
+		self.status.set_hovered(False)

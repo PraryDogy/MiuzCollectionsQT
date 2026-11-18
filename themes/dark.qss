@@ -958,7 +958,17 @@ ChoosePathWidget[state="ok"] {
     border-radius: 8px;
 }
 
-/* PY: размер заголовка 14px — QFont в коде, если нужно. */
+/* Наведение на MfPathWidget: фон светлее, рамка та же */
+ChoosePathWidget[state="warn"][hovered="true"] {
+    background: #2c2612;
+    border: 2px dashed #d9a520;
+}
+
+ChoosePathWidget[state="ok"][hovered="true"] {
+    background: #163529;
+    border: 2px dashed #10b981;
+}
+
 ChoosePathStatus[state="warn"] {
     color: #e5b93a;
     font-weight: bold;
