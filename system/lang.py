@@ -452,11 +452,11 @@ class Lng:
 		"Enhance text"
 	)
 	text_search_descr = (
-		"Для поиска нескольких слов введите их через запятую или с новой строки.",
-		"Separate search words with commas or line breaks."
+		"Поиск изображений по имени файла. Чтобы найти несколько, перечислите имена через запятую или с новой строки.",
+		"Find images by file name. To find several, list the names separated by commas or line breaks."
 	)
 	text_search = (
-		"Поиск",
+		"Текстовый поиск",
 		"Text editor"
 	)
 	find_matches = (
