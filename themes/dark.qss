@@ -177,14 +177,15 @@ USep {
 /* PY: размер миниатюры — setFixedSize в коде.
    Рамка остаётся в QSS, потому что меняется при выделении. */
 Thumb {
-    border: 2px solid transparent;
     border-radius: 8px;
 }
 
-/* PY: то же, что и у Thumb. */
-SquareThumb {
+Thumb[framed="noframe"] {
     border: 2px solid transparent;
-    border-radius: 8px;
+}
+
+Thumb[framed="frame"] {
+    border: 2px solid #1a7cf0;
 }
 
 /* PY: размер плитки — setFixedSize, отступы — setContentsMargins. */

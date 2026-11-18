@@ -220,6 +220,12 @@ class Thumb(TransparentFrame):
 		if self._framed == value:
 			return
 		self._framed = value
+
+		if value:
+			value = "frame"
+		else:
+			value = "noframe"
+
 		self.setProperty("framed", value)
 		self._update_style()
 
