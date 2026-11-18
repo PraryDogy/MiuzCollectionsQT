@@ -37,6 +37,7 @@ class WinTextSearch(UMainWindow):
 		group_layout.setSpacing(7)
 
 		self.title_row = TitleWidget(Lng.text_search, Lng.text_search_descr)
+		self.title_row.set_margins(5, 0, 5, 0)
 		self.title_row.description_widget.setWordWrap(True)
 		group_layout.addWidget(self.title_row)
 

@@ -363,6 +363,7 @@ class WinImgSearch(UMainWindow):
 		header_layout.setSpacing(5)
 
 		self.title_widget = TitleWidget(Lng.image_search, Lng.image_search_descr)
+		self.title_widget.set_margins(5, 0, 5, 0)
 		header_layout.addWidget(self.title_widget)
 
 		self.content_layout.addWidget(header_widget)

@@ -1058,7 +1058,7 @@ class NewMfWin(UMainWindow):
 		self.central_layout.addWidget(group_wrapper)
 		group_lay = QVBoxLayout(group_wrapper)
 		group_lay.setContentsMargins(5, 5, 5, 5)
-		group_lay.setSpacing(5)
+		group_lay.setSpacing(10)
 
 		self.mf_alias_widget = MfAliasWidget()
 		self.mf_alias_widget.auto_name_clicked.connect(self.autoname_cmd)

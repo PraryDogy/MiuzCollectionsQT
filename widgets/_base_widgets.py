@@ -935,6 +935,9 @@ class TitleWidget(TransparentWidget):
 		self.title_widget.h_layout.addStretch()
 		self.title_widget.h_layout.addWidget(widget)
 
+	def set_margins(self, l, t, r, b):
+		self.v_lay.setContentsMargins(l, t, r, b)
+
 
 
 # если переименовываешь, не забудь qss
@@ -1358,10 +1361,6 @@ class SaveRowArrowWidget(RowArrowWidget):
 		self.set_left_icon(Static.GRAY_ICONS / "diskette.svg")
 
 
-class MfAliasLineEdit(ULineEdit):
-	pass
-
-
 class MfAliasWidget(TransparentWidget):
 	changed = pyqtSignal()
 	auto_name_clicked = pyqtSignal()
@@ -1377,13 +1376,8 @@ class MfAliasWidget(TransparentWidget):
 		self.name_is_valid: bool = False
 
 		v_layout = QVBoxLayout(self)
-		v_layout.setContentsMargins(10, 0, 10, 10)
+		v_layout.setContentsMargins(5, 0, 5, 0)
 		v_layout.setSpacing(5)
-
-		title_wrapper = TransparentWidget()
-		title_lay = QHBoxLayout(title_wrapper)
-		title_lay.setContentsMargins(0, 0, 0, 0)
-		title_lay.setSpacing(0)
 
 		title = TitleWidget(
 			Lng.catalog_name,
@@ -1397,7 +1391,7 @@ class MfAliasWidget(TransparentWidget):
 		autoname_button.clicked.connect(self.auto_name_clicked.emit)
 		title.add_title_button(autoname_button)
 
-		self.line_edit = MfAliasLineEdit()
+		self.line_edit = ULineEdit()
 		self.line_edit.setPlaceholderText(Lng.alias_immutable)
 		self.line_edit.textChanged.connect(self._on_text_changed)
 		v_layout.addWidget(self.line_edit)
