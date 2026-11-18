@@ -927,6 +927,10 @@ class TitleWidget(TransparentWidget):
 		self.description_widget.set_state("gray")
 		self.v_lay.addWidget(self.description_widget)
 
+	def add_title_button(self, widget: TransparentButton):
+		self.title_widget.h_layout.addStretch()
+		self.title_widget.h_layout.addWidget(widget)
+
 
 
 # если переименовываешь, не забудь qss

@@ -235,18 +235,14 @@ class ControlsWidget(UGroupBox):
 	def __init__(self):
 		super().__init__()
 		self.v_layout = QVBoxLayout(self)
-		self.v_layout.setContentsMargins(5, 5, 5, 15)
-		self.v_layout.setSpacing(0)
+		self.v_layout.setContentsMargins(5, 5, 5, 5)
+		self.v_layout.setSpacing(5)
 
-		title = TitleTextWidget(Lng.accuracy)
+		title = TitleWidget(Lng.accuracy, Lng.accuracy_descr)
 		self.v_layout.addWidget(title)
 
 		self.slider_widget = SliderWidget()
 		self.v_layout.addWidget(self.slider_widget)
-
-		descr = TransparentLabel(Lng.accuracy_descr)
-		descr.set_state("gray")
-		self.v_layout.addWidget(descr)
 
 
 class WinImgSearch(UMainWindow):
