@@ -181,7 +181,7 @@ class WinImgSearchDropWidget(ImageDropFrame):
 		self.setFixedSize(*DROP_WIDGET_SIZE)
 
 		self.v_layout = QVBoxLayout(self)
-		self.v_layout.setContentsMargins(0, 0, 0, 0)
+		self.v_layout.setContentsMargins(10, 10, 10, 10)
 		self.v_layout.setSpacing(10)
 		self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -192,24 +192,23 @@ class WinImgSearchDropWidget(ImageDropFrame):
 			self.svg_widget,
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
-		# self.title_label = TitleTextWidget(Lng.image_search)
-
-		# self.v_layout.addWidget(
-		# 	self.title_label,
-		# 	alignment=Qt.AlignmentFlag.AlignCenter,
-		# )
 
 		self.descr_label = TransparentLabel("")
 		self.descr_label.set_state("gray")
+		self.descr_label.set_elide(True, ignore_width=False)
 		self.descr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.v_layout.addWidget(
 			self.descr_label,
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
 
+		self.show_default()
+
+	def show_loading(self, file_name: str):
+		self.descr_label.setText(f"{Lng.loading}\n{file_name}")
+
+	def show_default(self):
 		lines_base_text = (
-			# f"{Lng.search} "
-			# f"{Lng.in_} "
 			f"{Lng.catalog}: \"{Mf.current_mf.mf_alias}\"",
 
 			f"{Lng.image_search_drop}.",
@@ -231,15 +230,11 @@ class WinImgSearchPreviewWidget(ImageDropFrame):
 		self.image_label.set_elide(True, ignore_width=False)
 		self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		layout = QVBoxLayout(self)
-		layout.setContentsMargins(10, 10, 10, 10)
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setSpacing(0)
 		layout.addWidget(self.image_label)
 
-	def show_loading(self, file_name: str):
-		self.image_label.setText(f"{Lng.loading}\n{file_name}")
-
 	def set_pixmap(self, img_array: np.ndarray):
-		return
 
 		def finished(qimage: QImage):
 			self.pixmap = QPixmap.fromImage(qimage)
@@ -392,8 +387,7 @@ class WinImgSearch(UMainWindow):
 
 	def image_dropped(self, path: str):
 		# сразу показываем состояние загрузки, не дожидаясь чтения файла
-		self.preview_widget.show_loading(os.path.basename(path))
-		self.image_stack.setCurrentIndex(1)
+		self.drop_widget.show_loading(os.path.basename(path))
 		self.set_close_button_text()
 		self.start_read_img_task(path)
 
@@ -507,6 +501,7 @@ class WinImgSearch(UMainWindow):
 				self.shm = shared_memory.SharedMemory(name=item.shm_name)
 				self.img_array = np.ndarray(item.shape, dtype=np.dtype(item.dtype), buffer=self.shm.buf)
 				self.image_stack.setCurrentIndex(1)
+				self.drop_widget.show_default()
 				self.preview_widget.set_pixmap(self.img_array)
 
 				if item.is_grayscale():

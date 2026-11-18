@@ -235,11 +235,11 @@ WinImageView {
 }
 
 /* PY: размер области — setMinimumSize, радиус оставить здесь. */
-WinImgSearchPreviewWidget {
+/* WinImgSearchPreviewWidget {
     background: #111a22;
     border: 2px dashed #243a52;
     border-radius: 8px;
-}
+} */
 
 /* PY: размер и пунктирная рамка оставить здесь,
    отступы внутри — setContentsMargins у layout.
