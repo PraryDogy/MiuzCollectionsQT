@@ -1054,19 +1054,25 @@ class NewMfWin(UMainWindow):
 		self.has_unsaved = False
 		self.discard_win = None
 
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-		self.central_layout.setSpacing(10)
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
+		self.central_layout.setSpacing(0)
+
+		group_wrapper = UGroupBox()
+		self.central_layout.addWidget(group_wrapper)
+		group_lay = QVBoxLayout(group_wrapper)
+		group_lay.setContentsMargins(5, 5, 5, 5)
+		group_lay.setSpacing(5)
 
 		self.mf_alias_widget = MfAliasWidget()
 		self.mf_alias_widget.auto_name_clicked.connect(self.autoname_cmd)
 		self.mf_alias_widget.changed.connect(self._on_changed)
-		self.central_layout.addWidget(self.mf_alias_widget)
+		group_lay.addWidget(self.mf_alias_widget)
 
 		self.mf_path_widget = MfPathWidget(mf=None)
 		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
-		self.central_layout.addWidget(self.mf_path_widget)
+		group_lay.addWidget(self.mf_path_widget)
 
-		self.central_layout.addStretch()
+		self.central_layout.addSpacing(10)
 
 		# Футер с кнопками без «Новый каталог»
 		self.save_group = SaveRowWidget(show_new_catalog=False)

@@ -1358,7 +1358,11 @@ class SaveRowArrowWidget(RowArrowWidget):
 		self.set_left_icon(Static.GRAY_ICONS / "diskette.svg")
 
 
-class MfAliasWidget(UGroupBox):
+class MfAliasLineEdit(ULineEdit):
+	pass
+
+
+class MfAliasWidget(TransparentWidget):
 	changed = pyqtSignal()
 	auto_name_clicked = pyqtSignal()
 
@@ -1381,28 +1385,20 @@ class MfAliasWidget(UGroupBox):
 		title_lay.setContentsMargins(0, 0, 0, 0)
 		title_lay.setSpacing(0)
 
-		title = TitleTextWidget(Lng.catalog_name, Static.GRAY_ICONS / "text_edit.svg")
-		title_lay.addWidget(title)
-		v_layout.addWidget(title_wrapper)
+		title = TitleWidget(
+			Lng.catalog_name,
+			Lng.folder_name_full.format(minim=self.MINIM, maxim=self.MAXIM),
+			Static.GRAY_ICONS / "text_edit.svg"
+		)
+		v_layout.addWidget(title)
+
 
 		autoname_button = UPushButton(Lng.auto_name)
 		autoname_button.setIcon(QIcon(str(Static.GRAY_ICONS / "wand.svg")))
 		autoname_button.clicked.connect(self.auto_name_clicked.emit)
-		title_lay.addStretch()
-		title_lay.addWidget(autoname_button)
+		title.add_title_button(autoname_button)
 
-		# v_layout.addWidget(USep())
-
-		text = Lng.folder_name_full.format(minim=self.MINIM, maxim=self.MAXIM)
-		name_text = TransparentLabel(text)
-		name_text.set_state("gray")
-		name_text.setWordWrap(True)
-		name_text.setContentsMargins(0, 0, 0, 0)
-		v_layout.addWidget(name_text)
-
-		v_layout.addSpacing(5)
-
-		self.line_edit = ULineEdit()
+		self.line_edit = MfAliasLineEdit()
 		self.line_edit.setPlaceholderText(Lng.alias_immutable)
 		self.line_edit.textChanged.connect(self._on_text_changed)
 		v_layout.addWidget(self.line_edit)
@@ -1411,8 +1407,6 @@ class MfAliasWidget(UGroupBox):
 		self.validate_timer = QTimer(self)
 		self.validate_timer.setSingleShot(True)
 		self.validate_timer.timeout.connect(self._check_and_show)
-
-		v_layout.addSpacing(5)
 
 		checker_wrapper = TransparentWidget()
 		checker_lay = QHBoxLayout(checker_wrapper)
@@ -1424,7 +1418,7 @@ class MfAliasWidget(UGroupBox):
 		checker_lay.addWidget(self.checker_svg)
 
 		self.checker_text = TransparentLabel("")
-		self.checker_text.set_state("gray")
+		# self.checker_text.set_state("gray")
 		self.checker_text.set_elide(True, ignore_width=False)
 		self.checker_text.set_selectable(True)
 		checker_lay.addWidget(self.checker_text)
@@ -1452,7 +1446,7 @@ class MfAliasWidget(UGroupBox):
 		self.name_is_valid = bool(text) and error_text is None
 
 		if not text:
-			self.checker_svg.load(str(Static.GRAY_ICONS / "attention.svg"))
+			self.checker_svg.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 			self.checker_text.setText(Lng.enter_alias_warning)
 		elif error_text:
 			self.checker_svg.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))

@@ -1006,3 +1006,9 @@ CalendarBigDate {
     color: #b2b2b2;
     font-size: 25pt;
 }
+
+
+MfAliasLineEdit {
+    background: #222e3b;
+    border: 1px solid #3b4e61;
+}
