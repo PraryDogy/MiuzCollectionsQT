@@ -683,7 +683,7 @@ class Grid(UScrollVerticalArea):
 		self.scroll_wid = TransparentFrame()
 		self.setWidget(self.scroll_wid)
 		self.scroll_layout = QVBoxLayout(self.scroll_wid)
-		self.scroll_layout.setContentsMargins(0, 0, 0, 0)
+		self.scroll_layout.setContentsMargins(0, 10, 0, 10)
 		self.scroll_layout.setSpacing(0)
 		self.scroll_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 

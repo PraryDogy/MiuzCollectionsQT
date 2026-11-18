@@ -136,8 +136,6 @@ class WinMain(UMainWindow):
 	hh = 800
 	ww = 0
 
-	FOOTER_MARGINS = 5
-
 	def __init__(self, argv: list):
 		super().__init__()
 		# отступы от окна слева справа, кроме заголовка окна
@@ -205,7 +203,7 @@ class WinMain(UMainWindow):
 		right_wid = UGroupBox()
 		self.splitter.addWidget(right_wid)
 		self.right_layout = QVBoxLayout(right_wid)
-		self.right_layout.setContentsMargins(0, 10, 0, 10)
+		self.right_layout.setContentsMargins(0, 0, 0, 0)
 		self.right_layout.setSpacing(0)
 
 		self.grid = Grid()
@@ -217,7 +215,6 @@ class WinMain(UMainWindow):
 
 		# левый и правый маргин для красивого отступа
 		self.bar_bottom = BarBottom()
-		self.bar_bottom.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.bar_bottom.resize_thumbnails.connect(
 			lambda: self.grid.resize_thumbnails()
 		)
