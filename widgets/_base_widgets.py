@@ -1387,8 +1387,7 @@ class MfAliasWidget(TransparentWidget):
 
 		title = TitleWidget(
 			Lng.catalog_name,
-			Lng.folder_name_full.format(minim=self.MINIM, maxim=self.MAXIM),
-			Static.GRAY_ICONS / "text_edit.svg"
+			Lng.folder_name_full.format(minim=self.MINIM, maxim=self.MAXIM)
 		)
 		v_layout.addWidget(title)
 

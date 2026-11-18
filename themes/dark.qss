@@ -152,7 +152,7 @@ UBlackFrame {
 /* PY: отступы содержимого группы — setContentsMargins у layout. */
 UGroupBox {
     background: #131b23;
-    border: 1px solid #243240;
+    border: 1px solid #314456;
     border-radius: 8px;
     color: #ffffff;
 }
@@ -355,7 +355,7 @@ RedButton:pressed {
    см. HoverGroupBox ниже. */
 HoverGroupBox {
     background: #131b23;
-    border: 1px solid #243240;
+    border: 1px solid #33475b;
     border-radius: 8px;
 }
 
@@ -1005,10 +1005,4 @@ ServerLabel {
 CalendarBigDate {
     color: #b2b2b2;
     font-size: 25pt;
-}
-
-
-MfAliasLineEdit {
-    background: #222e3b;
-    border: 1px solid #3b4e61;
 }
