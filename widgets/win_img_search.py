@@ -16,9 +16,10 @@ from system.multiprocess import ProcessWorker, ReadImg
 from system.runnable import BlurImgBgTask, ImageSearcher, UThreadPool
 from system.utils import ImageReader
 
-from ._base_widgets import (ActiveButton, TitleTextWidget, TransparentFrame,
-                            TransparentLabel, TransparentWidget, UGroupBox,
-                            UMainWindow, UPushButton, USep, USlider, TitleWidget)
+from ._base_widgets import (ActiveButton, SubGroup, TitleWidget,
+                            TransparentFrame, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWindow,
+                            UPushButton, USlider)
 
 DROP_WIDGET_SIZE = (350, 300)
 
@@ -228,7 +229,7 @@ class WinImgSearchPreviewWidget(TransparentFrame):
 		self.image_label.clear()
 
 
-class ControlsWidget(UGroupBox):
+class ControlsWidget(SubGroup):
 	reset_btn_clicked = pyqtSignal()
 	slider_moved = pyqtSignal(int)
 

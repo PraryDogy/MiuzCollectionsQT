@@ -229,6 +229,10 @@ class UGroupBox(QGroupBox):
 		super().__init__(title, parent)
 
 
+class SubGroup(UGroupBox):
+    pass
+
+
 class HoverGroupBox(UGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)

@@ -223,8 +223,8 @@ WinImgSearchPreviewWidget {
 /* PY: размер и пунктирная рамка оставить здесь,
    отступы внутри — setContentsMargins у layout. */
 WinImgSearchDropWidget {
-    background: #111a23;
-    border: 2px dashed #263440;
+    background: #192430;
+    border: 2px dashed #34485d;
     border-radius: 8px;
 }
 
@@ -951,4 +951,14 @@ ServerLabel {
 CalendarBigDate {
     color: #b2b2b2;
     font-size: 25pt;
+}
+
+
+/* PY: отступы содержимого — setContentsMargins у layout, как у UGroupBox.
+   Ярче UGroupBox, но темнее полей и кнопок. */
+SubGroup {
+    background: #18222d;
+    border: 1px solid #34485d;
+    border-radius: 8px;
+    color: #ffffff;
 }
