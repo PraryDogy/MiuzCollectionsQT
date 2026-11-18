@@ -370,6 +370,7 @@ class Lng:
 	choose_period = ("Выбрать период", "Choose period")
 	find_catalog = ("Найти каталог", "Find catalog")
 	no_catalog_path = ("Каталог не найден", "Catalog not found")
+	ok_catalog_path = ("Каталог найден", "Found catalog")
 	auto_name = ("Подобрать имя", "Suggest name")
 	period = ("Период", "Period")
 	selected_dates = ("Выбранные даты", "Selected dates")
@@ -722,4 +723,8 @@ class Lng:
 	choose_another_image = (
 		"Выбрать другое изображение",
 		"Choose another image"
+	)
+	press_choose_catalog = (
+		"Нажмите, чтобы выбрать каталог",
+		"Click to choose a catalog"
 	)

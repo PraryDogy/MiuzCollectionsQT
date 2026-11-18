@@ -926,12 +926,6 @@ TransparentLabel[state="gray_bold"] {
     font-weight: bold;
 }
 
-/* PY: размер шрифта 14px — QFont в коде. */
-ChoosePathWidget TransparentLabel {
-    font-weight: bold;
-    font-size: 14px;
-    color: #ffffff;
-}
 
 /* PY: не требуется. */
 CalendarDaySelectedText {
@@ -952,20 +946,29 @@ QToolTip {
    ВЫБОР ПУТИ
    ===================================================================== */
 
-/* PY: размер области — setMinimumSize. Отступы — setContentsMargins. */
-ChoosePathWidget {
-    border-radius: 9px;
-    padding: 2px 2px;
+ChoosePathWidget[state="warn"] {
+    background: #1d1a0f;
+    border: 2px dashed #d9a520;
+    border-radius: 8px;
 }
 
 ChoosePathWidget[state="ok"] {
-    background: #27064e3b;
+    background: #0e1f1b;
     border: 2px dashed #10b981;
+    border-radius: 8px;
 }
 
-ChoosePathWidget[state="warn"] {
-    background: #273a2c12;
-    border: 2px dashed #6b5420;
+/* PY: размер заголовка 14px — QFont в коде, если нужно. */
+ChoosePathStatus[state="warn"] {
+    color: #e5b93a;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+ChoosePathStatus[state="ok"] {
+    color: #34d399;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 

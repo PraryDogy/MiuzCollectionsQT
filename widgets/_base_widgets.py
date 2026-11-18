@@ -1607,6 +1607,21 @@ class USvgWidgetBg(TransparentLabel):
 		super().mouseReleaseEvent(event)
 
 
+class ChoosePathStatus(TransparentLabel):
+	def __init__(self, text="", parent=None):
+		super().__init__(text, parent)
+
+	def set_state(self, state: str):
+		"""state: 'ok' или 'warn'. Меняет свойство, стиль переприменяется."""
+		if self.property("state") == state:
+			return
+		self.setProperty("state", state)
+		self.style().unpolish(self)
+		self.style().polish(self)
+		self.update()
+
+
+# именно он а не group box для прозрачности
 class ChoosePathWidget(TransparentFrame):
 	"""Строка статуса пути: иконка и текст. Состояние задаётся свойством 'state' для QSS."""
 
@@ -1617,13 +1632,22 @@ class ChoosePathWidget(TransparentFrame):
 		lay.setContentsMargins(10, 10, 10, 10)
 		lay.setSpacing(5)
 
-		# self.icon = QSvgWidget()
-		# self.icon.setFixedSize(16, 16)
-		# lay.addWidget(self.icon)
+		self.icon = QSvgWidget()
+		self.icon.setFixedSize(26, 26)
+		lay.addWidget(self.icon)
+
+		text_wrapper = TransparentWidget()
+		lay.addWidget(text_wrapper)
+		text_lay = QVBoxLayout(text_wrapper)
+		text_lay.setContentsMargins(0, 0, 0, 0)
+		text_lay.setSpacing(0)
+
+		self.status_label = ChoosePathStatus("")
+		text_lay.addWidget(self.status_label)
 
 		self.path_label = TransparentLabel("")
 		self.path_label.set_elide(True)
-		lay.addWidget(self.path_label)
+		text_lay.addWidget(self.path_label)
 
 		self.set_state("warn")
 
@@ -1636,13 +1660,19 @@ class ChoosePathWidget(TransparentFrame):
 		self.style().polish(self)
 		self.update()
 
-	def set_status(self, icon_path: Path, text: str, state: str):
-		# self.icon.load(str(icon_path))
-		self.path_label.setText(text)
-		self.set_state(state)
+	def set_bad(self):
+		self.icon.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+		self.status_label.setText(Lng.no_catalog_path)
+		self.status_label.set_state("warn")
+		self.path_label.setText(Lng.press_choose_catalog)
+		self.set_state("warn")
 
-	def set_path(self, path: str):
+	def set_good(self, path: str):
+		self.icon.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
+		self.status_label.setText(Lng.ok_catalog_path)
+		self.status_label.set_state("ok")
 		self.path_label.setText(path)
+		self.set_state("ok")
 
 
 class MfPathWidget(HoverGroupBox):
@@ -1705,19 +1735,11 @@ class MfPathWidget(HoverGroupBox):
 	def update_ui(self):
 		if self._path_exists():
 			self.setToolTip(self.draft_mf_path)
-			self.status.set_status(
-				Static.COLOR_ICONS / "green_checkmark.svg",
-				self.draft_mf_path,
-				"ok",
-			)
+			self.status.set_good(self.draft_mf_path)
 			self.watch_timer.stop()
 		else:
 			self.setToolTip(Lng.find_catalog)
-			self.status.set_status(
-				Static.COLOR_ICONS / "yellow_warning.svg",
-				Lng.no_catalog_path,
-				"warn",
-			)
+			self.status.set_bad()
 			if not self.watch_timer.isActive():
 				self.watch_timer.start(1000)  # Проверка каждую секунду
 

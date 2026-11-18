@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="300" viewBox="0 0 760 300" font-family="-apple-system, Helvetica, Arial, sans-serif">
+
+  <!-- фон превью -->
+  <rect width="760" height="300" fill="#080c11"/>
+
+  <defs>
+    <!-- свечение под зелёной рамкой -->
+    <filter id="glowOk" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ============ СОСТОЯНИЕ WARN ============ -->
+  <text x="40" y="36" fill="#7b8792" font-size="13" letter-spacing="1">WARN · КАТАЛОГ НЕ НАЙДЕН</text>
+
+  <!-- панель-подложка -->
+  <rect x="40" y="50" width="680" height="82" rx="8" fill="#0f151b" stroke="#34485c" stroke-width="1"/>
+
+  <!-- строка статуса: тонкая левая полоса как индикатор -->
+  <rect x="40" y="50" width="4" height="82" rx="2" fill="#e5b93a"/>
+
+  <!-- карточка строки -->
+  <rect x="60" y="66" width="640" height="50" rx="8" fill="#1d1a0f" stroke="#d9a520" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+  <!-- иконка предупреждения -->
+  <polygon points="84,104 96,82 108,104" fill="none" stroke="#e5b93a" stroke-width="2" stroke-linejoin="round"/>
+  <line x1="96" y1="90" x2="96" y2="98" stroke="#e5b93a" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="96" cy="102" r="1.2" fill="#e5b93a"/>
+
+  <!-- текст статуса и пути -->
+  <text x="122" y="91" fill="#e5b93a" font-size="14" font-weight="700">Каталог не найден</text>
+  <text x="122" y="108" fill="#7b8792" font-size="12">Укажите папку кнопкой «Найти каталог»</text>
+
+  <!-- ============ СОСТОЯНИЕ OK ============ -->
+  <text x="40" y="180" fill="#7b8792" font-size="13" letter-spacing="1">OK · КАТАЛОГ НАЙДЕН</text>
+
+  <rect x="40" y="194" width="680" height="82" rx="8" fill="#0f151b" stroke="#34485c" stroke-width="1"/>
+  <rect x="40" y="194" width="4" height="82" rx="2" fill="#34d399"/>
+
+  <rect x="60" y="210" width="640" height="50" rx="8" fill="#0e1f1b" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6 4" filter="url(#glowOk)"/>
+
+  <!-- иконка галочки -->
+  <circle cx="96" cy="235" r="9" fill="none" stroke="#34d399" stroke-width="2"/>
+  <polyline points="91,235 95,239 102,231" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- статус и путь -->
+  <text x="122" y="235" fill="#34d399" font-size="14" font-weight="700">Каталог найден</text>
+  <text x="122" y="252" fill="#7b8792" font-size="12">/Volumes/shares-1/…/Photo/Art/Ready</text>
+
+</svg>
