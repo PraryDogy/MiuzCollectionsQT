@@ -1061,8 +1061,6 @@ class NewMfWin(UMainWindow):
 		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
 		group_lay.addWidget(self.mf_path_widget)
 
-		self.central_layout.addSpacing(10)
-
 		# Футер с кнопками без «Новый каталог»
 		self.save_group = SaveRowWidget()
 		self.save_group.save_clicked.connect(self.save_changes)

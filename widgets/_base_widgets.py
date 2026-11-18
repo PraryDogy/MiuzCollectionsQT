@@ -915,7 +915,7 @@ class TitleTextWidget(TransparentWidget):
 
 
 class TitleWidget(TransparentWidget):
-	def __init__(self, title: str, description: str = None, title_svg: Path = None):
+	def __init__(self, title: str, descr: str = None, title_svg: Path = None, sep: bool = True):
 		super().__init__()
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(0, 0, 0, 0)
@@ -924,11 +924,12 @@ class TitleWidget(TransparentWidget):
 		self.title_widget = TitleTextWidget(title, title_svg)
 		self.v_lay.addWidget(self.title_widget)
 
-		if description:
+		if sep:
 			self.sep = USep()
 			self.v_lay.addWidget(self.sep)
 
-			self.description_widget = TransparentLabel(description)
+		if descr:
+			self.description_widget = TransparentLabel(descr)
 			self.description_widget.set_state("gray")
 			self.v_lay.addWidget(self.description_widget)
 
@@ -1669,18 +1670,11 @@ class MfPathWidget(HoverGroupBox):
 		self.title_widget = TitleWidget(
 			Lng.catalog_path,
 			Lng.catalog_path_descr,
-			Static.COLOR_ICONS / "finder.svg"
+			Static.COLOR_ICONS / "finder.svg",
+			sep=False
 		)
 		self.title_widget.description_widget.setWordWrap(True)
 		content_lay.addWidget(self.title_widget)
-
-		# self.title_widget = TitleTextWidget(Lng.catalog_path, Static.COLOR_ICONS / "finder.svg")
-		# content_lay.addWidget(self.title_widget)
-
-		# descr_label = TransparentLabel(Lng.catalog_path_descr)
-		# descr_label.set_state("gray")
-		# descr_label.setWordWrap(True)
-		# content_lay.addWidget(descr_label)
 
 		content_lay.addSpacing(5)
 
