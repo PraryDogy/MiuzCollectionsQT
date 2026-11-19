@@ -1542,7 +1542,7 @@ class FlowLayout(QLayout):
 		return y + line_height - rect.y() + margins.bottom()
 
 
-class USvgWidgetBg(TransparentLabel):
+class SvgBg(TransparentLabel):
 	clicked_ = pyqtSignal()
 
 	def __init__(self, svg: Path, ww0: int, ww1: int):

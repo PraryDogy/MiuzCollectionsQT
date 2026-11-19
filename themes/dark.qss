@@ -366,22 +366,22 @@ HoverGroupBox[hovered="true"] {
 
 /* PY: размер кнопки-иконки — setFixedSize.
    Радиус и фон оставить здесь. */
-USvgWidgetBg {
+SvgBg {
     background: transparent;
     border: none;
     border-radius: 8px;
     color: #ffffff;
 }
 
-USvgWidgetBg:hover[style="base"] {
+SvgBg:hover[style="base"] {
     background: #212c38;
 }
 
-USvgWidgetBg[style="selected"] {
+SvgBg[style="selected"] {
     background: #283645;
 }
 
-USvgWidgetBg[style="pressed"] {
+SvgBg[style="pressed"] {
     background: #3a4d61;
 }
 

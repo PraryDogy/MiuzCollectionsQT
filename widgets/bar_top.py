@@ -11,7 +11,7 @@ from system.lang import Lng
 
 from ._base_widgets import (TitleBar, TransparentFrame, TransparentLabel,
                             TransparentWidget, ULineEdit, UMenu, UPushButton,
-                            USvgWidgetBg)
+                            SvgBg)
 from .win_servers import ServersWin
 from .win_text_search import WinTextSearch
 
@@ -220,7 +220,7 @@ class BarTop(TransparentFrame):
 		self.h_layout.addStretch()
 
 		# --- Кнопка поиска по картинке ---
-		self.img_search_btn = USvgWidgetBg(Static.GRAY_ICONS / "camera.svg", 28, 14)
+		self.img_search_btn = SvgBg(Static.GRAY_ICONS / "camera.svg", 28, 14)
 		self.img_search_btn.clicked_.connect(self.open_img_search_win.emit)
 		self.h_layout.addWidget(self.img_search_btn)
 
@@ -238,14 +238,14 @@ class BarTop(TransparentFrame):
 		self.h_layout.addStretch(0)
 
 		# --- Кнопка подключения к серверам ---
-		self.connect_btn = USvgWidgetBg(Static.GRAY_ICONS / "connections.svg", 28, 14)
+		self.connect_btn = SvgBg(Static.GRAY_ICONS / "connections.svg", 28, 14)
 		self.connect_btn.clicked_.connect(self.open_server_window)
 		self.h_layout.addWidget(self.connect_btn)
 
 		self.h_layout.addSpacing(5)
 
 		# --- Кнопка настроек ---
-		self.settings_btn = USvgWidgetBg(Static.GRAY_ICONS / "settings.svg", 28, 14)
+		self.settings_btn = SvgBg(Static.GRAY_ICONS / "settings.svg", 28, 14)
 		self.settings_btn.clicked_.connect(self.open_settings_win.emit)
 		self.h_layout.addWidget(self.settings_btn)
 

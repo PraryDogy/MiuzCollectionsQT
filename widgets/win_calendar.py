@@ -1,23 +1,37 @@
-from PyQt6.QtCore import QDate, Qt, pyqtSignal, QSize
-from PyQt6.QtGui import QAction, QImage, QMouseEvent, QPixmap, QIcon
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
+from pathlib import Path
+
+from PyQt6.QtCore import QDate, Qt, pyqtSignal
+from PyQt6.QtGui import QAction, QMouseEvent
+from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import JsonData, Static
-from system.lang import Lng
-from system.utils import Utils
 from system.items import ReadableDateItem
+from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, TransparentLabel,
-							TransparentWidget, UMainWindow, UMenu, UPushButton,
-							USep, TitleWidget, UGroupBox)
+from ._base_widgets import (ActiveButton, SvgBg, TitleWidget, TransparentFrame,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UMainWindow, UMenu, UPushButton, USep)
 
 
-class CalendarSvgNavi(QSvgWidget):
+class CalendarSvgNavi(TransparentWidget):
 	clicked = pyqtSignal()
 
-	def __init__(self, file_path, parent=None):
-		super().__init__(file_path, parent)
+	def __init__(self, svg: Path, alignment):
+		super().__init__()
+
+		self.setSizePolicy(
+					QSizePolicy.Policy.Expanding,
+					QSizePolicy.Policy.Expanding
+				)
+
+		h_lay = QHBoxLayout(self)
+		h_lay.setContentsMargins(0, 0, 0, 0)
+		h_lay.setAlignment(alignment)
+
+		svg_btn = SvgBg(svg, 25, 15)
+		svg_btn.clicked_.connect(self.svg_clicked)
+		h_lay.addWidget(svg_btn)
+
 		self._is_active = True
 		self.set_enabled()
 
@@ -28,6 +42,10 @@ class CalendarSvgNavi(QSvgWidget):
 	def set_disabled(self):
 		self._is_active = False
 		self.setCursor(Qt.CursorShape.ForbiddenCursor)
+
+	def svg_clicked(self):
+		if self._is_active:
+			self.clicked.emit()
 
 	def mouseReleaseEvent(self, a0):
 		if self._is_active and a0.button() == Qt.MouseButton.LeftButton:
@@ -80,6 +98,8 @@ class CalendarCircle(TransparentLabel):
 	pass
 
 
+
+
 class WinCalendar(UMainWindow):
 	date_selected = pyqtSignal(QDate)
 	min_year = 2015
@@ -108,13 +128,13 @@ class WinCalendar(UMainWindow):
 		calendar_wrapper = UGroupBox()
 		self.central_layout.addWidget(calendar_wrapper)
 		self.wrapper_layout = QVBoxLayout(calendar_wrapper)
-		self.wrapper_layout.setContentsMargins(self.central_layout.contentsMargins())
+		self.wrapper_layout.setContentsMargins(5, 5, 5, 0)
 		self.wrapper_layout.setSpacing(self.central_layout.spacing())
 		self.wrapper_layout.setSpacing(0)
 
 		self.init_ui()
 		self.adjustSize()
-		self.setFixedSize(self.width() + 30, self.height())
+		self.setFixedSize(self.width() + 15, self.height())
 
 	def init_ui(self):
 		_title_widget = TitleWidget("", title_svg=Static.COLOR_ICONS / "calendar.svg")
@@ -130,11 +150,16 @@ class WinCalendar(UMainWindow):
 		self.nav_layout.setSpacing(5)
 		self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-		self.btn_prev = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_left.svg"))
-		self.btn_prev.setFixedSize(*self.svg_nav_size)
+
+
+
+		self.btn_prev = CalendarSvgNavi(
+			Static.GRAY_ICONS / "arrow_left.svg",
+			Qt.AlignmentFlag.AlignLeft
+		)
 		self.btn_prev.clicked.connect(self.prev_month)
 		self.nav_layout.addWidget(self.btn_prev)
-		self.nav_layout.addStretch()
+		# self.nav_layout.addStretch()
 
 		self.btn_month = UPushButton("")
 		self.menu_month = UMenu(parent=self)
@@ -147,10 +172,12 @@ class WinCalendar(UMainWindow):
 		self.btn_year.setMenu(self.menu_year)
 		self.populate_years()
 		self.nav_layout.addWidget(self.btn_year)
-		self.nav_layout.addStretch()
+		# self.nav_layout.addStretch()
 
-		self.btn_next = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_right.svg"))
-		self.btn_next.setFixedSize(*self.svg_nav_size)
+		self.btn_next = CalendarSvgNavi(
+			Static.GRAY_ICONS / "arrow_right.svg",
+			Qt.AlignmentFlag.AlignRight
+		)
 		self.btn_next.clicked.connect(self.next_month)
 		self.nav_layout.addWidget(self.btn_next)
 
