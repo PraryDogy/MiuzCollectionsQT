@@ -2,7 +2,6 @@ import hashlib
 import json
 import os
 import struct
-import threading
 import time
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -10,7 +9,7 @@ from multiprocessing import shared_memory
 from pathlib import Path
 
 import numpy as np
-from PyQt6.QtCore import QDate, QLocale, QObject, pyqtSignal
+from PyQt6.QtCore import QDate, QLocale
 from PyQt6.QtGui import QImage
 
 from cfg import Static
@@ -18,61 +17,33 @@ from cfg import Static
 from .image_reader import ImageReader
 
 
-class _ProbeSignals(QObject):
-	done = pyqtSignal(str, bool)  # путь, доступен ли
-
-
 class RootProbe:
-    POS_TTL = 3.0        # доступный каталог: результат действует 3 с
-    NEG_TTL = 1.0        # недоступный: проверяем чаще, чтобы поймать монтирование
-    HANG_TIMEOUT = 3.0   # дольше — считаем недоступным, пока проверка висит
-    signals = _ProbeSignals()
-    _lock = threading.Lock()
-    _result: dict[str, tuple[bool, float]] = {}
-    _busy: set[str] = set()
-    _started: dict[str, float] = {}
+	"""Проверка доступности каталога: диск отвечает и отдаёт содержимое.
 
-    @classmethod
-    def check(cls, path: str) -> bool | None:
-        """True / False — актуальный ответ; None — проверка идёт."""
-        now = time.monotonic()
-        with cls._lock:
-            cached = cls._result.get(path)
-            ttl = cls.POS_TTL if (cached and cached[0]) else cls.NEG_TTL
-            fresh = cached is not None and now - cached[1] < ttl
+	Результат кэшируется на TTL секунд, чтобы частые вызовы не били по диску.
+	"""
 
-            if not fresh and path not in cls._busy:
-                cls._busy.add(path)
-                cls._started[path] = now
-                threading.Thread(target=cls._probe, args=(path,), daemon=True).start()
+	TTL = 2.0
+	_cache: dict[str, tuple[bool, float]] = {}
 
-            if fresh:
-                return cached[0]
-            if path in cls._busy and now - cls._started.get(path, now) > cls.HANG_TIMEOUT:
-                return False
-            return None
+	@classmethod
+	def is_available(cls, path: str) -> bool:
+		now = time.monotonic()
+		hit = cls._cache.get(path)
+		if hit and now - hit[1] < cls.TTL:
+			return hit[0]
+		ok = cls._probe(path)
+		cls._cache[path] = (ok, now)
+		return ok
 
-    @classmethod
-    def _probe(cls, path: str) -> None:
-        ok = cls._listable(path)
-        with cls._lock:
-            cls._result[path] = (ok, time.monotonic())
-            cls._busy.discard(path)
-            cls._started.pop(path, None)
-        cls.signals.done.emit(path, ok)
-
-    @staticmethod
-    def _listable(path: str) -> bool:
-        """Каталог должен отдавать содержимое: во время монтирования isdir уже True,
-        а чтение ещё падает."""
-        if not os.path.isdir(path):
-            return False
-        try:
-            with os.scandir(path) as it:
-                next(it, None)
-            return True
-        except OSError:
-            return False
+	@staticmethod
+	def _probe(path: str) -> bool:
+		try:
+			with os.scandir(path) as it:
+				next(it, None)
+			return True
+		except OSError:
+			return False
 
 
 @dataclass(slots=True)
