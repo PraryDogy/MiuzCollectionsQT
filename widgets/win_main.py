@@ -236,11 +236,9 @@ class WinMain(UMainWindow):
 	def with_conn(fn: callable):
 		@functools.wraps(fn)
 		def wrapper(self: "WinMain", *args):
-			if RootProbe.check(Mf.current_mf.mf_path) is False:
-				self.open_win_smb(Mf.current_mf)
+			if RootProbe.check(Mf.current_mf.mf_path) is not True:
+				self.open_win_smb(Mf.current_mf)  # окно само закроется, когда каталог станет доступен
 				return None
-			if not Mf.current_mf.is_root_alive_cached():
-				return None  # проверка ещё идёт, действие нужно повторить после ответа
 			return fn(self, *args)
 		return wrapper
 
@@ -340,7 +338,7 @@ class WinMain(UMainWindow):
 		self.left_menu.init_ui()
 		self.load_st_grid()
 
-		if RootProbe.check(mf.mf_path) is False:
+		if RootProbe.check(mf.mf_path) is not True:
 			self.open_win_smb(mf)
 
 	@with_conn

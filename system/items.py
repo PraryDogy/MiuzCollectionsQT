@@ -23,40 +23,56 @@ class _ProbeSignals(QObject):
 
 
 class RootProbe:
-	"""Проверка доступности корня каталога по запросу, без фонового опроса.
+    POS_TTL = 3.0        # доступный каталог: результат действует 3 с
+    NEG_TTL = 1.0        # недоступный: проверяем чаще, чтобы поймать монтирование
+    HANG_TIMEOUT = 3.0   # дольше — считаем недоступным, пока проверка висит
+    signals = _ProbeSignals()
+    _lock = threading.Lock()
+    _result: dict[str, tuple[bool, float]] = {}
+    _busy: set[str] = set()
+    _started: dict[str, float] = {}
 
-	- Проверка запускается только из check(), то есть когда что-то нужно знать.
-	- Результат кэшируется на TTL секунд.
-	- На один путь не больше одной проверки в работе: зависший диск не порождает новых потоков.
-	- GUI не ждёт диск: результат приходит сигналом signals.done.
-	"""
+    @classmethod
+    def check(cls, path: str) -> bool | None:
+        """True / False — актуальный ответ; None — проверка идёт."""
+        now = time.monotonic()
+        with cls._lock:
+            cached = cls._result.get(path)
+            ttl = cls.POS_TTL if (cached and cached[0]) else cls.NEG_TTL
+            fresh = cached is not None and now - cached[1] < ttl
 
-	TTL = 10.0
-	signals = _ProbeSignals()
-	_lock = threading.Lock()
-	_result: dict[str, tuple[bool, float]] = {}
-	_busy: set[str] = set()
+            if not fresh and path not in cls._busy:
+                cls._busy.add(path)
+                cls._started[path] = now
+                threading.Thread(target=cls._probe, args=(path,), daemon=True).start()
 
-	@classmethod
-	def check(cls, path: str) -> bool | None:
-		"""Возвращает последний известный результат (None, если его ещё нет).
-		Если результат устарел, запускает проверку; ответ придёт в signals.done."""
-		now = time.monotonic()
-		with cls._lock:
-			cached = cls._result.get(path)
-			stale = cached is None or now - cached[1] >= cls.TTL
-			if stale and path not in cls._busy:
-				cls._busy.add(path)
-				threading.Thread(target=cls._probe, args=(path,), daemon=True).start()
-			return cached[0] if cached else None
+            if fresh:
+                return cached[0]
+            if path in cls._busy and now - cls._started.get(path, now) > cls.HANG_TIMEOUT:
+                return False
+            return None
 
-	@classmethod
-	def _probe(cls, path: str) -> None:
-		ok = os.path.isdir(path)  # может зависнуть: это делает только один поток на путь
-		with cls._lock:
-			cls._result[path] = (ok, time.monotonic())
-			cls._busy.discard(path)
-		cls.signals.done.emit(path, ok)  # в GUI-поток уйдёт через очередь Qt
+    @classmethod
+    def _probe(cls, path: str) -> None:
+        ok = cls._listable(path)
+        with cls._lock:
+            cls._result[path] = (ok, time.monotonic())
+            cls._busy.discard(path)
+            cls._started.pop(path, None)
+        cls.signals.done.emit(path, ok)
+
+    @staticmethod
+    def _listable(path: str) -> bool:
+        """Каталог должен отдавать содержимое: во время монтирования isdir уже True,
+        а чтение ещё падает."""
+        if not os.path.isdir(path):
+            return False
+        try:
+            with os.scandir(path) as it:
+                next(it, None)
+            return True
+        except OSError:
+            return False
 
 
 @dataclass(slots=True)

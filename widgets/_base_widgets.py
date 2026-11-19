@@ -1661,6 +1661,7 @@ class ChoosePathWidget(TransparentFrame):
 
 class MfPathWidget(HoverGroupBox):
 	changed = pyqtSignal()
+	user_busy = pyqtSignal(bool)   # True — открыт диалог выбора папки
 
 	def __init__(self, mf: Mf = None):
 		super().__init__()
@@ -1731,7 +1732,7 @@ class MfPathWidget(HoverGroupBox):
 			self.update_ui()
 
 	def update_ui(self):
-		if self._path_exists():
+		if RootProbe.check(self.draft_mf_path) is True:
 			self.setToolTip(self.draft_mf_path)
 			self.status.set_good(self.draft_mf_path)
 		else:
@@ -1757,8 +1758,12 @@ class MfPathWidget(HoverGroupBox):
 			directory = os.path.expanduser("~/Downloads")
 		else:
 			directory = self.draft_mf_path
-		self.dialog = QFileDialog(directory=directory)
-		url = self.dialog.getExistingDirectory()
+		self.user_busy.emit(True)
+		try:
+			self.dialog = QFileDialog(directory=directory)
+			url = self.dialog.getExistingDirectory()
+		finally:
+			self.user_busy.emit(False)
 		if url and os.path.isdir(url):
 			self.update_path(url)
 

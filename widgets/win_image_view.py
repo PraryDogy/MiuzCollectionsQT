@@ -288,9 +288,7 @@ class WinImageView(UMainWindow):
 		self.restart_img_wid(QPixmap.fromImage(qimage))
 
 		if RootProbe.check(Mf.current_mf.mf_path) is not True:
-			# диск не ответил: миниатюра остаётся, полный файл не загружаем
-			print("img viewer: каталог недоступен, полный файл не загружаем")
-			return
+			return  # миниатюра остаётся, полный файл не грузим
 
 		self.set_title()
 		self.load_image()
