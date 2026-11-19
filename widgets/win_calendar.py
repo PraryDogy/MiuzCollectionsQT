@@ -115,10 +115,10 @@ class WinCalendar(UMainWindow):
 
 		# --- РАЗДЕЛЕНИЕ ЛОГИКИ ---
 		if date is None or not date.isValid():
-			self.selected_date = self.date_now
+			self.selected_date: QDate = self.date_now
 			self.view_date = self.date_now
 		else:
-			self.selected_date = date
+			self.selected_date: QDate = date
 			self.view_date = date
 
 		self.setWindowTitle(Lng.calendar)
@@ -248,7 +248,7 @@ class WinCalendar(UMainWindow):
 
 	def reset_button_cmd(self):
 		# Сбрасываем выделение и возвращаем сетку на текущий месяц
-		self.selected_date = None
+		self.selected_date = self.date_now
 		self.view_date = self.date_now
 		self.update_calendar()
 
@@ -337,6 +337,7 @@ class WinCalendar(UMainWindow):
 		new_date = self.view_date.addMonths(-1)
 		if new_date >= min_date:
 			self.view_date = new_date
+			self.selected_date = new_date
 			self.update_calendar()
 
 	def next_month(self):
