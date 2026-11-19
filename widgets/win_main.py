@@ -477,7 +477,13 @@ class WinMain(UMainWindow):
 		self.info_win.show()
 
 	def open_new_mf_win(self):
+
+		def on_closed():
+			self.bar_top.reload_catalog_menu()
+			self.restart_scaner_task()
+
 		self.new_mf_win = NewMfWin()
+		self.new_mf_win.closed.connect(on_closed)
 		self.new_mf_win.center_to_parent(self)
 		self.new_mf_win.show()
 

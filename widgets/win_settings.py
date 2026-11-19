@@ -1016,6 +1016,8 @@ class MfSettings(UGroupBox):
 
 
 class NewMfWin(UMainWindow):
+	closed = pyqtSignal()
+
 	def __init__(self, mf_path: str = None):
 		super().__init__()
 		self.setWindowTitle(Lng.new_catalog)
@@ -1095,7 +1097,7 @@ class NewMfWin(UMainWindow):
 			)
 			Mf.items.append(mf)
 			Mf.write_json_data()
-			QTimer.singleShot(100, restart_app)
+			QTimer.singleShot(100, self.closed.emit)
 
 		win = ConfirmWindow(Lng.app_will_restarted)
 		win.ok_clicked.connect(fin)
