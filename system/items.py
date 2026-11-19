@@ -2,18 +2,61 @@ import hashlib
 import json
 import os
 import struct
+import threading
+import time
 from dataclasses import dataclass
 from datetime import date, datetime
 from multiprocessing import shared_memory
 from pathlib import Path
 
 import numpy as np
-from PyQt6.QtCore import QDate, QLocale
+from PyQt6.QtCore import QDate, QLocale, QObject, pyqtSignal
 from PyQt6.QtGui import QImage
 
 from cfg import Static
 
 from .image_reader import ImageReader
+
+
+class _ProbeSignals(QObject):
+	done = pyqtSignal(str, bool)  # путь, доступен ли
+
+
+class RootProbe:
+	"""Проверка доступности корня каталога по запросу, без фонового опроса.
+
+	- Проверка запускается только из check(), то есть когда что-то нужно знать.
+	- Результат кэшируется на TTL секунд.
+	- На один путь не больше одной проверки в работе: зависший диск не порождает новых потоков.
+	- GUI не ждёт диск: результат приходит сигналом signals.done.
+	"""
+
+	TTL = 10.0
+	signals = _ProbeSignals()
+	_lock = threading.Lock()
+	_result: dict[str, tuple[bool, float]] = {}
+	_busy: set[str] = set()
+
+	@classmethod
+	def check(cls, path: str) -> bool | None:
+		"""Возвращает последний известный результат (None, если его ещё нет).
+		Если результат устарел, запускает проверку; ответ придёт в signals.done."""
+		now = time.monotonic()
+		with cls._lock:
+			cached = cls._result.get(path)
+			stale = cached is None or now - cached[1] >= cls.TTL
+			if stale and path not in cls._busy:
+				cls._busy.add(path)
+				threading.Thread(target=cls._probe, args=(path,), daemon=True).start()
+			return cached[0] if cached else None
+
+	@classmethod
+	def _probe(cls, path: str) -> None:
+		ok = os.path.isdir(path)  # может зависнуть: это делает только один поток на путь
+		with cls._lock:
+			cls._result[path] = (ok, time.monotonic())
+			cls._busy.discard(path)
+		cls.signals.done.emit(path, ok)  # в GUI-поток уйдёт через очередь Qt
 
 
 @dataclass(slots=True)
@@ -155,7 +198,7 @@ class Mf:
 		return Static.APP_DATA_DIR / rel_thumb_path
 
 	def is_root_alive(self):
-		return os.path.exists(self.mf_path)
+		return RootProbe.check(self.mf_path) is True
 
 	def get_data(self):
 		return {i: getattr(self, i) for i in self.__slots__}

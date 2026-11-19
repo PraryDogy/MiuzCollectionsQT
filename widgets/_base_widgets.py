@@ -1670,8 +1670,8 @@ class MfPathWidget(HoverGroupBox):
 		self.mf = mf
 		self.draft_mf_path = mf.mf_path if mf else None
 
-		self.watch_timer = QTimer(self)
-		self.watch_timer.timeout.connect(self.check_path_by_timer)
+		# результат проверки доступности приходит сигналом, опрос диска не используется
+		RootProbe.signals.done.connect(self._on_probe_done)
 
 		main_lay = QHBoxLayout(self)
 		main_lay.setContentsMargins(10, 5, 10, 5)
@@ -1713,25 +1713,30 @@ class MfPathWidget(HoverGroupBox):
 			self.dialog_dir()
 		super().mouseReleaseEvent(event)
 
+	def enterEvent(self, a0):
+		super().enterEvent(a0)
+		self.status.set_hovered(True)
+
+	def leaveEvent(self, a0):
+		super().leaveEvent(a0)
+		self.status.set_hovered(False)
+
 	def _path_exists(self) -> bool:
-		return bool(self.draft_mf_path) and os.path.exists(self.draft_mf_path)
+		# проверка идёт через кэш RootProbe: диск не трогаем из GUI-потока
+		return bool(self.draft_mf_path) and RootProbe.check(self.draft_mf_path) is True
+
+	def _on_probe_done(self, path: str, ok: bool):
+		# ответ может прийти по старому пути: обновляем только если он текущий
+		if path == self.draft_mf_path:
+			self.update_ui()
 
 	def update_ui(self):
 		if self._path_exists():
 			self.setToolTip(self.draft_mf_path)
 			self.status.set_good(self.draft_mf_path)
-			self.watch_timer.stop()
 		else:
 			self.setToolTip(Lng.find_catalog)
 			self.status.set_bad()
-			if not self.watch_timer.isActive():
-				self.watch_timer.start(1000)  # Проверка каждую секунду
-
-	def check_path_by_timer(self):
-		"""Срабатывание таймера в режиме ожидания пути"""
-		if self._path_exists():
-			self.changed.emit()
-			self.update_ui()
 
 	def update_path(self, new_path: str):
 		"""Единый метод обновления пути из любых событий"""
@@ -1768,11 +1773,3 @@ class MfPathWidget(HoverGroupBox):
 		if a0.mimeData().hasUrls():
 			a0.accept()
 		return super().dragEnterEvent(a0)
-
-	def enterEvent(self, a0):
-		super().enterEvent(a0)
-		self.status.set_hovered(True)
-
-	def leaveEvent(self, a0):
-		super().leaveEvent(a0)
-		self.status.set_hovered(False)
