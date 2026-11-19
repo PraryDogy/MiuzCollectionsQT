@@ -492,6 +492,7 @@ class WinMain(UMainWindow):
 
 		def on_closed():
 			self.bar_top.reload_catalog_menu()
+			self.on_mf_clicked(Mf.items[-1])
 			self.restart_scaner_task()
 
 		self.new_mf_win = NewMfWin()
