@@ -729,6 +729,8 @@ class Lng:
 		"Click to choose a catalog"
 	)
 	new_mf_confirm = (
-		"Проверьте данные каталога. Имя нельзя будет изменить после сохранения.",
-		"Check the catalog details. The name cannot be changed after saving."
+		"Проверьте данные каталога. Имя нельзя будет изменить после сохранения. "
+		"Создание каталога может занять время: все изображения будут проиндексированы.",
+		"Check the catalog details. The name cannot be changed after saving. "
+		"Creating the catalog may take a while: all images will be indexed."
 	)
