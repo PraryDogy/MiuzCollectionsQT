@@ -329,6 +329,7 @@ class WinMain(UMainWindow):
 		self.win_smb = WinSmb(mf)
 		self.win_smb.destroyed.connect(lambda: setattr(self, "win_smb", None))
 		self.win_smb.restart_scaner.connect(self.restart_scaner_task)
+		self.win_smb.center_to_parent(self)
 		self.win_smb.show()
 
 	def on_mf_clicked(self, mf: Mf):
