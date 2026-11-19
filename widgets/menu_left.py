@@ -45,6 +45,7 @@ class MenuLeft(UTreeWidget):
 		self.root_item: MenuLeftTreeWidgetItem | None = None
 		# кэш относительных путей из БД, чтобы перестраивать дерево без запроса к БД
 		self._paths: list[str] = []
+		self._build_gen = 0
 
 		self.base_folder_icon = QIcon(str(Static.COLOR_ICONS / "base_folder.svg"))
 		self.base_stop_list_icon = QIcon(str(Static.COLOR_ICONS / "base_folder_stop_list.svg"))
@@ -60,16 +61,29 @@ class MenuLeft(UTreeWidget):
 	# --- построение ---
 	def init_ui(self):
 		self.clear()
+		self._build_gen += 1
+		gen = self._build_gen
 
 		root_item = MenuLeftTreeWidgetItem(self, Mf.current_mf.mf_alias, os.sep)
 		root_item.setIcon(0, self.base_folder_icon)
 		self.addTopLevelItem(root_item)
 
 		task = DbDirsLoader(Mf.current_mf)
-		task.sigs.finished_.connect(lambda lst, r=root_item: self.build_tree(r, lst))
+		task.sigs.finished_.connect(
+			lambda lst, g=gen, r=root_item: self.build_tree(g, r, lst)
+		)
 		UThreadPool.start(task)
 
-	def build_tree(self, root_item: MenuLeftTreeWidgetItem, paths: list[str]) -> None:
+	def build_tree(self, gen: int, root_item: MenuLeftTreeWidgetItem, paths: list[str]) -> None:
+		# результат устарел: дерево уже пересоздано другим вызовом init_ui()
+		if gen != self._build_gen:
+			return
+		# корень могли удалить через clear(), тогда строить нечего
+		try:
+			root_item.text(0)
+		except RuntimeError:
+			return
+
 		self.root_item = root_item
 		# пути из БД уже относительные: /subfolder/subfolder
 		self._paths = [p for p in paths if p != os.sep]

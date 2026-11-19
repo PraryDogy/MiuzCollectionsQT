@@ -1,12 +1,11 @@
 import os
 import sys
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QApplication, QHBoxLayout
 
 from cfg import Static
-from system.database import Dirs
 from system.items import Mf, Servers
 from system.lang import Lng
 from system.multiprocess import ProcessWorker
@@ -24,6 +23,8 @@ def restart_app():
 
 
 class WinSmb(UMainWindow):
+	restart_scaner = pyqtSignal()
+
 	def __init__(self, mf: Mf):
 		super().__init__()
 		self.mf = mf
@@ -89,13 +90,10 @@ class WinSmb(UMainWindow):
 		self.mf.old_mf_path = self.mf.mf_path  # текущий путь становится старым
 		self.mf.mf_path = new_path             # новый путь становится текущим
 		Mf.write_json_data()
-		restart_app()
-
+		self.restart_scaner.emit()
+		self.deleteLater()
 
 	def keyPressEvent(self, a0):
 		if a0.key() in (Qt.Key.Key_Escape, ):
 			self.deleteLater()
 		return super().keyPressEvent(a0)
-
-	def deleteLater(self):
-		return super().deleteLater()
