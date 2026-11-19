@@ -200,11 +200,9 @@ class WinInfo(UMainWindow):
 	def copy_enter(self, e):
 		loc = self.labels["location"]
 		loc.set_state("regular_bold")
-		loc.set_underline(True)
 
 	def copy_leave(self, e):
 		self.labels["location"].set_state("regular")
-		self.labels["location"].set_underline(False)
 
 	def _load_info(self):
 		self.workers: dict[str, ProcessWorker] = {

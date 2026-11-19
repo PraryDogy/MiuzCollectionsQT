@@ -37,6 +37,7 @@ class TransparentLabel(QLabel):
 	sym_paragraph_sep = "\u2029"
 
 	states = ("regular", "gray", "regular_bold", "gray_bold")  # допустимые состояния
+	sizes = ("default", "small", "big")                        # размеры описаны в QSS
 
 	def __init__(self, text="", parent=None):
 		super().__init__(text or "", parent)
@@ -47,16 +48,16 @@ class TransparentLabel(QLabel):
 		self._state = "regular"
 		self._underline = False
 		self.setProperty("state", self._state)
+		self.setProperty("size", "default")
 
-	def set_underline(self, enabled: bool):
-		enabled = bool(enabled)
-		if enabled == self._underline:
+	def set_size(self, size: str = "default"):
+		if size not in self.sizes:
+			raise ValueError(f"Unknown size: {size!r}, expected one of {self.sizes}")
+		if self.property("size") == size:
 			return
-
-		self._underline = enabled
-		font = self.font()
-		font.setUnderline(enabled)
-		self.setFont(font)
+		self.setProperty("size", size)
+		self.style().unpolish(self)
+		self.style().polish(self)
 		self.update()
 
 	def set_state(self, state: str):
@@ -67,7 +68,6 @@ class TransparentLabel(QLabel):
 
 		self._state = state
 		self.setProperty("state", state)
-		# Без repolish QSS не применит новое значение свойства
 		self.style().unpolish(self)
 		self.style().polish(self)
 		self.update()

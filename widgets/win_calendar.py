@@ -10,19 +10,7 @@ from system.items import ReadableDateItem
 
 from ._base_widgets import (ActiveButton, TransparentLabel,
 							TransparentWidget, UMainWindow, UMenu, UPushButton,
-							USep)
-
-
-class CalendarBigDate(TransparentLabel):
-
-	def __init__(self):
-		super().__init__(text="30 сентября 2026")
-		self.set_font_size(25)
-		self.setAlignment(Qt.AlignmentFlag.AlignLeft)
-		self.adjustSize()
-		self.setFixedWidth(self.width())
-		self.clear()
-		self.set_state("gray")
+							USep, TitleWidget)
 
 
 class CalendarSvgNavi(QSvgWidget):

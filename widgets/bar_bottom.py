@@ -40,7 +40,7 @@ class PathItem(TransparentWidget):
 
 		self.text_wid = TransparentLabel(text=name)
 		self.text_wid.set_state("gray")
-		self.text_wid.set_font_size(11)
+		self.text_wid.set_size("small")
 		self.collapse()
 		item_layout.addWidget(self.text_wid)
 
@@ -137,12 +137,12 @@ class ProgressWidget(TransparentWidget):
 		# Путь показывается полностью, без обрезки
 		self.alias_label = TransparentLabel("")
 		self.alias_label.set_state("gray")
-		self.alias_label.set_font_size(11)
+		self.alias_label.set_size("small")
 
 		# Статус идёт сразу за путём
 		self.status_label = TransparentLabel("")
 		self.status_label.set_state("gray")
-		self.status_label.set_font_size(11)
+		self.status_label.set_size("small")
 
 		self.h_layout = QHBoxLayout(self)
 		self.h_layout.setContentsMargins(0, 0, 0, 0)

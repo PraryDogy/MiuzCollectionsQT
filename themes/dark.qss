@@ -926,6 +926,16 @@ TransparentLabel[state="gray_bold"] {
     font-weight: bold;
 }
 
+TransparentLabel[size="small"] {
+    font-size: 11px;
+}
+
+TransparentLabel[size="big"] {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
 
 /* PY: не требуется. */
 CalendarDaySelectedText {
