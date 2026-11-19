@@ -734,3 +734,7 @@ class Lng:
 		"Check the catalog details. The name cannot be changed after saving. "
 		"Creating the catalog may take a while: all images will be indexed."
 	)
+	remove_catalog_failed = (
+		"Не удалось удалить каталог",
+		"Remove catalog failed"
+	)

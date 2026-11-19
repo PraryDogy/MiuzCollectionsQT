@@ -504,8 +504,16 @@ class WinMain(UMainWindow):
 		self.bar_top.settings_btn.set_selected_style()
 		self.settings_win = WinSettings()
 		self.settings_win.closed.connect(self.bar_top.settings_btn.set_base_style)
+		self.settings_win.mf_removed.connect(self.on_mf_removed)
 		self.settings_win.center_to_parent(self.window())
 		self.settings_win.show()
+
+	def on_mf_removed(self):
+		"""Каталог удалён: переключаемся на оставшийся и обновляем меню."""
+		if Mf.current_mf not in Mf.items:
+			Mf.current_mf = Mf.items[0]   # удаление запрещено для последнего каталога
+		self.bar_top.reload_catalog_menu()
+		self.on_mf_clicked(Mf.current_mf)  # дерево, сетка, путь и текст кнопки
 
 	def load_st_grid(self):
 

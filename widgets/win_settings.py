@@ -1008,9 +1008,14 @@ class MfSettings(UGroupBox):
 
 	def start_mf_cleaner(self, clean_type: str):
 
-		def on_finish():
+		def on_finish(success: bool):
 			if clean_type == "remove_mf":
-				self.mf_removed.emit()
+				if success:
+					self.mf_removed.emit()
+				else:
+					win = WarningWindow(Lng.remove_catalog_failed)
+					win.center_to_parent(self.window())
+					win.show()
 			else:
 				restart_app()
 
@@ -1152,6 +1157,7 @@ class NewMfWin(UMainWindow):
 
 class WinSettings(UMainWindow):
 	closed = pyqtSignal()
+	mf_removed = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -1228,12 +1234,23 @@ class WinSettings(UMainWindow):
 	def init_right_side(self):
 		item = self.left_menu.currentItem()
 		mf = item.data(Qt.ItemDataRole.UserRole)  # None для пункта "Общие"
-		r_wid = GeneralSettings() if mf is None else MfSettings(mf)
 
-		# Любое изменение на странице помечает окно как несохранённое
+		if mf is None:
+			r_wid = GeneralSettings()
+		else:
+			r_wid = MfSettings(mf)
+			r_wid.mf_removed.connect(self._on_mf_removed)
+
 		r_wid.changed.connect(self._on_page_changed)
 		self.current_page = r_wid
 		self.right_lay.insertWidget(0, r_wid)
+
+	def _on_mf_removed(self):
+		# удаление уже записано в БД и JSON, несохранённых правок от него не осталось
+		self.has_unsaved = False
+		self.save_widget.hide_warning()
+		self.mf_removed.emit()   # сигнал для WinMain (объявлен в WinSettings)
+		self.close()
 
 	def _on_page_changed(self):
 		self.has_unsaved = True
