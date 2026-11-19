@@ -236,11 +236,12 @@ class WinMain(UMainWindow):
 	def with_conn(fn: callable):
 		@functools.wraps(fn)
 		def wrapper(self: "WinMain", *args):
-			if RootProbe.check(Mf.current_mf.mf_path) is not True:
-				self.open_win_smb(Mf.current_mf)  # окно само закроется, когда каталог станет доступен
+			if not RootProbe.is_available(Mf.current_mf.mf_path):
+				self.open_win_smb(Mf.current_mf)
 				return None
 			return fn(self, *args)
 		return wrapper
+
 
 	def stop_list_changed_cmd(self):
 		"""Стоп-лист изменился в любую сторону: сканер пересчитает папки и миниатюры."""
@@ -338,7 +339,7 @@ class WinMain(UMainWindow):
 		self.left_menu.init_ui()
 		self.load_st_grid()
 
-		if RootProbe.check(mf.mf_path) is not True:
+		if not RootProbe.is_available(mf.mf_path):
 			self.open_win_smb(mf)
 
 	@with_conn

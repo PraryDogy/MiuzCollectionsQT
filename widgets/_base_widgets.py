@@ -1671,9 +1671,6 @@ class MfPathWidget(HoverGroupBox):
 		self.mf = mf
 		self.draft_mf_path = mf.mf_path if mf else None
 
-		# результат проверки доступности приходит сигналом, опрос диска не используется
-		RootProbe.signals.done.connect(self._on_probe_done)
-
 		main_lay = QHBoxLayout(self)
 		main_lay.setContentsMargins(10, 5, 10, 5)
 		main_lay.setSpacing(10)
@@ -1723,16 +1720,10 @@ class MfPathWidget(HoverGroupBox):
 		self.status.set_hovered(False)
 
 	def _path_exists(self) -> bool:
-		# проверка идёт через кэш RootProbe: диск не трогаем из GUI-потока
-		return bool(self.draft_mf_path) and RootProbe.check(self.draft_mf_path) is True
-
-	def _on_probe_done(self, path: str, ok: bool):
-		# ответ может прийти по старому пути: обновляем только если он текущий
-		if path == self.draft_mf_path:
-			self.update_ui()
+		return bool(self.draft_mf_path) and RootProbe.is_available(self.draft_mf_path)
 
 	def update_ui(self):
-		if RootProbe.check(self.draft_mf_path) is True:
+		if self._path_exists():
 			self.setToolTip(self.draft_mf_path)
 			self.status.set_good(self.draft_mf_path)
 		else:

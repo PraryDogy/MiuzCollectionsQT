@@ -284,10 +284,9 @@ class WinImageView(UMainWindow):
 			i.raise_()
 
 	def load_thumb(self):
-		qimage = self.current_data_item.base_qimage
-		self.restart_img_wid(QPixmap.fromImage(qimage))
+		self.restart_img_wid(QPixmap.fromImage(self.current_data_item.base_qimage))
 
-		if RootProbe.check(Mf.current_mf.mf_path) is not True:
+		if not RootProbe.is_available(Mf.current_mf.mf_path):
 			return  # миниатюра остаётся, полный файл не грузим
 
 		self.set_title()

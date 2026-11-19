@@ -14,12 +14,13 @@ from .win_servers import ServersWin
 
 class WinSmb(UMainWindow):
 	restart_scaner = pyqtSignal()
+	CHECK_MS = 1500
 
 	def __init__(self, mf: Mf):
 		super().__init__()
 		self.mf = mf
-		self._user_control = False   # пользователь выбрал путь (обзор или drop)
-		self._dialog_open = False    # диалог обзора открыт прямо сейчас
+		self._user_control = False  # пользователь выбрал путь (обзор или drop)
+		self._dialog_open = False   # диалог обзора открыт прямо сейчас
 		self._closing = False
 
 		self.set_close_only()
@@ -32,14 +33,11 @@ class WinSmb(UMainWindow):
 		wrapper_lay.setContentsMargins(5, 10, 5, 10)
 		wrapper_lay.setSpacing(10)
 
-		title_widget = TitleTextWidget(mf.mf_alias, Static.COLOR_ICONS / "image_folder.svg")
-		wrapper_lay.addWidget(title_widget)
+		wrapper_lay.addWidget(TitleTextWidget(mf.mf_alias, Static.COLOR_ICONS / "image_folder.svg"))
 
-		# --- Виджет пути ---
 		self.path_widget = MfPathWidget(mf)
 		wrapper_lay.addWidget(self.path_widget)
 
-		# --- Кнопки ---
 		btns_wid = TransparentWidget()
 		self.central_layout.addWidget(btns_wid)
 		btns_lay = QHBoxLayout(btns_wid)
@@ -64,23 +62,14 @@ class WinSmb(UMainWindow):
 
 		self.path_widget.user_busy.connect(self._on_user_busy)
 		self.path_widget.changed.connect(self._on_user_changed)
-		RootProbe.signals.done.connect(self._on_root_done)
+
+		self._timer = QTimer(self)
+		self._timer.timeout.connect(self._tick)
+		self._timer.start(self.CHECK_MS)
 
 		self.setFixedWidth(450)
 		self.adjustSize()
 		self.setFixedHeight(self.height())
-
-		self._poll = QTimer(self)
-		self._poll.setInterval(1500)
-		self._poll.timeout.connect(self._tick)
-		self._poll.start()
-
-	# ---------- сигналы ----------
-
-	def _tick(self):
-		# запрашиваем состояние; если проверка уже идёт, RootProbe её не дублирует
-		if RootProbe.check(self.mf.mf_path) is True:
-			self._on_root_done(self.mf.mf_path, True)
 
 	def _on_user_busy(self, busy: bool):
 		self._dialog_open = busy
@@ -89,41 +78,25 @@ class WinSmb(UMainWindow):
 		# changed эмитится только из update_path: после обзора или drop
 		self._user_control = True
 
-	def _on_root_done(self, path: str, ok: bool):
-		if not ok or path != self.mf.mf_path:
-			return
-		# выбор пользователя важнее автоматического закрытия
+	def _tick(self):
+		# каталог вернулся сам, и пользователь ничего не выбирал: закрываем
 		if self._user_control or self._dialog_open:
 			return
-		self._finish(restart=True)
-
-	# ---------- закрытие ----------
+		if RootProbe.is_available(self.mf.mf_path):
+			self._finish(restart=True)
 
 	def _finish(self, restart: bool):
 		if self._closing:
 			return
 		self._closing = True
-		self._poll.stop()
-		self._disconnect_root_done()
+		self._timer.stop()
 		if restart:
 			self.restart_scaner.emit()
 		self.deleteLater()
 
-	def _disconnect_root_done(self):
-		try:
-			RootProbe.signals.done.disconnect(self._on_root_done)
-		except (TypeError, RuntimeError):
-			pass  # уже отключено
-
 	def closeEvent(self, a0):
-		self._disconnect_root_done()
+		self._finish(restart=False)
 		super().closeEvent(a0)
-
-	def deleteLater(self):
-		self._disconnect_root_done()
-		super().deleteLater()
-
-	# ---------- действия ----------
 
 	def open_servers(self):
 		self.servers_win = ServersWin()
@@ -133,14 +106,13 @@ class WinSmb(UMainWindow):
 	def ok_cmd(self):
 		new_path = self.path_widget.validate_and_show_win()
 		if not new_path:
-			return  # путь не выбран или не существует: сканировать нечего
+			return
 
 		if new_path != self.mf.mf_path:
-			self.mf.old_mf_path = self.mf.mf_path  # текущий путь становится старым
-			self.mf.mf_path = new_path             # новый путь становится текущим
+			self.mf.old_mf_path = self.mf.mf_path
+			self.mf.mf_path = new_path
 			Mf.write_json_data()
 
-		# скан запускается в любом случае, полный проход только при смене пути
 		self._finish(restart=True)
 
 	def keyPressEvent(self, a0):
