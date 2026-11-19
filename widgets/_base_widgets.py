@@ -50,12 +50,12 @@ class TransparentLabel(QLabel):
 		self.setProperty("state", self._state)
 		self.setProperty("size", "default")
 
-	def set_size(self, size: str = "default"):
+	def set_size(self, size: str):
 		if size not in self.sizes:
 			raise ValueError(f"Unknown size: {size!r}, expected one of {self.sizes}")
-		if self.property("size") == size:
+		if self.property("text_size") == size:
 			return
-		self.setProperty("size", size)
+		self.setProperty("text_size", size)
 		self.style().unpolish(self)
 		self.style().polish(self)
 		self.update()

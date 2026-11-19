@@ -920,11 +920,11 @@ TransparentLabel[state="gray_bold"] {
     font-weight: bold;
 }
 
-TransparentLabel[size="small"] {
+TransparentLabel[text_size="small"] {
     font-size: 11px;
 }
 
-TransparentLabel[size="big"] {
+TransparentLabel[text_size="big"] {
     font-size: 20px;
 }
 
