@@ -494,7 +494,8 @@ class WinImgSearch(UMainWindow):
 
 	def open_progress_win(self):
 		self.close_progress_win()
-		self.progress_win = ProgressWin()
+		pixmap = self.preview_widget.pixmap
+		self.progress_win = ProgressWin(pixmap)
 		self.progress_win.center_to_parent(self)
 		self.progress_win.stop_img_search.connect(self.progress_stop_cmd)
 		self.progress_win.show()
