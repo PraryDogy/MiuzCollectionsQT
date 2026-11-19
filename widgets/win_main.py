@@ -7,14 +7,14 @@ from PyQt6.QtGui import QCloseEvent, QGuiApplication, QImage, QKeyEvent
 from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.items import DataItem, Filters, Mf
+from system.image_reader import ImageReader
+from system.items import DataItem, Filters, Mf, RootProbe
 from system.lang import Lng
 from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
+from system.runnable import SetFav, ThumbScale, UThreadPool, Utils
 from system.scaner import (BaseScaner, DirsReady, ForcedScaner, MfScanned,
                            PathCheckPassed, PathMismatch, ScanerWorker,
                            ScanProgress)
-from system.runnable import SetFav, ThumbScale, UThreadPool, Utils
-from system.image_reader import ImageReader
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, USep, WarningWindow)
@@ -236,11 +236,12 @@ class WinMain(UMainWindow):
 	def with_conn(fn: callable):
 		@functools.wraps(fn)
 		def wrapper(self: "WinMain", *args):
-			avaiable_mf_path = Mf.current_mf.is_root_alive()
-			if avaiable_mf_path:
-				return fn(self, *args)
-			self.open_win_smb(Mf.current_mf)
-			return None
+			if RootProbe.check(Mf.current_mf.mf_path) is False:
+				self.open_win_smb(Mf.current_mf)
+				return None
+			if not Mf.current_mf.is_root_alive_cached():
+				return None  # проверка ещё идёт, действие нужно повторить после ответа
+			return fn(self, *args)
 		return wrapper
 
 	def stop_list_changed_cmd(self):
@@ -339,8 +340,7 @@ class WinMain(UMainWindow):
 		self.left_menu.init_ui()
 		self.load_st_grid()
 
-		mf_path = mf.is_root_alive()
-		if not mf_path:
+		if RootProbe.check(mf.mf_path) is False:
 			self.open_win_smb(mf)
 
 	@with_conn

@@ -307,7 +307,6 @@ ActiveButton {
     background: #0a6ce0;
     border: 1px solid #1a7cf0;
     color: #ffffff;
-    font-weight: bold;
 }
 
 ActiveButton:hover {

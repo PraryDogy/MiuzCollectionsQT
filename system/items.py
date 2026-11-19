@@ -197,7 +197,12 @@ class Mf:
 		rel_thumb_path = Path(rel_thumb_path.strip(os.sep))
 		return Static.APP_DATA_DIR / rel_thumb_path
 
-	def is_root_alive(self):
+	def is_root_alive(self) -> bool:
+		"""Синхронная проверка. Только для фоновых процессов: сканер, воркеры."""
+		return os.path.isdir(self.mf_path)
+
+	def is_root_alive_cached(self) -> bool:
+		"""Для GUI-потока: не ждёт диск, результат приходит через RootProbe.signals."""
 		return RootProbe.check(self.mf_path) is True
 
 	def get_data(self):
