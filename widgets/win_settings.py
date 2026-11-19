@@ -563,11 +563,6 @@ class MfRepairGroup(HoverGroupBox):
 		title_widget = TitleWidget(title, description, sep=False)
 		self.v_lay.addWidget(title_widget)
 
-		descr_widget = TransparentLabel(description)
-		descr_widget.set_style("gray", "regular", False)
-		descr_widget.setWordWrap(True)
-		self.v_lay.addWidget(descr_widget)
-
 		self.setFixedWidth(200)
 
 	def mouseReleaseEvent(self, event):
