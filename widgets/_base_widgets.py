@@ -79,11 +79,6 @@ class TransparentLabel(QLabel):
 		self._original_text = text
 		self._update_text()
 
-	def set_font_size(self, value_px: int):
-		font = self.font()
-		font.setPixelSize(value_px)
-		self.setFont(font)
-
 	def set_selectable(self, enabled: bool):
 		if enabled:
 			self.setTextInteractionFlags(

@@ -910,12 +910,6 @@ TransparentLabel[state="gray"] {
     color: #7b8792;
 }
 
-/* Значение точности: единственная подпись с акцентным цветом. */
-TransparentLabel[state="accent"] {
-    color: #4f9dff;
-    font-weight: bold;
-}
-
 TransparentLabel[state="regular_bold"] {
     color: #ffffff;
     font-weight: bold;
@@ -932,7 +926,6 @@ TransparentLabel[size="small"] {
 
 TransparentLabel[size="big"] {
     font-size: 20px;
-    font-weight: bold;
 }
 
 
