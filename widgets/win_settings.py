@@ -903,6 +903,7 @@ class MfStopListWidget(HoverGroupBox):
 
 class MfSettings(UGroupBox):
 	changed = pyqtSignal()
+	mf_removed = pyqtSignal()
 
 	def __init__(self, mf: Mf):
 		super().__init__()
@@ -1006,8 +1007,15 @@ class MfSettings(UGroupBox):
 		self.repair_win.show()
 
 	def start_mf_cleaner(self, clean_type: str):
+
+		def on_finish():
+			if clean_type == "remove_mf":
+				self.mf_removed.emit()
+			else:
+				restart_app()
+
 		self.reset_task = MfCleaner(self.mf, clean_type)
-		self.reset_task.sigs.finished_.connect(restart_app)
+		self.reset_task.sigs.finished_.connect(on_finish)
 		UThreadPool.start(self.reset_task)
 
 	def mouseReleaseEvent(self, a0):
