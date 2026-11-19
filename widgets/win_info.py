@@ -19,17 +19,6 @@ from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, UMenu, UPushButton)
 
 
-class WinInfoSelectableLabel(TransparentLabel):
-	def __init__(self, text: str):
-		super().__init__(text)
-		self.set_selectable(True)
-
-	def contextMenuEvent(self, ev):
-		if not self.selectedText():
-			self.setSelection(0, len(self.text()))
-		super().contextMenuEvent(ev)
-
-
 class CopyPathButton(UPushButton):
 	copy_clicked = pyqtSignal()
 	ms = 1000
@@ -104,7 +93,7 @@ class WinInfo(UMainWindow):
 		self.setWindowTitle(Lng.info)
 
 		self.readable_date = ReadableDateItem(JsonData.lng_index)
-		self.labels: dict[str, WinInfoSelectableLabel] = {}
+		self.labels: dict[str, TransparentLabel] = {}
 		self.data_item = data_item
 		self.abs_path = data_item.abs_path
 
@@ -145,7 +134,7 @@ class WinInfo(UMainWindow):
 		self.central_layout.addWidget(wid)
 
 		outer_lay = QVBoxLayout(wid)
-		outer_lay.setContentsMargins(10, 10, 10, 10)
+		outer_lay.setContentsMargins(5, 5, 5, 5)
 		outer_lay.setSpacing(10)
 
 		outer_lay.addWidget(self.img_wid, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -164,20 +153,22 @@ class WinInfo(UMainWindow):
 			("resol", Lng.resol, Lng.calculating),
 		]
 
-		l_fl = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
-
 		for row, (key, caption, value) in enumerate(rows):
 			left_lbl = TransparentLabel(caption + ":")
 			left_lbl.set_state("gray")
-			right_lbl = WinInfoSelectableLabel(value)
+			right_lbl = TransparentLabel(value)
+			right_lbl.set_selectable(True)
 			for i in left_lbl, right_lbl:
 				i.set_font_size(11)
 
+			left_lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+			right_lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
 			right_lbl.set_elide(True, ignore_width=False)
 
-			self.grid_lay.addWidget(left_lbl, row, 0, alignment=l_fl)
-			self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
-			self.grid_lay.addWidget(right_lbl, row, 2)
+			self.grid_lay.addWidget(left_lbl, row, 0)
+			# self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
+			self.grid_lay.addWidget(right_lbl, row, 1)
 			self.labels[key] = right_lbl
 
 		# Правая колонка забирает всё оставшееся место окна

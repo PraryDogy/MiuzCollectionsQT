@@ -995,16 +995,6 @@ WinSettingsMfAliasTitle {
     font-weight: bold;
 }
 
-/* PY: размер шрифта 11pt — QFont в коде. */
-WinInfoLeftLabel {
-    font-size: 11pt;
-}
-
-/* PY: размер шрифта 11pt — QFont в коде. */
-WinInfoSelectableLabel {
-    font-size: 11pt;
-}
-
 /* PY: отступ 1px — setContentsMargins, если нужен. */
 ServerLabel {
     padding-left: 1px;
