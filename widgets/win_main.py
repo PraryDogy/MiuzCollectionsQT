@@ -10,7 +10,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, Filters, Mf
 from system.lang import Lng
 from system.multiprocess import FilesRemover, ProcessWorker, UpdateThumb
-from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
+from system.scaner import (BaseScaner, DirsReady, ForcedScaner, MfScanned,
                            PathCheckPassed, PathMismatch, ScanerWorker,
                            ScanProgress)
 from system.runnable import SetFav, ThumbScale, UThreadPool, Utils
@@ -309,26 +309,13 @@ class WinMain(UMainWindow):
 		self.filters_win.center_to_parent(self.window())
 		self.filters_win.show()
 
-	@staticmethod
-	def _is_alive(widget) -> bool:
-		"""False, если окно уже удалено на стороне Qt."""
-		if widget is None:
-			return False
-		try:
-			widget.isVisible()
-			return True
-		except RuntimeError:
-			return False
-		
 	def open_win_smb(self, mf: Mf):
-		if self._is_alive(self.win_smb) and self.win_smb.isVisible():
+		if self.win_smb is not None and self.win_smb.isVisible():
 			self.win_smb.activateWindow()
 			self.win_smb.raise_()
 			return
 
 		self.win_smb = WinSmb(mf)
-		self.win_smb.destroyed.connect(lambda: setattr(self, "win_smb", None))
-		self.win_smb.restart_scaner.connect(self.restart_scaner_task)
 		self.win_smb.show()
 
 	def on_mf_clicked(self, mf: Mf):
@@ -681,6 +668,8 @@ class WinMain(UMainWindow):
 				self.on_path_check_passed(data)
 			elif isinstance(data, DirsReady):
 				self.on_dirs_ready(data)
+			elif isinstance(data, MfScanned):
+				self.on_mf_scanned(data)
 			elif isinstance(data, ScanProgress):
 				progress.show_status(data)
 
@@ -689,6 +678,8 @@ class WinMain(UMainWindow):
 			progress.show_timer()
 			new_db_time = int(os.stat(Static.DB_FILE).st_mtime)
 			if db_changed(self.db_mtime, new_db_time) or self.stop_list_changed:
+				if hasattr(self, "grid_refresh_timer"):
+					self.grid_refresh_timer.stop()  # финальная перерисовка заменяет отложенную
 				self.load_st_grid()
 				self.left_menu.init_ui()
 				self.stop_list_changed = False
@@ -697,6 +688,17 @@ class WinMain(UMainWindow):
 				self.start_scaner_task()
 		else:
 			self.scaner_poll_timer.start(ms)
+
+	def on_mf_scanned(self, data: MfScanned):
+		"""Каталог записал изменения в БД: обновляем сетку, если он текущий."""
+		if Mf.current_mf is None or Mf.current_mf.mf_alias != data.mf_alias:
+			return
+		if not hasattr(self, "grid_refresh_timer"):
+			self.grid_refresh_timer = QTimer(self)
+			self.grid_refresh_timer.setSingleShot(True)
+			self.grid_refresh_timer.timeout.connect(self.load_st_grid)
+		# серия сообщений подряд даёт одну перерисовку через 1.5 с
+		self.grid_refresh_timer.start(1500)
 
 	def on_dirs_ready(self, data: DirsReady):
 		"""Папки записаны в Dirs: перестраиваем дерево, сетку не трогаем."""
@@ -741,12 +743,6 @@ class WinMain(UMainWindow):
 
 	def start_scaner_task(self, ms: int = 3000, force_full: bool = False):
 
-		def scan_order(current: Mf) -> list[Mf]:
-			rest = [m for m in Mf.items if m is not current]
-			if any(m is current for m in Mf.items):
-				return [current, *rest]
-			return list(Mf.items)
-
 		if not hasattr(self, "scaner_task"):
 			# print("первая инициация сканера")
 			self.scaner_task = None
@@ -783,7 +779,7 @@ class WinMain(UMainWindow):
 				# print("штатно запускаю ОБЩИЙ сканер")
 				self.scaner_task = ScanerWorker(
 					target=BaseScaner.start,
-					args=(scan_order(Mf.current_mf), force_full),
+					args=(Mf.items, force_full),
 				)
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
 			self.bar_bottom.progress_widget.show_loading()

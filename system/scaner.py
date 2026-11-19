@@ -11,12 +11,10 @@ import sqlalchemy
 
 from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
-from system.image_reader import ImageReader
 from system.items import ImageArrayItem, Mf
 from system.multiprocess import BaseProcessWorker
-from system.utils import Utils
+from system.utils import ImageReader, Utils
 
-from .stop_list import StopList
 
 # ==========================================
 # Константы
@@ -72,6 +70,12 @@ class ScanProgress:
 @dataclass(slots=True)
 class DirsReady:
     """Папки Mf записаны в Dirs (пока с PENDING_MOD). Можно строить левое меню."""
+    mf_alias: str
+
+
+@dataclass(slots=True)
+class MfScanned:
+    """В БД записаны изменения каталога. GUI может перерисовать сетку."""
     mf_alias: str
 
 
@@ -147,6 +151,30 @@ class DirsDiff:
     changed: list[DirItem]        # mod отличается (включая PENDING_MOD)
     stopped: list[DirItem]        # стоп-папки на диске, mod = StopList.MOD
     newly_stopped: list[DirItem]  # стали стоп-папкой только что
+
+
+class StopList:
+    """
+    Стоп-лист по относительным путям. Папка из стоп-листа и всё её поддерево
+    считаются стоп-папками: изображения в них не сканируются, структура сохраняется.
+    """
+
+    # mod для стоп-папок в Dirs. Реальный mtime никогда не равен 0.
+    MOD = 0
+
+    def __init__(self, stop_list: list[str]):
+        self.roots = {
+            os.sep + s.strip(os.sep)
+            for s in stop_list
+            if s.strip(os.sep)
+        }
+
+    def contains(self, rel_path: str) -> bool:
+        rel = os.sep + rel_path.strip(os.sep)
+        for root in self.roots:
+            if rel == root or rel.startswith(root + os.sep):
+                return True
+        return False
 
 
 class Progress:
@@ -260,6 +288,7 @@ class MfScan:
         self.mf = env.mf
         self.engine = env.engine
         self.progress = Progress(env)
+        self.changed = False  # были ли записи в БД
 
     # ---------- публичные точки входа ----------
 
@@ -582,6 +611,8 @@ class MfScan:
             Utils.write_thumbnail(Utils.get_broken_thumbnail(), thumb_path)
 
     def _delete_thumb_records(self, chunk: list[ImgItem]) -> None:
+        if chunk:
+            self.changed = True
         with self.engine.begin() as conn:
             conn.execute(
                 sqlalchemy.delete(Thumbs.table)
@@ -590,6 +621,8 @@ class MfScan:
             )
 
     def _upsert_thumb_records(self, chunk: list[ImgItem]) -> None:
+        if chunk:
+            self.changed = True
         rows = []
         for img in chunk:
             rel_img_path = self.mf.create_rel_path(img.abs_img_path)
@@ -620,6 +653,8 @@ class MfScan:
 
     def _write_dirs(self, dirs: list[DirItem]) -> None:
         """Записывает папки в Dirs одной транзакцией (delete + insert)."""
+        if dirs:
+            self.changed = True
         if not self.mf.is_root_alive():
             print("root lost, skip Dirs update", self.mf.mf_alias)
             return
@@ -642,6 +677,8 @@ class MfScan:
                 conn.execute(sqlalchemy.insert(Dirs.table), values)
 
     def _remove_dirs(self, dirs: list[DirItem]) -> None:
+        if dirs:
+            self.changed = True
         self._remove_dir_thumbs(dirs)
         self._delete_dir_records(dirs)
 
@@ -726,24 +763,27 @@ def _run_mf(
     engine: sqlalchemy.Engine,
     queue: Queue,
     action: Callable[[MfScan], None],
-) -> None:
+) -> bool:
     """
     Общая обёртка одного Mf: проверка доступности корня, проверка идентичности
     каталога (если выставлен old_mf_path) и выполнение действия. Исключения логируются.
+    Возвращает True, если в БД были записаны изменения.
     """
     if not mf.is_root_alive():
         queue.put(ScanProgress("no_connection", mf.mf_alias))
         print("no connection", mf.mf_alias)
         sleep(3)
-        return
+        return False
 
+    scan = None
     try:
         scan = MfScan(ScanEnv(mf, engine, queue))
         if mf.old_mf_path is not None and not scan.check_identity():
-            return  # БД не трогаем
+            return False  # БД не трогаем
         action(scan)
     except Exception:
         print(traceback.format_exc())
+    return scan is not None and scan.changed
 
 
 # ==========================================
@@ -757,7 +797,9 @@ class BaseScaner:
         with _engine() as engine:
             for mf in mf_list:
                 print("scaner started", mf.mf_alias)
-                _run_mf(mf, engine, queue, lambda scan: scan.run(force_full))
+                changed = _run_mf(mf, engine, queue, lambda scan: scan.run(force_full))
+                if changed:
+                    queue.put(MfScanned(mf.mf_alias))
                 print("scaner finished", mf.mf_alias)
 
 
