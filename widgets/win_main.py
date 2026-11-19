@@ -505,8 +505,33 @@ class WinMain(UMainWindow):
 		self.settings_win = WinSettings()
 		self.settings_win.closed.connect(self.bar_top.settings_btn.set_base_style)
 		self.settings_win.mf_removed.connect(self.on_mf_removed)
+		self.settings_win.repair_done.connect(self.on_repair_done)
 		self.settings_win.center_to_parent(self.window())
 		self.settings_win.show()
+
+	def on_repair_done(self, clean_type: str):
+		self.close_all_windows_except_main()
+
+		win = WarningWindow(Lng.reindex_warning)
+		win.center_to_parent(self)
+		win.show()
+
+		# full_repair очищает миниатюры, но папки остаются: без полного прохода
+		# сканер их не пересоздаст, поэтому запускаем с force_full
+		try:
+			self.scaner_task.terminate_join()
+		except AttributeError:
+			pass
+		self.start_scaner_task(force_full=(clean_type == "full_repair"))
+
+	def close_all_windows_except_main(self):
+		for win in list(UMainWindow.win_list):
+			if win is self:
+				continue
+			try:
+				win.close()
+			except RuntimeError:
+				pass  # окно уже удалено
 
 	def on_mf_removed(self):
 		"""Каталог удалён: переключаемся на оставшийся и обновляем меню."""

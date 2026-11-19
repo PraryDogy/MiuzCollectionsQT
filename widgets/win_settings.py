@@ -904,6 +904,7 @@ class MfStopListWidget(HoverGroupBox):
 class MfSettings(UGroupBox):
 	changed = pyqtSignal()
 	mf_removed = pyqtSignal()
+	repair_done = pyqtSignal(str)   # clean_type: "simple_repair" или "full_repair"
 
 	def __init__(self, mf: Mf):
 		super().__init__()
@@ -1009,15 +1010,16 @@ class MfSettings(UGroupBox):
 	def start_mf_cleaner(self, clean_type: str):
 
 		def on_finish(success: bool):
+			if not success:
+				win = WarningWindow(Lng.repair_failed)
+				win.center_to_parent(self.window())
+				win.show()
+				return
+
 			if clean_type == "remove_mf":
-				if success:
-					self.mf_removed.emit()
-				else:
-					win = WarningWindow(Lng.remove_catalog_failed)
-					win.center_to_parent(self.window())
-					win.show()
+				self.mf_removed.emit()
 			else:
-				restart_app()
+				self.repair_done.emit(clean_type)
 
 		self.reset_task = MfCleaner(self.mf, clean_type)
 		self.reset_task.sigs.finished_.connect(on_finish)
@@ -1158,6 +1160,7 @@ class NewMfWin(UMainWindow):
 class WinSettings(UMainWindow):
 	closed = pyqtSignal()
 	mf_removed = pyqtSignal()
+	repair_done = pyqtSignal(str)
 
 	def __init__(self):
 		super().__init__()
@@ -1240,10 +1243,18 @@ class WinSettings(UMainWindow):
 		else:
 			r_wid = MfSettings(mf)
 			r_wid.mf_removed.connect(self._on_mf_removed)
+			r_wid.repair_done.connect(self._on_repair_done)
 
 		r_wid.changed.connect(self._on_page_changed)
 		self.current_page = r_wid
 		self.right_lay.insertWidget(0, r_wid)
+
+	def _on_repair_done(self, clean_type: str):
+		# очистка уже записана в БД, несохранённых правок не осталось
+		self.has_unsaved = False
+		self.save_widget.hide_warning()
+		self.repair_done.emit(clean_type)
+		self.close()
 
 	def _on_mf_removed(self):
 		# удаление уже записано в БД и JSON, несохранённых правок от него не осталось

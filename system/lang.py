@@ -738,3 +738,11 @@ class Lng:
 		"Не удалось удалить каталог",
 		"Remove catalog failed"
 	)
+	repair_failed = (
+		"Не удалось выполнить восстановление каталога",
+		"Failed to restore the catalog"
+	)
+	reindex_warning = (
+		"Восстановление запущено. Индексация изображений может занять время, пока она идёт, часть изображений может отсутствовать.",
+		"Repair started. Image indexing may take a while, and some images may be missing until it finishes."
+	)
