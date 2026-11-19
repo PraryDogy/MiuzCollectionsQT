@@ -14,9 +14,6 @@ from PyQt6.QtWidgets import QApplication
 from cfg import Static
 
 
-class ImageReader:
-	pass
-
 class Utils:
 
 	@classmethod

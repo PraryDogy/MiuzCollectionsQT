@@ -10,11 +10,12 @@ from typing import Callable, Literal
 import sqlalchemy
 
 from cfg import Static
+
 from .database import Dbase, Dirs, Thumbs
+from .image_reader import ImageReader
 from .items import ImageArrayItem, Mf
 from .multiprocess import BaseProcessWorker
-from .utils import ImageReader, Utils
-
+from .utils import Utils
 
 # ==========================================
 # Константы

@@ -154,7 +154,7 @@ class ZoomWidget(ImgViewSvg):
 
 	def __init__(self):
 		super().__init__()
-		self.load(str(Static.COLOR_ICONS / "zoom_buttons.svg"))
+		self.load(str(Static.GRAY_ICONS / "zoom_buttons.svg"))
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.zone_width = self.width() / 4
 		self.start_pos = None
