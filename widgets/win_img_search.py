@@ -1,25 +1,24 @@
 import os
 from multiprocessing import shared_memory
 
-import cv2
 import numpy as np
-import sqlalchemy
-from PyQt6.QtCore import QPoint, QStandardPaths, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QCursor, QIcon, QImage, QPixmap
+from PyQt6.QtCore import QStandardPaths, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QStackedWidget, QVBoxLayout
+from PyQt6.QtWidgets import (QFileDialog, QHBoxLayout, QStackedWidget,
+                             QVBoxLayout)
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Static
+from system.image_reader import ImageReader
 from system.items import ImageArrayItem, Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg
 from system.runnable import BlurImgBgTask, ImageSearcher, UThreadPool
-from system.image_reader import ImageReader
 
 from ._base_widgets import (ActiveButton, SubGroup, TitleWidget,
                             TransparentFrame, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UMenu, UPushButton, USlider)
+                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
+                            UPushButton, USlider)
 
 DROP_WIDGET_SIZE = (350, 300)
 
