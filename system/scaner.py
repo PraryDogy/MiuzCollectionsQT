@@ -10,10 +10,10 @@ from typing import Callable, Literal
 import sqlalchemy
 
 from cfg import Static
-from system.database import Dbase, Dirs, Thumbs
-from system.items import ImageArrayItem, Mf
-from system.multiprocess import BaseProcessWorker
-from system.utils import ImageReader, Utils
+from .database import Dbase, Dirs, Thumbs
+from .items import ImageArrayItem, Mf
+from .multiprocess import BaseProcessWorker
+from .utils import ImageReader, Utils
 
 
 # ==========================================

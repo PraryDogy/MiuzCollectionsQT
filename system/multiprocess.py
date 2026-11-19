@@ -11,7 +11,8 @@ from time import sleep
 from typing import Literal
 
 from cfg import Static
-from system.items import ImageArrayItem, Mf
+
+from .items import ImageArrayItem, Mf
 
 
 class BaseProcessWorker:
@@ -391,6 +392,7 @@ class UpdateThumb:
 	def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
 
 		import sqlalchemy
+
 		from system.database import Dbase, Thumbs
 		
 		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
