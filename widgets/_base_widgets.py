@@ -20,8 +20,8 @@ from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
                              QTreeWidget, QTreeWidgetItem, QVBoxLayout,
                              QWidget)
 
-from cfg import JsonData, Static
-from system.items import Mf
+from cfg import Static
+from system.items import Mf, RootProbe
 from system.lang import Lng
 from system.themes import ThemeChanger
 from system.utils import Utils
