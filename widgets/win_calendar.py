@@ -10,7 +10,7 @@ from system.items import ReadableDateItem
 
 from ._base_widgets import (ActiveButton, TransparentLabel,
 							TransparentWidget, UMainWindow, UMenu, UPushButton,
-							USep, TitleWidget)
+							USep, TitleWidget, UGroupBox)
 
 
 class CalendarSvgNavi(QSvgWidget):
@@ -84,7 +84,7 @@ class WinCalendar(UMainWindow):
 	date_selected = pyqtSignal(QDate)
 	min_year = 2015
 	cell_size = (45, 35)
-	svg_nav_size = (23, 23)
+	svg_nav_size = (15, 15)
 	svg_circle_size = (27, 27)
 
 	# Теперь принимаем date, который может быть невалидным или None
@@ -105,41 +105,29 @@ class WinCalendar(UMainWindow):
 		self.set_close_only()
 		self.set_always_on_top()
 
-		self.init_ui()
+		calendar_wrapper = UGroupBox()
+		self.central_layout.addWidget(calendar_wrapper)
+		self.wrapper_layout = QVBoxLayout(calendar_wrapper)
+		self.wrapper_layout.setContentsMargins(self.central_layout.contentsMargins())
+		self.wrapper_layout.setSpacing(self.central_layout.spacing())
+		self.wrapper_layout.setSpacing(0)
 
+		self.init_ui()
 		self.adjustSize()
-		self.setFixedSize(self.width(), self.height())
-		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+		self.setFixedSize(self.width() + 30, self.height())
 
 	def init_ui(self):
-		spacing = 10
-
-		dynamic_container = TransparentWidget()
-		self.central_layout.addWidget(dynamic_container)
-
-		dynamic_container_lay = QHBoxLayout(dynamic_container)
-		dynamic_container_lay.setContentsMargins(0, 0, 0, 0)
-		dynamic_container_lay.setSpacing(0)
-
-		calendar_icon = QSvgWidget(str(Static.COLOR_ICONS / "calendar.svg"))
-		calendar_icon.setFixedSize(15, 15)
-		dynamic_container_lay.addWidget(calendar_icon)
-		dynamic_container_lay.addSpacing(10)
-
-		self.dynamic_label = TransparentLabel()
-		dynamic_container_lay.addWidget(self.dynamic_label)
-		dynamic_container_lay.addStretch(1)
-
-		self.central_layout.addSpacing(spacing)
-		self.central_layout.addWidget(USep())
-		self.central_layout.addSpacing(spacing)
+		_title_widget = TitleWidget("", title_svg=Static.COLOR_ICONS / "calendar.svg")
+		_title_widget.v_lay.setSpacing(10)
+		self.wrapper_layout.addWidget(_title_widget)
+		self.dynamic_label = _title_widget.title_widget.text_widget
 
 		self.nav_widget = TransparentWidget()
-		self.central_layout.addWidget(self.nav_widget)
+		self.wrapper_layout.addWidget(self.nav_widget)
 
 		self.nav_layout = QHBoxLayout(self.nav_widget)
-		self.nav_layout.setContentsMargins(0, 0, 0, 0)
-		self.nav_layout.setSpacing(0)
+		self.nav_layout.setContentsMargins(0, 7, 0, 7)
+		self.nav_layout.setSpacing(5)
 		self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 		self.btn_prev = CalendarSvgNavi(str(Static.GRAY_ICONS / "arrow_left.svg"))
@@ -153,7 +141,6 @@ class WinCalendar(UMainWindow):
 		self.btn_month.setMenu(self.menu_month)
 		self.populate_months()
 		self.nav_layout.addWidget(self.btn_month)
-		self.nav_layout.addSpacing(10)
 
 		self.btn_year = UPushButton("")
 		self.menu_year = UMenu(parent=self)
@@ -167,8 +154,7 @@ class WinCalendar(UMainWindow):
 		self.btn_next.clicked.connect(self.next_month)
 		self.nav_layout.addWidget(self.btn_next)
 
-		self.central_layout.addSpacing(spacing)
-		self.central_layout.addWidget(USep())
+		self.wrapper_layout.addWidget(USep())
 
 		header_widget = TransparentWidget()
 		header_layout = QHBoxLayout(header_widget)
@@ -183,17 +169,15 @@ class WinCalendar(UMainWindow):
 			lbl_day.setFixedSize(*self.cell_size)
 			header_layout.addWidget(lbl_day)
 
-		self.central_layout.addWidget(header_widget)
-		self.central_layout.addWidget(USep())
+		self.wrapper_layout.addWidget(header_widget)
+
+		self.wrapper_layout.addWidget(USep())
 
 		self.calendar_container = TransparentWidget()
 		self.calendar_container_layout = QVBoxLayout(self.calendar_container)
 		self.calendar_container_layout.setContentsMargins(0, 0, 0, 0)
 		self.calendar_container_layout.setSpacing(0)
-		self.central_layout.addWidget(self.calendar_container)
-
-		self.central_layout.addWidget(USep())
-		self.central_layout.addSpacing(spacing)
+		self.wrapper_layout.addWidget(self.calendar_container)
 
 		self.btn_container = TransparentWidget()
 		self.central_layout.addWidget(self.btn_container)
@@ -217,6 +201,8 @@ class WinCalendar(UMainWindow):
 
 		self.create_calendar_widget()
 		self.update_calendar()
+
+		self.wrapper_layout.addStretch()
 
 	def _add_circle(self, cell, day_num: int, kind: str):
 		size = self.svg_circle_size[0]
