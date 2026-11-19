@@ -728,3 +728,7 @@ class Lng:
 		"Нажмите, чтобы выбрать каталог",
 		"Click to choose a catalog"
 	)
+	new_mf_confirm = (
+		"Проверьте данные каталога. Имя нельзя будет изменить после сохранения.",
+		"Check the catalog details. The name cannot be changed after saving."
+	)

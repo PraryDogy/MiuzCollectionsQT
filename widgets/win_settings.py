@@ -1097,9 +1097,10 @@ class NewMfWin(UMainWindow):
 			)
 			Mf.items.append(mf)
 			Mf.write_json_data()
-			QTimer.singleShot(100, self.closed.emit)
+			self.closed.emit()
+			self.deleteLater()
 
-		win = ConfirmWindow(Lng.app_will_restarted)
+		win = ConfirmWindow(Lng.new_mf_confirm)
 		win.ok_clicked.connect(fin)
 		win.center_to_parent(self.window())
 		win.show()

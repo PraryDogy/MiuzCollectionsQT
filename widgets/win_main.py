@@ -309,13 +309,25 @@ class WinMain(UMainWindow):
 		self.filters_win.center_to_parent(self.window())
 		self.filters_win.show()
 
+	@staticmethod
+	def _is_alive(widget) -> bool:
+		"""False, если окно уже удалено на стороне Qt."""
+		if widget is None:
+			return False
+		try:
+			widget.isVisible()
+			return True
+		except RuntimeError:
+			return False
+
 	def open_win_smb(self, mf: Mf):
-		if self.win_smb is not None and self.win_smb.isVisible():
+		if self._is_alive(self.win_smb) and self.win_smb.isVisible():
 			self.win_smb.activateWindow()
 			self.win_smb.raise_()
 			return
 
 		self.win_smb = WinSmb(mf)
+		self.win_smb.destroyed.connect(lambda: setattr(self, "win_smb", None))
 		self.win_smb.show()
 
 	def on_mf_clicked(self, mf: Mf):
