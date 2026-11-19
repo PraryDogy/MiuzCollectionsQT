@@ -96,6 +96,10 @@ class CalendarDaySelectedText(TransparentLabel):
 		super().__init__(text, parent)
 
 
+class CalendarCircle(TransparentLabel):
+	pass
+
+
 class WinCalendar(UMainWindow):
 	date_selected = pyqtSignal(QDate)
 	min_year = 2015
@@ -243,6 +247,15 @@ class WinCalendar(UMainWindow):
 
 		self.create_calendar_widget()
 		self.update_calendar()
+
+	def _add_circle(self, cell, day_num: int, kind: str):
+		size = self.svg_circle_size[0]
+		circle = CalendarCircle(str(day_num), cell)
+		circle.setProperty("circle", kind)  # "selected" или "today"
+		circle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		circle.setFixedSize(size, size)
+		circle.move((self.cell_size[0] - size) // 2, (self.cell_size[1] - size) // 2)
+		circle.show()
 
 	def ok_btn_cmd(self):
 		# Отправляем выбранную дату, либо пустой (невалидный) QDate, если None
@@ -415,34 +428,15 @@ class WinCalendar(UMainWindow):
 					btn_day.setFixedSize(*self.cell_size)
 					btn_day.clicked.connect(self.inactive_day_clicked)
 				else:
-					# Если дата выбрана, рисуем синий круг
+					btn_day = CalendarDay("", d_date)
+					btn_day.setFixedSize(*self.cell_size)
 					if self.selected_date is not None and d_date == self.selected_date:
-						btn_day = CalendarDaySelected(str(day_num), d_date)
-						btn_day.setFixedSize(*self.cell_size)
-						btn_day.setPixmap(self.blue_circle_pixmap)
-
-						btn_day_text = CalendarDaySelectedText(
-							text=str(day_num),
-							parent=btn_day
-						)
-						btn_day_text.setGeometry(btn_day.rect())
-						btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-					# Если это сегодняшний день (но он не выбран явно), рисуем серый круг
+						self._add_circle(btn_day, day_num, "selected")
 					elif d_date == self.date_now:
-						btn_day = CalendarDay(str(day_num), d_date)
-						btn_day.setFixedSize(*self.cell_size)
-						btn_day.setPixmap(self.gray_circle_pixmap)
-
-						btn_day_text = CalendarDaySelectedText(
-							text=str(day_num),
-							parent=btn_day
-						)
-						btn_day_text.setGeometry(btn_day.rect())
-						btn_day_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-					# Обычный день
+						self._add_circle(btn_day, day_num, "today")
 					else:
-						btn_day = CalendarDay(str(day_num), d_date)
-						btn_day.setFixedSize(*self.cell_size)
+						btn_day.setText(str(day_num))
+					btn_day.clicked.connect(self.day_selected)
 
 					btn_day.clicked.connect(self.day_selected)
 

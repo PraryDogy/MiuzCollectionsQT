@@ -185,7 +185,7 @@ Thumb[framed="noframe"] {
 }
 
 Thumb[framed="frame"] {
-    border: 2px solid #1a7cf0;
+    border: 2px solid #0a6ce0;
 }
 
 /* PY: размер плитки — setFixedSize, отступы — setContentsMargins. */
@@ -920,10 +920,22 @@ TransparentLabel[text_size="big"] {
 }
 
 
+
+
 /* PY: не требуется. */
-CalendarDaySelectedText {
+CalendarCircle[circle="selected"] {
+    background: #0a6ce0;
+    border-radius: 13px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+CalendarCircle[circle="today"] {
+    background: #303b46;
+    border-radius: 13px;
     color: #ffffff;
 }
+
 
 /* PY: шрифт 11px у QToolTip задавать через QFont в коде не нужно,
    тултип использует шрифт приложения. Отступ 2px оставить здесь. */
