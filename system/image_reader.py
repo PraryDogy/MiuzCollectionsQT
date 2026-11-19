@@ -4,14 +4,11 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-import cv2
 import numpy as np
-import pillow_heif
-import rawpy
-import tifffile
 from PIL import Image, ImageCms, ImageOps
 
-pillow_heif.register_heif_opener()
+# Лёгкий модуль чтения изображений. Тяжёлые декодеры (cv2, rawpy, tifffile,
+# pillow_heif) импортируются внутри методов, только когда они нужны.
 Image.MAX_IMAGE_PIXELS = None
 
 ICC_TIFF_TAG = 34675          # InterColorProfile
@@ -26,6 +23,17 @@ _TIFF_ORIENT = {
 	7: Image.Transpose.TRANSVERSE,
 	8: Image.Transpose.ROTATE_90,
 }
+
+_heif_ready = False
+
+
+def _ensure_heif() -> None:
+	"""Регистрирует декодер HEIF один раз, перед первым чтением HEIC/HEIF."""
+	global _heif_ready
+	if not _heif_ready:
+		import pillow_heif
+		pillow_heif.register_heif_opener()
+		_heif_ready = True
 
 
 class ImageReader:
@@ -164,6 +172,8 @@ class ImageReader:
 	def _read_pil(cls, path: str):
 		"""JPEG, PNG, WebP, BMP, HEIC, ICNS и другие форматы, которые читает Pillow."""
 		try:
+			if os.path.splitext(path)[1].lower() in (".heic", ".heif"):
+				_ensure_heif()
 			with Image.open(path) as img:
 				icc = img.info.get("icc_profile")  # читаем до exif_transpose
 				img = ImageOps.exif_transpose(img)
@@ -186,6 +196,7 @@ class ImageReader:
 
 	@classmethod
 	def _read_tiff(cls, path: str):
+		import tifffile
 		try:
 			with tifffile.TiffFile(path) as tf:
 				page = tf.pages[0]
@@ -268,6 +279,7 @@ class ImageReader:
 
 	@classmethod
 	def _read_raw(cls, path: str):
+		import rawpy
 		try:
 			# https://github.com/letmaik/rawpy
 			with rawpy.imread(path) as raw:
@@ -289,6 +301,7 @@ class ImageReader:
 
 	@classmethod
 	def _read_movie(cls, path: str, time_sec=1):
+		import cv2
 		try:
 			cap = cv2.VideoCapture(path)
 			cap.set(cv2.CAP_PROP_POS_MSEC, time_sec * 1000)

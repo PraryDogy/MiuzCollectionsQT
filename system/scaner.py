@@ -11,11 +11,10 @@ import sqlalchemy
 
 from cfg import Static
 from system.database import Dbase, Dirs, Thumbs
+from system.image_reader import ImageReader
 from system.items import ImageArrayItem, Mf
 from system.multiprocess import BaseProcessWorker
 from system.utils import Utils
-from system.image_reader import ImageReader
-
 
 # ==========================================
 # Константы

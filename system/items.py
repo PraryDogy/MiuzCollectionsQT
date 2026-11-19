@@ -4,17 +4,17 @@ import os
 import struct
 from dataclasses import dataclass
 from datetime import date, datetime
-from multiprocessing import Process, Queue, shared_memory
+from multiprocessing import shared_memory
 from pathlib import Path
-from multiprocessing import Process, Queue, shared_memory
-import cv2
+
 import numpy as np
-from PIL import Image
 from PyQt6.QtCore import QDate, QLocale
 from PyQt6.QtGui import QImage
 
 from cfg import Static
+
 from .image_reader import ImageReader
+
 
 @dataclass(slots=True)
 class DataItem:
@@ -386,6 +386,7 @@ class ImageArrayItem:
 		return width, height
 
 	def resize(self, size: int) -> np.ndarray | None:
+		import cv2
 		if self.image_array is None:
 			self.image_array = self.get_broken_image()
 
