@@ -128,7 +128,7 @@ class WinCalendar(UMainWindow):
 		calendar_wrapper = UGroupBox()
 		self.central_layout.addWidget(calendar_wrapper)
 		self.wrapper_layout = QVBoxLayout(calendar_wrapper)
-		self.wrapper_layout.setContentsMargins(5, 5, 5, 0)
+		self.wrapper_layout.setContentsMargins(5, 10, 5, 0)
 		self.wrapper_layout.setSpacing(self.central_layout.spacing())
 		self.wrapper_layout.setSpacing(0)
 
