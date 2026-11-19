@@ -115,7 +115,7 @@ class WinCalendar(UMainWindow):
 
 		# --- РАЗДЕЛЕНИЕ ЛОГИКИ ---
 		if date is None or not date.isValid():
-			self.selected_date = None
+			self.selected_date = self.date_now
 			self.view_date = self.date_now
 		else:
 			self.selected_date = date
