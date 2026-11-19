@@ -254,7 +254,6 @@ class WinMain(UMainWindow):
 
 	def set_no_img_search(self):
 		Dynamic.img_search_thumb_paths.clear()
-		self.bar_top.img_search_btn.set_base_style()
 		try:
 			self.win_img_search.deleteLater()
 		except (RuntimeError, AttributeError):
@@ -268,14 +267,10 @@ class WinMain(UMainWindow):
 		def on_closed():
 			win = self.win_img_search
 			if not win.preview_widget.pixmap.isNull():
-				self.bar_top.img_search_btn.set_selected_style()
 				win.hide()
 			else:
-				self.bar_top.img_search_btn.set_base_style()
 				self.win_img_search = None
 				win.deleteLater()
-
-		self.bar_top.img_search_btn.set_selected_style()
 
 		if not getattr(self, "win_img_search", None):
 			self.win_img_search = WinImgSearch()
@@ -648,7 +643,6 @@ class WinMain(UMainWindow):
 	def reset_img_search(self):
 		if getattr(self, "win_img_search", UMainWindow):
 			self.win_img_search.reset_img_search()
-			self.bar_top.img_search_btn.set_base_style()
 			self.win_img_search.deleteLater()
 			delattr(self, "win_img_search")
 
