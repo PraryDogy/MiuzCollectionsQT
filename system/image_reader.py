@@ -1,10 +1,7 @@
 import io
 import os
-import struct
 import subprocess
 import tempfile
-import time
-from functools import wraps
 from pathlib import Path
 
 import cv2
@@ -13,11 +10,6 @@ import pillow_heif
 import rawpy
 import tifffile
 from PIL import Image, ImageCms, ImageOps
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QColorSpace, QImage
-from PyQt6.QtWidgets import QApplication
-
-from cfg import Static
 
 pillow_heif.register_heif_opener()
 Image.MAX_IMAGE_PIXELS = None
