@@ -333,22 +333,28 @@ class MfCleaner(URunnable):
 		self.sigs.finished_.emit(success)
 
 	def _task(self):
-		with Dbase.main_engine.begin() as conn:
+		rel_paths: list[str] = []
 
+		with Dbase.main_engine.begin() as conn:
 			if self.clean_type == "simple_repair":
 				self.clean_dir_table(conn)
-				# print("clean dirs mf cleaner")
 
 			if self.clean_type == "full_repair":
 				rel_paths = self.get_rel_thumb_paths(conn)
 				if rel_paths:
-					self.remove_thumb_images(rel_paths)
 					self.clean_thumbs_table(conn)
-					# print("clean thumbs mf cleaner")
 
-		# изменяем список и JSON только после успешной очистки БД
+			if self.clean_type == "remove_mf":
+				self.clean_dir_table(conn)
+				rel_paths = self.get_rel_thumb_paths(conn)
+				self.clean_thumbs_table(conn)
+
+		# файлы удаляем только после коммита: если БД откатилась, миниатюры остаются
+		if rel_paths:
+			self.remove_thumb_images(rel_paths)
+
+		# список каталогов меняем только после успешной очистки
 		if self.clean_type == "remove_mf":
-			# print("remove mf mf cleaner")
 			Mf.items[:] = [m for m in Mf.items if m.mf_alias != self.mf.mf_alias]
 			Mf.write_json_data()
 
@@ -372,17 +378,25 @@ class MfCleaner(URunnable):
 		return [p for p in conn.execute(stmt).scalars().all() if p]
 
 	def remove_thumb_images(self, rel_paths: list[str]):
+		hashdir = Static.HASHDIR.resolve()
 		parents = set()
-		for rel_path in rel_paths:
-			abs_thumb_path = Mf.get_abs_thumb_path(rel_path)
-			try:
-				os.remove(abs_thumb_path)
-			except OSError as e:
-				print(f"Mf data cleaner error: {abs_thumb_path}: {e}")
-			parents.add(os.path.dirname(abs_thumb_path))
 
+		for rel_path in rel_paths:
+			abs_thumb = Path(Mf.get_abs_thumb_path(rel_path)).resolve()
+			# удаляем только файлы строго внутри HASHDIR
+			if hashdir not in abs_thumb.parents:
+				print(f"Mf data cleaner: путь вне HASHDIR пропущен: {abs_thumb}")
+				continue
+			try:
+				abs_thumb.unlink(missing_ok=True)
+			except OSError as e:
+				print(f"Mf data cleaner error: {abs_thumb}: {e}")
+			parents.add(abs_thumb.parent)
+
+		# чистим подпапки hashdir, но не сам hashdir
 		for parent in parents:
-			shutil.rmtree(parent, ignore_errors=True)
+			if parent != hashdir and hashdir in parent.parents:
+				shutil.rmtree(parent, ignore_errors=True)
 
 
 class DbDirsLoader(URunnable):
