@@ -896,10 +896,8 @@ QScrollBar::sub-line:horizontal {
    ТЕКСТОВЫЕ МЕТКИ
    ===================================================================== */
 
-/* PY: не требуется, чисто стиль. */
 TransparentLabel {
     background: transparent;
-    color: #ffffff;
 }
 
 TransparentLabel[state="regular"] {
@@ -910,13 +908,7 @@ TransparentLabel[state="gray"] {
     color: #7b8792;
 }
 
-TransparentLabel[state="regular_bold"] {
-    color: #ffffff;
-    font-weight: bold;
-}
-
-TransparentLabel[state="gray_bold"] {
-    color: #7b8792;
+TransparentLabel[text_bold="true"] {
     font-weight: bold;
 }
 
@@ -927,7 +919,6 @@ TransparentLabel[text_size="small"] {
 TransparentLabel[text_size="big"] {
     font-size: 20px;
 }
-
 
 
 /* PY: не требуется. */

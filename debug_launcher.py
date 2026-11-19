@@ -83,7 +83,7 @@ class Launcher(UMainWindow):
         self.central_layout.addWidget(self._build_bottom_row())
 
         self.status = TransparentLabel("")
-        self.status.set_state("gray")
+        self.status.set_style("gray", "regular", False)
         self.central_layout.addWidget(self.status)
         self.update_status()
 

@@ -231,7 +231,7 @@ class WinImgSearchDropWidget(ImageDropFrame):
 		)
 
 		self.descr_label = TransparentLabel("")
-		self.descr_label.set_state("gray")
+		self.descr_label.set_style("gray", "regular", False)
 		self.descr_label.set_elide(True, ignore_width=False)
 		self.descr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.v_layout.addWidget(

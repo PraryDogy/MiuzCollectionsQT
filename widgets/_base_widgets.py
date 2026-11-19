@@ -36,41 +36,27 @@ class TransparentLabel(QLabel):
 	sym_line_feed = "\u000a"
 	sym_paragraph_sep = "\u2029"
 
-	states = ("regular", "gray", "regular_bold", "gray_bold")  # допустимые состояния
-	sizes = ("default", "small", "big")                        # размеры описаны в QSS
-
 	def __init__(self, text="", parent=None):
 		super().__init__(text or "", parent)
-
 		self._original_text = text or ""
 		self._elide_enabled = False
 		self._context_menu_enabled = False
-		self._state = "regular"
 		self._underline = False
-		self.setProperty("state", self._state)
-		self.setProperty("size", "default")
 
-	def set_size(self, size: str):
-		if size not in self.sizes:
-			raise ValueError(f"Unknown size: {size!r}, expected one of {self.sizes}")
-		if self.property("text_size") == size:
-			return
-		self.setProperty("text_size", size)
+	def set_style(self, color: Literal["regular", "gray", "accent"], size: Literal["regular", "small", "big"], bold: bool):
+		values = {
+			"state": color,
+			"text_size": size,
+			"text_bold": "true" if bold else "false",
+		}
+		for k, v in values.items():
+			self.setProperty(k, v)
 		self.style().unpolish(self)
 		self.style().polish(self)
 		self.update()
 
 	def set_state(self, state: str):
-		if state not in self.states:
-			raise ValueError(f"Unknown state: {state!r}, expected one of {self.states}")
-		if state == self._state:
-			return
-
-		self._state = state
-		self.setProperty("state", state)
-		self.style().unpolish(self)
-		self.style().polish(self)
-		self.update()
+		return
 
 	def get_state(self) -> str:
 		return self._state
@@ -926,7 +912,7 @@ class TitleWidget(TransparentWidget):
 		if descr:
 			self.description_widget = TransparentLabel(descr)
 			self.description_widget.setWordWrap(True)
-			self.description_widget.set_state("gray")
+			self.description_widget.set_style("gray", "regular", False)
 			self.v_lay.addWidget(self.description_widget)
 
 	def add_title_button(self, widget: TransparentButton):
@@ -1193,7 +1179,7 @@ class ConfirmWindow(VerticalWindow):
 		self.icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.text_wid = TransparentLabel(text)
-		self.text_wid.set_state("gray")
+		self.text_wid.set_style("gray", "regular", False)
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
@@ -1245,7 +1231,7 @@ class WarningWindow(VerticalWindow):
 		)
 
 		self.text_wid = TransparentLabel(text)
-		self.text_wid.set_state("gray")
+		self.text_wid.set_style("gray", "regular", False)
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
@@ -1297,7 +1283,7 @@ class InputTextWin(UMainWindow):
 			svg_text_layout.addWidget(svg_icon)
 
 		self.description_label = TransparentLabel(description)
-		self.description_label.set_state("gray")
+		self.description_label.set_style("gray", "regular", False)
 		svg_text_layout.addWidget(self.description_label)
 
 		self.central_layout.addSpacing(10)
@@ -1603,17 +1589,18 @@ class USvgWidgetBg(TransparentLabel):
 
 
 class ChoosePathStatus(TransparentLabel):
-	def __init__(self, text="", parent=None):
-		super().__init__(text, parent)
+	pass
+	# def __init__(self, text="", parent=None):
+	# 	super().__init__(text, parent)
 
-	def set_state(self, state: str):
-		"""state: 'ok' или 'warn'. Меняет свойство, стиль переприменяется."""
-		if self.property("state") == state:
-			return
-		self.setProperty("state", state)
-		self.style().unpolish(self)
-		self.style().polish(self)
-		self.update()
+	# def set_state(self, state: str):
+	# 	"""state: 'ok' или 'warn'. Меняет свойство, стиль переприменяется."""
+	# 	if self.property("state") == state:
+	# 		return
+	# 	self.setProperty("state", state)
+	# 	self.style().unpolish(self)
+	# 	self.style().polish(self)
+	# 	self.update()
 
 
 class ChoosePathWidget(TransparentFrame):

@@ -140,7 +140,7 @@ class CatalogWidget(TransparentWidget):
 		self.h_lay.setSpacing(0)
 
 		self.title = TransparentLabel(Lng.catalog)
-		self.title.set_state("gray")
+		self.title.set_style("gray", "regular", False)
 		self.h_lay.addWidget(self.title)
 
 		self.h_lay.addSpacing(10)

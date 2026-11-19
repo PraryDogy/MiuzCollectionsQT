@@ -102,7 +102,7 @@ class ThumbBlueTextWidget(TransparentLabel):
 		super().__init__(day_month_year)
 		self.set_elide(True)
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.set_state("gray")
+		self.set_style("gray", "regular", False)
 
 
 class ThumbMiuzBlueTextWidget(TransparentLabel):
@@ -119,7 +119,7 @@ class ThumbMiuzBlueTextWidget(TransparentLabel):
 		super().__init__(f"{day_month_year}\n{miuz_collection_name}")
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.set_elide(True)
-		self.set_state("gray")
+		self.set_style("gray", "regular", False)
 
 
 class Thumb(TransparentFrame):

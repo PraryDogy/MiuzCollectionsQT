@@ -564,7 +564,7 @@ class MfRepairGroup(HoverGroupBox):
 		self.v_lay.addWidget(title_widget)
 
 		descr_widget = TransparentLabel(description)
-		descr_widget.set_state("gray")
+		descr_widget.set_style("gray", "regular", False)
 		descr_widget.setWordWrap(True)
 		self.v_lay.addWidget(descr_widget)
 
@@ -717,7 +717,7 @@ class IgnoreListWin(UMainWindow):
 		self.group_lay.addWidget(self.title_widget)
 
 		self.descr_widget = TransparentLabel(text=Lng.ignore_list_descr_short)
-		self.descr_widget.set_state("gray")
+		self.descr_widget.set_style("gray", "regular", False)
 		self.descr_widget.setWordWrap(True)
 		self.group_lay.addWidget(self.descr_widget)
 

@@ -155,11 +155,10 @@ class WinInfo(UMainWindow):
 
 		for row, (key, caption, value) in enumerate(rows):
 			left_lbl = TransparentLabel(caption + ":")
-			left_lbl.set_state("gray")
+			left_lbl.set_style("gray", "small", False)
 			right_lbl = TransparentLabel(value)
+			right_lbl.set_style("regular", "small", False)
 			right_lbl.set_selectable(True)
-			# for i in left_lbl, right_lbl:
-				# i.set_font_size(11)
 
 			left_lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 			right_lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -199,10 +198,11 @@ class WinInfo(UMainWindow):
 
 	def copy_enter(self, e):
 		loc = self.labels["location"]
-		loc.set_state("regular_bold")
+		loc.set_style("regular", "small", True)
 
 	def copy_leave(self, e):
-		self.labels["location"].set_state("regular")
+		loc = self.labels["location"]
+		loc.set_style("regular", "small", False)
 
 	def _load_info(self):
 		self.workers: dict[str, ProcessWorker] = {
