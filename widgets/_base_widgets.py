@@ -1588,21 +1588,6 @@ class USvgWidgetBg(TransparentLabel):
 		super().mouseReleaseEvent(event)
 
 
-class ChoosePathStatus(TransparentLabel):
-	pass
-	# def __init__(self, text="", parent=None):
-	# 	super().__init__(text, parent)
-
-	# def set_state(self, state: str):
-	# 	"""state: 'ok' или 'warn'. Меняет свойство, стиль переприменяется."""
-	# 	if self.property("state") == state:
-	# 		return
-	# 	self.setProperty("state", state)
-	# 	self.style().unpolish(self)
-	# 	self.style().polish(self)
-	# 	self.update()
-
-
 class ChoosePathWidget(TransparentFrame):
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -1626,12 +1611,13 @@ class ChoosePathWidget(TransparentFrame):
 		text_lay.setContentsMargins(0, 0, 0, 0)
 		text_lay.setSpacing(0)
 
-		self.status_label = ChoosePathStatus("")
+		self.status_label = TransparentLabel("")
+		self.status_label.set_style("regular", "regular", True)
 		self.status_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		text_lay.addWidget(self.status_label)
 
 		self.path_label = TransparentLabel("")
-		self.path_label.setObjectName("choosePathPath")
+		self.path_label.set_style("regular", "regular", False)
 		self.path_label.set_elide(True)
 		self.path_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		text_lay.addWidget(self.path_label)

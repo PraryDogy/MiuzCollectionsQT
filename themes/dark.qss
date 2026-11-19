@@ -963,18 +963,6 @@ ChoosePathWidget[state="ok"][hovered="true"] {
     border: 2px dashed #10b981;
 }
 
-ChoosePathStatus[state="warn"] {
-    color: #e5b93a;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-ChoosePathStatus[state="ok"] {
-    color: #34d399;
-    font-weight: bold;
-    font-size: 14px;
-}
-
 
 /* =====================================================================
    ЗАГОЛОВКИ СТРАНИЦ
