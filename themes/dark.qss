@@ -899,7 +899,6 @@ QScrollBar::sub-line:horizontal {
 /* PY: не требуется, чисто стиль. */
 TransparentLabel {
     background: transparent;
-    border: none;
     color: #ffffff;
 }
 

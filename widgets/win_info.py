@@ -158,8 +158,8 @@ class WinInfo(UMainWindow):
 			left_lbl.set_state("gray")
 			right_lbl = TransparentLabel(value)
 			right_lbl.set_selectable(True)
-			for i in left_lbl, right_lbl:
-				i.set_font_size(11)
+			# for i in left_lbl, right_lbl:
+				# i.set_font_size(11)
 
 			left_lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 			right_lbl.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -167,8 +167,8 @@ class WinInfo(UMainWindow):
 			right_lbl.set_elide(True, ignore_width=False)
 
 			self.grid_lay.addWidget(left_lbl, row, 0)
-			# self.grid_lay.addItem(QSpacerItem(15, 0), row, 1)
-			self.grid_lay.addWidget(right_lbl, row, 1)
+			self.grid_lay.addItem(QSpacerItem(5, 0), row, 1)
+			self.grid_lay.addWidget(right_lbl, row, 2)
 			self.labels[key] = right_lbl
 
 		# Правая колонка забирает всё оставшееся место окна

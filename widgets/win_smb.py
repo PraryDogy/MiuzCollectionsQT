@@ -81,15 +81,15 @@ class WinSmb(UMainWindow):
 	def ok_cmd(self):
 		new_path = self.path_widget.validate_and_show_win()
 		if not new_path:
-			return
+			return  # путь не выбран или не существует: сканировать нечего
 
-		if new_path == self.mf.mf_path:
-			self.deleteLater()
-			return
+		path_changed = new_path != self.mf.mf_path
+		if path_changed:
+			self.mf.old_mf_path = self.mf.mf_path  # текущий путь становится старым
+			self.mf.mf_path = new_path             # новый путь становится текущим
+			Mf.write_json_data()
 
-		self.mf.old_mf_path = self.mf.mf_path  # текущий путь становится старым
-		self.mf.mf_path = new_path             # новый путь становится текущим
-		Mf.write_json_data()
+		# скан запускается в любом случае, полный проход только при смене пути
 		self.restart_scaner.emit()
 		self.deleteLater()
 
