@@ -1,3 +1,4 @@
+# верх system/multiprocess.py
 import errno
 import os
 import traceback
@@ -9,13 +10,8 @@ from queue import Empty
 from time import sleep
 from typing import Literal
 
-import sqlalchemy
-from typing_extensions import Literal
-
 from cfg import Static
-from system.database import Dbase, Thumbs
 from system.items import ImageArrayItem, Mf
-from system.utils import Utils
 
 
 class BaseProcessWorker:
@@ -393,8 +389,13 @@ class FilesRemover:
 class UpdateThumb:
 	@staticmethod
 	def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
+
+		import sqlalchemy
+		from system.database import Dbase, Thumbs
 		
 		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
+			from system.utils import Utils
+
 			image_item = ImageArrayItem(abs_img_path)
 			image_item.load()
 			image_item.resize(Static.THUMB_MAX_SIZE)

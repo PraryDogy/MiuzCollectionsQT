@@ -17,7 +17,7 @@ from cfg import Dynamic, JsonData, Static
 
 from .database import Dbase, Dirs, Properties, Thumbs
 from .items import DataItem, ImageArrayItem, Mf, ReadableDateItem
-from .scaner import StopList
+from .stop_list import StopList
 from .utils import Utils
 
 
@@ -159,6 +159,7 @@ class ThumbnailsLoader(URunnable):
 			self.sigs.finished_.emit([])
 
 	def create_dict(self, res: list[tuple]):
+
 		thumbs = []
 
 		scaled_fn = Utils.thumb_scaler()
