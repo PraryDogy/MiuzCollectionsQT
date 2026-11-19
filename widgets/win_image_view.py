@@ -285,29 +285,13 @@ class WinImageView(UMainWindow):
 
 	def load_thumb(self):
 		qimage = self.current_data_item.base_qimage
-		pixmap = QPixmap.fromImage(qimage)
-		self.restart_img_wid(pixmap)
+		self.restart_img_wid(QPixmap.fromImage(qimage))
 
-		root_state = RootProbe.check(Mf.current_mf.mf_path)
-		if root_state is None:
-			# проверка ещё идёт: ждём сигнала, окно SMB пока не открываем
-			RootProbe.signals.done.connect(self._on_root_checked)
+		if RootProbe.check(Mf.current_mf.mf_path) is not True:
+			# диск не ответил: миниатюра остаётся, полный файл не загружаем
+			print("img viewer: каталог недоступен, полный файл не загружаем")
 			return
-		if root_state is False:
-			self.image_not_exists.emit()
-			return
-		self._load_after_root_ok()
 
-	def _on_root_checked(self, path: str, ok: bool):
-		if path != Mf.current_mf.mf_path:
-			return
-		RootProbe.signals.done.disconnect(self._on_root_checked)
-		if ok:
-			self._load_after_root_ok()
-		else:
-			self.image_not_exists.emit()
-
-	def _load_after_root_ok(self):
 		self.set_title()
 		self.load_image()
 
