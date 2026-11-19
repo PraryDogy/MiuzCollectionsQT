@@ -741,6 +741,12 @@ class WinMain(UMainWindow):
 
 	def start_scaner_task(self, ms: int = 3000, force_full: bool = False):
 
+		def scan_order(current: Mf) -> list[Mf]:
+			rest = [m for m in Mf.items if m is not current]
+			if any(m is current for m in Mf.items):
+				return [current, *rest]
+			return list(Mf.items)
+
 		if not hasattr(self, "scaner_task"):
 			# print("первая инициация сканера")
 			self.scaner_task = None
@@ -777,7 +783,7 @@ class WinMain(UMainWindow):
 				# print("штатно запускаю ОБЩИЙ сканер")
 				self.scaner_task = ScanerWorker(
 					target=BaseScaner.start,
-					args=(Mf.items, force_full),
+					args=(scan_order(Mf.current_mf), force_full),
 				)
 			self.db_mtime = int(os.stat(Static.DB_FILE).st_mtime)
 			self.bar_bottom.progress_widget.show_loading()
