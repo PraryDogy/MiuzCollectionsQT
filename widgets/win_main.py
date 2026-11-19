@@ -14,7 +14,7 @@ from system.scaner import (BaseScaner, DirsReady, ForcedScaner,
                            PathCheckPassed, PathMismatch, ScanerWorker,
                            ScanProgress)
 from system.runnable import SetFav, ThumbScale, UThreadPool, Utils
-from system.utils import ImageReader
+from system.image_reader import ImageReader
 
 from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
                             UGroupBox, UMainWindow, USep, WarningWindow)

@@ -9,7 +9,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import Mf
 from system.lang import Lng
 from system.scaner import ScanProgress
-from system.utils import ImageReader
+from system.image_reader import ImageReader
 
 from ._base_widgets import TransparentWidget, USep, USlider, TagWidget, TransparentLabel
 

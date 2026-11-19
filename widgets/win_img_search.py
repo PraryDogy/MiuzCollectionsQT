@@ -14,7 +14,7 @@ from system.items import ImageArrayItem, Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg
 from system.runnable import BlurImgBgTask, ImageSearcher, UThreadPool
-from system.utils import ImageReader
+from system.image_reader import ImageReader
 
 from ._base_widgets import (ActiveButton, SubGroup, TitleWidget,
                             TransparentFrame, TransparentLabel,
