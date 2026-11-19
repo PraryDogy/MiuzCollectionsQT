@@ -143,13 +143,15 @@ def _size_items(mf):
 # ---------------------------------------------------------------------------
 
 def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
+    from PyQt6.QtGui import QPixmap
     copy_src = [items[0].abs_path]
     copy_dest = str(root / "catalog" / "Копия")
+    sample_pixmap = QPixmap.fromImage(items[0].base_qimage)
 
     factories = [
         # поиск и просмотр
         ("Поиск по изображению", lambda: _new("widgets.win_img_search", "WinImgSearch")),
-        ("Прогресс поиска", lambda: _new("widgets.win_img_search", "ProgressWin")),
+        ("Прогресс поиска", lambda: _new("widgets.win_img_search", "ProgressWin", sample_pixmap)),
         ("Просмотр изображения", lambda: _new("widgets.win_image_view", "WinImageView", _img_view_item(items))),
         ("Информация о файле", lambda: _new("widgets.win_info", "WinInfo", items[0])),
         ("Коллаж", lambda: _new("widgets.win_collage", "WinCollage", items)),

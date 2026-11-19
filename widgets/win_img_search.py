@@ -26,12 +26,16 @@ DROP_WIDGET_SIZE = (350, 300)
 class ProgressWin(UMainWindow):
 	stop_img_search = pyqtSignal()
 
-	def __init__(self):
+	def __init__(self, pixmap: QPixmap):
 		super().__init__()
 
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.progress)
+
+		self.image_widget = TransparentLabel()
+		self.central_layout.addWidget(self.image_widget)
+		self.image_widget.setPixmap(pixmap)
 
 		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square.svg"))
 
