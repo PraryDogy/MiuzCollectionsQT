@@ -76,26 +76,6 @@ class CalendarDayInactive(TransparentLabel):
 		return super().enterEvent(event)
 
 
-
-class CalendarDaySelected(TransparentLabel):
-	clicked = pyqtSignal()
-
-	def __init__(self, text: str, date: QDate):
-		super().__init__()
-		self.date = date
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-	def mouseReleaseEvent(self, ev: QMouseEvent):
-		if ev.button() == Qt.MouseButton.LeftButton:
-			self.clicked.emit()
-		super().mouseReleaseEvent(ev)
-
-
-class CalendarDaySelectedText(TransparentLabel):
-	def __init__(self, text="", parent=None):
-		super().__init__(text, parent)
-
-
 class CalendarCircle(TransparentLabel):
 	pass
 
@@ -112,14 +92,6 @@ class WinCalendar(UMainWindow):
 		super().__init__()
 		self.readable_date = ReadableDateItem(JsonData.lng_index)
 		self.date_now = QDate.currentDate()
-
-		qimg = QImage(str(Static.COLOR_ICONS / "blue_circle.svg"))
-		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
-		self.blue_circle_pixmap = QPixmap.fromImage(qimg_scaled)
-
-		qimg = QImage(str(Static.GRAY_ICONS / "circle.svg"))
-		qimg_scaled = Utils.scale_qimage_dpr(qimg, self.svg_circle_size[0])
-		self.gray_circle_pixmap = QPixmap.fromImage(qimg_scaled)
 
 		# --- РАЗДЕЛЕНИЕ ЛОГИКИ ---
 		if date is None or not date.isValid():
@@ -157,13 +129,6 @@ class WinCalendar(UMainWindow):
 		self.dynamic_label = TransparentLabel()
 		dynamic_container_lay.addWidget(self.dynamic_label)
 		dynamic_container_lay.addStretch(1)
-
-		reset_icon = QIcon(str(Static.GRAY_ICONS / "cancel_solid.svg"))
-		self.reset_button = UPushButton(Lng.reset)
-		self.reset_button.clicked.connect(self.reset_button_cmd)
-		self.reset_button.setIcon(reset_icon)
-		self.reset_button.setIconSize(QSize(10, 10))
-		dynamic_container_lay.addWidget(self.reset_button)
 
 		self.central_layout.addSpacing(spacing)
 		self.central_layout.addWidget(USep())
@@ -235,9 +200,14 @@ class WinCalendar(UMainWindow):
 		self.btn_container_layout = QHBoxLayout(self.btn_container)
 		self.btn_container_layout.setContentsMargins(0, 0, 0, 0)
 		self.btn_container_layout.setSpacing(5)
+
+		self.reset_button = UPushButton(Lng.reset)
+		self.reset_button.clicked.connect(self.reset_button_cmd)
+		self.btn_container_layout.addWidget(self.reset_button)
+
 		self.btn_container_layout.addStretch(1)
 
-		cancel_btn = UPushButton(Lng.cancel)
+		cancel_btn = UPushButton(Lng.close)
 		cancel_btn.clicked.connect(self.deleteLater)
 		self.btn_container_layout.addWidget(cancel_btn)
 
