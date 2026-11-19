@@ -16,12 +16,6 @@ from ._base_widgets import (ActiveButton, MfPathWidget, QVBoxLayout,
 from .win_servers import ServersWin
 
 
-def restart_app():
-	ProcessWorker.stop_all() 
-	os.execl(sys.executable, sys.executable, *sys.argv)
-	QApplication.exit(0)
-
-
 class WinSmb(UMainWindow):
 	restart_scaner = pyqtSignal()
 
