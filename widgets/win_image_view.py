@@ -3,11 +3,10 @@ from dataclasses import dataclass
 from multiprocessing import shared_memory
 
 import numpy as np
-from PyQt6.QtCore import (QEvent, QObject, QPoint, QPointF, QSize, Qt, QTimer,
-                          pyqtSignal)
-from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QIcon, QImage,
-                         QKeyEvent, QMouseEvent, QPainter, QPixmap,
-                         QResizeEvent, QTransform)
+from PyQt6.QtCore import QEvent, QPointF, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import (QAction, QContextMenuEvent, QCursor, QImage,
+                         QKeyEvent, QMouseEvent, QPixmap, QResizeEvent,
+                         QTransform)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
                              QGraphicsPixmapItem, QGraphicsScene,
@@ -19,9 +18,8 @@ from system.items import DataItem, ImageArrayItem, Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg
 from system.runnable import ImgArrayQImage, UThreadPool
-from system.utils import Utils
 
-from ._base_widgets import UMainWindow, UMenu, USep
+from ._base_widgets import UMainWindow, UMenu
 from .actions import CopyPath, RevealInFinder, Save, SetFav, WinInfoAction
 
 
