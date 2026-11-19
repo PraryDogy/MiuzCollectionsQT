@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (QApplication, QGraphicsOpacityEffect,
 from typing_extensions import Literal
 
 from cfg import Static
-from system.items import DataItem, ImageArrayItem, Mf
+from system.items import DataItem, ImageArrayItem, Mf, RootProbe
 from system.lang import Lng
 from system.multiprocess import ProcessWorker, ReadImg
 from system.runnable import ImgArrayQImage, UThreadPool
@@ -288,16 +288,28 @@ class WinImageView(UMainWindow):
 		pixmap = QPixmap.fromImage(qimage)
 		self.restart_img_wid(pixmap)
 
-		avaiable_mf_path = Mf.current_mf.is_root_alive()
-		if avaiable_mf_path:
-			if not os.path.exists(self.current_data_item.abs_path):
-				self.image_not_exists.emit()
-			else:
-				self.set_title()
-				self.load_image()
+		root_state = RootProbe.check(Mf.current_mf.mf_path)
+		if root_state is None:
+			# проверка ещё идёт: ждём сигнала, окно SMB пока не открываем
+			RootProbe.signals.done.connect(self._on_root_checked)
+			return
+		if root_state is False:
+			self.image_not_exists.emit()
+			return
+		self._load_after_root_ok()
+
+	def _on_root_checked(self, path: str, ok: bool):
+		if path != Mf.current_mf.mf_path:
+			return
+		RootProbe.signals.done.disconnect(self._on_root_checked)
+		if ok:
+			self._load_after_root_ok()
 		else:
 			self.image_not_exists.emit()
-			print("img viewer > no smb")
+
+	def _load_after_root_ok(self):
+		self.set_title()
+		self.load_image()
 
 	def load_image(self, ms = 300):
 

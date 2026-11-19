@@ -406,7 +406,7 @@ class ImageArrayItem:
 	def get_img_res(self):
 
 		def read():
-			if len(self.image_array.shape) > 1:
+			if self.image_array is not None and len(self.image_array.shape) > 1:
 				h, w = self.image_array.shape[0], self.image_array.shape[1]
 				return f"{w}x{h}"
 			return None

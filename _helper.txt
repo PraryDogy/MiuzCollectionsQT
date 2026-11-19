@@ -9,3 +9,8 @@ spacing между кнопками 5
 окно margins left top right bottom:
     10 5 10 10 при group box,
     10 10 10 10 при сепараторе под заголовком
+
+
+зависание
+echo "block drop out quick proto tcp to 192.168.10.121 port 445" | sudo pfctl -ef -
+
