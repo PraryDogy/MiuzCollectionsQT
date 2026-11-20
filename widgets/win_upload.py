@@ -56,7 +56,7 @@ class UploadWin(UMainWindow):
 
 	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
 		super().__init__()
-		self.setWindowTitle(Lng.file_loading)
+		self.setWindowTitle(Lng.upload_win)
 		self.set_close_only()
 		self.set_always_on_top()
 

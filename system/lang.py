@@ -753,3 +753,7 @@ class Lng:
 		"Восстановление запущено. Индексация изображений может занять время, пока она идёт, часть изображений может отсутствовать.",
 		"Repair started. Image indexing may take a while, and some images may be missing until it finishes."
 	)
+	upload_win = (
+		"Окно загрузки",
+		"Upload window"
+	)
