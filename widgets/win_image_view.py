@@ -16,7 +16,7 @@ from typing_extensions import Literal
 from cfg import Static
 from system.items import DataItem, ImageArrayItem, Mf, RootProbe
 from system.lang import Lng
-from system.multiprocess import ProcessWorker, ReadImg
+from system.multiprocess import ProcessWorker, ImageArrayItemLoader
 from system.runnable import ImgArrayQImage, UThreadPool
 
 from ._base_widgets import UMainWindow, UMenu
@@ -330,7 +330,7 @@ class WinImageView(UMainWindow):
 		else:
 
 			self.read_img_task = ProcessWorker(
-				target=ReadImg.start,
+				target=ImageArrayItemLoader.start,
 				args=(self.current_data_item.abs_path, 0, )
 			)
 			self.read_img_timer = QTimer(self)

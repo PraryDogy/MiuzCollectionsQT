@@ -64,16 +64,18 @@ class ProcessWorker(BaseProcessWorker):
 		super().__init__(target, (*args, self.process_queue))
 
 
-class ReadImg:
+class ImageArrayItemLoader:
 	@staticmethod
-	def start(src: str, size: int, queue: Queue):
+	def start(src: str, queue: Queue, size: int = None):
 		array_item = ImageArrayItem(src)
 		array_item.load()
 		array_item.load_shared_memory()
-		if size > 0:
+		if size:
 			array_item.resize(size)
 		queue.put(array_item)
 		array_item.shm.close()
+
+		print(size)
 
 
 class OneFileInfo:

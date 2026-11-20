@@ -12,7 +12,7 @@ from cfg import Dynamic, Static
 from system.image_reader import ImageReader
 from system.items import ImageArrayItem, Mf
 from system.lang import Lng
-from system.multiprocess import ProcessWorker, ReadImg
+from system.multiprocess import ProcessWorker, ImageArrayItemLoader
 from system.runnable import BlurImgBgTask, ImageSearcher, UThreadPool
 
 from ._base_widgets import (ActiveButton, SubGroup, TitleWidget,
@@ -26,16 +26,12 @@ DROP_WIDGET_SIZE = (350, 300)
 class ProgressWin(UMainWindow):
 	stop_img_search = pyqtSignal()
 
-	def __init__(self, pixmap: QPixmap):
+	def __init__(self):
 		super().__init__()
 
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.progress)
-
-		self.image_widget = TransparentLabel()
-		self.central_layout.addWidget(self.image_widget)
-		self.image_widget.setPixmap(pixmap)
 
 		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square.svg"))
 
@@ -495,7 +491,7 @@ class WinImgSearch(UMainWindow):
 	def open_progress_win(self):
 		self.close_progress_win()
 		pixmap = self.preview_widget.pixmap
-		self.progress_win = ProgressWin(pixmap)
+		self.progress_win = ProgressWin()
 		self.progress_win.center_to_parent(self)
 		self.progress_win.stop_img_search.connect(self.progress_stop_cmd)
 		self.progress_win.show()
@@ -534,7 +530,7 @@ class WinImgSearch(UMainWindow):
 			self.read_img_task = None
 		self.img_array = None
 		self.read_img_poll_ms = ms
-		self.read_img_task = ProcessWorker(target=ReadImg.start, args=(url, 300))
+		self.read_img_task = ProcessWorker(target=ImageArrayItemLoader.start, args=(url, 300))
 		self.read_img_task.start()
 		self.read_img_timer.start(ms)
 
