@@ -1006,3 +1006,75 @@ CalendarBigDate {
     color: #b2b2b2;
     font-size: 25pt;
 }
+
+
+/* =====================================================================
+   ТАБЛИЦЫ
+   ===================================================================== */
+
+/* PY: отступы от краёв — setContentsMargins у виджета.
+   Высоту строк задавать через verticalHeader().setDefaultSectionSize(). */
+UTableWidget {
+    background: #131b23;
+    border: 1px solid #243240;
+    border-radius: 8px;
+    color: #ffffff;
+    gridline-color: #1d2833;
+    padding: 2px 2px 2px 2px;
+    selection-background-color: #1d2833;
+    selection-color: #ffffff;
+}
+
+/* PY: угол между заголовками и вертикальной шапкой — в коде не нужен. */
+UTableWidget QTableCornerButton::section {
+    background: #131b23;
+    border: none;
+    border-bottom: 1px solid #243240;
+    border-right: 1px solid #243240;
+}
+
+/* PY: высоту заголовка задавать через horizontalHeader().setFixedHeight(). */
+UTableWidget QHeaderView::section {
+    background: #131b23;
+    color: #7b8792;
+    border: none;
+    border-bottom: 1px solid #243240;
+    padding: 5px 8px 5px 8px;
+    font-size: 11px;
+}
+
+/* UTableWidget QHeaderView::section:hover {
+    background: #161f28;
+}
+
+UTableWidget QHeaderView::section:pressed {
+    background: #1d2833;
+} */
+
+/* PY: выделение рисует сам QTableWidget через selection-background-color,
+   делегат для таблиц не нужен, пока нет скруглённых строк. */
+UTableWidget::item {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    padding: 4px 8px 4px 8px;
+}
+
+UTableWidget::item:selected {
+    background: #1d2833;
+    color: #ffffff;
+}
+
+UTableWidget::item:selected:!active {
+    background: #1d2833;
+    color: #ffffff;
+}
+
+
+UTableWidget QHeaderView::section {
+    font-weight: normal;
+}
+
+
+/* PY: угловой элемент и полосы прокрутки уже описаны выше,
+   отдельных правил для таблицы не требуется. */

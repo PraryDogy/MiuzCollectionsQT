@@ -5,29 +5,28 @@ import sys
 from pathlib import Path
 
 from PyQt6.QtCore import QEvent, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import (QAction, QContextMenuEvent, QIcon,
-                         QImage, QPixmap)
+from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSizePolicy,
-                             QSpacerItem, QSplitter, QTableWidget,
-                             QTableWidgetItem, QVBoxLayout)
+                             QSpacerItem, QSplitter, QTableWidgetItem,
+                             QVBoxLayout)
 
 from cfg import JsonData, Static, Themes
 from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import ProcessWorker
-from system.runnable import HashDirSize, HashDirSizeItem, MfCleaner, UThreadPool
+from system.runnable import (HashDirSize, HashDirSizeItem, MfCleaner,
+                             UThreadPool)
 from system.themes import ThemeChanger
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, HoverGroupBox,
                             MfAliasWidget, MfPathWidget, RowArrowWidget,
-                            SuperConfirmWindow, TitleWidget,
+                            SuperConfirmWindow, TagWidget, TitleWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
-                            UListWidget, UListWidgetItem,
-                            UMainWindow, UMenu, UPushButton,
-                            UScrollVerticalArea, USep, USpinBox, TagWidget,
-                            WarningWindow)
+                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
+                            UPushButton, UScrollVerticalArea, USep, USpinBox,
+                            UTableWidget, WarningWindow)
 
 
 def restart_app():
@@ -253,14 +252,15 @@ class SizesWin(UMainWindow):
 			Lng.file_size,
 			Lng.images
 		]
-		self.table = QTableWidget()
+		self.table = UTableWidget()
+		self.table.horizontalHeader().setHighlightSections(False)
 		self.table.setSortingEnabled(True)
 		self.table.setColumnCount(len(headers))
 		self.table.setHorizontalHeaderLabels(headers)
 		self.table.setRowCount(len(size_items))
 		self.table.verticalHeader().hide()
 		self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignVCenter)
-		self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+		self.table.setSelectionBehavior(UTableWidget.SelectionBehavior.SelectRows)
 		self.table.horizontalScrollBar().setDisabled(True)
 		self.table.horizontalScrollBar().hide()
 
