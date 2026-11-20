@@ -4,15 +4,17 @@ import sys
 from pathlib import Path
 from zipfile import ZipFile
 
-from PyQt6.QtCore import QObject, pyqtSignal
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import QObject, Qt, pyqtSignal
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.items import Mf
 from system.lang import Lng
 from system.runnable import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow)
+from ._base_widgets import (ConfirmWindow, HoverGroupBox, TitleWidget,
+                            TransparentWidget)
 from .win_settings import NewMfWin
 
 
@@ -46,9 +48,58 @@ class ZipTask(URunnable):
 		self.sigs.finished.emit()
 
 
+class MiuzGroup(HoverGroupBox):
+	remove_mf_clicked = pyqtSignal()
+
+	def __init__(self):
+		super().__init__()
+		self.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
+		# внешний горизонтальный layout: контент слева, кнопка справа
+		main_lay = QHBoxLayout(self)
+		main_lay.setContentsMargins(10, 5, 10, 5)
+		main_lay.setSpacing(10)
+
+		# левая часть: заголовок и описание
+		content = TransparentWidget()
+		content_lay = QVBoxLayout(content)
+		content_lay.setContentsMargins(0, 0, 0, 0)
+		content_lay.setSpacing(7)
+
+		title_widget = TitleWidget(
+			"MIUZ Diamonds",
+			"Загрузить настройки для MIUZ Diamonds",
+			Static.COLOR_ICONS / "miuz.svg"
+		)
+		content_lay.addWidget(title_widget)
+
+		# правая часть: кнопка запуска, по центру по вертикали
+		self.start_btn = QSvgWidget(str(Static.GRAY_ICONS / "arrow_right.svg"))
+		self.start_btn.setFixedSize(15, 15)
+
+		main_lay.addWidget(content, 1)
+		main_lay.addWidget(self.start_btn, 0, Qt.AlignmentFlag.AlignVCenter)
+
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
+			self.remove_mf_clicked.emit()
+		super().mouseReleaseEvent(event)
+
+
 
 class FirstLoadWin(NewMfWin):
-	pass
+	def __init__(self, mf_path = None):
+		super().__init__(mf_path)
+
+		if os.path.exists(Static.MIUZ_ZIP):
+			idx = self.group_lay.indexOf(self.mf_path_widget) + 1
+
+			self.miuz_wid = MiuzGroup()
+			self.miuz_wid.clicked.connect(self.copy_zip_cmd)
+			self.group_lay.insertWidget(idx, self.miuz_wid)
+
+			self.setFixedHeight(self.height() + self.miuz_wid.sizeHint().height())
 
 	def copy_zip_cmd(self):
 
