@@ -713,15 +713,15 @@ class Lng:
 		"Вы уверены, что правильно указали каталог? Все кэшированные изображения будут удалены и созданы заново. Это может занять время.",
 		"Are you sure you specified the correct folder? All cached images will be deleted and recreated. This may take a while.",
 	)
-	rescan_folder_title = ("Обновить каталог", "Refresh folder")
+	partial_reset_title = ("Частичный сброс", "Partial reset")
 	rescan_folder_description = (
 		"Каталог будет просканирован заново. Используйте, если часть изображений не отображается.",
 		"The folder will be scanned again. Use this if some images are missing.",
 	)
 	reset_cache_title = ("Полный сброс", "Full reset")
 	reset_cache_description = (
-		"Все кешированные изображения будут удалены и добавлены заново. Используйте при серьёзных ошибках.",
-		"All cached images will be deleted and added again. Use this if there are serious errors.",
+		"Все кешированные изображения будут проиндексированы заново. Используйте при серьёзных ошибках.",
+		"All cached images will be re-indexed. Use this if there are serious errors.",
 	)
 	search_window = (
 		"Окно поиска",

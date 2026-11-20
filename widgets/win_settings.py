@@ -563,9 +563,10 @@ class MfRepairGroup(HoverGroupBox):
 		self.v_lay.setSpacing(10)
 
 		title_widget = TitleWidget(title, description, sep=False)
+		title_widget.description_widget.setWordWrap(True)
 		self.v_lay.addWidget(title_widget)
 
-		self.setFixedWidth(200)
+		self.setFixedWidth(330)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
@@ -586,11 +587,11 @@ class MfRepairWin(UMainWindow):
 
 		h_wrapper = TransparentWidget()
 		self.central_layout.addWidget(h_wrapper)
-		self.h_lay = QHBoxLayout(h_wrapper)
+		self.h_lay = QVBoxLayout(h_wrapper)
 		self.h_lay.setContentsMargins(0, 0, 0, 0)
 		self.h_lay.setSpacing(10)
 
-		small_repair = MfRepairGroup(Lng.rescan_folder_title, Lng.rescan_folder_description)
+		small_repair = MfRepairGroup(Lng.partial_reset_title, Lng.rescan_folder_description)
 		small_repair.clicked.connect(self.simple_repair_clicked.emit)
 		self.h_lay.addWidget(small_repair)
 
@@ -608,12 +609,20 @@ class MfRepairWin(UMainWindow):
 
 		self.central_layout.setSpacing(5)
 
-		close_btn = UPushButton(Lng.close)
+		close_wrapper = TransparentWidget()
+		close_layout = QHBoxLayout(close_wrapper)
+		close_layout.setContentsMargins(0, 0, 0, 0)
+		close_layout.setSpacing(0)
+
+		# close_layout.addStretch(1)
+
+		close_btn = ActiveButton(Lng.close)
 		close_btn.clicked.connect(self.deleteLater)
-		self.central_layout.addWidget(close_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+		close_layout.addWidget(close_btn)
+
+		self.central_layout.addWidget(close_wrapper)
 
 		self.adjustSize()
-		close_btn.setFixedWidth(big_repair.width())
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
