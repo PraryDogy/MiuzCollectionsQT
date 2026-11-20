@@ -107,8 +107,8 @@ class RebootableSettings(UGroupBox):
 		self.eng_flag_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
 		main_layout = QVBoxLayout(self)
-		main_layout.setContentsMargins(0, 0, 0, 0)
-		main_layout.setSpacing(0)
+		main_layout.setContentsMargins(10, 5, 5, 5)
+		main_layout.setSpacing(5)
 
 		self._create_language_widget(main_layout)
 		main_layout.addWidget(USep())
@@ -314,8 +314,8 @@ class NonRebootableSettings(UGroupBox):
 	def __init__(self):
 		super().__init__()
 		main_layout = QVBoxLayout(self)
-		main_layout.setContentsMargins(0, 0, 0, 0)
-		main_layout.setSpacing(0)
+		main_layout.setContentsMargins(10, 5, 5, 5)
+		main_layout.setSpacing(5)
 
 		self.size_items = {}
 
@@ -395,8 +395,8 @@ class ThemesWidget(UGroupBox):
 	def __init__(self):
 		super().__init__()
 		main_lay = QVBoxLayout(self)
-		main_lay.setContentsMargins(0, 0, 0, 0)
-		main_lay.setSpacing(0)
+		main_lay.setContentsMargins(10, 5, 5, 5)
+		main_lay.setSpacing(5)
 
 		title_wid = RowArrowWidget(Lng.theme)
 		title_wid.set_left_icon(Static.COLOR_ICONS / "theme.svg")
