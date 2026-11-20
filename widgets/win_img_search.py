@@ -35,8 +35,14 @@ class ProgressWin(UMainWindow):
 
 		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square.svg"))
 
+		wrapper = UGroupBox()
+		self.central_layout.addWidget(wrapper)
+		wrapper_lay = QVBoxLayout(wrapper)
+		wrapper_lay.setContentsMargins(5, 5, 5, 5)
+		wrapper_lay.setSpacing(5)
+
 		self.text_container = TransparentWidget()
-		self.central_layout.addWidget(self.text_container)
+		wrapper_lay.addWidget(self.text_container)
 
 		self.text_layout = QHBoxLayout(self.text_container)
 		self.text_layout.setContentsMargins(5, 0, 5, 0)
