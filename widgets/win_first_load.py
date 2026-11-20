@@ -4,18 +4,15 @@ import sys
 from pathlib import Path
 from zipfile import ZipFile
 
-from PyQt6.QtCore import QObject, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout
+from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtWidgets import QApplication
 
 from cfg import JsonData, Static
 from system.items import Mf
 from system.lang import Lng
 from system.runnable import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
-                            RowArrowWidget, SaveRowArrowWidget, UGroupBox,
-                            UMainWindow, UMenu, UPushButton)
+from ._base_widgets import (ConfirmWindow)
 from .win_settings import NewMfWin
 
 

@@ -461,7 +461,8 @@ class WinMain(UMainWindow):
 	@with_conn
 	def upload_files(self, dropped_files: list[str]):
 
-		def fin(dest: str):
+		def fin():
+			dest = Mf.current_mf.create_abs_path(Dynamic.current_dir)
 			self.upload_win.deleteLater()
 			self.paste_files(dropped_files, dest)
 
@@ -471,9 +472,7 @@ class WinMain(UMainWindow):
 			current_dir=Dynamic.current_dir,
 			files_to_copy=dropped_files
 		)
-		self.upload_win.ok_clicked.connect(
-			lambda dest: fin(dest)
-		)
+		self.upload_win.ok_clicked.connect(fin)
 		self.upload_win.center_to_parent(self)
 		self.upload_win.show()
 
