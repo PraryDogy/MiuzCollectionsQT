@@ -12,8 +12,8 @@ from ._base_widgets import (ActiveButton, ChoosePathWidget, TitleWidget,
                             TransparentWidget, UGroupBox, UMainWindow,
                             UPushButton, UTreeWidget, UTreeWidgetItem)
 
-MIN_WIDTH = 430         # минимальная ширина окна
-LIST_HEIGHT = 160       # высота списка файлов, дальше прокрутка
+MIN_WIDTH = 430             # минимальная ширина окна
+MAX_VISIBLE_ROWS = 5        # дальше список не растёт, появляется прокрутка
 
 
 def format_size(size: int) -> str:
@@ -32,6 +32,9 @@ class ClickablePathWidget(ChoosePathWidget):
 
 	def __init__(self):
 		super().__init__()
+		# базовый класс делает весь блок прозрачным для мыши; возвращаем события самому блоку.
+		# дочерние подписи и иконка остаются прозрачными
+		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 	def mouseReleaseEvent(self, event):
@@ -101,7 +104,7 @@ class UploadWin(UMainWindow):
 
 		self.setMinimumWidth(MIN_WIDTH)
 		self.adjustSize()
-		self.setFixedHeight(self.height())
+		self.setFixedSize(max(MIN_WIDTH, self.width()), self.sizeHint().height())
 
 	def _build_files_list(self, paths: list[str]) -> UTreeWidget:
 		"""Таблица из двух колонок: имя слева, размер справа. Превью не грузятся."""
@@ -111,7 +114,6 @@ class UploadWin(UMainWindow):
 		widget.setIndentation(0)
 		widget.setSelectionMode(UTreeWidget.SelectionMode.NoSelection)
 		widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-		widget.setFixedHeight(LIST_HEIGHT)
 
 		header = widget.header()
 		header.setStretchLastSection(False)
@@ -129,7 +131,14 @@ class UploadWin(UMainWindow):
 			item.setToolTip(0, path)
 			item.setTextAlignment(1, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
+		widget.setFixedHeight(self._list_height(widget))
 		return widget
+
+	def _list_height(self, widget: UTreeWidget) -> int:
+		"""Высота списка: по числу строк, но не больше MAX_VISIBLE_ROWS. Дальше прокрутка."""
+		row_h = widget.sizeHintForRow(0) or 20
+		rows = min(widget.topLevelItemCount(), MAX_VISIBLE_ROWS)
+		return rows * row_h + 2 * widget.frameWidth() + 2
 
 	def choose_dir(self, *_):
 		url = QFileDialog.getExistingDirectory(self, "", self.current_dir)
