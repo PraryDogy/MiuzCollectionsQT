@@ -13,7 +13,7 @@ from system.utils import Utils
 from ._base_widgets import (ActiveButton, HoverGroupBox,
                             ChoosePathWidget, TitleTextWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, USep)
+                            UPushButton, USep, TitleWidget)
 
 
 
@@ -26,7 +26,6 @@ class DestinyFolderWidget(HoverGroupBox):
 		self.copy_path_btn_locked = False
 
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
-		self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
 		# внешний горизонтальный layout: контент слева, стрелка справа
 		main_lay = QHBoxLayout(self)
@@ -39,24 +38,18 @@ class DestinyFolderWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(5)
 
-		self.title_label = TitleTextWidget(Lng.upload_files, Static.GRAY_ICONS / "folder.svg")
-		content_lay.addWidget(self.title_label)
+		self.title_widget = TitleWidget(
+			title=Lng.upload_files,
+			descr=Lng.upload_files_description
+		)
+		self.title_widget.description_widget.setWordWrap(False)
+		content_lay.addWidget(self.title_widget)
 
-		description = TransparentLabel(self.get_plural_text(len(files_to_copy)) + "\n" + Lng.upload_files_description)
-		description.set_style("gray", "regular", "regular")
-		description.setWordWrap(True)
-		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
-		content_lay.addWidget(description)
-
-		txt = self.get_plural_text(len(files_to_copy))
+		content_lay.addSpacing(5)
 
 		self.path_status = ChoosePathWidget()
 		content_lay.addWidget(self.path_status)
-		self.path_status.set_status(
-			Static.COLOR_ICONS / "green_checkmark.svg",
-			self.current_dir,
-			state="ok"
-		)
+		self.path_status.set_good(self.current_dir, lng=Lng.chosen_folder)
 		self.setToolTip(self.current_dir)
 
 		# правая часть: стрелка по центру по вертикали
@@ -74,29 +67,22 @@ class DestinyFolderWidget(HoverGroupBox):
 			url = url.rstrip(os.sep)
 			self.current_dir = url
 			self.dir_changed.emit(self.current_dir)
-			self.path_status.set_status(
-				Static.COLOR_ICONS / "green_checkmark.svg",
-				self.current_dir,
-				state="ok"
-			)
+			self.path_status.set_good(self.current_dir, lng=Lng.chosen_folder)
 			self.setToolTip(self.current_dir)
-
-	def get_plural_text(self, count):
-		# 1. Определяем, какой кортеж использовать на основе правил русского языка
-		if count % 10 == 1 and count % 100 != 11:
-			chosen_tuple = Lng.chosen_x_files   # ... 1 файл
-		elif 2 <= count % 10 <= 4 and not (12 <= count % 100 <= 14):
-			chosen_tuple = Lng.chosen_xx_files  # ... 2-4 файла
-		else:
-			chosen_tuple = Lng.chosen_xxx_files # ... 5-20 файлов
-
-		# 2. Берем строку под нужный язык и сразу подставляем число
-		return chosen_tuple.format(files_count=count)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
 			self.change_dir()
 		return super().mouseReleaseEvent(event)
+
+	def enterEvent(self, a0):
+		super().enterEvent(a0)
+		self.path_status.set_hovered(True)
+
+	def leaveEvent(self, a0):
+		super().leaveEvent(a0)
+		self.path_status.set_hovered(False)
+
 
 
 class UploadWin(UMainWindow):
@@ -105,7 +91,7 @@ class UploadWin(UMainWindow):
 	def __init__(self, mf: Mf, current_dir: str, files_to_copy: list[str]):
 		super().__init__()
 		self.setWindowTitle(Lng.file_loading)
-		self.setFixedWidth(450)
+		self.setFixedWidth(430)
 		self.set_close_only()
 		self.set_always_on_top()
 
@@ -120,6 +106,11 @@ class UploadWin(UMainWindow):
 		self.button_layout = QHBoxLayout(self.button_widget)
 		self.button_layout.setContentsMargins(0, 0, 0, 0)
 		self.button_layout.setSpacing(5)
+
+		find_catalog_btn = UPushButton(Lng.choose_folder)
+		find_catalog_btn.setIcon(QIcon(str(Static.GRAY_ICONS / "magnifier.svg")))
+		find_catalog_btn.clicked.connect(self.destiny_widget.change_dir)
+		self.button_layout.addWidget(find_catalog_btn)
 
 		self.button_layout.addStretch()
 

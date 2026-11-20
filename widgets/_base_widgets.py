@@ -1646,9 +1646,9 @@ class ChoosePathWidget(TransparentFrame):
 		self.path_label.setText(Lng.press_choose_catalog)
 		self.set_state("warn")
 
-	def set_good(self, path: str):
+	def set_good(self, path: str, lng: str):
 		self.icon.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
-		self.status_label.setText(Lng.ok_catalog_path)
+		self.status_label.setText(lng)
 		self.status_label.set_state("ok")
 		self.path_label.setText(path)
 		self.set_state("ok")
@@ -1720,7 +1720,7 @@ class MfPathWidget(HoverGroupBox):
 	def update_ui(self):
 		if self._path_exists():
 			self.setToolTip(self.draft_mf_path)
-			self.status.set_good(self.draft_mf_path)
+			self.status.set_good(self.draft_mf_path, lng=Lng.ok_catalog_path)
 		else:
 			self.setToolTip(Lng.find_catalog)
 			self.status.set_bad()

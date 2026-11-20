@@ -108,6 +108,7 @@ class Lng:
 	copy_dirpath = ("Скопировать путь", "Copy path")
 	copy_filepaths = ("Скопировать пути к файлам", "Copy file paths")
 	add = ("Добавить", "Add")
+	add_connection = ("Добавить подключение", "Add connection")
 	search_in = ("Поиск в каталоге", "Search in catalog")
 	indexing_files = ("Индексация файлов", "Indexing files")
 	indexing = ("Индексация", "Indexing")
@@ -232,6 +233,10 @@ class Lng:
 	edit = (
 		"Редактировать",
 		"Edit"
+	)
+	edit_connection = (
+		"Редактировать подключение",
+		"Edit connection"
 	)
 	confirm_delete = (
 		"Вы уверены, что хотите удалить данные этого сервера?",
@@ -369,6 +374,8 @@ class Lng:
 	)
 	choose_period = ("Выбрать период", "Choose period")
 	find_catalog = ("Найти каталог", "Find catalog")
+	choose_folder = ("Выбрать папку", "Choose folder")
+	chosen_folder = ("Выбранная папка", "Chosen folder")
 	no_catalog_path = ("Каталог не найден", "Catalog not found")
 	ok_catalog_path = ("Каталог найден", "Found catalog")
 	auto_name = ("Подобрать имя", "Suggest name")

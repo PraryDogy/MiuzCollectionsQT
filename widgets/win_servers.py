@@ -152,12 +152,11 @@ class LoginWin(UMainWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setFixedWidth(300)
 		
 		# Убрали сепаратор по правилу: если UGroupBox (или рамка) рядом с заголовком, сепаратор не нужен
 		
 		is_edit = server_item is not None
-		title_word = Lng.edit if is_edit else Lng.add
+		title_word = Lng.edit_connection if is_edit else Lng.add_connection
 		self.setWindowTitle(f"{title_word}")
 
 		# --- GroupBox для формы ---
@@ -166,8 +165,8 @@ class LoginWin(UMainWindow):
 		
 		form_lay = QVBoxLayout(group)
 		# Сделали внутренние отступы и промежутки аккуратнее
-		form_lay.setContentsMargins(10, 10, 10, 10)
-		form_lay.setSpacing(6)
+		form_lay.setContentsMargins(5, 5, 5, 5)
+		form_lay.setSpacing(5)
 
 		# Псевдоним
 		form_lay.addWidget(ServerLabel(Lng.alias.capitalize()))
@@ -223,7 +222,7 @@ class LoginWin(UMainWindow):
 			self.pass_.setText(server_item.password)
 
 		self.adjustSize()
-		self.setFixedHeight(self.height())
+		self.setFixedSize(self.width(), self.height())
 
 	def ok_cmd(self):
 		stmt = all((

@@ -604,11 +604,14 @@ class MfRepairWin(UMainWindow):
 
 		btn_wrapper_lay.addStretch()
 
-		close_btn = ActiveButton(Lng.close)
+		self.central_layout.setSpacing(5)
+
+		close_btn = UPushButton(Lng.close)
 		close_btn.clicked.connect(self.deleteLater)
-		btn_wrapper_lay.addWidget(close_btn)
+		self.central_layout.addWidget(close_btn, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.adjustSize()
+		close_btn.setFixedWidth(big_repair.width())
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
