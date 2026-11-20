@@ -1,12 +1,10 @@
 import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
-from system.items import Mf
 from system.lang import Lng
 from system.scaner import ScanProgress
 from system.image_reader import ImageReader

@@ -1,11 +1,10 @@
-from pathlib import Path
 
-from PyQt6.QtCore import QByteArray, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QIcon, QKeyEvent, QMouseEvent
+from PyQt6.QtCore import QSize, Qt, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon, QKeyEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QGridLayout, QHBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout
 
-from cfg import Dynamic, JsonData, Static
+from cfg import Dynamic, Static
 from system.items import Mf
 from system.lang import Lng
 

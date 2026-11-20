@@ -3,7 +3,7 @@ import os
 import sys
 import traceback
 
-from PyQt6.QtCore import QEvent, QTimer
+from PyQt6.QtCore import QEvent
 from PyQt6.QtWidgets import (QApplication, QDialog, QPushButton, QTextEdit,
                              QVBoxLayout)
 

@@ -4,8 +4,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import QEvent, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import (QAction, QContextMenuEvent, QFontMetrics, QIcon,
+from PyQt6.QtCore import QEvent, QSize, Qt, pyqtSignal
+from PyQt6.QtGui import (QAction, QContextMenuEvent, QIcon,
                          QImage, QPixmap)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSizePolicy,
@@ -24,7 +24,7 @@ from ._base_widgets import (ActiveButton, ConfirmWindow, HoverGroupBox,
                             MfAliasWidget, MfPathWidget, RowArrowWidget,
                             SuperConfirmWindow, TitleWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
-                            UListSpacerItem, UListWidget, UListWidgetItem,
+                            UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton,
                             UScrollVerticalArea, USep, USpinBox, TagWidget,
                             WarningWindow)

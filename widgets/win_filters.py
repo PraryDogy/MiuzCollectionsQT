@@ -1,9 +1,6 @@
-import os
-from pathlib import Path
 
 from PyQt6.QtCore import QDate, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QCursor, QIcon
-from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
@@ -13,7 +10,7 @@ from system.lang import Lng
 from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
                             InputTextWin, TitleWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
-                            UPushButton, USep, TagWidget)
+                            UPushButton, TagWidget)
 from .win_calendar import WinCalendar
 
 

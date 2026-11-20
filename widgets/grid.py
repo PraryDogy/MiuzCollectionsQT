@@ -3,12 +3,12 @@ import re
 
 from PyQt6.QtCore import (QMimeData, QPoint, QRect, QSize, Qt, QTimer, QUrl,
                           pyqtSignal)
-from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QCursor, QDrag,
+from PyQt6.QtGui import (QAction, QColor, QContextMenuEvent, QDrag,
                          QFont, QFontMetrics, QIcon, QImage, QKeyEvent,
                          QMouseEvent, QPainter, QPixmap, QResizeEvent)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout,
-                             QRubberBand, QSizePolicy, QVBoxLayout)
+                             QRubberBand, QVBoxLayout)
 
 from cfg import Dynamic, JsonData, Static
 from system.items import DataItem, Mf

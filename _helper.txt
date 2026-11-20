@@ -11,6 +11,4 @@ spacing между кнопками 5
     10 10 10 10 при сепараторе под заголовком
 
 
-зависание
-echo "block drop out quick proto tcp to 192.168.10.121 port 445" | sudo pfctl -ef -
-
+ruff check --select F401 --fix .

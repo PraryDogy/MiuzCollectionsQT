@@ -1,21 +1,19 @@
 import os
-import re
-import sys
 from pathlib import Path
 from typing import Literal
 
 from PyQt6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
                           pyqtSignal)
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-                         QFontMetrics, QIcon, QMouseEvent, QPainter,
+                         QFontMetrics, QIcon, QPainter,
                          QPainterPath, QPalette)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
-                             QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+                             QGroupBox, QHBoxLayout, QLabel,
                              QLayout, QLineEdit, QListWidget, QListWidgetItem,
                              QMainWindow, QMenu, QProgressBar, QPushButton,
                              QScrollArea, QSizePolicy, QSlider, QSpinBox,
-                             QStackedWidget, QStyle, QStyledItemDelegate,
+                             QStyle, QStyledItemDelegate,
                              QStyleOptionViewItem, QTextEdit, QTreeView,
                              QTreeWidget, QTreeWidgetItem, QVBoxLayout,
                              QWidget)

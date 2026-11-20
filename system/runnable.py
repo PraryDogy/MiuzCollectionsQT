@@ -11,7 +11,7 @@ import numpy as np
 import sqlalchemy
 from PyQt6.QtCore import (QObject, QRectF, QRunnable, QSize, Qt, QThreadPool,
                           pyqtSignal)
-from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPixmap
+from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath
 
 from cfg import Dynamic, JsonData, Static
 

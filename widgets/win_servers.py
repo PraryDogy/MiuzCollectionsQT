@@ -1,5 +1,4 @@
 import json
-import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,14 +8,14 @@ from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
-from cfg import JsonData, Static
+from cfg import Static
 from system.items import Servers
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, TitleWidget,
-                            TransparentLabel, TransparentWidget, UGroupBox,
+                            TransparentLabel, UGroupBox,
                             ULineEdit, UListWidget, UListWidgetItem,
-                            UMainWindow, UMenu, UPushButton, USep)
+                            UMainWindow, UMenu, UPushButton)
 
 
 @dataclass(slots=True)

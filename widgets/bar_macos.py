@@ -2,7 +2,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QImage, QKeyEvent, QPixmap
 from PyQt6.QtWidgets import QMenuBar
 
-from cfg import JsonData, Static
+from cfg import Static
 from system.lang import Lng
 from system.utils import Utils
 

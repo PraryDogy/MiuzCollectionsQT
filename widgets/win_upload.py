@@ -2,27 +2,21 @@ import os
 from collections import deque
 from queue import Empty
 
-import numpy as np
-from PyQt6.QtCore import QEvent, QSize, Qt, QThreadPool, QTimer, pyqtSignal
-from PyQt6.QtGui import QIcon, QImage, QPixmap
-from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import (QAbstractItemView, QFileDialog, QGridLayout,
-                             QHBoxLayout, QLabel, QListView, QScrollArea,
-                             QSizePolicy, QVBoxLayout)
+from PyQt6.QtCore import Qt, QThreadPool, QTimer, pyqtSignal
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import (QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+                             QVBoxLayout)
 
-from cfg import JsonData, Static
+from cfg import Static
 from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import ImageArrayItemLoader, ProcessWorker
 from system.runnable import BlurImgBgTask, ImgArrayQImage
-from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, ChoosePathWidget, HoverGroupBox,
-                            TitleTextWidget, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, TransparentFrame,
-                            UScrollVerticalArea, UMainWindow, UPushButton, USep)
-from .grid import GridStandart, SquareThumb
-
+from ._base_widgets import (ActiveButton, ChoosePathWidget, TitleWidget,
+                            TransparentFrame, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWindow,
+                            UPushButton, UScrollVerticalArea)
 
 THUMB_SIZE = 100        # размер, который отдаёт загрузчик и занимает квадрат в строке
 ICON_SIZE = THUMB_SIZE  # квадрат миниатюры в строке списка

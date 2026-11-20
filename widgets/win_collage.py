@@ -5,7 +5,7 @@ from PyQt6.QtCore import QBuffer, QIODevice, Qt, QTimer
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QGridLayout
 
-from cfg import JsonData, Static
+from cfg import Static
 from system.items import DataItem
 from system.lang import Lng
 

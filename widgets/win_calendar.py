@@ -8,8 +8,7 @@ from cfg import JsonData, Static
 from system.items import ReadableDateItem
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, SvgBg, TitleWidget, TransparentFrame,
-                            TransparentLabel, TransparentWidget, UGroupBox,
+from ._base_widgets import (ActiveButton, SvgBg, TitleWidget, TransparentLabel, TransparentWidget, UGroupBox,
                             UMainWindow, UMenu, UPushButton, USep)
 
 

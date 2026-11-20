@@ -3,9 +3,9 @@ from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy
+from PyQt6.QtWidgets import QHBoxLayout
 
-from cfg import JsonData, Static
+from cfg import Static
 from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker

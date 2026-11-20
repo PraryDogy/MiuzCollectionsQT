@@ -3,7 +3,7 @@ import os
 import subprocess
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QCloseEvent, QGuiApplication, QImage, QKeyEvent
+from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeyEvent
 from PyQt6.QtWidgets import QSizePolicy, QSplitter, QVBoxLayout
 
 from cfg import Dynamic, JsonData, Static
@@ -16,12 +16,11 @@ from system.scaner import (BaseScaner, DirsReady, ForcedScaner, MfScanned,
                            PathCheckPassed, PathMismatch, ScanerWorker,
                            ScanProgress)
 
-from ._base_widgets import (ConfirmWindow, TransparentLabel, TransparentWidget,
-                            UGroupBox, UMainWindow, USep, WarningWindow)
+from ._base_widgets import (ConfirmWindow, TransparentLabel, UGroupBox, UMainWindow, WarningWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
-from .grid import Grid, GridStandart, Thumb
+from .grid import Grid, GridStandart
 from .menu_left import MenuLeft
 from .win_collage import WinCollage
 from .win_copy_files import WinCopyFiles
