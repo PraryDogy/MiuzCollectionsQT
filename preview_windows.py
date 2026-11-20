@@ -191,6 +191,8 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         ("Индикатор прогресса", lambda: _new("widgets._base_widgets", "WinProgressbar", "Выполняется")),
     ]
 
+    factories.sort(key=lambda x: x[0])
+
     if with_main:
         # WinMain с аргументом noscan: сканер не запускается, БД только читается
         factories.append(
