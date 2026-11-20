@@ -530,7 +530,7 @@ class WinImgSearch(UMainWindow):
 			self.read_img_task = None
 		self.img_array = None
 		self.read_img_poll_ms = ms
-		self.read_img_task = ProcessWorker(target=ImageArrayItemLoader.start, args=(url, 300))
+		self.read_img_task = ProcessWorker(target=ImageArrayItemLoader.start, args=(url, None))
 		self.read_img_task.start()
 		self.read_img_timer.start(ms)
 
