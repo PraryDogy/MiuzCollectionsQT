@@ -107,10 +107,12 @@ class Launcher(UMainWindow):
         grid = QGridLayout(wid)
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(6)
+        rows = (len(self.factories) + 1) // 2      # высота каждого столбца
         for i, (name, _) in enumerate(self.factories):
+            col, row = divmod(i, rows)             # сначала заполняем столбец сверху вниз
             btn = UPushButton(name)
             btn.clicked.connect(lambda _=False, idx=i: self.open_one(idx))
-            grid.addWidget(btn, i // 2, i % 2)
+            grid.addWidget(btn, row, col)
         return wid
 
     def _build_bottom_row(self):
