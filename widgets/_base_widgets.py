@@ -1268,36 +1268,26 @@ class SuperConfirmWindow(ConfirmWindow):
 class InputTextWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 
-	def __init__(self, description: str, svg: Path = None):
+	def __init__(self, title: str, description: str):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.text_input)
+		self.setWindowTitle(title)
 		self.show_titlebar_sep()
-		self.central_layout.addSpacing(10)
+		self.central_layout.setSpacing(10)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
-		svg_text_widget = TransparentWidget()
-		self.central_layout.addWidget(svg_text_widget)
-		svg_text_layout = QHBoxLayout(svg_text_widget)
-		svg_text_layout.setContentsMargins(5, 0, 10, 0)
-		svg_text_layout.setSpacing(5)
-
-		if svg:
-			svg_icon = QSvgWidget(str(svg))
-			svg_icon.setFixedSize(15, 15)
-			svg_text_layout.addWidget(svg_icon)
-
-		self.description_label = TransparentLabel(description)
+		text = " " + description
+		self.description_label = TransparentLabel(text)
+		# self.description_label.setWordWrap(True)
 		self.description_label.set_style("gray", "regular", "regular")
-		svg_text_layout.addWidget(self.description_label)
-
-		self.central_layout.addSpacing(10)
+		self.central_layout.addWidget(self.description_label)
 
 		self.line_edit_widget = ULineEdit()
 		self.line_edit_widget.setPlaceholderText(Lng.input_text)
 		self.central_layout.addWidget(self.line_edit_widget)
 
-		self.central_layout.addSpacing(10)
+		# self.central_layout.addSpacing(5)
 
 		btn_widget = TransparentWidget()
 		self.central_layout.addWidget(btn_widget)
@@ -1321,7 +1311,7 @@ class InputTextWin(UMainWindow):
 		btn_layout.addWidget(self.ok_btn)
 
 		self.adjustSize()
-		self.setFixedSize(self.width(), self.height())
+		self.setFixedSize(300, self.height())
 
 	def ok_clicked_cmd(self):
 		text = self.line_edit_widget.text()

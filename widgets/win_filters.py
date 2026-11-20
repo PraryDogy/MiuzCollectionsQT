@@ -375,8 +375,8 @@ class UserTags(TransparentWidget):
 				self._create_tags()
 
 		self.text_win = InputTextWin(
-			description=Lng.new_tag_desc,
-			svg=Static.GRAY_ICONS / "tags.svg"
+			title=Lng.new_tag,
+			description=Lng.new_tag_desc
 		)
 		self.text_win.setWindowTitle(Lng.new_tag)
 		self.text_win.center_to_parent(self.window())

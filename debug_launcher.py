@@ -10,14 +10,17 @@ debug_launcher.py: отладочный запуск окон проекта с 
 Данные приложения не затрагиваются: используется песочница из preview_windows.py.
 Тема меняется кнопками в окне и применяется ко всем открытым окнам сразу,
 cfg.json при этом не записывается.
+Escape закрывает активное окно (в том числе лаунчер, тогда закрываются все окна).
 """
 import argparse
 import atexit
 import importlib
 import os
 import shutil
+import subprocess
 import sys
 import traceback
+from pathlib import Path
 
 from PyQt6.QtCore import QEvent, QObject, Qt
 from PyQt6.QtGui import QGuiApplication
@@ -36,6 +39,14 @@ THEME_CHOICES = [
 ]
 
 YY = 100
+SCRIPT_PATH = Path(__file__).resolve()
+
+
+def parse_pos(text: str) -> tuple[int, int]:
+    """Разбирает строку вида 'x,y' в кортеж координат."""
+    x, y = text.split(",")
+    return int(x), int(y)
+
 
 def reload_window_modules() -> None:
     """Перечитывает модули окон из widgets/, чтобы подхватить правки без перезапуска.
@@ -71,6 +82,30 @@ class CloseFilter(QObject):
         return False
 
 
+class EscapeFilter(QObject):
+    """Application-level фильтр: Escape закрывает активное окно.
+
+    Ловит нажатие до того, как оно дойдёт до виджета, поэтому работает
+    независимо от фокуса внутри окна. Для лаунчера закрываются все окна.
+    """
+
+    def __init__(self, launcher):
+        super().__init__()
+        self.launcher = launcher
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.KeyPress and event.key() == Qt.Key.Key_Escape:
+            win = QApplication.activeWindow()
+            if win is None:
+                return False
+            if win is self.launcher:
+                self.launcher.close_all()
+            else:
+                win.close()          # пройдёт через CloseFilter
+            return True
+        return False
+
+
 class Launcher(UMainWindow):
     def __init__(self, factories):
         super().__init__()
@@ -88,6 +123,9 @@ class Launcher(UMainWindow):
         self.status.set_style("gray", "regular", "regular")
         self.central_layout.addWidget(self.status)
         self.update_status()
+
+        self._esc_filter = EscapeFilter(self)
+        QApplication.instance().installEventFilter(self._esc_filter)
 
     # --- построение интерфейса ---
 
@@ -125,6 +163,9 @@ class Launcher(UMainWindow):
         close_all = UPushButton("Закрыть все окна")
         close_all.clicked.connect(self.close_all)
         lay.addWidget(close_all)
+        restart = UPushButton("Перезапустить")
+        restart.clicked.connect(self.restart_app)
+        lay.addWidget(restart)
         lay.addStretch()
         open_all = ActiveButton("Открыть все")
         open_all.clicked.connect(self.open_all)
@@ -152,7 +193,7 @@ class Launcher(UMainWindow):
         y = (screen.height() - size.height()) // 2
         win.move(x, y)
 
-    def open_one(self, index: int):
+    def open_one(self, index: int, pos: tuple[int, int] | None = None):
         name, factory = self.factories[index]
         reload_window_modules()              # свежий код окна при каждом открытии
         try:
@@ -168,7 +209,11 @@ class Launcher(UMainWindow):
         win.installEventFilter(close_filter)
 
         win.show()
-        self.center_screen(win)                   # центрируем после show(): размер окна уже известен
+        win._launcher_index = index          # номер фабрики, нужен для перезапуска
+        if pos is None:
+            self.center_screen(win)          # обычное открытие: по центру
+        else:
+            win.move(*pos)                   # восстановление: в сохранённую позицию
         self.move(self.x(), YY)
         win.raise_()
         self.opened.append(win)
@@ -186,18 +231,6 @@ class Launcher(UMainWindow):
         self.opened = alive
         return alive
 
-    def _next_slot(self) -> tuple[int, int]:
-        """Координаты следующего окна: справа от лаунчера, по сетке в пределах экрана."""
-        area = QApplication.primaryScreen().availableGeometry()
-        step_x, step_y = 380, 320
-        left = area.x() + 700                       # правее лаунчера (он у x=40)
-        cols = max(1, (area.right() - left) // step_x)
-        rows = max(1, (area.bottom() - area.y()) // step_y)
-        index = len(self._alive_windows())
-        col = index % cols
-        row = (index // cols) % rows                # после заполнения экрана начинаем сверху
-        return left + col * step_x, area.y() + 40 + row * step_y
-
     def open_all(self, *_):
         for i in range(len(self.factories)):
             self.open_one(i)
@@ -210,10 +243,23 @@ class Launcher(UMainWindow):
                 pass             # окно уже удалено
         self.opened.clear()
 
-    def keyPressEvent(self, a0):
-        if a0.key() == Qt.Key.Key_Escape:
-            self.close_all()
-        return super().keyPressEvent(a0)
+    def restart_app(self, *_):
+        """Перезапускает лаунчер и восстанавливает окна и их позиции."""
+        open_spec = ",".join(
+            f"{w._launcher_index}:{w.x()}:{w.y()}" for w in self._alive_windows()
+        )
+        launcher_pos = f"{self.x()},{self.y()}"
+        self.close_all()
+        cmd = [
+            sys.executable,
+            str(SCRIPT_PATH),
+            *sys.argv[1:],
+            f"--theme={JsonData.theme}",
+            f"--open={open_spec}",               # формат: индекс:x:y через запятую
+            f"--launcher-pos={launcher_pos}",    # через =, чтобы отрицательные координаты не сочли опцией
+        ]
+        subprocess.Popen(cmd, cwd=str(pw.PROJECT_DIR))
+        QApplication.quit()
 
 
 def main() -> int:
@@ -223,6 +269,10 @@ def main() -> int:
                         help="тема при старте")
     parser.add_argument("--main", action="store_true", help="добавить главное окно (без сканера)")
     parser.add_argument("--geo", action="store_true", help="добавить окна geo_finder.py")
+    parser.add_argument("--open", default="",
+                        help="окна для открытия при старте: индекс:x:y через запятую")
+    parser.add_argument("--launcher-pos", default="",
+                        help="позиция лаунчера x,y")
     args = parser.parse_args()
 
     os.chdir(pw.PROJECT_DIR)   # темы и иконки ищутся относительно папки проекта
@@ -240,11 +290,20 @@ def main() -> int:
     factories = pw.build_factories(root, mf, items, args.main, args.geo)
 
     launcher = Launcher(factories)
-    launcher.center_screen(launcher)
-    launcher.move(launcher.x(), YY)
+    if args.launcher_pos:
+        launcher.move(*parse_pos(args.launcher_pos))
+    else:
+        launcher.center_screen(launcher)
+        launcher.move(launcher.x(), YY)
     launcher.show()
+
     if args.all:
         launcher.open_all()
+    else:
+        for part in args.open.split(","):
+            if part.strip():
+                idx, x, y = part.split(":")
+                launcher.open_one(int(idx), (int(x), int(y)))
 
     return app.exec()
 

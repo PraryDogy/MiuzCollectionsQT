@@ -187,7 +187,7 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
                                         "Текст предупреждения")),
         ("Двойное подтверждение", lambda: _new("widgets._base_widgets", "SuperConfirmWindow",
                                                "Очень опасное действие")),
-        ("Ввод текста", lambda: _new("widgets._base_widgets", "InputTextWin", "Введите описание")),
+        ("Ввод текста", lambda: _new("widgets._base_widgets", "InputTextWin", "Новый тег",  "Придумайте название нового тега")),
         ("Индикатор прогресса", lambda: _new("widgets._base_widgets", "WinProgressbar", "Выполняется")),
     ]
 
