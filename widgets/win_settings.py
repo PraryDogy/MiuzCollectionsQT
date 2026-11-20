@@ -535,7 +535,9 @@ class GeneralSettings(TransparentWidget):
 
 		v_lay.addWidget(AboutWid())
 
-		self.adjustSize()
+		self.ensurePolished()
+
+		# self.adjustSize()
 
 	def save_changes(self):
 		def fin():
