@@ -78,7 +78,7 @@ class Lng:
 	menu = ("Меню", "Menu")
 	calendar = ("Календарь", "Calendar")
 	favorites = ("Избранное", "Favorites")
-	favorite_servers = ("Подключения", "Connections")
+	connections_list = ("Список подключений", "Connections list")
 	servers = ("Серверы", "Servers")
 	cancel = ("Отмена", "Cancel")
 	confirmation = ("Подтверждение", "Confirmation")
@@ -561,7 +561,7 @@ class Lng:
 		"Папки из игнор-листа не индексируются: их изображения не кешируются и не отображаются. Добавлять и удалять папки можно в левом меню или через кнопку «Открыть список».",
 		"Folders in the ignore list are not indexed: their images are not cached or shown. You can add and remove folders in the left menu or via the «Open list» button."
 	)
-	ignore_list_empty = (
+	list_empty = (
 		"Список пуст",
 		"The list is empty",
 	)

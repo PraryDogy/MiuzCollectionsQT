@@ -13,9 +13,31 @@ from system.items import Servers
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, TitleWidget,
-                            TransparentLabel, UGroupBox,
+                            TransparentLabel, TransparentWidget, UGroupBox,
                             ULineEdit, UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton)
+
+
+class EmptyOverlay(TransparentLabel):
+	"""Подсказка поверх пустого списка. Не перехватывает мышь, центрируется по родителю."""
+
+	def __init__(self, parent: TransparentWidget, text: str):
+		super().__init__(text=text, parent=parent)
+		self.set_style("gray", "regular", "regular")
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.setWordWrap(True)
+		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+		self.hide()
+
+	def update_geometry(self):
+		parent = self.parentWidget()
+		max_w = max(0, parent.width() - 40)
+		self.setFixedWidth(max_w)
+		self.adjustSize()
+		self.move(
+			(parent.width() - self.width()) // 2,
+			(parent.height() - self.height()) // 2,
+		)
 
 
 @dataclass(slots=True)
@@ -49,6 +71,12 @@ class ServerList(UListWidget):
 		super().__init__()
 		self.evlosh_servers_path = Path("./_miuz_servers.json")
 
+		self.empty_overlay = EmptyOverlay(self.viewport(), Lng.list_empty)
+		self.model().rowsInserted.connect(self._update_empty_overlay)
+		self.model().rowsRemoved.connect(self._update_empty_overlay)
+		self.model().modelReset.connect(self._update_empty_overlay)
+		self._update_empty_overlay()
+
 	def remove_cmd(self, server_item: ServerItem):
 		self.win_warn = ConfirmWindow(Lng.confirm_delete)
 		self.win_warn.ok_clicked.connect(lambda: self.remove_server.emit(server_item))
@@ -65,6 +93,16 @@ class ServerList(UListWidget):
 		if list_item:
 			self.connect_server.emit()
 		return super().mouseDoubleClickEvent(e)
+
+	def _update_empty_overlay(self, *_):
+		is_empty = self.count() == 0
+		self.empty_overlay.setVisible(is_empty)
+		if is_empty:
+			self.empty_overlay.update_geometry()
+
+	def resizeEvent(self, e):
+		super().resizeEvent(e)
+		self._update_empty_overlay()
 
 	def contextMenuEvent(self, a0):
 		self.menu_ = UMenu(parent=self)
@@ -260,9 +298,10 @@ class ServersWin(UMainWindow):
 		# --- Группа "Избранное" ---
 		group = UGroupBox()
 		group_lay = QVBoxLayout(group)
-		group_lay.setContentsMargins(12, 12, 12, 12)
-		group_lay.setSpacing(8)
-		title_lbl = TitleWidget(Lng.favorite_servers, Lng.servers_description)
+		group_lay.setContentsMargins(5, 10, 5, 10)
+		group_lay.setSpacing(5)
+		title_lbl = TitleWidget(Lng.connections_list, Lng.servers_description)
+		title_lbl.set_margins(5, 0, 5, 5)
 		group_lay.addWidget(title_lbl)
 		self.central_layout.addWidget(group)
 

@@ -726,7 +726,7 @@ class IgnoreListWin(UMainWindow):
 		self.v_list_widget.installEventFilter(self)
 
 		# заглушка живёт внутри списка и центрируется в его области
-		self.empty_lbl = TransparentLabel(Lng.ignore_list_empty, parent=self.v_list_widget)
+		self.empty_lbl = TransparentLabel(Lng.list_empty, parent=self.v_list_widget)
 		self.empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.empty_lbl.hide()
 
