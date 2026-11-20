@@ -8,7 +8,7 @@ from PyQt6.QtGui import QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QAbstractItemView, QFileDialog, QGridLayout,
                              QHBoxLayout, QLabel, QListView, QScrollArea,
-                             QSizePolicy, QVBoxLayout, QWidget)
+                             QSizePolicy, QVBoxLayout)
 
 from cfg import JsonData, Static
 from system.items import Mf
@@ -19,8 +19,8 @@ from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ChoosePathWidget, HoverGroupBox,
                             TitleTextWidget, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UListWidget,
-                            UListWidgetItem, UMainWindow, UPushButton, USep)
+                            TransparentWidget, UGroupBox, TransparentFrame,
+                            UScrollVerticalArea, UMainWindow, UPushButton, USep)
 from .grid import GridStandart, SquareThumb
 
 
@@ -30,51 +30,96 @@ ROW_PADDING = 8         # отступы строки по высоте
 THUMB_RADIUS = 8        # скругление углов миниатюры
 
 
-def empty_icon(size: int) -> QIcon:
-	"""Прозрачный квадрат того же размера, что и готовая миниатюра. Резервирует место."""
-	canvas = QPixmap(size, size)
-	canvas.fill(Qt.GlobalColor.transparent)
-	return QIcon(canvas)
+LOAD_SIZE = 200      # размер, который отдаёт загрузчик
+CELL = 100           # размер миниатюры в сетке
+SPACING = 10         # расстояние между ячейками
+RADIUS = 8           # скругление углов миниатюры
 
 
-class ImageListWidget(UListWidget):
-	"""Список файлов: миниатюра слева, имя справа.
+class ImageCell(TransparentWidget):
+	"""Миниатюра 100×100 и имя файла под ней."""
+
+	def __init__(self, path: str):
+		super().__init__()
+		self.setFixedWidth(CELL)
+
+		lay = QVBoxLayout(self)
+		lay.setContentsMargins(0, 0, 0, 0)
+		lay.setSpacing(4)
+
+		self.pic_label = QLabel()
+		self.pic_label.setFixedSize(CELL, CELL)
+		self.pic_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		lay.addWidget(self.pic_label)
+
+		self.name_label = TransparentLabel(os.path.basename(path))
+		self.name_label.set_style("gray", "small", "regular")
+		self.name_label.set_elide(True)
+		self.name_label.setFixedWidth(CELL)
+		self.name_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+		self.name_label.setToolTip(path)
+		lay.addWidget(self.name_label)
+
+	def set_pixmap(self, pixmap: QPixmap | None):
+		if pixmap is None or pixmap.isNull():
+			self.pic_label.setText("✕")
+			return
+		self.pic_label.setPixmap(pixmap)
+
+
+class ImageGridWidget(UScrollVerticalArea):
+	"""Сетка миниатюр 100×100. Число колонок зависит от ширины окна.
 
 	Цепочка для каждого файла:
-	ImageArrayItemLoader (подпроцесс) -> ImgArrayQImage (пул) -> BlurImgBgTask (пул) -> QIcon (GUI).
+	ImageArrayItemLoader (подпроцесс) -> ImgArrayQImage (пул) -> BlurImgBgTask (пул) -> QPixmap (GUI).
 	"""
 
 	def __init__(self, paths: list[str], max_workers: int | None = None):
 		super().__init__()
 		self.paths = paths
 		self.max_workers = max_workers or min(4, os.cpu_count() or 2)
-		self._pending = deque()
-		self._active: dict[int, ProcessWorker] = {}   # загрузка массива в подпроцессе
-		self._items: list[UListWidgetItem] = []
-		self._tasks: dict[int, object] = {}           # задачи в пуле, чтобы не удалились раньше времени
-
+		self._pending = deque(range(len(paths)))
+		self._active: dict[int, ProcessWorker] = {}   # загрузка массива
+		self._tasks: dict[int, object] = {}           # задачи в пуле потоков
+		self._cells: list[ImageCell] = [ImageCell(p) for p in paths]
+		self._cols = 0
 		self._pool = QThreadPool.globalInstance()
 
-		self.setViewMode(QListView.ViewMode.ListMode)
-		self.setIconSize(QSize(ICON_SIZE, ICON_SIZE))
-		self.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
-		self.setSpacing(2)
-		self.setWordWrap(False)
+		self.setWidgetResizable(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-		for idx, path in enumerate(paths):
-			item = UListWidgetItem(self, os.path.basename(path))
-			item.setToolTip(path)
-			item.setSizeHint(QSize(0, ICON_SIZE + ROW_PADDING))
-			item.setIcon(empty_icon(ICON_SIZE))
-			self.addItem(item)
-			self._items.append(item)
-			self._pending.append(idx)
+		self.container = TransparentFrame()
+		self.grid = QGridLayout(self.container)
+		self.grid.setContentsMargins(10, 10, 10, 10)
+		self.grid.setSpacing(SPACING)
+		self.grid.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+		self.setWidget(self.container)
+
+		self._relayout()
 
 		self._timer = QTimer(self)
 		self._timer.timeout.connect(self._poll)
 		self._timer.start(50)
 		self._start_next()
+
+	# --- раскладка ---
+
+	def resizeEvent(self, event):
+		super().resizeEvent(event)
+		self._relayout()
+
+	def _relayout(self):
+		"""Пересчитывает число колонок по ширине и перекладывает ячейки."""
+		step = CELL + SPACING
+		cols = max(1, (self.viewport().width() - 20 + SPACING) // step)
+		if cols == self._cols:
+			return
+		self._cols = cols
+
+		for cell in self._cells:
+			self.grid.removeWidget(cell)
+		for i, cell in enumerate(self._cells):
+			self.grid.addWidget(cell, i // cols, i % cols)
 
 	# --- этап 1: массив в подпроцессе ---
 
@@ -83,7 +128,7 @@ class ImageListWidget(UListWidget):
 			idx = self._pending.popleft()
 			worker = ProcessWorker(
 				target=ImageArrayItemLoader.start,
-				args=(self.paths[idx], THUMB_SIZE),
+				args=(self.paths[idx], LOAD_SIZE),
 			)
 			worker.start()
 			self._active[idx] = worker
@@ -106,6 +151,8 @@ class ImageListWidget(UListWidget):
 
 			if item is not None:
 				self._run_qimage_task(idx, item.image_array)
+			else:
+				self._cells[idx].set_pixmap(None)
 
 		self._start_next()
 
@@ -125,8 +172,9 @@ class ImageListWidget(UListWidget):
 	def _on_qimage(self, idx: int, qimage):
 		self._tasks.pop(idx, None)
 		if qimage is None or qimage.isNull():
+			self._cells[idx].set_pixmap(None)
 			return
-		task = BlurImgBgTask(qimage, size=(ICON_SIZE, ICON_SIZE), radius=THUMB_RADIUS)
+		task = BlurImgBgTask(qimage, size=(CELL, CELL), radius=RADIUS)
 		task.sigs.finished_.connect(lambda final, i=idx: self._on_final(i, final))
 		self._tasks[idx] = task
 		self._pool.start(task)
@@ -135,8 +183,10 @@ class ImageListWidget(UListWidget):
 
 	def _on_final(self, idx: int, qimage):
 		self._tasks.pop(idx, None)
-		if qimage is not None and not qimage.isNull():
-			self._items[idx].setIcon(QIcon(QPixmap.fromImage(qimage)))
+		if qimage is None or qimage.isNull():
+			self._cells[idx].set_pixmap(None)
+			return
+		self._cells[idx].set_pixmap(QPixmap.fromImage(qimage))
 
 	def stop(self):
 		"""Останавливает загрузку. Вызвать в closeEvent окна."""
@@ -192,7 +242,7 @@ class UploadWin(UMainWindow):
 		self.title_widget.description_widget.setWordWrap(False)
 		self.group_layout.addWidget(self.title_widget)
 
-		self.list_widget = ImageListWidget(files_to_copy)  # абсолютные пути к файлам
+		self.list_widget = ImageGridWidget(files_to_copy)  # абсолютные пути к файлам
 		self.group_layout.addWidget(self.list_widget)
 
 		self.path_widget = ClickablePathWidget()
