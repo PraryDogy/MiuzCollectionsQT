@@ -4,10 +4,10 @@ import sys
 from pathlib import Path
 from zipfile import ZipFile
 
-from PyQt6.QtCore import QObject, Qt, pyqtSignal, QSize
+from PyQt6.QtCore import QObject, QSize, Qt, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QSizePolicy, QVBoxLayout
-from PyQt6.QtGui import QIcon
 
 from cfg import JsonData, Static
 from system.items import Mf
@@ -15,8 +15,10 @@ from system.lang import Lng
 from system.runnable import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, HoverGroupBox, TitleWidget,
-                            TransparentWidget, UPushButton)
+                            TransparentWidget, UMenu, UPushButton)
 from .win_settings import NewMfWin
+
+LNG_INDEX = Lng.CURRENT_LNG_INDEX
 
 
 def restart_app():
@@ -92,11 +94,25 @@ class MiuzGroup(HoverGroupBox):
 class FirstLoadWin(NewMfWin):
 	def __init__(self, mf_path = None):
 		super().__init__(mf_path)
+		rus_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
+		eng_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
-		if Lng.CURRENT_LNG_INDEX == 0:
-			icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
+		if LNG_INDEX == 0:
+			icon = rus_icon
 		else:
-			QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
+			icon = eng_icon
+
+		lng_menu = UMenu()
+
+		rus = QAction(Lng.lng_menu_rus, lng_menu)
+		rus.setIcon(rus_icon)
+		rus.setIconVisibleInMenu(True)
+		lng_menu.addAction(rus)
+
+		eng = QAction(Lng.lng_menu_eng, lng_menu)
+		eng.setIcon(eng_icon)
+		eng.setIconVisibleInMenu(True)
+		lng_menu.addAction(eng)
 
 		lng_wrapper = TransparentWidget()
 		lng_layout = QHBoxLayout(lng_wrapper)
@@ -106,10 +122,11 @@ class FirstLoadWin(NewMfWin):
 		lng_layout.addStretch()
 
 		lng_button = UPushButton("")
-		lng_button.setFixedWidth(30)
+		lng_button.setMenu(lng_menu)
 		lng_button.setIcon(icon)
 		lng_button.setIconSize(QSize(18, 18))
 		lng_button.adjustSize()
+		lng_button.setFixedWidth(lng_button.width() + 10)
 		lng_layout.addWidget(lng_button)
 
 		self.title_bar.set_custom_widget(lng_wrapper)
