@@ -364,8 +364,10 @@ class UListWidgetItem(QListWidgetItem):
 
 
 class UTreeWidgetItem(QTreeWidgetItem):
-	def __init__(self, parent: QTreeWidget | QTreeWidgetItem, text: str):
-		super().__init__(parent, [text])
+	def __init__(self, parent: QTreeWidget | QTreeWidgetItem, texts: str | list[str]):
+		if isinstance(texts, str):
+			texts = [texts]
+		super().__init__(parent, texts)
 
 
 class UListWidget(TransparentListWidget):
