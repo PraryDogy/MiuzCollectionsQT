@@ -82,7 +82,7 @@ class ProgressWin(UMainWindow):
 			current_count = total_count
 
 		if total_count == 0:
-			text = Lng.please_wait
+			text = Lng.preparing
 		else:
 			text = (
 				f"{Lng.indexing} "
