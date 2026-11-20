@@ -160,15 +160,6 @@ class DestinyFolderWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(5)
 
-		self.title_widget = TitleWidget(
-			title=Lng.upload_files,
-			descr=Lng.upload_files_description
-		)
-		self.title_widget.description_widget.setWordWrap(False)
-		content_lay.addWidget(self.title_widget)
-
-		content_lay.addSpacing(5)
-
 		self.path_status = ChoosePathWidget()
 		content_lay.addWidget(self.path_status)
 		self.path_status.set_good(self.current_dir, lng=Lng.chosen_folder)
@@ -219,12 +210,24 @@ class UploadWin(UMainWindow):
 
 		self.current_dir = (mf.mf_path + current_dir).rstrip(os.sep)
 
-		grid = ImageListWidget(files_to_copy)  # абсолютные пути к файлам
-		self.central_layout.addWidget(grid)
+		self.group_box = UGroupBox()
+		self.group_layout = QVBoxLayout(self.group_box)
+		self.group_layout.setContentsMargins(10, 10, 10, 10)
+		self.group_layout.setSpacing(8)
+		self.central_layout.addWidget(self.group_box)
+
+		self.title_widget = TitleWidget(
+			title=Lng.upload_files,
+			sep=False
+		)
+		self.group_layout.addWidget(self.title_widget)
+
+		self.list_widget = ImageListWidget(files_to_copy)  # абсолютные пути к файлам
+		self.group_layout.addWidget(self.list_widget)
 
 		self.destiny_widget = DestinyFolderWidget(self.current_dir, files_to_copy)
 		self.destiny_widget.dir_changed.connect(self.dir_changed_cmd)
-		self.central_layout.addWidget(self.destiny_widget)
+		self.group_layout.addWidget(self.destiny_widget)
 
 		self.button_widget = TransparentWidget()
 		self.central_layout.addWidget(self.button_widget)
