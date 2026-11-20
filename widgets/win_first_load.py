@@ -18,7 +18,7 @@ from ._base_widgets import (ConfirmWindow, HoverGroupBox, TitleWidget,
                             TransparentWidget, UMenu, UPushButton)
 from .win_settings import NewMfWin
 
-LNG_INDEX = Lng.CURRENT_LNG_INDEX
+LNG_INDEX = 0
 
 
 def restart_app():
@@ -164,7 +164,7 @@ class FirstLoadWin(NewMfWin):
 			Mf.items.clear()
 			Mf.items.append(mf)
 			Mf.write_json_data()
-			JsonData.lng_index = Lng.CURRENT_LNG_INDEX
+			JsonData.lng_index = LNG_INDEX
 			JsonData.write_json_data()
 			restart_app()
 
