@@ -4,9 +4,10 @@ import sys
 from pathlib import Path
 from zipfile import ZipFile
 
-from PyQt6.QtCore import QObject, Qt, pyqtSignal
+from PyQt6.QtCore import QObject, Qt, pyqtSignal, QSize
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QSizePolicy, QVBoxLayout
+from PyQt6.QtGui import QIcon
 
 from cfg import JsonData, Static
 from system.items import Mf
@@ -14,7 +15,7 @@ from system.lang import Lng
 from system.runnable import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWindow, HoverGroupBox, TitleWidget,
-                            TransparentWidget)
+                            TransparentWidget, UPushButton)
 from .win_settings import NewMfWin
 
 
@@ -91,6 +92,28 @@ class MiuzGroup(HoverGroupBox):
 class FirstLoadWin(NewMfWin):
 	def __init__(self, mf_path = None):
 		super().__init__(mf_path)
+
+		if Lng.CURRENT_LNG_INDEX == 0:
+			icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
+		else:
+			QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
+
+		lng_wrapper = TransparentWidget()
+		lng_layout = QHBoxLayout(lng_wrapper)
+		lng_layout.setContentsMargins(0, 5, 11, 0)
+		lng_layout.setSpacing(0)
+
+		lng_layout.addStretch()
+
+		lng_button = UPushButton("")
+		lng_button.setFixedWidth(30)
+		lng_button.setIcon(icon)
+		lng_button.setIconSize(QSize(18, 18))
+		lng_button.adjustSize()
+		lng_layout.addWidget(lng_button)
+
+		self.title_bar.set_custom_widget(lng_wrapper)
+		self.set_titlebar_height(lng_button.height() + 8)
 
 		if os.path.exists(Static.MIUZ_ZIP):
 			idx = self.group_lay.indexOf(self.mf_path_widget) + 1
