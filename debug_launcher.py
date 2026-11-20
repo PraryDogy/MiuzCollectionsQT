@@ -174,6 +174,8 @@ class Launcher(UMainWindow):
         self.opened.append(win)
         print(f"[ок] {name}", flush=True)
 
+        print(self.y())
+
     def _alive_windows(self):
         """Оставляет только окна, которые ещё видны. Закрытые не занимают место."""
         alive = []
