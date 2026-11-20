@@ -15,7 +15,7 @@ from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath
 
 from cfg import Dynamic, JsonData, Static
 
-from .database import Dbase, Dirs, Properties, Thumbs
+from .database import HIST_BINS, Dbase, Dirs, Properties, Thumbs
 from .items import DataItem, ImageArrayItem, Mf, ReadableDateItem
 from .stop_list import StopList
 from .utils import Utils
@@ -599,6 +599,17 @@ class BlurImgBgTask(URunnable):
 		self.sigs.finished_.emit(final_qimg)
 
 
+def hist_to_bytes(hist: np.ndarray) -> bytes:
+	"""float32 в диапазоне 0..1 -> uint8. Ошибка округления не больше 1/255."""
+	return np.clip(hist * 255, 0, 255).astype(np.uint8).tobytes()
+
+
+def bytes_to_hist(bytes_hist: bytes) -> np.ndarray:
+	"""uint8 -> float32 в диапазоне 0..1 в исходной форме гистограммы."""
+	flat = np.frombuffer(bytes_hist, dtype=np.uint8)
+	return flat.reshape(HIST_BINS).astype(np.float32) / 255.0
+
+
 class ImageSearcher(URunnable):
 
 	class Sigs(QObject):
@@ -620,7 +631,7 @@ class ImageSearcher(URunnable):
 		self.thumbs_no_hist = []
 
 		hsv1 = cv2.cvtColor(src_img, cv2.COLOR_BGR2HSV)
-		self.hist1 = cv2.calcHist([hsv1], [0, 1], None, [50, 60], [0, 180, 0, 256])
+		self.hist1 = cv2.calcHist([hsv1], [0, 1], None, list(HIST_BINS), [0, 180, 0, 256])
 		cv2.normalize(self.hist1, self.hist1, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 
 	def stop_task(self):
@@ -650,7 +661,7 @@ class ImageSearcher(URunnable):
 			if bytes_hist is None:
 				self.thumbs_no_hist.append((id_, rel_thumb_path, bytes_hist))
 			else:
-				decoded_hist = self.decode_hist(bytes_hist)
+				decoded_hist = bytes_to_hist(bytes_hist)
 				new_data = (id_, rel_thumb_path, decoded_hist)
 				self.thumbs_with_hist.append(new_data)
 
@@ -667,7 +678,7 @@ class ImageSearcher(URunnable):
 			self.current_count += 1
 			abs_thumb_path = Mf.get_abs_thumb_path(rel_thumb_path)
 			hist = self.calc_hist(abs_thumb_path)
-			bytes_hist = hist.tobytes()
+			bytes_hist = hist_to_bytes(hist)
 			self.thumbs_with_hist.append((id_, rel_thumb_path, hist))
 			db_data.append((id_, rel_thumb_path, bytes_hist))
 			if x % self.chunk_size == 0:
@@ -677,18 +688,13 @@ class ImageSearcher(URunnable):
 			self.write_to_db(db_data)
 			db_data.clear()
 
-	def calc_hist(self, abs_thumb_path: str):
+	def calc_hist(self, abs_thumb_path: str) -> np.ndarray:
 		array_item = ImageArrayItem(abs_thumb_path)
 		array_item.load()
-		hsv2 = cv2.cvtColor(array_item.image_array, cv2.COLOR_BGR2HSV)
-		hist2 = cv2.calcHist([hsv2], [0, 1], None, [50, 60], [0, 180, 0, 256])
-		cv2.normalize(hist2, hist2, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-		return hist2
-
-	def decode_hist(self, bytes_hist: bytes) -> np.ndarray:
-		flat_array = np.frombuffer(bytes_hist, dtype=np.float32)
-		hist = flat_array.reshape(50, 60)
-		return hist
+		hsv = cv2.cvtColor(array_item.image_array, cv2.COLOR_BGR2HSV)
+		hist = cv2.calcHist([hsv], [0, 1], None, list(HIST_BINS), [0, 180, 0, 256])
+		cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+		return hist.astype(np.float32)
 
 	def write_to_db(self, db_data: list):
 		values = [

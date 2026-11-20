@@ -4,6 +4,10 @@ from cfg import Static
 
 METADATA = sqlalchemy.MetaData()
 
+HIST_BINS = (50, 60)
+HIST_BYTES = HIST_BINS[0] * HIST_BINS[1]   # 3000 байт в uint8
+DB_SCHEMA_VERSION = 2                       # 2 = гистограммы uint8
+
 
 _table_thumbs = sqlalchemy.Table(
 	"thumbs", METADATA,
@@ -100,8 +104,10 @@ class Dbase:
 	@classmethod
 	def init(cls) -> sqlalchemy.Engine:
 		Dbase.main_engine = cls.create_engine()
-		cls.ensure_properties_trigger(Dbase.main_engine)
-		cls.cleanup_orphan_properties(Dbase.main_engine)  # один раз при старте
+		cls.ensure_schema(Dbase.main_engine)
+		cls.ensure_triggers(Dbase.main_engine)
+		cls.migrate_histograms(Dbase.main_engine)
+		cls.cleanup_orphan_properties(Dbase.main_engine)
 		cls.toggle_wal(False)
 
 	@classmethod
@@ -117,8 +123,60 @@ class Dbase:
 				"timeout": cls._timeout,
 			},
 		)
-		METADATA.create_all(engine)
 		return engine
+
+	@classmethod
+	def ensure_schema(cls, engine: sqlalchemy.Engine) -> None:
+		"""Создаёт недостающие таблицы и индексы. Безопасно вызывать при каждом старте."""
+		METADATA.create_all(engine)  # создаёт только отсутствующие таблицы
+		with engine.begin() as conn:
+			conn.execute(sqlalchemy.text(
+				"CREATE INDEX IF NOT EXISTS ix_properties_thumb_id ON properties(thumb_id)"
+			))
+
+	@classmethod
+	def ensure_triggers(cls, engine: sqlalchemy.Engine) -> None:
+		"""Триггеры пересоздаются при каждом старте, чтобы тела были актуальны."""
+		with engine.begin() as conn:
+			conn.execute(sqlalchemy.text("DROP TRIGGER IF EXISTS thumbs_delete_properties"))
+			conn.execute(sqlalchemy.text("""
+				CREATE TRIGGER thumbs_delete_properties
+				AFTER DELETE ON thumbs
+				BEGIN
+					DELETE FROM properties WHERE thumb_id = OLD.id;
+				END
+			"""))
+			conn.execute(sqlalchemy.text("DROP TRIGGER IF EXISTS properties_size_guard"))
+			conn.execute(sqlalchemy.text(f"""
+				CREATE TRIGGER properties_size_guard
+				BEFORE INSERT ON properties
+				WHEN NEW.bytes_hist IS NOT NULL AND LENGTH(NEW.bytes_hist) != {HIST_BYTES}
+				BEGIN
+					SELECT RAISE(IGNORE);
+				END
+			"""))
+
+	@classmethod
+	def migrate_histograms(cls, engine: sqlalchemy.Engine) -> None:
+		"""Один раз удаляет гистограммы старого формата и освобождает место."""
+		with engine.begin() as conn:
+			version = conn.execute(sqlalchemy.text("PRAGMA user_version")).scalar()
+			if version >= DB_SCHEMA_VERSION:
+				return
+			conn.execute(
+				sqlalchemy.text("DELETE FROM properties WHERE LENGTH(bytes_hist) != :size"),
+				{"size": HIST_BYTES},
+			)
+			conn.execute(sqlalchemy.text(f"PRAGMA user_version = {DB_SCHEMA_VERSION}"))
+		# VACUUM вне транзакции: Dbase.vacuum использует AUTOCOMMIT
+		cls.vacuum()
+
+	@classmethod
+	def cleanup_orphan_properties(cls, engine: sqlalchemy.Engine) -> None:
+		with engine.begin() as conn:
+			conn.execute(sqlalchemy.text(
+				"DELETE FROM properties WHERE thumb_id NOT IN (SELECT id FROM thumbs)"
+			))
 
 	@classmethod
 	def toggle_wal(cls, value: bool):
@@ -134,34 +192,11 @@ class Dbase:
 	@classmethod
 	def vacuum(cls):
 		try:
-			# Добавляем AUTOCOMMIT, чтобы SQLite не открывал транзакцию неявно
+			# AUTOCOMMIT, чтобы SQLite не открывал транзакцию неявно
 			with cls.main_engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
 				conn.execute(sqlalchemy.text("VACUUM"))
 		except Exception as e:
 			print("database vacuum error", e)
-
-	@classmethod
-	def ensure_properties_trigger(cls, engine: sqlalchemy.Engine) -> None:
-		"""Индекс и триггер. Триггер пересоздаётся, чтобы тело всегда было актуальным."""
-		with engine.begin() as conn:
-			conn.execute(sqlalchemy.text(
-				"CREATE INDEX IF NOT EXISTS ix_properties_thumb_id ON properties(thumb_id)"
-			))
-			conn.execute(sqlalchemy.text("DROP TRIGGER IF EXISTS thumbs_delete_properties"))
-			conn.execute(sqlalchemy.text("""
-				CREATE TRIGGER thumbs_delete_properties
-				AFTER DELETE ON thumbs
-				BEGIN
-					DELETE FROM properties WHERE thumb_id = OLD.id;
-				END
-			"""))
-
-	@classmethod
-	def cleanup_orphan_properties(cls, engine: sqlalchemy.Engine) -> None:
-		with engine.begin() as conn:
-			conn.execute(sqlalchemy.text(
-				"DELETE FROM properties WHERE thumb_id NOT IN (SELECT id FROM thumbs)"
-			))
 
 	@classmethod
 	def clear_root_mf(cls):
