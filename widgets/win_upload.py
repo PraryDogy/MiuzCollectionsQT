@@ -1,61 +1,59 @@
 import os
+from collections import deque
+from queue import Empty
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QEvent
-from PyQt6.QtGui import QIcon
+import numpy as np
+from PyQt6.QtCore import QEvent, QSize, Qt, QThreadPool, QTimer, pyqtSignal
+from PyQt6.QtGui import QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QSizePolicy, QVBoxLayout
+from PyQt6.QtWidgets import (QAbstractItemView, QFileDialog, QGridLayout,
+                             QHBoxLayout, QLabel, QListView, QScrollArea,
+                             QSizePolicy, QVBoxLayout, QWidget)
 
 from cfg import JsonData, Static
 from system.items import Mf
 from system.lang import Lng
+from system.multiprocess import ImageArrayItemLoader, ProcessWorker
+from system.runnable import BlurImgBgTask, ImgArrayQImage
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ChoosePathWidget, HoverGroupBox,
                             TitleTextWidget, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, USep, UListWidget, UListWidgetItem)
+                            TransparentWidget, UGroupBox, UListWidget,
+                            UListWidgetItem, UMainWindow, UPushButton, USep)
 from .grid import GridStandart, SquareThumb
 
-import os
-from collections import deque
-from queue import Empty
 
-import numpy as np
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QImage, QPixmap
-from PyQt6.QtWidgets import QGridLayout, QLabel, QScrollArea, QVBoxLayout, QWidget
-
-from system.multiprocess import ImageArrayItemLoader, ProcessWorker
-
-from ._base_widgets import TransparentLabel
+THUMB_SIZE = 100        # размер, который отдаёт загрузчик и занимает квадрат в строке
+ICON_SIZE = THUMB_SIZE  # квадрат миниатюры в строке списка
+ROW_PADDING = 8         # отступы строки по высоте
+THUMB_RADIUS = 8        # скругление углов миниатюры
 
 
-import os
-from collections import deque
-from queue import Empty
-
-import numpy as np
-from PyQt6.QtCore import QSize, Qt, QTimer
-from PyQt6.QtGui import QIcon, QImage, QPixmap
-from PyQt6.QtWidgets import QAbstractItemView, QListView
-
-from system.multiprocess import ImageArrayItemLoader, ProcessWorker
-
-
-THUMB_SIZE = 200
-ICON_SIZE = 64          # размер миниатюры в строке списка
+def empty_icon(size: int) -> QIcon:
+	"""Прозрачный квадрат того же размера, что и готовая миниатюра. Резервирует место."""
+	canvas = QPixmap(size, size)
+	canvas.fill(Qt.GlobalColor.transparent)
+	return QIcon(canvas)
 
 
 class ImageListWidget(UListWidget):
-	"""Список файлов: миниатюра слева, имя справа. Миниатюры грузятся в подпроцессах."""
+	"""Список файлов: миниатюра слева, имя справа.
+
+	Цепочка для каждого файла:
+	ImageArrayItemLoader (подпроцесс) -> ImgArrayQImage (пул) -> BlurImgBgTask (пул) -> QIcon (GUI).
+	"""
 
 	def __init__(self, paths: list[str], max_workers: int | None = None):
 		super().__init__()
 		self.paths = paths
 		self.max_workers = max_workers or min(4, os.cpu_count() or 2)
 		self._pending = deque()
-		self._active: dict[int, ProcessWorker] = {}
+		self._active: dict[int, ProcessWorker] = {}   # загрузка массива в подпроцессе
 		self._items: list[UListWidgetItem] = []
+		self._tasks: dict[int, object] = {}           # задачи в пуле, чтобы не удалились раньше времени
+
+		self._pool = QThreadPool.globalInstance()
 
 		self.setViewMode(QListView.ViewMode.ListMode)
 		self.setIconSize(QSize(ICON_SIZE, ICON_SIZE))
@@ -67,7 +65,8 @@ class ImageListWidget(UListWidget):
 		for idx, path in enumerate(paths):
 			item = UListWidgetItem(self, os.path.basename(path))
 			item.setToolTip(path)
-			item.setSizeHint(QSize(0, ICON_SIZE + 8))
+			item.setSizeHint(QSize(0, ICON_SIZE + ROW_PADDING))
+			item.setIcon(empty_icon(ICON_SIZE))
 			self.addItem(item)
 			self._items.append(item)
 			self._pending.append(idx)
@@ -76,6 +75,8 @@ class ImageListWidget(UListWidget):
 		self._timer.timeout.connect(self._poll)
 		self._timer.start(50)
 		self._start_next()
+
+	# --- этап 1: массив в подпроцессе ---
 
 	def _start_next(self):
 		while self._pending and len(self._active) < self.max_workers:
@@ -104,18 +105,38 @@ class ImageListWidget(UListWidget):
 			del self._active[idx]
 
 			if item is not None:
-				try:
-					from system.utils import Utils
-					qimage = Utils.qimage_from_array(item.image_array)
-					pixmap = QPixmap.fromImage(qimage)
-					self._items[idx].setIcon(QIcon(pixmap))
-				except Exception:
-					pass
+				self._run_qimage_task(idx, item.image_array)
 
 		self._start_next()
 
-		if not self._active and not self._pending:
+		if not self._active and not self._pending and not self._tasks:
 			self._timer.stop()
+
+	# --- этап 2: массив -> QImage в пуле потоков ---
+
+	def _run_qimage_task(self, idx: int, array):
+		task = ImgArrayQImage(array)
+		task.sigs.finished_.connect(lambda qimage, i=idx: self._on_qimage(i, qimage))
+		self._tasks[idx] = task
+		self._pool.start(task)
+
+	# --- этап 3: фон и композиция в пуле потоков ---
+
+	def _on_qimage(self, idx: int, qimage):
+		self._tasks.pop(idx, None)
+		if qimage is None or qimage.isNull():
+			return
+		task = BlurImgBgTask(qimage, size=(ICON_SIZE, ICON_SIZE), radius=THUMB_RADIUS)
+		task.sigs.finished_.connect(lambda final, i=idx: self._on_final(i, final))
+		self._tasks[idx] = task
+		self._pool.start(task)
+
+	# --- готовая миниатюра (GUI-поток) ---
+
+	def _on_final(self, idx: int, qimage):
+		self._tasks.pop(idx, None)
+		if qimage is not None and not qimage.isNull():
+			self._items[idx].setIcon(QIcon(QPixmap.fromImage(qimage)))
 
 	def stop(self):
 		"""Останавливает загрузку. Вызвать в closeEvent окна."""
@@ -124,6 +145,7 @@ class ImageListWidget(UListWidget):
 		for worker in self._active.values():
 			worker.terminate_join()
 		self._active.clear()
+		self._tasks.clear()
 
 
 class ClickablePathWidget(ChoosePathWidget):
