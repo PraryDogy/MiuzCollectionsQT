@@ -1143,7 +1143,7 @@ class VerticalWindow(UMainWindow):
 
 		self.setFixedWidth(self.WIDTH)
 
-	def _adjust_window_size(self, text_wid: TransparentLabel, text: str):
+	def adjust_window_size(self, text_wid: TransparentLabel, text: str):
 		text_wid.setWordWrap(True)
 
 		# ширина, доступная тексту: окно минус отступы central_layout и icon_text_layout
@@ -1164,6 +1164,30 @@ class VerticalWindow(UMainWindow):
 		titlebar_h = max(self.height() - self.centralWidget().height(), 0)
 		self.setFixedHeight(self.centralWidget().sizeHint().height() + titlebar_h)
 
+	def adjust_window_size_single_line(self, text_wid: TransparentLabel, text: str):
+		"""Текст в одну строку, без обрезки. Ширина окна растёт под длину текста."""
+		text_wid.setWordWrap(False)
+		text_wid.set_elide(False)
+		text_wid.setText(text)
+
+		cm = self.central_layout.contentsMargins()
+		im = self.icon_text_layout.contentsMargins()
+		extra_w = cm.left() + cm.right() + im.left() + im.right()
+
+		# ширина текста в пикселях шрифта метки, с запасом на отступы самой метки
+		text_w = text_wid.fontMetrics().horizontalAdvance(text) + 4
+		# окно не уже базовой ширины, но и не уже самого текста
+		win_w = max(self.WIDTH, text_w + extra_w)
+
+		self.setFixedWidth(win_w)
+		text_wid.setFixedWidth(win_w - extra_w)
+		text_wid.setFixedHeight(text_wid.fontMetrics().height())
+
+		self.icon_text_layout.activate()
+		self.central_layout.activate()
+		titlebar_h = max(self.height() - self.centralWidget().height(), 0)
+		self.setFixedHeight(self.centralWidget().sizeHint().height() + titlebar_h)
+
 
 class ConfirmWindow(VerticalWindow):
 	ok_clicked = pyqtSignal()
@@ -1178,18 +1202,18 @@ class ConfirmWindow(VerticalWindow):
 
 		self._setup_ui(text, danger)
 		self.central_layout.activate()
-		self._adjust_window_size(self.text_wid, text)
+		self.adjust_window_size(self.description_label, text)
 
 	def _setup_ui(self, text: str, danger: bool):
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		self.svg_widget.setFixedSize(65, 65)
 		self.icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
-		self.text_wid = TransparentLabel(text)
-		self.text_wid.set_style("gray", "regular", "regular")
-		self.text_wid.set_selectable(True)
-		self.text_wid.setWordWrap(True)
-		self.icon_text_layout.addWidget(self.text_wid)
+		self.description_label = TransparentLabel(text)
+		self.description_label.set_style("gray", "regular", "regular")
+		self.description_label.set_selectable(True)
+		self.description_label.setWordWrap(True)
+		self.icon_text_layout.addWidget(self.description_label)
 
 		ok_cls = RedButton if danger else ActiveButton
 		self.ok_btn = ok_cls(Lng.confirm)
@@ -1228,7 +1252,7 @@ class WarningWindow(VerticalWindow):
 
 		self._setup_ui(text, text_edit_text)
 		self.central_layout.activate()
-		self._adjust_window_size(self.text_wid, text)
+		self.adjust_window_size(self.text_wid, text)
 
 	def _setup_ui(self, text: str, text_edit_text: str):
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))

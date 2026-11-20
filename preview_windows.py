@@ -172,7 +172,7 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         # серверы и файлы
         ("Серверы", lambda: _new("widgets.win_servers", "ServersWin")),
         ("Вход на сервер", lambda: _new("widgets.win_servers", "LoginWin")),
-        ("Загрузка файлов", lambda: _new("widgets.win_upload", "UploadWin", mf, "", copy_src)),
+        ("Загрузка файлов", lambda: _new("widgets.win_upload", "UploadWin", copy_src)),
         ("Копирование (песочница)", lambda: _new("widgets.win_copy_files", "WinCopyFiles",
                                                  target_dir=copy_dest, files_to_copy=copy_src)),
         ("Замена файла", lambda: _new("widgets.win_copy_files", "ReplaceWin", "sample_red.jpg", True)),

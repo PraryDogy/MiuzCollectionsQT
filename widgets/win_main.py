@@ -462,16 +462,12 @@ class WinMain(UMainWindow):
 	def upload_files(self, dropped_files: list[str]):
 
 		def fin():
-			dest = Mf.current_mf.create_abs_path(Dynamic.current_dir)
 			self.upload_win.deleteLater()
 			self.paste_files(dropped_files, dest)
 
 		dropped_files = filter_supported(dropped_files)
-		self.upload_win = UploadWin(
-			mf=Mf.current_mf,
-			current_dir=Dynamic.current_dir,
-			files_to_copy=dropped_files
-		)
+		dest = Mf.current_mf.create_abs_path(Dynamic.current_dir)
+		self.upload_win = UploadWin(dest)
 		self.upload_win.ok_clicked.connect(fin)
 		self.upload_win.center_to_parent(self)
 		self.upload_win.show()
