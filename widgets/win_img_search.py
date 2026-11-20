@@ -112,7 +112,7 @@ class SliderWidget(TransparentWidget):
 	def __init__(self):
 		super().__init__()
 
-		base_value = 50
+		base_value = 30
 		self.current_value = base_value
 
 		self.h_layout = QHBoxLayout(self)
@@ -123,7 +123,7 @@ class SliderWidget(TransparentWidget):
 		self.slider.setOrientation(
 			Qt.Orientation.Horizontal
 		)
-		self.slider.setMinimum(30)
+		self.slider.setMinimum(0)
 		self.slider.setMaximum(100)
 		self.slider.setValue(base_value)
 
