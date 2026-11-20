@@ -43,11 +43,16 @@ class TransparentLabel(QLabel):
 		self._context_menu_enabled = False
 		self._underline = False
 
-	def set_style(self, color: Literal["regular", "gray", "accent"], size: Literal["regular", "small", "big"], bold: bool):
+	def set_style(
+			self,
+			color: Literal["regular", "gray", "accent"],
+			size: Literal["regular", "small", "big"],
+			weight: Literal["regular", "bold"]
+	):
 		values = {
 			"state": color,
 			"text_size": size,
-			"text_bold": "true" if bold else "false",
+			"text_weight": weight,
 		}
 		for k, v in values.items():
 			self.setProperty(k, v)
@@ -912,7 +917,7 @@ class TitleWidget(TransparentWidget):
 		if descr:
 			self.description_widget = TransparentLabel(descr)
 			self.description_widget.setWordWrap(True)
-			self.description_widget.set_style("gray", "regular", False)
+			self.description_widget.set_style("gray", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
 
 	def add_title_button(self, widget: TransparentButton):
@@ -1179,7 +1184,7 @@ class ConfirmWindow(VerticalWindow):
 		self.icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.text_wid = TransparentLabel(text)
-		self.text_wid.set_style("gray", "regular", False)
+		self.text_wid.set_style("gray", "regular", "regular")
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
@@ -1231,7 +1236,7 @@ class WarningWindow(VerticalWindow):
 		)
 
 		self.text_wid = TransparentLabel(text)
-		self.text_wid.set_style("gray", "regular", False)
+		self.text_wid.set_style("gray", "regular", "regular")
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
 		self.icon_text_layout.addWidget(self.text_wid)
@@ -1283,7 +1288,7 @@ class InputTextWin(UMainWindow):
 			svg_text_layout.addWidget(svg_icon)
 
 		self.description_label = TransparentLabel(description)
-		self.description_label.set_style("gray", "regular", False)
+		self.description_label.set_style("gray", "regular", "regular")
 		svg_text_layout.addWidget(self.description_label)
 
 		self.central_layout.addSpacing(10)
@@ -1612,12 +1617,12 @@ class ChoosePathWidget(TransparentFrame):
 		text_lay.setSpacing(0)
 
 		self.status_label = TransparentLabel("")
-		self.status_label.set_style("regular", "regular", True)
+		self.status_label.set_style("regular", "regular", "bold")
 		self.status_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		text_lay.addWidget(self.status_label)
 
 		self.path_label = TransparentLabel("")
-		self.path_label.set_style("regular", "regular", False)
+		self.path_label.set_style("regular", "regular", "regular")
 		self.path_label.set_elide(True)
 		self.path_label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		text_lay.addWidget(self.path_label)

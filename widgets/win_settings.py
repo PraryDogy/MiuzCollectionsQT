@@ -712,7 +712,7 @@ class IgnoreListWin(UMainWindow):
 		self.group_lay.addWidget(self.title_widget)
 
 		self.descr_widget = TransparentLabel(text=Lng.ignore_list_descr_short)
-		self.descr_widget.set_style("gray", "regular", False)
+		self.descr_widget.set_style("gray", "regular", "regular")
 		self.descr_widget.setWordWrap(True)
 		self.group_lay.addWidget(self.descr_widget)
 

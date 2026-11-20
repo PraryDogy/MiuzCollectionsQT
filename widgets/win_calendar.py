@@ -81,7 +81,7 @@ class CalendarDayInactive(TransparentLabel):
 	def __init__(self, text: str, date: QDate):
 		super().__init__(text)
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.set_style("gray", "regular", False)
+		self.set_style("gray", "regular", "regular")
 		self.date = date
 
 	def mouseReleaseEvent(self, ev: QMouseEvent):
@@ -191,7 +191,7 @@ class WinCalendar(UMainWindow):
 		for col in range(7):
 			week_name = self.readable_date.q_locale.dayName(col + 1, self.readable_date.q_locale.FormatType.ShortFormat)
 			lbl_day = TransparentLabel(week_name.capitalize())
-			lbl_day.set_style("gray", "regular", False)
+			lbl_day.set_style("gray", "regular", "regular")
 			lbl_day.setAlignment(Qt.AlignmentFlag.AlignCenter)
 			lbl_day.setFixedSize(*self.cell_size)
 			header_layout.addWidget(lbl_day)

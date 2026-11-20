@@ -43,7 +43,7 @@ class DestinyFolderWidget(HoverGroupBox):
 		content_lay.addWidget(self.title_label)
 
 		description = TransparentLabel(self.get_plural_text(len(files_to_copy)) + "\n" + Lng.upload_files_description)
-		description.set_style("gray", "regular", False)
+		description.set_style("gray", "regular", "regular")
 		description.setWordWrap(True)
 		description.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 		content_lay.addWidget(description)

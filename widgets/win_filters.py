@@ -126,7 +126,7 @@ class DatesWidget(UGroupBox):
 		self.date_btns_layout.addSpacing(10)
 
 		from_label = TransparentLabel(Lng.start_date)
-		from_label.set_style("gray", "regular", False)
+		from_label.set_style("gray", "regular", "regular")
 		self.date_btns_layout.addWidget(from_label)
 
 		self.left_calendar_tag = CalendarTag()
@@ -136,7 +136,7 @@ class DatesWidget(UGroupBox):
 		self.date_btns_layout.addSpacing(10)
 
 		to_label = TransparentLabel(Lng.end_date)
-		to_label.set_style("gray", "regular", False)
+		to_label.set_style("gray", "regular", "regular")
 		self.date_btns_layout.addWidget(to_label)
 
 		self.right_calendar_tag = CalendarTag()
@@ -430,14 +430,14 @@ class TagsWidget(UGroupBox):
 		self.v_lay.addWidget(self.title_widget)
 
 		st_tags_title = TransparentLabel(Lng.standart_tags)
-		st_tags_title.set_style("gray", "regular", False)
+		st_tags_title.set_style("gray", "regular", "regular")
 		self.v_lay.addWidget(st_tags_title)
 
 		self.standart_tags = StandartTags(self.pending)
 		self.v_lay.addWidget(self.standart_tags)
 
 		user_tags_title = TransparentLabel(Lng.user_tags)
-		user_tags_title.set_style("gray", "regular", False)
+		user_tags_title.set_style("gray", "regular", "regular")
 		self.v_lay.addWidget(user_tags_title)
 
 		self.user_tags = UserTags(self.pending)

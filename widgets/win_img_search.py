@@ -55,11 +55,11 @@ class ProgressWin(UMainWindow):
 		self.labels_layout.addStretch()
 
 		self.please_wait_label = TransparentLabel(Lng.please_wait)
-		self.please_wait_label.set_style("regular", "regular", True)
+		self.please_wait_label.set_style("regular", "regular", "bold")
 		self.labels_layout.addWidget(self.please_wait_label)
 
 		self.text_label = TransparentLabel("")
-		self.text_label.set_style("gray", "regular", False)
+		self.text_label.set_style("gray", "regular", "regular")
 		self.labels_layout.addWidget(self.text_label)
 
 		self.labels_layout.addStretch()
@@ -246,7 +246,7 @@ class WinImgSearchDropWidget(ImageDropFrame):
 		)
 
 		self.descr_label = TransparentLabel("")
-		self.descr_label.set_style("gray", "regular", False)
+		self.descr_label.set_style("gray", "regular", "regular")
 		self.descr_label.set_elide(True, ignore_width=False)
 		self.descr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.v_layout.addWidget(

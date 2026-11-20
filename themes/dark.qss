@@ -907,7 +907,11 @@ TransparentLabel[state="gray"] {
     color: #7b8792;
 }
 
-TransparentLabel[text_bold="true"] {
+TransparentLabel[text_weight="regular"] {
+    font-weight: normal;
+}
+
+TransparentLabel[text_weight="bold"] {
     font-weight: bold;
 }
 

@@ -26,7 +26,7 @@ class AboutWin(VerticalWindow):
 		self.set_close_only()
 
 		icon = TransparentLabel("")
-		icon.set_style("gray", "regular", False)
+		icon.set_style("gray", "regular", "regular")
 		qimage = QImage(str(Static.APP_ICONS / "icon.png"))
 		qimage_saled = Utils.scale_qimage_dpr(
 			qimage=qimage,
@@ -36,7 +36,7 @@ class AboutWin(VerticalWindow):
 		self.icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		lbl = TransparentLabel(self.INFO_TEXT)
-		lbl.set_style("gray", "regular", False)
+		lbl.set_style("gray", "regular", "regular")
 		lbl.set_selectable(True)
 		self.icon_text_layout.addWidget(lbl)
 

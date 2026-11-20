@@ -39,7 +39,7 @@ class PathItem(TransparentWidget):
 		item_layout.addWidget(self.img_wid)
 
 		self.text_wid = TransparentLabel(text=name)
-		self.text_wid.set_style("gray", "small", False)
+		self.text_wid.set_style("gray", "small", "regular")
 		self.collapse()
 		item_layout.addWidget(self.text_wid)
 
@@ -135,11 +135,11 @@ class ProgressWidget(TransparentWidget):
 
 		# Путь показывается полностью, без обрезки
 		self.alias_label = TransparentLabel("")
-		self.alias_label.set_style("gray", "small", False)
+		self.alias_label.set_style("gray", "small", "regular")
 
 		# Статус идёт сразу за путём
 		self.status_label = TransparentLabel("")
-		self.status_label.set_style("gray", "small", False)
+		self.status_label.set_style("gray", "small", "regular")
 
 		self.h_layout = QHBoxLayout(self)
 		self.h_layout.setContentsMargins(0, 0, 0, 0)
@@ -167,8 +167,8 @@ class ProgressWidget(TransparentWidget):
 		self.timer.stop()
 		alias, text = self.scan_progress_parts(progress)
 		self._set_texts(alias, text)
-		self.alias_label.set_style("regular", "small", True)
-		self.status_label.set_style("regular", "small", True)
+		self.alias_label.set_style("regular", "small", "bold")
+		self.status_label.set_style("regular", "small", "bold")
 
 		if progress.kind == "indexing":
 			self.set_green_checkmark.emit()
@@ -181,8 +181,8 @@ class ProgressWidget(TransparentWidget):
 		"""Запуск сканера до первого прогресса."""
 		self.timer.stop()
 		self._set_texts("", Lng.loading)
-		self.alias_label.set_style("gray", "small", False)
-		self.status_label.set_style("gray", "small", False)
+		self.alias_label.set_style("gray", "small", "regular")
+		self.status_label.set_style("gray", "small", "regular")
 
 		self.set_arrow_terminal.emit()
 
@@ -190,8 +190,8 @@ class ProgressWidget(TransparentWidget):
 		"""Обратный отсчёт до следующего сканирования."""
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self._set_texts("", self._timer_text())
-		self.alias_label.set_style("gray", "small", False)
-		self.status_label.set_style("gray", "small", False)
+		self.alias_label.set_style("gray", "small", "regular")
+		self.status_label.set_style("gray", "small", "regular")
 		self.set_arrow_terminal.emit()
 		self.timer.start(1000)
 
@@ -199,8 +199,8 @@ class ProgressWidget(TransparentWidget):
 		"""Пустое состояние без таймера."""
 		self.timer.stop()
 		self._set_texts("", "")
-		self.alias_label.set_style("gray", "small", False)
-		self.status_label.set_style("gray", "small", False)
+		self.alias_label.set_style("gray", "small", "regular")
+		self.status_label.set_style("gray", "small", "regular")
 		self.set_arrow_terminal.emit()
 
 	# --- Внутреннее ---
