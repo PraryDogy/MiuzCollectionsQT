@@ -16,6 +16,7 @@ from system.runnable import URunnable, UThreadPool
 from ._base_widgets import (ConfirmWindow, MfAliasWidget, MfPathWidget,
                             RowArrowWidget, SaveRowArrowWidget, UGroupBox,
                             UMainWindow, UMenu, UPushButton)
+from .win_settings import NewMfWin
 
 
 def restart_app():
@@ -49,121 +50,8 @@ class ZipTask(URunnable):
 
 
 
-class FirstLoadWin(UMainWindow):
-	def __init__(self):
-		super().__init__()
-		self.setFixedWidth(400)
-		self.set_always_on_top()
-		self.set_close_only()
-		UThreadPool.init()
-		Lng.init_lang(0)
-		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.init_ui()
-		self.adjustSize()
-		# self.setFixedHeight(self.height())
-
-	def remove_ui(self):
-		while self.central_layout.count():
-			item = self.central_layout.takeAt(0)
-			widget = item.widget()
-			if widget:
-				widget.deleteLater()
-
-	def init_ui(self):
-		self.setWindowTitle(Lng.settings)
-		self.init_lang_widget()
-		self.init_mf_alias_widget()
-		self.init_path_widget()
-		self.init_last_block()
-
-	def change_language(self, value: int):
-		Lng.init_lang(value)
-		self.remove_ui()
-		self.init_ui()
-
-	def init_lang_widget(self):
-		if Lng.CURRENT_LNG_INDEX == 0:
-			lng_btn_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
-		else:
-			lng_btn_icon  = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
-
-		# Сохраняем ссылку в self.lng_container
-		self.lng_container = UGroupBox()
-		self.central_layout.addWidget(self.lng_container)
-		
-		lng_layout = QHBoxLayout(self.lng_container)
-		lng_layout.setContentsMargins(0, 0, 0, 0)
-		lng_layout.setSpacing(10)
-
-		lng_wid = RowArrowWidget(Lng.language_max)
-		lng_wid.set_left_icon(Static.COLOR_ICONS / "language.svg")
-		lng_wid.hide_arrow()
-		lng_layout.addWidget(lng_wid)
-
-		lng_icons = (
-			QIcon(str(Static.COLOR_ICONS / "rus_flag.svg")),
-			QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
-		)
-
-		lng_menu = UMenu(parent=self)
-		for value in (0, 1):
-			action = QAction(Lng.lng_menu_rus, lng_menu)
-			action.setIcon(lng_icons[value])
-			action.setIconVisibleInMenu(True)
-			action.triggered.connect(lambda e, v=value: self.change_language(v))
-			lng_menu.addAction(action)
-
-		lng_btn = UPushButton()
-		lng_btn.setFixedWidth(100)
-		lng_btn.setMenu(lng_menu)
-		lng_btn.setIcon(lng_btn_icon)
-		lng_layout.addWidget(lng_btn)
-
-		# self.lng_container.adjustSize()
-
-	def init_mf_alias_widget(self):
-		self.mf_alias_widget = MfAliasWidget()
-		self.mf_alias_widget.changed.connect(
-			lambda: self.save_widget.show_warning()
-		)
-		self.central_layout.addWidget(self.mf_alias_widget)
-
-	def init_path_widget(self):
-
-		def mf_path_changed():
-			if self.path_widget.draft_mf_path:
-				basename = os.path.basename(self.path_widget.draft_mf_path).capitalize()
-				self.mf_alias_widget.line_edit.setText(basename)
-			self.path_widget.draft_mf_path
-			self.save_widget.show_warning()
-
-		self.path_widget = MfPathWidget()
-		self.path_widget.changed.connect(
-			lambda: mf_path_changed()
-		)
-		self.central_layout.addWidget(self.path_widget)
-
-	def init_last_block(self):
-		self.last_block_container = UGroupBox()
-		self.central_layout.addWidget(self.last_block_container)
-
-		last_block_layout = QVBoxLayout(self.last_block_container)
-		last_block_layout.setContentsMargins(0, 0, 0, 0)
-		last_block_layout.setSpacing(0)
-
-		if Static.MIUZ_ZIP.exists():
-			self.copy_zip_widget = RowArrowWidget(
-				Lng.miuz_diamonds
-			)
-			self.copy_zip_widget.set_left_icon(Static.COLOR_ICONS / "miuz.svg")
-			self.copy_zip_widget.clicked.connect(
-				lambda: self.copy_zip_cmd()
-			)
-			last_block_layout.addWidget(self.copy_zip_widget)
-
-		self.save_widget = SaveRowArrowWidget()
-		self.save_widget.clicked.connect(lambda: self.save_cmd())
-		last_block_layout.addWidget(self.save_widget)
+class FirstLoadWin(NewMfWin):
+	pass
 
 	def copy_zip_cmd(self):
 
