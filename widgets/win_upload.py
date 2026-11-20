@@ -72,8 +72,8 @@ class UploadWin(UMainWindow):
 		title.description_widget.setWordWrap(False)
 		self.group_layout.addWidget(title)
 
-		self.files_widget = self._build_files_list(files_to_copy)
-		self.group_layout.addWidget(self.files_widget)
+		# self.files_widget = self._build_files_list(files_to_copy)
+		# self.group_layout.addWidget(self.files_widget)
 
 		self.path_widget = ClickablePathWidget()
 		self.path_widget.set_good(self.current_dir, lng=Lng.chosen_folder)
