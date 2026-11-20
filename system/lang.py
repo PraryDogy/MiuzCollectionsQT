@@ -78,7 +78,7 @@ class Lng:
 	menu = ("Меню", "Menu")
 	calendar = ("Календарь", "Calendar")
 	favorites = ("Избранное", "Favorites")
-	favorite_servers = ("Избранные серверы", "Favorite servers")
+	favorite_servers = ("Подключения", "Connections")
 	servers = ("Серверы", "Servers")
 	cancel = ("Отмена", "Cancel")
 	confirmation = ("Подтверждение", "Confirmation")
