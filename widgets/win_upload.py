@@ -3,17 +3,19 @@ import os
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QIcon
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QVBoxLayout, QSizePolicy
+from PyQt6.QtWidgets import QFileDialog, QHBoxLayout, QSizePolicy, QVBoxLayout
 
 from cfg import JsonData, Static
 from system.items import Mf
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, HoverGroupBox,
-                            ChoosePathWidget, TitleTextWidget, TransparentLabel,
+from ._base_widgets import (ActiveButton, ChoosePathWidget, HoverGroupBox,
+                            TitleTextWidget, TitleWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow,
-                            UPushButton, USep, TitleWidget)
+                            UPushButton, USep)
+from .grid import GridStandart, SquareThumb
+
 
 
 
