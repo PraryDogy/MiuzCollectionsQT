@@ -208,6 +208,11 @@ class Launcher(UMainWindow):
                 pass             # окно уже удалено
         self.opened.clear()
 
+    def keyPressEvent(self, a0):
+        if a0.key() == Qt.Key.Key_Escape:
+            self.close_all()
+        return super().keyPressEvent(a0)
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Отладочный запуск окон с темой")
