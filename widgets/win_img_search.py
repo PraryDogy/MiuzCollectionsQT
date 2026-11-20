@@ -31,32 +31,41 @@ class ProgressWin(UMainWindow):
 
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setWindowTitle(Lng.progress)
+		self.setWindowTitle(Lng.image_search)
+		self.show_titlebar_sep()
 
 		self.stop_icon = QIcon(str(Static.GRAY_ICONS / "square.svg"))
 
-		wrapper = UGroupBox()
-		self.central_layout.addWidget(wrapper)
-		wrapper_lay = QVBoxLayout(wrapper)
-		wrapper_lay.setContentsMargins(5, 5, 5, 5)
-		wrapper_lay.setSpacing(5)
-
 		self.text_container = TransparentWidget()
-		wrapper_lay.addWidget(self.text_container)
+		self.central_layout.addWidget(self.text_container)
+		self.h_lay = QHBoxLayout(self.text_container)
+		self.h_lay.setContentsMargins(0, 0, 0, 0)
+		self.h_lay.setSpacing(10)
 
-		self.text_layout = QHBoxLayout(self.text_container)
-		self.text_layout.setContentsMargins(5, 0, 5, 0)
-		self.text_layout.setSpacing(10)
+		self.svg_icon = QSvgWidget(str(Static.COLOR_ICONS / "clock.svg"))
+		self.svg_icon.setFixedSize(40, 40)
+		self.h_lay.addWidget(self.svg_icon, alignment=Qt.AlignmentFlag.AlignVCenter)
 
-		self.svg_icon = QSvgWidget(str(Static.GRAY_ICONS / "image_icon.svg"))
-		self.svg_icon.setFixedSize(28, 28)
-		self.text_layout.addWidget(self.svg_icon)
+		self.labels_container = TransparentWidget()
+		self.labels_layout = QVBoxLayout(self.labels_container)
+		self.labels_layout.setContentsMargins(0, 0, 0, 0)
+		self.labels_layout.setSpacing(0)
+		self.h_lay.addWidget(self.labels_container)
+
+		self.labels_layout.addStretch()
+
+		self.please_wait_label = TransparentLabel(Lng.please_wait)
+		self.please_wait_label.set_style("regular", "regular", True)
+		self.labels_layout.addWidget(self.please_wait_label)
 
 		self.text_label = TransparentLabel("")
-		self.text_layout.addWidget(self.text_label)
+		self.text_label.set_style("gray", "regular", False)
+		self.labels_layout.addWidget(self.text_label)
 
-		self.cancel_btn = UPushButton(Lng.stop)
-		self.cancel_btn.setIcon(self.stop_icon)
+		self.labels_layout.addStretch()
+
+		self.cancel_btn = UPushButton(Lng.cancel)
+		# self.cancel_btn.setIcon(self.stop_icon)
 		self.cancel_btn.clicked.connect(self.stop_img_search.emit)
 		self.central_layout.addWidget(self.cancel_btn)
 
