@@ -66,7 +66,7 @@ class ProcessWorker(BaseProcessWorker):
 
 class ImageArrayItemLoader:
 	@staticmethod
-	def start(src: str, queue: Queue, size: int = None):
+	def start(src: str, size: int | None, queue: Queue):
 		array_item = ImageArrayItem(src)
 		array_item.load()
 		array_item.load_shared_memory()
@@ -74,8 +74,6 @@ class ImageArrayItemLoader:
 			array_item.resize(size)
 		queue.put(array_item)
 		array_item.shm.close()
-
-		print(size)
 
 
 class OneFileInfo:
