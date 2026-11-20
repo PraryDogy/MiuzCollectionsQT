@@ -116,9 +116,11 @@ class WinCalendar(UMainWindow):
 		if date is None or not date.isValid():
 			self.selected_date: QDate = self.date_now
 			self.view_date = self.date_now
+			self.date_on_load = self.date_now
 		else:
 			self.selected_date: QDate = date
 			self.view_date = date
+			self.date_on_load = date
 
 		self.setWindowTitle(Lng.calendar)
 		self.set_close_only()
@@ -148,9 +150,6 @@ class WinCalendar(UMainWindow):
 		self.nav_layout.setContentsMargins(0, 7, 0, 7)
 		self.nav_layout.setSpacing(5)
 		self.nav_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-
-
 
 		self.btn_prev = CalendarSvgNavi(
 			Static.GRAY_ICONS / "arrow_left.svg",
@@ -247,8 +246,8 @@ class WinCalendar(UMainWindow):
 
 	def reset_button_cmd(self):
 		# Сбрасываем выделение и возвращаем сетку на текущий месяц
-		self.selected_date = self.date_now
-		self.view_date = self.date_now
+		self.selected_date = self.date_on_load
+		self.view_date = self.date_on_load
 		self.update_calendar()
 
 	def create_calendar_widget(self):
