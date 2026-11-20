@@ -15,6 +15,7 @@ from PyQt6.QtGui import QImage
 from cfg import Static
 
 from .image_reader import ImageReader
+from .utils import Utils
 
 
 class RootProbe:
@@ -423,7 +424,7 @@ class ImageArrayItem:
 	def resize(self, size: int) -> np.ndarray | None:
 		import cv2
 		if self.image_array is None:
-			self.image_array = self.get_broken_image()
+			self.image_array = Utils.get_broken_image()
 
 		try:
 			h, w = self.image_array.shape[:2]
@@ -439,7 +440,7 @@ class ImageArrayItem:
 
 		except Exception as e:
 			print(f"resize error: {e}")
-			self.image_array = self.get_broken_image()
+			self.image_array = Utils.get_broken_image()
 
 		return self.image_array
 
