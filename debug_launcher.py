@@ -35,6 +35,7 @@ THEME_CHOICES = [
     ("Авто", "auto"),
 ]
 
+YY = 100
 
 def reload_window_modules() -> None:
     """Перечитывает модули окон из widgets/, чтобы подхватить правки без перезапуска.
@@ -168,6 +169,7 @@ class Launcher(UMainWindow):
 
         win.show()
         self.center_screen(win)                   # центрируем после show(): размер окна уже известен
+        self.move(self.x(), YY)
         win.raise_()
         self.opened.append(win)
         print(f"[ок] {name}", flush=True)
@@ -239,6 +241,7 @@ def main() -> int:
 
     launcher = Launcher(factories)
     launcher.center_screen(launcher)
+    launcher.move(launcher.x(), YY)
     launcher.show()
     if args.all:
         launcher.open_all()
