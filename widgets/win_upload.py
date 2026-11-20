@@ -65,7 +65,8 @@ class UploadWin(UMainWindow):
 		self.group_layout.setSpacing(8)
 		self.central_layout.addWidget(self.group_box)
 
-		title = TitleWidget(title=Lng.upload_files, sep=False)
+		title = TitleWidget(title=Lng.upload_files, descr=Lng.upload_files_description)
+		title.description_widget.setWordWrap(False)
 		self.group_layout.addWidget(title)
 
 		self.files_widget = self._build_files_list(files_to_copy)
