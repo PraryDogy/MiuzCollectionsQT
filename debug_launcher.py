@@ -20,6 +20,7 @@ import sys
 import traceback
 
 from PyQt6.QtCore import QEvent, QObject, Qt
+from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout
 
 import preview_windows as pw
@@ -142,9 +143,17 @@ class Launcher(UMainWindow):
             f"Тема: {JsonData.theme}, стиль приложения: {len(app.styleSheet())} симв."
         )
 
+    def center_screen(self, win) -> None:
+        """Центрирует окно на главном экране (та же логика, что в методе center_screen)."""
+        screen = QGuiApplication.primaryScreen().geometry()
+        size = win.geometry()
+        x = (screen.width() - size.width()) // 2
+        y = (screen.height() - size.height()) // 2
+        win.move(x, y)
+
     def open_one(self, index: int):
         name, factory = self.factories[index]
-        reload_window_modules()          # свежий код окна при каждом открытии
+        reload_window_modules()              # свежий код окна при каждом открытии
         try:
             win = factory()
         except Exception:
@@ -154,12 +163,11 @@ class Launcher(UMainWindow):
 
         # UMainWindow по умолчанию модальное: снимаем, чтобы окна не блокировали друг друга
         win.setWindowModality(Qt.WindowModality.NonModal)
-        close_filter = CloseFilter(win)   # parent=win: фильтр живёт вместе с окном
+        close_filter = CloseFilter(win)      # parent=win: фильтр живёт вместе с окном
         win.installEventFilter(close_filter)
 
-        x, y = self._next_slot()
         win.show()
-        win.move(x, y)                   # ставим после show(): окно не должно сдвигаться
+        self.center_screen(win)                   # центрируем после show(): размер окна уже известен
         win.raise_()
         self.opened.append(win)
         print(f"[ок] {name}", flush=True)
@@ -225,7 +233,7 @@ def main() -> int:
     factories = pw.build_factories(root, mf, items, args.main, args.geo)
 
     launcher = Launcher(factories)
-    launcher.move(40, 40)
+    launcher.center_screen(launcher)
     launcher.show()
     if args.all:
         launcher.open_all()
