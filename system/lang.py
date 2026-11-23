@@ -509,8 +509,8 @@ class Lng:
 		"Skip"
 	)
 	upload_files_description = (
-		"Файлы будут загружены в указанную папку.",
-		"Files will be uploaded to the specified folder.",
+		"Файлы загрузятся в папку:",
+		"Files will be uploaded to:",
 	)
 	upload_files = (
 		"Загрузка файлов",

@@ -1122,21 +1122,33 @@ class WinProgressbar(UMainWindow):
 
 
 class VerticalWindow(UMainWindow):
+	WIDTH = 280  # одна ширина на все диалоги, подклассы могут переопределить
 
 	def __init__(self):
 		super().__init__()
-		self.setFixedWidth(280)
+		self.setFixedWidth(self.WIDTH)
 		self.set_always_on_top()
 		self.set_close_only()
-
 		self.show_titlebar_sep()
-
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.central_layout.setContentsMargins(10, 0, 10, 10)
-		self.central_layout.setSpacing(5)
+		self.central_layout.setSpacing(6)
+
+	def fit_label(self, label: QLabel):
+		# ширина, доступная лейблу: окно минус поля central_layout
+		cm = self.central_layout.contentsMargins()
+		label_w = self.WIDTH - cm.left() - cm.right()
+
+		# реальная высота текста с переносом при этой ширине
+		label.setWordWrap(True)
+		label.setFixedWidth(label_w)
+		label_h = label.heightForWidth(label_w)
+		if label_h <= 0:
+			label_h = label.sizeHint().height()
+		label.setFixedHeight(label_h)
 
 	def finish_layout(self):
-		# высота окна считается по содержимому, с учётом переноса текста
+		# все размеры уже зафиксированы, adjustSize считает высоту окна
+		self.central_layout.activate()
 		self.adjustSize()
 
 
@@ -1147,6 +1159,7 @@ class ConfirmWindow(VerticalWindow):
 	def __init__(self, text: str, danger: bool = False):
 		super().__init__()
 		self.setWindowTitle(Lng.attention)
+
 		self._setup_ui(text, danger)
 		self.finish_layout()
 
@@ -1158,11 +1171,9 @@ class ConfirmWindow(VerticalWindow):
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.set_selectable(True)
-		self.description_label.setWordWrap(True)
 		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.central_layout.addWidget(self.description_label)
-
-		self.central_layout.addSpacing(5)
+		self.fit_label(self.description_label)
 
 		ok_cls = RedButton if danger else ActiveButton
 		self.ok_btn = ok_cls(Lng.confirm)
@@ -1194,8 +1205,6 @@ class WarningWindow(VerticalWindow):
 
 	def __init__(self, text: str, text_edit_text: str = None):
 		super().__init__()
-		self.set_always_on_top()
-		self.set_close_only()
 		self.show_titlebar_sep()
 		self.setWindowTitle(Lng.attention)
 
@@ -1210,16 +1219,14 @@ class WarningWindow(VerticalWindow):
 		self.text_wid = TransparentLabel(text)
 		self.text_wid.set_style("gray", "regular", "regular")
 		self.text_wid.set_selectable(True)
-		self.text_wid.setWordWrap(True)
 		self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.central_layout.addWidget(self.text_wid)
+		self.fit_label(self.text_wid)
 
 		if text_edit_text:
 			self.text_edit_widget = UTextEdit()
 			self.text_edit_widget.setPlainText(text_edit_text)
 			self.central_layout.addWidget(self.text_edit_widget)
-
-		self.central_layout.addSpacing(5)
 
 		self.cancel_btn = ActiveButton(Lng.got_it)
 		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
