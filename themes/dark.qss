@@ -1065,7 +1065,3 @@ UTableWidget::item:selected:!active {
 UTableWidget QHeaderView::section {
     font-weight: normal;
 }
-
-
-/* PY: угловой элемент и полосы прокрутки уже описаны выше,
-   отдельных правил для таблицы не требуется. */
