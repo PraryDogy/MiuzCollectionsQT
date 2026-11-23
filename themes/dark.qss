@@ -939,6 +939,8 @@ QToolTip {
     border: 1px solid #2f3f4f;
     color: #ffffff;
     padding: 2px;
+    font-weight: bold;
+    font-size: 13px;
 }
 
 
@@ -1065,3 +1067,4 @@ UTableWidget::item:selected:!active {
 UTableWidget QHeaderView::section {
     font-weight: normal;
 }
+
