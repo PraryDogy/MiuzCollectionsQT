@@ -24,6 +24,7 @@ class AboutWin(VerticalWindow):
 		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
+		self.setWindowTitle(Lng.show_about)
 
 		icon = TransparentLabel("")
 		icon.set_style("gray", "regular", "regular")
@@ -33,15 +34,17 @@ class AboutWin(VerticalWindow):
 			size=100
 		)
 		icon.setPixmap(QPixmap.fromImage(qimage_saled))
-		self.icon_text_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
+		self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		lbl = TransparentLabel(self.INFO_TEXT)
 		lbl.set_style("gray", "regular", "regular")
 		lbl.set_selectable(True)
-		self.icon_text_layout.addWidget(lbl)
+		self.central_layout.addWidget(lbl)
+
+		self.central_layout.addSpacing(5)
 
 		close_btn = UPushButton(Lng.close)
-		self.btn_layout.addWidget(close_btn)
+		self.central_layout.addWidget(close_btn)
 		close_btn.clicked.connect(self.deleteLater)
 
 		self.adjustSize()
