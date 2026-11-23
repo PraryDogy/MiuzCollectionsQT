@@ -427,6 +427,10 @@ class Lng:
 		"Вы уверены, что хотите удалить этот тег из приложения навсегда?",
 		"Are you sure you want to permanently delete this tag from the app?"
 	)
+	remove_tag_confirm = (
+		"Удалить тег",
+		"Remove tag"
+	)
 	new_tag = (
 		"Новый тег",
 		"New tag"
