@@ -20,13 +20,13 @@ from system.runnable import (HashDirSize, HashDirSizeItem, MfCleaner,
 from system.themes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, ConfirmWindow, HoverGroupBox,
-                            MfAliasWidget, MfPathWidget, RowArrowWidget,
-                            TagWidget, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UListWidget,
-                            UListWidgetItem, UMainWindow, UMenu, UPushButton,
-                            UScrollVerticalArea, USep, USpinBox, UTableWidget,
-                            WarningWindow)
+from ._base_widgets import (ActiveButton, AllertWin, ConfirmWindow,
+                            HoverGroupBox, MfAliasWidget, MfPathWidget,
+                            RowArrowWidget, TagWidget, TitleWidget,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
+                            UPushButton, UScrollVerticalArea, USep, USpinBox,
+                            UTableWidget)
 
 
 def restart_app():
@@ -988,7 +988,11 @@ class MfSettings(UGroupBox):
 
 	def save_changes(self):
 		if not self.path_widget.validate_and_show_win():
-			win_warn = WarningWindow(Lng.select_catalog_path)
+			win_warn = AllertWin(
+				text=Lng.select_catalog_path,
+				confirm_btn="blue",
+				icon="yellow"
+			)
 			win_warn.center_to_parent(self.window())
 			win_warn.ok_clicked.connect(win_warn.deleteLater)
 			win_warn.show()
@@ -1023,7 +1027,11 @@ class MfSettings(UGroupBox):
 
 	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
-			win = WarningWindow(Lng.at_least_one_folder_required)
+			win = AllertWin(
+				text=Lng.at_least_one_folder_required,
+				confirm_btn="blue",
+				icon="yellow"
+			)
 		else:
 			win = ConfirmWindow(
 				text=Lng.remove_catalog_warn,
@@ -1045,7 +1053,11 @@ class MfSettings(UGroupBox):
 
 		def on_finish(success: bool):
 			if not success:
-				win = WarningWindow(Lng.repair_failed)
+				win = AllertWin(
+					text=Lng.repair_failed,
+					confirm_btn="blue",
+					icon="yellow"
+				)
 				win.center_to_parent(self.window())
 				win.show()
 				return

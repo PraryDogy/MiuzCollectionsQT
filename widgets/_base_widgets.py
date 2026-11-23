@@ -1250,49 +1250,6 @@ class ConfirmWindow(AllertWin):
 		self.button_layout.addWidget(self.cancel_btn)
 
 
-class WarningWindow(VerticalWindow):
-	ok_clicked = pyqtSignal()
-	cancel_clicked = pyqtSignal()
-
-	def __init__(self, text: str, text_edit_text: str = None):
-		super().__init__()
-		self.setWindowTitle(Lng.attention)
-
-		self._setup_ui(text, text_edit_text)
-		self.finish_layout()
-
-	def _setup_ui(self, text: str, text_edit_text: str):
-		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
-		self.svg_widget.setFixedSize(65, 65)
-		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
-
-		self.text_wid = TransparentLabel(text)
-		self.text_wid.set_style("gray", "regular", "regular")
-		self.text_wid.set_selectable(True)
-		self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.central_layout.addWidget(self.text_wid)
-		self.fit_label(self.text_wid)
-
-		if text_edit_text:
-			self.text_edit_widget = UTextEdit()
-			self.text_edit_widget.setPlainText(text_edit_text)
-			self.central_layout.addWidget(self.text_edit_widget)
-
-		button_layout = self.create_button_layout()
-
-		self.cancel_btn = ActiveButton(Lng.got_it)
-		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
-		self.cancel_btn.clicked.connect(self.deleteLater)
-		button_layout.addWidget(self.cancel_btn)
-
-	def keyPressEvent(self, event):
-		if event.key() == Qt.Key.Key_Escape:
-			self.cancel_clicked.emit()
-			self.deleteLater()
-		else:
-			super().keyPressEvent(event)
-
-
 class InputTextWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 
@@ -1469,7 +1426,11 @@ class MfAliasWidget(TransparentWidget):
 		self.validate_timer.stop()
 		self._show_state(error_text)
 		if error_text:
-			win_warn = WarningWindow(error_text)
+			win_warn = AllertWin(
+				text=error_text,
+				confirm_btn="blue",
+				icon="yellow"
+			)
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
 			return None
@@ -1761,7 +1722,11 @@ class MfPathWidget(HoverGroupBox):
 
 	def validate_and_show_win(self):
 		if not self._path_exists():
-			win_warn = WarningWindow(Lng.select_catalog_path)
+			win_warn = AllertWin(
+				text=Lng.select_catalog_path,
+				confirm_btn="blue",
+				icon="yellow"
+			)
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
 			return None

@@ -12,7 +12,7 @@ from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
                             UCheckBox, UPushButton, VerticalWindow,
-                            WarningWindow, WinProgressbar)
+                            AllertWin, WinProgressbar)
 
 
 class ReplaceWin(VerticalWindow):
@@ -345,9 +345,10 @@ class WinCopyFiles(WinProgressbar):
 
         self.close_replace_window()
 
-        self.error_win = WarningWindow(
-            Lng.copy_error,
-            traceback_text,
+        self.error_win = AllertWin(
+            text=f"{Lng.copy_error}\n{traceback_text}",
+            confirm_btn="blue",
+            icon="yellow"
         )
         self.error_win.center_to_parent(self.window())
         self.error_win.show()

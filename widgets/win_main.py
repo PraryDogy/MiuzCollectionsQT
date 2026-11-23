@@ -16,7 +16,8 @@ from system.scaner import (BaseScaner, DirsReady, ForcedScaner, MfScanned,
                            PathCheckPassed, PathMismatch, ScanerWorker,
                            ScanProgress)
 
-from ._base_widgets import (ConfirmWindow, TransparentLabel, UGroupBox, UMainWindow, WarningWindow)
+from ._base_widgets import (AllertWin, ConfirmWindow, TransparentLabel,
+                            UGroupBox, UMainWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -249,7 +250,11 @@ class WinMain(UMainWindow):
 		self.stop_list_changed = True
 		self.restart_scaner_task()
 
-		win_warn = WarningWindow(Lng.wait_for_scan)
+		win_warn = AllertWin(
+			text=Lng.wait_for_scan,
+			confirm_btn="blue",
+			icon="blue"
+		)
 		win_warn.center_to_parent(self)
 		win_warn.show()
 
@@ -294,7 +299,11 @@ class WinMain(UMainWindow):
 		self.bar_bottom.bar_path.update_path(abs_path)
 
 	def on_hide_digits_clicked(self):
-		self.win_warn = WarningWindow(Lng.hide_digits_full)
+		self.win_warn = AllertWin(
+			text=Lng.hide_digits_full,
+			confirm_btn="blue",
+			icon="blue"
+		)
 		self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
 		self.win_warn.center_to_parent(self)
 		self.win_warn.show()
@@ -508,7 +517,11 @@ class WinMain(UMainWindow):
 	def on_repair_done(self, clean_type: str):
 		self.close_all_windows_except_main()
 
-		win = WarningWindow(Lng.reindex_warning)
+		win = AllertWin(
+			text=Lng.reindex_warning,
+			confirm_btn="blue",
+			icon="blue"
+		)
 		win.center_to_parent(self)
 		win.show()
 
