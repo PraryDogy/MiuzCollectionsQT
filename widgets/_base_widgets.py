@@ -24,8 +24,7 @@ from system.utils import Utils
 
 
 class TransparentButton(QPushButton):
-	def __init__(self, text="", parent=None):
-		super().__init__(text=text, parent=parent)
+	pass
 
 
 class TransparentLabel(QLabel):
@@ -38,6 +37,15 @@ class TransparentLabel(QLabel):
 		self._elide_enabled = False
 		self._context_menu_enabled = False
 		self._underline = False
+
+		# исходные настройки, к которым возвращаемся при выключении elide
+		self._base_policy = self.sizePolicy()
+		self._base_min_width = self.minimumWidth()
+
+		# tooltip, который ставит сам элидинг; пользовательский tooltip не трогаем
+		self._auto_tooltip = False
+
+	# --- Стиль ---
 
 	def set_style(
 			self,
@@ -57,14 +65,44 @@ class TransparentLabel(QLabel):
 		self.update()
 
 	def set_state(self, state: str):
-		return
+		self.setProperty("state", state)
 
 	def get_state(self) -> str:
-		return self._state
+		return self.property("state")
+
+	# --- Текст ---
 
 	def setText(self, text: str):
-		self._original_text = text
+		self._original_text = text or ""
 		self._update_text()
+
+	def text_full(self) -> str:
+		"""Исходный текст без элидинга."""
+		return self._original_text
+
+	def _update_text(self):
+		text = (
+			self.get_elided_text()
+			if self._elide_enabled
+			else self._original_text
+		)
+
+		# без изменения текста не дергаем QLabel, иначе resizeEvent даёт лишние перерисовки
+		if text != self.text():
+			QLabel.setText(self, text)
+
+		self._apply_auto_tooltip(text)
+
+	def _apply_auto_tooltip(self, shown: str):
+		want_tip = self._elide_enabled and shown != self._original_text
+		if want_tip:
+			self.setToolTip(self._original_text)
+			self._auto_tooltip = True
+		elif self._auto_tooltip:
+			self.setToolTip("")
+			self._auto_tooltip = False
+
+	# --- Выделение и меню ---
 
 	def set_selectable(self, enabled: bool):
 		if enabled:
@@ -82,6 +120,8 @@ class TransparentLabel(QLabel):
 	def set_context_menu(self, enabled: bool):
 		self._context_menu_enabled = enabled
 
+	# --- Элидинг ---
+
 	def set_elide(self, enabled: bool = True, ignore_width: bool = True):
 		self._elide_enabled = enabled
 		if enabled:
@@ -89,7 +129,29 @@ class TransparentLabel(QLabel):
 			policy = (QSizePolicy.Policy.Ignored if ignore_width
 					  else QSizePolicy.Policy.Preferred)
 			self.setSizePolicy(policy, QSizePolicy.Policy.Preferred)
+		else:
+			self.setMinimumWidth(self._base_min_width)
+			self.setSizePolicy(self._base_policy)
 		self._update_text()
+
+	def get_elided_text(self) -> str:
+		width = self.contentsRect().width()
+		if width <= 0:
+			return self._original_text
+
+		metrics = QFontMetrics(self.font())
+		lines = self._original_text.splitlines() or [""]
+		return "\n".join(
+			metrics.elidedText(line, Qt.TextElideMode.ElideMiddle, width)
+			for line in lines
+		)
+
+	def refresh_elide(self):
+		"""Пересчёт сокращения, например после того как появилась ширина."""
+		if self._elide_enabled:
+			self._update_text()
+
+	# --- Размеры ---
 
 	def sizeHint(self):
 		hint = super().sizeHint()
@@ -106,42 +168,12 @@ class TransparentLabel(QLabel):
 			hint.setWidth(0)
 		return hint
 
-	def get_elided_text(self):
-		width = self.contentsRect().width()
-		if width <= 0:
-			return self._original_text
-
-		metrics = QFontMetrics(self.font())
-
-		lines = self._original_text.splitlines()
-		return '\n'.join(
-			metrics.elidedText(
-				line,
-				Qt.TextElideMode.ElideMiddle,
-				width,
-			)
-			for line in lines
-		)
-
-	def _update_text(self):
-		text = (
-			self.get_elided_text()
-			if self._elide_enabled
-			else self._original_text
-		)
-
-		QLabel.setText(self, text)
-
-		self.setToolTip(
-			self._original_text
-			if self._elide_enabled and text != self._original_text
-			else ""
-		)
-
 	def resizeEvent(self, event):
 		super().resizeEvent(event)
 		if self._elide_enabled:
 			self._update_text()
+
+	# --- Контекстное меню ---
 
 	def contextMenuEvent(self, ev: QContextMenuEvent):
 		if not self._context_menu_enabled:
@@ -152,7 +184,7 @@ class TransparentLabel(QLabel):
 
 		full_text = clean(self._original_text)
 
-		# При elide выделение относится к обрезанной строке, поэтому копируем исходный текст
+		# при элидинге выделение относится к обрезанной строке, поэтому копируем исходный текст
 		if self._elide_enabled:
 			copy_text = full_text
 		else:
@@ -177,42 +209,30 @@ class TransparentLabel(QLabel):
 
 
 class TransparentFrame(QFrame):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	pass
 
 
 class TransparentWidget(QWidget):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	pass
 
 
 class TransparentLineEdit(QLineEdit):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	pass
 
 
 class TransparentTextEdit(QTextEdit):
-	def __init__(self, parent=None):
-		super().__init__(parent)
-
+	pass
 
 class TransparentMenu(QMenu):
-	def __init__(self, title=None, parent=None):
-		super().__init__(title, parent)
+	pass
 
 
 class TransparentScrollArea(QScrollArea):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	pass
 
 
 class UGroupBox(QGroupBox):
-	def __init__(self, title=None, parent=None):
-		super().__init__(title, parent)
-
-
-class SubGroup(UGroupBox):
-    pass
+	pass
 
 
 class UTableWidget(QTableWidget):
@@ -244,18 +264,15 @@ class HoverGroupBox(UGroupBox):
 
 
 class TransparentListWidget(QListWidget):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	pass
 
 
 class TransparentTreeWidget(QTreeWidget):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	pass
 
 
 class TransparentTreeView(QTreeView):
-	def __init__(self, parent=None):
-		super().__init__(parent)
+	pass
 
 
 class UMenu(TransparentMenu):

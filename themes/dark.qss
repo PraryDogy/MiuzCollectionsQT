@@ -14,7 +14,6 @@
        #0b1015                  окно (UMainWindow)
        #0f151b                  UFrame
        #131b23                  UGroupBox, списки, деревья, меню
-       #161f28                  SubGroup
        #1a232d                  кнопки, поля, спинбокс, тултип, карточка
        #111a22                  зона перетаскивания
        rgba(40, 54, 69, 191)    кнопка «вверх»
@@ -157,14 +156,6 @@ UGroupBox {
     color: #ffffff;
 }
 
-/* PY: отступы содержимого — setContentsMargins у layout, как у UGroupBox.
-   Вложенная группа: фон чуть светлее, рамка та же. */
-SubGroup {
-    background: #161f28;
-    border: 1px solid #243240;
-    border-radius: 8px;
-    color: #ffffff;
-}
 
 /* PY: высоту разделителя задать setFixedHeight(1).
    Цвета и рамка остаются в QSS. */

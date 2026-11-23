@@ -15,7 +15,7 @@ from system.lang import Lng
 from system.multiprocess import ProcessWorker, ImageArrayItemLoader
 from system.runnable import BlurImgBgTask, ImageSearcher, UThreadPool
 
-from ._base_widgets import (ActiveButton, SubGroup, TitleWidget,
+from ._base_widgets import (ActiveButton, TitleWidget,
                             TransparentFrame, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
                             UPushButton, USlider)
@@ -314,7 +314,7 @@ class WinImgSearchPreviewWidget(ImageDropFrame):
 		self.image_label.clear()
 
 
-class ControlsWidget(SubGroup):
+class ControlsWidget(UGroupBox):
 	reset_btn_clicked = pyqtSignal()
 	slider_moved = pyqtSignal(int)
 
