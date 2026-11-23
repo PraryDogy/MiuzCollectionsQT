@@ -226,7 +226,7 @@ class WinMain(UMainWindow):
 		else:
 			print("СКАНЕР ВЫКЛЮЧЕН")
 			self.bar_bottom.progress_widget.reset()
-			self.bar_bottom.progress_widget.status_label.setText("СКАНЕР ВЫКЛЮЧЕН")
+			self.bar_bottom.progress_widget.setText("СКАНЕР ВЫКЛЮЧЕН")
 
 		self.left_menu.init_ui()
 		self.path_bar_update(Mf.current_mf.mf_path)
@@ -613,7 +613,7 @@ class WinMain(UMainWindow):
 		)
 
 		self.grid.selection_count_changed.connect(
-			lambda x: print("куда выделение вписать?")
+			lambda x: self.bar_bottom.set_selection_count(x)
 		)
 
 		self.grid.clear_word_search.connect(

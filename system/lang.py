@@ -385,6 +385,7 @@ class Lng:
 	from_text = ("С", "From")
 	to_text = ("По", "To")
 	not_selected = ("Не выбрано", "Not set")
+	selected = ("Выбрано", "Selected")
 
 	# Пресеты меню
 	preset_today = ("Сегодня", "Today")

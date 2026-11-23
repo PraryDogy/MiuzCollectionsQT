@@ -2,14 +2,15 @@ import os
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QSizePolicy
 
 from cfg import Dynamic, JsonData, Static
+from system.image_reader import ImageReader
 from system.lang import Lng
 from system.scaner import ScanProgress
-from system.image_reader import ImageReader
 
-from ._base_widgets import TransparentWidget, USep, USlider, TagWidget, TransparentLabel
+from ._base_widgets import (TagWidget, TransparentLabel, TransparentWidget,
+                            USep, USlider)
 
 # =============================================================================
 # ПУТЬ (бывший bar_path.py)
@@ -120,38 +121,19 @@ class PathBar(TransparentWidget):
 # ПРОГРЕСС (ProgressWidget)
 # =============================================================================
 
-class ProgressWidget(TransparentWidget):
+class ProgressWidget(TransparentLabel):
 	set_warning = pyqtSignal()
 	set_green_checkmark = pyqtSignal()
 	set_arrow_terminal = pyqtSignal()
 	path_visible_changed = pyqtSignal(bool)  # True, когда показан путь
 
 	def __init__(self):
-		super().__init__()
-		self._last_alias: str | None = None
+		super().__init__("")
+		self.set_elide(True)  # сокращается сам, когда не помещается в строку
+
 		self._last_text: str | None = None
-
-		# Путь показывается полностью, без обрезки
-		self.alias_label = TransparentLabel("")
-		self.alias_label.set_style("gray", "small", "regular")
-
-		# Статус идёт сразу за путём
-		self.status_label = TransparentLabel("")
-		self.status_label.set_style("gray", "small", "regular")
-
-		self.h_layout = QHBoxLayout(self)
-		self.h_layout.setContentsMargins(0, 0, 0, 0)
-		self.h_layout.setSpacing(0)
-		self.h_layout.addWidget(self.alias_label)
-		self.h_layout.addWidget(self.status_label)
-
-
-		self.tag_widget = TagWidget()
-		self.tag_widget.set_qss_style(self.tag_widget.qss_transparent)
-		self.h_layout.addWidget(self.tag_widget)
-		self.tag_widget.hide()
-
-		self.h_layout.addStretch()
+		self._active = False
+		self._path_visible = False
 
 		self.total_seconds = JsonData.scaner_minutes * 60
 		self.timer = QTimer(self)
@@ -164,13 +146,11 @@ class ProgressWidget(TransparentWidget):
 		"""Прогресс сканера. Таймер останавливается, чтобы не перебивать текст."""
 		self.timer.stop()
 		alias, text = self.scan_progress_parts(progress)
-		self._set_texts(alias, text)
-		self.alias_label.set_style("regular", "small", "bold")
-		self.status_label.set_style("regular", "small", "bold")
+		self._show(alias, text, active=True)
 
 		if progress.kind == "indexing":
 			self.set_green_checkmark.emit()
-		elif progress.kind in ("no_connection",):
+		elif progress.kind == "no_connection":
 			self.set_warning.emit()
 		else:
 			self.set_arrow_terminal.emit()
@@ -178,50 +158,45 @@ class ProgressWidget(TransparentWidget):
 	def show_loading(self):
 		"""Запуск сканера до первого прогресса."""
 		self.timer.stop()
-		self._set_texts("", Lng.loading)
-		self.alias_label.set_style("gray", "small", "regular")
-		self.status_label.set_style("gray", "small", "regular")
-
+		self._show("", Lng.loading, active=False)
 		self.set_arrow_terminal.emit()
 
 	def show_timer(self):
 		"""Обратный отсчёт до следующего сканирования."""
 		self.total_seconds = JsonData.scaner_minutes * 60
-		self._set_texts("", self._timer_text())
-		self.alias_label.set_style("gray", "small", "regular")
-		self.status_label.set_style("gray", "small", "regular")
+		self._show("", self._timer_text(), active=False)
 		self.set_arrow_terminal.emit()
 		self.timer.start(1000)
 
 	def reset(self):
 		"""Пустое состояние без таймера."""
 		self.timer.stop()
-		self._set_texts("", "")
-		self.alias_label.set_style("gray", "small", "regular")
-		self.status_label.set_style("gray", "small", "regular")
+		self._show("", "", active=False)
 		self.set_arrow_terminal.emit()
 
 	# --- Внутреннее ---
 
-	def _set_texts(self, alias: str, text: str):
-		if alias == self._last_alias and text == self._last_text:
+	def _show(self, alias: str, text: str, active: bool):
+		full = f"{alias}{text}"
+		if full == self._last_text and active == self._active:
 			return
-		self._last_alias = alias
-		self._last_text = text
+		self._last_text = full
+		self._active = active
 
-		self.alias_label.setText(alias)
-		self.alias_label.setVisible(bool(alias))
-		self.status_label.setText(text)
-		self.path_visible_changed.emit(bool(alias))
+		self.set_style("regular" if active else "gray", "small", "regular")
+		self.setText(full)
 
-		QTimer.singleShot(50, lambda: self.alias_label.setToolTip(alias[:-1]))
+		path_visible = bool(alias)
+		if path_visible != self._path_visible:
+			self._path_visible = path_visible
+			self.path_visible_changed.emit(path_visible)
 
 	def _on_tick(self):
 		self.total_seconds -= 1
 		if self.total_seconds <= 0:
 			self.timer.stop()
 			return
-		self.status_label.setText(self._timer_text())
+		self._show("", self._timer_text(), active=False)
 
 	def _timer_text(self) -> str:
 		minutes = self.total_seconds // 60
@@ -239,25 +214,28 @@ class ProgressWidget(TransparentWidget):
 			)
 		return f"{progress.mf_alias}: ", Lng.no_connection.lower()
 
-	# --- Отладка: демо состояний и elide ---
+	# --- Отладка ---
 
-	def run_demo(self, step_ms: int = 15500):
-		"""
-		Отладка: короткий и длинный алиас с одинаковым статусом, в конце запускает таймер.
-		Удаляется целиком этим методом.
-		"""
-		status = "индексация файлов 12 из 340"
-		demo_steps = [
-			# (self.set_green_checkmark, "mf:", status),
-			(self.set_green_checkmark, "очень длинное имя хранилища для проверки elide:", status),
+	def run_demo(self, step_ms: int = 3000):
+		"""Отладка: короткий, средний и длинный текст по кругу. Удаляется этим методом."""
+		texts = [
+			"ок",
+			"индексация файлов 12 из 340",
+			"/Users/evlosh/Library/Application Support/AddressBook/Sources/78F2B3EB-422E-4261-A7D8-75B254689072: индексация 9 из 10000",
 		]
-		self.timer.stop()
-		for i, (signal, alias, text) in enumerate(demo_steps):
-			QTimer.singleShot(
-				i * step_ms,
-				lambda s=signal, a=alias, t=text: (s.emit(), self._set_texts(a, t)),
-			)
-		QTimer.singleShot(len(demo_steps) * step_ms, self.show_timer)
+		self._demo_index = 0
+		self._demo_texts = texts
+
+		if not hasattr(self, "_demo_timer"):
+			self._demo_timer = QTimer(self)
+			self._demo_timer.timeout.connect(self._demo_step)
+		self._demo_timer.start(step_ms)
+		self._demo_step()
+
+	def _demo_step(self):
+		text = self._demo_texts[self._demo_index]
+		self.setText(text)
+		self._demo_index = (self._demo_index + 1) % len(self._demo_texts)
 
 	@staticmethod
 	def _short_dir(path: str, max_parts: int = 15) -> str:
@@ -289,16 +267,15 @@ class BarBottom(TransparentWidget):
 	resize_thumbnails = pyqtSignal()
 
 	FOOTER_MARGINS = 5
+	GAP = 50
 
 	def __init__(self):
 		super().__init__()
 
-		# --- Вертикальный лэйаут: путь сверху, нижняя строка снизу ---
 		self.v_layout = QVBoxLayout(self)
 		self.v_layout.setContentsMargins(self.FOOTER_MARGINS, 0, self.FOOTER_MARGINS, 0)
 		self.v_layout.setSpacing(0)
 
-		# --- Путь ---
 		self.bar_path = PathBar()
 		self.bar_path.h_layout.setContentsMargins(0, 0, 0, 0)
 		self.v_layout.addWidget(self.bar_path)
@@ -306,7 +283,6 @@ class BarBottom(TransparentWidget):
 		self.v_layout.addSpacing(5)
 		self.v_layout.addWidget(USep())
 
-		# --- Нижняя строка: прогресс, выделение, слайдер ---
 		bottom = TransparentWidget()
 		self.h_layout = QHBoxLayout(bottom)
 		self.h_layout.setContentsMargins(0, 0, 0, 0)
@@ -314,13 +290,17 @@ class BarBottom(TransparentWidget):
 		self.h_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 		self.v_layout.addWidget(bottom)
 
+		# --- Левая зона: иконка и прогресс ---
+		self.progress_block = TransparentWidget()
+		progress_layout = QHBoxLayout(self.progress_block)
+		progress_layout.setContentsMargins(0, 0, 0, 0)
+		progress_layout.setSpacing(0)
+
 		self.progress_svg = QSvgWidget(str(Static.GRAY_ICONS / "arrow_terminal.svg"))
 		self.progress_svg.setFixedSize(12, 12)
-		self.h_layout.addWidget(self.progress_svg)
+		progress_layout.addWidget(self.progress_svg)
+		progress_layout.addSpacing(5)
 
-		self.h_layout.addSpacing(5)
-
-		# --- Прогресс: растягивается, когда выделение скрыто ---
 		self.progress_widget = ProgressWidget()
 		self.progress_widget.set_arrow_terminal.connect(
 			lambda: self.progress_svg.load(str(Static.GRAY_ICONS / "arrow_terminal.svg"))
@@ -331,9 +311,30 @@ class BarBottom(TransparentWidget):
 		self.progress_widget.set_green_checkmark.connect(
 			lambda: self.progress_svg.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
 		)
-		self.h_layout.addWidget(self.progress_widget)
+		progress_layout.addWidget(self.progress_widget)
 
-		self.h_layout.addStretch()
+		self.h_layout.addWidget(self.progress_block, stretch=1)
+
+		# --- Отступ слева от подписи (виден только при выделении) ---
+		self.left_gap = TransparentWidget()
+		self.left_gap.setFixedWidth(self.GAP)
+		self.h_layout.addWidget(self.left_gap)
+
+		# --- Подпись выделения по центру ---
+		self.chosen_label = TransparentLabel()
+		self.chosen_label.set_style("gray", "small", "regular")
+		self.chosen_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.h_layout.addWidget(self.chosen_label, stretch=0)
+
+		# --- Отступ справа от подписи (виден только при выделении) ---
+		self.right_gap = TransparentWidget()
+		self.right_gap.setFixedWidth(self.GAP)
+		self.h_layout.addWidget(self.right_gap)
+
+		# --- Симметричная зона справа ---
+		self.right_spacer = TransparentWidget()
+		self.right_spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+		self.h_layout.addWidget(self.right_spacer, stretch=1)
 
 		# --- Слайдер справа ---
 		self.slider = BarBottomSlider()
@@ -345,4 +346,13 @@ class BarBottom(TransparentWidget):
 		self.slider.clicked.connect(self.resize_thumbnails)
 		self.h_layout.addWidget(self.slider)
 
-		# QTimer.singleShot(1000, self.progress_widget.run_demo)
+		self.set_selection_count(0)
+
+	def set_selection_count(self, selected: int, total: int = 0):
+		show = selected > 0
+		self.chosen_label.setVisible(show)
+		self.right_spacer.setVisible(show)
+		if show:
+			self.chosen_label.setText(f"{Lng.selected}: {selected}")
+
+		# self.progress_widget.run_demo()
