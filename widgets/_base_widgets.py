@@ -1197,8 +1197,8 @@ class AllertWin(VerticalWindow):
 		data = {
 			"red": Static.COLOR_ICONS / "red_warning.svg",
 			"blue": Static.COLOR_ICONS / "info.svg",
-			"yellow": Static.COLOR_ICONS / "green_checkmark.svg",
-			"green": Static.COLOR_ICONS / "red_warning.svg",
+			"yellow": Static.COLOR_ICONS / "yellow_warning.svg",
+			"green": Static.COLOR_ICONS / "green_checkmark.svg",
 		}
 		self.icon_path = str(data[icon])
 
