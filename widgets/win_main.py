@@ -121,7 +121,9 @@ class TestWid(TransparentLabel):
 
 	def reload(self):
 		self.confirm_win = ConfirmWindow(
-			text="Стандратное окно подтверждения, другая строка и другой текстовый текст"
+			text="Стандратное окно подтверждения, другая строка и другой текстовый текст",
+			confirm_btn="blue",
+			icon="blue"
 		)
 		self.confirm_win.center_to_parent(self.window())
 		self.confirm_win.show()
@@ -449,7 +451,11 @@ class WinMain(UMainWindow):
 		mf = Mf.current_mf
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
-		self.remove_files_win = ConfirmWindow(text, danger=True)
+		self.remove_files_win = ConfirmWindow(
+			text=text,
+			confirm_btn="red",
+			icon="yellow"
+		)
 		file_remover = ProcessWorker(
 				target=FilesRemover.start,
 				args=(abs_paths, )
@@ -776,7 +782,11 @@ class WinMain(UMainWindow):
 			self.on_mf_clicked(mf)
 			self.open_win_smb(mf)
 
-		self.mismatch_win = ConfirmWindow(Lng.catalog_mismatch_text, danger=True)
+		self.mismatch_win = ConfirmWindow(
+			text=Lng.catalog_mismatch_text,
+			confirm_btn="blue",
+			icon="red",
+		)
 		self.mismatch_win.ok_clicked.connect(confirm_other_catalog)
 		self.mismatch_win.cancel_clicked.connect(revert_to_old_catalog)
 		self.mismatch_win.center_to_parent(self)

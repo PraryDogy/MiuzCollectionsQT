@@ -11,7 +11,11 @@ class UploadWin(ConfirmWindow):
 	# WIDTH = 320
 
 	def __init__(self, dest: str):
-		super().__init__(Lng.upload_files_description)
+		super().__init__(
+			text=Lng.upload_files_description,
+			confirm_btn="blue",
+			icon="blue"
+		)
 		self.setWindowTitle(Lng.upload_files)
 
 		self._dest = dest
@@ -23,12 +27,8 @@ class UploadWin(ConfirmWindow):
 		self.dest_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.dest_widget.set_style("regular", "small", "regular")
 		self.dest_widget.setWordWrap(True)
-		# self.dest_widget.set_elide(True)
 		self.dest_widget.set_selectable(True)
 		self.central_layout.insertWidget(idx, self.dest_widget)
 
 		self.confirm_btn.setText(Lng.upload)
-		self.svg_widget.load(str(Static.COLOR_ICONS / "info.svg"))
-		# self.adjustSize()
-
 		self.fit_label(self.dest_widget)

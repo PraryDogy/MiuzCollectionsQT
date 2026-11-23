@@ -395,7 +395,11 @@ class UserTags(TransparentWidget):
 				self.load_st_grid.emit()
 			widget.deleteLater()
 
-		self.remove_tag_win = ConfirmWindow(Lng.remove_tag_question, True)
+		self.remove_tag_win = ConfirmWindow(
+			text=Lng.remove_tag_question,
+			confirm_btn="red",
+			icon="yellow"
+		)
 		self.remove_tag_win.confirm_btn.setText(Lng.remove_tag_confirm)
 		self.remove_tag_win.ok_clicked.connect(ok_clicked)
 		self.remove_tag_win.center_to_parent(self.window())

@@ -1181,16 +1181,11 @@ class VerticalWindow(UMainWindow):
 		self.adjustSize()
 
 
-class ConfirmWindow(VerticalWindow):
+class AllertWin(VerticalWindow):
 	ok_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 
-	def __init__(
-			self,
-			text: str,
-			confirm_btn: Literal["red", "blue", "regular"],
-			icon: Literal["red", "blue", "yellow", "green"]
-	):
+	def __init__(self, text: str, confirm_btn: Literal["red", "blue", "regular"], icon: Literal["red", "blue", "yellow", "green"]):
 		super().__init__()
 		data = {
 			"red": RedButton,
@@ -1223,15 +1218,11 @@ class ConfirmWindow(VerticalWindow):
 		self.central_layout.addWidget(self.description_label)
 		self.fit_label(self.description_label)
 
-		button_layout = self.create_button_layout()
+		self.button_layout = self.create_button_layout()
 
-		self.confirm_btn = self.confirm_button_cls(Lng.confirm)
+		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self._confirm)
-		button_layout.addWidget(self.confirm_btn)
-
-		self.cancel_btn = UPushButton(Lng.cancel)
-		self.cancel_btn.clicked.connect(self._cancel)
-		button_layout.addWidget(self.cancel_btn)
+		self.button_layout.addWidget(self.confirm_btn)
 
 	def _confirm(self):
 		self.ok_clicked.emit()
@@ -1246,6 +1237,17 @@ class ConfirmWindow(VerticalWindow):
 			self._cancel()
 		else:
 			super().keyPressEvent(event)
+
+
+class ConfirmWindow(AllertWin):
+	def __init__(self, text: str, confirm_btn: Literal["red", "blue", "regular"], icon: Literal["red", "blue", "yellow", "green"]):
+		super().__init__(text, confirm_btn, icon)
+		self.init_ui()
+
+	def init_ui(self):
+		self.cancel_btn = UPushButton(Lng.cancel)
+		self.cancel_btn.clicked.connect(self._cancel)
+		self.button_layout.addWidget(self.cancel_btn)
 
 
 class WarningWindow(VerticalWindow):
