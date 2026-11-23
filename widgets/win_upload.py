@@ -21,7 +21,7 @@ class UploadWin(ConfirmWindow):
 
 		self.dest_widget = TransparentLabel(dest)
 		self.dest_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.dest_widget.set_style("regular", "regular", "regular")
+		self.dest_widget.set_style("regular", "small", "regular")
 		self.dest_widget.setWordWrap(True)
 		# self.dest_widget.set_elide(True)
 		self.dest_widget.set_selectable(True)
@@ -29,4 +29,6 @@ class UploadWin(ConfirmWindow):
 
 		self.ok_btn.setText(Lng.upload)
 		self.svg_widget.load(str(Static.COLOR_ICONS / "info.svg"))
-		self.adjustSize()
+		# self.adjustSize()
+
+		self.fit_label(self.dest_widget)
