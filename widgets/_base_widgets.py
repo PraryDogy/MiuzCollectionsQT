@@ -1207,9 +1207,12 @@ class AllertWin(VerticalWindow):
 		self.finish_layout()
 
 	def _setup_ui(self, text: str):
+
 		self.svg_widget = QSvgWidget(self.icon_path)
 		self.svg_widget.setFixedSize(65, 65)
 		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+
+		self.central_layout.addSpacing(5)
 
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
