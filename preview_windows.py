@@ -180,13 +180,11 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
 
         # базовые диалоги
         ("Подтверждение", lambda: _new("widgets._base_widgets", "ConfirmWindow",
-                                       "Подтвердить действие?")),
-        ("Опасное подтверждение", lambda: _new("widgets._base_widgets", "ConfirmWindow",
-                                               "Удалить навсегда?", danger=True)),
+                                       "Длинный текст предупреждения в несколько строк для теста длины hfhfhfhfhhfhfhf")),
+        ("Подтверждение опасное", lambda: _new("widgets._base_widgets", "ConfirmWindow",
+                                               "Длинный текст предупреждения в несколько строк для теста длины", danger=True)),
         ("Предупреждение", lambda: _new("widgets._base_widgets", "WarningWindow",
-                                        "Текст предупреждения")),
-        ("Двойное подтверждение", lambda: _new("widgets._base_widgets", "SuperConfirmWindow",
-                                               "Очень опасное действие")),
+                                        "Длинный текст предупреждения в несколько строк для теста длины")),
         ("Ввод текста", lambda: _new("widgets._base_widgets", "InputTextWin", "Новый тег",  "Придумайте название нового тега")),
         ("Индикатор прогресса", lambda: _new("widgets._base_widgets", "WinProgressbar", "Выполняется")),
     ]
