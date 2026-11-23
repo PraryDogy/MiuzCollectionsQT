@@ -1273,12 +1273,6 @@ class WarningWindow(VerticalWindow):
 			super().keyPressEvent(event)
 
 
-class SuperConfirmWindow(ConfirmWindow):
-	def __init__(self, text: str):
-		super().__init__(text)
-		self.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
-
-
 class InputTextWin(UMainWindow):
 	ok_clicked = pyqtSignal(str)
 

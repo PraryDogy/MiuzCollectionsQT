@@ -22,11 +22,11 @@ from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, ConfirmWindow, HoverGroupBox,
                             MfAliasWidget, MfPathWidget, RowArrowWidget,
-                            SuperConfirmWindow, TagWidget, TitleWidget,
-                            TransparentLabel, TransparentWidget, UGroupBox,
-                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
-                            UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            UTableWidget, WarningWindow)
+                            TagWidget, TitleWidget, TransparentLabel,
+                            TransparentWidget, UGroupBox, UListWidget,
+                            UListWidgetItem, UMainWindow, UMenu, UPushButton,
+                            UScrollVerticalArea, USep, USpinBox, UTableWidget,
+                            WarningWindow)
 
 
 def restart_app():
@@ -992,7 +992,8 @@ class MfSettings(UGroupBox):
 			restart_app()
 
 		if self.path_widget.draft_mf_path != self.mf.mf_path:
-			win = SuperConfirmWindow(Lng.make_sure_path)
+			win = ConfirmWindow(Lng.make_sure_path)
+			win.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
 		else:
 			win = ConfirmWindow(Lng.app_will_restarted)
 
