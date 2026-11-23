@@ -1,6 +1,7 @@
 from PyQt6.QtCore import QEvent, QPoint, Qt
 from PyQt6.QtWidgets import QWidget
 
+from cfg import Static
 from system.lang import Lng
 
 from ._base_widgets import ConfirmWindow, TransparentLabel
@@ -11,6 +12,7 @@ class UploadWin(ConfirmWindow):
 
 	def __init__(self, dest: str):
 		super().__init__(Lng.upload_files_description)
+		self.setWindowTitle(Lng.upload_files)
 
 		self._dest = dest
 
@@ -24,3 +26,6 @@ class UploadWin(ConfirmWindow):
 		self.dest_widget.set_elide(True)
 		self.dest_widget.set_selectable(True)
 		self.central_layout.insertWidget(idx, self.dest_widget)
+
+		self.ok_btn.setText(Lng.upload)
+		self.svg_widget.load(str(Static.COLOR_ICONS / "info.svg"))
