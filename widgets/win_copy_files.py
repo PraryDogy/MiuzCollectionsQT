@@ -40,7 +40,7 @@ class ReplaceWin(VerticalWindow):
         icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
         icon.setFixedSize(65, 65)
 
-        self.icon_text_layout.addWidget(
+        self.central_layout.addWidget(
             icon,
             alignment=Qt.AlignmentFlag.AlignCenter,
         )
@@ -48,14 +48,14 @@ class ReplaceWin(VerticalWindow):
         message = TransparentLabel(
             Lng.file_exists
         )
-        self.icon_text_layout.addWidget(message)
+        self.central_layout.addWidget(message)
 
         self.filename_label = TransparentLabel(self.filename)
         self.filename_label.setFixedWidth(message.sizeHint().width())
         self.filename_label.set_elide(True)
-        self.icon_text_layout.addWidget(self.filename_label)
+        self.central_layout.addWidget(self.filename_label)
 
-        self.icon_text_layout.addSpacing(5)
+        self.central_layout.addSpacing(5)
 
         self.replace_all_checkbox = UCheckBox(
             Lng.apply_to_all_files
@@ -66,7 +66,7 @@ class ReplaceWin(VerticalWindow):
         self.replace_all_checkbox.setChecked(False)
 
         if self.show_checkbox:
-            self.icon_text_layout.addWidget(
+            self.central_layout.addWidget(
                 self.replace_all_checkbox
             )
 
@@ -87,19 +87,19 @@ class ReplaceWin(VerticalWindow):
         self.keep_both_button.clicked.connect(self._keep_both)
         self.actions_layout.addWidget(self.keep_both_button)
 
-        self.btn_layout.addWidget(self.actions_widget)
+        self.central_layout.addWidget(self.actions_widget)
 
         self.skip_button = UPushButton(
             Lng.skip
         )
         self.skip_button.clicked.connect(self._skip)
-        self.btn_layout.addWidget(self.skip_button)
+        self.central_layout.addWidget(self.skip_button)
 
         self.cancel_button = UPushButton(
             Lng.cancel
         )
         self.cancel_button.clicked.connect(self._cancel)
-        self.btn_layout.addWidget(self.cancel_button)
+        self.central_layout.addWidget(self.cancel_button)
 
     def _checkbox_clicked(self):
         if self.replace_all_checkbox.isChecked():
