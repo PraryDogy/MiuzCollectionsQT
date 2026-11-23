@@ -1131,7 +1131,19 @@ class VerticalWindow(UMainWindow):
 		self.set_close_only()
 		self.show_titlebar_sep()
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.central_layout.setSpacing(6)
+		self.central_layout.setSpacing(3)
+
+		self.button_layout = None
+
+	def create_button_layout(self, top_spacing: int = 5, spacing: int = 6):
+		# обертка для кнопок, наследники добавляют в self.button_layout свои кнопки
+		self.central_layout.addSpacing(top_spacing)
+		self.button_widget = TransparentWidget()
+		self.button_layout = QVBoxLayout(self.button_widget)
+		self.button_layout.setContentsMargins(0, 0, 0, 0)
+		self.button_layout.setSpacing(spacing)
+		self.central_layout.addWidget(self.button_widget)
+		return self.button_layout
 
 	def fit_label(self, label: QLabel):
 		# ширина, доступная лейблу: окно минус поля central_layout
@@ -1175,14 +1187,16 @@ class ConfirmWindow(VerticalWindow):
 		self.central_layout.addWidget(self.description_label)
 		self.fit_label(self.description_label)
 
+		button_layout = self.create_button_layout()
+
 		ok_cls = RedButton if danger else ActiveButton
 		self.ok_btn = ok_cls(Lng.confirm)
 		self.ok_btn.clicked.connect(self._confirm)
-		self.central_layout.addWidget(self.ok_btn)
+		button_layout.addWidget(self.ok_btn)
 
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self._cancel)
-		self.central_layout.addWidget(self.cancel_btn)
+		button_layout.addWidget(self.cancel_btn)
 
 	def _confirm(self):
 		self.ok_clicked.emit()
@@ -1205,7 +1219,6 @@ class WarningWindow(VerticalWindow):
 
 	def __init__(self, text: str, text_edit_text: str = None):
 		super().__init__()
-		self.show_titlebar_sep()
 		self.setWindowTitle(Lng.attention)
 
 		self._setup_ui(text, text_edit_text)
@@ -1228,10 +1241,12 @@ class WarningWindow(VerticalWindow):
 			self.text_edit_widget.setPlainText(text_edit_text)
 			self.central_layout.addWidget(self.text_edit_widget)
 
+		button_layout = self.create_button_layout()
+
 		self.cancel_btn = ActiveButton(Lng.got_it)
 		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
 		self.cancel_btn.clicked.connect(self.deleteLater)
-		self.central_layout.addWidget(self.cancel_btn)
+		button_layout.addWidget(self.cancel_btn)
 
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key.Key_Escape:

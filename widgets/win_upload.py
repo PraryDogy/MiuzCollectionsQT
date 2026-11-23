@@ -20,5 +20,7 @@ class UploadWin(ConfirmWindow):
 		self.dest_widget.setWordWrap(True)
 		self.dest_widget.set_elide(True)
 		self.dest_widget.set_selectable(True)
+
 		self.central_layout.insertWidget(idx, self.dest_widget)
-		self.fit_label(self.description_label)
+		# self.central_layout.insertSpacing(idx + 1, 5)
+		# self.fit_label(self.description_label)
