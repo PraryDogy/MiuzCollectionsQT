@@ -27,7 +27,7 @@ class UploadWin(ConfirmWindow):
 		self.dest_widget.set_selectable(True)
 		self.central_layout.insertWidget(idx, self.dest_widget)
 
-		self.ok_btn.setText(Lng.upload)
+		self.confirm_btn.setText(Lng.upload)
 		self.svg_widget.load(str(Static.COLOR_ICONS / "info.svg"))
 		# self.adjustSize()
 

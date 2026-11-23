@@ -1185,15 +1185,34 @@ class ConfirmWindow(VerticalWindow):
 	ok_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 
-	def __init__(self, text: str, danger: bool = False):
+	def __init__(
+			self,
+			text: str,
+			confirm_btn: Literal["red", "blue", "regular"],
+			icon: Literal["red", "blue", "yellow", "green"]
+	):
 		super().__init__()
-		self.setWindowTitle(Lng.attention)
+		data = {
+			"red": RedButton,
+			"blue": ActiveButton,
+			"regular": UPushButton
+		}
+		self.confirm_button_cls = data[confirm_btn]
 
-		self._setup_ui(text, danger)
+		data = {
+			"red": Static.COLOR_ICONS / "red_warning.svg",
+			"blue": Static.COLOR_ICONS / "info.svg",
+			"yellow": Static.COLOR_ICONS / "green_checkmark.svg",
+			"green": Static.COLOR_ICONS / "red_warning.svg",
+		}
+		self.icon_path = str(data[icon])
+
+		self.setWindowTitle(Lng.attention)
+		self._setup_ui(text)
 		self.finish_layout()
 
-	def _setup_ui(self, text: str, danger: bool):
-		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
+	def _setup_ui(self, text: str):
+		self.svg_widget = QSvgWidget(self.icon_path)
 		self.svg_widget.setFixedSize(65, 65)
 		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -1206,10 +1225,9 @@ class ConfirmWindow(VerticalWindow):
 
 		button_layout = self.create_button_layout()
 
-		ok_cls = RedButton if danger else ActiveButton
-		self.ok_btn = ok_cls(Lng.confirm)
-		self.ok_btn.clicked.connect(self._confirm)
-		button_layout.addWidget(self.ok_btn)
+		self.confirm_btn = self.confirm_button_cls(Lng.confirm)
+		self.confirm_btn.clicked.connect(self._confirm)
+		button_layout.addWidget(self.confirm_btn)
 
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self._cancel)
