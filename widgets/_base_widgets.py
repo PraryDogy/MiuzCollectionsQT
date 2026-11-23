@@ -1122,71 +1122,22 @@ class WinProgressbar(UMainWindow):
 
 
 class VerticalWindow(UMainWindow):
-	WIDTH = 280  # одна ширина на все диалоги, подклассы могут переопределить
 
 	def __init__(self):
 		super().__init__()
+		self.setFixedWidth(280)
+		self.set_always_on_top()
+		self.set_close_only()
 
-		self.icon_text_widget = TransparentWidget()
-		self.central_layout.addWidget(self.icon_text_widget)
+		self.show_titlebar_sep()
 
-		self.icon_text_layout = QVBoxLayout(self.icon_text_widget)
-		self.icon_text_layout.setContentsMargins(10, 0, 10, 0)
-		self.icon_text_layout.setSpacing(5)
+		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+		self.central_layout.setContentsMargins(10, 0, 10, 10)
+		self.central_layout.setSpacing(5)
 
-		self.btn_widget = TransparentWidget()
-		self.central_layout.addWidget(self.btn_widget)
-
-		self.btn_layout = QVBoxLayout(self.btn_widget)
-		self.btn_layout.setContentsMargins(0, 0, 0, 0)
-		self.btn_layout.setSpacing(6)
-
-		self.setFixedWidth(self.WIDTH)
-
-	def adjust_window_size(self, text_wid: TransparentLabel, text: str):
-		text_wid.setWordWrap(True)
-
-		# ширина, доступная тексту: окно минус отступы central_layout и icon_text_layout
-		cm = self.central_layout.contentsMargins()
-		im = self.icon_text_layout.contentsMargins()
-		text_w = self.WIDTH - cm.left() - cm.right() - im.left() - im.right()
-		text_wid.setFixedWidth(text_w)
-
-		# высота метки = реальная высота текста с переносом при этой ширине
-		text_h = text_wid.heightForWidth(text_w)
-		if text_h <= 0:
-			text_h = text_wid.sizeHint().height()
-		text_wid.setFixedHeight(text_h)
-
-		# окно = содержимое + заголовок
-		self.icon_text_layout.activate()
-		self.central_layout.activate()
-		titlebar_h = max(self.height() - self.centralWidget().height(), 0)
-		self.setFixedHeight(self.centralWidget().sizeHint().height() + titlebar_h)
-
-	def adjust_window_size_single_line(self, text_wid: TransparentLabel, text: str):
-		"""Текст в одну строку, без обрезки. Ширина окна растёт под длину текста."""
-		text_wid.setWordWrap(False)
-		text_wid.set_elide(False)
-		text_wid.setText(text)
-
-		cm = self.central_layout.contentsMargins()
-		im = self.icon_text_layout.contentsMargins()
-		extra_w = cm.left() + cm.right() + im.left() + im.right()
-
-		# ширина текста в пикселях шрифта метки, с запасом на отступы самой метки
-		text_w = text_wid.fontMetrics().horizontalAdvance(text) + 4
-		# окно не уже базовой ширины, но и не уже самого текста
-		win_w = max(self.WIDTH, text_w + extra_w)
-
-		self.setFixedWidth(win_w)
-		text_wid.setFixedWidth(win_w - extra_w)
-		text_wid.setFixedHeight(text_wid.fontMetrics().height())
-
-		self.icon_text_layout.activate()
-		self.central_layout.activate()
-		titlebar_h = max(self.height() - self.centralWidget().height(), 0)
-		self.setFixedHeight(self.centralWidget().sizeHint().height() + titlebar_h)
+	def finish_layout(self):
+		# высота окна считается по содержимому, с учётом переноса текста
+		self.adjustSize()
 
 
 class ConfirmWindow(VerticalWindow):
@@ -1195,34 +1146,32 @@ class ConfirmWindow(VerticalWindow):
 
 	def __init__(self, text: str, danger: bool = False):
 		super().__init__()
-		self.set_always_on_top()
-		self.set_close_only()
-		# self.show_titlebar_underline()
 		self.setWindowTitle(Lng.attention)
-
 		self._setup_ui(text, danger)
-		self.central_layout.activate()
-		self.adjust_window_size(self.description_label, text)
+		self.finish_layout()
 
 	def _setup_ui(self, text: str, danger: bool):
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		self.svg_widget.setFixedSize(65, 65)
-		self.icon_text_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.set_selectable(True)
 		self.description_label.setWordWrap(True)
-		self.icon_text_layout.addWidget(self.description_label)
+		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.central_layout.addWidget(self.description_label)
+
+		self.central_layout.addSpacing(5)
 
 		ok_cls = RedButton if danger else ActiveButton
 		self.ok_btn = ok_cls(Lng.confirm)
 		self.ok_btn.clicked.connect(self._confirm)
-		self.btn_layout.addWidget(self.ok_btn)
+		self.central_layout.addWidget(self.ok_btn)
 
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self._cancel)
-		self.btn_layout.addWidget(self.cancel_btn)
+		self.central_layout.addWidget(self.cancel_btn)
 
 	def _confirm(self):
 		self.ok_clicked.emit()
@@ -1251,31 +1200,31 @@ class WarningWindow(VerticalWindow):
 		self.setWindowTitle(Lng.attention)
 
 		self._setup_ui(text, text_edit_text)
-		self.central_layout.activate()
-		self.adjust_window_size(self.text_wid, text)
+		self.finish_layout()
 
 	def _setup_ui(self, text: str, text_edit_text: str):
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		self.svg_widget.setFixedSize(65, 65)
-		self.icon_text_layout.addWidget(
-			self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter
-		)
+		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.text_wid = TransparentLabel(text)
 		self.text_wid.set_style("gray", "regular", "regular")
 		self.text_wid.set_selectable(True)
 		self.text_wid.setWordWrap(True)
-		self.icon_text_layout.addWidget(self.text_wid)
+		self.text_wid.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.central_layout.addWidget(self.text_wid)
 
 		if text_edit_text:
 			self.text_edit_widget = UTextEdit()
 			self.text_edit_widget.setPlainText(text_edit_text)
-			self.icon_text_layout.addWidget(self.text_edit_widget)
+			self.central_layout.addWidget(self.text_edit_widget)
+
+		self.central_layout.addSpacing(5)
 
 		self.cancel_btn = ActiveButton(Lng.got_it)
 		self.cancel_btn.clicked.connect(self.cancel_clicked.emit)
 		self.cancel_btn.clicked.connect(self.deleteLater)
-		self.btn_layout.addWidget(self.cancel_btn)
+		self.central_layout.addWidget(self.cancel_btn)
 
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key.Key_Escape:
