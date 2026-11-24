@@ -529,11 +529,6 @@ class RedButton(UPushButton):
 		super().__init__(text)
 
 
-class AccentButton(UPushButton):
-	def __init__(self, text):
-		super().__init__(text)
-
-
 class USep(TransparentFrame):
 	def __init__(self):
 		super().__init__()
