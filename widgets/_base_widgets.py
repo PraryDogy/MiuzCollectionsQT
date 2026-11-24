@@ -187,13 +187,12 @@ class WrapLabel(TextMixin, QTextEdit):
 	def __init__(self, text: str = "", parent=None):
 		super().__init__(parent)
 		self._init_text_mixin(text)
-		self._align = Qt.AlignmentFlag.AlignLeft
-		self._wrap = True
-
+		# self.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
 		self.setReadOnly(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setText(text)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 	# --- API, совпадающий с QLabel ---
 
@@ -205,20 +204,9 @@ class WrapLabel(TextMixin, QTextEdit):
 	def text(self) -> str:
 		return self.toPlainText()
 
-	def setWordWrap(self, enabled: bool):
-		self._wrap = enabled
-		self._apply_option()
-
-	def setAlignment(self, align):
-		self._align = align
-		self._apply_option()
-
 	def _apply_option(self):
 		# настройки документа: перенос и выравнивание для всего текста
 		opt = self.document().defaultTextOption()
-		opt.setAlignment(self._align)
-		opt.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere
-						if self._wrap else QTextOption.WrapMode.NoWrap)
 		self.document().setDefaultTextOption(opt)
 
 	def _selected_text(self) -> str:
