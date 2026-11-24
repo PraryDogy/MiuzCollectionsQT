@@ -1153,12 +1153,11 @@ class VerticalWin(UMainWindow):
 		self.button_layout = None
 		self.text_layout = None
 
-	def create_button_layout(self, top_spacing: int = 5, spacing: int = 6):
-		self.central_layout.addSpacing(top_spacing)
+	def create_button_layout(self):
 		self.button_widget = TransparentWidget()
 		self.button_layout = QVBoxLayout(self.button_widget)
-		self.button_layout.setContentsMargins(0, 0, 0, 0)
-		self.button_layout.setSpacing(spacing)
+		self.button_layout.setContentsMargins(0, 5, 0, 5)
+		self.button_layout.setSpacing(6)
 		self.central_layout.addWidget(self.button_widget)
 		return self.button_layout
 

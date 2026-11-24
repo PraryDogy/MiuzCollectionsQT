@@ -133,8 +133,8 @@ def _confirm(key, btn: str, icon: str, text: str = None, setup=None):
     """Фабрика ConfirmWindow с теми же аргументами, что и в рабочем коде.
     key: ключ Lng, text: литерал (если key не нужен), setup: правка окна после создания."""
     def make():
-        from widgets._base_widgets import ConfirmWindow
-        win = ConfirmWindow(text=text or _lng(key), confirm_btn=btn, icon=icon)
+        from widgets._base_widgets import ConfirmWin
+        win = ConfirmWin(text=text or _lng(key), confirm_btn=btn, icon=icon)
         if setup:
             setup(win)
         return win
