@@ -41,9 +41,6 @@ class ReplaceWin(VerticalWin):
         icon.setFixedSize(65, 65)
         self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter,)
 
-        self.create_text_layout()
-        self.create_button_layout()
-
         message = TransparentLabel(Lng.file_exists)
         self.text_layout.addWidget(message)
 

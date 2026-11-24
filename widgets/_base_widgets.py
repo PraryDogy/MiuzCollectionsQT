@@ -1150,8 +1150,8 @@ class VerticalWin(UMainWindow):
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setSpacing(3)
 
-		self.button_layout = None
-		self.text_layout = None
+		self.button_layout = self.create_text_layout()
+		self.text_layout = self.create_button_layout()
 
 	def create_button_layout(self):
 		self.button_widget = TransparentWidget()
@@ -1232,16 +1232,13 @@ class AllertWin(VerticalWin):
 		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 		self.central_layout.addSpacing(5)
 
-		text_layout = self.create_text_layout()
-
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.set_selectable(True)
 		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		text_layout.addWidget(self.description_label)
+		self.text_layout.addWidget(self.description_label)
 		self.fit_label(self.description_label)
 
-		self.button_layout = self.create_button_layout()
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
 		self.button_layout.addWidget(self.confirm_btn)
