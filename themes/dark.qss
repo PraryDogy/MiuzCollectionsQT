@@ -492,20 +492,17 @@ BarTopLineEdit:focus {
    ===================================================================== */
 
 /* PY: отступ между индикатором и текстом — spacing здесь, размеры в коде не нужны. */
+
 UCheckBox {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-    spacing: 6px;
+    spacing: 5px;
 }
 
-/* PY: размер индикатора 15x15 — sub-control, остаётся в QSS. */
 UCheckBox::indicator {
-    background: transparent;
-    border: none;
-    width: 15px;
-    height: 15px;
-    border-radius: 5px;
+    background: #1d2833;
+    border: 1px solid #3a4d61;
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
 }
 
 UCheckBox::indicator:checked {
@@ -514,6 +511,10 @@ UCheckBox::indicator:checked {
 
 UCheckBox::indicator:unchecked {
     image: none;
+}
+
+UCheckBox::indicator:hover {
+    border: 1px solid #4a5a6a;
 }
 
 /* PY: размер 16x16 — sub-control. */

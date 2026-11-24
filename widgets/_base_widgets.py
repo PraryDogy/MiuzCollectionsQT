@@ -1150,40 +1150,46 @@ class VerticalWin(UMainWindow):
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setSpacing(3)
 
-		self.button_layout = self.create_text_layout()
-		self.text_layout = self.create_button_layout()
+		self.icon_layout = self.create_icon_layout()
+		self.text_layout = self.create_text_layout()
+		self.button_layout = self.create_button_layout()
 
-	def create_button_layout(self):
-		self.button_widget = TransparentWidget()
-		self.button_layout = QVBoxLayout(self.button_widget)
-		self.button_layout.setContentsMargins(0, 5, 0, 5)
-		self.button_layout.setSpacing(6)
-		self.central_layout.addWidget(self.button_widget)
-		return self.button_layout
+	def _wrap(self, margins: tuple, spacing: int, align=None) -> QVBoxLayout:
+		# общая обёртка: виджет с вертикальным layout, добавляется в central_layout
+		widget = TransparentWidget()
+		layout = QVBoxLayout(widget)
+		layout.setContentsMargins(*margins)
+		layout.setSpacing(spacing)
+		if align is not None:
+			layout.setAlignment(align)
+		self.central_layout.addWidget(widget)
+		return layout
 
-	def create_text_layout(self):
-		# обертка для текста с полями: лейблы внутри получают ширину без полей
-		self.text_wrapper = TransparentWidget()
-		self.text_layout = QVBoxLayout(self.text_wrapper)
-		self.text_layout.setContentsMargins(5, 0, 5, 0)
-		self.text_layout.setSpacing(1)
-		self.central_layout.addWidget(self.text_wrapper)
-		return self.text_layout
+	def create_icon_layout(self) -> QVBoxLayout:
+		return self._wrap((0, 0, 0, 0), 0, Qt.AlignmentFlag.AlignHCenter)
+
+	def create_text_layout(self) -> QVBoxLayout:
+		return self._wrap((5, 0, 5, 0), 1, Qt.AlignmentFlag.AlignHCenter)
+
+	def create_button_layout(self, top_spacing: int = 5) -> QVBoxLayout:
+		# без выравнивания: кнопки растягиваются на всю ширину
+		return self._wrap((0, top_spacing, 0, 5), 6)
 
 	def fit_label(self, label: QLabel):
-		# ширина, доступная лейблу: окно минус поля central_layout и text_layout
-		cm = self.central_layout.contentsMargins()
-		label_w = self.WIDTH - cm.left() - cm.right()
-		if self.text_layout is not None:
-			tm = self.text_layout.contentsMargins()
-			label_w -= tm.left() + tm.right()
+		label_w = self.text_width()
 
 		label.setWordWrap(True)
+		label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # текст по центру внутри лейбла
 		label.setFixedWidth(label_w)
 		label_h = label.heightForWidth(label_w)
 		if label_h <= 0:
 			label_h = label.sizeHint().height()
 		label.setFixedHeight(label_h)
+
+	def text_width(self) -> int:
+		cm = self.central_layout.contentsMargins()
+		tm = self.text_layout.contentsMargins()
+		return self.WIDTH - cm.left() - cm.right() - tm.left() - tm.right()
 
 	def finish_layout(self):
 		self.central_layout.activate()
@@ -1229,13 +1235,11 @@ class AllertWin(VerticalWin):
 	def _setup_ui(self, text: str):
 		self.svg_widget = QSvgWidget(self.icon_path)
 		self.svg_widget.setFixedSize(65, 65)
-		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
-		self.central_layout.addSpacing(5)
+		self.icon_layout.addWidget(self.svg_widget)
 
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.set_selectable(True)
-		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.description_label)
 		self.fit_label(self.description_label)
 

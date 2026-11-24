@@ -34,18 +34,19 @@ class ReplaceWin(VerticalWin):
         self.setFixedWidth(300)
         self._init_ui()
         self.adjustSize()
-        # self.setFixedSize(self.width(), self.height())
 
     def _init_ui(self):
         icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
         icon.setFixedSize(65, 65)
-        self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter,)
+        self.icon_layout.addWidget(icon)
 
         message = TransparentLabel(Lng.file_exists)
+        message.set_style("gray", "regular", "regular")
         self.text_layout.addWidget(message)
 
         self.filename_label = TransparentLabel(self.filename)
-        self.filename_label.set_elide(True)
+        self.filename_label.set_elide(True, ignore_width=True)
+        self.filename_label.set_style("regular", "small", "regular")
         self.text_layout.addWidget(self.filename_label)
 
         self.actions_widget = TransparentWidget()
@@ -63,6 +64,8 @@ class ReplaceWin(VerticalWin):
         self.keep_both_button.clicked.connect(self._keep_both)
         self.actions_layout.addWidget(self.keep_both_button)
 
+        self.button_layout.setSpacing(4)
+
         self.skip_button = UPushButton(Lng.skip)
         self.skip_button.clicked.connect(self._skip)
         self.button_layout.addWidget(self.skip_button)
@@ -76,7 +79,10 @@ class ReplaceWin(VerticalWin):
         self.replace_all_checkbox.setChecked(False)
 
         if self.show_checkbox:
-            self.central_layout.addWidget(self.replace_all_checkbox)
+            self.central_layout.addWidget(
+                self.replace_all_checkbox,
+                alignment=Qt.AlignmentFlag.AlignCenter
+        )
 
     def _checkbox_clicked(self):
         if self.replace_all_checkbox.isChecked():

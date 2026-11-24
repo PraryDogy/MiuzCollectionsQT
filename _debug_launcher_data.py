@@ -199,8 +199,8 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         ("Загрузка файлов", lambda: _new("widgets.win_upload", "UploadWin", copy_dest)),
         ("Копирование (песочница)", lambda: _new("widgets.win_copy_files", "WinCopyFiles",
                                                  target_dir=copy_dest, files_to_copy=copy_src)),
-        ("Замена файла", lambda: _new("widgets.win_copy_files", "ReplaceWin", "sample_red.jpg", True)),
-        ("Замена файла без чекбокса", lambda: _new("widgets.win_copy_files", "ReplaceWin", "sample_red.jpg", False)),
+        ("Замена файла", lambda: _new("widgets.win_copy_files", "ReplaceWin", "sample_red_very long filename_sample_red_very_long_filename.jpg", True)),
+        ("Замена файла без чекбокса", lambda: _new("widgets.win_copy_files", "ReplaceWin", "sample_red_very_long_filename_sample_red_very_long_filename.jpg", False)),
         ("Первый запуск", lambda: _new("widgets.win_first_load", "FirstLoadWin")),
 
         # ConfirmWindow и AllertWin: короткий и длинный текст, синяя кнопка, жёлтая иконка
