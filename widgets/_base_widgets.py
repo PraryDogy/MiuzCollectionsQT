@@ -1155,7 +1155,6 @@ class VerticalWin(UMainWindow):
 		self.button_layout = self.create_button_layout()
 
 	def _wrap(self, margins: tuple, spacing: int, align=None) -> QVBoxLayout:
-		# общая обёртка: виджет с вертикальным layout, добавляется в central_layout
 		widget = TransparentWidget()
 		layout = QVBoxLayout(widget)
 		layout.setContentsMargins(*margins)
@@ -1172,37 +1171,19 @@ class VerticalWin(UMainWindow):
 		return self._wrap((5, 0, 5, 0), 1, Qt.AlignmentFlag.AlignHCenter)
 
 	def create_button_layout(self, top_spacing: int = 5) -> QVBoxLayout:
-		# без выравнивания: кнопки растягиваются на всю ширину
 		return self._wrap((0, top_spacing, 0, 5), 6)
 
-	def fit_label(self, label: QLabel):
-		label_w = self.text_width()
-
-		label.setWordWrap(True)
-		label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # текст по центру внутри лейбла
-		label.setFixedWidth(label_w)
-		label_h = label.heightForWidth(label_w)
-		if label_h <= 0:
-			label_h = label.sizeHint().height()
-		label.setFixedHeight(label_h)
-
-	def text_width(self) -> int:
-		cm = self.central_layout.contentsMargins()
-		tm = self.text_layout.contentsMargins()
-		return self.WIDTH - cm.left() - cm.right() - tm.left() - tm.right()
-
 	def finish_layout(self):
-		self.central_layout.activate()
-		self.adjustSize()
+		QTimer.singleShot(0, lambda: self.setFixedHeight(self.height()))
 
-	def set_width(self, width: int):
-		self.WIDTH = width
-		self.setFixedWidth(width)
-		self.fit_label(self.description_label)
-		self.finish_layout()
+	def add_text_label(self, label: TransparentLabel):
+		label.setWordWrap(True)
+		label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum,)
+		self.text_layout.addWidget(label)
 
 
-class AllertWin(VerticalWin):
+class _AllertWin(VerticalWin):
 	BUTTONS: dict[str, UPushButton] = {
 		"red": RedButton,
 		"blue": ActiveButton,
@@ -1239,9 +1220,7 @@ class AllertWin(VerticalWin):
 
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
-		self.description_label.set_selectable(True)
-		self.text_layout.addWidget(self.description_label)
-		self.fit_label(self.description_label)
+		self.add_text_label(self.description_label)
 
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
@@ -1262,7 +1241,18 @@ class AllertWin(VerticalWin):
 			super().keyPressEvent(event)
 
 
-class ConfirmWin(AllertWin):
+class AllertWin(_AllertWin):
+	def __init__(
+		self,
+		text: str,
+		confirm_btn: Literal["red", "blue", "regular"],
+		icon: Literal["red", "blue", "yellow", "green"],
+	):
+		super().__init__(text, confirm_btn, icon)
+		self.finish_layout()
+
+
+class ConfirmWin(_AllertWin):
 	def __init__(
 		self,
 		text: str,
@@ -1273,6 +1263,7 @@ class ConfirmWin(AllertWin):
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.on_cancel)
 		self.button_layout.addWidget(self.cancel_btn)
+		self.finish_layout()
 
 
 class InputTextWin(UMainWindow):
