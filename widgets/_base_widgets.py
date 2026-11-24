@@ -1161,12 +1161,12 @@ class VerticalWin(UMainWindow):
 		self.central_layout.addWidget(self.button_widget)
 		return self.button_layout
 
-	def create_text_layout(self, margin: int = 5):
+	def create_text_layout(self):
 		# обертка для текста с полями: лейблы внутри получают ширину без полей
 		self.text_wrapper = TransparentWidget()
 		self.text_layout = QVBoxLayout(self.text_wrapper)
-		self.text_layout.setContentsMargins(margin, 0, margin, 0)
-		self.text_layout.setSpacing(5)
+		self.text_layout.setContentsMargins(5, 0, 5, 0)
+		self.text_layout.setSpacing(1)
 		self.central_layout.addWidget(self.text_wrapper)
 		return self.text_layout
 

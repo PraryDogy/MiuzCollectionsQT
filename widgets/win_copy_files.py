@@ -3,7 +3,7 @@ from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
 
 from cfg import Static
 from system.items import Mf
@@ -31,91 +31,63 @@ class ReplaceWin(VerticalWin):
         self.set_close_only()
         self.set_always_on_top()
         self.show_titlebar_sep()
-
+        self.setFixedWidth(300)
         self._init_ui()
         self.adjustSize()
-        self.setFixedSize(self.width(), self.height())
+        # self.setFixedSize(self.width(), self.height())
 
     def _init_ui(self):
         icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
         icon.setFixedSize(65, 65)
+        self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter,)
 
-        self.central_layout.addWidget(
-            icon,
-            alignment=Qt.AlignmentFlag.AlignCenter,
-        )
+        self.create_text_layout()
+        self.create_button_layout()
 
-        message = TransparentLabel(
-            Lng.file_exists
-        )
-        self.central_layout.addWidget(message)
+        message = TransparentLabel(Lng.file_exists)
+        self.text_layout.addWidget(message)
 
         self.filename_label = TransparentLabel(self.filename)
-        self.filename_label.setFixedWidth(message.sizeHint().width())
         self.filename_label.set_elide(True)
-        self.central_layout.addWidget(self.filename_label)
-
-        self.central_layout.addSpacing(5)
-
-        self.replace_all_checkbox = UCheckBox(
-            Lng.apply_to_all_files
-        )
-        self.replace_all_checkbox.clicked.connect(
-            self._checkbox_clicked
-        )
-        self.replace_all_checkbox.setChecked(False)
-
-        if self.show_checkbox:
-            self.central_layout.addWidget(
-                self.replace_all_checkbox
-            )
+        self.text_layout.addWidget(self.filename_label)
 
         self.actions_widget = TransparentWidget()
+        self.button_layout.addWidget(self.actions_widget)
+
         self.actions_layout = QHBoxLayout(self.actions_widget)
         self.actions_layout.setContentsMargins(0, 0, 0, 0)
         self.actions_layout.setSpacing(5)
 
-        self.replace_button = ActiveButton(
-            Lng.replace
-        )
+        self.replace_button = ActiveButton(Lng.replace)
         self.replace_button.clicked.connect(self._replace)
         self.actions_layout.addWidget(self.replace_button)
 
-        self.keep_both_button = UPushButton(
-            Lng.keep_both
-        )
+        self.keep_both_button = UPushButton(Lng.keep_both)
         self.keep_both_button.clicked.connect(self._keep_both)
         self.actions_layout.addWidget(self.keep_both_button)
 
-        self.central_layout.addWidget(self.actions_widget)
-
-        self.skip_button = UPushButton(
-            Lng.skip
-        )
+        self.skip_button = UPushButton(Lng.skip)
         self.skip_button.clicked.connect(self._skip)
-        self.central_layout.addWidget(self.skip_button)
+        self.button_layout.addWidget(self.skip_button)
 
-        self.cancel_button = UPushButton(
-            Lng.cancel
-        )
+        self.cancel_button = UPushButton(Lng.cancel)
         self.cancel_button.clicked.connect(self._cancel)
-        self.central_layout.addWidget(self.cancel_button)
+        self.button_layout.addWidget(self.cancel_button)
+
+        self.replace_all_checkbox = UCheckBox(Lng.apply_to_all_files)
+        self.replace_all_checkbox.clicked.connect(self._checkbox_clicked)
+        self.replace_all_checkbox.setChecked(False)
+
+        if self.show_checkbox:
+            self.central_layout.addWidget(self.replace_all_checkbox)
 
     def _checkbox_clicked(self):
         if self.replace_all_checkbox.isChecked():
-            self.replace_button.setText(
-                Lng.replace_all
-            )
-            self.keep_both_button.setText(
-                Lng.keep_all
-            )
+            self.replace_button.setText(Lng.replace_all)
+            self.keep_both_button.setText(Lng.keep_all)
         else:
-            self.replace_button.setText(
-                Lng.replace
-            )
-            self.keep_both_button.setText(
-                Lng.keep_both
-            )
+            self.replace_button.setText(Lng.replace)
+            self.keep_both_button.setText(Lng.keep_both)
 
     def _keep_both(self):
         self.keep_both.emit()
