@@ -948,6 +948,7 @@ class TitleWidget(TransparentWidget):
 
 		if descr:
 			self.description_widget = WrapLabel(descr)
+			self.description_widget.setToolTip("")
 			self.description_widget.set_style("gray", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
 

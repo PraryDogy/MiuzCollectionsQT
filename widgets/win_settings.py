@@ -26,7 +26,7 @@ from ._base_widgets import (ActiveButton, AllertWin, ConfirmWin,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             UListWidget, UListWidgetItem, UMainWindow, UMenu,
                             UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            UTableWidget)
+                            UTableWidget, WrapLabel)
 
 
 def restart_app():
@@ -722,13 +722,13 @@ class IgnoreListWin(UMainWindow):
 		self.group_lay.setContentsMargins(10, 5, 10, 10)
 		self.group_lay.setSpacing(5)
 
-		self.title_widget = TitleWidget(Lng.ignore_list, Lng.ignore_list_descr_short, Static.COLOR_ICONS / "stop.svg", sep=False)
+		self.title_widget = TitleWidget(
+			Lng.ignore_list,
+			Lng.ignore_list_descr_short,
+			Static.COLOR_ICONS / "stop.svg",
+			sep=False
+		)
 		self.group_lay.addWidget(self.title_widget)
-
-		self.descr_widget = TransparentLabel(text=Lng.ignore_list_descr_short)
-		self.descr_widget.set_style("gray", "regular", "regular")
-		self.descr_widget.setWordWrap(True)
-		self.group_lay.addWidget(self.descr_widget)
 
 		self.v_list_widget = UListWidget()
 		self.v_list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)

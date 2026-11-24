@@ -25,7 +25,6 @@ class EmptyOverlay(TransparentLabel):
 		super().__init__(text=text, parent=parent)
 		self.set_style("gray", "regular", "regular")
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.setWordWrap(True)
 		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 		self.hide()
 
