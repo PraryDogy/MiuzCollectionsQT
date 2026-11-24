@@ -1143,17 +1143,21 @@ class VerticalWin(UMainWindow):
 
 	def __init__(self):
 		super().__init__()
+		self.setFixedWidth(self.WIDTH)
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
-		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-		self.central_layout.setSpacing(3)
 
-		self.setFixedWidth(self.WIDTH)
 		self.icon_layout = self.create_icon_layout()
 		self.text_layout = self.create_text_layout()
 		self.button_layout = self.create_button_layout()
-		self.central_layout.addStretch(1)
+		# self.central_layout.addStretch(1)
+
+	@staticmethod
+	def line_count(label: QLabel, width: int) -> int:
+		line_h = label.fontMetrics().lineSpacing()
+		total_h = label.heightForWidth(width)
+		return max(1, round(total_h / line_h))
 
 	def create_icon_layout(self):
 		wrapper = TransparentWidget()
@@ -1225,6 +1229,8 @@ class _AllertWin(VerticalWin):
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.setWordWrap(True)
 		self.text_layout.addWidget(self.description_label)
+
+		count = self.line_count(self.description_label, self.WIDTH)
 
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
