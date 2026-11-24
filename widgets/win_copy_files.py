@@ -45,9 +45,11 @@ class ReplaceWin(VerticalWin):
         self.text_layout.addWidget(message)
 
         self.filename_label = TransparentLabel(self.filename)
-        self.filename_label.set_elide(True, ignore_width=True)
-        self.filename_label.set_style("regular", "small", "regular")
+        self.filename_label.setWordWrap(True)
+        self.filename_label.set_style("regular", "regular", "regular")
         self.text_layout.addWidget(self.filename_label)
+
+        self.fit_label(self.filename_label)
 
         self.actions_widget = TransparentWidget()
         self.button_layout.addWidget(self.actions_widget)
