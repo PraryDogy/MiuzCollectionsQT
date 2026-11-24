@@ -3,18 +3,18 @@ from pathlib import Path
 from typing import Literal
 
 from PyQt6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
-                          pyqtSignal)
+						  pyqtSignal)
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-                         QFontMetrics, QIcon, QPainter, QPainterPath, QPalette)
+						 QFontMetrics, QIcon, QPainter, QPainterPath, QPalette)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
-                             QGroupBox, QHBoxLayout, QLabel, QLayout,
-                             QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
-                             QStyle, QStyledItemDelegate, QStyleOptionViewItem,
-                             QTableWidget, QTextEdit, QTreeView, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+							 QGroupBox, QHBoxLayout, QLabel, QLayout,
+							 QLineEdit, QListWidget, QListWidgetItem,
+							 QMainWindow, QMenu, QProgressBar, QPushButton,
+							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
+							 QStyle, QStyledItemDelegate, QStyleOptionViewItem,
+							 QTableWidget, QTextEdit, QTreeView, QTreeWidget,
+							 QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import Static
 from system.items import Mf, RootProbe

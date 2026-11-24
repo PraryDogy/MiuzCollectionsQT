@@ -45,7 +45,9 @@ class ReplaceWin(VerticalWin):
         message.set_style("gray", "regular", "regular")
 
         self.filename_label = TransparentLabel(self.filename)
+        self.filename_label.set_elide(True)
         self.add_text_label(self.filename_label)
+        self.text_layout.addWidget(self.filename_label)
         self.filename_label.set_style("regular", "regular", "regular")
 
         self.actions_widget = TransparentWidget()
