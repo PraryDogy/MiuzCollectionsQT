@@ -183,43 +183,28 @@ class TransparentLabel(TextMixin, QLabel):
 			self._update_text()
 
 
-class WrapLabel(TextMixin, QTextEdit):
+class WrapLabel(QTextEdit):
 	def __init__(self, text: str = "", parent=None):
-		super().__init__(parent)
-		self._init_text_mixin(text)
+		super().__init__(text, parent)
 		self.setReadOnly(True)
-		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setFrameShape(QFrame.Shape.NoFrame)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setText(text)
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setWordWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
+		self.document().setDocumentMargin(0)
 
-	# --- API, совпадающий с QLabel ---
-
-	def setText(self, text: str):
-		self._original_text = text or ""
-		self.setPlainText(self._original_text)
-		self._apply_option()
-
-	def text(self) -> str:
-		return self.toPlainText()
-
-	def _apply_option(self):
-		# настройки документа: перенос и выравнивание для всего текста
 		opt = self.document().defaultTextOption()
+		opt.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.document().setDefaultTextOption(opt)
 
-	def _selected_text(self) -> str:
-		return self.textCursor().selectedText()
-
-	# --- Размеры ---
+		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
 	def hasHeightForWidth(self) -> bool:
 		return True
 
 	def heightForWidth(self, width: int) -> int:
-		m = self.contentsMargins()
-		self.document().setTextWidth(width - m.left() - m.right())
-		return math.ceil(self.document().size().height()) + m.top() + m.bottom()
+		self.document().setTextWidth(width)
+		return math.ceil(self.document().size().height())
 
 	def minimumSizeHint(self) -> QSize:
 		return QSize(0, 0)
@@ -1159,7 +1144,6 @@ class VerticalWin(UMainWindow):
 
 	def __init__(self):
 		super().__init__()
-		self.setFixedWidth(self.WIDTH)
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
@@ -1195,8 +1179,9 @@ class VerticalWin(UMainWindow):
 		return self.button_layout
 
 	def finish_layout(self):
-		self.adjustSize()
-		self.setFixedHeight(self.height())
+		self.setFixedWidth(self.WIDTH)
+		self.window_layout.activate()
+		self.setFixedHeight(self.window_layout.totalHeightForWidth(self.WIDTH))
 
 
 class _AllertWin(VerticalWin):
@@ -1227,7 +1212,7 @@ class _AllertWin(VerticalWin):
 
 		self.setWindowTitle(Lng.attention)
 		self._setup_ui(text)
-		self.finish_layout()
+		# self.finish_layout()
 
 	def _setup_ui(self, text: str):
 		self.svg_widget = QSvgWidget(self.icon_path)
@@ -1236,7 +1221,7 @@ class _AllertWin(VerticalWin):
 
 		self.description_label = WrapLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
-		self.text_layout.addWidget(self.description_label)
+		self.text_layout.addWidget(self.description_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)

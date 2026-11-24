@@ -48,6 +48,7 @@ class ReplaceWin(VerticalWin):
         self.text_layout.addWidget(message)
 
         self.filename_label = WrapLabel(self.filename)
+        self.filename_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.text_layout.addWidget(self.filename_label)
 
         self.actions_widget = TransparentWidget()
@@ -85,7 +86,6 @@ class ReplaceWin(VerticalWin):
                 alignment=Qt.AlignmentFlag.AlignCenter
             )
             self.central_layout.addSpacing(5)
-        
 
     def _checkbox_clicked(self):
         if self.replace_all_checkbox.isChecked():
