@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PyQt6.QtCore import QEvent, QSize, Qt, pyqtSignal
+from PyQt6.QtCore import QEvent, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QIcon, QImage, QPixmap
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLineEdit, QSizePolicy,
@@ -20,13 +20,13 @@ from system.runnable import (HashDirSize, HashDirSizeItem, MfCleaner,
 from system.themes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, AllertWin, ConfirmWin,
-                            HoverGroupBox, MfAliasWidget, MfPathWidget,
-                            RowArrowWidget, TagWidget, TitleWidget,
-                            TransparentLabel, TransparentWidget, UGroupBox,
-                            UListWidget, UListWidgetItem, UMainWindow, UMenu,
-                            UPushButton, UScrollVerticalArea, USep, USpinBox,
-                            UTableWidget, WrapLabel)
+from ._base_widgets import (ActiveButton, AllertWin, ConfirmWin, HoverGroupBox,
+                            MfAliasWidget, MfPathWidget, RowArrowWidget,
+                            TagWidget, TitleWidget, TransparentLabel,
+                            TransparentWidget, UGroupBox, UListWidget,
+                            UListWidgetItem, UMainWindow, UMenu, UPushButton,
+                            UScrollVerticalArea, USep, USpinBox, UTableWidget,
+                            WrapLabel)
 
 
 def restart_app():
@@ -1082,7 +1082,7 @@ class NewMfWin(UMainWindow):
 
 		self.setFixedWidth(510)
 		self.adjustSize()
-		self.setFixedHeight(self.height())
+		QTimer.singleShot(1, lambda: self.setFixedHeight(self.height()))
 
 	def autoname_cmd(self):
 		if self.mf_path_widget.draft_mf_path:
