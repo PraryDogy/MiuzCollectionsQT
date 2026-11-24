@@ -28,6 +28,36 @@ from system.utils import Utils
 class TransparentButton(QPushButton):
 	pass
 
+class TransparentWidget(QWidget):
+	pass
+
+
+class TransparentFrame(QFrame):
+	pass
+
+
+class TransparentLineEdit(QLineEdit):
+	pass
+
+
+class TransparentTextEdit(QTextEdit):
+	pass
+
+class TransparentMenu(QMenu):
+	pass
+
+
+class TransparentScrollArea(QScrollArea):
+	pass
+
+
+class UGroupBox(QGroupBox):
+	pass
+
+
+class UTableWidget(QTableWidget):
+	pass
+
 
 class TextMixin:
 	"""Общее поведение текстовых виджетов: стиль, выделение, копирование, меню."""
@@ -40,7 +70,7 @@ class TextMixin:
 
 	# --- Стиль ---
 
-	def set_style(self, color, size, weight):
+	def set_style(self: TransparentWidget, color, size, weight):
 		for k, v in {"state": color, "text_size": size, "text_weight": weight}.items():
 			self.setProperty(k, v)
 		self.style().unpolish(self)
@@ -48,18 +78,18 @@ class TextMixin:
 		self.updateGeometry()
 		self.update()
 
-	def set_state(self, state: str):
+	def set_state(self: TransparentWidget, state: str):
 		self.setProperty("state", state)
 
-	def get_state(self) -> str:
+	def get_state(self: TransparentWidget) -> str:
 		return self.property("state")
 
-	def text_full(self) -> str:
+	def text_full(self: TransparentWidget) -> str:
 		return self._original_text
 
 	# --- Выделение и меню ---
 
-	def set_selectable(self, enabled: bool):
+	def set_selectable(self: TransparentWidget | QTextEdit, enabled: bool):
 		if enabled:
 			self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 			self.setCursor(Qt.CursorShape.IBeamCursor)
@@ -81,7 +111,7 @@ class TextMixin:
 	def _menu_copy_text(self, full_text: str) -> str:
 		return self._clean(self._selected_text()) or full_text
 
-	def contextMenuEvent(self, ev: QContextMenuEvent):
+	def contextMenuEvent(self: TransparentWidget , ev: QContextMenuEvent):
 		if not self._context_menu_enabled:
 			return super().contextMenuEvent(ev)
 
@@ -210,37 +240,6 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.document().setTextWidth(self.viewport().width())
 		# без лишнего +4, только высота документа
 		self.setFixedHeight(int(self.document().size().height()))
-
-
-class TransparentFrame(QFrame):
-	pass
-
-
-class TransparentWidget(QWidget):
-	pass
-
-
-class TransparentLineEdit(QLineEdit):
-	pass
-
-
-class TransparentTextEdit(QTextEdit):
-	pass
-
-class TransparentMenu(QMenu):
-	pass
-
-
-class TransparentScrollArea(QScrollArea):
-	pass
-
-
-class UGroupBox(QGroupBox):
-	pass
-
-
-class UTableWidget(QTableWidget):
-	pass
 
 
 class HoverGroupBox(UGroupBox):
