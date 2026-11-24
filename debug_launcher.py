@@ -26,7 +26,7 @@ from PyQt6.QtCore import QEvent, QObject, Qt
 from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import QApplication, QGridLayout, QHBoxLayout
 
-import preview_windows as pw
+import _debug_launcher_data as pw
 from cfg import JsonData
 from system.themes import ThemeChanger
 from widgets._base_widgets import (ActiveButton, TransparentLabel,

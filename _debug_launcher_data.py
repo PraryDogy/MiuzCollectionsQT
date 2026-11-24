@@ -149,13 +149,6 @@ def _alert(key, btn: str, icon: str, text: str = None, extra: str = ""):
     return make
 
 
-def _set_confirm_text(key: str):
-    """Правка кнопки подтверждения после создания окна (как в win_filters)."""
-    def setup(win):
-        win.confirm_btn.setText(_lng(key))
-    return setup
-
-
 def _img_view_item(items):
     from widgets.win_image_view import ImgViewItem
     return ImgViewItem(
@@ -210,39 +203,13 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         ("Замена файла без чекбокса", lambda: _new("widgets.win_copy_files", "ReplaceWin", "sample_red.jpg", False)),
         ("Первый запуск", lambda: _new("widgets.win_first_load", "FirstLoadWin")),
 
-        # ConfirmWindow: каждое место вызова из рабочего кода
-        ("Подтверждение: стандартное", _confirm(None, "blue", "blue",
-            text="Стандартное окно подтверждения, другая строка и другой текстовый текст")),
-        ("Подтверждение: удаление файла", _confirm("remove_file_question", "red", "yellow")),
-        ("Подтверждение: удаление файлов", _confirm("remove_files_question", "red", "yellow")),
-        ("Подтверждение: каталог не совпал", _confirm("catalog_mismatch_text", "blue", "red")),
-        ("Подтверждение: удаление сервера", _confirm("confirm_delete", "red", "yellow")),
-        ("Подтверждение: сброс данных", _confirm("erase_data_long", "red", "yellow")),
-        ("Подтверждение: перезапуск приложения", _confirm("app_will_restarted", "blue", "blue")),
-        ("Подтверждение: неверный путь", _confirm("make_sure_path", "blue", "red")),
-        ("Подтверждение: удаление каталога", _confirm("remove_catalog_warn", "red", "yellow")),
-        ("Подтверждение: новый каталог", _confirm("new_mf_confirm", "blue", "blue")),
-        ("Подтверждение: удаление тега", _confirm("remove_tag_question", "red", "yellow",
-                                                  setup=_set_confirm_text("remove_tag_confirm"))),
-        ("Подтверждение: сохранение первого запуска", _confirm("save_text_long", "blue", "yellow")),
-
-        # AllertWin: каждое место вызова из рабочего кода
-        ("Алерт: ожидание сканера", _alert("wait_for_scan", "blue", "blue")),
-        ("Алерт: скрытие цифр", _alert("hide_digits_full", "blue", "blue")),
-        ("Алерт: переиндексация", _alert("reindex_warning", "blue", "blue")),
-        ("Алерт: путь каталога (настройки)", _alert("select_catalog_path", "blue", "yellow")),
-        ("Алерт: путь каталога (базовые виджеты)", _alert("select_catalog_path", "blue", "yellow")),
-        ("Алерт: минимум один каталог", _alert("at_least_one_folder_required", "blue", "yellow")),
-        ("Алерт: ошибка восстановления", _alert("repair_failed", "blue", "yellow")),
-        ("Алерт: ошибка копирования", _alert("copy_error", "blue", "yellow",
-                                             extra="\nTraceback (пример)")),
-        ("Алерт: ошибка (базовые виджеты)", _alert(None, "blue", "yellow", text="Текст ошибки (пример)")),
-
-        # варианты иконок и кнопок, которых нет в коде, но нужны для проверки темы
-        ("Алерт: зелёная галочка, обычная кнопка", _alert(None, "regular", "green",
-                                                          text="Операция выполнена")),
-        ("Алерт: красная иконка, красная кнопка", _alert(None, "red", "red",
-                                                         text="Необратимое действие")),
+        # ConfirmWindow и AllertWin: короткий и длинный текст, синяя кнопка, жёлтая иконка
+        ("Подтверждение: короткий текст", _confirm(None, "blue", "yellow", text="Короткий текст")),
+        ("Подтверждение: длинный текст", _confirm(None, "blue", "yellow",
+            text="Длинный текст предупреждения в несколько строк для теста длины")),
+        ("Алерт: короткий текст", _alert(None, "blue", "yellow", text="Короткий текст")),
+        ("Алерт: длинный текст", _alert(None, "blue", "yellow",
+            text="Длинный текст предупреждения в несколько строк для теста длины")),
 
         # прочие диалоги
         ("Ввод текста", lambda: _new("widgets._base_widgets", "InputTextWin", "Новый тег", "Придумайте название нового тега")),
