@@ -563,7 +563,6 @@ class MfRepairGroup(HoverGroupBox):
 		self.v_lay.setSpacing(10)
 
 		title_widget = TitleWidget(title, description, sep=False)
-		title_widget.description_widget.setWordWrap(True)
 		self.v_lay.addWidget(title_widget)
 
 		self.setFixedWidth(330)
