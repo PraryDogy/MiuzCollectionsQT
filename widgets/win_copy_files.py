@@ -32,9 +32,8 @@ class ReplaceWin(VerticalWin):
         self.set_close_only()
         self.set_always_on_top()
         self.show_titlebar_sep()
-        self.setFixedWidth(300)
         self._init_ui()
-        # self.adjustSize()
+        self.finish_layout()
 
     def _init_ui(self):
         icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))

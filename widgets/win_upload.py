@@ -20,11 +20,8 @@ class UploadWin(ConfirmWin):
 		idx = self.central_layout.indexOf(descr) + 1
 
 		self.dest_widget = TransparentLabel(dest)
-		self.dest_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.add_text_label(self.dest_widget)
 		self.dest_widget.set_style("regular", "small", "regular")
-		self.dest_widget.setWordWrap(True)
 		self.dest_widget.set_selectable(True)
-		self.central_layout.insertWidget(idx, self.dest_widget)
 
 		self.confirm_btn.setText(Lng.upload)
-		self.fit_label(self.dest_widget)
