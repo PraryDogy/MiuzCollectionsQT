@@ -1182,6 +1182,7 @@ class VerticalWin(UMainWindow):
 
 	def finish_layout(self):
 		self.setFixedWidth(self.WIDTH)
+		QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 class _AllertWin(VerticalWin):
 	BUTTONS: dict[str, UPushButton] = {
@@ -1220,6 +1221,7 @@ class _AllertWin(VerticalWin):
 
 		self.description_label = WrapLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
+		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.description_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
