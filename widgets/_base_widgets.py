@@ -183,35 +183,33 @@ class TransparentLabel(TextMixin, QLabel):
 			self._update_text()
 
 
-from PyQt6.QtWidgets import QTextEdit, QSizePolicy, QFrame
-from PyQt6.QtCore import Qt
-
 class WrapLabel(TextMixin, QTextEdit):
-    def __init__(self, text: str = "", parent=None):
-        super().__init__(parent)
-        self.setReadOnly(True)
-        self.setFrameShape(QFrame.Shape.NoFrame)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+	def __init__(self, text: str = "", parent=None):
+		super().__init__(parent)
+		self._init_text_mixin(text)
+		self.setReadOnly(True)
+		self.setFrameShape(QFrame.Shape.NoFrame)
+		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-        # убираем внутренние отступы самого документа
-        self.document().setDocumentMargin(0)
+		# убираем внутренние отступы самого документа
+		self.document().setDocumentMargin(0)
 
-        self.setPlainText(text)
-        self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
-        self._fit_height()
+		self.setPlainText(text)
+		self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
+		self._fit_height()
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.document().setTextWidth(self.viewport().width())
-        self._fit_height()
+	def resizeEvent(self, event):
+		super().resizeEvent(event)
+		self.document().setTextWidth(self.viewport().width())
+		self._fit_height()
 
-    def _fit_height(self):
-        self.document().setTextWidth(self.viewport().width())
-        # без лишнего +4, только высота документа
-        self.setFixedHeight(int(self.document().size().height()))
+	def _fit_height(self):
+		self.document().setTextWidth(self.viewport().width())
+		# без лишнего +4, только высота документа
+		self.setFixedHeight(int(self.document().size().height()))
 
 
 class TransparentFrame(QFrame):
@@ -1184,9 +1182,6 @@ class VerticalWin(UMainWindow):
 
 	def finish_layout(self):
 		self.setFixedWidth(self.WIDTH)
-		self.window_layout.activate()
-		self.setFixedHeight(self.window_layout.totalHeightForWidth(self.WIDTH))
-
 
 class _AllertWin(VerticalWin):
 	BUTTONS: dict[str, UPushButton] = {
