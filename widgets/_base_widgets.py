@@ -30,6 +30,7 @@ class TransparentButton(QPushButton):
 class TransparentLabel(QLabel):
 	sym_line_feed = "\u000a"
 	sym_paragraph_sep = "\u2029"
+	LINE_HEIGHT = 16
 
 	def __init__(self, text="", parent=None):
 		super().__init__(text or "", parent)
@@ -69,6 +70,13 @@ class TransparentLabel(QLabel):
 
 	def get_state(self) -> str:
 		return self.property("state")
+
+	def set_fixed_word_wrap(self, width: int) -> int:
+		self.setWordWrap(True)
+		line_h = self.fontMetrics().lineSpacing()
+		total_h = self.heightForWidth(width)
+		lines = max(1, round(total_h / line_h))
+		self.setFixedHeight(self.LINE_HEIGHT * lines)
 
 	# --- Текст ---
 
@@ -1151,13 +1159,6 @@ class VerticalWin(UMainWindow):
 		self.icon_layout = self.create_icon_layout()
 		self.text_layout = self.create_text_layout()
 		self.button_layout = self.create_button_layout()
-		# self.central_layout.addStretch(1)
-
-	@staticmethod
-	def line_count(label: QLabel, width: int) -> int:
-		line_h = label.fontMetrics().lineSpacing()
-		total_h = label.heightForWidth(width)
-		return max(1, round(total_h / line_h))
 
 	def create_icon_layout(self):
 		wrapper = TransparentWidget()
@@ -1172,7 +1173,6 @@ class VerticalWin(UMainWindow):
 		wrapper = TransparentWidget()
 		self.central_layout.addWidget(wrapper)
 		self.text_layout = QVBoxLayout(wrapper)
-		self.text_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.setContentsMargins(0, 0, 0, 0)
 		self.text_layout.setSpacing(5)
 		return self.text_layout
@@ -1186,7 +1186,6 @@ class VerticalWin(UMainWindow):
 		return self.button_layout
 
 	def finish_layout(self):
-		return
 		QTimer.singleShot(0, lambda: self.setFixedHeight(self.height()))
 
 
@@ -1227,10 +1226,9 @@ class _AllertWin(VerticalWin):
 
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
-		self.description_label.setWordWrap(True)
+		self.description_label.set_fixed_word_wrap(self.WIDTH)
+		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.description_label)
-
-		count = self.line_count(self.description_label, self.WIDTH)
 
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
