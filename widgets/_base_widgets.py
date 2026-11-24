@@ -1139,7 +1139,7 @@ class WinProgressbar(UMainWindow):
 
 
 class VerticalWindow(UMainWindow):
-	WIDTH = 280  # одна ширина на все диалоги, подклассы могут переопределить
+	WIDTH = 250
 
 	def __init__(self):
 		super().__init__()
@@ -1151,9 +1151,9 @@ class VerticalWindow(UMainWindow):
 		self.central_layout.setSpacing(3)
 
 		self.button_layout = None
+		self.text_layout = None
 
 	def create_button_layout(self, top_spacing: int = 5, spacing: int = 6):
-		# обертка для кнопок, наследники добавляют в self.button_layout свои кнопки
 		self.central_layout.addSpacing(top_spacing)
 		self.button_widget = TransparentWidget()
 		self.button_layout = QVBoxLayout(self.button_widget)
@@ -1162,12 +1162,23 @@ class VerticalWindow(UMainWindow):
 		self.central_layout.addWidget(self.button_widget)
 		return self.button_layout
 
+	def create_text_layout(self, margin: int = 5):
+		# обертка для текста с полями: лейблы внутри получают ширину без полей
+		self.text_wrapper = TransparentWidget()
+		self.text_layout = QVBoxLayout(self.text_wrapper)
+		self.text_layout.setContentsMargins(margin, 0, margin, 0)
+		self.text_layout.setSpacing(5)
+		self.central_layout.addWidget(self.text_wrapper)
+		return self.text_layout
+
 	def fit_label(self, label: QLabel):
-		# ширина, доступная лейблу: окно минус поля central_layout
+		# ширина, доступная лейблу: окно минус поля central_layout и text_layout
 		cm = self.central_layout.contentsMargins()
 		label_w = self.WIDTH - cm.left() - cm.right()
+		if self.text_layout is not None:
+			tm = self.text_layout.contentsMargins()
+			label_w -= tm.left() + tm.right()
 
-		# реальная высота текста с переносом при этой ширине
 		label.setWordWrap(True)
 		label.setFixedWidth(label_w)
 		label_h = label.heightForWidth(label_w)
@@ -1176,7 +1187,6 @@ class VerticalWindow(UMainWindow):
 		label.setFixedHeight(label_h)
 
 	def finish_layout(self):
-		# все размеры уже зафиксированы, adjustSize считает высоту окна
 		self.central_layout.activate()
 		self.adjustSize()
 
@@ -1219,11 +1229,13 @@ class AllertWin(VerticalWindow):
 		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 		self.central_layout.addSpacing(5)
 
+		text_layout = self.create_text_layout()
+
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.set_selectable(True)
 		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.central_layout.addWidget(self.description_label)
+		text_layout.addWidget(self.description_label)
 		self.fit_label(self.description_label)
 
 		self.button_layout = self.create_button_layout()
