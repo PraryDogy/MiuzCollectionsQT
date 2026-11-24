@@ -314,7 +314,7 @@ class WinImgSearchPreviewWidget(ImageDropFrame):
 		self.image_label.clear()
 
 
-class ControlsWidget(UGroupBox):
+class ControlsWidget(TransparentWidget):
 	reset_btn_clicked = pyqtSignal()
 	slider_moved = pyqtSignal(int)
 
