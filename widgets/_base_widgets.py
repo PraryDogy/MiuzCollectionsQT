@@ -1143,47 +1143,47 @@ class VerticalWin(UMainWindow):
 
 	def __init__(self):
 		super().__init__()
-		self.setFixedWidth(self.WIDTH)
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
 		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 		self.central_layout.setSpacing(3)
 
+		self.setFixedWidth(self.WIDTH)
 		self.icon_layout = self.create_icon_layout()
 		self.text_layout = self.create_text_layout()
 		self.button_layout = self.create_button_layout()
+		self.central_layout.addStretch(1)
 
-	def _wrap(self, margins: tuple, spacing: int, align=None) -> QVBoxLayout:
-		widget = TransparentWidget()
-		layout = QVBoxLayout(widget)
-		layout.setContentsMargins(*margins)
-		layout.setSpacing(spacing)
-		if align is not None:
-			layout.setAlignment(align)
-		self.central_layout.addWidget(widget)
-		return layout
+	def create_icon_layout(self):
+		wrapper = TransparentWidget()
+		self.central_layout.addWidget(wrapper)
+		self.icon_layout = QVBoxLayout(wrapper)
+		self.icon_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.icon_layout.setContentsMargins(0, 0, 0, 0)
+		self.icon_layout.setSpacing(0)
+		return self.icon_layout
 
-	def create_icon_layout(self) -> QVBoxLayout:
-		return self._wrap((0, 0, 0, 0), 0, Qt.AlignmentFlag.AlignHCenter)
+	def create_text_layout(self):
+		wrapper = TransparentWidget()
+		self.central_layout.addWidget(wrapper)
+		self.text_layout = QVBoxLayout(wrapper)
+		self.text_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.text_layout.setContentsMargins(0, 0, 0, 0)
+		self.text_layout.setSpacing(5)
+		return self.text_layout
 
-	def create_text_layout(self) -> QVBoxLayout:
-		return self._wrap((5, 0, 5, 0), 1, Qt.AlignmentFlag.AlignHCenter)
-
-	def create_button_layout(self, top_spacing: int = 5) -> QVBoxLayout:
-		return self._wrap((0, top_spacing, 0, 5), 6)
+	def create_button_layout(self):
+		wrapper = TransparentWidget()
+		self.central_layout.addWidget(wrapper)
+		self.button_layout = QVBoxLayout(wrapper)
+		self.button_layout.setContentsMargins(0, 0, 0, 0)
+		self.button_layout.setSpacing(5)
+		return self.button_layout
 
 	def finish_layout(self):
-		self.adjustSize()
 		return
 		QTimer.singleShot(0, lambda: self.setFixedHeight(self.height()))
-
-	def add_text_label(self, label: TransparentLabel):
-		# if not label._elide_enabled:
-			# label.setWordWrap(True)
-		# label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		# label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum,)
-		self.text_layout.addWidget(label)
 
 
 class _AllertWin(VerticalWin):
