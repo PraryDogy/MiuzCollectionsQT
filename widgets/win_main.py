@@ -16,7 +16,7 @@ from system.scaner import (BaseScaner, DirsReady, ForcedScaner, MfScanned,
                            PathCheckPassed, PathMismatch, ScanerWorker,
                            ScanProgress)
 
-from ._base_widgets import (AllertWin, ConfirmWindow, TransparentLabel,
+from ._base_widgets import (AllertWin, ConfirmWin, TransparentLabel,
                             UGroupBox, UMainWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
@@ -121,7 +121,7 @@ class TestWid(TransparentLabel):
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 	def reload(self):
-		self.confirm_win = ConfirmWindow(
+		self.confirm_win = ConfirmWin(
 			text="Стандратное окно подтверждения, другая строка и другой текстовый текст",
 			confirm_btn="blue",
 			icon="blue"
@@ -250,11 +250,7 @@ class WinMain(UMainWindow):
 		self.stop_list_changed = True
 		self.restart_scaner_task()
 
-		win_warn = AllertWin(
-			text=Lng.wait_for_scan,
-			confirm_btn="blue",
-			icon="blue"
-		)
+		win_warn = AllertWin(Lng.wait_for_scan, "blue", "blue")
 		win_warn.center_to_parent(self)
 		win_warn.show()
 
@@ -299,11 +295,7 @@ class WinMain(UMainWindow):
 		self.bar_bottom.bar_path.update_path(abs_path)
 
 	def on_hide_digits_clicked(self):
-		self.win_warn = AllertWin(
-			text=Lng.hide_digits_full,
-			confirm_btn="blue",
-			icon="blue"
-		)
+		self.win_warn = AllertWin(Lng.hide_digits_full, "blue", "blue")
 		self.win_warn.ok_clicked.connect(self.win_warn.deleteLater)
 		self.win_warn.center_to_parent(self)
 		self.win_warn.show()
@@ -460,7 +452,7 @@ class WinMain(UMainWindow):
 		mf = Mf.current_mf
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
-		self.remove_files_win = ConfirmWindow(
+		self.remove_files_win = ConfirmWin(
 			text=text,
 			confirm_btn="red",
 			icon="yellow"
@@ -517,11 +509,7 @@ class WinMain(UMainWindow):
 	def on_repair_done(self, clean_type: str):
 		self.close_all_windows_except_main()
 
-		win = AllertWin(
-			text=Lng.reindex_warning,
-			confirm_btn="blue",
-			icon="blue"
-		)
+		win = AllertWin(Lng.reindex_warning, "blue", "blue")
 		win.center_to_parent(self)
 		win.show()
 
@@ -795,7 +783,7 @@ class WinMain(UMainWindow):
 			self.on_mf_clicked(mf)
 			self.open_win_smb(mf)
 
-		self.mismatch_win = ConfirmWindow(
+		self.mismatch_win = ConfirmWin(
 			text=Lng.catalog_mismatch_text,
 			confirm_btn="blue",
 			icon="red",

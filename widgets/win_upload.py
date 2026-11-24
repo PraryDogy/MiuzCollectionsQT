@@ -4,10 +4,10 @@ from PyQt6.QtWidgets import QWidget
 from cfg import Static
 from system.lang import Lng
 
-from ._base_widgets import ConfirmWindow, TransparentLabel
+from ._base_widgets import ConfirmWin, TransparentLabel
 
 
-class UploadWin(ConfirmWindow):
+class UploadWin(ConfirmWin):
 	# WIDTH = 320
 
 	def __init__(self, dest: str):

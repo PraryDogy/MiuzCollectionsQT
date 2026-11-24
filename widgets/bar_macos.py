@@ -6,12 +6,12 @@ from cfg import Static
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import UMenu, UPushButton, VerticalWindow, TransparentLabel
+from ._base_widgets import UMenu, UPushButton, VerticalWin, TransparentLabel
 from .win_servers import ServersWin
 from .win_settings import WinSettings
 
 
-class AboutWin(VerticalWindow):
+class AboutWin(VerticalWin):
 	INFO_TEXT = "\n".join([
 		f"{Static.APP_NAME}",
 		f"Version {Static.APP_VERSION}",

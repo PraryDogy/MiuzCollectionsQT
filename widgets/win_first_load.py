@@ -14,7 +14,7 @@ from system.items import Mf
 from system.lang import Lng
 from system.runnable import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWindow, HoverGroupBox, TitleWidget,
+from ._base_widgets import (ConfirmWin, HoverGroupBox, TitleWidget,
                             TransparentWidget, UMenu, UPushButton)
 from .win_settings import NewMfWin
 
@@ -171,7 +171,7 @@ class FirstLoadWin(NewMfWin):
 		mf_alias = self.mf_alias_widget.validate_and_show_win()
 		mf_path = self.path_widget.validate_and_show_win()
 		if mf_alias and mf_path:
-			self.save_win = ConfirmWindow(
+			self.save_win = ConfirmWin(
 				text=Lng.save_text_long,
 				confirm_btn="blue",
 				icon="yellow"

@@ -20,7 +20,7 @@ from system.runnable import (HashDirSize, HashDirSizeItem, MfCleaner,
 from system.themes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, AllertWin, ConfirmWindow,
+from ._base_widgets import (ActiveButton, AllertWin, ConfirmWin,
                             HoverGroupBox, MfAliasWidget, MfPathWidget,
                             RowArrowWidget, TagWidget, TitleWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
@@ -35,7 +35,7 @@ def restart_app():
 	QApplication.exit(0)
 
 
-class CancelChangesWin(ConfirmWindow):
+class CancelChangesWin(ConfirmWin):
 	def __init__(self, text):
 		super().__init__(
 			text=text, 
@@ -226,7 +226,7 @@ class RebootableSettings(UGroupBox):
 			shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
 			restart_app()
 
-		reset_win = ConfirmWindow(
+		reset_win = ConfirmWin(
 			text=Lng.erase_data_long,
 			confirm_btn="red",
 			icon="yellow"
@@ -555,7 +555,7 @@ class GeneralSettings(TransparentWidget):
 			JsonData.write_json_data()
 			restart_app()
 
-		win = ConfirmWindow(
+		win = ConfirmWin(
 			text=Lng.app_will_restarted,
 			confirm_btn="blue",
 			icon="blue"
@@ -988,11 +988,7 @@ class MfSettings(UGroupBox):
 
 	def save_changes(self):
 		if not self.path_widget.validate_and_show_win():
-			win_warn = AllertWin(
-				text=Lng.select_catalog_path,
-				confirm_btn="blue",
-				icon="yellow"
-			)
+			win_warn = AllertWin(Lng.select_catalog_path, "blue", "yellow")
 			win_warn.center_to_parent(self.window())
 			win_warn.ok_clicked.connect(win_warn.deleteLater)
 			win_warn.show()
@@ -1008,14 +1004,14 @@ class MfSettings(UGroupBox):
 			restart_app()
 
 		if self.path_widget.draft_mf_path != self.mf.mf_path:
-			win = ConfirmWindow(
+			win = ConfirmWin(
 				text=Lng.make_sure_path,
 				confirm_btn="blue",
 				icon="yellow"
 			)
 			win.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
 		else:
-			win = ConfirmWindow(
+			win = ConfirmWin(
 				text=Lng.app_will_restarted,
 				confirm_btn="blue",
 				icon="blue"
@@ -1027,13 +1023,9 @@ class MfSettings(UGroupBox):
 
 	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
-			win = AllertWin(
-				text=Lng.at_least_one_folder_required,
-				confirm_btn="blue",
-				icon="yellow"
-			)
+			win = AllertWin(Lng.at_least_one_folder_required, "blue", "yellow")
 		else:
-			win = ConfirmWindow(
+			win = ConfirmWin(
 				text=Lng.remove_catalog_warn,
 				confirm_btn="red",
 				icon="yellow"
@@ -1053,11 +1045,7 @@ class MfSettings(UGroupBox):
 
 		def on_finish(success: bool):
 			if not success:
-				win = AllertWin(
-					text=Lng.repair_failed,
-					confirm_btn="blue",
-					icon="yellow"
-				)
+				win = AllertWin(Lng.repair_failed, "blue", "yellow")
 				win.center_to_parent(self.window())
 				win.show()
 				return
@@ -1161,7 +1149,7 @@ class NewMfWin(UMainWindow):
 			self.closed.emit()
 			self.deleteLater()
 
-		win = ConfirmWindow(
+		win = ConfirmWin(
 			text=Lng.new_mf_confirm,
 			confirm_btn="blue",
 			icon="blue"
@@ -1363,11 +1351,11 @@ class WinSettings(UMainWindow):
 		win.ok_clicked.connect(self._on_close_confirmed)
 		self._show_unsaved_window(win)
 
-	def _create_unsaved_window(self) -> ConfirmWindow:
+	def _create_unsaved_window(self) -> ConfirmWin:
 		win = CancelChangesWin(Lng.unsaved_changes_confirm)
 		return win
 
-	def _show_unsaved_window(self, win: ConfirmWindow):
+	def _show_unsaved_window(self, win: ConfirmWin):
 		win.center_to_parent(self)
 		win.show()
 		self.discard_win = win  # держим ссылку, чтобы окно не удалилось

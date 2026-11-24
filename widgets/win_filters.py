@@ -7,7 +7,7 @@ from cfg import Dynamic, JsonData, Static
 from system.items import Filters, ReadableDateItem
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, ConfirmWindow, FlowLayout,
+from ._base_widgets import (ActiveButton, ConfirmWin, FlowLayout,
                             InputTextWin, TitleWidget, TransparentLabel,
                             TransparentWidget, UGroupBox, UMainWindow, UMenu,
                             UPushButton, TagWidget)
@@ -395,7 +395,7 @@ class UserTags(TransparentWidget):
 				self.load_st_grid.emit()
 			widget.deleteLater()
 
-		self.remove_tag_win = ConfirmWindow(
+		self.remove_tag_win = ConfirmWin(
 			text=Lng.remove_tag_question,
 			confirm_btn="red",
 			icon="yellow"

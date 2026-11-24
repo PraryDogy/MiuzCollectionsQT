@@ -11,11 +11,11 @@ from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
-                            UCheckBox, UPushButton, VerticalWindow,
+                            UCheckBox, UPushButton, VerticalWin,
                             AllertWin, WinProgressbar)
 
 
-class ReplaceWin(VerticalWindow):
+class ReplaceWin(VerticalWin):
     replace_pressed = pyqtSignal()
     skip_pressed = pyqtSignal()
     cancel_pressed = pyqtSignal()
@@ -345,11 +345,7 @@ class WinCopyFiles(WinProgressbar):
 
         self.close_replace_window()
 
-        self.error_win = AllertWin(
-            text=f"{Lng.copy_error}\n{traceback_text}",
-            confirm_btn="blue",
-            icon="yellow"
-        )
+        self.error_win = AllertWin(f"{Lng.copy_error}\n{traceback_text}", "blue", "yellow")
         self.error_win.center_to_parent(self.window())
         self.error_win.show()
 

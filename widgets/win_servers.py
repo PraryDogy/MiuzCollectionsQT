@@ -12,7 +12,7 @@ from cfg import Static
 from system.items import Servers
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, ConfirmWindow, TitleWidget,
+from ._base_widgets import (ActiveButton, ConfirmWin, TitleWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             ULineEdit, UListWidget, UListWidgetItem,
                             UMainWindow, UMenu, UPushButton)
@@ -78,7 +78,7 @@ class ServerList(UListWidget):
 		self._update_empty_overlay()
 
 	def remove_cmd(self, server_item: ServerItem):
-		self.win_warn = ConfirmWindow(
+		self.win_warn = ConfirmWin(
 			text=Lng.confirm_delete,
 			confirm_btn="red",
 			icon="yellow"

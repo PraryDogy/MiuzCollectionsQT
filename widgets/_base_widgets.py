@@ -1138,7 +1138,7 @@ class WinProgressbar(UMainWindow):
 		return super().closeEvent(a0)
 
 
-class VerticalWindow(UMainWindow):
+class VerticalWin(UMainWindow):
 	WIDTH = 250
 
 	def __init__(self):
@@ -1197,7 +1197,7 @@ class VerticalWindow(UMainWindow):
 		self.finish_layout()
 
 
-class AllertWin(VerticalWindow):
+class AllertWin(VerticalWin):
 	BUTTONS = {"red": RedButton, "blue": ActiveButton, "regular": UPushButton}
 	ICONS = {
 		"red": "red_warning.svg",
@@ -1258,7 +1258,7 @@ class AllertWin(VerticalWindow):
 			super().keyPressEvent(event)
 
 
-class ConfirmWindow(AllertWin):
+class ConfirmWin(AllertWin):
 	def __init__(
 		self,
 		text: str,
@@ -1447,11 +1447,7 @@ class MfAliasWidget(TransparentWidget):
 		self.validate_timer.stop()
 		self._show_state(error_text)
 		if error_text:
-			win_warn = AllertWin(
-				text=error_text,
-				confirm_btn="blue",
-				icon="yellow"
-			)
+			win_warn = AllertWin(error_text, "blue", "yellow")
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
 			return None
@@ -1743,11 +1739,7 @@ class MfPathWidget(HoverGroupBox):
 
 	def validate_and_show_win(self):
 		if not self._path_exists():
-			win_warn = AllertWin(
-				text=Lng.select_catalog_path,
-				confirm_btn="blue",
-				icon="yellow"
-			)
+			win_warn = AllertWin(Lng.select_catalog_path, "blue", "yellow")
 			win_warn.center_to_parent(self.window())
 			win_warn.show()
 			return None
