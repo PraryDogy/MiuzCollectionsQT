@@ -37,11 +37,7 @@ def restart_app():
 
 class CancelChangesWin(ConfirmWin):
 	def __init__(self, text):
-		super().__init__(
-			text=text, 
-			confirm_btn="red",
-			icon="yellow"
-		)
+		super().__init__(text, "red", "yellow")
 		self.confirm_btn.setText(Lng.do_not_save)
 		self.cancel_btn.setText(Lng.keep_editing)
 
@@ -226,11 +222,7 @@ class RebootableSettings(UGroupBox):
 			shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
 			restart_app()
 
-		reset_win = ConfirmWin(
-			text=Lng.erase_data_long,
-			confirm_btn="red",
-			icon="yellow"
-		)
+		reset_win = ConfirmWin(Lng.erase_data_long, "red", "yellow")
 		reset_win.center_to_parent(self.window())
 		reset_win.ok_clicked.connect(fin)
 		reset_win.show()
@@ -555,11 +547,7 @@ class GeneralSettings(TransparentWidget):
 			JsonData.write_json_data()
 			restart_app()
 
-		win = ConfirmWin(
-			text=Lng.app_will_restarted,
-			confirm_btn="blue",
-			icon="blue"
-		)
+		win = ConfirmWin(Lng.app_will_restarted, "blue", "blue")
 		win.ok_clicked.connect(fin)
 		win.center_to_parent(self.window())
 		win.show()
@@ -1004,18 +992,10 @@ class MfSettings(UGroupBox):
 			restart_app()
 
 		if self.path_widget.draft_mf_path != self.mf.mf_path:
-			win = ConfirmWin(
-				text=Lng.make_sure_path,
-				confirm_btn="blue",
-				icon="yellow"
-			)
+			win = ConfirmWin(Lng.make_sure_path, "blue", "yellow")
 			win.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
 		else:
-			win = ConfirmWin(
-				text=Lng.app_will_restarted,
-				confirm_btn="blue",
-				icon="blue"
-			)
+			win = ConfirmWin(Lng.app_will_restarted, "blue", "blue")
 
 		win.ok_clicked.connect(final)
 		win.center_to_parent(self.window())
@@ -1025,11 +1005,7 @@ class MfSettings(UGroupBox):
 		if len(Mf.items) == 1:
 			win = AllertWin(Lng.at_least_one_folder_required, "blue", "yellow")
 		else:
-			win = ConfirmWin(
-				text=Lng.remove_catalog_warn,
-				confirm_btn="red",
-				icon="yellow"
-			)
+			win = ConfirmWin(Lng.remove_catalog_warn, "red", "yellow")
 			win.ok_clicked.connect(lambda: self.start_mf_cleaner("remove_mf"))
 		win.center_to_parent(self.window())
 		win.show()
@@ -1149,11 +1125,7 @@ class NewMfWin(UMainWindow):
 			self.closed.emit()
 			self.deleteLater()
 
-		win = ConfirmWin(
-			text=Lng.new_mf_confirm,
-			confirm_btn="blue",
-			icon="blue"
-		)
+		win = ConfirmWin(Lng.new_mf_confirm, "blue", "blue")
 		win.ok_clicked.connect(fin)
 		win.center_to_parent(self.window())
 		win.show()

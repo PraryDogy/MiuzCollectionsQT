@@ -78,11 +78,7 @@ class ServerList(UListWidget):
 		self._update_empty_overlay()
 
 	def remove_cmd(self, server_item: ServerItem):
-		self.win_warn = ConfirmWin(
-			text=Lng.confirm_delete,
-			confirm_btn="red",
-			icon="yellow"
-		)
+		self.win_warn = ConfirmWin(Lng.confirm_delete, "red", "yellow")
 		self.win_warn.ok_clicked.connect(lambda: self.remove_server.emit(server_item))
 		self.win_warn.center_to_parent(self.window())
 		self.win_warn.show()

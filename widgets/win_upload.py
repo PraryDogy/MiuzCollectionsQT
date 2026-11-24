@@ -11,11 +11,7 @@ class UploadWin(ConfirmWin):
 	# WIDTH = 320
 
 	def __init__(self, dest: str):
-		super().__init__(
-			text=Lng.upload_files_description,
-			confirm_btn="blue",
-			icon="blue"
-		)
+		super().__init__(Lng.upload_files_description, "blue", "blue")
 		self.setWindowTitle(Lng.upload_files)
 
 		self._dest = dest

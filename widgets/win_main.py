@@ -114,25 +114,6 @@ class ForcedDirsRegistry:
 # UI
 # =============================================================================
 
-class TestWid(TransparentLabel):
-	def __init__(self, parent=None):
-		super().__init__(parent=parent, text="TEST")
-		self.setFixedHeight(50)
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-	def reload(self):
-		self.confirm_win = ConfirmWin(
-			text="Стандратное окно подтверждения, другая строка и другой текстовый текст",
-			confirm_btn="blue",
-			icon="blue"
-		)
-		self.confirm_win.center_to_parent(self.window())
-		self.confirm_win.show()
-
-	def mouseReleaseEvent(self, a0):
-		self.reload()
-		return super().mouseReleaseEvent(a0)
-
 
 class WinMain(UMainWindow):
 	hh = 800
@@ -452,11 +433,7 @@ class WinMain(UMainWindow):
 		mf = Mf.current_mf
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
-		self.remove_files_win = ConfirmWin(
-			text=text,
-			confirm_btn="red",
-			icon="yellow"
-		)
+		self.remove_files_win = ConfirmWin(text, "red", "yellow")
 		file_remover = ProcessWorker(
 				target=FilesRemover.start,
 				args=(abs_paths, )
@@ -783,11 +760,7 @@ class WinMain(UMainWindow):
 			self.on_mf_clicked(mf)
 			self.open_win_smb(mf)
 
-		self.mismatch_win = ConfirmWin(
-			text=Lng.catalog_mismatch_text,
-			confirm_btn="blue",
-			icon="red",
-		)
+		self.mismatch_win = ConfirmWin(Lng.catalog_mismatch_text, "blue", "red")
 		self.mismatch_win.ok_clicked.connect(confirm_other_catalog)
 		self.mismatch_win.cancel_clicked.connect(revert_to_old_catalog)
 		self.mismatch_win.center_to_parent(self)

@@ -1198,7 +1198,11 @@ class VerticalWin(UMainWindow):
 
 
 class AllertWin(VerticalWin):
-	BUTTONS = {"red": RedButton, "blue": ActiveButton, "regular": UPushButton}
+	BUTTONS: dict[str, UPushButton] = {
+		"red": RedButton,
+		"blue": ActiveButton,
+		"regular": UPushButton
+	}
 	ICONS = {
 		"red": "red_warning.svg",
 		"blue": "info.svg",
@@ -1239,7 +1243,7 @@ class AllertWin(VerticalWin):
 		self.fit_label(self.description_label)
 
 		self.button_layout = self.create_button_layout()
-		self.confirm_btn = self.confirm_button_cls(Lng.confirm)
+		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
 		self.button_layout.addWidget(self.confirm_btn)
 
