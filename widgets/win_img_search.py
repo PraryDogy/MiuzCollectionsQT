@@ -235,7 +235,7 @@ class WinImgSearchDropWidget(ImageDropFrame):
 
 		self.v_layout = QVBoxLayout(self)
 		self.v_layout.setContentsMargins(10, 10, 10, 10)
-		self.v_layout.setSpacing(10)
+		self.v_layout.setSpacing(0)
 		self.v_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "image.svg"))
@@ -245,29 +245,36 @@ class WinImgSearchDropWidget(ImageDropFrame):
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
 
-		self.descr_label = TransparentLabel("")
-		self.descr_label.set_style("gray", "regular", "regular")
-		self.descr_label.set_elide(True, ignore_width=False)
-		self.descr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.v_layout.addSpacing(5)
+
+		self.first_row_label = TransparentLabel("")
+		self.first_row_label.set_style("gray", "regular", "regular")
+		self.first_row_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.v_layout.addWidget(
-			self.descr_label,
+			self.first_row_label,
+			alignment=Qt.AlignmentFlag.AlignCenter,
+		)
+
+		self.second_row_label = TransparentLabel("")
+		self.second_row_label.set_style("gray", "regular", "regular")
+		self.second_row_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.v_layout.addWidget(
+			self.second_row_label,
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
 
 		self.show_default()
 
 	def show_loading(self, file_name: str):
-		self.descr_label.setText(f"{Lng.loading}\n{file_name}")
+		self.first_row_label.setText(Lng.loading)
+		self.second_row_label.setText(file_name)
+		self.second_row_label.set_elide(True, ignore_width=False)
 		self.svg_widget.load(str(Static.COLOR_ICONS / "loading.svg"))
 
 	def show_default(self):
-		lines_base_text = (
-			f"{Lng.catalog}: \"{Mf.current_mf.mf_alias}\"",
-
-			f"{Lng.image_search_drop}.",
-		)
-		self.base_text = "\n".join(lines_base_text)
-		self.descr_label.setText(self.base_text)
+		self.first_row_label.setText(f"{Lng.catalog}: \"{Mf.current_mf.mf_alias}\"",)
+		self.second_row_label.setText(Lng.image_search_drop)
+		self.second_row_label.set_elide(False)
 		self.svg_widget.load(str(Static.COLOR_ICONS / "image.svg"))
 
 
