@@ -8,7 +8,7 @@ from ._base_widgets import ConfirmWin, TransparentLabel, WrapLabel
 
 
 class UploadWin(ConfirmWin):
-	# WIDTH = 320
+	WIDTH = 300
 
 	def __init__(self, dest: str):
 		super().__init__(Lng.upload_files_description, "blue", "blue")

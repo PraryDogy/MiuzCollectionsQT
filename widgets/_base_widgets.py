@@ -133,48 +133,48 @@ class TextMixin:
 
 
 class TransparentLabel(TextMixin, QLabel):
-	def __init__(self, text="", parent=None):
-		super().__init__(text or "", parent)
-		self._init_text_mixin(text)
+	def __init__(self, text: str = "", parent=None):
+		super().__init__(parent)
+		self._init_text_mixin("")
 		self._elide_enabled = False
-		self._underline = False
+		self._auto_tooltip = False
 		self._base_policy = self.sizePolicy()
 		self._base_min_width = self.minimumWidth()
-		self._auto_tooltip = False
+		self.setText(text)
 
 	def setText(self, text: str):
 		self._original_text = text or ""
 		self._update_text()
+
+	def setWordWrap(self, on: bool):
+		raise RuntimeError("TransparentLabel однострочный, для переноса используйте WrapLabel")
 
 	def _selected_text(self) -> str:
 		return self.selectedText()
 
 	def _menu_copy_text(self, full_text: str) -> str:
 		# при элидинге выделение относится к обрезанной строке, копируем исходный текст
-		if self._elide_enabled:
-			return full_text
-		return super()._menu_copy_text(full_text)
+		return full_text if self._elide_enabled else super()._menu_copy_text(full_text)
 
 	def _update_text(self):
-		text = self.get_elided_text() if self._elide_enabled else self._original_text
-		if text != self.text():
-			QLabel.setText(self, text)
-		self._apply_auto_tooltip(text)
+		shown = self.get_elided_text() if self._elide_enabled else self._original_text
+		if shown != self.text():
+			QLabel.setText(self, shown)
+		self._update_tooltip(shown)
 
-	def _apply_auto_tooltip(self, shown: str):
-		want_tip = self._elide_enabled and shown != self._original_text
-		if want_tip:
+	def _update_tooltip(self, shown: str):
+		need_tip = self._elide_enabled and shown != self._original_text
+		if need_tip:
 			self.setToolTip(self._original_text)
-			self._auto_tooltip = True
 		elif self._auto_tooltip:
 			self.setToolTip("")
-			self._auto_tooltip = False
+		self._auto_tooltip = need_tip
 
 	def set_elide(self, enabled: bool = True, ignore_width: bool = True):
 		self._elide_enabled = enabled
 		if enabled:
-			self.setMinimumWidth(0)
 			policy = QSizePolicy.Policy.Ignored if ignore_width else QSizePolicy.Policy.Preferred
+			self.setMinimumWidth(0)
 			self.setSizePolicy(policy, QSizePolicy.Policy.Preferred)
 		else:
 			self.setMinimumWidth(self._base_min_width)
@@ -185,9 +185,9 @@ class TransparentLabel(TextMixin, QLabel):
 		width = self.contentsRect().width()
 		if width <= 0:
 			return self._original_text
-		metrics = QFontMetrics(self.font())
-		lines = self._original_text.splitlines() or [""]
-		return "\n".join(metrics.elidedText(line, Qt.TextElideMode.ElideMiddle, width) for line in lines)
+		return QFontMetrics(self.font()).elidedText(
+			self._original_text, Qt.TextElideMode.ElideMiddle, width
+		)
 
 	def refresh_elide(self):
 		if self._elide_enabled:
@@ -197,7 +197,8 @@ class TransparentLabel(TextMixin, QLabel):
 		hint = super().sizeHint()
 		if self._elide_enabled:
 			fm = QFontMetrics(self.font())
-			hint.setWidth(hint.width() - fm.horizontalAdvance(self.text())
+			hint.setWidth(hint.width()
+						  - fm.horizontalAdvance(self.text())
 						  + fm.horizontalAdvance(self._original_text))
 		return hint
 
@@ -214,40 +215,41 @@ class TransparentLabel(TextMixin, QLabel):
 
 
 class WrapLabel(TextMixin, QTextEdit):
-    def __init__(self, text: str = "", parent=None):
-        super().__init__(parent)
-        self._init_text_mixin(text)
-        self.setReadOnly(True)
-        self.setFrameShape(QFrame.Shape.NoFrame)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.document().setDocumentMargin(0)
+	def __init__(self, text: str = "", parent=None):
+		super().__init__(parent)
+		self._init_text_mixin(text)
+		self.setReadOnly(True)
+		self.setFrameShape(QFrame.Shape.NoFrame)
+		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+		self.document().setDocumentMargin(0)
 
-        self.setPlainText(self._original_text)
-        self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
-        self._fit_height()
+		self.setPlainText(self._original_text)
+		self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
+		self._fit_height()
 
-        # включаем выделение и кастомное меню
-        self.set_selectable(True)
+		# включаем выделение и кастомное меню
+		self.set_selectable(True)
+		self.setToolTip(text)
 
-    def setText(self, text: str):
-        # перекрываем QTextEdit.setText, иначе _original_text устареет
-        self._original_text = text or ""
-        self.setPlainText(self._original_text)
+	def setText(self, text: str):
+		# перекрываем QTextEdit.setText, иначе _original_text устареет
+		self._original_text = text or ""
+		self.setPlainText(self._original_text)
 
-    def _selected_text(self) -> str:
-        return self.textCursor().selectedText()
+	def _selected_text(self) -> str:
+		return self.textCursor().selectedText()
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.document().setTextWidth(self.viewport().width())
-        self._fit_height()
+	def resizeEvent(self, event):
+		super().resizeEvent(event)
+		self.document().setTextWidth(self.viewport().width())
+		self._fit_height()
 
-    def _fit_height(self):
-        self.document().setTextWidth(self.viewport().width())
-        self.setFixedHeight(int(self.document().size().height()))
+	def _fit_height(self):
+		self.document().setTextWidth(self.viewport().width())
+		self.setFixedHeight(int(self.document().size().height()))
 
 
 class HoverGroupBox(UGroupBox):
