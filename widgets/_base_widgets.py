@@ -1181,6 +1181,7 @@ class VerticalWin(UMainWindow):
 		wrapper = TransparentWidget()
 		self.central_layout.addWidget(wrapper)
 		self.text_layout = QVBoxLayout(wrapper)
+		self.text_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.setContentsMargins(0, 0, 0, 0)
 		self.text_layout.setSpacing(5)
 		return self.text_layout
