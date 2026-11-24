@@ -214,32 +214,40 @@ class TransparentLabel(TextMixin, QLabel):
 
 
 class WrapLabel(TextMixin, QTextEdit):
-	def __init__(self, text: str = "", parent=None):
-		super().__init__(parent)
-		self._init_text_mixin(text)
-		self.setReadOnly(True)
-		self.setFrameShape(QFrame.Shape.NoFrame)
-		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+    def __init__(self, text: str = "", parent=None):
+        super().__init__(parent)
+        self._init_text_mixin(text)
+        self.setReadOnly(True)
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.document().setDocumentMargin(0)
 
-		# убираем внутренние отступы самого документа
-		self.document().setDocumentMargin(0)
+        self.setPlainText(self._original_text)
+        self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
+        self._fit_height()
 
-		self.setPlainText(text)
-		self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
-		self._fit_height()
+        # включаем выделение и кастомное меню
+        self.set_selectable(True)
 
-	def resizeEvent(self, event):
-		super().resizeEvent(event)
-		self.document().setTextWidth(self.viewport().width())
-		self._fit_height()
+    def setText(self, text: str):
+        # перекрываем QTextEdit.setText, иначе _original_text устареет
+        self._original_text = text or ""
+        self.setPlainText(self._original_text)
 
-	def _fit_height(self):
-		self.document().setTextWidth(self.viewport().width())
-		# без лишнего +4, только высота документа
-		self.setFixedHeight(int(self.document().size().height()))
+    def _selected_text(self) -> str:
+        return self.textCursor().selectedText()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.document().setTextWidth(self.viewport().width())
+        self._fit_height()
+
+    def _fit_height(self):
+        self.document().setTextWidth(self.viewport().width())
+        self.setFixedHeight(int(self.document().size().height()))
 
 
 class HoverGroupBox(UGroupBox):
