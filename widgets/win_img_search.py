@@ -49,7 +49,7 @@ class ProgressWin(UMainWindow):
 		self.labels_container = TransparentWidget()
 		self.labels_layout = QVBoxLayout(self.labels_container)
 		self.labels_layout.setContentsMargins(0, 0, 0, 0)
-		self.labels_layout.setSpacing(0)
+		self.labels_layout.setSpacing(3)
 		self.h_lay.addWidget(self.labels_container)
 
 		self.labels_layout.addStretch()

@@ -1282,7 +1282,7 @@ class InputTextWin(UMainWindow):
 		self.set_close_only()
 		self.setWindowTitle(title)
 		self.show_titlebar_sep()
-		self.central_layout.setSpacing(10)
+		self.central_layout.setSpacing(5)
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		text = " " + description
@@ -1295,7 +1295,7 @@ class InputTextWin(UMainWindow):
 		self.line_edit_widget.setPlaceholderText(Lng.input_text)
 		self.central_layout.addWidget(self.line_edit_widget)
 
-		# self.central_layout.addSpacing(5)
+		self.central_layout.addSpacing(5)
 
 		btn_widget = TransparentWidget()
 		self.central_layout.addWidget(btn_widget)
