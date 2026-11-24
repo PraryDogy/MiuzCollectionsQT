@@ -40,15 +40,20 @@ class ReplaceWin(VerticalWin):
         icon.setFixedSize(65, 65)
         self.icon_layout.addWidget(icon)
 
+        self.text_layout.setSpacing(0)
+
         message = TransparentLabel(Lng.file_exists)
+        message.setAlignment(Qt.AlignmentFlag.AlignCenter)
         message.set_style("gray", "regular", "regular")
-        message.setWordWrap(True)
         self.text_layout.addWidget(message)
 
         self.filename_label = TransparentLabel(self.filename)
+        self.filename_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.filename_label.set_style("regular", "regular", "regular")
-        self.filename_label.set_elide(True)
+        self.filename_label.set_fixed_word_wrap(self.WIDTH)
         self.text_layout.addWidget(self.filename_label)
+
+        print(self.filename_label.text())
 
         self.actions_widget = TransparentWidget()
         self.button_layout.addWidget(self.actions_widget)
@@ -83,7 +88,9 @@ class ReplaceWin(VerticalWin):
             self.central_layout.addWidget(
                 self.replace_all_checkbox,
                 alignment=Qt.AlignmentFlag.AlignCenter
-        )
+            )
+            self.central_layout.addSpacing(5)
+        
 
     def _checkbox_clicked(self):
         if self.replace_all_checkbox.isChecked():
