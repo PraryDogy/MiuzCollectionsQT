@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QWidget
 from cfg import Static
 from system.lang import Lng
 
-from ._base_widgets import ConfirmWin, TransparentLabel
+from ._base_widgets import ConfirmWin, TransparentLabel, WrapLabel
 
 
 class UploadWin(ConfirmWin):
@@ -16,13 +16,9 @@ class UploadWin(ConfirmWin):
 
 		self._dest = dest
 
-		descr = self.description_label
-		idx = self.central_layout.indexOf(descr) + 1
-
-		self.dest_widget = TransparentLabel(dest)
-		self.dest_widget.set_style("regular", "small", "regular")
-		self.dest_widget.set_selectable(True)
-		self.dest_widget.setWordWrap(True)
+		self.dest_widget = WrapLabel(dest)
+		self.dest_widget.set_style("regular", "regular", "regular")
+		self.dest_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.dest_widget)
 
 		self.confirm_btn.setText(Lng.upload)
