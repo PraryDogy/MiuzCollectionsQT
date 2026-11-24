@@ -1069,3 +1069,6 @@ UTableWidget QHeaderView::section {
     font-weight: normal;
 }
 
+WrapLabel {
+    background: transparent;
+}

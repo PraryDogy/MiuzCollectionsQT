@@ -10,9 +10,9 @@ from system.items import Mf
 from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
-from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
-                            UCheckBox, UPushButton, VerticalWin,
-                            AllertWin, WinProgressbar)
+from ._base_widgets import (ActiveButton, AllertWin, TransparentLabel,
+                            TransparentWidget, UCheckBox, UPushButton,
+                            VerticalWin, WinProgressbar, WrapLabel)
 
 
 class ReplaceWin(VerticalWin):
@@ -47,13 +47,8 @@ class ReplaceWin(VerticalWin):
         message.set_style("gray", "regular", "regular")
         self.text_layout.addWidget(message)
 
-        self.filename_label = TransparentLabel(self.filename)
-        self.filename_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.filename_label.set_style("regular", "regular", "regular")
-        self.filename_label.set_fixed_word_wrap(self.WIDTH)
+        self.filename_label = WrapLabel(self.filename)
         self.text_layout.addWidget(self.filename_label)
-
-        print(self.filename_label.text())
 
         self.actions_widget = TransparentWidget()
         self.button_layout.addWidget(self.actions_widget)

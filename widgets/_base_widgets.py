@@ -1,20 +1,22 @@
+import math
 import os
 from pathlib import Path
 from typing import Literal
 
 from PyQt6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
-						  pyqtSignal)
+                          pyqtSignal)
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-						 QFontMetrics, QIcon, QPainter, QPainterPath, QPalette)
+                         QFontMetrics, QIcon, QPainter, QPainterPath, QPalette,
+                         QTextOption)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
-							 QGroupBox, QHBoxLayout, QLabel, QLayout,
-							 QLineEdit, QListWidget, QListWidgetItem,
-							 QMainWindow, QMenu, QProgressBar, QPushButton,
-							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
-							 QStyle, QStyledItemDelegate, QStyleOptionViewItem,
-							 QTableWidget, QTextEdit, QTreeView, QTreeWidget,
-							 QTreeWidgetItem, QVBoxLayout, QWidget)
+                             QGroupBox, QHBoxLayout, QLabel, QLayout,
+                             QLineEdit, QListWidget, QListWidgetItem,
+                             QMainWindow, QMenu, QProgressBar, QPushButton,
+                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
+                             QStyle, QStyledItemDelegate, QStyleOptionViewItem,
+                             QTableWidget, QTextEdit, QTreeView, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import Static
 from system.items import Mf, RootProbe
@@ -214,6 +216,32 @@ class TransparentLabel(QLabel):
 			menu.addAction(reveal_action)
 
 		menu.show_menu_under_cursor(ev)
+
+
+class WrapLabel(QTextEdit):
+	def __init__(self, text: str = "", parent=None):
+		super().__init__(text, parent)
+		self.setReadOnly(True)
+		self.setFrameShape(QFrame.Shape.NoFrame)
+		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setWordWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
+		self.document().setDocumentMargin(0)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+	def hasHeightForWidth(self) -> bool:
+		return True
+
+	def heightForWidth(self, width: int) -> int:
+		self.document().setTextWidth(width)
+		return math.ceil(self.document().size().height())
+
+	def minimumSizeHint(self) -> QSize:
+		return QSize(0, 0)
+
+
+
 
 
 class TransparentFrame(QFrame):
@@ -1186,7 +1214,9 @@ class VerticalWin(UMainWindow):
 		return self.button_layout
 
 	def finish_layout(self):
-		QTimer.singleShot(0, lambda: self.setFixedHeight(self.height()))
+		self.adjustSize()
+		print(self.height())
+		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.height()))
 
 
 class _AllertWin(VerticalWin):
