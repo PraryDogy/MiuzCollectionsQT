@@ -20,8 +20,9 @@ class UploadWin(ConfirmWin):
 		idx = self.central_layout.indexOf(descr) + 1
 
 		self.dest_widget = TransparentLabel(dest)
-		self.add_text_label(self.dest_widget)
 		self.dest_widget.set_style("regular", "small", "regular")
 		self.dest_widget.set_selectable(True)
+		self.dest_widget.setWordWrap(True)
+		self.text_layout.addWidget(self.dest_widget)
 
 		self.confirm_btn.setText(Lng.upload)
