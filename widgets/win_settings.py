@@ -934,7 +934,7 @@ class MfSettings(UGroupBox):
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
-		self.title_label = TitleWidget(title=self.mf.mf_alias, title_svg=Static.COLOR_ICONS / "image_folder.svg", sep=False)
+		self.title_label = TitleWidget(title=self.mf.mf_alias, sep=False)
 		self.title_label.set_margins(10, 0, 10, 0)
 		self.main_lay.addWidget(self.title_label)
 
