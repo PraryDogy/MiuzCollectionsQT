@@ -1174,12 +1174,15 @@ class VerticalWin(UMainWindow):
 		return self._wrap((0, top_spacing, 0, 5), 6)
 
 	def finish_layout(self):
+		self.adjustSize()
+		return
 		QTimer.singleShot(0, lambda: self.setFixedHeight(self.height()))
 
 	def add_text_label(self, label: TransparentLabel):
-		label.setWordWrap(True)
-		label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum,)
+		# if not label._elide_enabled:
+			# label.setWordWrap(True)
+		# label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		# label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum,)
 		self.text_layout.addWidget(label)
 
 
@@ -1220,7 +1223,8 @@ class _AllertWin(VerticalWin):
 
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
-		self.add_text_label(self.description_label)
+		self.description_label.setWordWrap(True)
+		self.text_layout.addWidget(self.description_label)
 
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
