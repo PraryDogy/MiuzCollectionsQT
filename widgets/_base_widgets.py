@@ -4,19 +4,19 @@ from pathlib import Path
 from typing import Literal
 
 from PyQt6.QtCore import (QEvent, QPoint, QRect, QRectF, QSize, Qt, QTimer,
-                          pyqtSignal)
+						  pyqtSignal)
 from PyQt6.QtGui import (QAction, QCloseEvent, QColor, QContextMenuEvent,
-                         QFontMetrics, QIcon, QPainter, QPainterPath, QPalette,
-                         QTextOption)
+						 QFontMetrics, QIcon, QPainter, QPainterPath, QPalette,
+						 QTextOption)
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame,
-                             QGroupBox, QHBoxLayout, QLabel, QLayout,
-                             QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMenu, QProgressBar, QPushButton,
-                             QScrollArea, QSizePolicy, QSlider, QSpinBox,
-                             QStyle, QStyledItemDelegate, QStyleOptionViewItem,
-                             QTableWidget, QTextEdit, QTreeView, QTreeWidget,
-                             QTreeWidgetItem, QVBoxLayout, QWidget)
+							 QGroupBox, QHBoxLayout, QLabel, QLayout,
+							 QLineEdit, QListWidget, QListWidgetItem,
+							 QMainWindow, QMenu, QProgressBar, QPushButton,
+							 QScrollArea, QSizePolicy, QSlider, QSpinBox,
+							 QStyle, QStyledItemDelegate, QStyleOptionViewItem,
+							 QTableWidget, QTextEdit, QTreeView, QTreeWidget,
+							 QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from cfg import Static
 from system.items import Mf, RootProbe
@@ -183,31 +183,35 @@ class TransparentLabel(TextMixin, QLabel):
 			self._update_text()
 
 
-class WrapLabel(QTextEdit):
-	def __init__(self, text: str = "", parent=None):
-		super().__init__(text, parent)
-		self.setReadOnly(True)
-		self.setFrameShape(QFrame.Shape.NoFrame)
-		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setWordWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
-		self.document().setDocumentMargin(0)
+from PyQt6.QtWidgets import QTextEdit, QSizePolicy, QFrame
+from PyQt6.QtCore import Qt
 
-		opt = self.document().defaultTextOption()
-		opt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.document().setDefaultTextOption(opt)
+class WrapLabel(TextMixin, QTextEdit):
+    def __init__(self, text: str = "", parent=None):
+        super().__init__(parent)
+        self.setReadOnly(True)
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        # убираем внутренние отступы самого документа
+        self.document().setDocumentMargin(0)
 
-	def hasHeightForWidth(self) -> bool:
-		return True
+        self.setPlainText(text)
+        self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
+        self._fit_height()
 
-	def heightForWidth(self, width: int) -> int:
-		self.document().setTextWidth(width)
-		return math.ceil(self.document().size().height())
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.document().setTextWidth(self.viewport().width())
+        self._fit_height()
 
-	def minimumSizeHint(self) -> QSize:
-		return QSize(0, 0)
+    def _fit_height(self):
+        self.document().setTextWidth(self.viewport().width())
+        # без лишнего +4, только высота документа
+        self.setFixedHeight(int(self.document().size().height()))
 
 
 class TransparentFrame(QFrame):
