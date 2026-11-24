@@ -1180,38 +1180,43 @@ class VerticalWindow(UMainWindow):
 		self.central_layout.activate()
 		self.adjustSize()
 
+	def set_width(self, width: int):
+		self.WIDTH = width
+		self.setFixedWidth(width)
+		self.fit_label(self.description_label)
+		self.finish_layout()
+
 
 class AllertWin(VerticalWindow):
+	BUTTONS = {"red": RedButton, "blue": ActiveButton, "regular": UPushButton}
+	ICONS = {
+		"red": "red_warning.svg",
+		"blue": "info.svg",
+		"yellow": "yellow_warning.svg",
+		"green": "green_checkmark.svg",
+	}
+
 	ok_clicked = pyqtSignal()
 	cancel_clicked = pyqtSignal()
 
-	def __init__(self, text: str, confirm_btn: Literal["red", "blue", "regular"], icon: Literal["red", "blue", "yellow", "green"]):
+	def __init__(
+		self,
+		text: str,
+		confirm_btn: Literal["red", "blue", "regular"],
+		icon: Literal["red", "blue", "yellow", "green"],
+	):
 		super().__init__()
-		data = {
-			"red": RedButton,
-			"blue": ActiveButton,
-			"regular": UPushButton
-		}
-		self.confirm_button_cls = data[confirm_btn]
-
-		data = {
-			"red": Static.COLOR_ICONS / "red_warning.svg",
-			"blue": Static.COLOR_ICONS / "info.svg",
-			"yellow": Static.COLOR_ICONS / "yellow_warning.svg",
-			"green": Static.COLOR_ICONS / "green_checkmark.svg",
-		}
-		self.icon_path = str(data[icon])
+		self.confirm_button_cls = self.BUTTONS[confirm_btn]
+		self.icon_path = str(Static.COLOR_ICONS / self.ICONS[icon])
 
 		self.setWindowTitle(Lng.attention)
 		self._setup_ui(text)
 		self.finish_layout()
 
 	def _setup_ui(self, text: str):
-
 		self.svg_widget = QSvgWidget(self.icon_path)
 		self.svg_widget.setFixedSize(65, 65)
 		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
-
 		self.central_layout.addSpacing(5)
 
 		self.description_label = TransparentLabel(text)
@@ -1222,34 +1227,35 @@ class AllertWin(VerticalWindow):
 		self.fit_label(self.description_label)
 
 		self.button_layout = self.create_button_layout()
-
-		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
-		self.confirm_btn.clicked.connect(self._confirm)
+		self.confirm_btn = self.confirm_button_cls(Lng.confirm)
+		self.confirm_btn.clicked.connect(self.on_confirm)
 		self.button_layout.addWidget(self.confirm_btn)
 
-	def _confirm(self):
+	def on_confirm(self):
 		self.ok_clicked.emit()
 		self.deleteLater()
 
-	def _cancel(self):
+	def on_cancel(self):
 		self.cancel_clicked.emit()
 		self.deleteLater()
 
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key.Key_Escape:
-			self._cancel()
+			self.on_cancel()
 		else:
 			super().keyPressEvent(event)
 
 
 class ConfirmWindow(AllertWin):
-	def __init__(self, text: str, confirm_btn: Literal["red", "blue", "regular"], icon: Literal["red", "blue", "yellow", "green"]):
+	def __init__(
+		self,
+		text: str,
+		confirm_btn: Literal["red", "blue", "regular"],
+		icon: Literal["red", "blue", "yellow", "green"],
+	):
 		super().__init__(text, confirm_btn, icon)
-		self.init_ui()
-
-	def init_ui(self):
 		self.cancel_btn = UPushButton(Lng.cancel)
-		self.cancel_btn.clicked.connect(self._cancel)
+		self.cancel_btn.clicked.connect(self.on_cancel)
 		self.button_layout.addWidget(self.cancel_btn)
 
 
