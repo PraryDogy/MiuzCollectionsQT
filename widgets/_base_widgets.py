@@ -29,42 +29,23 @@ class TransparentButton(QPushButton):
 	pass
 
 
-class TransparentLabel(QLabel):
+class TextMixin:
+	"""Общее поведение текстовых виджетов: стиль, выделение, копирование, меню."""
 	sym_line_feed = "\u000a"
 	sym_paragraph_sep = "\u2029"
-	LINE_HEIGHT = 16
 
-	def __init__(self, text="", parent=None):
-		super().__init__(text or "", parent)
+	def _init_text_mixin(self, text: str):
 		self._original_text = text or ""
-		self._elide_enabled = False
 		self._context_menu_enabled = False
-		self._underline = False
-
-		# исходные настройки, к которым возвращаемся при выключении elide
-		self._base_policy = self.sizePolicy()
-		self._base_min_width = self.minimumWidth()
-
-		# tooltip, который ставит сам элидинг; пользовательский tooltip не трогаем
-		self._auto_tooltip = False
 
 	# --- Стиль ---
 
-	def set_style(
-			self,
-			color: Literal["regular", "gray", "accent"],
-			size: Literal["regular", "small", "big"],
-			weight: Literal["regular", "bold"]
-	):
-		values = {
-			"state": color,
-			"text_size": size,
-			"text_weight": weight,
-		}
-		for k, v in values.items():
+	def set_style(self, color, size, weight):
+		for k, v in {"state": color, "text_size": size, "text_weight": weight}.items():
 			self.setProperty(k, v)
 		self.style().unpolish(self)
 		self.style().polish(self)
+		self.updateGeometry()
 		self.update()
 
 	def set_state(self, state: str):
@@ -73,34 +54,81 @@ class TransparentLabel(QLabel):
 	def get_state(self) -> str:
 		return self.property("state")
 
-	def set_fixed_word_wrap(self, width: int) -> int:
-		self.setWordWrap(True)
-		line_h = self.fontMetrics().lineSpacing()
-		total_h = self.heightForWidth(width)
-		lines = max(1, round(total_h / line_h))
-		self.setFixedHeight(self.LINE_HEIGHT * lines)
+	def text_full(self) -> str:
+		return self._original_text
 
-	# --- Текст ---
+	# --- Выделение и меню ---
+
+	def set_selectable(self, enabled: bool):
+		if enabled:
+			self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+			self.setCursor(Qt.CursorShape.IBeamCursor)
+			self.set_context_menu(True)
+		else:
+			self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+			self.unsetCursor()
+
+	def set_context_menu(self, enabled: bool):
+		self._context_menu_enabled = enabled
+
+	@staticmethod
+	def _clean(s: str) -> str:
+		return s.replace(TextMixin.sym_paragraph_sep, "").replace(TextMixin.sym_line_feed, "")
+
+	def _selected_text(self) -> str:
+		raise NotImplementedError
+
+	def _menu_copy_text(self, full_text: str) -> str:
+		return self._clean(self._selected_text()) or full_text
+
+	def contextMenuEvent(self, ev: QContextMenuEvent):
+		if not self._context_menu_enabled:
+			return super().contextMenuEvent(ev)
+
+		full_text = self._clean(self._original_text)
+		copy_text = self._menu_copy_text(full_text)
+
+		menu = UMenu(parent=self)
+
+		copy_action = QAction(Lng.copy, menu)
+		copy_action.triggered.connect(lambda: Utils.pyqt_copy_text(copy_text))
+		menu.addAction(copy_action)
+
+		if os.path.isfile(full_text) or os.path.isdir(full_text):
+			reveal_action = QAction(Lng.reveal_in_finder, menu)
+			reveal_action.triggered.connect(lambda: Utils.macos_reveal_files([full_text]))
+			menu.addAction(reveal_action)
+
+		menu.show_menu_under_cursor(ev)
+
+
+class TransparentLabel(TextMixin, QLabel):
+	def __init__(self, text="", parent=None):
+		super().__init__(text or "", parent)
+		self._init_text_mixin(text)
+		self._elide_enabled = False
+		self._underline = False
+		self._base_policy = self.sizePolicy()
+		self._base_min_width = self.minimumWidth()
+		self._auto_tooltip = False
 
 	def setText(self, text: str):
 		self._original_text = text or ""
 		self._update_text()
 
-	def text_full(self) -> str:
-		"""Исходный текст без элидинга."""
-		return self._original_text
+	def _selected_text(self) -> str:
+		return self.selectedText()
+
+	def _menu_copy_text(self, full_text: str) -> str:
+		# при элидинге выделение относится к обрезанной строке, копируем исходный текст
+		if self._elide_enabled:
+			return full_text
+		return super()._menu_copy_text(full_text)
 
 	def _update_text(self):
-		text = (
-			self.get_elided_text()
-			if self._elide_enabled
-			else self._original_text
-		)
-
-		# без изменения текста не дергаем QLabel, иначе resizeEvent даёт лишние перерисовки
+		text = self.get_elided_text() if self._elide_enabled else self._original_text
 		if text != self.text():
 			QLabel.setText(self, text)
-
 		self._apply_auto_tooltip(text)
 
 	def _apply_auto_tooltip(self, shown: str):
@@ -112,32 +140,11 @@ class TransparentLabel(QLabel):
 			self.setToolTip("")
 			self._auto_tooltip = False
 
-	# --- Выделение и меню ---
-
-	def set_selectable(self, enabled: bool):
-		if enabled:
-			self.setTextInteractionFlags(
-				Qt.TextInteractionFlag.TextSelectableByMouse
-			)
-			self.setCursor(Qt.CursorShape.IBeamCursor)
-			self.set_context_menu(True)
-		else:
-			self.setTextInteractionFlags(
-				Qt.TextInteractionFlag.NoTextInteraction
-			)
-			self.unsetCursor()
-
-	def set_context_menu(self, enabled: bool):
-		self._context_menu_enabled = enabled
-
-	# --- Элидинг ---
-
 	def set_elide(self, enabled: bool = True, ignore_width: bool = True):
 		self._elide_enabled = enabled
 		if enabled:
 			self.setMinimumWidth(0)
-			policy = (QSizePolicy.Policy.Ignored if ignore_width
-					  else QSizePolicy.Policy.Preferred)
+			policy = QSizePolicy.Policy.Ignored if ignore_width else QSizePolicy.Policy.Preferred
 			self.setSizePolicy(policy, QSizePolicy.Policy.Preferred)
 		else:
 			self.setMinimumWidth(self._base_min_width)
@@ -148,28 +155,20 @@ class TransparentLabel(QLabel):
 		width = self.contentsRect().width()
 		if width <= 0:
 			return self._original_text
-
 		metrics = QFontMetrics(self.font())
 		lines = self._original_text.splitlines() or [""]
-		return "\n".join(
-			metrics.elidedText(line, Qt.TextElideMode.ElideMiddle, width)
-			for line in lines
-		)
+		return "\n".join(metrics.elidedText(line, Qt.TextElideMode.ElideMiddle, width) for line in lines)
 
 	def refresh_elide(self):
-		"""Пересчёт сокращения, например после того как появилась ширина."""
 		if self._elide_enabled:
 			self._update_text()
-
-	# --- Размеры ---
 
 	def sizeHint(self):
 		hint = super().sizeHint()
 		if self._elide_enabled:
 			fm = QFontMetrics(self.font())
-			shown_w = fm.horizontalAdvance(self.text())
-			full_w = fm.horizontalAdvance(self._original_text)
-			hint.setWidth(hint.width() - shown_w + full_w)
+			hint.setWidth(hint.width() - fm.horizontalAdvance(self.text())
+						  + fm.horizontalAdvance(self._original_text))
 		return hint
 
 	def minimumSizeHint(self):
@@ -183,65 +182,64 @@ class TransparentLabel(QLabel):
 		if self._elide_enabled:
 			self._update_text()
 
-	# --- Контекстное меню ---
 
-	def contextMenuEvent(self, ev: QContextMenuEvent):
-		if not self._context_menu_enabled:
-			return super().contextMenuEvent(ev)
-
-		def clean(s: str) -> str:
-			return s.replace(self.sym_paragraph_sep, "").replace(self.sym_line_feed, "")
-
-		full_text = clean(self._original_text)
-
-		# при элидинге выделение относится к обрезанной строке, поэтому копируем исходный текст
-		if self._elide_enabled:
-			copy_text = full_text
-		else:
-			copy_text = clean(self.selectedText()) or full_text
-
-		menu = UMenu(parent=self)
-
-		copy_action = QAction(Lng.copy, menu)
-		copy_action.triggered.connect(
-			lambda: Utils.pyqt_copy_text(copy_text)
-		)
-		menu.addAction(copy_action)
-
-		if os.path.isfile(full_text) or os.path.isdir(full_text):
-			reveal_action = QAction(Lng.reveal_in_finder, menu)
-			reveal_action.triggered.connect(
-				lambda: Utils.macos_reveal_files([full_text])
-			)
-			menu.addAction(reveal_action)
-
-		menu.show_menu_under_cursor(ev)
-
-
-class WrapLabel(QTextEdit):
+class WrapLabel(TextMixin, QTextEdit):
 	def __init__(self, text: str = "", parent=None):
-		super().__init__(text, parent)
+		super().__init__(parent)
+		self._init_text_mixin(text)
+		self._align = Qt.AlignmentFlag.AlignLeft
+		self._wrap = True
+
 		self.setReadOnly(True)
 		self.setFrameShape(QFrame.Shape.NoFrame)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setWordWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
 		self.document().setDocumentMargin(0)
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.viewport().setAutoFillBackground(False)  # прозрачный фон, как у QLabel
 		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+		self.setText(text)
+
+	# --- API, совпадающий с QLabel ---
+
+	def setText(self, text: str):
+		self._original_text = text or ""
+		self.setPlainText(self._original_text)
+		self._apply_option()
+
+	def text(self) -> str:
+		return self.toPlainText()
+
+	def setWordWrap(self, enabled: bool):
+		self._wrap = enabled
+		self._apply_option()
+
+	def setAlignment(self, align):
+		self._align = align
+		self._apply_option()
+
+	def _apply_option(self):
+		# настройки документа: перенос и выравнивание для всего текста
+		opt = self.document().defaultTextOption()
+		opt.setAlignment(self._align)
+		opt.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere
+						if self._wrap else QTextOption.WrapMode.NoWrap)
+		self.document().setDefaultTextOption(opt)
+
+	def _selected_text(self) -> str:
+		return self.textCursor().selectedText()
+
+	# --- Размеры ---
 
 	def hasHeightForWidth(self) -> bool:
 		return True
 
 	def heightForWidth(self, width: int) -> int:
-		self.document().setTextWidth(width)
-		return math.ceil(self.document().size().height())
+		m = self.contentsMargins()
+		self.document().setTextWidth(width - m.left() - m.right())
+		return math.ceil(self.document().size().height()) + m.top() + m.bottom()
 
 	def minimumSizeHint(self) -> QSize:
 		return QSize(0, 0)
-
-
-
 
 
 class TransparentFrame(QFrame):
@@ -1256,7 +1254,6 @@ class _AllertWin(VerticalWin):
 
 		self.description_label = TransparentLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
-		self.description_label.set_fixed_word_wrap(self.WIDTH)
 		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.description_label)
 

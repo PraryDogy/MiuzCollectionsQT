@@ -886,36 +886,42 @@ QScrollBar::sub-line:horizontal {
 /* =====================================================================
    ТЕКСТОВЫЕ МЕТКИ
    ===================================================================== */
-
-TransparentLabel {
+TransparentLabel,
+WrapLabel {
     background: transparent;
-}
-
-TransparentLabel[state="regular"] {
+    border: none;
     color: #ffffff;
 }
 
-TransparentLabel[state="gray"] {
+TransparentLabel[state="regular"],
+WrapLabel[state="regular"] {
+    color: #ffffff;
+}
+
+TransparentLabel[state="gray"],
+WrapLabel[state="gray"] {
     color: #7b8792;
 }
 
-TransparentLabel[text_weight="regular"] {
+TransparentLabel[text_weight="regular"],
+WrapLabel[text_weight="regular"] {
     font-weight: normal;
 }
 
-TransparentLabel[text_weight="bold"] {
+TransparentLabel[text_weight="bold"],
+WrapLabel[text_weight="bold"] {
     font-weight: bold;
 }
 
-TransparentLabel[text_size="small"] {
+TransparentLabel[text_size="small"],
+WrapLabel[text_size="small"] {
     font-size: 11px;
 }
 
-TransparentLabel[text_size="big"] {
+TransparentLabel[text_size="big"],
+WrapLabel[text_size="big"] {
     font-size: 20px;
 }
-
-
 
 
 /* PY: не требуется. */
@@ -1067,8 +1073,4 @@ UTableWidget::item:selected:!active {
 
 UTableWidget QHeaderView::section {
     font-weight: normal;
-}
-
-WrapLabel {
-    background: transparent;
 }
