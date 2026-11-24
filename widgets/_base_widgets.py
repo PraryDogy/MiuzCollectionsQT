@@ -191,12 +191,8 @@ class WrapLabel(TextMixin, QTextEdit):
 		self._wrap = True
 
 		self.setReadOnly(True)
-		self.setFrameShape(QFrame.Shape.NoFrame)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.document().setDocumentMargin(0)
-		self.viewport().setAutoFillBackground(False)  # прозрачный фон, как у QLabel
-		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 		self.setText(text)
 
 	# --- API, совпадающий с QLabel ---
@@ -1213,8 +1209,7 @@ class VerticalWin(UMainWindow):
 
 	def finish_layout(self):
 		self.adjustSize()
-		print(self.height())
-		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.height()))
+		self.setFixedHeight(self.height())
 
 
 class _AllertWin(VerticalWin):

@@ -48,7 +48,11 @@ class ReplaceWin(VerticalWin):
         self.text_layout.addWidget(message)
 
         self.filename_label = WrapLabel(self.filename)
+        self.filename_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.text_layout.addWidget(self.filename_label)
+
+        self.filename_label.adjustSize()
+        print(self.filename_label.height())
 
         self.actions_widget = TransparentWidget()
         self.button_layout.addWidget(self.actions_widget)
