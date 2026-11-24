@@ -187,7 +187,6 @@ class WrapLabel(TextMixin, QTextEdit):
 	def __init__(self, text: str = "", parent=None):
 		super().__init__(parent)
 		self._init_text_mixin(text)
-		# self.setWrapMode(QTextOption.WrapMode.WrapAtWordBoundaryOrAnywhere)
 		self.setReadOnly(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -952,8 +951,7 @@ class TitleWidget(TransparentWidget):
 			self.v_lay.addWidget(self.sep)
 
 		if descr:
-			self.description_widget = TransparentLabel(descr)
-			self.description_widget.setWordWrap(True)
+			self.description_widget = WrapLabel(descr)
 			self.description_widget.set_style("gray", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
 
@@ -1235,9 +1233,8 @@ class _AllertWin(VerticalWin):
 		self.svg_widget.setFixedSize(65, 65)
 		self.icon_layout.addWidget(self.svg_widget)
 
-		self.description_label = TransparentLabel(text)
+		self.description_label = WrapLabel(text)
 		self.description_label.set_style("gray", "regular", "regular")
-		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.description_label)
 
 		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
@@ -1297,8 +1294,8 @@ class InputTextWin(UMainWindow):
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		text = " " + description
-		self.description_label = TransparentLabel(text)
-		# self.description_label.setWordWrap(True)
+		self.description_label = WrapLabel(text)
+		self.description_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.central_layout.addWidget(self.description_label)
 
