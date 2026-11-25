@@ -1148,14 +1148,13 @@ class WinProgressbar(UMainWindow):
 
 class VerticalWin(UMainWindow):
 	WIDTH = 250
-	ui_finished = pyqtSignal()
 
-	def __init__(self):
+	def __init__(self, parent: UMainWindow):
 		super().__init__()
+		self._parent = parent
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
-
 		self.icon_layout = self.create_icon_layout()
 		self.text_layout = self.create_text_layout()
 		self.button_layout = self.create_button_layout()
@@ -1189,7 +1188,8 @@ class VerticalWin(UMainWindow):
 	def finish_layout(self):
 		self.setFixedWidth(self.WIDTH)
 		self.adjustSize()
-		self.ui_finished.emit()
+		self.center_to_parent(self._parent)
+		self.show()
 		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 
@@ -1211,11 +1211,12 @@ class _AllertWin(VerticalWin):
 
 	def __init__(
 		self,
+		parent: UMainWindow,
 		text: str,
 		confirm_btn: Literal["red", "blue", "regular"],
 		icon: Literal["red", "blue", "yellow", "green"],
 	):
-		super().__init__()
+		super().__init__(parent)
 		self.confirm_button_cls = self.BUTTONS[confirm_btn]
 		self.icon_path = str(Static.COLOR_ICONS / self.ICONS[icon])
 
@@ -1254,22 +1255,24 @@ class _AllertWin(VerticalWin):
 class AllertWin(_AllertWin):
 	def __init__(
 		self,
+		parent: UMainWindow,
 		text: str,
 		confirm_btn: Literal["red", "blue", "regular"],
 		icon: Literal["red", "blue", "yellow", "green"],
 	):
-		super().__init__(text, confirm_btn, icon)
+		super().__init__(parent, text, confirm_btn, icon)
 		self.finish_layout()
 
 
 class ConfirmWin(_AllertWin):
 	def __init__(
 		self,
+		parent: UMainWindow,
 		text: str,
 		confirm_btn: Literal["red", "blue", "regular"],
 		icon: Literal["red", "blue", "yellow", "green"],
 	):
-		super().__init__(text, confirm_btn, icon)
+		super().__init__(parent, text, confirm_btn, icon)
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.on_cancel)
 		self.button_layout.addWidget(self.cancel_btn)
