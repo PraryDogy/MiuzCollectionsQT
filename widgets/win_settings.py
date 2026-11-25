@@ -1071,7 +1071,7 @@ class NewMfWin(UMainWindow):
 			self.mf_path_widget_changed()
 
 		self.setFixedWidth(510)
-		# self.mf_path_widget.title_widget.description_widget.fit_to_width(510)
+		self.mf_path_widget.title_widget.description_widget.fit_to_width(400)
 		self.adjustSize()
 		QTimer.singleShot(1, lambda: self.setFixedHeight(self.height()))
 
