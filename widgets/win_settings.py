@@ -510,7 +510,7 @@ class AboutWid(UGroupBox):
 		h_lay.addStretch()
 
 
-class GeneralSettings(TransparentWidget):
+class GeneralSettings(BaseGroupBox):
 	lang_changed = pyqtSignal()
 	changed = pyqtSignal()
 
@@ -519,7 +519,11 @@ class GeneralSettings(TransparentWidget):
 
 		v_lay = QVBoxLayout(self)
 		v_lay.setSpacing(10)
-		v_lay.setContentsMargins(0, 0, 0, 0)
+		v_lay.setContentsMargins(10, 10, 10, 10)
+
+		title = TitleWidget(title=Lng.settings, sep=False)
+		title.set_margins(2, 0, 2, 0)
+		v_lay.addWidget(title)
 
 		self.rebootable_settings = RebootableSettings()
 		self.rebootable_settings.changed.connect(self.changed.emit)
@@ -912,18 +916,8 @@ class MfSettings(BaseGroupBox):
 
 		self.mf = mf
 
-		outer_lay = QVBoxLayout(self)
-		outer_lay.setContentsMargins(2, 2, 2, 2)
-		outer_lay.setSpacing(0)
-
-		self.scroll = UScrollVerticalArea()
-		outer_lay.addWidget(self.scroll)
-
-		main_wid = TransparentWidget()
-		self.scroll.setWidget(main_wid)
-
-		main_lay = QVBoxLayout(main_wid)
-		main_lay.setContentsMargins(5, 5, 5, 5)
+		main_lay = QVBoxLayout(self)
+		main_lay.setContentsMargins(10, 10, 10, 10)
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
