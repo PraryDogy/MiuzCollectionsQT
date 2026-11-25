@@ -1148,6 +1148,7 @@ class WinProgressbar(UMainWindow):
 
 class VerticalWin(UMainWindow):
 	WIDTH = 250
+	ui_finished = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -1188,6 +1189,7 @@ class VerticalWin(UMainWindow):
 	def finish_layout(self):
 		self.setFixedWidth(self.WIDTH)
 		self.adjustSize()
+		self.ui_finished.emit()
 		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 

@@ -440,6 +440,7 @@ class WinMain(UMainWindow):
 			)
 		self.remove_files_win.center_to_parent(self.window())
 		self.remove_files_win.ok_clicked.connect(start_file_remover)
+		self.remove_files_win.center_to_parent(self)
 		self.remove_files_win.show()
 
 	@with_conn
