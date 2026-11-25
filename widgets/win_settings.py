@@ -917,7 +917,7 @@ class MfSettings(BaseGroupBox):
 		self.mf = mf
 
 		main_lay = QVBoxLayout(self)
-		main_lay.setContentsMargins(10, 10, 10, 10)
+		main_lay.setContentsMargins(8, 8, 8, 8)
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
