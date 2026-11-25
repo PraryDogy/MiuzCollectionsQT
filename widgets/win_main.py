@@ -433,15 +433,14 @@ class WinMain(UMainWindow):
 		mf = Mf.current_mf
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
+
 		self.remove_files_win = ConfirmWin(self, text, "red", "yellow")
+		self.remove_files_win.ok_clicked.connect(start_file_remover)
+
 		file_remover = ProcessWorker(
 				target=FilesRemover.start,
 				args=(abs_paths, )
 			)
-		# self.remove_files_win.center_to_parent(self.window())
-		self.remove_files_win.ok_clicked.connect(start_file_remover)
-		# self.remove_files_win.center_to_parent(self)
-		# self.remove_files_win.show()
 
 	@with_conn
 	def upload_files(self, dropped_files: list[str]):
