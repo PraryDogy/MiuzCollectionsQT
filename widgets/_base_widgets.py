@@ -1187,7 +1187,9 @@ class VerticalWin(UMainWindow):
 
 	def finish_layout(self):
 		self.setFixedWidth(self.WIDTH)
-		QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
+		self.adjustSize()
+		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
+
 
 class _AllertWin(VerticalWin):
 	BUTTONS: dict[str, UPushButton] = {
@@ -1217,7 +1219,6 @@ class _AllertWin(VerticalWin):
 
 		self.setWindowTitle(Lng.attention)
 		self._setup_ui(text)
-		# self.finish_layout()
 
 	def _setup_ui(self, text: str):
 		self.svg_widget = QSvgWidget(self.icon_path)
@@ -1256,6 +1257,7 @@ class AllertWin(_AllertWin):
 		icon: Literal["red", "blue", "yellow", "green"],
 	):
 		super().__init__(text, confirm_btn, icon)
+		self.ensurePolished()
 		self.finish_layout()
 
 
@@ -1270,6 +1272,7 @@ class ConfirmWin(_AllertWin):
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.on_cancel)
 		self.button_layout.addWidget(self.cancel_btn)
+		self.ensurePolished()
 		self.finish_layout()
 
 
