@@ -513,7 +513,7 @@ UListWidget {
     border: 1px solid #17202a;
     border-radius: 8px;
     color: #c9d1da;
-    padding: 10px 2px 10px 2px;
+    padding: 4px 4px 4px 4px;
 }
 
 UListWidget::item {
@@ -540,7 +540,7 @@ UTreeWidget {
     border: 1px solid #17202a;
     border-radius: 8px;
     color: #c9d1da;
-    padding: 10px 2px 10px 2px;
+    padding: 4px 4px 4px 4px;
 }
 
 UTreeView::item,
