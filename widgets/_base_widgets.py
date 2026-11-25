@@ -157,8 +157,17 @@ class TransparentLabel(TextMixin, QLabel):
 		return self.selectedText()
 
 	def _menu_copy_text(self, full_text: str) -> str:
-		# при элидинге выделение относится к обрезанной строке, копируем исходный текст
 		return full_text if self._elide_enabled else super()._menu_copy_text(full_text)
+
+	def _metrics(self) -> QFontMetrics:
+		# шрифт из QSS появляется только после полировки, иначе меряем шрифт по умолчанию
+		self.ensurePolished()
+		return QFontMetrics(self.font())
+
+	def changeEvent(self, event):
+		super().changeEvent(event)
+		if event.type() in (QEvent.Type.StyleChange, QEvent.Type.FontChange):
+			self._update_text()
 
 	def _update_text(self):
 		shown = self.get_elided_text() if self._elide_enabled else self._original_text
@@ -174,12 +183,12 @@ class TransparentLabel(TextMixin, QLabel):
 			self.setToolTip("")
 		self._auto_tooltip = need_tip
 
-	def set_elide(self, enabled: bool = True, ignore_width: bool = True):
+	def set_elide(self, enabled: bool, *old_args, **old_kw):
 		self._elide_enabled = enabled
 		if enabled:
-			policy = QSizePolicy.Policy.Ignored if ignore_width else QSizePolicy.Policy.Preferred
+			# Minimum: виджет получает полную ширину текста, но может сжаться
 			self.setMinimumWidth(0)
-			self.setSizePolicy(policy, QSizePolicy.Policy.Preferred)
+			self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 		else:
 			self.setMinimumWidth(self._base_min_width)
 			self.setSizePolicy(self._base_policy)
@@ -189,9 +198,17 @@ class TransparentLabel(TextMixin, QLabel):
 		width = self.contentsRect().width()
 		if width <= 0:
 			return self._original_text
-		return QFontMetrics(self.font()).elidedText(
-			self._original_text, Qt.TextElideMode.ElideMiddle, width
+		fm = self._metrics()
+		# каждая строка обрезается отдельно, \n сохраняется
+		return "\n".join(
+			fm.elidedText(line, Qt.TextElideMode.ElideMiddle, width)
+			for line in self._original_text.split("\n")
 		)
+
+	def _original_text_width(self) -> int:
+		fm = self._metrics()
+		return max((fm.horizontalAdvance(line)
+					for line in self._original_text.split("\n")), default=0)
 
 	def refresh_elide(self):
 		if self._elide_enabled:
@@ -200,10 +217,9 @@ class TransparentLabel(TextMixin, QLabel):
 	def sizeHint(self):
 		hint = super().sizeHint()
 		if self._elide_enabled:
-			fm = QFontMetrics(self.font())
-			hint.setWidth(hint.width()
-						  - fm.horizontalAdvance(self.text())
-						  + fm.horizontalAdvance(self._original_text))
+			m = self.contentsMargins()
+			# ширина по полному тексту, а не по уже обрезанному
+			hint.setWidth(self._original_text_width() + m.left() + m.right())
 		return hint
 
 	def minimumSizeHint(self):
