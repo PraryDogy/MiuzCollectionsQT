@@ -878,3 +878,15 @@ UTableWidget::item:selected:!active {
 }
 
 
+MfAliasWidget ULineEdit {
+    background: #131b24;
+    border: 1px solid #2b3947;
+    border-radius: 6px;
+    color: #c9d1da;
+    padding: 5px 2px 5px 2px;
+}
+
+MfAliasWidget ULineEdit:hover {
+    background: #17202b;
+    border: 1px solid #3a4b5e;
+}
