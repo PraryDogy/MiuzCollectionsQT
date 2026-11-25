@@ -23,7 +23,7 @@ from system.items import Mf, RootProbe
 from system.lang import Lng
 from system.themes import ThemeChanger
 from system.utils import Utils
-
+from math import ceil
 
 class TransparentButton(QPushButton):
 	pass
@@ -250,6 +250,12 @@ class WrapLabel(TextMixin, QTextEdit):
 	def _fit_height(self):
 		self.document().setTextWidth(self.viewport().width())
 		self.setFixedHeight(int(self.document().size().height()))
+
+	def fit_to_width(self, width: int):
+		# viewport совпадает с шириной, так как рамки и скроллбары отключены
+		self.setFixedWidth(width)
+		self.document().setTextWidth(width)
+		self.setFixedHeight(ceil(self.document().size().height()))
 
 
 class HoverGroupBox(UGroupBox):
@@ -1155,6 +1161,7 @@ class VerticalWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
+		self.setFixedWidth(self.WIDTH)
 		self.icon_layout = self.create_icon_layout()
 		self.text_layout = self.create_text_layout()
 		self.button_layout = self.create_button_layout()
@@ -1187,10 +1194,14 @@ class VerticalWin(UMainWindow):
 
 	def finish_layout(self):
 		self.setFixedWidth(self.WIDTH)
+		m = self.central_layout.contentsMargins()
+		text_width = self.WIDTH - m.left() - m.right()
+		for label in self.findChildren(WrapLabel):
+			label.fit_to_width(text_width)
+		# self.central_layout.activate()
 		self.adjustSize()
 		self.center_to_parent(self._parent)
 		self.show()
-		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 
 class _AllertWin(VerticalWin):
