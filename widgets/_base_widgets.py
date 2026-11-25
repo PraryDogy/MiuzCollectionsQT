@@ -1193,12 +1193,10 @@ class VerticalWin(UMainWindow):
 		return self.button_layout
 
 	def finish_layout(self):
-		self.setFixedWidth(self.WIDTH)
 		m = self.central_layout.contentsMargins()
 		text_width = self.WIDTH - m.left() - m.right()
 		for label in self.findChildren(WrapLabel):
 			label.fit_to_width(text_width)
-		# self.central_layout.activate()
 		self.adjustSize()
 		self.center_to_parent(self._parent)
 		self.show()
