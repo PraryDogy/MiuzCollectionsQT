@@ -1197,7 +1197,7 @@ class WinSettings(UMainWindow):
 			parent=self.left_menu,
 			text=Lng.general
 		)
-		main_settings_item.setIcon(QIcon(str(Static.COLOR_ICONS / "settings.svg")))
+		main_settings_item.setIcon(QIcon(str(Static.GRAY_ICONS / "settings 1.svg")))
 		main_settings_item.setData(Qt.ItemDataRole.UserRole, None)
 		self.left_menu.addItem(main_settings_item)
 
