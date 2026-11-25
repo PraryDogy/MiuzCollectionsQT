@@ -182,10 +182,6 @@ _TitleTextLabel {
     font-size: 20px;
 }
 
-/* проверить: grep по коду, используется ли класс */
-MfPathTitle {
-    font-size: 15px;
-}
 
 /* Чёрные области: просмотр изображений, превью поиска */
 WinImgViewGraphics,
@@ -820,13 +816,6 @@ ChoosePathWidget > TransparentFrame[state="warn"] {
 /* =====================================================================
    ЗАГОЛОВКИ СТРАНИЦ
    ===================================================================== */
-
-/* проверить grep: в этом файле класса WinSettingsMfAliasTitle нет */
-WinSettingsMfAliasTitle {
-    color: #c9d1da;
-    font-size: 23px;
-    font-weight: bold;
-}
 
 ServerLabel {
     padding-left: 1px;
