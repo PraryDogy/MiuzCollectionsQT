@@ -1388,6 +1388,16 @@ class MfAliasWidget(TransparentWidget):
 		autoname_button.clicked.connect(self.auto_name_clicked.emit)
 		title.add_title_button(autoname_button)
 
+		self.line_edit = ULineEdit()
+		self.line_edit.setPlaceholderText(Lng.alias_immutable)
+		self.line_edit.textChanged.connect(self._on_text_changed)
+		v_layout.addWidget(self.line_edit)
+
+		# таймер отложенной проверки: перезапускается при каждом изменении текста
+		self.validate_timer = QTimer(self)
+		self.validate_timer.setSingleShot(True)
+		self.validate_timer.timeout.connect(self._check_and_show)
+
 		checker_wrapper = TransparentWidget()
 		checker_lay = QHBoxLayout(checker_wrapper)
 		checker_lay.setContentsMargins(0, 0, 0, 0)
@@ -1402,18 +1412,6 @@ class MfAliasWidget(TransparentWidget):
 		checker_lay.addWidget(self.checker_text)
 		checker_lay.addStretch()
 		v_layout.addWidget(checker_wrapper)
-
-
-		self.line_edit = ULineEdit()
-		self.line_edit.setPlaceholderText(Lng.alias_immutable)
-		self.line_edit.textChanged.connect(self._on_text_changed)
-		v_layout.addWidget(self.line_edit)
-
-		# таймер отложенной проверки: перезапускается при каждом изменении текста
-		self.validate_timer = QTimer(self)
-		self.validate_timer.setSingleShot(True)
-		self.validate_timer.timeout.connect(self._check_and_show)
-
 
 		self._show_state(None)
 
