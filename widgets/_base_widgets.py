@@ -1613,23 +1613,24 @@ class ChoosePathWidget(TransparentFrame):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		# мышь проходит сквозь строку к MfPathWidget
-		for w in (self, ):
-			w.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
 		lay = QHBoxLayout(self)
-		lay.setContentsMargins(10, 10, 10, 10)
+		lay.setContentsMargins(0, 0, 10, 0)
 		lay.setSpacing(10)
 
-		self.icon = QSvgWidget()
-		self.icon.setFixedSize(26, 26)
-		self.icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-		# lay.addWidget(self.icon)
+		# полоска статуса слева, цвет задаётся через QSS по свойству state
+		self.accent = TransparentFrame()
+		self.accent.setFixedWidth(3)
+		self.accent.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+		self.accent.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+		lay.addWidget(self.accent)
 
 		text_wrapper = TransparentWidget()
 		text_wrapper.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-		lay.addWidget(text_wrapper)
+		lay.addWidget(text_wrapper, 1)
 		text_lay = QVBoxLayout(text_wrapper)
-		text_lay.setContentsMargins(0, 0, 0, 0)
+		text_lay.setContentsMargins(0, 5, 0, 5)
 		text_lay.setSpacing(0)
 
 		self.status_label = TransparentLabel("")
@@ -1657,23 +1658,23 @@ class ChoosePathWidget(TransparentFrame):
 		self.update()
 
 	def set_state(self, state: str):
-		"""state: 'ok' или 'warn'. Меняет свойство, стиль переприменяется."""
+		"""state: 'ok' или 'warn'. Меняет цвет полоски через QSS."""
 		if self.property("state") == state:
 			return
 		self.setProperty("state", state)
-		self.style().unpolish(self)
-		self.style().polish(self)
+		self.accent.setProperty("state", state)
+		for w in (self, self.accent):
+			w.style().unpolish(w)
+			w.style().polish(w)
 		self.update()
 
 	def set_bad(self):
-		self.icon.load(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		self.status_label.setText(Lng.no_catalog_path)
 		self.status_label.set_state("warn")
 		self.path_label.setText(Lng.press_choose_catalog)
 		self.set_state("warn")
 
 	def set_good(self, path: str, lng: str):
-		self.icon.load(str(Static.COLOR_ICONS / "green_checkmark.svg"))
 		self.status_label.setText(lng)
 		self.status_label.set_state("ok")
 		self.path_label.setText(path)

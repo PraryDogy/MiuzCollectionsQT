@@ -798,17 +798,24 @@ QToolTip {
    Рамка и фон одинаковые, чтобы зона не конкурировала с ActiveButton.
    ===================================================================== */
 
+
 ChoosePathWidget {
-    background: #121a23;
-    border: 2px dashed #2b3947;
-    border-radius: 8px;
+    background: transparent;
+    border: none;
 }
 
-ChoosePathWidget[hovered="true"] {
-    background: #19232e;
-    border: 2px dashed #3a4b5e;
+ChoosePathWidget > TransparentFrame {
+    background: transparent;
+    border: none;
 }
 
+ChoosePathWidget > TransparentFrame[state="ok"] {
+    background: #10b981;
+}
+
+ChoosePathWidget > TransparentFrame[state="warn"] {
+    background: #d9a520;
+}
 
 /* =====================================================================
    ЗАГОЛОВКИ СТРАНИЦ
