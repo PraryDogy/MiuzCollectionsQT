@@ -1,49 +1,46 @@
 /* =====================================================================
-   ТЁМНАЯ ТЕМА (подход VS Code)
+   ТЁМНАЯ ТЕМА
 
-   Слои различаются тонкими рамками и небольшой разницей яркости.
-   Цвет используется только для действий и состояний: основная кнопка,
-   значение точности, активная зона перетаскивания, выделение.
-
-   Каждый виджет описан отдельным блоком: цвета и геометрия вместе.
-   Перед блоком комментарий PY: что из геометрии стоит вынести в код.
+   Слои различаются фоном и рамкой. Цвет акцента используется только
+   для действий и состояний: основная кнопка, теги, активная зона.
 
    Палитра (по ролям):
      Фоны
        #000000                  просмотр изображений, превью поиска
-       #0b1015                  окно (UMainWindow)
-       #0f151b                  UFrame
-       #131b23                  UGroupBox, списки, деревья, меню
-       #1a232d                  кнопки, поля, спинбокс, тултип, карточка
-       #111a22                  зона перетаскивания
-       rgba(40, 54, 69, 191)    кнопка «вверх»
+       #080b0f                  окно (UMainWindow)
+       #10161d                  UFrame
+       #141c25                  UGroupBox, списки, деревья, таблицы, меню
+       #1d2834                  кнопки, поля, спинбокс, тултип, шапка таблицы
+       #121a23                  зона перетаскивания
+       rgba(40, 54, 69, 200)    кнопка «вверх»
        rgba(0, 0, 0, 150)       затемнение окна
      Рамки
-       #243240                  рамка UFrame, групп, списков, дорожки
-       #2f3f4f                  рамка кнопок, полей, спинбокса
-       #3a4d61                  рамка при наведении
+       #2a3a4b                  рамка UFrame, групп, списков, таблиц
+       #3a4d61                  рамка кнопок, полей, спинбокса, дорожки
+       #4f6680                  рамка при наведении
      Состояния
-       #1d2833                  наведение строк, выделение, отметка
-       #212c38                  наведение кнопок и полей
-       #283645                  нажатие, иконочная кнопка: выбрано
-       #465a70                  полоса прокрутки: нажатие
+       #22303f                  наведение строк, выделение, отметка
+       #263446                  наведение кнопок и полей
+       #2f3f53                  нажатие, иконочная кнопка: выбрано
+       #5d7490                  полоса прокрутки: нажатие
      Текст
        #ffffff                  основной текст
-       #7b8792                  серый текст подписей
+       #9aa6b2                  серый текст подписей
      Акцент (только действия и состояния)
        #0a6ce0                  ActiveButton, синий тег
        #1a7cf0                  ActiveButton: наведение и рамка
        #0859bd                  ActiveButton: нажатие
-       #2f5f96                  пунктирная рамка зоны перетаскивания
+       #2f5f96                  пунктирная рамка зоны перетаскивания (не используется)
      Теги
        #303b46 / #3d4a56        серый
        #064e3b / #10b981        зелёный
        #3a2c12 / #6b5420        жёлтый
        #7f1d1d / #ef4444        красный
      Слайдер
-       #8f9ba6                  ползунок
+       #3a4d61                  дорожка
+       #aab6c2                  ползунок
 
-   ВАЖНО: цвет выделения списков (#1d2833) дублируется в system/themes.py,
+   ВАЖНО: цвет выделения списков (#22303f) дублируется в system/themes.py,
    класс DarkTreeTheme.sel_color. При смене цвета меняйте в обоих местах.
    Выделение дерева (UTreeView, UTreeWidget) рисует делегат, в QSS его нет.
    ===================================================================== */
@@ -53,65 +50,21 @@
    ПРОЗРАЧНЫЕ ОБЁРТКИ
    ===================================================================== */
 
-/* PY: не требуется, чисто стилевая обёртка. */
-TransparentButton {
+TransparentButton,
+TransparentFrame,
+TransparentWidget,
+TransparentLineEdit,
+TransparentTextEdit,
+TransparentMenu,
+TransparentScrollArea,
+ImgViewSvg {
     background: transparent;
     border: none;
     color: #ffffff;
 }
 
-/* PY: не требуется. */
-TransparentFrame {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-}
-
-/* PY: не требуется. */
-TransparentWidget {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-}
-
-/* PY: не требуется. */
-TransparentLineEdit {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-}
-
-/* PY: не требуется. */
-TransparentTextEdit {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-}
-
-/* PY: не требуется. */
-TransparentMenu {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-}
-
-/* PY: не требуется. */
-TransparentScrollArea {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-}
-
-/* PY: не требуется. */
 /* проверить: grep по коду, используется ли класс */
 MacControlButton {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-}
-
-/* PY: не требуется. */
-ImgViewSvg {
     background: transparent;
     border: none;
     color: #ffffff;
@@ -122,25 +75,20 @@ ImgViewSvg {
    ОКНО, ФРЕЙМЫ И ПАНЕЛИ
    ===================================================================== */
 
-/* PY: фон окна задаётся здесь, а не в коде.
-   Если класс окна называется иначе, поправьте имя селектора. */
 UMainWindow {
-    background: #0b1015;
+    background: #080b0f;
     border: none;
     color: #ffffff;
 }
 
-/* PY: внутренние отступы в layout — setContentsMargins.
-   Размер рамки и скругление можно оставить здесь. */
 UFrame {
-    background: #0f151b;
-    border: 1px solid #243240;
+    background: #10161d;
+    border: 1px solid #2a3a4b;
     border-radius: 8px;
     color: #ffffff;
 }
 
-/* PY: размер просмотрщика задавать через setMinimumSize в коде,
-   рамка прозрачна, чтобы не было сдвига при изменении. */
+/* рамка прозрачна, чтобы не было сдвига при изменении */
 UBlackFrame {
     background: #000000;
     border: 1px solid transparent;
@@ -148,25 +96,20 @@ UBlackFrame {
     color: #ffffff;
 }
 
-/* PY: отступы содержимого группы — setContentsMargins у layout. */
 UGroupBox {
-    background: #131b23;
-    border: 1px solid #314456;
+    background: #141c25;
+    border: 1px solid #2a3a4b;
     border-radius: 8px;
     color: #ffffff;
 }
 
-
-/* PY: высоту разделителя задать setFixedHeight(1).
-   Цвета и рамка остаются в QSS. */
 USep {
-    background: #1a232d;
-    border: 1px solid #243240;
+    background: #2a3a4b;
+    border: none;
     color: #ffffff;
 }
 
-/* PY: размер миниатюры — setFixedSize в коде.
-   Рамка остаётся в QSS, потому что меняется при выделении. */
+/* Миниатюры */
 Thumb {
     border-radius: 8px;
 }
@@ -179,80 +122,48 @@ Thumb[framed="frame"] {
     border: 2px solid #0a6ce0;
 }
 
-/* PY: размер плитки — setFixedSize, отступы — setContentsMargins. */
 ThumbImgWidget {
-    background: #1a232d;
+    background: #1d2834;
     border-radius: 6px;
 }
 
-/* PY: размер шрифта 11px — QFont в коде. */
-ThumbFilenameWid {
-    font-size: 11px;
-}
-
-/* PY: размер шрифта 11px — QFont в коде. */
-ThumbBlueTextWidget {
-    font-size: 11px;
-}
-
-/* PY: размер шрифта 11px — QFont в коде. */
+ThumbFilenameWid,
+ThumbBlueTextWidget,
 ThumbMiuzBlueTextWidget {
     font-size: 11px;
 }
 
-/* PY: размер шрифта 20px и жирность — QFont в коде. */
 _TitleTextLabel {
     font-weight: bold;
     font-size: 20px;
 }
 
-/* PY: размер шрифта 15px — QFont в коде. */
 /* проверить: grep по коду, используется ли класс */
 MfPathTitle {
     font-size: 15px;
 }
 
 /* Чёрные области: просмотр изображений, превью поиска */
-
-/* PY: размер области — setMinimumSize, радиус оставить здесь. */
-WinImgViewGraphics {
-    background: #000000;
-    border-radius: 8px;
-}
-
-/* PY: размер области — setMinimumSize, радиус оставить здесь. */
+WinImgViewGraphics,
 WinImageView {
     background: #000000;
     border-radius: 8px;
 }
 
-/* PY: размер области — setMinimumSize, радиус оставить здесь. */
-/* WinImgSearchPreviewWidget {
-    background: #111a22;
-    border: 2px dashed #243a52;
-    border-radius: 8px;
-} */
-
-/* PY: размер и пунктирная рамка оставить здесь,
-   отступы внутри — setContentsMargins у layout.
-   Рамка приглушённая: зона выделяется формой, а не яркостью. */
+/* Зона перетаскивания: нейтральная, статус передаёт иконка */
 WinImgSearchDropWidget {
-    background: #111a22;
-    border: 2px dashed #243a52;
+    background: #121a23;
+    border: 2px dashed #3a4d61;
     border-radius: 8px;
 }
 
-
-/* PY: размер кнопки «вверх» — setFixedSize (например 36x36),
-   радиус 18px даёт круг. */
 UpBtnLabel {
-    background: rgba(40, 54, 69, 191);
-    border: none;
+    background: rgba(40, 54, 69, 200);
+    border: 1px solid #3a4d61;
     border-radius: 18px;
     color: #ffffff;
 }
 
-/* PY: затемнение на всё окно — setGeometry по размеру родителя в коде. */
 UMainWinOverlay {
     background: rgba(0, 0, 0, 150);
     border-radius: 8px;
@@ -263,11 +174,9 @@ UMainWinOverlay {
    КНОПКИ
    ===================================================================== */
 
-/* PY: минимальные размеры — setMinimumHeight / setMinimumWidth.
-   Отступы текста оставить здесь. */
 UPushButton {
-    background: #1a232d;
-    border: 1px solid #2f3f4f;
+    background: #1d2834;
+    border: 1px solid #3a4d61;
     border-radius: 8px;
     color: #ffffff;
     font-size: 11px;
@@ -276,24 +185,22 @@ UPushButton {
 }
 
 UPushButton:hover {
-    background: #212c38;
-    border: 1px solid #3a4d61;
+    background: #263446;
+    border: 1px solid #4f6680;
 }
 
 UPushButton:pressed {
-    background: #283645;
-    border: 1px solid #3a4d61;
+    background: #2f3f53;
+    border: 1px solid #4f6680;
 }
 
-/* PY: размер стрелки меню — sub-control, остаётся в QSS. */
 UPushButton::menu-indicator {
     width: 12px;
     height: 12px;
     image: url("./icons/gray/arrow_down.svg");
 }
 
-/* PY: высоту и ширину задавать setFixedSize / setMinimumWidth.
-   Основное действие: единственная кнопка с полным акцентом. */
+/* Основное действие: единственная кнопка с полным акцентом */
 ActiveButton {
     background: #0a6ce0;
     border: 1px solid #1a7cf0;
@@ -302,6 +209,7 @@ ActiveButton {
 
 ActiveButton:hover {
     background: #1a7cf0;
+    border: 1px solid #3a8cf5;
 }
 
 ActiveButton:pressed {
@@ -309,7 +217,6 @@ ActiveButton:pressed {
     border: 1px solid #0a6ce0;
 }
 
-/* PY: размеры — setMinimumHeight / setMinimumWidth. */
 AccentButton {
     background: #15447f;
     border: 1px solid #2a5c98;
@@ -326,7 +233,6 @@ AccentButton:pressed {
     border: 1px solid #2a5c98;
 }
 
-/* PY: размеры — setMinimumHeight / setMinimumWidth. */
 RedButton {
     background: #d11f2e;
     border: 1px solid #e0313f;
@@ -335,6 +241,7 @@ RedButton {
 
 RedButton:hover {
     background: #dc2a39;
+    border: 1px solid #f04a57;
 }
 
 RedButton:pressed {
@@ -342,21 +249,17 @@ RedButton:pressed {
     border: 1px solid #f04a57;
 }
 
-/* PY: группа «наведение» — выделение через свойство hovered,
-   см. HoverGroupBox ниже. */
 HoverGroupBox {
-    background: #131b23;
-    border: 1px solid #33475b;
+    background: #141c25;
+    border: 1px solid #2a3a4b;
     border-radius: 8px;
 }
 
 HoverGroupBox[hovered="true"] {
-    background: #1d2833;
-    border: 1px solid #3a4d61;
+    background: #22303f;
+    border: 1px solid #4f6680;
 }
 
-/* PY: размер кнопки-иконки — setFixedSize.
-   Радиус и фон оставить здесь. */
 SvgBg {
     background: transparent;
     border: none;
@@ -365,11 +268,11 @@ SvgBg {
 }
 
 SvgBg:hover[style="base"] {
-    background: #212c38;
+    background: #263446;
 }
 
 SvgBg[style="selected"] {
-    background: #283645;
+    background: #2f3f53;
 }
 
 SvgBg[style="pressed"] {
@@ -381,109 +284,93 @@ SvgBg[style="pressed"] {
    ПОЛЯ ВВОДА
    ===================================================================== */
 
-/* PY: высоту поля — setFixedHeight у QLineEdit.
-   padding-right 28px нужен под кнопку очистки. */
 ULineEdit {
-    background: #1a232d;
-    border: 1px solid #2f3f4f;
+    background: #1d2834;
+    border: 1px solid #3a4d61;
     border-radius: 6px;
     color: #ffffff;
     padding: 5px 2px 5px 2px;
 }
 
 ULineEdit:hover {
-    background: #212c38;
-    border: 1px solid #3a4d61;
+    background: #263446;
+    border: 1px solid #4f6680;
 }
 
-/* PY: высоту и отступы — setMinimumHeight и setContentsMargins. */
 UTextEdit {
-    background: #1a232d;
-    border: 1px solid #2f3f4f;
+    background: #1d2834;
+    border: 1px solid #3a4d61;
     border-radius: 8px;
     color: #ffffff;
     padding: 5px 2px 5px 2px;
 }
 
 UTextEdit:hover {
-    background: #212c38;
-    border: 1px solid #3a4d61;
+    background: #263446;
+    border: 1px solid #4f6680;
 }
 
-/* PY: ширину и высоту спинбокса — setFixedWidth / setFixedHeight. */
 USpinBox {
-    background: #1a232d;
-    border: 1px solid #2f3f4f;
+    background: #1d2834;
+    border: 1px solid #3a4d61;
     border-radius: 4px;
     color: #ffffff;
 }
 
 USpinBox:hover {
-    background: #212c38;
-    border: 1px solid #3a4d61;
+    background: #263446;
+    border: 1px solid #4f6680;
 }
 
-/* PY: размеры кнопок — sub-control, остаются в QSS. */
-USpinBox::up-button {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-    width: 17px;
-    height: 9px;
-    margin-top: 2px;
-    margin-right: 2px;
-    border-radius: 3px;
-}
-
-USpinBox::up-button:pressed {
-    background: #283645;
-    border: none;
-}
-
-/* PY: размеры кнопок — sub-control, остаются в QSS. */
+USpinBox::up-button,
 USpinBox::down-button {
     background: transparent;
     border: none;
     color: #ffffff;
     width: 17px;
     height: 9px;
-    margin-bottom: 2px;
-    margin-right: 2px;
     border-radius: 3px;
 }
 
+USpinBox::up-button {
+    margin-top: 2px;
+    margin-right: 2px;
+}
+
+USpinBox::down-button {
+    margin-bottom: 2px;
+    margin-right: 2px;
+}
+
+USpinBox::up-button:pressed,
 USpinBox::down-button:pressed {
-    background: #283645;
+    background: #2f3f53;
     border: none;
 }
 
-/* PY: размер стрелки — sub-control, остаётся в QSS. */
 USpinBox::up-arrow {
     width: 9px;
     height: 9px;
     image: url("./icons/gray/arrow_up.svg");
 }
 
-/* PY: размер стрелки — sub-control, остаётся в QSS. */
 USpinBox::down-arrow {
     width: 9px;
     height: 9px;
     image: url("./icons/gray/arrow_down.svg");
 }
 
-/* PY: размер поля поиска и отступы под иконку лупы оставить здесь. */
 SearchWidLineEdit {
     padding-left: 25px;
     padding-right: 25px;
 }
 
-/* PY: прозрачное поле в верхней панели — setMinimumHeight. */
 BarTopLineEdit {
     background: transparent;
 }
 
 BarTopLineEdit:focus {
-    background: #1a232d;
+    background: #1d2834;
 }
 
 
@@ -491,15 +378,13 @@ BarTopLineEdit:focus {
    ЧЕКБОКСЫ И ОТМЕТКИ
    ===================================================================== */
 
-/* PY: отступ между индикатором и текстом — spacing здесь, размеры в коде не нужны. */
-
 UCheckBox {
     spacing: 5px;
 }
 
 UCheckBox::indicator {
-    background: #1d2833;
-    border: 1px solid #3a4d61;
+    background: #1d2834;
+    border: 1px solid #4f6680;
     width: 12px;
     height: 12px;
     border-radius: 4px;
@@ -514,20 +399,19 @@ UCheckBox::indicator:unchecked {
 }
 
 UCheckBox::indicator:hover {
-    border: 1px solid #4a5a6a;
+    border: 1px solid #5d7490;
 }
 
-/* PY: размер 16x16 — sub-control. */
 UListWidget::indicator {
-    background: #1d2833;
-    border: 1px solid #3a4d61;
+    background: #1d2834;
+    border: 1px solid #4f6680;
     width: 16px;
     height: 16px;
     border-radius: 4px;
 }
 
 UListWidget::indicator:disabled {
-    background: #1d2833;
+    background: #1d2834;
     border: 1px solid #3a4d61;
 }
 
@@ -540,18 +424,14 @@ UListWidget::indicator:checked {
    МЕНЮ
    ===================================================================== */
 
-/* PY: минимальную ширину меню — setMinimumWidth у QMenu.
-   Внутренний padding оставить в QSS, его учитывает сам Qt. */
 UMenu {
-    background: #131b23;
-    border: 1px solid #243240;
+    background: #141c25;
+    border: 1px solid #2a3a4b;
     border-radius: 8px;
     color: #ffffff;
     padding: 5px 2px 5px 2px;
 }
 
-/* PY: высоту строки лучше задавать через sizeHint, а не padding:
-   padding зависит от шрифта. Пока оставить в QSS. */
 UMenu::item {
     background: transparent;
     border: none;
@@ -560,16 +440,14 @@ UMenu::item {
 }
 
 UMenu::item:selected {
-    background: #1d2833;
+    background: #22303f;
     border-radius: 6px;
 }
 
-/* PY: отступ иконки — sub-control, остаётся в QSS. */
 UMenu::icon {
     padding-left: 5px;
 }
 
-/* PY: размер индикатора — sub-control, остаётся в QSS. */
 UMenu::indicator {
     width: 16px;
     height: 16px;
@@ -584,7 +462,6 @@ UMenu::indicator:unchecked {
     image: none;
 }
 
-/* PY: размер стрелки подменю — sub-control, остаётся в QSS. */
 UMenu::right-arrow {
     width: 12px;
     height: 12px;
@@ -601,18 +478,14 @@ UMenu::right-arrow:selected {
    СПИСКИ
    ===================================================================== */
 
-/* PY: отступы от краёв — setContentsMargins у виджета.
-   Высоту строк — setUniformRowHeights(True). */
 UListWidget {
-    background: #131b23;
-    border: 1px solid #243240;
+    background: #141c25;
+    border: 1px solid #2a3a4b;
     border-radius: 8px;
     color: #ffffff;
     padding: 10px 2px 10px 2px;
 }
 
-/* PY: высоту строки 30px задавать через sizeHint() делегата,
-   а не height в QSS. */
 UListWidget::item {
     background: transparent;
     border: none;
@@ -620,13 +493,9 @@ UListWidget::item {
     height: 30px;
 }
 
-UListWidget::item:selected {
-    background: #1d2833;
-    border-radius: 6px;
-}
-
+UListWidget::item:selected,
 UListWidget::item:selected:!active {
-    background: #1d2833;
+    background: #22303f;
     border-radius: 6px;
 }
 
@@ -635,43 +504,16 @@ UListWidget::item:selected:!active {
    ДЕРЕВЬЯ
    ===================================================================== */
 
-/* PY: отступы от краёв — setContentsMargins у виджета. */
-UTreeView {
-    background: #131b23;
-    border: 1px solid #243240;
-    border-radius: 8px;
-    color: #ffffff;
-    padding: 10px 2px 10px 2px;
-}
-
-/* PY: высоту строки 30px задавать через sizeHint() делегата. */
-UTreeView::item {
-    background: transparent;
-    border: none;
-    color: #ffffff;
-    height: 30px;
-}
-
-/* PY: иконки ветвей — sub-control, остаются в QSS. */
-UTreeView::branch:has-children:closed {
-    image: url(./icons/gray/expand.svg);
-}
-
-UTreeView::branch:has-children:open {
-    image: url(./icons/gray/collapse.svg);
-}
-
-/* PY: отступы от краёв — setContentsMargins у виджета.
-   MenuLeft наследует UTreeWidget, поэтому стиль берётся отсюда. */
+UTreeView,
 UTreeWidget {
-    background: #131b23;
-    border: 1px solid #243240;
+    background: #141c25;
+    border: 1px solid #2a3a4b;
     border-radius: 8px;
     color: #ffffff;
     padding: 10px 2px 10px 2px;
 }
 
-/* PY: высоту строки 30px задавать через sizeHint() делегата. */
+UTreeView::item,
 UTreeWidget::item {
     background: transparent;
     border: none;
@@ -679,11 +521,12 @@ UTreeWidget::item {
     height: 30px;
 }
 
-/* PY: иконки ветвей — sub-control, остаются в QSS. */
+UTreeView::branch:has-children:closed,
 UTreeWidget::branch:has-children:closed {
     image: url(./icons/gray/expand.svg);
 }
 
+UTreeView::branch:has-children:open,
 UTreeWidget::branch:has-children:open {
     image: url(./icons/gray/collapse.svg);
 }
@@ -693,7 +536,6 @@ UTreeWidget::branch:has-children:open {
    ТЕГИ
    ===================================================================== */
 
-/* PY: высоту тега — setFixedHeight, скругление 12px даёт капсулу. */
 TagWidget {
     background: transparent;
     border: none;
@@ -752,12 +594,12 @@ TagWidget[style="red"]:hover {
 }
 
 TagWidget[style="transparent"] {
-    border: 1px solid #2f3f4f;
+    border: 1px solid #3a4d61;
 }
 
 TagWidget[style="transparent"]:hover {
-    background: #1d2833;
-    border: 1px solid #3a4d61;
+    background: #22303f;
+    border: 1px solid #4f6680;
 }
 
 
@@ -765,19 +607,16 @@ TagWidget[style="transparent"]:hover {
    СЛАЙДЕР
    ===================================================================== */
 
-/* PY: длину слайдера — setMinimumWidth у QSlider.
-   Толщина дорожки — sub-control, остаётся в QSS. */
 USlider::groove:horizontal {
-    background-color: #243240;
+    background-color: #3a4d61;
     height: 3px;
     border-radius: 1px;
     margin: 0px;
 }
 
-/* PY: размер ползунка — sub-control, остаётся в QSS.
-   проверить: по расчёту нужно 3.5px */
+/* проверить: по расчёту нужно 3.5px */
 USlider::handle:horizontal {
-    background-color: #8f9ba6;
+    background-color: #aab6c2;
     height: 10px;
     width: 10px;
     border-radius: 5px;
@@ -791,90 +630,59 @@ USlider::handle:horizontal {
    Видимая ширина = 14 - 3 - 3 = 8px, скругление = 4px.
    ===================================================================== */
 
-/* PY: не требуется, стилевой базовый блок. */
 QScrollBar {
     background: transparent;
     border: none;
 }
 
-/* PY: ширину полосы — sub-control, остаётся в QSS. */
 QScrollBar:vertical {
     width: 14px;
     margin: 4px 3px 4px 3px;
 }
 
-/* PY: высоту полосы — sub-control, остаётся в QSS. */
 QScrollBar:horizontal {
     height: 14px;
     margin: 3px 4px 3px 4px;
 }
 
-/* PY: минимальную длину ползунка — sub-control, остаётся в QSS. */
 QScrollBar::handle:vertical {
-    background: #2f3f4f;
+    background: #3a4d61;
     min-height: 30px;
     border-radius: 4px;
 }
 
 QScrollBar::handle:vertical:hover {
-    background: #3a4d61;
+    background: #4f6680;
 }
 
 QScrollBar::handle:vertical:pressed {
-    background: #465a70;
+    background: #5d7490;
 }
 
 QScrollBar::handle:horizontal {
-    background: #2f3f4f;
+    background: #3a4d61;
     min-width: 30px;
     border-radius: 4px;
 }
 
 QScrollBar::handle:horizontal:hover {
-    background: #3a4d61;
+    background: #4f6680;
 }
 
 QScrollBar::handle:horizontal:pressed {
-    background: #465a70;
+    background: #5d7490;
 }
 
-QScrollBar::add-page:vertical {
-    background: transparent;
-}
-
-QScrollBar::sub-page:vertical {
-    background: transparent;
-}
-
-QScrollBar::add-page:horizontal {
-    background: transparent;
-}
-
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal,
 QScrollBar::sub-page:horizontal {
     background: transparent;
 }
 
-QScrollBar::add-line:vertical {
-    height: 0px;
-    width: 0px;
-    border: none;
-    background: none;
-}
-
-QScrollBar::sub-line:vertical {
-    height: 0px;
-    width: 0px;
-    border: none;
-    background: none;
-}
-
-QScrollBar::add-line:horizontal {
-    height: 0px;
-    width: 0px;
-    border: none;
-    background: none;
-}
-
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:horizontal {
     height: 0px;
     width: 0px;
@@ -886,6 +694,7 @@ QScrollBar::sub-line:horizontal {
 /* =====================================================================
    ТЕКСТОВЫЕ МЕТКИ
    ===================================================================== */
+
 TransparentLabel,
 WrapLabel {
     background: transparent;
@@ -900,7 +709,7 @@ WrapLabel[state="regular"] {
 
 TransparentLabel[state="gray"],
 WrapLabel[state="gray"] {
-    color: #7b8792;
+    color: #9aa6b2;
 }
 
 TransparentLabel[text_weight="regular"],
@@ -923,8 +732,6 @@ WrapLabel[text_size="big"] {
     font-size: 20px;
 }
 
-
-/* PY: не требуется. */
 CalendarCircle[circle="selected"] {
     background: #0a6ce0;
     border-radius: 13px;
@@ -938,12 +745,9 @@ CalendarCircle[circle="today"] {
     color: #ffffff;
 }
 
-
-/* PY: шрифт 11px у QToolTip задавать через QFont в коде не нужно,
-   тултип использует шрифт приложения. Отступ 2px оставить здесь. */
 QToolTip {
-    background: #1a232d;
-    border: 1px solid #2f3f4f;
+    background: #1d2834;
+    border: 1px solid #4f6680;
     color: #ffffff;
     padding: 2px;
     font-weight: bold;
@@ -953,43 +757,33 @@ QToolTip {
 
 /* =====================================================================
    ВЫБОР ПУТИ
+   Состояние (warn / ok) передаётся иконкой в коде, не цветом зоны.
+   Рамка и фон одинаковые, чтобы зона не конкурировала с ActiveButton.
    ===================================================================== */
 
-ChoosePathWidget[state="warn"] {
-    background: #151410;
-    border: 2px dashed #5c4a1e;
+ChoosePathWidget {
+    background: #121a23;
+    border: 2px dashed #3a4d61;
     border-radius: 8px;
 }
 
-ChoosePathWidget[state="ok"] {
-    background: #101815;
-    border: 2px dashed #2a5a4c;
-    border-radius: 8px;
+ChoosePathWidget[hovered="true"] {
+    background: #19232e;
+    border: 2px dashed #4f6680;
 }
 
-ChoosePathWidget[state="warn"][hovered="true"] {
-    background: #1d1a12;
-    border: 2px dashed #7a6228;
-}
-
-ChoosePathWidget[state="ok"][hovered="true"] {
-    background: #14231e;
-    border: 2px dashed #3a7a68;
-}
 
 /* =====================================================================
    ЗАГОЛОВКИ СТРАНИЦ
    ===================================================================== */
 
-/* PY: размер шрифта — QFont в коде.
-   В коде ещё нет класса WinSettingsMfAliasTitle в этом файле, проверить grep. */
+/* проверить grep: в этом файле класса WinSettingsMfAliasTitle нет */
 WinSettingsMfAliasTitle {
     color: #ffffff;
     font-size: 23px;
     font-weight: bold;
 }
 
-/* PY: отступ 1px — setContentsMargins, если нужен. */
 ServerLabel {
     padding-left: 1px;
 }
@@ -999,9 +793,8 @@ ServerLabel {
    КАЛЕНДАРЬ
    ===================================================================== */
 
-/* PY: размер шрифта 25pt — QFont в коде. */
 CalendarBigDate {
-    color: #b2b2b2;
+    color: #c4c9ce;
     font-size: 25pt;
 }
 
@@ -1010,47 +803,34 @@ CalendarBigDate {
    ТАБЛИЦЫ
    ===================================================================== */
 
-/* PY: отступы от краёв — setContentsMargins у виджета.
-   Высоту строк задавать через verticalHeader().setDefaultSectionSize(). */
 UTableWidget {
-    background: #131b23;
-    border: 1px solid #243240;
+    background: #141c25;
+    border: 1px solid #2a3a4b;
     border-radius: 8px;
     color: #ffffff;
-    gridline-color: #1d2833;
+    gridline-color: #232f3b;
     padding: 2px 2px 2px 2px;
-    selection-background-color: #1d2833;
+    selection-background-color: #22303f;
     selection-color: #ffffff;
 }
 
-/* PY: угол между заголовками и вертикальной шапкой — в коде не нужен. */
 UTableWidget QTableCornerButton::section {
-    background: #131b23;
+    background: #1d2834;
     border: none;
-    border-bottom: 1px solid #243240;
-    border-right: 1px solid #243240;
+    border-bottom: 1px solid #2a3a4b;
+    border-right: 1px solid #2a3a4b;
 }
 
-/* PY: высоту заголовка задавать через horizontalHeader().setFixedHeight(). */
 UTableWidget QHeaderView::section {
-    background: #131b23;
-    color: #7b8792;
+    background: #1d2834;
+    color: #9aa6b2;
     border: none;
-    border-bottom: 1px solid #243240;
+    border-bottom: 1px solid #2a3a4b;
     padding: 5px 8px 5px 8px;
     font-size: 11px;
+    font-weight: normal;
 }
 
-/* UTableWidget QHeaderView::section:hover {
-    background: #161f28;
-}
-
-UTableWidget QHeaderView::section:pressed {
-    background: #1d2833;
-} */
-
-/* PY: выделение рисует сам QTableWidget через selection-background-color,
-   делегат для таблиц не нужен, пока нет скруглённых строк. */
 UTableWidget::item {
     background: transparent;
     border: none;
@@ -1058,17 +838,8 @@ UTableWidget::item {
     padding: 4px 8px 4px 8px;
 }
 
-UTableWidget::item:selected {
-    background: #1d2833;
-    color: #ffffff;
-}
-
+UTableWidget::item:selected,
 UTableWidget::item:selected:!active {
-    background: #1d2833;
+    background: #22303f;
     color: #ffffff;
-}
-
-
-UTableWidget QHeaderView::section {
-    font-weight: normal;
 }

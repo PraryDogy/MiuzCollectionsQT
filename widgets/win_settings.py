@@ -1047,6 +1047,8 @@ class NewMfWin(UMainWindow):
 		self.mf_alias_widget.changed.connect(self._on_changed)
 		self.group_lay.addWidget(self.mf_alias_widget)
 
+		self.group_lay.addSpacing(10)
+
 		self.mf_path_widget = MfPathWidget(mf=None)
 		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)
 		self.group_lay.addWidget(self.mf_path_widget)
