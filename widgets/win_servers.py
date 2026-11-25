@@ -15,7 +15,7 @@ from system.lang import Lng
 from ._base_widgets import (ActiveButton, ConfirmWin, TitleWidget,
                             TransparentLabel, TransparentWidget, UGroupBox,
                             ULineEdit, UListWidget, UListWidgetItem,
-                            UMainWindow, UMenu, UPushButton)
+                            UMainWindow, UMenu, UPushButton, BaseGroupBox)
 
 
 class EmptyOverlay(TransparentLabel):
@@ -194,7 +194,7 @@ class LoginWin(UMainWindow):
 		self.setWindowTitle(f"{title_word}")
 
 		# --- GroupBox для формы ---
-		group = UGroupBox()
+		group = BaseGroupBox()
 		self.central_layout.addWidget(group)
 		
 		form_lay = QVBoxLayout(group)
