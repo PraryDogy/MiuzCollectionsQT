@@ -36,8 +36,8 @@ def restart_app():
 
 
 class CancelChangesWin(ConfirmWin):
-	def __init__(self, text):
-		super().__init__(text, "red", "yellow")
+	def __init__(self, parent, text):
+		super().__init__(parent, text, "red", "yellow")
 		self.confirm_btn.setText(Lng.do_not_save)
 		self.cancel_btn.setText(Lng.keep_editing)
 
@@ -222,10 +222,8 @@ class RebootableSettings(UGroupBox):
 			shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
 			restart_app()
 
-		reset_win = ConfirmWin(Lng.erase_data_long, "red", "yellow")
-		reset_win.center_to_parent(self.window())
-		reset_win.ok_clicked.connect(fin)
-		reset_win.show()
+		self.confirm = ConfirmWin(self.window(), Lng.erase_data_long, "red", "yellow")
+		self.confirm.ok_clicked.connect(fin)
 
 
 class SizesWin(UMainWindow):
@@ -547,11 +545,8 @@ class GeneralSettings(TransparentWidget):
 			JsonData.write_json_data()
 			restart_app()
 
-		win = ConfirmWin(Lng.app_will_restarted, "blue", "blue")
-		win.ok_clicked.connect(fin)
-		win.center_to_parent(self.window())
-		win.show()
-
+		self.confirm = ConfirmWin(self.window(), Lng.app_will_restarted, "blue", "blue")
+		self.confirm.ok_clicked.connect(fin)
 
 
 class MfRepairGroup(HoverGroupBox):
@@ -830,11 +825,9 @@ class IgnoreListWin(UMainWindow):
 		self.deleteLater()
 
 	def _ask_discard(self):
-		win = CancelChangesWin(Lng.unsaved_changes_confirm)
-		win.ok_clicked.connect(self._on_discard_confirmed)
-		win.center_to_parent(self)
-		win.show()
-		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
+		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
+		self.confirm.ok_clicked.connect(self._on_discard_confirmed)
+		self.discard_win = self.confirm  # держим ссылку, чтобы окно не удалилось
 
 	def _on_discard_confirmed(self):
 		self.has_unsaved = False
@@ -989,14 +982,12 @@ class MfSettings(UGroupBox):
 			restart_app()
 
 		if self.path_widget.draft_mf_path != self.mf.mf_path:
-			win = ConfirmWin(Lng.make_sure_path, "blue", "yellow")
-			win.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
+			self.confirm = ConfirmWin(self.window(), Lng.make_sure_path, "blue", "yellow")
+			self.confirm.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
 		else:
-			win = ConfirmWin(Lng.app_will_restarted, "blue", "blue")
+			self.confirm = ConfirmWin(self.window(), Lng.app_will_restarted, "blue", "blue")
 
-		win.ok_clicked.connect(final)
-		win.center_to_parent(self.window())
-		win.show()
+		self.confirm.ok_clicked.connect(final)
 
 	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
@@ -1118,10 +1109,8 @@ class NewMfWin(UMainWindow):
 			self.closed.emit()
 			self.deleteLater()
 
-		win = ConfirmWin(Lng.new_mf_confirm, "blue", "blue")
+		win = ConfirmWin(self.window(), Lng.new_mf_confirm, "blue", "blue")
 		win.ok_clicked.connect(fin)
-		win.center_to_parent(self.window())
-		win.show()
 
 	def _try_close(self):
 		# Кнопка «Отмена» и Esc: сначала проверка несохранённых изменений
@@ -1131,11 +1120,9 @@ class NewMfWin(UMainWindow):
 		self.close()
 
 	def _ask_discard(self):
-		win = CancelChangesWin(Lng.unsaved_changes_confirm)
-		win.ok_clicked.connect(self._on_discard_confirmed)
-		win.center_to_parent(self)
-		win.show()
-		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
+		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
+		self.confirm.ok_clicked.connect(self._on_discard_confirmed)
+		self.discard_win = self.confirm  # держим ссылку, чтобы окно не удалилось
 
 	def _on_discard_confirmed(self):
 		self.has_unsaved = False
@@ -1317,8 +1304,8 @@ class WinSettings(UMainWindow):
 		self._show_unsaved_window(win)
 
 	def _create_unsaved_window(self) -> ConfirmWin:
-		win = CancelChangesWin(Lng.unsaved_changes_confirm)
-		return win
+		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
+		return self.confirm
 
 	def _show_unsaved_window(self, win: ConfirmWin):
 		win.center_to_parent(self)

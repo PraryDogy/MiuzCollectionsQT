@@ -171,9 +171,5 @@ class FirstLoadWin(NewMfWin):
 		mf_alias = self.mf_alias_widget.validate_and_show_win()
 		mf_path = self.path_widget.validate_and_show_win()
 		if mf_alias and mf_path:
-			self.save_win = ConfirmWin(Lng.save_text_long, "blue", "yellow")
-			self.save_win.ok_clicked.connect(
-				lambda: save_fin(mf_alias, mf_path)
-			)
-			self.save_win.center_to_parent(self.window())
-			self.save_win.show()
+			self.confirm = ConfirmWin(self.window(), Lng.save_text_long, "blue", "yellow")
+			self.confirm.ok_clicked.connect(lambda: save_fin(mf_alias, mf_path))

@@ -10,8 +10,8 @@ from ._base_widgets import ConfirmWin, TransparentLabel, WrapLabel
 class UploadWin(ConfirmWin):
 	WIDTH = 300
 
-	def __init__(self, dest: str):
-		super().__init__(Lng.upload_files_description, "blue", "blue")
+	def __init__(self, parent, dest: str):
+		super().__init__(parent, Lng.upload_files_description, "blue", "blue")
 		self.setWindowTitle(Lng.upload_files)
 
 		self._dest = dest

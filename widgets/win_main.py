@@ -429,27 +429,21 @@ class WinMain(UMainWindow):
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
 
-		self.remove_files_win = ConfirmWin(self, text, "red", "yellow")
-		self.remove_files_win.ok_clicked.connect(start_file_remover)
-
-		file_remover = ProcessWorker(
-				target=FilesRemover.start,
-				args=(abs_paths, )
-			)
+		self.confirm = ConfirmWin(self, text, "red", "yellow")
+		self.confirm.ok_clicked.connect(start_file_remover)
+		file_remover = ProcessWorker(FilesRemover.start, (abs_paths, ))
 
 	@with_conn
 	def upload_files(self, dropped_files: list[str]):
 
 		def fin():
-			self.upload_win.deleteLater()
+			self.confirm.deleteLater()
 			self.paste_files(dropped_files, dest)
 
 		dropped_files = filter_supported(dropped_files)
 		dest = Mf.current_mf.create_abs_path(Dynamic.current_dir)
-		self.upload_win = UploadWin(dest)
-		self.upload_win.ok_clicked.connect(fin)
-		self.upload_win.center_to_parent(self)
-		self.upload_win.show()
+		self.confirm = UploadWin(self, dest)
+		self.confirm.ok_clicked.connect(fin)
 
 	@with_conn
 	def open_info_win(self, data_item: DataItem):
@@ -752,11 +746,9 @@ class WinMain(UMainWindow):
 			self.on_mf_clicked(mf)
 			self.open_win_smb(mf)
 
-		self.mismatch_win = ConfirmWin(Lng.catalog_mismatch_text, "blue", "red")
-		self.mismatch_win.ok_clicked.connect(confirm_other_catalog)
-		self.mismatch_win.cancel_clicked.connect(revert_to_old_catalog)
-		self.mismatch_win.center_to_parent(self)
-		self.mismatch_win.show()
+		self.confirm = ConfirmWin(self, Lng.catalog_mismatch_text, "blue", "red")
+		self.confirm.ok_clicked.connect(confirm_other_catalog)
+		self.confirm.cancel_clicked.connect(revert_to_old_catalog)
 
 	def start_scaner_task(self, ms: int = 3000, force_full: bool = False):
 
