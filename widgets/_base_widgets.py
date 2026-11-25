@@ -225,13 +225,10 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 		self.document().setDocumentMargin(0)
-
+		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 		self.setPlainText(self._original_text)
 		self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
 		self._fit_height()
-
-		# включаем выделение и кастомное меню
-		self.set_selectable(True)
 		self.setToolTip(text)
 
 	def setText(self, text: str):
@@ -256,6 +253,10 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.setFixedWidth(width)
 		self.document().setTextWidth(width)
 		self.setFixedHeight(ceil(self.document().size().height()))
+
+	def set_selectable(self, enabled):
+		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
+		return super().set_selectable(enabled)
 
 
 class HoverGroupBox(UGroupBox):
@@ -1407,9 +1408,7 @@ class MfAliasWidget(TransparentWidget):
 		checker_lay.addWidget(self.checker_svg)
 
 		self.checker_text = TransparentLabel("")
-		# self.checker_text.set_state("gray")
 		self.checker_text.set_elide(True, ignore_width=False)
-		self.checker_text.set_selectable(True)
 		checker_lay.addWidget(self.checker_text)
 		checker_lay.addStretch()
 		v_layout.addWidget(checker_wrapper)
