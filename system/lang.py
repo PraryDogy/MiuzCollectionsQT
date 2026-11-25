@@ -762,3 +762,7 @@ class Lng:
 		"Окно загрузки",
 		"Upload window"
 	)
+	general_settings = (
+		"Основные настройки",
+		"General settings"
+	)

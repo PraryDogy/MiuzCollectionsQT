@@ -521,7 +521,7 @@ class GeneralSettings(BaseGroupBox):
 		v_lay.setSpacing(10)
 		v_lay.setContentsMargins(10, 10, 10, 10)
 
-		title = TitleWidget(title=Lng.settings, sep=False)
+		title = TitleWidget(title=Lng.general_settings, sep=False)
 		title.set_margins(2, 0, 2, 0)
 		v_lay.addWidget(title)
 
