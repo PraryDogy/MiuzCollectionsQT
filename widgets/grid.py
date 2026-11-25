@@ -801,7 +801,7 @@ class Grid(UScrollVerticalArea):
 
 	def get_grid_spacing(self):
 		if JsonData.square_thumbs:
-			return 1
+			return 5
 		else:
 			return Static.GRID_SPACINGS[Dynamic.current_pixmap_size_index]
 

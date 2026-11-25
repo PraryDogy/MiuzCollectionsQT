@@ -152,6 +152,10 @@ Thumb[framed="frame"] {
     border: 2px solid #0a6ce0;
 }
 
+SquareThumb {
+    background: #19232e;
+}
+
 /* PY: размер плитки — setFixedSize, отступы — setContentsMargins. */
 ThumbImgWidget {
     background: #1a232d;
@@ -198,7 +202,7 @@ WinImgSearchDropWidget {
 }
 
 UpBtnLabel {
-    background: rgba(40, 54, 69, 200);
+    background: rgba(40, 54, 69, 255);
     border: 1px solid #2b3947;
     border-radius: 18px;
     color: #c9d1da;
@@ -876,3 +880,5 @@ UTableWidget::item:selected:!active {
     background: #22303f;
     color: #c9d1da;
 }
+
+
