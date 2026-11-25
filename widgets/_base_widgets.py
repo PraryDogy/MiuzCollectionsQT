@@ -1200,12 +1200,12 @@ class VerticalWin(UMainWindow):
 		self.button_layout.setSpacing(5)
 		return self.button_layout
 
-	def finish_layout(self):
-		m = self.central_layout.contentsMargins()
+	def finish_layout(self, OFFSET = 40):
 		for label in self.findChildren(WrapLabel):
-			label.fit_to_width(self.WIDTH - 40)
+			label.fit_to_width(self.WIDTH - OFFSET)
 		self.adjustSize()
 		self.center_to_parent(self._parent)
+		self.show()
 		QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 
