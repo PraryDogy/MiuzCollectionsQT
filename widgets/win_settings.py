@@ -1039,12 +1039,18 @@ class NewMfWin(UMainWindow):
 		self.group_lay.setContentsMargins(5, 5, 5, 5)
 		self.group_lay.setSpacing(10)
 
+		title = TitleWidget(
+			title=Lng.new_catalog,
+			sep=False
+		)
+		title.set_margins(2, 0, 2, 0)
+		self.group_lay.addWidget(title)
+
+
 		self.mf_alias_widget = MfAliasWidget()
 		self.mf_alias_widget.auto_name_clicked.connect(self.autoname_cmd)
 		self.mf_alias_widget.changed.connect(self._on_changed)
 		self.group_lay.addWidget(self.mf_alias_widget)
-
-		self.group_lay.addSpacing(10)
 
 		self.mf_path_widget = MfPathWidget(mf=None)
 		self.mf_path_widget.changed.connect(self.mf_path_widget_changed)

@@ -1364,7 +1364,7 @@ class SaveRowArrowWidget(RowArrowWidget):
 		self.set_left_icon(Static.GRAY_ICONS / "diskette.svg")
 
 
-class MfAliasWidget(TransparentWidget):
+class MfAliasWidget(UGroupBox):
 	changed = pyqtSignal()
 	auto_name_clicked = pyqtSignal()
 
@@ -1379,7 +1379,7 @@ class MfAliasWidget(TransparentWidget):
 		self.name_is_valid: bool = False
 
 		v_layout = QVBoxLayout(self)
-		v_layout.setContentsMargins(5, 0, 5, 0)
+		v_layout.setContentsMargins(10, 5, 10, 5)
 		v_layout.setSpacing(5)
 
 		title = TitleWidget(
