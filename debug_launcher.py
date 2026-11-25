@@ -213,7 +213,7 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         ("Восстановление каталога", lambda: _new("widgets.win_settings", "MfRepairWin")),
         ("Отмена изменений", lambda: _new("widgets.win_settings", "CancelChangesWin", _lng("unsaved_changes_confirm"))),
         ("Подключение SMB", lambda: _new("widgets.win_smb", "WinSmb", mf)),
-        ("О программе", lambda: _new("widgets.bar_macos", "AboutWin")),
+        ("О программе", lambda: _new("widgets.bar_macos", "AboutWin", parent=_LAUNCHER)),
 
         # серверы и файлы
         ("Серверы", lambda: _new("widgets.win_servers", "ServersWin")),

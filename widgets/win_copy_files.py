@@ -20,21 +20,19 @@ class ReplaceWin(VerticalWin):
     skip_pressed = pyqtSignal()
     cancel_pressed = pyqtSignal()
     keep_both = pyqtSignal()
-    WIDTH = 270
+    WIDTH = 300
 
     def __init__(self, parent, filename: str, show_checkbox: bool):
         super().__init__(parent)
 
         self.filename = filename
         self.show_checkbox = show_checkbox
-        self.setFixedWidth(self.WIDTH)
         self.setWindowTitle(Lng.replace)
         self.set_close_only()
         self.set_always_on_top()
         self.show_titlebar_sep()
         self._init_ui()
         self.finish_layout()
-        self.filename_label.fit_to_width(self.WIDTH - 40)
 
     def _init_ui(self):
         icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))

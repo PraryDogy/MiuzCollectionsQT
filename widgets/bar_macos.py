@@ -19,9 +19,10 @@ class AboutWin(VerticalWin):
 		"email: evlosh@gmail.com",
 		"telegram: evlosh",
 	])
+	WIDTH = 250
 
-	def __init__(self):
-		super().__init__()
+	def __init__(self, parent):
+		super().__init__(parent)
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.show_about)
@@ -34,22 +35,18 @@ class AboutWin(VerticalWin):
 			size=100
 		)
 		icon.setPixmap(QPixmap.fromImage(qimage_saled))
-		self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
+		self.icon_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		lbl = TransparentLabel(self.INFO_TEXT)
 		lbl.set_style("gray", "regular", "regular")
 		lbl.set_selectable(True)
-		self.central_layout.addWidget(lbl)
-
-		self.central_layout.addSpacing(5)
+		self.text_layout.addWidget(lbl)
 
 		close_btn = UPushButton(Lng.close)
-		self.central_layout.addWidget(close_btn)
+		self.button_layout.addWidget(close_btn)
 		close_btn.clicked.connect(self.deleteLater)
 
-		self.adjustSize()
-		self.setFixedSize(self.width(), self.height())
-		self.setFixedWidth(250)
+		self.finish_layout()
 
 	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 		"""Закрывает окно по Escape или Enter."""
@@ -94,6 +91,6 @@ class BarMacos(QMenuBar):
 		self.settings_win.show()
 
 	def open_about_window(self):
-		self.about_win = AboutWin()
+		self.about_win = AboutWin(self.window())
 		self.about_win.center_to_parent(self.window())
 		self.about_win.show()

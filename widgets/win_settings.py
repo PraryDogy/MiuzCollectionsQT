@@ -554,6 +554,7 @@ class GeneralSettings(BaseGroupBox):
 
 
 class MfRepairGroup(HoverGroupBox):
+	WIDTH = 330
 	def __init__(self, title, description):
 		super().__init__()
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -564,7 +565,8 @@ class MfRepairGroup(HoverGroupBox):
 		title_widget = TitleWidget(title, description, sep=False)
 		self.v_lay.addWidget(title_widget)
 
-		self.setFixedWidth(330)
+		title_widget.description_widget.fit_to_width(self.WIDTH - 30)
+		self.setFixedWidth(self.WIDTH)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:

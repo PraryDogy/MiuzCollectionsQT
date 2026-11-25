@@ -1165,6 +1165,7 @@ class VerticalWin(UMainWindow):
 	def __init__(self, parent: UMainWindow):
 		super().__init__()
 		self._parent = parent
+		self.hide()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
@@ -1201,12 +1202,11 @@ class VerticalWin(UMainWindow):
 
 	def finish_layout(self):
 		m = self.central_layout.contentsMargins()
-		text_width = self.WIDTH - m.left() - m.right()
 		for label in self.findChildren(WrapLabel):
-			label.fit_to_width(text_width)
+			label.fit_to_width(self.WIDTH - 40)
 		self.adjustSize()
 		self.center_to_parent(self._parent)
-		self.show()
+		QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 
 class _AllertWin(VerticalWin):
