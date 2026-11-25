@@ -1257,7 +1257,6 @@ class AllertWin(_AllertWin):
 		icon: Literal["red", "blue", "yellow", "green"],
 	):
 		super().__init__(text, confirm_btn, icon)
-		self.ensurePolished()
 		self.finish_layout()
 
 
@@ -1272,7 +1271,6 @@ class ConfirmWin(_AllertWin):
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.on_cancel)
 		self.button_layout.addWidget(self.cancel_btn)
-		self.ensurePolished()
 		self.finish_layout()
 
 
