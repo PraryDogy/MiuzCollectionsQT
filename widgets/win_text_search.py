@@ -8,7 +8,7 @@ from cfg import Dynamic, Static
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, TitleWidget, TransparentWidget,
-                            UGroupBox, UMainWindow, UPushButton, UTextEdit)
+                            UGroupBox, UMainWindow, UPushButton, UTextEdit, BaseGroupBox)
 
 
 class WinTextSearch(UMainWindow):
@@ -25,7 +25,7 @@ class WinTextSearch(UMainWindow):
 		self.magnifier_icon = QIcon(str(Static.GRAY_ICONS / "magnifier.svg"))
 		self.wand_icon = QIcon(str(Static.GRAY_ICONS / "wand.svg"))
 
-		group_container = UGroupBox()
+		group_container = BaseGroupBox()
 		self.central_layout.addWidget(group_container)
 		group_layout = QVBoxLayout(group_container)
 		group_layout.setContentsMargins(5, 5, 5, 5)

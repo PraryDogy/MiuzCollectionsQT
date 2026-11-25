@@ -293,7 +293,7 @@ class ServersWin(UMainWindow):
 		self.setFixedWidth(400)
 
 		# --- Группа "Избранное" ---
-		group = UGroupBox()
+		group = BaseGroupBox()
 		group_lay = QVBoxLayout(group)
 		group_lay.setContentsMargins(5, 10, 5, 10)
 		group_lay.setSpacing(5)

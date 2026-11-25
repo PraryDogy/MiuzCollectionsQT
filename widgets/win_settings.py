@@ -717,7 +717,7 @@ class IgnoreListWin(UMainWindow):
 		self.has_unsaved = False
 		self.discard_win = None
 
-		self.group_box = UGroupBox()
+		self.group_box = BaseGroupBox()
 		self.group_lay = QVBoxLayout(self.group_box)
 		self.group_lay.setContentsMargins(10, 5, 10, 10)
 		self.group_lay.setSpacing(5)

@@ -73,7 +73,8 @@ class MiuzGroup(HoverGroupBox):
 		title_widget = TitleWidget(
 			"MIUZ Diamonds",
 			"Загрузить настройки для MIUZ Diamonds",
-			Static.COLOR_ICONS / "miuz.svg"
+			Static.COLOR_ICONS / "miuz.svg",
+			sep=False
 		)
 		content_lay.addWidget(title_widget)
 
@@ -139,7 +140,7 @@ class FirstLoadWin(NewMfWin):
 			self.miuz_wid.clicked.connect(self.copy_zip_cmd)
 			self.group_lay.insertWidget(idx, self.miuz_wid)
 
-			self.setFixedHeight(self.height() + self.miuz_wid.sizeHint().height())
+			self.setFixedHeight(self.height() + 80)
 
 	def copy_zip_cmd(self):
 

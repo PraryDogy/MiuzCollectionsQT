@@ -7,10 +7,10 @@ from cfg import Dynamic, JsonData, Static
 from system.items import Filters, ReadableDateItem
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, ConfirmWin, FlowLayout,
-                            InputTextWin, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
-                            UPushButton, TagWidget)
+from ._base_widgets import (ActiveButton, BaseGroupBox, ConfirmWin, FlowLayout,
+                            InputTextWin, TagWidget, TitleWidget,
+                            TransparentLabel, TransparentWidget, UGroupBox,
+                            UMainWindow, UMenu, UPushButton)
 from .win_calendar import WinCalendar
 
 
@@ -63,7 +63,7 @@ class CalendarTag(TagWidget):
 		self.setFixedWidth(self.width())
 
 
-class DatesWidget(UGroupBox):
+class DatesWidget(BaseGroupBox):
 	load_st_grid = pyqtSignal()
 	readable_date = None
 
@@ -410,7 +410,7 @@ class UserTags(TransparentWidget):
 		return QSize(width, self.heightForWidth(width))
 
 
-class TagsWidget(UGroupBox):
+class TagsWidget(BaseGroupBox):
 	load_st_grid = pyqtSignal()
 
 	def __init__(self, pending: PendingTagsState):
