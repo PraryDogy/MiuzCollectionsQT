@@ -17,7 +17,7 @@ from system.scaner import (BaseScaner, DirsReady, ForcedScaner, MfScanned,
                            ScanProgress)
 
 from ._base_widgets import (AllertWin, ConfirmWin, TransparentLabel,
-                            UGroupBox, UMainWindow)
+                            BaseGroupBox, UMainWindow)
 from .bar_bottom import BarBottom
 from .bar_macos import BarMacos
 from .bar_top import BarTop
@@ -185,7 +185,7 @@ class WinMain(UMainWindow):
 		self.splitter.addWidget(self.left_menu)
 
 		# Правый виджет
-		right_wid = UGroupBox()
+		right_wid = BaseGroupBox()
 		self.splitter.addWidget(right_wid)
 		self.right_layout = QVBoxLayout(right_wid)
 		self.right_layout.setContentsMargins(0, 0, 0, 0)
