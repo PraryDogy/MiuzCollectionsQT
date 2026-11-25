@@ -26,7 +26,7 @@ from ._base_widgets import (ActiveButton, AllertWin, ConfirmWin, HoverGroupBox,
                             TransparentWidget, UGroupBox, UListWidget,
                             UListWidgetItem, UMainWindow, UMenu, UPushButton,
                             UScrollVerticalArea, USep, USpinBox, UTableWidget,
-                            WrapLabel)
+                            BaseGroupBox)
 
 
 def restart_app():
@@ -902,7 +902,7 @@ class MfStopListWidget(HoverGroupBox):
 		self.changed.emit()
 
 
-class MfSettings(UGroupBox):
+class MfSettings(BaseGroupBox):
 	changed = pyqtSignal()
 	mf_removed = pyqtSignal()
 	repair_done = pyqtSignal(str)   # clean_type: "simple_repair" или "full_repair"
@@ -1036,7 +1036,7 @@ class NewMfWin(UMainWindow):
 		self.has_unsaved = False
 		self.discard_win = None
 
-		group_wrapper = UGroupBox()
+		group_wrapper = BaseGroupBox()
 		self.central_layout.addWidget(group_wrapper)
 		self.group_lay = QVBoxLayout(group_wrapper)
 		self.group_lay.setContentsMargins(5, 5, 5, 5)

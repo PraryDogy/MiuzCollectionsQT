@@ -55,6 +55,10 @@ class UGroupBox(QGroupBox):
 	pass
 
 
+class BaseGroupBox(QGroupBox):
+	pass
+
+
 class UTableWidget(QTableWidget):
 	pass
 

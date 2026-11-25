@@ -97,10 +97,21 @@ UBlackFrame {
 }
 
 UGroupBox {
-    background: #141c25;
-    border: 1px solid #2a3a4b;
+    background: #19232e;
+    border: 1px solid #2f3f53;
     border-radius: 8px;
     color: #ffffff;
+}
+
+HoverGroupBox {
+    background: #19232e;
+    border: 1px solid #2f3f53;
+    border-radius: 8px;
+}
+
+HoverGroupBox[hovered="true"] {
+    background: #22303f;
+    border: 1px solid #4f6680;
 }
 
 USep {
@@ -108,6 +119,16 @@ USep {
     border: none;
     color: #ffffff;
 }
+
+BaseGroupBox {
+    background: #131b24;
+    border: 1px solid #243240;
+    border-radius: 8px;
+    color: #ffffff;
+}
+
+
+
 
 /* Миниатюры */
 Thumb {
@@ -249,16 +270,6 @@ RedButton:pressed {
     border: 1px solid #f04a57;
 }
 
-HoverGroupBox {
-    background: #141c25;
-    border: 1px solid #2a3a4b;
-    border-radius: 8px;
-}
-
-HoverGroupBox[hovered="true"] {
-    background: #22303f;
-    border: 1px solid #4f6680;
-}
 
 SvgBg {
     background: transparent;
