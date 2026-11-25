@@ -16,7 +16,7 @@ from system.runnable import BlurImgBgTask, UThreadPool
 from system.utils import Utils
 
 from ._base_widgets import (ActiveButton, TransparentLabel, TransparentWidget,
-                            UGroupBox, UMainWindow, UMenu, UPushButton)
+                            UGroupBox, UMainWindow, UMenu, UPushButton, BaseGroupBox)
 
 
 class CopyPathButton(UPushButton):
@@ -130,7 +130,7 @@ class WinInfo(UMainWindow):
 
 
 	def _build_info(self):
-		wid = UGroupBox()
+		wid = BaseGroupBox()
 		self.central_layout.addWidget(wid)
 
 		outer_lay = QVBoxLayout(wid)

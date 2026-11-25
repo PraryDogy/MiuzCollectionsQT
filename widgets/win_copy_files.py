@@ -20,20 +20,21 @@ class ReplaceWin(VerticalWin):
     skip_pressed = pyqtSignal()
     cancel_pressed = pyqtSignal()
     keep_both = pyqtSignal()
-    WIDTH = 300
+    WIDTH = 270
 
-    def __init__(self, filename: str, show_checkbox: bool):
-        super().__init__()
+    def __init__(self, parent, filename: str, show_checkbox: bool):
+        super().__init__(parent)
 
         self.filename = filename
         self.show_checkbox = show_checkbox
-
+        self.setFixedWidth(self.WIDTH)
         self.setWindowTitle(Lng.replace)
         self.set_close_only()
         self.set_always_on_top()
         self.show_titlebar_sep()
         self._init_ui()
         self.finish_layout()
+        self.filename_label.fit_to_width(self.WIDTH - 40)
 
     def _init_ui(self):
         icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
@@ -49,6 +50,7 @@ class ReplaceWin(VerticalWin):
 
         self.filename_label = WrapLabel(self.filename)
         self.filename_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.filename_label.set_style("regular", "regular", "bold")
         self.text_layout.addWidget(self.filename_label)
 
         self.actions_widget = TransparentWidget()
@@ -238,6 +240,7 @@ class WinCopyFiles(WinProgressbar):
             )
 
         self.replace_win = ReplaceWin(
+            self,
             filename,
             len(copy_item.src_urls) > 1,
         )
