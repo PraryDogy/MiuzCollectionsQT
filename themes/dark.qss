@@ -12,19 +12,24 @@
        #141c25                  UGroupBox, списки, деревья, таблицы, меню
        #1d2834                  кнопки, поля, спинбокс, тултип, шапка таблицы
        #121a23                  зона перетаскивания
+       #19232e                  UGroupBox
+       #1b2530                  HoverGroupBox в базовом состоянии
+       #243241                  HoverGroupBox при наведении
        rgba(40, 54, 69, 200)    кнопка «вверх»
        rgba(0, 0, 0, 150)       затемнение окна
-     Рамки
-       #2a3a4b                  рамка UFrame, групп, списков, таблиц
-       #3a4d61                  рамка кнопок, полей, спинбокса, дорожки
-       #4f6680                  рамка при наведении
+     Рамки (приглушённые)
+       #223040                  рамка UFrame, групп, списков, таблиц, меню
+       #26333f                  рамка UGroupBox, HoverGroupBox
+       #2b3947                  рамка кнопок, полей, спинбокса, тегов
+       #3a4b5e                  рамка при наведении
+       #4a5d72                  рамка индикаторов при наведении
      Состояния
        #22303f                  наведение строк, выделение, отметка
        #263446                  наведение кнопок и полей
        #2f3f53                  нажатие, иконочная кнопка: выбрано
        #5d7490                  полоса прокрутки: нажатие
      Текст
-       #e3e8ed                  основной текст (смягчённый белый)
+       #c9d1da                  основной текст
        #f2f5f8                  текст на заливке кнопок и тегов
        #9aa6b2                  серый текст подписей
      Акцент (только действия и состояния)
@@ -42,7 +47,7 @@
        #aab6c2                  ползунок
      Base-слой
        #131b24                  BaseGroupBox, UListWidget, UTreeView, UTreeWidget
-       #1a2530                  рамка Base-слоя
+       #17202a                  рамка Base-слоя
 
    ВАЖНО: цвет выделения списков (#22303f) дублируется в system/themes.py,
    класс DarkTreeTheme.sel_color. При смене цвета меняйте в обоих местах.
@@ -64,14 +69,14 @@ TransparentScrollArea,
 ImgViewSvg {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 /* проверить: grep по коду, используется ли класс */
 MacControlButton {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 
@@ -82,14 +87,14 @@ MacControlButton {
 UMainWindow {
     background: #080b0f;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 UFrame {
     background: #10161d;
-    border: 1px solid #2a3a4b;
+    border: 1px solid #223040;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 /* рамка прозрачна, чтобы не было сдвига при изменении */
@@ -97,38 +102,38 @@ UBlackFrame {
     background: #000000;
     border: 1px solid transparent;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 UGroupBox {
     background: #19232e;
-    border: 1px solid #2f3f53;
+    border: 1px solid #26333f;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 HoverGroupBox {
-    background: #19232e;
-    border: 1px solid #2f3f53;
+    background: #1b2530;
+    border: 1px solid #26333f;
     border-radius: 8px;
 }
 
 HoverGroupBox[hovered="true"] {
-    background: #22303f;
-    border: 1px solid #4f6680;
+    background: #243241;
+    border: 1px solid #3a4b5e;
 }
 
 USep {
-    background: #2a3a4b;
+    background: #223040;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 BaseGroupBox {
     background: #131b24;
-    border: 1px solid #1a2530;
+    border: 1px solid #17202a;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 
@@ -188,15 +193,15 @@ WinImageView {
 /* Зона перетаскивания: нейтральная, статус передаёт иконка */
 WinImgSearchDropWidget {
     background: #121a23;
-    border: 2px dashed #3a4d61;
+    border: 2px dashed #2b3947;
     border-radius: 8px;
 }
 
 UpBtnLabel {
     background: rgba(40, 54, 69, 200);
-    border: 1px solid #3a4d61;
+    border: 1px solid #2b3947;
     border-radius: 18px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 UMainWinOverlay {
@@ -211,9 +216,9 @@ UMainWinOverlay {
 
 UPushButton {
     background: #1d2834;
-    border: 1px solid #3a4d61;
+    border: 1px solid #2b3947;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
     font-size: 11px;
     padding-left: 5px;
     padding-right: 5px;
@@ -221,12 +226,12 @@ UPushButton {
 
 UPushButton:hover {
     background: #263446;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
 }
 
 UPushButton:pressed {
     background: #2f3f53;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
 }
 
 UPushButton::menu-indicator {
@@ -289,7 +294,7 @@ SvgBg {
     background: transparent;
     border: none;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 SvgBg:hover[style="base"] {
@@ -311,47 +316,47 @@ SvgBg[style="pressed"] {
 
 ULineEdit {
     background: #1d2834;
-    border: 1px solid #3a4d61;
+    border: 1px solid #2b3947;
     border-radius: 6px;
-    color: #e3e8ed;
+    color: #c9d1da;
     padding: 5px 2px 5px 2px;
 }
 
 ULineEdit:hover {
     background: #263446;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
 }
 
 UTextEdit {
     background: #1d2834;
-    border: 1px solid #3a4d61;
+    border: 1px solid #2b3947;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
     padding: 5px 2px 5px 2px;
 }
 
 UTextEdit:hover {
     background: #263446;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
 }
 
 USpinBox {
     background: #1d2834;
-    border: 1px solid #3a4d61;
+    border: 1px solid #2b3947;
     border-radius: 4px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 USpinBox:hover {
     background: #263446;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
 }
 
 USpinBox::up-button,
 USpinBox::down-button {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
     width: 17px;
     height: 9px;
     border-radius: 3px;
@@ -409,7 +414,7 @@ UCheckBox {
 
 UCheckBox::indicator {
     background: #1d2834;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
     width: 12px;
     height: 12px;
     border-radius: 4px;
@@ -424,12 +429,12 @@ UCheckBox::indicator:unchecked {
 }
 
 UCheckBox::indicator:hover {
-    border: 1px solid #5d7490;
+    border: 1px solid #4a5d72;
 }
 
 UListWidget::indicator {
     background: #1d2834;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
     width: 16px;
     height: 16px;
     border-radius: 4px;
@@ -437,7 +442,7 @@ UListWidget::indicator {
 
 UListWidget::indicator:disabled {
     background: #1d2834;
-    border: 1px solid #3a4d61;
+    border: 1px solid #2b3947;
 }
 
 UListWidget::indicator:checked {
@@ -451,16 +456,16 @@ UListWidget::indicator:checked {
 
 UMenu {
     background: #141c25;
-    border: 1px solid #2a3a4b;
+    border: 1px solid #223040;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
     padding: 5px 2px 5px 2px;
 }
 
 UMenu::item {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
     padding: 5px 30px 5px 10px;
 }
 
@@ -505,16 +510,16 @@ UMenu::right-arrow:selected {
 
 UListWidget {
     background: #131b24;
-    border: 1px solid #1a2530;
+    border: 1px solid #17202a;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
     padding: 10px 2px 10px 2px;
 }
 
 UListWidget::item {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
     height: 30px;
 }
 
@@ -532,9 +537,9 @@ UListWidget::item:selected:!active {
 UTreeView,
 UTreeWidget {
     background: #131b24;
-    border: 1px solid #1a2530;
+    border: 1px solid #17202a;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
     padding: 10px 2px 10px 2px;
 }
 
@@ -542,7 +547,7 @@ UTreeView::item,
 UTreeWidget::item {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
     height: 30px;
 }
 
@@ -565,7 +570,7 @@ TagWidget {
     background: transparent;
     border: none;
     border-radius: 12px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 TagWidget[style="blue"] {
@@ -581,12 +586,12 @@ TagWidget[style="blue"]:hover {
 
 TagWidget[style="gray"] {
     background: #303b46;
-    border: 1px solid #3d4a56;
+    border: 1px solid #36424f;
 }
 
 TagWidget[style="gray"]:hover {
     background: #3a4754;
-    border: 1px solid #4a5a6a;
+    border: 1px solid #434f5c;
 }
 
 TagWidget[style="green"] {
@@ -622,12 +627,12 @@ TagWidget[style="red"]:hover {
 }
 
 TagWidget[style="transparent"] {
-    border: 1px solid #3a4d61;
+    border: 1px solid #2b3947;
 }
 
 TagWidget[style="transparent"]:hover {
     background: #22303f;
-    border: 1px solid #4f6680;
+    border: 1px solid #3a4b5e;
 }
 
 
@@ -727,12 +732,12 @@ TransparentLabel,
 WrapLabel {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 TransparentLabel[state="regular"],
 WrapLabel[state="regular"] {
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 TransparentLabel[state="gray"],
@@ -770,13 +775,13 @@ CalendarCircle[circle="selected"] {
 CalendarCircle[circle="today"] {
     background: #303b46;
     border-radius: 13px;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
 
 QToolTip {
     background: #1d2834;
-    border: 1px solid #4f6680;
-    color: #e3e8ed;
+    border: 1px solid #3a4b5e;
+    color: #c9d1da;
     padding: 2px;
     font-weight: bold;
     font-size: 13px;
@@ -791,13 +796,13 @@ QToolTip {
 
 ChoosePathWidget {
     background: #121a23;
-    border: 2px dashed #3a4d61;
+    border: 2px dashed #2b3947;
     border-radius: 8px;
 }
 
 ChoosePathWidget[hovered="true"] {
     background: #19232e;
-    border: 2px dashed #4f6680;
+    border: 2px dashed #3a4b5e;
 }
 
 
@@ -807,7 +812,7 @@ ChoosePathWidget[hovered="true"] {
 
 /* проверить grep: в этом файле класса WinSettingsMfAliasTitle нет */
 WinSettingsMfAliasTitle {
-    color: #e3e8ed;
+    color: #c9d1da;
     font-size: 23px;
     font-weight: bold;
 }
@@ -822,7 +827,7 @@ ServerLabel {
    ===================================================================== */
 
 CalendarBigDate {
-    color: #c4c9ce;
+    color: #b4bcc6;
     font-size: 25pt;
 }
 
@@ -833,27 +838,27 @@ CalendarBigDate {
 
 UTableWidget {
     background: #141c25;
-    border: 1px solid #2a3a4b;
+    border: 1px solid #223040;
     border-radius: 8px;
-    color: #e3e8ed;
+    color: #c9d1da;
     gridline-color: #232f3b;
     padding: 2px 2px 2px 2px;
     selection-background-color: #22303f;
-    selection-color: #e3e8ed;
+    selection-color: #c9d1da;
 }
 
 UTableWidget QTableCornerButton::section {
     background: #1d2834;
     border: none;
-    border-bottom: 1px solid #2a3a4b;
-    border-right: 1px solid #2a3a4b;
+    border-bottom: 1px solid #223040;
+    border-right: 1px solid #223040;
 }
 
 UTableWidget QHeaderView::section {
     background: #1d2834;
     color: #9aa6b2;
     border: none;
-    border-bottom: 1px solid #2a3a4b;
+    border-bottom: 1px solid #223040;
     padding: 5px 8px 5px 8px;
     font-size: 11px;
     font-weight: normal;
@@ -862,12 +867,12 @@ UTableWidget QHeaderView::section {
 UTableWidget::item {
     background: transparent;
     border: none;
-    color: #e3e8ed;
+    color: #c9d1da;
     padding: 4px 8px 4px 8px;
 }
 
 UTableWidget::item:selected,
 UTableWidget::item:selected:!active {
     background: #22303f;
-    color: #e3e8ed;
+    color: #c9d1da;
 }
