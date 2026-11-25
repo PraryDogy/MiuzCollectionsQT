@@ -1703,9 +1703,9 @@ class MfPathWidget(HoverGroupBox):
 		content_lay.setSpacing(5)
 
 		self.title_widget = TitleWidget(
-			Lng.catalog_path,
-			Lng.catalog_path_descr,
-			Static.COLOR_ICONS / "finder.svg",
+			title=Lng.catalog_path,
+			descr=Lng.catalog_path_descr,
+			title_svg=Static.COLOR_ICONS / "finder.svg",
 			sep=False
 		)
 		content_lay.addWidget(self.title_widget)
