@@ -975,10 +975,8 @@ class MfSettings(UGroupBox):
 
 	def save_changes(self):
 		if not self.path_widget.validate_and_show_win():
-			win_warn = AllertWin(Lng.select_catalog_path, "blue", "yellow")
-			win_warn.center_to_parent(self.window())
-			win_warn.ok_clicked.connect(win_warn.deleteLater)
-			win_warn.show()
+			self.allert = AllertWin(self.window(), Lng.select_catalog_path, "blue", "yellow")
+			self.allert.ok_clicked.connect(self.allert.deleteLater)
 			return
 
 		def final():
@@ -1002,12 +1000,10 @@ class MfSettings(UGroupBox):
 
 	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
-			win = AllertWin(Lng.at_least_one_folder_required, "blue", "yellow")
+			self.allert = AllertWin(self.window(), Lng.at_least_one_folder_required, "blue", "yellow")
 		else:
-			win = ConfirmWin(Lng.remove_catalog_warn, "red", "yellow")
-			win.ok_clicked.connect(lambda: self.start_mf_cleaner("remove_mf"))
-		win.center_to_parent(self.window())
-		win.show()
+			self.confirm = ConfirmWin(self.window(), Lng.remove_catalog_warn, "red", "yellow")
+			self.confirm.ok_clicked.connect(lambda: self.start_mf_cleaner("remove_mf"))
 
 	def open_repair_win(self):
 		self.repair_win = MfRepairWin()
@@ -1020,9 +1016,7 @@ class MfSettings(UGroupBox):
 
 		def on_finish(success: bool):
 			if not success:
-				win = AllertWin(Lng.repair_failed, "blue", "yellow")
-				win.center_to_parent(self.window())
-				win.show()
+				self.allert = AllertWin(self.window(), Lng.repair_failed, "blue", "yellow")
 				return
 
 			if clean_type == "remove_mf":

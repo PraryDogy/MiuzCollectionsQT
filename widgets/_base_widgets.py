@@ -1464,9 +1464,7 @@ class MfAliasWidget(TransparentWidget):
 		self.validate_timer.stop()
 		self._show_state(error_text)
 		if error_text:
-			win_warn = AllertWin(error_text, "blue", "yellow")
-			win_warn.center_to_parent(self.window())
-			win_warn.show()
+			self.allert = AllertWin(self.window(), error_text, "blue", "yellow")
 			return None
 		return mf_alias
 
@@ -1756,9 +1754,7 @@ class MfPathWidget(HoverGroupBox):
 
 	def validate_and_show_win(self):
 		if not self._path_exists():
-			win_warn = AllertWin(Lng.select_catalog_path, "blue", "yellow")
-			win_warn.center_to_parent(self.window())
-			win_warn.show()
+			self.allert = AllertWin(self.window(), Lng.select_catalog_path, "blue", "yellow")
 			return None
 		return self.draft_mf_path
 
