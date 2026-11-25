@@ -1617,7 +1617,7 @@ class ChoosePathWidget(TransparentFrame):
 		self.icon = QSvgWidget()
 		self.icon.setFixedSize(26, 26)
 		self.icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-		lay.addWidget(self.icon)
+		# lay.addWidget(self.icon)
 
 		text_wrapper = TransparentWidget()
 		text_wrapper.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)

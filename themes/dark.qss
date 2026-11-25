@@ -956,28 +956,26 @@ QToolTip {
    ===================================================================== */
 
 ChoosePathWidget[state="warn"] {
-    background: #1d1a0f;
-    border: 2px dashed #d9a520;
+    background: #151410;
+    border: 2px dashed #5c4a1e;
     border-radius: 8px;
 }
 
 ChoosePathWidget[state="ok"] {
-    background: #0e1f1b;
-    border: 2px dashed #10b981;
+    background: #101815;
+    border: 2px dashed #2a5a4c;
     border-radius: 8px;
 }
 
-/* Наведение на MfPathWidget: фон заметно светлее, рамка та же */
 ChoosePathWidget[state="warn"][hovered="true"] {
-    background: #3a3216;
-    border: 2px dashed #d9a520;
+    background: #1d1a12;
+    border: 2px dashed #7a6228;
 }
 
 ChoosePathWidget[state="ok"][hovered="true"] {
-    background: #1d4234;
-    border: 2px dashed #10b981;
+    background: #14231e;
+    border: 2px dashed #3a7a68;
 }
-
 
 /* =====================================================================
    ЗАГОЛОВКИ СТРАНИЦ
