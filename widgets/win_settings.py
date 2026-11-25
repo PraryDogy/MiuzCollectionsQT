@@ -927,8 +927,9 @@ class MfSettings(BaseGroupBox):
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
-		self.title_label = TitleWidget(title=self.mf.mf_alias, sep=False)
-		self.title_label.set_margins(10, 0, 10, 0)
+		title = f"{Lng.settings} {self.mf.mf_alias}"
+		self.title_label = TitleWidget(title=title, sep=False)
+		self.title_label.set_margins(2, 0, 2, 0)
 		self.main_lay.addWidget(self.title_label)
 
 		self.path_widget = MfPathWidget(mf=self.mf)
