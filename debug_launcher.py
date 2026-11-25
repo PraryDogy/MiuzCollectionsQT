@@ -211,7 +211,7 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         ("Новый каталог", lambda: _new("widgets.win_settings", "NewMfWin")),
         ("Стоп-лист", lambda: _new("widgets.win_settings", "IgnoreListWin", mf)),
         ("Восстановление каталога", lambda: _new("widgets.win_settings", "MfRepairWin")),
-        ("Отмена изменений", lambda: _new("widgets.win_settings", "CancelChangesWin", _lng("unsaved_changes_confirm"))),
+        ("Отмена изменений", lambda: _new("widgets.win_settings", "CancelChangesWin", _LAUNCHER, _lng("unsaved_changes_confirm"))),
         ("Подключение SMB", lambda: _new("widgets.win_smb", "WinSmb", mf)),
         ("О программе", lambda: _new("widgets.bar_macos", "AboutWin", parent=_LAUNCHER)),
 
