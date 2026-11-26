@@ -244,7 +244,9 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.document().contentsChanged.connect(self.adjust_height)
-		self.setAlignment(Qt.AlignmentFlag.AlignLeft)
+		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+
+		self.setStyleSheet("background: black;")
 
 	def adjust_height(self):
 		self.adjustSize()

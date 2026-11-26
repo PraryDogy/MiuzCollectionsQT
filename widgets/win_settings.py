@@ -554,7 +554,7 @@ class GeneralSettings(BaseGroupBox):
 
 
 class MfRepairGroup(HoverGroupBox):
-	WIDTH = 330
+	# WIDTH = 330
 	def __init__(self, title, description):
 		super().__init__()
 		self.setFixedWidth(self.WIDTH)
@@ -565,6 +565,8 @@ class MfRepairGroup(HoverGroupBox):
 
 		title_widget = TitleWidget(title, description, sep=False)
 		self.v_lay.addWidget(title_widget)
+
+		title_widget.description_widget.setStyleSheet("background: black;")
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
@@ -648,7 +650,11 @@ class MfRepairWidget(HoverGroupBox):
 		content_lay.setContentsMargins(0, 0, 0, 0)
 		content_lay.setSpacing(7)
 
-		title_widget = TitleWidget(Lng.repair_errors, Lng.catalog_reindex_warning, Static.COLOR_ICONS / "repair.svg", sep=False)
+		title_widget = TitleWidget(
+			Lng.repair_errors,
+			Lng.catalog_reindex_warning,
+			Static.COLOR_ICONS / "repair.svg", sep=False
+		)
 		content_lay.addWidget(title_widget)
 
 		# правая часть: кнопка запуска, по центру по вертикали
