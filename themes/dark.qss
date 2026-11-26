@@ -878,7 +878,7 @@ UTableWidget::item:selected:!active {
 }
 
 
-MfAliasWidget ULineEdit {
+/* MfAliasWidget ULineEdit {
     background: #131b24;
     border: 1px solid #2b3947;
     border-radius: 6px;
@@ -932,4 +932,4 @@ WinTextSearch UTextEdit {
 WinTextSearch UTextEdit:hover {
     background: #131b24;
     border: 1px solid #3a4b5e;
-}
+} */
