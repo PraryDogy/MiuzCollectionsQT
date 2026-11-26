@@ -91,24 +91,21 @@ class TextMixin:
 	# --- Выделение и меню ---
 
 	def set_selectable(self: QLabel | QTextEdit, enabled: bool):
-		self.setTextInteractionFlags(
+		self._selectable = enabled
+
+		flags = (
 			Qt.TextInteractionFlag.TextSelectableByMouse
 			if enabled else Qt.TextInteractionFlag.NoTextInteraction
 		)
+		self.setTextInteractionFlags(flags)
 
-		cursor = (
-			Qt.CursorShape.IBeamCursor
-			if enabled else Qt.CursorShape.ArrowCursor
-		)
-
+		cursor = Qt.CursorShape.IBeamCursor if enabled else Qt.CursorShape.ArrowCursor
 		self.setCursor(cursor)
-
-		if isinstance(self, QTextEdit):
-			self.viewport().setCursor(cursor)
+		self.viewport().setCursor(cursor)
 
 		self.setAttribute(
 			Qt.WidgetAttribute.WA_TransparentForMouseEvents,
-			False
+			not enabled
 		)
 
 		self.set_context_menu(enabled)
@@ -250,23 +247,6 @@ class WrapLabel(TextMixin, QTextEdit):
 		margins = self.contentsMargins()
 		self.setFixedHeight(int(height + margins.top() + margins.bottom()))
 
-	def mouseDoubleClickEvent(self, e):
-		if not self._context_menu_enabled:
-			e.ignore()
-			return
-		return super().mouseDoubleClickEvent(e)
-
-	def mousePressEvent(self, e):
-		if not self._context_menu_enabled:
-			e.ignore()
-			return
-		super().mousePressEvent(e)
-
-	def contextMenuEvent(self, ev):
-		if not self._context_menu_enabled:
-			ev.ignore()
-			return
-		super().contextMenuEvent(ev)
 
 class HoverGroupBox(UGroupBox):
 	def __init__(self, title=None, parent=None):
