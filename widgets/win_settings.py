@@ -974,6 +974,7 @@ class MfSettings(BaseGroupBox):
 		if not self.path_widget.validate_and_show_win():
 			self.allert = AllertWin(self.window(), Lng.select_catalog_path, "blue", "yellow")
 			self.allert.ok_clicked.connect(self.allert.deleteLater)
+			self.allert.show()
 			return
 
 		def final():
@@ -997,6 +998,7 @@ class MfSettings(BaseGroupBox):
 	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
 			self.allert = AllertWin(self.window(), Lng.at_least_one_folder_required, "blue", "yellow")
+			self.allert.show()
 		else:
 			self.confirm = ConfirmWin(self.window(), Lng.remove_catalog_warn, "red", "yellow")
 			self.confirm.ok_clicked.connect(lambda: self.start_mf_cleaner("remove_mf"))
@@ -1014,6 +1016,7 @@ class MfSettings(BaseGroupBox):
 		def on_finish(success: bool):
 			if not success:
 				self.allert = AllertWin(self.window(), Lng.repair_failed, "blue", "yellow")
+				self.allert.show()
 				return
 
 			if clean_type == "remove_mf":

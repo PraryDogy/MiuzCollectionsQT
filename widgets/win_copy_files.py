@@ -324,6 +324,7 @@ class WinCopyFiles(WinProgressbar):
 
 		self.close_replace_window()
 		self.allert = AllertWin(self.window(), f"{Lng.copy_error}\n{traceback_text}", "blue", "yellow")
+		self.allert.show()
 		self.stop_task()
 		self.deleteLater()
 

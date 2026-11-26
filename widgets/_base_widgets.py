@@ -1355,9 +1355,6 @@ class InputTextWin(UMainWindow):
 		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
 		btn_layout.addWidget(self.ok_btn)
 
-		self.adjustSize()
-		# self.setFixedSize(300, self.height())
-
 	def ok_clicked_cmd(self):
 		text = self.line_edit_widget.text()
 		text = text.strip().replace("\n", " ")
@@ -1486,6 +1483,7 @@ class MfAliasWidget(UGroupBox):
 		self._show_state(error_text)
 		if error_text:
 			self.allert = AllertWin(self.window(), error_text, "blue", "yellow")
+			self.allert.show()
 			return None
 		return mf_alias
 
@@ -1777,6 +1775,7 @@ class MfPathWidget(HoverGroupBox):
 	def validate_and_show_win(self):
 		if not self._path_exists():
 			self.allert = AllertWin(self.window(), Lng.select_catalog_path, "blue", "yellow")
+			self.allert.show()
 			return None
 		return self.draft_mf_path
 
