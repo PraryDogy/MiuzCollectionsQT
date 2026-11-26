@@ -74,7 +74,12 @@ class TextMixin:
 
 	# --- Стиль ---
 
-	def set_style(self: QLabel | QTextEdit, color, size, weight):
+	def set_style(
+			self: QLabel | QTextEdit,
+			color: Literal["regular", "gray"],
+			size: Literal["regular", "small", "big"],
+			weight: Literal["regular", "bold"]
+	):
 		for k, v in {"state": color, "text_size": size, "text_weight": weight}.items():
 			self.setProperty(k, v)
 		self.style().unpolish(self)
@@ -245,7 +250,8 @@ class WrapLabel(TextMixin, QTextEdit):
 		doc.setTextWidth(self.viewport().width())
 		height = doc.size().height()
 		margins = self.contentsMargins()
-		self.setFixedHeight(int(height + margins.top() + margins.bottom()))
+		hh = int(height + margins.top() + margins.bottom())
+		self.setFixedHeight(hh)
 
 
 class HoverGroupBox(UGroupBox):
@@ -1147,11 +1153,10 @@ class VerticalWin(UMainWindow):
 	def __init__(self, parent: UMainWindow):
 		super().__init__()
 		self._parent = parent
-		self.hide()
+		self.setFixedWidth(self.WIDTH)
 		self.set_always_on_top()
 		self.set_close_only()
 		self.show_titlebar_sep()
-		self.setFixedWidth(self.WIDTH)
 		self.icon_layout = self.create_icon_layout()
 		self.text_layout = self.create_text_layout()
 		self.button_layout = self.create_button_layout()
