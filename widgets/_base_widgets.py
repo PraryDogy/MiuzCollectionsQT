@@ -91,16 +91,27 @@ class TextMixin:
 	# --- Выделение и меню ---
 
 	def set_selectable(self: QLabel | QTextEdit, enabled: bool):
-		if enabled:
-			self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-			self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-			self.setCursor(Qt.CursorShape.IBeamCursor)
-			self.set_context_menu(True)
-		else:
-			self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
-			self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
-			self.unsetCursor()
-			self.set_context_menu(False)
+		self.setTextInteractionFlags(
+			Qt.TextInteractionFlag.TextSelectableByMouse
+			if enabled else Qt.TextInteractionFlag.NoTextInteraction
+		)
+
+		cursor = (
+			Qt.CursorShape.IBeamCursor
+			if enabled else Qt.CursorShape.ArrowCursor
+		)
+
+		self.setCursor(cursor)
+
+		if isinstance(self, QTextEdit):
+			self.viewport().setCursor(cursor)
+
+		self.setAttribute(
+			Qt.WidgetAttribute.WA_TransparentForMouseEvents,
+			False
+		)
+
+		self.set_context_menu(enabled)
 
 	def set_context_menu(self, enabled: bool):
 		self._context_menu_enabled = enabled
@@ -224,13 +235,15 @@ class WrapLabel(TextMixin, QTextEdit):
 	def __init__(self, parent: TransparentWidget, text: str):
 		super().__init__(text, parent)
 		self._init_text_mixin(text)
+		self.set_selectable(False)
 		self.setReadOnly(True)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.document().contentsChanged.connect(self.adjust_height)
-		self.adjustSize()
+		self.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
 	def adjust_height(self):
+		self.adjustSize()
 		doc = self.document()
 		doc.setTextWidth(self.viewport().width())
 		height = doc.size().height()
@@ -929,7 +942,6 @@ class TitleWidget(TransparentWidget):
 
 		if descr:
 			self.description_widget = WrapLabel(self, descr)
-			self.description_widget.setToolTip("")
 			self.description_widget.set_style("regular", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
 
@@ -1279,7 +1291,7 @@ class InputTextWin(UMainWindow):
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		text = " " + description
-		self.description_label = WrapLabel(text)
+		self.description_label = WrapLabel(self, text)
 		self.description_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.central_layout.addWidget(self.description_label)

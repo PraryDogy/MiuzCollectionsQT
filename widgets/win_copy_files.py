@@ -46,7 +46,7 @@ class ReplaceWin(VerticalWin):
         message.set_style("gray", "regular", "regular")
         self.text_layout.addWidget(message)
 
-        self.filename_label = WrapLabel(self.filename)
+        self.filename_label = WrapLabel(self, self.filename)
         self.filename_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.filename_label.set_style("regular", "regular", "bold")
         self.text_layout.addWidget(self.filename_label)

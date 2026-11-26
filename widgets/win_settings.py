@@ -566,8 +566,6 @@ class MfRepairGroup(HoverGroupBox):
 		title_widget = TitleWidget(title, description, sep=False)
 		self.v_lay.addWidget(title_widget)
 
-		# title_widget.description_widget.fit_to_width(self.WIDTH - 30)
-
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
 			self.clicked.emit()

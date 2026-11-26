@@ -15,9 +15,8 @@ class UploadWin(ConfirmWin):
 		self.setWindowTitle(Lng.upload_files)
 		self.setToolTip(dest)
 		self._dest = dest
-		self.dest_widget = WrapLabel(dest)
+		self.dest_widget = WrapLabel(self, dest)
 		self.dest_widget.set_style("regular", "regular", "bold")
-		self.dest_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.dest_widget)
 		self.confirm_btn.setText(Lng.upload)
 
