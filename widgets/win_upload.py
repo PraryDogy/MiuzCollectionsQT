@@ -38,4 +38,4 @@ class UploadWin(VerticalWin):
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.button_layout.addWidget(self.cancel_btn)
 
-		# self.finish_layout()
+		self.finish_layout()
