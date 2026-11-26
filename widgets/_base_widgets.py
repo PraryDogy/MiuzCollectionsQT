@@ -262,6 +262,46 @@ class WrapLabel(TextMixin, QTextEdit):
 		# self.adjust_height()
 
 
+class WrapLabel(TextMixin, QTextEdit):
+	def __init__(self, parent: TransparentWidget, text: str):
+		super().__init__(text, parent)
+		self._init_text_mixin(text)
+		self.set_selectable(False)
+		self.setReadOnly(True)
+		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+		self.setStyleSheet("background: black;")
+
+		self.document().contentsChanged.connect(self.updateGeometry)
+
+	def _text_height(self, width: int) -> int:
+		doc = self.document().clone()
+		doc.setTextWidth(width)
+		margins = self.contentsMargins()
+		return int(doc.size().height() + margins.top() + margins.bottom())
+
+	def hasHeightForWidth(self) -> bool:
+		return True
+
+	def heightForWidth(self, width: int) -> int:
+		return self._text_height(width)
+
+	def sizeHint(self):
+		size = super().sizeHint()
+		size.setHeight(self._text_height(self.width() or size.width()))
+		return size
+
+	def minimumSizeHint(self):
+		size = super().minimumSizeHint()
+		size.setHeight(self._text_height(self.width() or size.width()))
+		return size
+
+	def resizeEvent(self, event):
+		super().resizeEvent(event)
+		self.updateGeometry()
+
+
 class HoverGroupBox(UGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
