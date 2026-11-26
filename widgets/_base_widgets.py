@@ -271,9 +271,16 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-		self.setStyleSheet("background: black;")
+
+		# Горизонталь растягиваем, вертикаль - только по содержимому
+		sp = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+		sp.setHeightForWidth(True)
+		self.setSizePolicy(sp)
 
 		self.document().contentsChanged.connect(self.updateGeometry)
+
+		# self.setStyleSheet("background: black;")
+
 
 	def _text_height(self, width: int) -> int:
 		doc = self.document().clone()
@@ -1235,11 +1242,14 @@ class VerticalWin(UMainWindow):
 		self.button_layout.setSpacing(5)
 		return self.button_layout
 
-	def finish_layout(self, OFFSET = 40):
-		self.adjustSize()
+	def finish_layout(self):
+		# Ширина уже фиксирована (self.WIDTH), поэтому считаем высоту для неё
+		layout = self.centralWidget().layout()
+		layout.activate()
+		height = layout.totalHeightForWidth(self.width())
+		self.setFixedHeight(height)
 		self.center_to_parent(self._parent)
 		self.show()
-		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 
 class _AllertWin(VerticalWin):
