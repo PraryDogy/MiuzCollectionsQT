@@ -16,6 +16,7 @@ class UploadWin(VerticalWin):
 		self.central_layout.setSpacing(0)
 		self.icon_layout.setContentsMargins(0, 0, 0, 5)
 		self.text_layout.setSpacing(0)
+		self.text_layout.setContentsMargins(0, 0, 0, 5)
 
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "info.svg"))
 		self.svg_widget.setFixedSize(70, 70)
