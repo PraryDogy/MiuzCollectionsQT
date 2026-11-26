@@ -244,7 +244,7 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.document().contentsChanged.connect(self.adjust_height)
-		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+		self.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
 		self.setStyleSheet("background: black;")
 
@@ -256,6 +256,10 @@ class WrapLabel(TextMixin, QTextEdit):
 		margins = self.contentsMargins()
 		hh = int(height + margins.top() + margins.bottom())
 		self.setFixedHeight(hh)
+
+	# def resizeEvent(self, event):
+		# super().resizeEvent(event)
+		# self.adjust_height()
 
 
 class HoverGroupBox(UGroupBox):
