@@ -941,6 +941,9 @@ class UMainWindow(QMainWindow):
 		height = layout.totalHeightForWidth(self.width())
 		self.setFixedHeight(height)
 
+	def show(self):
+		return super().show()
+
 
 class _TitleTextLabel(TransparentLabel):
 	def __init__(self, text="", parent=None):
