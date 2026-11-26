@@ -7,7 +7,7 @@ from ._base_widgets import ActiveButton, UPushButton, VerticalWin, WrapLabel, Tr
 
 
 class UploadWin(VerticalWin):
-	WIDTH = 300
+	WIDTH = 280
 	ok_clicked = pyqtSignal()
 
 	def __init__(self, parent, dest):
@@ -39,3 +39,9 @@ class UploadWin(VerticalWin):
 		self.button_layout.addWidget(self.cancel_btn)
 
 		self.finish_layout()
+
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		return super().keyPressEvent(a0)
