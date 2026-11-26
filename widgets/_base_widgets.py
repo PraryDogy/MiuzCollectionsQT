@@ -74,7 +74,7 @@ class TextMixin:
 
 	# --- Стиль ---
 
-	def set_style(self: QLabel, color, size, weight):
+	def set_style(self: QLabel | QTextEdit, color, size, weight):
 		for k, v in {"state": color, "text_size": size, "text_weight": weight}.items():
 			self.setProperty(k, v)
 		self.style().unpolish(self)
@@ -82,8 +82,11 @@ class TextMixin:
 		self.updateGeometry()
 		self.update()
 
-	def set_state(self: TransparentWidget, state: str):
+	def set_state(self: QLabel | QTextEdit, state: str):
 		self.setProperty("state", state)
+
+	def set_context_menu(self, enabled: bool):
+		self._context_menu_enabled = enabled
 
 	# --- Выделение и меню ---
 
@@ -96,8 +99,11 @@ class TextMixin:
 		else:
 			self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
 			self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
-			self.setCursor(Qt.CursorShape.ArrowCursor)
+			self.unsetCursor()
 			self.set_context_menu(False)
+
+	def set_context_menu(self, enabled: bool):
+		self._context_menu_enabled = enabled
 
 	@staticmethod
 	def _clean(s: str) -> str:
@@ -106,10 +112,10 @@ class TextMixin:
 	def _selected_text(self) -> str:
 		raise NotImplementedError
 
-	def _menu_copy_text(self, full_text: str) -> str:
+	def _menu_copy_text(self: QLabel | QTextEdit, full_text: str) -> str:
 		return self._clean(self._selected_text()) or full_text
 
-	def contextMenuEvent(self: TransparentWidget , ev: QContextMenuEvent):
+	def contextMenuEvent(self: QLabel | QTextEdit , ev: QContextMenuEvent):
 		if not self._context_menu_enabled:
 			return super().contextMenuEvent(ev)
 
@@ -218,8 +224,6 @@ class WrapLabel(TextMixin, QTextEdit):
 	def __init__(self, parent: TransparentWidget, text: str):
 		super().__init__(text, parent)
 		self._init_text_mixin(text)
-		self.set_selectable(False)
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.setReadOnly(True)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
