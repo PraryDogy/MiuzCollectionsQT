@@ -74,7 +74,7 @@ class TextMixin:
 
 	# --- Стиль ---
 
-	def set_style(self: TransparentWidget, color, size, weight):
+	def set_style(self: QLabel, color, size, weight):
 		for k, v in {"state": color, "text_size": size, "text_weight": weight}.items():
 			self.setProperty(k, v)
 		self.style().unpolish(self)
@@ -85,25 +85,19 @@ class TextMixin:
 	def set_state(self: TransparentWidget, state: str):
 		self.setProperty("state", state)
 
-	def get_state(self: TransparentWidget) -> str:
-		return self.property("state")
-
-	def text_full(self: TransparentWidget) -> str:
-		return self._original_text
-
 	# --- Выделение и меню ---
 
-	def set_selectable(self: TransparentWidget | QTextEdit, enabled: bool):
+	def set_selectable(self: QLabel | QTextEdit, enabled: bool):
 		if enabled:
+			self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 			self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 			self.setCursor(Qt.CursorShape.IBeamCursor)
 			self.set_context_menu(True)
 		else:
+			self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
 			self.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
-			self.unsetCursor()
-
-	def set_context_menu(self, enabled: bool):
-		self._context_menu_enabled = enabled
+			self.setCursor(Qt.CursorShape.ArrowCursor)
+			self.set_context_menu(False)
 
 	@staticmethod
 	def _clean(s: str) -> str:
@@ -221,48 +215,23 @@ class TransparentLabel(TextMixin, QLabel):
 
 
 class WrapLabel(TextMixin, QTextEdit):
-	def __init__(self, text: str = "", parent=None):
-		super().__init__(parent)
+	def __init__(self, parent: TransparentWidget, text: str):
+		super().__init__(text, parent)
 		self._init_text_mixin(text)
+		self.set_selectable(False)
+		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.setReadOnly(True)
-		self.setFrameShape(QFrame.Shape.NoFrame)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-		self.document().setDocumentMargin(0)
-		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-		self.setPlainText(self._original_text)
-		self.document().documentLayout().documentSizeChanged.connect(self._fit_height)
-		self._fit_height()
-		self.setToolTip(text)
+		self.document().contentsChanged.connect(self.adjust_height)
+		self.adjustSize()
 
-	def setText(self, text: str):
-		# перекрываем QTextEdit.setText, иначе _original_text устареет
-		self._original_text = text or ""
-		self.setPlainText(self._original_text)
-
-	def _selected_text(self) -> str:
-		return self.textCursor().selectedText()
-
-	def resizeEvent(self, event):
-		super().resizeEvent(event)
-		self.document().setTextWidth(self.viewport().width())
-		self._fit_height()
-
-	def _fit_height(self):
-		self.document().setTextWidth(self.viewport().width())
-		self.setFixedHeight(int(self.document().size().height()))
-
-	def fit_to_width(self, width: int):
-		# viewport совпадает с шириной, так как рамки и скроллбары отключены
-		self.setFixedWidth(width)
-		self.document().setTextWidth(width)
-		self.setFixedHeight(ceil(self.document().size().height()))
-
-	def set_selectable(self, enabled):
-		self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
-		return super().set_selectable(enabled)
+	def adjust_height(self):
+		doc = self.document()
+		doc.setTextWidth(self.viewport().width())
+		height = doc.size().height()
+		margins = self.contentsMargins()
+		self.setFixedHeight(int(height + margins.top() + margins.bottom()))
 
 
 class HoverGroupBox(UGroupBox):
@@ -955,7 +924,7 @@ class TitleWidget(TransparentWidget):
 			self.v_lay.addWidget(self.sep)
 
 		if descr:
-			self.description_widget = WrapLabel(descr)
+			self.description_widget = WrapLabel(self, descr)
 			self.description_widget.setToolTip("")
 			self.description_widget.set_style("regular", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
@@ -1201,12 +1170,10 @@ class VerticalWin(UMainWindow):
 		return self.button_layout
 
 	def finish_layout(self, OFFSET = 40):
-		for label in self.findChildren(WrapLabel):
-			label.fit_to_width(self.WIDTH - OFFSET)
 		self.adjustSize()
 		self.center_to_parent(self._parent)
 		self.show()
-		QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
+		# QTimer.singleShot(0, lambda: self.setFixedHeight(self.sizeHint().height()))
 
 
 class _AllertWin(VerticalWin):
@@ -1244,7 +1211,7 @@ class _AllertWin(VerticalWin):
 		self.svg_widget.setFixedSize(65, 65)
 		self.icon_layout.addWidget(self.svg_widget)
 
-		self.description_label = WrapLabel(text)
+		self.description_label = WrapLabel(self, text)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		self.text_layout.addWidget(self.description_label, alignment=Qt.AlignmentFlag.AlignCenter)

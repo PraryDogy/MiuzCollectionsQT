@@ -557,6 +557,7 @@ class MfRepairGroup(HoverGroupBox):
 	WIDTH = 330
 	def __init__(self, title, description):
 		super().__init__()
+		self.setFixedWidth(self.WIDTH)
 		self.setCursor(Qt.CursorShape.PointingHandCursor)
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(10, 10, 10, 10)
@@ -565,8 +566,7 @@ class MfRepairGroup(HoverGroupBox):
 		title_widget = TitleWidget(title, description, sep=False)
 		self.v_lay.addWidget(title_widget)
 
-		title_widget.description_widget.fit_to_width(self.WIDTH - 30)
-		self.setFixedWidth(self.WIDTH)
+		# title_widget.description_widget.fit_to_width(self.WIDTH - 30)
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
@@ -1025,12 +1025,14 @@ class MfSettings(BaseGroupBox):
 
 class NewMfWin(UMainWindow):
 	closed = pyqtSignal()
+	WIDTH = 510
 
 	def __init__(self, mf_path: str = None):
 		super().__init__()
 		self.setWindowTitle(Lng.new_catalog)
 		self.set_always_on_top()
 		self.set_close_only()
+		self.setFixedWidth(self.WIDTH)
 
 		self.has_unsaved = False
 		self.discard_win = None
@@ -1072,8 +1074,7 @@ class NewMfWin(UMainWindow):
 		if mf_path:
 			self.mf_path_widget_changed()
 
-		self.setFixedWidth(510)
-		self.mf_path_widget.title_widget.description_widget.fit_to_width(400)
+		# self.mf_path_widget.title_widget.description_widget.fit_to_width(400)
 		self.adjustSize()
 		QTimer.singleShot(1, lambda: self.setFixedHeight(self.height()))
 
