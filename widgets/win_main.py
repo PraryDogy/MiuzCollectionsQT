@@ -431,6 +431,7 @@ class WinMain(UMainWindow):
 
 		self.confirm = ConfirmWin(self, text, "red", "yellow")
 		self.confirm.ok_clicked.connect(start_file_remover)
+		self.confirm.show()
 		file_remover = ProcessWorker(FilesRemover.start, (abs_paths, ))
 
 	@with_conn
@@ -747,6 +748,7 @@ class WinMain(UMainWindow):
 			self.open_win_smb(mf)
 
 		self.confirm = ConfirmWin(self, Lng.catalog_mismatch_text, "blue", "red")
+		self.confirm.show()
 		self.confirm.ok_clicked.connect(confirm_other_catalog)
 		self.confirm.cancel_clicked.connect(revert_to_old_catalog)
 

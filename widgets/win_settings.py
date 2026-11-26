@@ -224,6 +224,7 @@ class RebootableSettings(UGroupBox):
 
 		self.confirm = ConfirmWin(self.window(), Lng.erase_data_long, "red", "yellow")
 		self.confirm.ok_clicked.connect(fin)
+		self.confirm.show()
 
 
 class SizesWin(UMainWindow):
@@ -551,6 +552,7 @@ class GeneralSettings(BaseGroupBox):
 
 		self.confirm = ConfirmWin(self.window(), Lng.app_will_restarted, "blue", "blue")
 		self.confirm.ok_clicked.connect(fin)
+		self.confirm.show()
 
 
 class MfRepairGroup(HoverGroupBox):
@@ -836,6 +838,7 @@ class IgnoreListWin(UMainWindow):
 		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
 		self.confirm.ok_clicked.connect(self._on_discard_confirmed)
 		self.discard_win = self.confirm  # держим ссылку, чтобы окно не удалилось
+		self.confirm.show()
 
 	def _on_discard_confirmed(self):
 		self.has_unsaved = False
@@ -989,6 +992,7 @@ class MfSettings(BaseGroupBox):
 			self.confirm = ConfirmWin(self.window(), Lng.app_will_restarted, "blue", "blue")
 
 		self.confirm.ok_clicked.connect(final)
+		self.confirm.show()
 
 	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
@@ -996,6 +1000,7 @@ class MfSettings(BaseGroupBox):
 		else:
 			self.confirm = ConfirmWin(self.window(), Lng.remove_catalog_warn, "red", "yellow")
 			self.confirm.ok_clicked.connect(lambda: self.start_mf_cleaner("remove_mf"))
+			self.confirm.show()
 
 	def open_repair_win(self):
 		self.repair_win = MfRepairWin()
@@ -1118,8 +1123,9 @@ class NewMfWin(UMainWindow):
 			self.closed.emit()
 			self.deleteLater()
 
-		win = ConfirmWin(self.window(), Lng.new_mf_confirm, "blue", "blue")
-		win.ok_clicked.connect(fin)
+		self.confirm = ConfirmWin(self.window(), Lng.new_mf_confirm, "blue", "blue")
+		self.confirm.ok_clicked.connect(fin)
+		self.confirm.show()
 
 	def _try_close(self):
 		# Кнопка «Отмена» и Esc: сначала проверка несохранённых изменений
@@ -1132,6 +1138,7 @@ class NewMfWin(UMainWindow):
 		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
 		self.confirm.ok_clicked.connect(self._on_discard_confirmed)
 		self.discard_win = self.confirm  # держим ссылку, чтобы окно не удалилось
+		self.confirm.show()
 
 	def _on_discard_confirmed(self):
 		self.has_unsaved = False
@@ -1317,7 +1324,6 @@ class WinSettings(UMainWindow):
 		return self.confirm
 
 	def _show_unsaved_window(self, win: ConfirmWin):
-		win.center_to_parent(self)
 		win.show()
 		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
 

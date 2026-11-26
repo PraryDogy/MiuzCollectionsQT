@@ -942,7 +942,6 @@ class UMainWindow(QMainWindow):
 		self.setFixedHeight(height)
 
 
-
 class _TitleTextLabel(TransparentLabel):
 	def __init__(self, text="", parent=None):
 		super().__init__(text, parent)
@@ -1121,11 +1120,12 @@ class RowArrowWidget(TransparentWidget):
 
 class WinProgressbar(UMainWindow):
 	cancel = pyqtSignal()
+	WIDTH = 370
 
 	def __init__(self, title: str):
 		super().__init__()
 		self.setWindowTitle(title)
-		self.setFixedWidth(370)
+		self.setFixedWidth(self.WIDTH)
 
 		self.central_layout.setSpacing(0)
 		self.show_titlebar_sep()
@@ -1172,7 +1172,7 @@ class WinProgressbar(UMainWindow):
 		self.below_label = TransparentLabel()
 		right_side_lay.addWidget(self.below_label)
 
-		self.adjustSize()
+		self.fix_window_height()
 
 	def cancel_cmd(self, *args):
 		self.cancel.emit()
@@ -1222,15 +1222,6 @@ class VerticalWin(UMainWindow):
 		self.button_layout.setContentsMargins(0, 0, 0, 0)
 		self.button_layout.setSpacing(5)
 		return self.button_layout
-
-	def fix_window_height(self):
-		# Ширина уже фиксирована (self.WIDTH), поэтому считаем высоту для неё
-		layout = self.centralWidget().layout()
-		layout.activate()
-		height = layout.totalHeightForWidth(self.width())
-		self.setFixedHeight(height)
-		self.center_to_parent(self._parent)
-		self.show()
 
 
 class _AllertWin(VerticalWin):
@@ -1365,7 +1356,7 @@ class InputTextWin(UMainWindow):
 		btn_layout.addWidget(self.ok_btn)
 
 		self.adjustSize()
-		self.setFixedSize(300, self.height())
+		# self.setFixedSize(300, self.height())
 
 	def ok_clicked_cmd(self):
 		text = self.line_edit_widget.text()

@@ -174,3 +174,4 @@ class FirstLoadWin(NewMfWin):
 		if mf_alias and mf_path:
 			self.confirm = ConfirmWin(self.window(), Lng.save_text_long, "blue", "yellow")
 			self.confirm.ok_clicked.connect(lambda: save_fin(mf_alias, mf_path))
+			self.confirm.show()

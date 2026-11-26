@@ -77,8 +77,9 @@ class ServerList(UListWidget):
 		self._update_empty_overlay()
 
 	def remove_cmd(self, server_item: ServerItem):
-		self.win_warn = ConfirmWin(self.window(), Lng.confirm_delete, "red", "yellow")
-		self.win_warn.ok_clicked.connect(lambda: self.remove_server.emit(server_item))
+		self.confirm = ConfirmWin(self.window(), Lng.confirm_delete, "red", "yellow")
+		self.confirm.show()
+		self.confirm.ok_clicked.connect(lambda: self.remove_server.emit(server_item))
 
 	def add_evlosh_servers(self):
 		with open(self.evlosh_servers_path) as file:

@@ -398,6 +398,7 @@ class UserTags(TransparentWidget):
 		self.confirm = ConfirmWin(self.window(), Lng.remove_tag_question, "red", "yellow")
 		self.confirm.confirm_btn.setText(Lng.remove_tag_confirm)
 		self.confirm.ok_clicked.connect(ok_clicked)
+		self.confirm.show()
 
 	def hasHeightForWidth(self):
 		return True
