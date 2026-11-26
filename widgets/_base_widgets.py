@@ -106,7 +106,9 @@ class TextMixin:
 
 		cursor = Qt.CursorShape.IBeamCursor if enabled else Qt.CursorShape.ArrowCursor
 		self.setCursor(cursor)
-		self.viewport().setCursor(cursor)
+
+		if isinstance(self, QTextEdit):
+			self.viewport().setCursor(cursor)
 
 		self.setAttribute(
 			Qt.WidgetAttribute.WA_TransparentForMouseEvents,
