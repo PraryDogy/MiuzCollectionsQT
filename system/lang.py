@@ -698,8 +698,8 @@ class Lng:
 		"Ignore list"
 	)
 	catalog_path_descr = (
-		"Если каталог не найден, укажите его кнопкой «Найти каталог» или перетащите каталог сюда.",
-		"If the catalog is not found, select it with «Find catalog» or drag a catalog here.",
+		"Если каталог с изображениями был перемещен, переименован или диск с каталогом был отключен, нажмите, чтобы найти каталог.",
+		"The catalog was moved, renamed, or the drive containing it was disconnected. Click to locate the catalog."
 	)
 	make_sure_path = (
 		"Убедитесь, что вы указали тот же каталог. Если каталог указан неправильно, все кэшированные изображения будут удалены и добавлены новые из другого каталога.",
@@ -766,3 +766,7 @@ class Lng:
 		"Основные настройки",
 		"General settings"
 	)
+	new_catalog_descr = (
+			"Каталог с изображениями будет проиндексирован для быстрого поиска и просмотра.",
+			"The image catalog will be indexed for fast searching and browsing.",
+		)

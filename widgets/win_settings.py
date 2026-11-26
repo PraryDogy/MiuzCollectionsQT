@@ -1083,6 +1083,10 @@ class NewMfWin(UMainWindow):
 
 		if mf_path:
 			self.mf_path_widget_changed()
+		else:
+			self.mf_path_widget.title_widget.description_widget.setText(
+				Lng.new_catalog_descr
+			)
 
 		self.fix_window_height()
 

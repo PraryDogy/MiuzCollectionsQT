@@ -1727,8 +1727,6 @@ class MfPathWidget(HoverGroupBox):
 		)
 		content_lay.addWidget(self.title_widget)
 
-		content_lay.addSpacing(5)
-
 		status_wrap = TransparentWidget()
 		content_lay.addWidget(status_wrap)
 		status_lay = QHBoxLayout(status_wrap)
@@ -1763,6 +1761,7 @@ class MfPathWidget(HoverGroupBox):
 
 	def update_ui(self):
 		if self._path_exists():
+
 			self.setToolTip(self.draft_mf_path)
 			self.status.set_good(self.draft_mf_path, lng=Lng.ok_catalog_path)
 		else:
