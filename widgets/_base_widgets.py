@@ -250,6 +250,23 @@ class WrapLabel(TextMixin, QTextEdit):
 		margins = self.contentsMargins()
 		self.setFixedHeight(int(height + margins.top() + margins.bottom()))
 
+	def mouseDoubleClickEvent(self, e):
+		if not self._context_menu_enabled:
+			e.ignore()
+			return
+		return super().mouseDoubleClickEvent(e)
+
+	def mousePressEvent(self, e):
+		if not self._context_menu_enabled:
+			e.ignore()
+			return
+		super().mousePressEvent(e)
+
+	def contextMenuEvent(self, ev):
+		if not self._context_menu_enabled:
+			ev.ignore()
+			return
+		super().contextMenuEvent(ev)
 
 class HoverGroupBox(UGroupBox):
 	def __init__(self, title=None, parent=None):
