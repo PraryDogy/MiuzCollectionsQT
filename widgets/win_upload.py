@@ -39,7 +39,7 @@ class UploadWin(VerticalWin):
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.button_layout.addWidget(self.cancel_btn)
 
-		self.finish_layout()
+		self.fix_window_height()
 
 
 	def keyPressEvent(self, a0):

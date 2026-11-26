@@ -46,7 +46,7 @@ class AboutWin(VerticalWin):
 		self.button_layout.addWidget(close_btn)
 		close_btn.clicked.connect(self.deleteLater)
 
-		self.finish_layout()
+		self.fix_window_height()
 
 	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 		"""Закрывает окно по Escape или Enter."""

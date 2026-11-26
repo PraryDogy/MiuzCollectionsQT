@@ -566,8 +566,6 @@ class MfRepairGroup(HoverGroupBox):
 		title_widget = TitleWidget(title, description, sep=False)
 		self.v_lay.addWidget(title_widget)
 
-		title_widget.description_widget.setStyleSheet("background: black;")
-
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton:
 			self.clicked.emit()
@@ -1078,9 +1076,7 @@ class NewMfWin(UMainWindow):
 		if mf_path:
 			self.mf_path_widget_changed()
 
-		# self.mf_path_widget.title_widget.description_widget.fit_to_width(400)
-		self.adjustSize()
-		QTimer.singleShot(1, lambda: self.setFixedHeight(self.height()))
+		self.fix_window_height()
 
 	def autoname_cmd(self):
 		if self.mf_path_widget.draft_mf_path:

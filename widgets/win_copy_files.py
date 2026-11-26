@@ -32,7 +32,7 @@ class ReplaceWin(VerticalWin):
 		self.set_always_on_top()
 		self.show_titlebar_sep()
 		self._init_ui()
-		self.finish_layout()
+		self.fix_window_height()
 
 	def _init_ui(self):
 		self.text_layout.setSpacing(0)

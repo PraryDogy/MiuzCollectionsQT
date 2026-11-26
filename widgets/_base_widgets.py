@@ -243,33 +243,6 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.setReadOnly(True)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.document().contentsChanged.connect(self.adjust_height)
-		self.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-		self.setStyleSheet("background: black;")
-
-	def adjust_height(self):
-		self.adjustSize()
-		doc = self.document()
-		doc.setTextWidth(self.viewport().width())
-		height = doc.size().height()
-		margins = self.contentsMargins()
-		hh = int(height + margins.top() + margins.bottom())
-		self.setFixedHeight(hh)
-
-	# def resizeEvent(self, event):
-		# super().resizeEvent(event)
-		# self.adjust_height()
-
-
-class WrapLabel(TextMixin, QTextEdit):
-	def __init__(self, parent: TransparentWidget, text: str):
-		super().__init__(text, parent)
-		self._init_text_mixin(text)
-		self.set_selectable(False)
-		self.setReadOnly(True)
-		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
 		# Горизонталь растягиваем, вертикаль - только по содержимому
@@ -961,6 +934,14 @@ class UMainWindow(QMainWindow):
 		if covered:
 			self.dim_overlay.raise_()
 
+	def fix_window_height(self):
+		# Ширина уже фиксирована (self.WIDTH), поэтому считаем высоту для неё
+		layout = self.centralWidget().layout()
+		layout.activate()
+		height = layout.totalHeightForWidth(self.width())
+		self.setFixedHeight(height)
+
+
 
 class _TitleTextLabel(TransparentLabel):
 	def __init__(self, text="", parent=None):
@@ -1242,7 +1223,7 @@ class VerticalWin(UMainWindow):
 		self.button_layout.setSpacing(5)
 		return self.button_layout
 
-	def finish_layout(self):
+	def fix_window_height(self):
 		# Ширина уже фиксирована (self.WIDTH), поэтому считаем высоту для неё
 		layout = self.centralWidget().layout()
 		layout.activate()
@@ -1320,7 +1301,7 @@ class AllertWin(_AllertWin):
 		icon: Literal["red", "blue", "yellow", "green"],
 	):
 		super().__init__(parent, text, confirm_btn, icon)
-		self.finish_layout()
+		self.fix_window_height()
 
 
 class ConfirmWin(_AllertWin):
@@ -1335,7 +1316,7 @@ class ConfirmWin(_AllertWin):
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.on_cancel)
 		self.button_layout.addWidget(self.cancel_btn)
-		self.finish_layout()
+		self.fix_window_height()
 
 
 class InputTextWin(UMainWindow):
