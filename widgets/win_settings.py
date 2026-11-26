@@ -1174,6 +1174,8 @@ class WinSettings(UMainWindow):
 	closed = pyqtSignal()
 	mf_removed = pyqtSignal()
 	repair_done = pyqtSignal(str)
+	WIDTH = 700
+	HEIGHT = 600
 
 	def __init__(self):
 		super().__init__()
@@ -1181,7 +1183,8 @@ class WinSettings(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.settings)
-		self.setFixedSize(700, 570)
+		self.setFixedWidth(self.WIDTH)
+		self.setFixedHeight(self.HEIGHT)
 
 		self.current_page = None
 		self.current_idx = 0
@@ -1207,8 +1210,6 @@ class WinSettings(UMainWindow):
 		self.new_catalog_btn.setIconSize(QSize(10, 10))
 		self.new_catalog_btn.clicked.connect(self.open_new_catalog_win)
 		self.save_widget.add_left_button(self.new_catalog_btn)
-
-
 
 		self.left_menu = UListWidget()
 		self.left_menu.clicked.connect(self.left_menu_click)

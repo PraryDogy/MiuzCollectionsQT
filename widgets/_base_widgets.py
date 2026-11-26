@@ -1727,11 +1727,20 @@ class MfPathWidget(HoverGroupBox):
 		)
 		content_lay.addWidget(self.title_widget)
 
+		sep_wrapper =  TransparentWidget()
+		sep_wrapper.setFixedHeight(1)
+		content_lay.addWidget(sep_wrapper)
+		sep_lay = QVBoxLayout(sep_wrapper)
+		sep_lay.setContentsMargins(0, 0, 50, 0)
+		sep_lay.setSpacing(0)
+		sep_lay.addWidget(USep())
+
 		status_wrap = TransparentWidget()
 		content_lay.addWidget(status_wrap)
-		status_lay = QHBoxLayout(status_wrap)
+		status_lay = QVBoxLayout(status_wrap)
 		status_lay.setContentsMargins(0, 0, 0, 0)
 		status_lay.setSpacing(0)
+
 		self.status = ChoosePathWidget()
 		status_lay.addWidget(self.status)
 
