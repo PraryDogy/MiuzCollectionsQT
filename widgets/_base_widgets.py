@@ -1728,7 +1728,7 @@ class MfPathWidget(HoverGroupBox):
 		content_lay.addWidget(self.title_widget)
 
 		sep_wrapper =  TransparentWidget()
-		sep_wrapper.setFixedHeight(1)
+		sep_wrapper.setFixedHeight(3)
 		content_lay.addWidget(sep_wrapper)
 		sep_lay = QVBoxLayout(sep_wrapper)
 		sep_lay.setContentsMargins(0, 0, 50, 0)
