@@ -1039,14 +1039,14 @@ class MfSettings(DarkGroupBox):
 
 class NewMfWin(UMainWindow):
 	closed = pyqtSignal()
-	WIDTH = 510
 
 	def __init__(self, mf_path: str = None):
+
 		super().__init__()
 		self.setWindowTitle(Lng.new_catalog)
 		self.set_always_on_top()
 		self.set_close_only()
-		self.setFixedWidth(self.WIDTH)
+		self.setFixedWidth(510)
 
 		self.has_unsaved = False
 		self.discard_win = None
@@ -1092,7 +1092,7 @@ class NewMfWin(UMainWindow):
 		self.save_group.add_left_button(find_catalog)
 
 		if mf_path:
-			self.mf_path_widget_changed()
+			self.mf_path_widget.set_path(mf_path)
 		else:
 			self.mf_path_widget.title_widget.description_widget.setText(
 				Lng.new_catalog_descr

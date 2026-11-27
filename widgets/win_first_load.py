@@ -17,7 +17,7 @@ from system.runnable import URunnable, UThreadPool
 from ._base_widgets import (ConfirmWin, LightHoverGroupBox, TitleWidget,
                             TransparentWidget, UMenu, UPushButton, TransparentLabel)
 from .win_settings import NewMfWin
-
+import json  # добавь в импорты
 
 def restart_app():
 	os.execl(sys.executable, sys.executable, *sys.argv)
@@ -92,10 +92,18 @@ class MiuzGroup(LightHoverGroupBox):
 
 
 class FirstLoadWin(NewMfWin):
+	TEMP_FILE = Static.APP_DATA_DIR / "temp_new_mf.json"
+
 	def __init__(self, mf_path = None):
-		super().__init__(mf_path)
+		# читаем временные данные до построения виджетов, чтобы передать путь в базовый класс
+		saved = self._read_temp()
+		super().__init__(saved.get("mf_path") or mf_path)
 
 		self.setWindowTitle(Static.APP_NAME)
+
+		if saved.get("mf_alias"):
+			self.mf_alias_widget.line_edit.setText(saved["mf_alias"])
+			self.has_unsaved = True
 		
 		self.rus_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
 		self.eng_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
@@ -138,7 +146,30 @@ class FirstLoadWin(NewMfWin):
 		self.set_fixed_height_wraps()
 		self.setFixedHeight(self.height() + 5) # поправка на кнопку языка в заголовке
 
+	@classmethod
+	def _read_temp(cls) -> dict:
+		try:
+			data = json.loads(cls.TEMP_FILE.read_text(encoding="utf-8"))
+		except (OSError, ValueError):
+			data = {}
+		# файл одноразовый: после чтения удаляем, чтобы старые данные не вернулись
+		cls.TEMP_FILE.unlink(missing_ok=True)
+		return data if isinstance(data, dict) else {}
+
+	def temp_save(self):
+		path = self.mf_path_widget.draft_mf_path
+		data = {
+			"mf_alias": self.mf_alias_widget.line_edit.text(),
+			"mf_path": str(path) if path else None,
+		}
+		try:
+			self.TEMP_FILE.parent.mkdir(parents=True, exist_ok=True)
+			self.TEMP_FILE.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+		except OSError as e:
+			print(f"temp_save: не удалось сохранить черновик: {e}")
+
 	def change_lang_cmd(self, index: int):
+		self.temp_save()  # сохраняем черновик до перезапуска
 		JsonData.lng_index = index
 		JsonData.write_json_data()
 		restart_app()

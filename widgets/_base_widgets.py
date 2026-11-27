@@ -1591,6 +1591,11 @@ class MfPathWidget(LightHoverGroupBox):
 		self.changed.emit()
 		self.update_ui()
 
+	def set_path(self, path: str | None):
+		"""Восстанавливает путь без сигнала changed (не считается изменением пользователя)"""
+		self.draft_mf_path = path.rstrip(os.sep) if path else None
+		self.update_ui()
+
 	def validate_and_show_win(self):
 		if not self._path_exists():
 			self.allert = AllertWin(Lng.select_catalog_path, "blue", "yellow")
