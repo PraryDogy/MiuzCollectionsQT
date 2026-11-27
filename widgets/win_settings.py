@@ -1052,12 +1052,18 @@ class NewMfWin(UMainWindow):
 		self.group_lay.setContentsMargins(5, 5, 5, 5)
 		self.group_lay.setSpacing(10)
 
+		main_title_wrapper = TransparentWidget()
+		self.group_lay.addWidget(main_title_wrapper)
+		self.main_title_lay = QHBoxLayout(main_title_wrapper)
+		self.main_title_lay.setContentsMargins(0, 0, 0, 0)
+		self.main_title_lay.setSpacing(0)
+
 		title = TitleWidget(
 			title=Lng.new_catalog,
 			sep=False
 		)
 		title.set_margins(2, 0, 2, 0)
-		self.group_lay.addWidget(title)
+		self.main_title_lay.addWidget(title)
 
 
 		self.mf_alias_widget = MfAliasWidget()

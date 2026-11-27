@@ -15,7 +15,7 @@ from system.lang import Lng
 from system.runnable import URunnable, UThreadPool
 
 from ._base_widgets import (ConfirmWin, HoverGroupBox, TitleWidget,
-                            TransparentWidget, UMenu, UPushButton)
+                            TransparentWidget, UMenu, UPushButton, TransparentLabel)
 from .win_settings import NewMfWin
 
 
@@ -94,6 +94,8 @@ class MiuzGroup(HoverGroupBox):
 class FirstLoadWin(NewMfWin):
 	def __init__(self, mf_path = None):
 		super().__init__(mf_path)
+
+		self.setWindowTitle(Static.APP_NAME)
 		
 		self.rus_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
 		self.eng_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
@@ -117,23 +119,13 @@ class FirstLoadWin(NewMfWin):
 		self.eng_action.triggered.connect(lambda e: self.change_lang_cmd(1))
 		self.lng_menu.addAction(self.eng_action)
 
-		lng_wrapper = TransparentWidget()
-		lng_layout = QHBoxLayout(lng_wrapper)
-		lng_layout.setContentsMargins(0, 5, 11, 0)
-		lng_layout.setSpacing(0)
-
-		lng_layout.addStretch()
-
 		self.lng_button = UPushButton("")
 		self.lng_button.setMenu(self.lng_menu)
 		self.lng_button.setIcon(icon)
 		self.lng_button.setIconSize(QSize(18, 18))
 		self.lng_button.adjustSize()
 		self.lng_button.setFixedWidth(self.lng_button.width() + 10)
-		lng_layout.addWidget(self.lng_button)
-
-		self.title_bar.set_custom_widget(lng_wrapper)
-		self.set_titlebar_height(self.lng_button.height() + 8)
+		self.main_title_lay.addWidget(self.lng_button)
 
 		if os.path.exists(Static.MIUZ_ZIP):
 			idx = self.group_lay.indexOf(self.mf_path_widget) + 1
