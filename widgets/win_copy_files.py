@@ -122,12 +122,10 @@ class WinCopyFiles(WinProgressbar):
 
 	def __init__(self, target_dir: str, files_to_copy: list[str]):
 		super().__init__(Lng.copying)
-		self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 		self.setFixedWidth(370)
 		self.set_close_only()
 		self.set_always_on_top()
 
-		self.owner = owner
 		self.target_dir = target_dir
 		self.files_to_copy = files_to_copy
 		self.dst_urls: list[str] = []
@@ -166,9 +164,6 @@ class WinCopyFiles(WinProgressbar):
 		self.copy_timer.timeout.connect(self.poll_task)
 
 		self.progressbar.setMaximum(100)
-
-		# Кнопка отмены в WinProgressbar эмитит cancel_clicked; закрываем окно
-		self.cancel_clicked.connect(self.close)
 
 		self.copy_task.start()
 		self.copy_timer.start(self.ms)
@@ -289,6 +284,7 @@ class WinCopyFiles(WinProgressbar):
 		if self.stopping:
 			return
 
+		# Отмена в окне замены закрывает всё копирование
 		self.close()
 
 	def close_replace_window(self):
@@ -309,14 +305,17 @@ class WinCopyFiles(WinProgressbar):
 			return
 
 		self.close_replace_window()
-		# Родитель алерта - владелец, а не это окно: иначе алерт удалится вместе с ним
+
+		# Алерт без родителя-окна: иначе он удалится вместе с этим окном
 		self.allert = AllertWin(
+			None,
 			f"{Lng.copy_error}\n{traceback_text}",
 			"blue",
 			"yellow",
 		)
 		self.allert.center_to_parent(self)
 		self.allert.show()
+
 		self.close()
 
 	def finish_task(self):
@@ -334,6 +333,7 @@ class WinCopyFiles(WinProgressbar):
 			)
 			self.bottom_label.setText(" ".join(below_text))
 
+		# stop_task выставляет stopping, поэтому closeEvent не эмитит cancel_clicked
 		self.stop_task()
 		self.copy_files_finished.emit(self.dst_urls)
 		self.close()
@@ -353,5 +353,12 @@ class WinCopyFiles(WinProgressbar):
 		self.copy_task.terminate_join()
 
 	def closeEvent(self, event):
+		# Закрытие до завершения (Cancel, крестик, ошибка) считаем отменой
+		was_running = not self.stopping
+
 		self.stop_task()
+
+		if was_running:
+			self.cancel_clicked.emit()
+
 		return super().closeEvent(event)

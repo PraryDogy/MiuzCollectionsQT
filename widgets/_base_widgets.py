@@ -1165,7 +1165,7 @@ class WinProgressbar(UMainWindow):
 		self.cancel_btn = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid.svg"))
 		self.cancel_btn.setFixedSize(13, 13)
 		self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-		self.cancel_btn.mouseReleaseEvent = lambda e: self.cancel_clicked.emit()
+		self.cancel_btn.mouseReleaseEvent = lambda e: self.close()
 		progressbar_lay.addWidget(self.cancel_btn)
 
 		self.bottom_label = TransparentLabel("bottom label")
