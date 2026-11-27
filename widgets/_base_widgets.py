@@ -818,6 +818,8 @@ class UMainWinOverlay(TransparentWidget):
 
 
 class UMainWindow(QMainWindow):
+	ok_clicked = pyqtSignal()
+	cancel_clicked = pyqtSignal()
 	win_list: list[TransparentWidget] = []
 	_focus_connected: bool = False
 
@@ -1122,17 +1124,13 @@ class RowArrowWidget(TransparentWidget):
 
 
 class WinProgressbar(UMainWindow):
-	cancel = pyqtSignal()
-	WIDTH = 370
 
 	def __init__(self, title: str):
 		super().__init__()
 		self.setWindowTitle(title)
-		self.setFixedWidth(self.WIDTH)
+		self.show_titlebar_sep()
 
 		self.central_layout.setSpacing(0)
-		self.show_titlebar_sep()
-		self.central_layout.addSpacing(10)
 
 		h_wid = TransparentWidget()
 		self.central_layout.addWidget(h_wid)
@@ -1150,8 +1148,8 @@ class WinProgressbar(UMainWindow):
 		right_side_lay.setSpacing(2)
 		h_lay.addWidget(right_side_wid)
 
-		self.above_label = TransparentLabel()
-		right_side_lay.addWidget(self.above_label)
+		self.top_label = TransparentLabel("top label")
+		right_side_lay.addWidget(self.top_label)
 
 		progressbar_row = TransparentWidget()
 		right_side_lay.addWidget(progressbar_row)
@@ -1172,18 +1170,19 @@ class WinProgressbar(UMainWindow):
 		self.cancel_btn.mouseReleaseEvent = self.cancel_cmd
 		progressbar_lay.addWidget(self.cancel_btn)
 
-		self.below_label = TransparentLabel()
-		right_side_lay.addWidget(self.below_label)
-
-		self.fix_window_height()
+		self.bottom_label = TransparentLabel("bottom label")
+		right_side_lay.addWidget(self.bottom_label)
 
 	def cancel_cmd(self, *args):
-		self.cancel.emit()
-		self.deleteLater()
+		self.cancel_clicked.emit()
 
-	def closeEvent(self, a0):
-		self.cancel.emit()
-		return super().closeEvent(a0)
+	def closeEvent(self, event):
+		self.cancel_clicked.emit()
+		return super().closeEvent(event)
+
+	def deleteLater(self):
+		self.cancel_clicked.emit()
+		return super().deleteLater()
 
 
 class VerticalWin(UMainWindow):

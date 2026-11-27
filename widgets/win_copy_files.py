@@ -119,17 +119,11 @@ class WinCopyFiles(WinProgressbar):
 	finished_ = pyqtSignal(list)
 	ms = 100
 
-	def __init__(
-		self,
-		target_dir: str,
-		files_to_copy: list[str],
-	):
+	def __init__(self, target_dir: str, files_to_copy: list[str],):
 		super().__init__(Lng.copying)
-
+		self.setFixedWidth(370)
 		self.set_close_only()
 		self.set_always_on_top()
-		self.adjustSize()
-		self.setFixedHeight(self.height())
 
 		self.target_dir = target_dir
 		self.files_to_copy = files_to_copy
@@ -143,11 +137,11 @@ class WinCopyFiles(WinProgressbar):
 		if not dst_text:
 			dst_text = Mf.current_mf.mf_alias
 
-		self.above_label.setText(
+		self.top_label.setText(
 			f'{Lng.copying} '
 			f'{Lng.in_} "{dst_text}"'
 		)
-		self.below_label.setText(
+		self.bottom_label.setText(
 			Lng.preparing
 		)
 
@@ -223,7 +217,7 @@ class WinCopyFiles(WinProgressbar):
 			Lng.from_,
 			str(copy_item.total_file_count),
 		)
-		self.below_label.setText(" ".join(below_text))
+		self.bottom_label.setText(" ".join(below_text))
 
 	def show_replace_window(self, copy_item: CopyTaskItem):
 		if self.stopping:
@@ -343,7 +337,7 @@ class WinCopyFiles(WinProgressbar):
 				Lng.from_,
 				str(self.copy_item.total_file_count),
 			)
-			self.below_label.setText(" ".join(below_text))
+			self.bottom_label.setText(" ".join(below_text))
 
 		self.finished_.emit(self.dst_urls)
 

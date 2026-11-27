@@ -363,14 +363,11 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def save_to_downloads(self, abs_paths: list[str]):
-		downloads = os.path.expanduser("~/Downloads")
-		copy_files_win = self.copy_files_win(
-			files_to_copy=abs_paths,
-			dest=downloads
-		)
-		copy_files_win.finished_.connect(
-			Utils.macos_reveal_files
-		)
+		self.win_copy_files = WinCopyFiles(abs_paths, os.path.expanduser("~/Downloads"))
+		self.win_copy_files.cancel_clicked.connect(self.win_copy_files.deleteLater)
+		self.win_copy_files.finished_.connect(Utils.macos_reveal_files)
+		self.win_copy_files.center_to_parent(self)
+		self.win_copy_files.show()
 
 	@with_conn
 	def set_files_to_copy(self, abs_files_to_copy: list):
@@ -379,15 +376,12 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def paste_files(self, files_to_copy: list[str], dest: str):
-		"""
-		files_to_copy, dest
-		"""
-		# копия списка: буфер очищается ниже, а окно копирования читает его позже
-		copy_files_win = self.copy_files_win(
-			files_to_copy=list(files_to_copy),
-			dest=dest
-		)
-		copy_files_win.finished_.connect(lambda *_: self.start_scaner_task())
+		self.win_copy_files = WinCopyFiles(files_to_copy, dest)
+		self.win_copy_files.cancel_clicked.connect(self.win_copy_files.deleteLater)
+		self.win_copy_files.finished_.connect(lambda *_: self.start_scaner_task())
+		self.win_copy_files.center_to_parent(self)
+		self.win_copy_files.show()
+
 		self.forced_scaner_dirs.add(Mf.current_mf, dest)
 		self.files_to_copy.clear()
 		self.grid.files_to_copy.clear()
@@ -863,15 +857,6 @@ class WinMain(UMainWindow):
 			lambda: finished(rel_path, value)
 		)
 		UThreadPool.start(self.task)
-
-	def copy_files_win(self, files_to_copy: list[str], dest: str):
-		progress_win = WinCopyFiles(
-			files_to_copy=files_to_copy,
-			target_dir=dest
-		)
-		progress_win.center_to_parent(self)
-		progress_win.show()
-		return progress_win
 
 	def open_server_win(self):
 		self.server_win = ServersWin()
