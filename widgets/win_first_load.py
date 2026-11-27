@@ -176,3 +176,9 @@ class FirstLoadWin(NewMfWin):
 			self.confirm = ConfirmWin(self.window(), Lng.save_text_long, "blue", "yellow")
 			self.confirm.ok_clicked.connect(lambda: save_fin(mf_alias, mf_path))
 			self.confirm.show()
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			a0.ignore()
+		elif a0.key() == Qt.Key.Key_Q and a0.modifiers() & Qt.KeyboardModifier.ControlModifier:
+			os._exit(1)
