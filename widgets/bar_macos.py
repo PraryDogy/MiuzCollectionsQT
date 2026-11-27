@@ -19,21 +19,18 @@ class AboutWin(UMainWindow):
 		"email: evlosh@gmail.com",
 		"telegram: evlosh",
 	])
-	WIDTH = 250
 
-	def __init__(self, parent):
-		super().__init__(parent)
+	def __init__(self):
+		super().__init__()
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.show_about)
+		self.setFixedWidth(250)
 
 		icon = TransparentLabel("")
 		icon.set_style("gray", "regular", "regular")
 		qimage = QImage(str(Static.APP_ICONS / "icon.png"))
-		qimage_saled = Utils.scale_qimage_dpr(
-			qimage=qimage,
-			size=100
-		)
+		qimage_saled = Utils.scale_qimage_dpr(qimage, 100)
 		icon.setPixmap(QPixmap.fromImage(qimage_saled))
 		self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -91,6 +88,6 @@ class BarMacos(QMenuBar):
 		self.settings_win.show()
 
 	def open_about_window(self):
-		self.about_win = AboutWin(self.window())
+		self.about_win = AboutWin()
 		self.about_win.center_to_parent(self.window())
 		self.about_win.show()

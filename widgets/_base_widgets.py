@@ -886,6 +886,12 @@ class UMainWindow(QMainWindow):
 		width = self.width() if self.width() > 0 else self.minimumWidth()
 		self.setFixedHeight(layout.totalHeightForWidth(width))
 
+		if self.height() < 2:
+			raise Exception ("UMainWindow fit win heigh высота меньше 2")
+
+		print(self.width(), self.height())
+
+
 
 class AllertWin(UMainWindow):
 	WIDTH = 250
