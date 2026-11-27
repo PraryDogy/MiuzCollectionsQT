@@ -12,7 +12,6 @@ class UploadWin(UMainWindow):
 	def __init__(self, dest):
 		super().__init__()
 		self.setWindowTitle(Lng.upload_files)
-		self.setFixedWidth(280)
 		self.show_titlebar_sep()
 		self.central_layout.setSpacing(0)
 
@@ -41,6 +40,7 @@ class UploadWin(UMainWindow):
 		self.cancel_btn.clicked.connect(self.deleteLater)
 		self.central_layout.addWidget(self.cancel_btn)
 
+		self.setFixedWidth(280)
 		self.fix_wrap_labels_win()
 
 	def keyPressEvent(self, a0):

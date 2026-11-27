@@ -448,15 +448,15 @@ class WinMain(UMainWindow):
 
 	@with_conn
 	def upload_files(self, dropped_files: list[str]):
-
-		def fin():
-			self.confirm.deleteLater()
-			self.paste_files(dropped_files, dest)
-
-		dropped_files = filter_supported(dropped_files)
+		files = filter_supported(dropped_files)
 		dest = Mf.current_mf.create_abs_path(Dynamic.current_dir)
-		self.confirm = UploadWin(dest)
-		self.confirm.ok_clicked.connect(fin)
+
+		win = UploadWin(dest)
+		self.upload_win = win
+
+		win.ok_clicked.connect(lambda: self.paste_files(files, dest))
+		win.ok_clicked.connect(win.deleteLater)
+		win.show()
 
 	@with_conn
 	def open_info_win(self, data_item: DataItem):
