@@ -222,7 +222,8 @@ class RebootableSettings(UGroupBox):
 			shutil.rmtree(Static.APP_DATA_DIR, ignore_errors=True)
 			restart_app()
 
-		self.confirm = ConfirmWin(self.window(), Lng.erase_data_long, "red", "yellow")
+		self.confirm = ConfirmWin(Lng.erase_data_long, "red", "yellow")
+		self.confirm.center_to_parent(self.window())
 		self.confirm.ok_clicked.connect(fin)
 		self.confirm.show()
 
