@@ -137,13 +137,8 @@ class WinCopyFiles(WinProgressbar):
 		if not dst_text:
 			dst_text = Mf.current_mf.mf_alias
 
-		self.top_label.setText(
-			f'{Lng.copying} '
-			f'{Lng.in_} "{dst_text}"'
-		)
-		self.bottom_label.setText(
-			Lng.preparing
-		)
+		self.top_label.setText(f'{Lng.copying} {Lng.in_} \"{dst_text}\"')
+		self.bottom_label.setText(Lng.preparing)
 
 		self.copy_item = CopyTaskItem(
 			dst_dir=target_dir,
@@ -297,7 +292,7 @@ class WinCopyFiles(WinProgressbar):
 
 		self.close_replace_window()
 		self.stop_task()
-		self.deleteLater()
+		self.cancel_clicked.emit()
 
 	def close_replace_window(self):
 		if self.replace_win is None:
@@ -320,7 +315,7 @@ class WinCopyFiles(WinProgressbar):
 		self.allert = AllertWin(self.window(), f"{Lng.copy_error}\n{traceback_text}", "blue", "yellow")
 		self.allert.show()
 		self.stop_task()
-		self.deleteLater()
+		self.cancel_clicked.emit()
 
 	def finish_task(self):
 		if self.stopping:
@@ -339,10 +334,9 @@ class WinCopyFiles(WinProgressbar):
 			)
 			self.bottom_label.setText(" ".join(below_text))
 
-		self.finished_.emit(self.dst_urls)
-
 		self.stop_task()
-		self.deleteLater()
+		self.finished_.emit(self.dst_urls)
+		self.cancel_clicked.emit()
 
 	def stop_task(self):
 		if self.stopping:
