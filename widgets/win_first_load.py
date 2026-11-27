@@ -69,9 +69,9 @@ class MiuzGroup(LightHoverGroupBox):
 		content_lay.setSpacing(7)
 
 		title_widget = TitleWidget(
-			"MIUZ Diamonds",
-			"Загрузить настройки для MIUZ Diamonds",
-			Static.COLOR_ICONS / "miuz.svg",
+			title="MIUZ Diamonds",
+			descr=Lng.miuz_diamonds_descr,
+			title_svg=Static.COLOR_ICONS / "miuz.svg",
 			sep=False
 		)
 		title_widget.v_lay.setSpacing(5)

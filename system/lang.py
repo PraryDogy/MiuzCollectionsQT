@@ -770,3 +770,8 @@ class Lng:
 			"Каталог с изображениями будет проиндексирован для быстрого поиска и просмотра.",
 			"The image catalog will be indexed for fast searching and browsing.",
 		)
+
+	miuz_diamonds_descr = (
+		"Загрузить настройки для MIUZ Diamonds",  # rus
+		"Load settings for MIUZ Diamonds",        # eng
+	)
