@@ -123,6 +123,9 @@ class WinCopyFiles(WinProgressbar):
 	def __init__(self, target_dir: str, files_to_copy: list[str]):
 		super().__init__(Lng.copying)
 		self.setFixedWidth(370)
+		self.adjustSize()
+		self.setFixedHeight(self.height())
+
 		self.set_close_only()
 		self.set_always_on_top()
 
@@ -141,6 +144,7 @@ class WinCopyFiles(WinProgressbar):
 
 		self.top_label.setText(f'{Lng.copying} {Lng.in_} \"{dst_text}\"')
 		self.bottom_label.setText(Lng.preparing)
+
 
 		self.copy_item = CopyTaskItem(
 			dst_dir=target_dir,
