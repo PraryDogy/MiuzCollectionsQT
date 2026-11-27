@@ -113,7 +113,7 @@ UGroupBox {
 }
 
 HoverGroupBox {
-    background: #1b2530;
+    background: #19232e;
     border: 1px solid #26333f;
     border-radius: 8px;
 }
