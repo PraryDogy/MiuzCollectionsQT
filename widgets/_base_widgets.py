@@ -945,13 +945,6 @@ class UMainWindow(QMainWindow):
 		return super().show()
 
 
-class VerticalWin:
-	pass
-
-class WinProgressbar:
-	pass
-
-
 class AllertWin(UMainWindow):
 	WIDTH = 250
 	BUTTONS: dict[str, type[UPushButton]] = {

@@ -6,12 +6,12 @@ from cfg import Static
 from system.lang import Lng
 from system.utils import Utils
 
-from ._base_widgets import UMenu, UPushButton, VerticalWin, TransparentLabel
+from ._base_widgets import UMenu, UPushButton, UMainWindow, TransparentLabel
 from .win_servers import ServersWin
 from .win_settings import WinSettings
 
 
-class AboutWin(VerticalWin):
+class AboutWin(UMainWindow):
 	INFO_TEXT = "\n".join([
 		f"{Static.APP_NAME}",
 		f"Version {Static.APP_VERSION}",
@@ -35,15 +35,15 @@ class AboutWin(VerticalWin):
 			size=100
 		)
 		icon.setPixmap(QPixmap.fromImage(qimage_saled))
-		self.icon_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
+		self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		lbl = TransparentLabel(self.INFO_TEXT)
 		lbl.set_style("gray", "regular", "regular")
 		lbl.set_selectable(True)
-		self.text_layout.addWidget(lbl)
+		self.central_layout.addWidget(lbl)
 
 		close_btn = UPushButton(Lng.close)
-		self.button_layout.addWidget(close_btn)
+		self.central_layout.addWidget(close_btn)
 		close_btn.clicked.connect(self.deleteLater)
 
 		self.fix_window_height()
