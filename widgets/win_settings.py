@@ -1120,6 +1120,9 @@ class NewMfWin(UMainWindow):
 	def mf_path_widget_changed(self):
 		self._on_changed()
 
+	def after_save(self):
+		pass
+
 	def save_changes(self):
 		mf_alias = self.mf_alias_widget.validate_and_show_win()
 		if not mf_alias:
@@ -1139,6 +1142,7 @@ class NewMfWin(UMainWindow):
 			Mf.write_json_data()
 			self.closed.emit()
 			self.deleteLater()
+			self.after_save()
 
 		self.confirm = ConfirmWin(Lng.new_mf_confirm, "blue", "blue")
 		self.confirm.ok_clicked.connect(fin)

@@ -155,28 +155,9 @@ class FirstLoadWin(NewMfWin):
 		self.hide()
 		UThreadPool.start(self.copy_task)
 
-	def save_cmd(self):
-
-		def save_fin(mf_alias: str, mf_path: str):
-			mf = Mf(
-				mf_alias=mf_alias,
-				mf_paths=[mf_path, ],
-				mf_stop_list=[]
-			)
-			Mf.items.clear()
-			Mf.items.append(mf)
-			Mf.write_json_data()
-			JsonData.lng_index = FirstLoadWin.LNG_INDEX
-			JsonData.write_json_data()
-			restart_app()
-
-		mf_alias = self.mf_alias_widget.validate_and_show_win()
-		mf_path = self.path_widget.validate_and_show_win()
-		if mf_alias and mf_path:
-			self.confirm = ConfirmWin(Lng.save_text_long, "blue", "yellow")
-			self.confirm.ok_clicked.connect(lambda: save_fin(mf_alias, mf_path))
-			self.confirm.center_to_parent(self)
-			self.confirm.show()
+	def after_save(self):
+		restart_app()
+		return super().after_save()
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:
