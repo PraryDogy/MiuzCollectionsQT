@@ -365,7 +365,7 @@ class WinMain(UMainWindow):
 	def save_to_downloads(self, abs_paths: list[str]):
 		self.win_copy_files = WinCopyFiles(abs_paths, os.path.expanduser("~/Downloads"))
 		self.win_copy_files.cancel_clicked.connect(self.win_copy_files.deleteLater)
-		self.win_copy_files.finished_.connect(Utils.macos_reveal_files)
+		self.win_copy_files.copy_files_finished.connect(Utils.macos_reveal_files)
 		self.win_copy_files.center_to_parent(self)
 		self.win_copy_files.show()
 
@@ -378,7 +378,7 @@ class WinMain(UMainWindow):
 	def paste_files(self, files_to_copy: list[str], dest: str):
 		self.win_copy_files = WinCopyFiles(files_to_copy, dest)
 		self.win_copy_files.cancel_clicked.connect(self.win_copy_files.deleteLater)
-		self.win_copy_files.finished_.connect(lambda *_: self.start_scaner_task())
+		self.win_copy_files.copy_files_finished.connect(lambda *_: self.start_scaner_task())
 		self.win_copy_files.center_to_parent(self)
 		self.win_copy_files.show()
 

@@ -116,7 +116,7 @@ class ReplaceWin(VerticalWin):
 
 
 class WinCopyFiles(WinProgressbar):
-	finished_ = pyqtSignal(list)
+	copy_files_finished = pyqtSignal(list)
 	ms = 100
 
 	def __init__(self, target_dir: str, files_to_copy: list[str],):
@@ -335,7 +335,7 @@ class WinCopyFiles(WinProgressbar):
 			self.bottom_label.setText(" ".join(below_text))
 
 		self.stop_task()
-		self.finished_.emit(self.dst_urls)
+		self.copy_files_finished.emit(self.dst_urls)
 		self.cancel_clicked.emit()
 
 	def stop_task(self):
