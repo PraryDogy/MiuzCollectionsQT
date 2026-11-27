@@ -434,7 +434,7 @@ class WinImgSearch(UMainWindow):
 		self.set_close_button_width()
 
 		self.adjustSize()
-		self.setFixedWidth(350)
+		self.setFixedWidth(self.width())
 		self.set_fixed_height_wraps()
 
 	def search_cmd(self):

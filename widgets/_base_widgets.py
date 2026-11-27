@@ -1013,9 +1013,16 @@ class TitleTextWidget(TransparentWidget):
 class TitleWidget(TransparentWidget):
 	def __init__(self, title: str, descr: str = None, title_svg: Path = None, sep: bool = True):
 		super().__init__()
+
+		# Высота зависит от ширины (перенос строк в описании),
+		# по вертикали виджет не растягивается сверх содержимого
+		sp = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+		sp.setHeightForWidth(True)
+		self.setSizePolicy(sp)
+
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(0, 0, 0, 0)
-		self.v_lay.setSpacing(0)
+		self.v_lay.setSpacing(2)
 
 		self.title_widget = TitleTextWidget(title, title_svg)
 		self.v_lay.addWidget(self.title_widget)
@@ -1029,10 +1036,11 @@ class TitleWidget(TransparentWidget):
 			self.description_widget.set_style("regular", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
 
-		self.adjustSize()
+	def hasHeightForWidth(self) -> bool:
+		return self.v_lay.hasHeightForWidth()
 
-		# self.description_widget.setStyleSheet("background: black;")
-		self.setStyleSheet("background: red;")
+	def heightForWidth(self, width: int) -> int:
+		return self.v_lay.totalHeightForWidth(width)
 
 	def add_title_button(self, widget: TransparentButton):
 		self.title_widget.h_layout.addStretch()
