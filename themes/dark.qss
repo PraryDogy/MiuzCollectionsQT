@@ -327,19 +327,6 @@ ULineEdit:hover {
     border: 1px solid #3a4b5e;
 }
 
-UTextEdit {
-    background: #1d2834;
-    border: 1px solid #2b3947;
-    border-radius: 8px;
-    color: #c9d1da;
-    padding: 5px 2px 5px 2px;
-}
-
-UTextEdit:hover {
-    background: #263446;
-    border: 1px solid #3a4b5e;
-}
-
 USpinBox {
     background: #1d2834;
     border: 1px solid #2b3947;
@@ -875,4 +862,58 @@ UTableWidget::item:selected,
 UTableWidget::item:selected:!active {
     background: #22303f;
     color: #c9d1da;
+}
+
+
+ServerList {
+    background: #1d2834;
+    border: 1px solid #2b3947;
+    border-radius: 6px;
+    color: #c9d1da;
+    padding: 4px 4px 4px 4px;
+}
+
+ServerList::item {
+    background: transparent;
+    border: none;
+    color: #c9d1da;
+    height: 30px;
+}
+
+ServerList::item:selected,
+ServerList::item:selected:!active {
+    background: #2f3f53;
+    border-radius: 6px;
+}
+
+IgnoreListWin UListWidget {
+    background: #1d2834;
+    border: 1px solid #2b3947;
+    border-radius: 6px;
+    color: #c9d1da;
+    padding: 4px 4px 4px 4px;
+}
+
+IgnoreListWin UListWidget::item {
+    background: transparent;
+    border: none;
+    color: #c9d1da;
+    height: 30px;
+}
+
+IgnoreListWin UListWidget::item:selected,
+IgnoreListWin UListWidget::item:selected:!active {
+    background: #2f3f53;
+    border-radius: 6px;
+}
+
+
+
+
+UTextEdit {
+    background: #1d2834;
+    border: 1px solid #2b3947;
+    border-radius: 6px;
+    color: #c9d1da;
+    padding: 5px 2px 5px 2px;
 }

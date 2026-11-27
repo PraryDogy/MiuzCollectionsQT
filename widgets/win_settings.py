@@ -724,7 +724,7 @@ class IgnoreListWin(UMainWindow):
 		self.group_box = BaseGroupBox()
 		self.group_lay = QVBoxLayout(self.group_box)
 		self.group_lay.setContentsMargins(10, 5, 10, 10)
-		self.group_lay.setSpacing(5)
+		self.group_lay.setSpacing(10)
 
 		self.title_widget = TitleWidget(
 			Lng.ignore_list,
@@ -732,6 +732,7 @@ class IgnoreListWin(UMainWindow):
 			Static.COLOR_ICONS / "stop.svg",
 			sep=False
 		)
+		self.title_widget.set_margins(5, 0, 5, 0)
 		self.group_lay.addWidget(self.title_widget)
 
 		self.v_list_widget = UListWidget()
@@ -748,8 +749,6 @@ class IgnoreListWin(UMainWindow):
 		self._refresh_list()
 
 		self.central_layout.addWidget(self.group_box)
-
-		self.central_layout.addSpacing(5)
 
 		btns_wrapper = TransparentWidget()
 		self.central_layout.addWidget(btns_wrapper)
@@ -774,9 +773,8 @@ class IgnoreListWin(UMainWindow):
 		save_btn.clicked.connect(self.save_changes)
 		btns_lay.addWidget(save_btn)
 
-		self.setMinimumWidth(380)
-		self.setMinimumHeight(380)
-		self.adjustSize()
+		self.setFixedWidth(380)
+		self.set_fixed_height_wraps()
 
 	def _refresh_list(self):
 		"""Перерисовывает список по черновику; при пустом списке показывает заглушку поверх него."""
