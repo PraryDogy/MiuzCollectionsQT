@@ -29,7 +29,6 @@ class AboutWin(UMainWindow):
 		self.central_layout.setSpacing(0)
 
 		self.show_titlebar_sep()
-		self.change_top_margin(0)
 
 		icon = TransparentLabel("")
 		icon.set_style("gray", "regular", "regular")
