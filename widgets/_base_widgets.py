@@ -1203,8 +1203,10 @@ class MfAliasWidget(UGroupBox):
 		title = TitleWidget(
 			Lng.catalog_name,
 			Lng.folder_name_full.format(minim=self.MINIM, maxim=self.MAXIM),
-			title_svg=Static.COLOR_ICONS / "info.svg"
+			title_svg=Static.COLOR_ICONS / "info.svg",
+			sep=True
 		)
+		title.v_lay.setSpacing(5)
 		v_layout.addWidget(title)
 
 
