@@ -960,6 +960,7 @@ class AllertWin(UMainWindow):
 		self.central_layout.addSpacing(5)
 
 	def _add_buttons(self):
+		self.central_layout.addSpacing(5)
 		self.confirm_btn = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
 		self.central_layout.addWidget(self.confirm_btn)
