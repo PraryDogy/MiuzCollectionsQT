@@ -1022,9 +1022,11 @@ class TitleWidget(TransparentWidget):
 		if sep:
 			self.sep = USep()
 			self.v_lay.addWidget(self.sep)
+		else:
+			self.v_lay.setSpacing(0)
 
 		if descr:
-			self.description_widget = WrapLabel(self, descr)
+			self.description_widget = TransparentLabel(descr)
 			self.description_widget.set_style("regular", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
 

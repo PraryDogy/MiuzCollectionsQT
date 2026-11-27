@@ -328,10 +328,12 @@ class ControlsWidget(TransparentWidget):
 	def __init__(self):
 		super().__init__()
 		self.v_layout = QVBoxLayout(self)
-		self.v_layout.setContentsMargins(5, 5, 5, 5)
-		self.v_layout.setSpacing(5)
+		self.v_layout.setContentsMargins(0, 0, 0, 0)
+		self.v_layout.setSpacing(0)
 
-		title = TitleWidget(Lng.accuracy, Lng.accuracy_descr)
+		title = TitleWidget(title=Lng.accuracy, descr=Lng.accuracy_descr, sep=False)
+		title.v_lay.setSpacing(0)
+		title.description_widget.setAlignment(Qt.AlignmentFlag.AlignLeft)
 		self.v_layout.addWidget(title)
 
 		self.slider_widget = SliderWidget()
@@ -368,20 +370,18 @@ class WinImgSearch(UMainWindow):
 
 		# --- Основной контент внутри UGroupBox ---
 		self.content_box = BaseGroupBox()
+		self.central_layout.addWidget(self.content_box)
 		self.content_layout = QVBoxLayout(self.content_box)
 		self.content_layout.setContentsMargins(5, 5, 5, 5)
-		self.content_layout.setSpacing(10)
+		self.content_layout.setSpacing(5)
 
-		header_widget = TransparentWidget()
-		header_layout = QVBoxLayout(header_widget)
-		header_layout.setContentsMargins(0, 0, 0, 0)
-		header_layout.setSpacing(5)
-
-		self.title_widget = TitleWidget(Lng.image_search, Lng.image_search_descr)
+		self.title_widget = TitleWidget(
+			title=Lng.image_search,
+			descr=Lng.image_search_descr,
+			sep=False
+		)
 		self.title_widget.set_margins(5, 0, 5, 0)
-		header_layout.addWidget(self.title_widget)
-
-		self.content_layout.addWidget(header_widget)
+		self.content_layout.addWidget(self.title_widget)
 
 		self.image_stack = QStackedWidget()
 		self.drop_widget = WinImgSearchDropWidget()
@@ -390,16 +390,23 @@ class WinImgSearch(UMainWindow):
 		self.image_stack.addWidget(self.drop_widget)
 		self.image_stack.addWidget(self.preview_widget)
 		self.image_stack.setCurrentIndex(0)
-		self.content_layout.addWidget(self.image_stack, alignment=Qt.AlignmentFlag.AlignCenter)
 		# бросок принимают обе зоны: пустая и превью
 		self.drop_widget.image_dropped.connect(self.image_dropped)
 		self.preview_widget.image_dropped.connect(self.image_dropped)
 		self.preview_widget.reset_requested.connect(self.reset_img_search)
+		self.content_layout.addWidget(self.image_stack, alignment=Qt.AlignmentFlag.AlignCenter)
 
-		self.controls_widget = ControlsWidget()
-		self.content_layout.addWidget(self.controls_widget)
+		self.accuracy_title = TitleWidget(
+			title=Lng.accuracy,
+			descr=Lng.accuracy_descr,
+			sep=False
+		)
+		self.accuracy_title.set_margins(5, 0, 5, 0)
+		self.content_layout.addWidget(self.accuracy_title)
 
-		self.central_layout.addWidget(self.content_box)
+		self.slider_widget = SliderWidget()
+		self.slider_widget.h_layout.setContentsMargins(5, 0, 5, 0)
+		self.content_layout.addWidget(self.slider_widget)
 
 		# --- Кнопки под группой ---
 		btn_layout = QHBoxLayout()
@@ -427,7 +434,8 @@ class WinImgSearch(UMainWindow):
 		self.set_close_button_width()
 
 		self.adjustSize()
-		self.setFixedSize(self.width(), self.height())
+		self.setFixedWidth(self.width())
+		self.setFixedHeight(self.height())
 
 	def search_cmd(self):
 		# нет изображения: просто закрываем окно
