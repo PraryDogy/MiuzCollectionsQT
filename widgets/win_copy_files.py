@@ -354,4 +354,4 @@ class WinCopyFiles(WinProgressbar):
 
 	def closeEvent(self, event):
 		self.stop_task()
-		super().closeEvent(event)
+		return super().closeEvent(event)
