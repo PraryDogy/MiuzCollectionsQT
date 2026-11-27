@@ -50,7 +50,7 @@ class ZipTask(URunnable):
 
 
 class MiuzGroup(LightHoverGroupBox):
-	remove_mf_clicked = pyqtSignal()
+	clicked = pyqtSignal()
 
 	def __init__(self):
 		super().__init__()
@@ -86,7 +86,7 @@ class MiuzGroup(LightHoverGroupBox):
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(event.pos()):
-			self.remove_mf_clicked.emit()
+			self.clicked.emit()
 		super().mouseReleaseEvent(event)
 
 
@@ -153,6 +153,7 @@ class FirstLoadWin(NewMfWin):
 		self.copy_task = ZipTask()
 		self.copy_task.sigs.finished.connect(fin)
 		self.hide()
+		UThreadPool.init()
 		UThreadPool.start(self.copy_task)
 
 	def after_save(self):
