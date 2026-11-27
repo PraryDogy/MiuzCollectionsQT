@@ -455,9 +455,10 @@ class UserTags(TransparentWidget):
 				self.load_st_grid.emit()
 			widget.deleteLater()
 
-		self.confirm = ConfirmWin(self.window(), Lng.remove_tag_question, "red", "yellow")
+		self.confirm = ConfirmWin(Lng.remove_tag_question, "red", "yellow")
 		self.confirm.confirm_btn.setText(Lng.remove_tag_confirm)
 		self.confirm.ok_clicked.connect(ok_clicked)
+		self.confirm.center_to_parent(self.window())
 		self.confirm.show()
 
 	def hasHeightForWidth(self):

@@ -443,6 +443,7 @@ class WinMain(UMainWindow):
 
 		self.confirm = ConfirmWin(text, "red", "yellow")
 		self.confirm.ok_clicked.connect(start_file_remover)
+		self.confirm.center_to_parent(self)
 		self.confirm.show()
 		file_remover = ProcessWorker(FilesRemover.start, (abs_paths, ))
 
@@ -760,10 +761,11 @@ class WinMain(UMainWindow):
 			self.on_mf_clicked(mf)
 			self.open_win_smb(mf)
 
-		self.confirm = ConfirmWin(self, Lng.catalog_mismatch_text, "blue", "red")
-		self.confirm.show()
+		self.confirm = ConfirmWin(Lng.catalog_mismatch_text, "blue", "red")
 		self.confirm.ok_clicked.connect(confirm_other_catalog)
 		self.confirm.cancel_clicked.connect(revert_to_old_catalog)
+		self.confirm.center_to_parent(self)
+		self.confirm.show()
 
 	def start_scaner_task(self, ms: int = 3000, force_full: bool = False):
 

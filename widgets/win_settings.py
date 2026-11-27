@@ -36,8 +36,8 @@ def restart_app():
 
 
 class CancelChangesWin(ConfirmWin):
-	def __init__(self, parent, text):
-		super().__init__(parent, text, "red", "yellow")
+	def __init__(self, text):
+		super().__init__(text, "red", "yellow")
 		self.confirm_btn.setText(Lng.do_not_save)
 		self.cancel_btn.setText(Lng.keep_editing)
 
@@ -223,8 +223,8 @@ class RebootableSettings(UGroupBox):
 			restart_app()
 
 		self.confirm = ConfirmWin(Lng.erase_data_long, "red", "yellow")
-		self.confirm.center_to_parent(self.window())
 		self.confirm.ok_clicked.connect(fin)
+		self.confirm.center_to_parent(self.window())
 		self.confirm.show()
 
 
@@ -551,8 +551,9 @@ class GeneralSettings(BaseGroupBox):
 			JsonData.write_json_data()
 			restart_app()
 
-		self.confirm = ConfirmWin(self.window(), Lng.app_will_restarted, "blue", "blue")
+		self.confirm = ConfirmWin(Lng.app_will_restarted, "blue", "blue")
 		self.confirm.ok_clicked.connect(fin)
+		self.confirm.center_to_parent(self.window())
 		self.confirm.show()
 
 
@@ -834,9 +835,10 @@ class IgnoreListWin(UMainWindow):
 		self.deleteLater()
 
 	def _ask_discard(self):
-		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
+		self.confirm = CancelChangesWin(Lng.unsaved_changes_confirm)
 		self.confirm.ok_clicked.connect(self._on_discard_confirmed)
 		self.discard_win = self.confirm  # держим ссылку, чтобы окно не удалилось
+		self.confirm.center_to_parent(self)
 		self.confirm.show()
 
 	def _on_discard_confirmed(self):
@@ -986,21 +988,24 @@ class MfSettings(BaseGroupBox):
 			restart_app()
 
 		if self.path_widget.draft_mf_path != self.mf.mf_path:
-			self.confirm = ConfirmWin(self.window(), Lng.make_sure_path, "blue", "yellow")
+			self.confirm = ConfirmWin(Lng.make_sure_path, "blue", "yellow")
 			self.confirm.svg_widget.load(str(Static.COLOR_ICONS / "red_warning.svg"))
 		else:
-			self.confirm = ConfirmWin(self.window(), Lng.app_will_restarted, "blue", "blue")
+			self.confirm = ConfirmWin(Lng.app_will_restarted, "blue", "blue")
 
 		self.confirm.ok_clicked.connect(final)
+		self.confirm.center_to_parent(self.window())
 		self.confirm.show()
 
 	def remove_mf(self, *args):	
 		if len(Mf.items) == 1:
-			self.allert = AllertWin(self.window(), Lng.at_least_one_folder_required, "blue", "yellow")
+			self.allert = AllertWin(Lng.at_least_one_folder_required, "blue", "yellow")
+			self.allert.center_to_parent(self.window())
 			self.allert.show()
 		else:
-			self.confirm = ConfirmWin(self.window(), Lng.remove_catalog_warn, "red", "yellow")
+			self.confirm = ConfirmWin(Lng.remove_catalog_warn, "red", "yellow")
 			self.confirm.ok_clicked.connect(lambda: self.start_mf_cleaner("remove_mf"))
+			self.confirm.center_to_parent(self.window())
 			self.confirm.show()
 
 	def open_repair_win(self):
@@ -1135,8 +1140,9 @@ class NewMfWin(UMainWindow):
 			self.closed.emit()
 			self.deleteLater()
 
-		self.confirm = ConfirmWin(self.window(), Lng.new_mf_confirm, "blue", "blue")
+		self.confirm = ConfirmWin(Lng.new_mf_confirm, "blue", "blue")
 		self.confirm.ok_clicked.connect(fin)
+		self.confirm.center_to_parent(self)
 		self.confirm.show()
 
 	def _try_close(self):
@@ -1147,9 +1153,10 @@ class NewMfWin(UMainWindow):
 		self.close()
 
 	def _ask_discard(self):
-		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
+		self.confirm = CancelChangesWin(Lng.unsaved_changes_confirm)
 		self.confirm.ok_clicked.connect(self._on_discard_confirmed)
 		self.discard_win = self.confirm  # держим ссылку, чтобы окно не удалилось
+		self.confirm.center_to_parent(self)
 		self.confirm.show()
 
 	def _on_discard_confirmed(self):
@@ -1333,10 +1340,11 @@ class WinSettings(UMainWindow):
 		self._show_unsaved_window(win)
 
 	def _create_unsaved_window(self) -> ConfirmWin:
-		self.confirm = CancelChangesWin(self, Lng.unsaved_changes_confirm)
+		self.confirm = CancelChangesWin(Lng.unsaved_changes_confirm)
 		return self.confirm
 
 	def _show_unsaved_window(self, win: ConfirmWin):
+		win.center_to_parent(self)
 		win.show()
 		self.discard_win = win  # держим ссылку, чтобы окно не удалилось
 

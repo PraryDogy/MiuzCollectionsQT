@@ -173,8 +173,9 @@ class FirstLoadWin(NewMfWin):
 		mf_alias = self.mf_alias_widget.validate_and_show_win()
 		mf_path = self.path_widget.validate_and_show_win()
 		if mf_alias and mf_path:
-			self.confirm = ConfirmWin(self.window(), Lng.save_text_long, "blue", "yellow")
+			self.confirm = ConfirmWin(Lng.save_text_long, "blue", "yellow")
 			self.confirm.ok_clicked.connect(lambda: save_fin(mf_alias, mf_path))
+			self.confirm.center_to_parent(self)
 			self.confirm.show()
 
 	def keyPressEvent(self, a0):
