@@ -288,10 +288,8 @@ class ServersWin(UMainWindow):
 	def __init__(self):
 		super().__init__()
 		self.set_always_on_top()
-		self.set_close_only()
-		
+		self.set_close_only()		
 		self.setWindowTitle(Lng.connections)
-		self.setFixedWidth(400)
 
 		# --- Группа "Избранное" ---
 		group = BaseGroupBox()
@@ -334,8 +332,9 @@ class ServersWin(UMainWindow):
 		self.connect_btn.clicked.connect(self.connect_cmd)
 		btn_layout.addWidget(self.connect_btn)
 
+		self.setFixedWidth(400)
 		self.adjustSize()
-		self.setFixedHeight(self.height())
+		# self.setFixedHeight(self.height())
 		self.setFocus()
 		self.init_data()
 

@@ -434,8 +434,8 @@ class WinImgSearch(UMainWindow):
 		self.set_close_button_width()
 
 		self.adjustSize()
-		self.setFixedWidth(self.width())
-		self.setFixedHeight(self.height())
+		self.setFixedWidth(350)
+		self.set_fixed_height_wraps()
 
 	def search_cmd(self):
 		# нет изображения: просто закрываем окно

@@ -241,6 +241,10 @@ class WrapLabel(TextMixin, QTextEdit):
 		self._init_text_mixin(text)
 		self.set_selectable(False)
 		self.setReadOnly(True)
+		self.setFrameShape(QFrame.Shape.NoFrame)
+		self.setContentsMargins(0, 0, 0, 0)
+		self.setViewportMargins(0, 0, 0, 0)
+		self.document().setDocumentMargin(0)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
@@ -252,14 +256,11 @@ class WrapLabel(TextMixin, QTextEdit):
 
 		self.document().contentsChanged.connect(self.updateGeometry)
 
-		# self.setStyleSheet("background: black;")
-
-
 	def _text_height(self, width: int) -> int:
 		doc = self.document().clone()
+		doc.setDocumentMargin(0)  # клон может не унаследовать настройку
 		doc.setTextWidth(width)
-		margins = self.contentsMargins()
-		return int(doc.size().height() + margins.top() + margins.bottom())
+		return math.ceil(doc.size().height())
 
 	def hasHeightForWidth(self) -> bool:
 		return True
@@ -1014,7 +1015,7 @@ class TitleWidget(TransparentWidget):
 		super().__init__()
 		self.v_lay = QVBoxLayout(self)
 		self.v_lay.setContentsMargins(0, 0, 0, 0)
-		self.v_lay.setSpacing(5)
+		self.v_lay.setSpacing(0)
 
 		self.title_widget = TitleTextWidget(title, title_svg)
 		self.v_lay.addWidget(self.title_widget)
@@ -1022,13 +1023,16 @@ class TitleWidget(TransparentWidget):
 		if sep:
 			self.sep = USep()
 			self.v_lay.addWidget(self.sep)
-		else:
-			self.v_lay.setSpacing(0)
 
 		if descr:
-			self.description_widget = TransparentLabel(descr)
+			self.description_widget = WrapLabel(self, descr)
 			self.description_widget.set_style("regular", "regular", "regular")
 			self.v_lay.addWidget(self.description_widget)
+
+		self.adjustSize()
+
+		# self.description_widget.setStyleSheet("background: black;")
+		self.setStyleSheet("background: red;")
 
 	def add_title_button(self, widget: TransparentButton):
 		self.title_widget.h_layout.addStretch()
