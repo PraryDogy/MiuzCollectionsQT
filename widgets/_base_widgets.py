@@ -810,38 +810,14 @@ class UBlackFrame(TransparentFrame):
 		super().__init__(parent)
 
 
-class UMainWinOverlay(TransparentWidget):
-	def __init__(self, parent=None):
-		"""для стилизации в qss"""
-		super().__init__(parent)
-		self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-
-
 class UMainWindow(QMainWindow):
 	win_list: list[TransparentWidget] = []
-	_focus_connected: bool = False
 
-	def __init__(self, parent: TransparentWidget = None):
+	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)
 		self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 		self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 		self.setup_window()
-		UMainWindow._connect_focus_signal()
-
-	@classmethod
-	def _connect_focus_signal(cls):
-		if UMainWindow._focus_connected:
-			return
-		app = QApplication.instance()
-		app.focusWindowChanged.connect(UMainWindow._on_focus_window_changed)
-		UMainWindow._focus_connected = True
-
-	@staticmethod
-	def _on_focus_window_changed(_window):
-		active = QApplication.activeWindow()
-		for w in list(UMainWindow.win_list):
-			if isinstance(w, UMainWindow):
-				w._apply_focus_state(active)
 
 	def setWindowTitle(self, title: str):
 		self.title_bar.set_title_text(title)
@@ -870,13 +846,7 @@ class UMainWindow(QMainWindow):
 		self.central_layout = QVBoxLayout()
 		self.central_layout.setContentsMargins(10, 5, 10, 10)
 		self.central_layout.setSpacing(10)
-
 		self.window_layout.addLayout(self.central_layout)
-
-		# Затемняющий слой поверх окна, виден когда поверх открыто другое UMainWindow
-		self.dim_overlay = UMainWinOverlay(parent=self)
-		self.dim_overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-		self.dim_overlay.hide()
 
 		self.register_window()
 
@@ -895,7 +865,7 @@ class UMainWindow(QMainWindow):
 		except ValueError:
 			pass
 
-	def center_to_parent(self, parent: TransparentWidget):
+	def center_to_parent(self, parent: QWidget):
 		try:
 			geo = self.geometry()
 			geo.moveCenter(parent.geometry().center())
@@ -913,36 +883,16 @@ class UMainWindow(QMainWindow):
 		self.unregister_window()
 		return super().closeEvent(event)
 
-	def deleteLater(self):
-		self.unregister_window()
-		return super().deleteLater()
-
 	def changeEvent(self, a0):
 		if a0.type() == QEvent.Type.ActivationChange:
 			self.title_bar.set_window_focused(self.isActiveWindow())
 		return super().changeEvent(a0)
 
-	def resizeEvent(self, a0):
-		self.dim_overlay.setGeometry(self.rect())
-		return super().resizeEvent(a0)
-
-	def _apply_focus_state(self, active_window):
-		# затемняем, только если активно другое наше UMainWindow;
-		# если активна другая программа (active_window is None), ничего не меняем
-		covered = isinstance(active_window, UMainWindow) and active_window is not self
-		self.dim_overlay.setVisible(covered)
-		if covered:
-			self.dim_overlay.raise_()
-
 	def fix_window_height(self):
-		# Ширина уже фиксирована (self.WIDTH), поэтому считаем высоту для неё
 		layout = self.centralWidget().layout()
 		layout.activate()
-		height = layout.totalHeightForWidth(self.width())
-		self.setFixedHeight(height)
-
-	def show(self):
-		return super().show()
+		width = self.width() if self.width() > 0 else self.minimumWidth()
+		self.setFixedHeight(layout.totalHeightForWidth(width))
 
 
 class AllertWin(UMainWindow):
