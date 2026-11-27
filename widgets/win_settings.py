@@ -106,7 +106,7 @@ class RebootableSettings(LightGroupBox):
 		self.eng_flag_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
 		main_layout = QVBoxLayout(self)
-		main_layout.setContentsMargins(10, 5, 5, 5)
+		main_layout.setContentsMargins(10, 2, 5, 5)
 		main_layout.setSpacing(5)
 
 		self._create_language_widget(main_layout)
@@ -925,7 +925,7 @@ class MfSettings(DarkGroupBox):
 		self.mf = mf
 
 		main_lay = QVBoxLayout(self)
-		main_lay.setContentsMargins(10, 10, 10, 10)
+		main_lay.setContentsMargins(10, 10, 10, 15)
 		main_lay.setSpacing(10)
 		self.main_lay = main_lay
 
@@ -948,8 +948,6 @@ class MfSettings(DarkGroupBox):
 			self.remove_folder = MfRemoveWidget()
 			self.remove_folder.remove_mf_clicked.connect(self.remove_mf)
 			main_lay.addWidget(self.remove_folder)
-
-		main_lay.addStretch()
 
 		# снимок исходных значений, сравниваем с ним при каждом изменении
 		self._initial = self._snapshot()
