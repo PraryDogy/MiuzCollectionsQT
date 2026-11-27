@@ -296,7 +296,11 @@ class ServersWin(UMainWindow):
 		group_lay = QVBoxLayout(group)
 		group_lay.setContentsMargins(5, 10, 5, 10)
 		group_lay.setSpacing(5)
-		title_lbl = TitleWidget(Lng.connections_list, Lng.servers_description)
+		title_lbl = TitleWidget(
+			title=Lng.connections_list,
+			descr=Lng.servers_description,
+			sep=False
+		)
 		title_lbl.set_margins(5, 0, 5, 5)
 		group_lay.addWidget(title_lbl)
 		self.central_layout.addWidget(group)
@@ -332,9 +336,8 @@ class ServersWin(UMainWindow):
 		self.connect_btn.clicked.connect(self.connect_cmd)
 		btn_layout.addWidget(self.connect_btn)
 
-		self.setFixedWidth(400)
-		self.adjustSize()
-		# self.setFixedHeight(self.height())
+		self.setFixedWidth(370)
+		self.set_fixed_height_wraps()
 		self.setFocus()
 		self.init_data()
 
