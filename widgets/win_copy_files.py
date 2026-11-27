@@ -20,24 +20,28 @@ class ReplaceWin(UMainWindow):
 	skip_pressed = pyqtSignal()
 	cancel_pressed = pyqtSignal()
 	keep_both = pyqtSignal()
-	WIDTH = 280
 
 	def __init__(self, filename: str, show_checkbox: bool):
 		super().__init__()
 
 		self.filename = filename
 		self.show_checkbox = show_checkbox
+
 		self.setWindowTitle(Lng.replace)
 		self.set_close_only()
 		self.set_always_on_top()
 		self.show_titlebar_sep()
 		self._init_ui()
+
+		self.setFixedWidth(280)
 		self.fix_window_height()
 
 	def _init_ui(self):
+		self.central_layout.setSpacing(0)
+
 		icon = QSvgWidget(str(Static.COLOR_ICONS / "yellow_warning.svg"))
 		icon.setFixedSize(65, 65)
-		self.central_layout.addWidget(icon)
+		self.central_layout.addWidget(icon, alignment=Qt.AlignmentFlag.AlignCenter)
 
 		message = TransparentLabel(Lng.file_exists)
 		message.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -64,9 +68,13 @@ class ReplaceWin(UMainWindow):
 		self.keep_both_button.clicked.connect(self._keep_both)
 		self.actions_layout.addWidget(self.keep_both_button)
 
+		self.central_layout.addSpacing(5)
+
 		self.skip_button = UPushButton(Lng.skip)
 		self.skip_button.clicked.connect(self._skip)
 		self.central_layout.addWidget(self.skip_button)
+
+		self.central_layout.addSpacing(5)
 
 		self.cancel_button = UPushButton(Lng.cancel)
 		self.cancel_button.clicked.connect(self._cancel)
@@ -77,6 +85,8 @@ class ReplaceWin(UMainWindow):
 		self.replace_all_checkbox.setChecked(False)
 
 		if self.show_checkbox:
+			self.central_layout.addSpacing(5)
+
 			self.central_layout.addWidget(
 				self.replace_all_checkbox,
 				alignment=Qt.AlignmentFlag.AlignCenter
