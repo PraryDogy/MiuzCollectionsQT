@@ -362,11 +362,7 @@ class WinCopyFiles(UMainWindow):
 		self.close_replace_window()
 
 		# Алерт без родителя-окна: иначе он удалится вместе с этим окном
-		self.allert = AllertWin(
-			f"{Lng.copy_error}\n{traceback_text}",
-			"blue",
-			"yellow",
-		)
+		self.allert = AllertWin(f"{Lng.copy_error}\n{traceback_text}", "blue", "yellow",)
 		self.allert.center_to_parent(self)
 		self.allert.show()
 

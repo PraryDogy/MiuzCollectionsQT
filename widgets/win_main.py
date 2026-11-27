@@ -231,7 +231,8 @@ class WinMain(UMainWindow):
 		"""Стоп-лист изменился в любую сторону: сканер пересчитает папки и миниатюры."""
 		self.stop_list_changed = True
 		self.restart_scaner_task()
-		self.allert = AllertWin(self, Lng.wait_for_scan, "blue", "blue")
+		self.allert = AllertWin(Lng.wait_for_scan, "blue", "blue")
+		self.allert.center_to_parent(self)
 		self.allert.show()
 
 	def set_no_img_search(self):
@@ -275,9 +276,10 @@ class WinMain(UMainWindow):
 		self.bar_bottom.bar_path.update_path(abs_path)
 
 	def on_hide_digits_clicked(self):
-		self.allert = AllertWin(self, Lng.hide_digits_full, "blue", "blue")
-		self.allert.show()
+		self.allert = AllertWin(Lng.hide_digits_full, "blue", "blue")
 		self.allert.ok_clicked.connect(self.allert.deleteLater)
+		self.allert.center_to_parent(self)
+		self.allert.show()
 
 	def open_filters_win(self):
 		self.filters_win = WinFilters()
@@ -488,7 +490,8 @@ class WinMain(UMainWindow):
 
 	def on_repair_done(self, clean_type: str):
 		self.close_all_windows_except_main()
-		self.allert = AllertWin(self, Lng.reindex_warning, "blue", "blue")
+		self.allert = AllertWin(Lng.reindex_warning, "blue", "blue")
+		self.allert.center_to_parent(self)
 		self.allert.show()
 
 		# full_repair очищает миниатюры, но папки остаются: без полного прохода

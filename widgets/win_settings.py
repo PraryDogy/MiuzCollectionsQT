@@ -973,8 +973,9 @@ class MfSettings(BaseGroupBox):
 
 	def save_changes(self):
 		if not self.path_widget.validate_and_show_win():
-			self.allert = AllertWin(self.window(), Lng.select_catalog_path, "blue", "yellow")
+			self.allert = AllertWin(Lng.select_catalog_path, "blue", "yellow")
 			self.allert.ok_clicked.connect(self.allert.deleteLater)
+			self.allert.center_to_parent(self.window())
 			self.allert.show()
 			return
 
@@ -1019,7 +1020,8 @@ class MfSettings(BaseGroupBox):
 
 		def on_finish(success: bool):
 			if not success:
-				self.allert = AllertWin(self.window(), Lng.repair_failed, "blue", "yellow")
+				self.allert = AllertWin(Lng.repair_failed, "blue", "yellow")
+				self.allert.center_to_parent(self.window())
 				self.allert.show()
 				return
 
