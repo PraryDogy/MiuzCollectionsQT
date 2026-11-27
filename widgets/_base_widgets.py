@@ -805,11 +805,6 @@ class UFrame(TransparentFrame):
 		super().__init__(parent)
 
 
-class UBlackFrame(TransparentFrame):
-	def __init__(self, parent=None):
-		super().__init__(parent)
-
-
 class UMainWindow(QMainWindow):
 	win_list: list[TransparentWidget] = []
 
