@@ -34,7 +34,7 @@ class ReplaceWin(UMainWindow):
 		self._init_ui()
 
 		self.setFixedWidth(280)
-		self.fix_window_height()
+		self.fix_wrap_labels_win()
 
 	def _init_ui(self):
 		self.central_layout.setSpacing(0)

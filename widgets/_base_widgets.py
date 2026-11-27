@@ -880,17 +880,20 @@ class UMainWindow(QMainWindow):
 			self.title_bar.set_window_focused(self.isActiveWindow())
 		return super().changeEvent(a0)
 
-	def fix_window_height(self):
+	def fix_wrap_labels_win(self):
+
+		wrap_labels = self.findChildren(WrapLabel)
+		if not wrap_labels:
+			raise Exception ("UMainWindow нет WrapLabels, фиксируй высоту обычным способом")
+
 		layout = self.centralWidget().layout()
 		layout.activate()
 		width = self.width() if self.width() > 0 else self.minimumWidth()
 		self.setFixedHeight(layout.totalHeightForWidth(width))
 
-		if self.height() < 2:
-			raise Exception ("UMainWindow fit win heigh высота меньше 2")
-
-		print(self.width(), self.height())
-
+	def change_top_margin(self, value: int):
+		m = self.central_layout.contentsMargins()
+		self.setContentsMargins(m.left(), value, m.right(), m.bottom())
 
 
 class AllertWin(UMainWindow):
@@ -931,7 +934,7 @@ class AllertWin(UMainWindow):
 		self._setup_icon(str(Static.COLOR_ICONS / self.ICONS[icon]))
 		self._setup_text(text)
 		self._add_buttons()
-		self.fix_window_height()
+		self.fix_wrap_labels_win()
 
 	def _setup_icon(self, icon_path: str):
 		self.svg_widget = QSvgWidget(icon_path)

@@ -25,7 +25,11 @@ class AboutWin(UMainWindow):
 		self.set_always_on_top()
 		self.set_close_only()
 		self.setWindowTitle(Lng.show_about)
-		self.setFixedWidth(250)
+		self.setFixedWidth(270)
+		self.central_layout.setSpacing(0)
+
+		self.show_titlebar_sep()
+		self.change_top_margin(0)
 
 		icon = TransparentLabel("")
 		icon.set_style("gray", "regular", "regular")
@@ -39,11 +43,14 @@ class AboutWin(UMainWindow):
 		lbl.set_selectable(True)
 		self.central_layout.addWidget(lbl)
 
+		self.central_layout.addSpacing(5)
+
 		close_btn = UPushButton(Lng.close)
 		self.central_layout.addWidget(close_btn)
 		close_btn.clicked.connect(self.deleteLater)
 
-		self.fix_window_height()
+		self.adjustSize()
+		self.setFixedHeight(self.height())
 
 	def keyPressEvent(self, a0: QKeyEvent | None) -> None:
 		"""Закрывает окно по Escape или Enter."""

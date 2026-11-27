@@ -54,7 +54,6 @@ class InputTextWin(UMainWindow):
 		self.setWindowTitle(title)
 		self.show_titlebar_sep()
 		self.central_layout.setSpacing(5)
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
 
 		text = " " + description
 		self.description_label = WrapLabel(self, text)
