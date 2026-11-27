@@ -74,6 +74,7 @@ class MiuzGroup(HoverGroupBox):
 			Static.COLOR_ICONS / "miuz.svg",
 			sep=False
 		)
+		title_widget.v_lay.setSpacing(5)
 		content_lay.addWidget(title_widget)
 
 		# правая часть: кнопка запуска, по центру по вертикали
@@ -91,20 +92,13 @@ class MiuzGroup(HoverGroupBox):
 
 
 class FirstLoadWin(NewMfWin):
-
-	LNG_INDEX = 0
-
 	def __init__(self, mf_path = None):
 		super().__init__(mf_path)
-
-		print(FirstLoadWin.LNG_INDEX)
-
-		Lng.init_lang(FirstLoadWin.LNG_INDEX)
 		
 		self.rus_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
 		self.eng_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
-		if FirstLoadWin.LNG_INDEX == 0:
+		if Lng.CURRENT_LNG_INDEX == 0:
 			icon = self.rus_icon
 		else:
 			icon = self.eng_icon
@@ -152,7 +146,8 @@ class FirstLoadWin(NewMfWin):
 		self.set_fixed_height_wraps()
 
 	def change_lang_cmd(self, index: int):
-		FirstLoadWin.LNG_INDEX == index
+		JsonData.lng_index = index
+		JsonData.write_json_data()
 		restart_app()
 
 	def copy_zip_cmd(self):
