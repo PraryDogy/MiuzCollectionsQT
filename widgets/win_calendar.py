@@ -8,8 +8,8 @@ from cfg import JsonData, Static
 from system.items import ReadableDateItem
 from system.lang import Lng
 
-from ._base_widgets import (ActiveButton, SvgBg, TitleWidget, TransparentLabel, TransparentWidget, UGroupBox,
-                            UMainWindow, UMenu, UPushButton, USep, BaseGroupBox)
+from ._base_widgets import (ActiveButton, SvgBg, TitleWidget, TransparentLabel, TransparentWidget, LightGroupBox,
+                            UMainWindow, UMenu, UPushButton, USep, DarkGroupBox)
 
 
 class CalendarSvgNavi(TransparentWidget):
@@ -126,7 +126,7 @@ class WinCalendar(UMainWindow):
 		self.set_close_only()
 		self.set_always_on_top()
 
-		calendar_wrapper = BaseGroupBox()
+		calendar_wrapper = DarkGroupBox()
 		self.central_layout.addWidget(calendar_wrapper)
 		self.wrapper_layout = QVBoxLayout(calendar_wrapper)
 		self.wrapper_layout.setContentsMargins(5, 10, 5, 0)

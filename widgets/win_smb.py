@@ -7,7 +7,7 @@ from system.items import Mf, RootProbe, Servers
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, MfPathWidget, QVBoxLayout,
-                            TitleTextWidget, TransparentWidget, UGroupBox,
+                            TitleTextWidget, TransparentWidget, LightGroupBox,
                             UMainWindow, UPushButton)
 from .win_servers import ServersWin
 
@@ -27,7 +27,7 @@ class WinSmb(UMainWindow):
 		self.set_always_on_top()
 		self.setWindowTitle(Lng.attention)
 
-		main_wrapper = UGroupBox()
+		main_wrapper = LightGroupBox()
 		self.central_layout.addWidget(main_wrapper)
 		wrapper_lay = QVBoxLayout(main_wrapper)
 		wrapper_lay.setContentsMargins(5, 10, 5, 10)

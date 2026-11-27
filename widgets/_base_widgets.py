@@ -51,11 +51,11 @@ class TransparentScrollArea(QScrollArea):
 	pass
 
 
-class UGroupBox(QGroupBox):
+class LightGroupBox(QGroupBox):
 	pass
 
 
-class BaseGroupBox(QGroupBox):
+class DarkGroupBox(QGroupBox):
 	pass
 
 
@@ -283,7 +283,7 @@ class WrapLabel(TextMixin, QTextEdit):
 		self.updateGeometry()
 
 
-class HoverGroupBox(UGroupBox):
+class LightHoverGroupBox(LightGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
 		self.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
@@ -1183,7 +1183,7 @@ class SaveRowArrowWidget(RowArrowWidget):
 		self.set_left_icon(Static.GRAY_ICONS / "diskette.svg")
 
 
-class MfAliasWidget(UGroupBox):
+class MfAliasWidget(LightGroupBox):
 	changed = pyqtSignal()
 	auto_name_clicked = pyqtSignal()
 
@@ -1506,7 +1506,7 @@ class ChoosePathWidget(TransparentFrame):
 		self.set_state("ok")
 
 
-class MfPathWidget(HoverGroupBox):
+class MfPathWidget(LightHoverGroupBox):
 	changed = pyqtSignal()
 	user_busy = pyqtSignal(bool)   # True — открыт диалог выбора папки
 

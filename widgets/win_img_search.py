@@ -17,8 +17,8 @@ from system.runnable import BlurImgBgTask, ImageSearcher, UThreadPool
 
 from ._base_widgets import (ActiveButton, TitleWidget,
                             TransparentFrame, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
-                            UPushButton, USlider, BaseGroupBox)
+                            TransparentWidget, LightGroupBox, UMainWindow, UMenu,
+                            UPushButton, USlider, DarkGroupBox)
 
 DROP_WIDGET_SIZE = (350, 300)
 
@@ -369,7 +369,7 @@ class WinImgSearch(UMainWindow):
 		self.read_img_timer.timeout.connect(self.poll_read_img)
 
 		# --- Основной контент внутри UGroupBox ---
-		self.content_box = BaseGroupBox()
+		self.content_box = DarkGroupBox()
 		self.central_layout.addWidget(self.content_box)
 		self.content_layout = QVBoxLayout(self.content_box)
 		self.content_layout.setContentsMargins(5, 5, 5, 5)

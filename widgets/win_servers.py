@@ -13,9 +13,9 @@ from system.items import Servers
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, ConfirmWin, TitleWidget,
-                            TransparentLabel, TransparentWidget, UGroupBox,
+                            TransparentLabel, TransparentWidget, LightGroupBox,
                             ULineEdit, UListWidget, UListWidgetItem,
-                            UMainWindow, UMenu, UPushButton, BaseGroupBox)
+                            UMainWindow, UMenu, UPushButton, DarkGroupBox)
 
 
 class EmptyOverlay(TransparentLabel):
@@ -196,7 +196,7 @@ class LoginWin(UMainWindow):
 		self.setWindowTitle(f"{title_word}")
 
 		# --- GroupBox для формы ---
-		group = BaseGroupBox()
+		group = DarkGroupBox()
 		self.central_layout.addWidget(group)
 		
 		form_lay = QVBoxLayout(group)
@@ -293,7 +293,7 @@ class ServersWin(UMainWindow):
 		self.setWindowTitle(Lng.connections)
 
 		# --- Группа "Избранное" ---
-		group = BaseGroupBox()
+		group = DarkGroupBox()
 		group_lay = QVBoxLayout(group)
 		group_lay.setContentsMargins(5, 10, 5, 10)
 		group_lay.setSpacing(5)

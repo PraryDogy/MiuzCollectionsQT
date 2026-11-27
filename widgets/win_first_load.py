@@ -14,7 +14,7 @@ from system.items import Mf
 from system.lang import Lng
 from system.runnable import URunnable, UThreadPool
 
-from ._base_widgets import (ConfirmWin, HoverGroupBox, TitleWidget,
+from ._base_widgets import (ConfirmWin, LightHoverGroupBox, TitleWidget,
                             TransparentWidget, UMenu, UPushButton, TransparentLabel)
 from .win_settings import NewMfWin
 
@@ -49,7 +49,7 @@ class ZipTask(URunnable):
 		self.sigs.finished.emit()
 
 
-class MiuzGroup(HoverGroupBox):
+class MiuzGroup(LightHoverGroupBox):
 	remove_mf_clicked = pyqtSignal()
 
 	def __init__(self):

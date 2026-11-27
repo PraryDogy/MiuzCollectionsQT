@@ -105,20 +105,20 @@ UBlackFrame {
     color: #c9d1da;
 }
 
-UGroupBox {
+LightGroupBox {
     background: #19232e;
     border: 1px solid #26333f;
     border-radius: 8px;
     color: #c9d1da;
 }
 
-HoverGroupBox {
+LightHoverGroupBox {
     background: #19232e;
     border: 1px solid #26333f;
     border-radius: 8px;
 }
 
-HoverGroupBox[hovered="true"] {
+LightHoverGroupBox[hovered="true"] {
     background: #1e2a37;
     border: 1px solid #3a4b5e;
 }
@@ -129,7 +129,7 @@ USep {
     color: #c9d1da;
 }
 
-BaseGroupBox {
+DarkGroupBox {
     background: #131b24;
     border: 1px solid #17202a;
     border-radius: 8px;

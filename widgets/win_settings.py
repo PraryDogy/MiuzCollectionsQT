@@ -20,13 +20,13 @@ from system.runnable import (HashDirSize, HashDirSizeItem, MfCleaner,
 from system.themes import ThemeChanger
 from system.utils import Utils
 
-from ._base_widgets import (ActiveButton, AllertWin, ConfirmWin, HoverGroupBox,
+from ._base_widgets import (ActiveButton, AllertWin, ConfirmWin, LightHoverGroupBox,
                             MfAliasWidget, MfPathWidget, RowArrowWidget,
                             TagWidget, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UListWidget,
+                            TransparentWidget, LightGroupBox, UListWidget,
                             UListWidgetItem, UMainWindow, UMenu, UPushButton,
                             UScrollVerticalArea, USep, USpinBox, UTableWidget,
-                            BaseGroupBox)
+                            DarkGroupBox)
 
 
 def restart_app():
@@ -84,13 +84,13 @@ class SaveRowWidget(TransparentWidget):
 		# self.h_lay.insertStretch(1)
 
 
-class LangTimeWidget(UGroupBox):
+class LangTimeWidget(LightGroupBox):
 	def __init__(self, title=None, parent=None):
 		super().__init__(title, parent)
 
 
 
-class RebootableSettings(UGroupBox):
+class RebootableSettings(LightGroupBox):
 	changed = pyqtSignal()
 	lang_changed = pyqtSignal()
 	SPIN_MAX = 60
@@ -310,7 +310,7 @@ class SizesWin(UMainWindow):
 		return super().keyPressEvent(a0)
 
 
-class NonRebootableSettings(UGroupBox):
+class NonRebootableSettings(LightGroupBox):
 	def __init__(self):
 		super().__init__()
 		main_layout = QVBoxLayout(self)
@@ -391,7 +391,7 @@ class ThemeBtn(TransparentWidget):
 		return super().enterEvent(event)
 
 
-class ThemesWidget(UGroupBox):
+class ThemesWidget(LightGroupBox):
 	def __init__(self):
 		super().__init__()
 		main_lay = QVBoxLayout(self)
@@ -490,7 +490,7 @@ class AboutWidLabel(TransparentLabel):
 		Utils.pyqt_copy_text(self.selectedText())
 
 
-class AboutWid(UGroupBox):
+class AboutWid(LightGroupBox):
 	def __init__(self):
 		super().__init__()
 		h_lay = QHBoxLayout(self)
@@ -512,7 +512,7 @@ class AboutWid(UGroupBox):
 		h_lay.addStretch()
 
 
-class GeneralSettings(BaseGroupBox):
+class GeneralSettings(DarkGroupBox):
 	lang_changed = pyqtSignal()
 	changed = pyqtSignal()
 
@@ -557,7 +557,7 @@ class GeneralSettings(BaseGroupBox):
 		self.confirm.show()
 
 
-class MfRepairGroup(HoverGroupBox):
+class MfRepairGroup(LightHoverGroupBox):
 	# WIDTH = 330
 	def __init__(self, title, description):
 		super().__init__()
@@ -633,7 +633,7 @@ class MfRepairWin(UMainWindow):
 
 
 
-class MfRepairWidget(HoverGroupBox):
+class MfRepairWidget(LightHoverGroupBox):
 	open_repair_win = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -673,7 +673,7 @@ class MfRepairWidget(HoverGroupBox):
 		super().mouseReleaseEvent(event)
 
 
-class MfRemoveWidget(HoverGroupBox):
+class MfRemoveWidget(LightHoverGroupBox):
 	remove_mf_clicked = pyqtSignal()
 
 	def __init__(self, title=None, parent=None):
@@ -723,7 +723,7 @@ class IgnoreListWin(UMainWindow):
 		self.has_unsaved = False
 		self.discard_win = None
 
-		self.group_box = BaseGroupBox()
+		self.group_box = DarkGroupBox()
 		self.group_lay = QVBoxLayout(self.group_box)
 		self.group_lay.setContentsMargins(10, 5, 10, 10)
 		self.group_lay.setSpacing(10)
@@ -860,7 +860,7 @@ class IgnoreListWin(UMainWindow):
 		return super().keyPressEvent(a0)
 
 
-class MfStopListWidget(HoverGroupBox):
+class MfStopListWidget(LightHoverGroupBox):
 	changed = pyqtSignal()
 
 	def __init__(self, mf: Mf):
@@ -914,7 +914,7 @@ class MfStopListWidget(HoverGroupBox):
 		self.changed.emit()
 
 
-class MfSettings(BaseGroupBox):
+class MfSettings(DarkGroupBox):
 	changed = pyqtSignal()
 	mf_removed = pyqtSignal()
 	repair_done = pyqtSignal(str)   # clean_type: "simple_repair" или "full_repair"
@@ -1053,7 +1053,7 @@ class NewMfWin(UMainWindow):
 		self.has_unsaved = False
 		self.discard_win = None
 
-		group_wrapper = BaseGroupBox()
+		group_wrapper = DarkGroupBox()
 		self.central_layout.addWidget(group_wrapper)
 		self.group_lay = QVBoxLayout(group_wrapper)
 		self.group_lay.setContentsMargins(5, 5, 5, 5)
