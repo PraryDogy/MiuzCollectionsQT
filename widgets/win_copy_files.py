@@ -22,8 +22,8 @@ class ReplaceWin(VerticalWin):
 	keep_both = pyqtSignal()
 	WIDTH = 280
 
-	def __init__(self, parent, filename: str, show_checkbox: bool):
-		super().__init__(parent)
+	def __init__(self, filename: str, show_checkbox: bool):
+		super().__init__()
 
 		self.filename = filename
 		self.show_checkbox = show_checkbox

@@ -222,7 +222,6 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         ("Копирование (песочница)", lambda: _new("widgets.win_copy_files", "WinCopyFiles",
                                                  target_dir=copy_dest, files_to_copy=copy_src)),
         ("Замена файла", lambda: _new_nonmodal("widgets.win_copy_files", "ReplaceWin",
-                                            _LAUNCHER,
                                             "sample_red_very long filename_sample_red_very_long_filename.jpg", True)),
         ("Замена файла без чекбокса", lambda: _new_nonmodal("widgets.win_copy_files", "ReplaceWin",
                                                             _LAUNCHER,
