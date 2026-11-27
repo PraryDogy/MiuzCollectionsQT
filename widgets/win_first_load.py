@@ -18,8 +18,6 @@ from ._base_widgets import (ConfirmWin, HoverGroupBox, TitleWidget,
                             TransparentWidget, UMenu, UPushButton)
 from .win_settings import NewMfWin
 
-LNG_INDEX = 0
-
 
 def restart_app():
 	os.execl(sys.executable, sys.executable, *sys.argv)
@@ -93,27 +91,37 @@ class MiuzGroup(HoverGroupBox):
 
 
 class FirstLoadWin(NewMfWin):
+
+	LNG_INDEX = 0
+
 	def __init__(self, mf_path = None):
 		super().__init__(mf_path)
-		rus_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
-		eng_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
 
-		if LNG_INDEX == 0:
-			icon = rus_icon
+		print(FirstLoadWin.LNG_INDEX)
+
+		Lng.init_lang(FirstLoadWin.LNG_INDEX)
+		
+		self.rus_icon = QIcon(str(Static.COLOR_ICONS / "rus_flag.svg"))
+		self.eng_icon = QIcon(str(Static.COLOR_ICONS / "eng_flag.svg"))
+
+		if FirstLoadWin.LNG_INDEX == 0:
+			icon = self.rus_icon
 		else:
-			icon = eng_icon
+			icon = self.eng_icon
 
-		lng_menu = UMenu()
+		self.lng_menu = UMenu()
 
-		rus = QAction(Lng.lng_menu_rus, lng_menu)
-		rus.setIcon(rus_icon)
-		rus.setIconVisibleInMenu(True)
-		lng_menu.addAction(rus)
+		self.rus_action = QAction(Lng.lng_menu_rus, self.lng_menu)
+		self.rus_action.setIcon(self.rus_icon)
+		self.rus_action.setIconVisibleInMenu(True)
+		self.rus_action.triggered.connect(lambda e: self.change_lang_cmd(0))
+		self.lng_menu.addAction(self.rus_action)
 
-		eng = QAction(Lng.lng_menu_eng, lng_menu)
-		eng.setIcon(eng_icon)
-		eng.setIconVisibleInMenu(True)
-		lng_menu.addAction(eng)
+		self.eng_action = QAction(Lng.lng_menu_eng, self.lng_menu)
+		self.eng_action.setIcon(self.eng_icon)
+		self.eng_action.setIconVisibleInMenu(True)
+		self.eng_action.triggered.connect(lambda e: self.change_lang_cmd(1))
+		self.lng_menu.addAction(self.eng_action)
 
 		lng_wrapper = TransparentWidget()
 		lng_layout = QHBoxLayout(lng_wrapper)
@@ -122,16 +130,16 @@ class FirstLoadWin(NewMfWin):
 
 		lng_layout.addStretch()
 
-		lng_button = UPushButton("")
-		lng_button.setMenu(lng_menu)
-		lng_button.setIcon(icon)
-		lng_button.setIconSize(QSize(18, 18))
-		lng_button.adjustSize()
-		lng_button.setFixedWidth(lng_button.width() + 10)
-		lng_layout.addWidget(lng_button)
+		self.lng_button = UPushButton("")
+		self.lng_button.setMenu(self.lng_menu)
+		self.lng_button.setIcon(icon)
+		self.lng_button.setIconSize(QSize(18, 18))
+		self.lng_button.adjustSize()
+		self.lng_button.setFixedWidth(self.lng_button.width() + 10)
+		lng_layout.addWidget(self.lng_button)
 
 		self.title_bar.set_custom_widget(lng_wrapper)
-		self.set_titlebar_height(lng_button.height() + 8)
+		self.set_titlebar_height(self.lng_button.height() + 8)
 
 		if os.path.exists(Static.MIUZ_ZIP):
 			idx = self.group_lay.indexOf(self.mf_path_widget) + 1
@@ -142,6 +150,10 @@ class FirstLoadWin(NewMfWin):
 
 		self.setFixedWidth(500)
 		self.set_fixed_height_wraps()
+
+	def change_lang_cmd(self, index: int):
+		FirstLoadWin.LNG_INDEX == index
+		restart_app()
 
 	def copy_zip_cmd(self):
 
@@ -166,7 +178,7 @@ class FirstLoadWin(NewMfWin):
 			Mf.items.clear()
 			Mf.items.append(mf)
 			Mf.write_json_data()
-			JsonData.lng_index = LNG_INDEX
+			JsonData.lng_index = FirstLoadWin.LNG_INDEX
 			JsonData.write_json_data()
 			restart_app()
 
