@@ -136,6 +136,7 @@ class FirstLoadWin(NewMfWin):
 
 		self.setFixedWidth(500)
 		self.set_fixed_height_wraps()
+		self.setFixedHeight(self.height() + 5) # поправка на кнопку языка в заголовке
 
 	def change_lang_cmd(self, index: int):
 		JsonData.lng_index = index
