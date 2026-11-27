@@ -138,9 +138,10 @@ class FirstLoadWin(NewMfWin):
 
 			self.miuz_wid = MiuzGroup()
 			self.miuz_wid.clicked.connect(self.copy_zip_cmd)
-			self.group_lay.insertWidget(idx, self.miuz_wid)
+			# self.group_lay.insertWidget(idx, self.miuz_wid)
 
-			self.setFixedHeight(self.height() + 80)
+		self.setFixedWidth(500)
+		self.set_fixed_height_wraps()
 
 	def copy_zip_cmd(self):
 

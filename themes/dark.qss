@@ -917,3 +917,12 @@ UTextEdit {
     color: #c9d1da;
     padding: 5px 2px 5px 2px;
 }
+
+
+MfAliasWidget ULineEdit {
+    background: #212e3b;
+}
+
+MfAliasWidget UPushButton {
+    background: #212e3b;
+}

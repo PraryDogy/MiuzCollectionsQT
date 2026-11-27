@@ -1207,6 +1207,7 @@ class MfAliasWidget(UGroupBox):
 			sep=True
 		)
 		title.v_lay.setSpacing(5)
+		title.set_margins(5, 0, 5, 0)
 		v_layout.addWidget(title)
 
 
@@ -1227,7 +1228,7 @@ class MfAliasWidget(UGroupBox):
 
 		checker_wrapper = TransparentWidget()
 		checker_lay = QHBoxLayout(checker_wrapper)
-		checker_lay.setContentsMargins(0, 0, 0, 0)
+		checker_lay.setContentsMargins(5, 0, 5, 0)
 		checker_lay.setSpacing(5)
 
 		self.checker_svg = QSvgWidget()
@@ -1532,13 +1533,13 @@ class MfPathWidget(HoverGroupBox):
 		)
 		content_lay.addWidget(self.title_widget)
 
-		sep_wrapper =  TransparentWidget()
-		sep_wrapper.setFixedHeight(3)
-		content_lay.addWidget(sep_wrapper)
-		sep_lay = QVBoxLayout(sep_wrapper)
-		sep_lay.setContentsMargins(0, 0, 50, 0)
-		sep_lay.setSpacing(0)
-		sep_lay.addWidget(USep())
+		# sep_wrapper =  TransparentWidget()
+		# sep_wrapper.setFixedHeight(3)
+		# content_lay.addWidget(sep_wrapper)
+		# sep_lay = QVBoxLayout(sep_wrapper)
+		# sep_lay.setContentsMargins(0, 0, 50, 0)
+		# sep_lay.setSpacing(0)
+		# sep_lay.addWidget(USep())
 
 		status_wrap = TransparentWidget()
 		content_lay.addWidget(status_wrap)
