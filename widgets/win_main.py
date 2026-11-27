@@ -377,7 +377,7 @@ class WinMain(UMainWindow):
 	@with_conn
 	def paste_files(self, files_to_copy: list[str], dest: str):
 		self.win_copy_files = WinCopyFiles(files_to_copy, dest)
-		self.win_copy_files.cancel_clicked.connect(self.win_copy_files.deleteLater)
+		self.win_copy_files.cancel_clicked.connect(lambda: self.win_copy_files.deleteLater())
 		self.win_copy_files.copy_files_finished.connect(lambda *_: self.start_scaner_task())
 		self.win_copy_files.center_to_parent(self)
 		self.win_copy_files.show()

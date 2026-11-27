@@ -116,21 +116,25 @@ class ReplaceWin(VerticalWin):
 
 
 class WinCopyFiles(WinProgressbar):
+	cancel_clicked = pyqtSignal()
 	copy_files_finished = pyqtSignal(list)
 	ms = 100
 
-	def __init__(self, target_dir: str, files_to_copy: list[str],):
+	def __init__(self, target_dir: str, files_to_copy: list[str]):
 		super().__init__(Lng.copying)
+		self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 		self.setFixedWidth(370)
 		self.set_close_only()
 		self.set_always_on_top()
 
+		self.owner = owner
 		self.target_dir = target_dir
 		self.files_to_copy = files_to_copy
 		self.dst_urls: list[str] = []
 
 		self.copy_item: CopyTaskItem | None = None
 		self.replace_win: ReplaceWin | None = None
+		self.allert: AllertWin | None = None
 		self.stopping = False
 
 		dst_text = os.path.basename(target_dir)
@@ -162,6 +166,9 @@ class WinCopyFiles(WinProgressbar):
 		self.copy_timer.timeout.connect(self.poll_task)
 
 		self.progressbar.setMaximum(100)
+
+		# Кнопка отмены в WinProgressbar эмитит cancel_clicked; закрываем окно
+		self.cancel_clicked.connect(self.close)
 
 		self.copy_task.start()
 		self.copy_timer.start(self.ms)
@@ -233,18 +240,10 @@ class WinCopyFiles(WinProgressbar):
 		)
 		self.replace_win.center_to_parent(self)
 
-		self.replace_win.replace_pressed.connect(
-			self.replace_file
-		)
-		self.replace_win.keep_both.connect(
-			self.keep_both_file
-		)
-		self.replace_win.skip_pressed.connect(
-			self.skip_file
-		)
-		self.replace_win.cancel_pressed.connect(
-			self.cancel_from_replace
-		)
+		self.replace_win.replace_pressed.connect(self.replace_file)
+		self.replace_win.keep_both.connect(self.keep_both_file)
+		self.replace_win.skip_pressed.connect(self.skip_file)
+		self.replace_win.cancel_pressed.connect(self.cancel_from_replace)
 
 		self.replace_win.show()
 
@@ -290,9 +289,7 @@ class WinCopyFiles(WinProgressbar):
 		if self.stopping:
 			return
 
-		self.close_replace_window()
-		self.stop_task()
-		self.cancel_clicked.emit()
+		self.close()
 
 	def close_replace_window(self):
 		if self.replace_win is None:
@@ -312,18 +309,21 @@ class WinCopyFiles(WinProgressbar):
 			return
 
 		self.close_replace_window()
-		self.allert = AllertWin(self.window(), f"{Lng.copy_error}\n{traceback_text}", "blue", "yellow")
+		# Родитель алерта - владелец, а не это окно: иначе алерт удалится вместе с ним
+		self.allert = AllertWin(
+			self,
+			f"{Lng.copy_error}\n{traceback_text}",
+			"blue",
+			"yellow",
+		)
 		self.allert.show()
-		self.stop_task()
-		self.cancel_clicked.emit()
+		self.close()
 
 	def finish_task(self):
 		if self.stopping:
 			return
 
-		self.progressbar.setValue(
-			self.progressbar.maximum()
-		)
+		self.progressbar.setValue(self.progressbar.maximum())
 
 		if self.copy_item:
 			below_text = (
@@ -336,7 +336,7 @@ class WinCopyFiles(WinProgressbar):
 
 		self.stop_task()
 		self.copy_files_finished.emit(self.dst_urls)
-		self.cancel_clicked.emit()
+		self.close()
 
 	def stop_task(self):
 		if self.stopping:
