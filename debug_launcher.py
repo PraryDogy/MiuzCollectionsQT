@@ -161,13 +161,13 @@ def _lng(key: str) -> str:
 
 def _confirm(btn: str, icon: str, text: str):
     def make():
-        return _new_nonmodal("widgets._base_widgets", "ConfirmWin", _LAUNCHER, text, btn, icon)
+        return _new_nonmodal("widgets._base_widgets", "ConfirmWin", text, btn, icon)
     return make
 
 
 def _alert(btn: str, icon: str, text: str):
     def make():
-        return _new_nonmodal("widgets._base_widgets", "AllertWin", _LAUNCHER, text, btn, icon)
+        return _new_nonmodal("widgets._base_widgets", "AllertWin", text, btn, icon)
     return make
 
 
@@ -233,11 +233,6 @@ def build_factories(root: Path, mf, items, with_main: bool, with_geo: bool):
         ("Подтверждение: длинный текст", _confirm("blue", "yellow", LONG_TEXT)),
         ("Алерт: короткий текст", _alert("blue", "yellow", "Короткий текст")),
         ("Алерт: длинный текст", _alert("blue", "yellow", LONG_TEXT)),
-
-        # прочие диалоги
-        ("Ввод текста", lambda: _new("widgets._base_widgets", "InputTextWin",
-                                     "Новый тег", "Придумайте название нового тега")),
-        ("Индикатор прогресса", lambda: _new("widgets._base_widgets", "WinProgressbar", "Выполняется")),
     ]
 
     factories.sort(key=lambda x: x[0])
