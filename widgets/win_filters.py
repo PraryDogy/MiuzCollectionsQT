@@ -88,6 +88,9 @@ class InputTextWin(UMainWindow):
 		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
 		btn_layout.addWidget(self.ok_btn)
 
+		self.setFixedWidth(300)
+		self.set_fixed_height_wraps()
+
 	def ok_clicked_cmd(self):
 		text = self.line_edit_widget.text()
 		text = text.strip().replace("\n", " ")

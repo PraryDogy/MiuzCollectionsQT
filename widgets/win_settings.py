@@ -1088,7 +1088,7 @@ class NewMfWin(UMainWindow):
 				Lng.new_catalog_descr
 			)
 
-		self.fix_wrap_labels_win()
+		self.set_fixed_height_wraps()
 
 	def autoname_cmd(self):
 		if self.mf_path_widget.draft_mf_path:

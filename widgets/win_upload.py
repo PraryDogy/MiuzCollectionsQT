@@ -41,7 +41,7 @@ class UploadWin(UMainWindow):
 		self.central_layout.addWidget(self.cancel_btn)
 
 		self.setFixedWidth(280)
-		self.fix_wrap_labels_win()
+		self.set_fixed_height_wraps()
 
 	def keyPressEvent(self, a0):
 		if a0.key() == Qt.Key.Key_Escape:

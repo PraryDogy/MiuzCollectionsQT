@@ -441,7 +441,7 @@ class WinMain(UMainWindow):
 		dirs_to_scan = dirs_to_rescan(abs_paths)
 		text = getattr(Lng, remove_confirm_key(len(abs_paths)))
 
-		self.confirm = ConfirmWin(self, text, "red", "yellow")
+		self.confirm = ConfirmWin(text, "red", "yellow")
 		self.confirm.ok_clicked.connect(start_file_remover)
 		self.confirm.show()
 		file_remover = ProcessWorker(FilesRemover.start, (abs_paths, ))

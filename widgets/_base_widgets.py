@@ -803,7 +803,7 @@ class UFrame(TransparentFrame):
 
 
 class UMainWindow(QMainWindow):
-	win_list: list[TransparentWidget] = []
+	win_list: list["UMainWindow"] = []
 
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)
@@ -850,12 +850,15 @@ class UMainWindow(QMainWindow):
 
 	def register_window(self):
 		self.win_list.append(self)
+		oid = id(self)
+		self.destroyed.connect(lambda *_: UMainWindow._drop_by_id(oid))
+
+	@classmethod
+	def _drop_by_id(cls, oid: int):
+		cls.win_list[:] = [w for w in cls.win_list if id(w) != oid]
 
 	def unregister_window(self):
-		try:
-			self.win_list.remove(self)
-		except ValueError:
-			pass
+		self._drop_by_id(id(self))
 
 	def center_to_parent(self, parent: QWidget):
 		try:
@@ -880,11 +883,10 @@ class UMainWindow(QMainWindow):
 			self.title_bar.set_window_focused(self.isActiveWindow())
 		return super().changeEvent(a0)
 
-	def fix_wrap_labels_win(self):
-
+	def set_fixed_height_wraps(self):
 		wrap_labels = self.findChildren(WrapLabel)
 		if not wrap_labels:
-			raise Exception ("UMainWindow нет WrapLabels, фиксируй высоту обычным способом")
+			raise Exception("UMainWindow нет WrapLabels, фиксируй высоту обычным способом")
 
 		layout = self.centralWidget().layout()
 		layout.activate()
@@ -934,7 +936,7 @@ class AllertWin(UMainWindow):
 		self._setup_icon(str(Static.COLOR_ICONS / self.ICONS[icon]))
 		self._setup_text(text)
 		self._add_buttons()
-		self.fix_wrap_labels_win()
+		self.set_fixed_height_wraps()
 
 	def _setup_icon(self, icon_path: str):
 		self.svg_widget = QSvgWidget(icon_path)
