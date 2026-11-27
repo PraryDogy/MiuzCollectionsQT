@@ -9,8 +9,8 @@ from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, BaseGroupBox, ConfirmWin, FlowLayout,
                             TagWidget, TitleWidget, TransparentLabel,
-                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
-                            UPushButton)
+                            TransparentWidget, UGroupBox, ULineEdit,
+                            UMainWindow, UMenu, UPushButton, WrapLabel)
 from .win_calendar import WinCalendar
 
 
