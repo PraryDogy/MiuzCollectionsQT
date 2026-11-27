@@ -454,7 +454,7 @@ class WinMain(UMainWindow):
 
 		dropped_files = filter_supported(dropped_files)
 		dest = Mf.current_mf.create_abs_path(Dynamic.current_dir)
-		self.confirm = UploadWin(self, dest)
+		self.confirm = UploadWin(dest)
 		self.confirm.ok_clicked.connect(fin)
 
 	@with_conn

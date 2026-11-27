@@ -7,17 +7,20 @@ from ._base_widgets import ActiveButton, UPushButton, UMainWindow, WrapLabel, Tr
 
 
 class UploadWin(UMainWindow):
-	WIDTH = 280
 	ok_clicked = pyqtSignal()
 
-	def __init__(self, parent, dest):
-		super().__init__(parent)
+	def __init__(self, dest):
+		super().__init__()
 		self.setWindowTitle(Lng.upload_files)
+		self.setFixedWidth(280)
+		self.show_titlebar_sep()
 		self.central_layout.setSpacing(0)
 
 		self.svg_widget = QSvgWidget(str(Static.COLOR_ICONS / "info.svg"))
-		self.svg_widget.setFixedSize(70, 70)
-		self.central_layout.addWidget(self.svg_widget)
+		self.svg_widget.setFixedSize(65, 65)
+		self.central_layout.addWidget(self.svg_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+
+		self.central_layout.addSpacing(5)
 
 		self.descr = TransparentLabel(Lng.upload_files_description)
 		self.descr.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -31,6 +34,8 @@ class UploadWin(UMainWindow):
 		self.ok_btn = ActiveButton(Lng.upload)
 		self.ok_btn.clicked.connect(self.ok_clicked.emit)
 		self.central_layout.addWidget(self.ok_btn)
+
+		self.central_layout.addSpacing(5)
 
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.deleteLater)
