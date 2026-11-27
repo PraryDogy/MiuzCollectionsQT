@@ -975,50 +975,40 @@ class AllertWin(UMainWindow):
 		self.show_titlebar_sep()
 		self.setWindowTitle(Lng.attention)
 
-		self.confirm_button_cls = self.BUTTONS[confirm_btn]
+		self.central_layout.setSpacing(0)
+		self.central_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-		self.icon_layout = self._add_section(spacing=0)
-		self.text_layout = self._add_section(spacing=5)
-		self.button_layout = self._add_section(spacing=5, align=None)
+		self.confirm_button_cls = self.BUTTONS[confirm_btn]
 
 		self._setup_icon(str(Static.COLOR_ICONS / self.ICONS[icon]))
 		self._setup_text(text)
 		self._add_buttons()
 		self.fix_window_height()
 
-	def _add_section(
-		self,
-		spacing: int,
-		align: Qt.AlignmentFlag | None = Qt.AlignmentFlag.AlignCenter,
-	) -> QVBoxLayout:
-		wrapper = TransparentWidget()
-		self.central_layout.addWidget(wrapper)
-
-		layout = QVBoxLayout(wrapper)
-		if align is not None:
-			layout.setAlignment(align)
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setSpacing(spacing)
-		return layout
-
 	def _setup_icon(self, icon_path: str):
 		self.svg_widget = QSvgWidget(icon_path)
 		self.svg_widget.setFixedSize(65, 65)
-		self.icon_layout.addWidget(self.svg_widget)
+		self.central_layout.addWidget(
+			self.svg_widget,
+			alignment=Qt.AlignmentFlag.AlignCenter,
+		)
 
 	def _setup_text(self, text: str):
 		self.description_label = WrapLabel(self, text)
 		self.description_label.set_style("gray", "regular", "regular")
 		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.text_layout.addWidget(
+
+		self.central_layout.addSpacing(5)
+		self.central_layout.addWidget(
 			self.description_label,
 			alignment=Qt.AlignmentFlag.AlignCenter,
 		)
+		self.central_layout.addSpacing(5)
 
 	def _add_buttons(self):
 		self.confirm_btn = self.confirm_button_cls(Lng.confirm)
 		self.confirm_btn.clicked.connect(self.on_confirm)
-		self.button_layout.addWidget(self.confirm_btn)
+		self.central_layout.addWidget(self.confirm_btn)
 
 	def on_confirm(self):
 		self.ok_clicked.emit()
@@ -1040,7 +1030,8 @@ class ConfirmWin(AllertWin):
 		super()._add_buttons()
 		self.cancel_btn = UPushButton(Lng.cancel)
 		self.cancel_btn.clicked.connect(self.on_cancel)
-		self.button_layout.addWidget(self.cancel_btn)
+		self.central_layout.addSpacing(5)
+		self.central_layout.addWidget(self.cancel_btn)
 
 
 class _TitleTextLabel(TransparentLabel):
