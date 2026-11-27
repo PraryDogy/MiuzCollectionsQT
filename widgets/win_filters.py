@@ -8,9 +8,9 @@ from system.items import Filters, ReadableDateItem
 from system.lang import Lng
 
 from ._base_widgets import (ActiveButton, BaseGroupBox, ConfirmWin, FlowLayout,
-                            InputTextWin, TagWidget, TitleWidget,
-                            TransparentLabel, TransparentWidget, UGroupBox,
-                            UMainWindow, UMenu, UPushButton)
+                            TagWidget, TitleWidget, TransparentLabel,
+                            TransparentWidget, UGroupBox, UMainWindow, UMenu,
+                            UPushButton)
 from .win_calendar import WinCalendar
 
 
@@ -42,6 +42,65 @@ class PendingDatesState:
 	def reset(self):
 		self.start = None
 		self.end = None
+
+
+class InputTextWin(UMainWindow):
+	ok_clicked = pyqtSignal(str)
+
+	def __init__(self, title: str, description: str):
+		super().__init__()
+		self.set_always_on_top()
+		self.set_close_only()
+		self.setWindowTitle(title)
+		self.show_titlebar_sep()
+		self.central_layout.setSpacing(5)
+		self.central_layout.setContentsMargins(10, 5, 10, 10)
+
+		text = " " + description
+		self.description_label = WrapLabel(self, text)
+		self.description_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+		self.description_label.set_style("gray", "regular", "regular")
+		self.central_layout.addWidget(self.description_label)
+
+		self.line_edit_widget = ULineEdit()
+		self.line_edit_widget.setPlaceholderText(Lng.input_text)
+		self.central_layout.addWidget(self.line_edit_widget)
+
+		self.central_layout.addSpacing(5)
+
+		btn_widget = TransparentWidget()
+		self.central_layout.addWidget(btn_widget)
+
+		btn_layout = QHBoxLayout(btn_widget)
+		btn_layout.setContentsMargins(0, 0, 0, 0)
+		btn_layout.setSpacing(5)
+
+		reset_btn = UPushButton(Lng.reset)
+		reset_btn.clicked.connect(self.line_edit_widget.clear)
+		btn_layout.addWidget(reset_btn)
+
+		btn_layout.addStretch()
+
+		self.cancel_btn = UPushButton(Lng.close)
+		self.cancel_btn.clicked.connect(self.deleteLater)
+		btn_layout.addWidget(self.cancel_btn)
+
+		self.ok_btn = ActiveButton(Lng.apply)
+		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
+		btn_layout.addWidget(self.ok_btn)
+
+	def ok_clicked_cmd(self):
+		text = self.line_edit_widget.text()
+		text = text.strip().replace("\n", " ")
+		self.ok_clicked.emit(text)
+		self.deleteLater()
+
+	def keyPressEvent(self, a0):
+		if a0.key() == Qt.Key.Key_Escape:
+			self.deleteLater()
+		elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+			self.ok_clicked_cmd()
+		return super().keyPressEvent(a0)
 
 
 class WinFiltersTitleWidget(TitleWidget):

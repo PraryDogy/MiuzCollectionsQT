@@ -3,7 +3,7 @@ from queue import Empty
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QProgressBar, QVBoxLayout
 
 from cfg import Static
 from system.items import Mf
@@ -11,8 +11,8 @@ from system.lang import Lng
 from system.multiprocess import CopyTask, CopyTaskItem, CopyTaskWorker
 
 from ._base_widgets import (ActiveButton, AllertWin, TransparentLabel,
-							TransparentWidget, UCheckBox, UPushButton,
-							VerticalWin, WinProgressbar, WrapLabel)
+                            TransparentWidget, UCheckBox, UMainWindow,
+                            UPushButton, VerticalWin, WrapLabel)
 
 
 class ReplaceWin(VerticalWin):
@@ -115,19 +115,17 @@ class ReplaceWin(VerticalWin):
 		event.accept()
 
 
-class WinCopyFiles(WinProgressbar):
+class WinCopyFiles(UMainWindow):
 	cancel_clicked = pyqtSignal()
 	copy_files_finished = pyqtSignal(list)
 	ms = 100
 
 	def __init__(self, target_dir: str, files_to_copy: list[str]):
-		super().__init__(Lng.copying)
+		super().__init__()
 		self.setFixedWidth(370)
-		self.adjustSize()
-		self.setFixedHeight(self.height())
-
 		self.set_close_only()
 		self.set_always_on_top()
+		self.show_titlebar_sep()
 
 		self.target_dir = target_dir
 		self.files_to_copy = files_to_copy
@@ -138,13 +136,15 @@ class WinCopyFiles(WinProgressbar):
 		self.allert: AllertWin | None = None
 		self.stopping = False
 
+		self._build_ui()
+
 		dst_text = os.path.basename(target_dir)
 		if not dst_text:
 			dst_text = Mf.current_mf.mf_alias
 
+		self.setWindowTitle(Lng.copying)
 		self.top_label.setText(f'{Lng.copying} {Lng.in_} \"{dst_text}\"')
 		self.bottom_label.setText(Lng.preparing)
-
 
 		self.copy_item = CopyTaskItem(
 			dst_dir=target_dir,
@@ -167,10 +167,56 @@ class WinCopyFiles(WinProgressbar):
 		self.copy_timer.setSingleShot(True)
 		self.copy_timer.timeout.connect(self.poll_task)
 
-		self.progressbar.setMaximum(100)
-
 		self.copy_task.start()
 		self.copy_timer.start(self.ms)
+
+		# Высота по содержимому, как раньше
+		self.adjustSize()
+		self.setFixedHeight(self.height())
+
+	def _build_ui(self):
+		self.central_layout.setSpacing(0)
+
+		h_wid = TransparentWidget()
+		self.central_layout.addWidget(h_wid)
+		h_lay = QHBoxLayout(h_wid)
+		h_lay.setContentsMargins(0, 0, 0, 0)
+		h_lay.setSpacing(10)
+
+		left_side_icon = QSvgWidget(str(Static.COLOR_ICONS / "copy_files.svg"))
+		left_side_icon.setFixedSize(40, 40)
+		h_lay.addWidget(left_side_icon)
+
+		right_side_wid = TransparentWidget()
+		right_side_lay = QVBoxLayout(right_side_wid)
+		right_side_lay.setContentsMargins(0, 0, 0, 0)
+		right_side_lay.setSpacing(2)
+		h_lay.addWidget(right_side_wid)
+
+		self.top_label = TransparentLabel("top label")
+		right_side_lay.addWidget(self.top_label)
+
+		progressbar_row = TransparentWidget()
+		right_side_lay.addWidget(progressbar_row)
+		progressbar_lay = QHBoxLayout(progressbar_row)
+		progressbar_lay.setContentsMargins(0, 0, 0, 0)
+		progressbar_lay.setSpacing(10)
+		progressbar_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+		self.progressbar = QProgressBar()
+		self.progressbar.setTextVisible(False)
+		self.progressbar.setFixedHeight(6)
+		self.progressbar.setMaximum(100)
+		progressbar_lay.addWidget(self.progressbar)
+
+		self.cancel_btn = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid.svg"))
+		self.cancel_btn.setFixedSize(13, 13)
+		self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+		self.cancel_btn.mouseReleaseEvent = lambda e: self.close()
+		progressbar_lay.addWidget(self.cancel_btn)
+
+		self.bottom_label = TransparentLabel("bottom label")
+		right_side_lay.addWidget(self.bottom_label)
 
 	def poll_task(self):
 		if self.stopping:
@@ -233,7 +279,6 @@ class WinCopyFiles(WinProgressbar):
 			)
 
 		self.replace_win = ReplaceWin(
-			self,
 			filename,
 			len(copy_item.src_urls) > 1,
 		)
@@ -312,7 +357,6 @@ class WinCopyFiles(WinProgressbar):
 
 		# Алерт без родителя-окна: иначе он удалится вместе с этим окном
 		self.allert = AllertWin(
-			None,
 			f"{Lng.copy_error}\n{traceback_text}",
 			"blue",
 			"yellow",

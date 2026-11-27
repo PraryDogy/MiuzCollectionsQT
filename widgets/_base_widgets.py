@@ -945,6 +945,111 @@ class UMainWindow(QMainWindow):
 		return super().show()
 
 
+class VerticalWin:
+	pass
+
+class WinProgressbar:
+	pass
+
+
+class AllertWin(UMainWindow):
+	WIDTH = 250
+	BUTTONS: dict[str, type[UPushButton]] = {
+		"red": RedButton,
+		"blue": ActiveButton,
+		"regular": UPushButton,
+	}
+	ICONS = {
+		"red": "red_warning.svg",
+		"blue": "info.svg",
+		"yellow": "yellow_warning.svg",
+		"green": "green_checkmark.svg",
+	}
+
+	ok_clicked = pyqtSignal()
+	cancel_clicked = pyqtSignal()
+
+	def __init__(
+		self,
+		text: str,
+		confirm_btn: Literal["red", "blue", "regular"],
+		icon: Literal["red", "blue", "yellow", "green"],
+	):
+		super().__init__()
+		self.setFixedWidth(self.WIDTH)
+		self.set_always_on_top()
+		self.set_close_only()
+		self.show_titlebar_sep()
+		self.setWindowTitle(Lng.attention)
+
+		self.confirm_button_cls = self.BUTTONS[confirm_btn]
+
+		self.icon_layout = self._add_section(spacing=0)
+		self.text_layout = self._add_section(spacing=5)
+		self.button_layout = self._add_section(spacing=5, align=None)
+
+		self._setup_icon(str(Static.COLOR_ICONS / self.ICONS[icon]))
+		self._setup_text(text)
+		self._add_buttons()
+		self.fix_window_height()
+
+	def _add_section(
+		self,
+		spacing: int,
+		align: Qt.AlignmentFlag | None = Qt.AlignmentFlag.AlignCenter,
+	) -> QVBoxLayout:
+		wrapper = TransparentWidget()
+		self.central_layout.addWidget(wrapper)
+
+		layout = QVBoxLayout(wrapper)
+		if align is not None:
+			layout.setAlignment(align)
+		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setSpacing(spacing)
+		return layout
+
+	def _setup_icon(self, icon_path: str):
+		self.svg_widget = QSvgWidget(icon_path)
+		self.svg_widget.setFixedSize(65, 65)
+		self.icon_layout.addWidget(self.svg_widget)
+
+	def _setup_text(self, text: str):
+		self.description_label = WrapLabel(self, text)
+		self.description_label.set_style("gray", "regular", "regular")
+		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.text_layout.addWidget(
+			self.description_label,
+			alignment=Qt.AlignmentFlag.AlignCenter,
+		)
+
+	def _add_buttons(self):
+		self.confirm_btn = self.confirm_button_cls(Lng.confirm)
+		self.confirm_btn.clicked.connect(self.on_confirm)
+		self.button_layout.addWidget(self.confirm_btn)
+
+	def on_confirm(self):
+		self.ok_clicked.emit()
+		self.deleteLater()
+
+	def on_cancel(self):
+		self.cancel_clicked.emit()
+		self.deleteLater()
+
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key.Key_Escape:
+			self.on_cancel()
+		else:
+			super().keyPressEvent(event)
+
+
+class ConfirmWin(AllertWin):
+	def _add_buttons(self):
+		super()._add_buttons()
+		self.cancel_btn = UPushButton(Lng.cancel)
+		self.cancel_btn.clicked.connect(self.on_cancel)
+		self.button_layout.addWidget(self.cancel_btn)
+
+
 class _TitleTextLabel(TransparentLabel):
 	def __init__(self, text="", parent=None):
 		super().__init__(text, parent)
@@ -1118,241 +1223,6 @@ class RowArrowWidget(TransparentWidget):
 		if self.arrow_wid.isVisible():
 			self.setCursor(Qt.CursorShape.PointingHandCursor)
 		return super().enterEvent(event)
-
-
-
-class WinProgressbar(UMainWindow):
-
-	def __init__(self, title: str):
-		super().__init__()
-		self.setWindowTitle(title)
-		self.show_titlebar_sep()
-
-		self.central_layout.setSpacing(0)
-
-		h_wid = TransparentWidget()
-		self.central_layout.addWidget(h_wid)
-		h_lay = QHBoxLayout(h_wid)
-		h_lay.setContentsMargins(0, 0, 0, 0)
-		h_lay.setSpacing(10)
-
-		left_side_icon = QSvgWidget(str(Static.COLOR_ICONS / "copy_files.svg"))
-		left_side_icon.setFixedSize(40, 40)
-		h_lay.addWidget(left_side_icon)
-
-		right_side_wid = TransparentWidget()
-		right_side_lay = QVBoxLayout(right_side_wid)
-		right_side_lay.setContentsMargins(0, 0, 0, 0)
-		right_side_lay.setSpacing(2)
-		h_lay.addWidget(right_side_wid)
-
-		self.top_label = TransparentLabel("top label")
-		right_side_lay.addWidget(self.top_label)
-
-		progressbar_row = TransparentWidget()
-		right_side_lay.addWidget(progressbar_row)
-		progressbar_lay = QHBoxLayout(progressbar_row)
-		progressbar_lay.setContentsMargins(0, 0, 0, 0)
-		progressbar_lay.setSpacing(10)
-		progressbar_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-		self.progressbar = QProgressBar()
-		self.progressbar.setTextVisible(False)
-		self.progressbar.setFixedHeight(6)
-		self.progressbar.adjustSize()
-		progressbar_lay.addWidget(self.progressbar)
-
-		self.cancel_btn = QSvgWidget(str(Static.GRAY_ICONS / "cancel_solid.svg"))
-		self.cancel_btn.setFixedSize(13, 13)
-		self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-		self.cancel_btn.mouseReleaseEvent = lambda e: self.close()
-		progressbar_lay.addWidget(self.cancel_btn)
-
-		self.bottom_label = TransparentLabel("bottom label")
-		right_side_lay.addWidget(self.bottom_label)
-
-
-class VerticalWin(UMainWindow):
-	WIDTH = 250
-
-	def __init__(self):
-		super().__init__()
-		self.setFixedWidth(self.WIDTH)
-		self.set_always_on_top()
-		self.set_close_only()
-		self.show_titlebar_sep()
-		self.icon_layout = self.create_icon_layout()
-		self.text_layout = self.create_text_layout()
-		self.button_layout = self.create_button_layout()
-
-	def create_icon_layout(self):
-		wrapper = TransparentWidget()
-		self.central_layout.addWidget(wrapper)
-		self.icon_layout = QVBoxLayout(wrapper)
-		self.icon_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.icon_layout.setContentsMargins(0, 0, 0, 0)
-		self.icon_layout.setSpacing(0)
-		return self.icon_layout
-
-	def create_text_layout(self):
-		wrapper = TransparentWidget()
-		self.central_layout.addWidget(wrapper)
-		self.text_layout = QVBoxLayout(wrapper)
-		self.text_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.text_layout.setContentsMargins(0, 0, 0, 0)
-		self.text_layout.setSpacing(5)
-		return self.text_layout
-
-	def create_button_layout(self):
-		wrapper = TransparentWidget()
-		self.central_layout.addWidget(wrapper)
-		self.button_layout = QVBoxLayout(wrapper)
-		self.button_layout.setContentsMargins(0, 0, 0, 0)
-		self.button_layout.setSpacing(5)
-		return self.button_layout
-
-
-class _AllertWin(VerticalWin):
-	BUTTONS: dict[str, UPushButton] = {
-		"red": RedButton,
-		"blue": ActiveButton,
-		"regular": UPushButton
-	}
-	ICONS = {
-		"red": "red_warning.svg",
-		"blue": "info.svg",
-		"yellow": "yellow_warning.svg",
-		"green": "green_checkmark.svg",
-	}
-
-	ok_clicked = pyqtSignal()
-	cancel_clicked = pyqtSignal()
-
-	def __init__(
-		self,
-		text: str,
-		confirm_btn: Literal["red", "blue", "regular"],
-		icon: Literal["red", "blue", "yellow", "green"],
-	):
-		super().__init__()
-		self.confirm_button_cls = self.BUTTONS[confirm_btn]
-		self.icon_path = str(Static.COLOR_ICONS / self.ICONS[icon])
-
-		self.setWindowTitle(Lng.attention)
-		self._setup_ui(text)
-
-	def _setup_ui(self, text: str):
-		self.svg_widget = QSvgWidget(self.icon_path)
-		self.svg_widget.setFixedSize(65, 65)
-		self.icon_layout.addWidget(self.svg_widget)
-
-		self.description_label = WrapLabel(self, text)
-		self.description_label.set_style("gray", "regular", "regular")
-		self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.text_layout.addWidget(self.description_label, alignment=Qt.AlignmentFlag.AlignCenter)
-
-		self.confirm_btn: UPushButton = self.confirm_button_cls(Lng.confirm)
-		self.confirm_btn.clicked.connect(self.on_confirm)
-		self.button_layout.addWidget(self.confirm_btn)
-
-	def on_confirm(self):
-		self.ok_clicked.emit()
-		self.deleteLater()
-
-	def on_cancel(self):
-		self.cancel_clicked.emit()
-		self.deleteLater()
-
-	def keyPressEvent(self, event):
-		if event.key() == Qt.Key.Key_Escape:
-			self.on_cancel()
-		else:
-			super().keyPressEvent(event)
-
-
-class AllertWin(_AllertWin):
-	def __init__(
-		self,
-		text: str,
-		confirm_btn: Literal["red", "blue", "regular"],
-		icon: Literal["red", "blue", "yellow", "green"],
-	):
-		super().__init__(text, confirm_btn, icon)
-		self.fix_window_height()
-
-
-class ConfirmWin(_AllertWin):
-	def __init__(
-		self,
-		text: str,
-		confirm_btn: Literal["red", "blue", "regular"],
-		icon: Literal["red", "blue", "yellow", "green"],
-	):
-		super().__init__(text, confirm_btn, icon)
-		self.cancel_btn = UPushButton(Lng.cancel)
-		self.cancel_btn.clicked.connect(self.on_cancel)
-		self.button_layout.addWidget(self.cancel_btn)
-		self.fix_window_height()
-
-
-class InputTextWin(UMainWindow):
-	ok_clicked = pyqtSignal(str)
-
-	def __init__(self, title: str, description: str):
-		super().__init__()
-		self.set_always_on_top()
-		self.set_close_only()
-		self.setWindowTitle(title)
-		self.show_titlebar_sep()
-		self.central_layout.setSpacing(5)
-		self.central_layout.setContentsMargins(10, 5, 10, 10)
-
-		text = " " + description
-		self.description_label = WrapLabel(self, text)
-		self.description_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-		self.description_label.set_style("gray", "regular", "regular")
-		self.central_layout.addWidget(self.description_label)
-
-		self.line_edit_widget = ULineEdit()
-		self.line_edit_widget.setPlaceholderText(Lng.input_text)
-		self.central_layout.addWidget(self.line_edit_widget)
-
-		self.central_layout.addSpacing(5)
-
-		btn_widget = TransparentWidget()
-		self.central_layout.addWidget(btn_widget)
-
-		btn_layout = QHBoxLayout(btn_widget)
-		btn_layout.setContentsMargins(0, 0, 0, 0)
-		btn_layout.setSpacing(5)
-
-		reset_btn = UPushButton(Lng.reset)
-		reset_btn.clicked.connect(self.line_edit_widget.clear)
-		btn_layout.addWidget(reset_btn)
-
-		btn_layout.addStretch()
-
-		self.cancel_btn = UPushButton(Lng.close)
-		self.cancel_btn.clicked.connect(self.deleteLater)
-		btn_layout.addWidget(self.cancel_btn)
-
-		self.ok_btn = ActiveButton(Lng.apply)
-		self.ok_btn.clicked.connect(self.ok_clicked_cmd)
-		btn_layout.addWidget(self.ok_btn)
-
-	def ok_clicked_cmd(self):
-		text = self.line_edit_widget.text()
-		text = text.strip().replace("\n", " ")
-		self.ok_clicked.emit(text)
-		self.deleteLater()
-
-	def keyPressEvent(self, a0):
-		if a0.key() == Qt.Key.Key_Escape:
-			self.deleteLater()
-		elif a0.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-			self.ok_clicked_cmd()
-		return super().keyPressEvent(a0)
-
 
 
 class SaveRowArrowWidget(RowArrowWidget):
