@@ -311,11 +311,11 @@ class WinCopyFiles(WinProgressbar):
 		self.close_replace_window()
 		# Родитель алерта - владелец, а не это окно: иначе алерт удалится вместе с ним
 		self.allert = AllertWin(
-			self,
 			f"{Lng.copy_error}\n{traceback_text}",
 			"blue",
 			"yellow",
 		)
+		self.allert.center_to_parent(self)
 		self.allert.show()
 		self.close()
 
