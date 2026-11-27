@@ -211,10 +211,6 @@ class DatesWidget(BaseGroupBox):
 		return q_date.toString("dd.MM.yyyy")
 
 	def show_calendar_win(self, flag: str):
-		qdate = self.pending.start if flag == "start" else self.pending.end
-
-		self.calendar_win = WinCalendar(qdate)
-		self.calendar_win.center_to_parent(self.window())
 
 		def on_date_selected(date: QDate):
 			# только черновик: в Dynamic попадёт после «Применить»
@@ -235,6 +231,9 @@ class DatesWidget(BaseGroupBox):
 
 			self.handle_preset_change()
 
+		qdate = self.pending.start if flag == "start" else self.pending.end
+		self.calendar_win = WinCalendar(qdate)
+		self.calendar_win.center_to_parent(self.window())
 		self.calendar_win.date_selected.connect(on_date_selected)
 		self.calendar_win.show()
 
