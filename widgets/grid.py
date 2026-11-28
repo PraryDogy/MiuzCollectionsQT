@@ -382,11 +382,10 @@ class GridModeWidget(UPushButton):
 		self.setFixedWidth(text_width + 35 + self.iconSize().width())
 
 	def change_mode(self, square: bool):
-		if JsonData.square_thumbs == square:
-			return
 		JsonData.square_thumbs = square
 		self.setText(self.MODES[square])
 		self.load_st_grid.emit()
+		JsonData.write_json_data()
 
 
 class GridSortWidget(TransparentWidget):

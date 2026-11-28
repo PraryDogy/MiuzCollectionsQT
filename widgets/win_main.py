@@ -127,7 +127,7 @@ class WinMain(UMainWindow):
 		m = self.central_layout.contentsMargins()
 		self.central_layout.setContentsMargins(m.left(), m.top(), m.right(), 0)
 
-		self.ww = 1200 if JsonData.square_thumbs else 1160
+		self.ww = 1240 if JsonData.square_thumbs else 1160
 
 		self.forced_scaner_dirs = ForcedDirsRegistry()
 		self.go_to_url: str | None = None
