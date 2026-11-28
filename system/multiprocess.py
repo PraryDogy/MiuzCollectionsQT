@@ -433,7 +433,7 @@ class UpdateThumb:
 				Thumbs.birth.name: 0,
 				Thumbs.mod.name: mod,
 				Thumbs.root.name: root,
-				Thumbs.coll.name: "none",
+				Thumbs.name_key.name: "none",
 				Thumbs.fav.name: 0,
 				Thumbs.mf_alias.name: mf.mf_alias
 			}

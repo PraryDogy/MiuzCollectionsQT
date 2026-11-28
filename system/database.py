@@ -1,4 +1,5 @@
 import sqlalchemy
+from sqlalchemy import event
 
 from cfg import Static
 
@@ -6,7 +7,7 @@ METADATA = sqlalchemy.MetaData()
 
 HIST_BINS = (50, 60)
 HIST_BYTES = HIST_BINS[0] * HIST_BINS[1]   # 3000 байт в uint8
-DB_SCHEMA_VERSION = 3                       # 3 = гистограммы uint8 (сброс миграций)
+DB_SCHEMA_VERSION = 3.1                       # 3 = name_key у thumbs, гистограммы uint8
 
 
 _table_thumbs = sqlalchemy.Table(
@@ -34,7 +35,7 @@ class Thumbs:
 	birth = _table_thumbs.c.birth
 	mod = _table_thumbs.c.mod
 	root = _table_thumbs.c.resol
-	coll = _table_thumbs.c.coll
+	name_key = _table_thumbs.c.coll   # нормализованное имя без расширения
 	fav = _table_thumbs.c.fav
 	mf_alias = _table_thumbs.c.brand
 
@@ -105,7 +106,7 @@ class Dbase:
 	def init(cls) -> sqlalchemy.Engine:
 		Dbase.main_engine = cls.create_engine()
 		cls.ensure_schema(Dbase.main_engine)
-		cls.reset_properties_if_outdated(Dbase.main_engine)
+		cls.migrate_to_v3(Dbase.main_engine)
 		cls.toggle_wal(False)
 
 	@classmethod
@@ -121,24 +122,50 @@ class Dbase:
 				"timeout": cls._timeout,
 			},
 		)
-		return engine
 
-	@classmethod
-	def reset_properties_if_outdated(cls, engine: sqlalchemy.Engine) -> None:
-		"""Если версия схемы в БД старее текущей, полностью очищает properties и вакуумит базу."""
-		with engine.begin() as conn:
-			version = conn.execute(sqlalchemy.text("PRAGMA user_version")).scalar()
-			if version >= DB_SCHEMA_VERSION:
-				return
-			conn.execute(sqlalchemy.text("DELETE FROM properties"))
-			conn.execute(sqlalchemy.text(f"PRAGMA user_version = {DB_SCHEMA_VERSION}"))
-		# VACUUM вне транзакции: Dbase.vacuum использует AUTOCOMMIT
-		cls.vacuum()
+		@event.listens_for(engine, "connect")
+		def _set_sqlite_pragmas(dbapi_conn, _):
+			cursor = dbapi_conn.cursor()
+			cursor.execute("PRAGMA foreign_keys=ON")
+			cursor.close()
+
+		return engine
 
 	@classmethod
 	def ensure_schema(cls, engine: sqlalchemy.Engine) -> None:
 		"""Создаёт отсутствующие таблицы. Безопасно вызывать при каждом старте."""
 		METADATA.create_all(engine)
+
+	@classmethod
+	def migrate_to_v3(cls, engine: sqlalchemy.Engine) -> None:
+
+		"""При версии ниже DB_SCHEMA_VERSION очищает properties и заполняет name_key для всех thumbs."""
+		with engine.begin() as conn:
+			version = conn.execute(sqlalchemy.text("PRAGMA user_version")).scalar()
+			if version >= DB_SCHEMA_VERSION:
+				return
+
+			from .utils import Utils  # нужен для Utils.make_name_key
+			conn.execute(sqlalchemy.delete(Properties.table))
+
+			rows = conn.execute(
+				sqlalchemy.select(Thumbs.id, Thumbs.rel_img_path)
+			).all()
+
+			if rows:
+				conn.execute(
+					sqlalchemy.update(Thumbs.table)
+					.where(Thumbs.id == sqlalchemy.bindparam("b_id"))
+					.values({Thumbs.name_key.name: sqlalchemy.bindparam("b_key")}),
+					[
+						{"b_id": row_id, "b_key": Utils.make_name_key(rel_img_path)}
+						for row_id, rel_img_path in rows
+					],
+				)
+
+			conn.execute(sqlalchemy.text(f"PRAGMA user_version = {DB_SCHEMA_VERSION}"))
+		# VACUUM вне транзакции: Dbase.vacuum использует AUTOCOMMIT
+		cls.vacuum()
 
 	@classmethod
 	def toggle_wal(cls, value: bool):

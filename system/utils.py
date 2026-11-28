@@ -182,3 +182,9 @@ class Utils:
 		path = Static.JPEG_ICONS / "broken_image.jpg"
 		with Image.open(path) as img:
 			return np.array(img.convert("RGB"))
+
+	@staticmethod
+	def make_name_key(rel_img_path: str) -> str:
+		"""Имя файла без расширения: нижний регистр, только буквы и цифры."""
+		stem = os.path.splitext(os.path.basename(rel_img_path))[0]
+		return "".join(ch for ch in stem.lower() if ch.isalnum())
