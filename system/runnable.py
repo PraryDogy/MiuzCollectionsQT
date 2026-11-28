@@ -367,8 +367,18 @@ class MfCleaner(URunnable):
 		conn.execute(stmt)
 
 	def clean_thumbs_table(self, conn: sqlalchemy.Connection):
-		stmt = sqlalchemy.delete(Thumbs.table).where(Thumbs.mf_alias == self.mf.mf_alias)
-		conn.execute(stmt)
+		thumb_ids = (
+			sqlalchemy.select(Thumbs.id)
+			.where(Thumbs.mf_alias == self.mf.mf_alias)
+		)
+		conn.execute(
+			sqlalchemy.delete(Properties.table)
+			.where(Properties.thumb_id.in_(thumb_ids))
+		)
+		conn.execute(
+			sqlalchemy.delete(Thumbs.table)
+			.where(Thumbs.mf_alias == self.mf.mf_alias)
+		)
 
 	def get_rel_thumb_paths(self, conn: sqlalchemy.Connection) -> list[str]:
 		stmt = (

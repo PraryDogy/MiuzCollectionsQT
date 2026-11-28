@@ -393,7 +393,7 @@ class UpdateThumb:
 
 		import sqlalchemy
 
-		from system.database import Dbase, Thumbs
+		from system.database import Dbase, Properties, Thumbs
 		
 		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
 			from system.utils import Utils
@@ -464,12 +464,20 @@ class UpdateThumb:
 			engine = Dbase.create_engine()
 			with engine.begin() as conn:
 				if chunk_rel_img_paths:
-					stmt = (
+					thumb_ids = (
+						sqlalchemy.select(Thumbs.id)
+						.where(Thumbs.mf_alias == mf.mf_alias)
+						.where(Thumbs.rel_img_path.in_(chunk_rel_img_paths))
+					)
+					conn.execute(
+						sqlalchemy.delete(Properties.table)
+						.where(Properties.thumb_id.in_(thumb_ids))
+					)
+					conn.execute(
 						sqlalchemy.delete(Thumbs.table)
 						.where(Thumbs.mf_alias == mf.mf_alias)
 						.where(Thumbs.rel_img_path.in_(chunk_rel_img_paths))
 					)
-					conn.execute(stmt)
 				if values_list:
 					stmt = sqlalchemy.insert(Thumbs.table).values(values_list)
 					conn.execute(stmt)

@@ -11,7 +11,7 @@ import sqlalchemy
 
 from cfg import Static
 
-from .database import Dbase, Dirs, Thumbs
+from .database import Dbase, Dirs, Properties, Thumbs
 from .image_reader import ImageReader
 from .items import ImageArrayItem, Mf
 from .multiprocess import BaseProcessWorker
@@ -614,10 +614,20 @@ class MfScan:
     def _delete_thumb_records(self, chunk: list[ImgItem]) -> None:
         if chunk:
             self.changed = True
+        rel_thumb_paths = [i.rel_thumb_path for i in chunk]
         with self.engine.begin() as conn:
+            thumb_ids = (
+                sqlalchemy.select(Thumbs.id)
+                .where(Thumbs.rel_thumb_path.in_(rel_thumb_paths))
+                .where(Thumbs.mf_alias == self.mf.mf_alias)
+            )
+            conn.execute(
+                sqlalchemy.delete(Properties.table)
+                .where(Properties.thumb_id.in_(thumb_ids))
+            )
             conn.execute(
                 sqlalchemy.delete(Thumbs.table)
-                .where(Thumbs.rel_thumb_path.in_([i.rel_thumb_path for i in chunk]))
+                .where(Thumbs.rel_thumb_path.in_(rel_thumb_paths))
                 .where(Thumbs.mf_alias == self.mf.mf_alias)
             )
 
@@ -643,9 +653,19 @@ class MfScan:
 
         with self.engine.begin() as conn:
             # удаляем по тем же путям миниатюр, что и вставляем
+            rel_thumb_paths = [r[Thumbs.rel_thumb_path.name] for r in rows]
+            thumb_ids = (
+                sqlalchemy.select(Thumbs.id)
+                .where(Thumbs.rel_thumb_path.in_(rel_thumb_paths))
+                .where(Thumbs.mf_alias == self.mf.mf_alias)
+            )
+            conn.execute(
+                sqlalchemy.delete(Properties.table)
+                .where(Properties.thumb_id.in_(thumb_ids))
+            )
             conn.execute(
                 sqlalchemy.delete(Thumbs.table)
-                .where(Thumbs.rel_thumb_path.in_([r[Thumbs.rel_thumb_path.name] for r in rows]))
+                .where(Thumbs.rel_thumb_path.in_(rel_thumb_paths))
                 .where(Thumbs.mf_alias == self.mf.mf_alias)
             )
             conn.execute(sqlalchemy.insert(Thumbs.table).values(rows))
@@ -699,13 +719,22 @@ class MfScan:
                         print("root lost, stop removing thumbs", self.mf.mf_alias)
                         return
                     chunk = thumbs[i:i + BATCH_SIZE]
-                    for rel_thumb_path in chunk:
-                        _delete_thumb_file(rel_thumb_path)
+                    thumb_ids = (
+                        sqlalchemy.select(Thumbs.id)
+                        .where(Thumbs.rel_thumb_path.in_(chunk))
+                        .where(Thumbs.mf_alias == self.mf.mf_alias)
+                    )
+                    conn.execute(
+                        sqlalchemy.delete(Properties.table)
+                        .where(Properties.thumb_id.in_(thumb_ids))
+                    )
                     conn.execute(
                         sqlalchemy.delete(Thumbs.table)
                         .where(Thumbs.rel_thumb_path.in_(chunk))
                         .where(Thumbs.mf_alias == self.mf.mf_alias)
                     )
+                    for rel_thumb_path in chunk:
+                        _delete_thumb_file(rel_thumb_path)
 
     def _delete_dir_records(self, dirs: list[DirItem]) -> None:
         if not self.mf.is_root_alive():
