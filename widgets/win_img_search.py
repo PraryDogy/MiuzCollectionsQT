@@ -482,7 +482,11 @@ class WinImgSearch(UMainWindow):
 		if self.img_array is None:
 			return
 		self.stop_img_search()
-		self.img_search_task = ImageSearcher(src_img=self.img_array, similarity_value=self.controls_widget.slider_widget.current_value, mf=Mf.current_mf)
+		self.img_search_task = ImageSearcher(
+			src_img=self.img_array,
+			similarity_value=self.slider_widget.current_value,
+			mf=Mf.current_mf
+		)
 		self.img_search_task.sigs.finished_.connect(self.img_search_finished)
 		self.img_search_task.sigs.found_image.connect(self.found_image_cmd)
 		Dynamic.img_search_thumb_paths.clear()
