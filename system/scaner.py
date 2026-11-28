@@ -646,7 +646,7 @@ class MfScan:
                 Thumbs.birth.name: 0,
                 Thumbs.mod.name: img.mod,
                 Thumbs.root.name: os.path.dirname(rel_img_path),
-                Thumbs.name_key.name: "none",
+                Thumbs.name_key.name:Utils.make_name_key(rel_img_path),
                 Thumbs.fav.name: 0,
                 Thumbs.mf_alias.name: self.mf.mf_alias,
             })

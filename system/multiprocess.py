@@ -392,12 +392,10 @@ class UpdateThumb:
 	def start(mf: Mf, rel_img_paths: list[str], queue: Queue):
 
 		import sqlalchemy
-
-		from system.database import Dbase, Properties, Thumbs
+		from .utils import Utils
+		from .database import Dbase, Properties, Thumbs
 		
 		def _write_thumb(abs_img_path: str, abs_thumb_path: str):
-			from system.utils import Utils
-
 			image_item = ImageArrayItem(abs_img_path)
 			image_item.load()
 			image_item.resize(Static.THUMB_MAX_SIZE)
@@ -425,6 +423,8 @@ class UpdateThumb:
 			)
 			if None in properties:
 				return None
+
+			name_key = Utils.make_name_key(rel_img_path)
 				
 			return {
 				Thumbs.rel_img_path.name: rel_img_path,
@@ -433,7 +433,7 @@ class UpdateThumb:
 				Thumbs.birth.name: 0,
 				Thumbs.mod.name: mod,
 				Thumbs.root.name: root,
-				Thumbs.name_key.name: "none",
+				Thumbs.name_key.name: name_key,
 				Thumbs.fav.name: 0,
 				Thumbs.mf_alias.name: mf.mf_alias
 			}
